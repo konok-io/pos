@@ -1063,68 +1063,54 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
                   <div style={{textAlign:'right',display:'flex',gap:8}}>
                     <button onClick={() => {
                       const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
-                      const printContent = `
-                        <html>
-                        <head>
-                          <title>Purchase Invoice - ${viewPurchase.id}</title>
-                          <style>
-                            body { font-family: 'Bangla', sans-serif; padding: 20px; }
-                            h2 { text-align: center; color: #0F766E; }
-                            .header { margin-bottom: 20px; }
-                            .info { margin-bottom: 20px; }
-                            table { width: 100%; border-collapse: collapse; }
-                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                            th { background: #f0fdfa; }
-                            .total { background: #f0fdfa; font-weight: bold; }
-                            .footer { margin-top: 20px; text-align: center; color: #666; }
-                            @media print { button { display: none; } }
-                          </style>
-                        </head>
-                        <body>
-                          <h2>🧾 Purchase Invoice</h2>
-                          <div class="info">
-                            <p><strong>Invoice ID:</strong> ${viewPurchase.id}</p>
-                            <p><strong>Date:</strong> ${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</p>
-                            <p><strong>Supplier:</strong> ${viewPurchase.supplier}</p>
-                          </div>
-                          <table>
-                            <thead>
-                              <tr>
-                                <th>পণ্যের নাম</th>
-                                <th>কোম্পানি/ক্যাটাগরি</th>
-                                <th>পরিমাণ</th>
-                                <th>দাম</th>
-                                <th>মোট</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              ${viewPurchase.items.map(item => `
-                                <tr>
-                                  <td>${item.name}</td>
-                                  <td>${item.company} / ${item.cat || '-'}</td>
-                                  <td>${item.stock || 0} ${item.unit || 'পিস'}</td>
-                                  <td>${fmt(item.buyP || 0)}</td>
-                                  <td>${fmt((item.stock || 0) * (item.buyP || 0))}</td>
-                                </tr>
-                              `).join('')}
-                            </tbody>
-                            <tfoot>
-                              <tr class="total">
-                                <td colspan="4">সর্বমোট</td>
-                                <td>${fmt(grandTotal)}</td>
-                              </tr>
-                            </tfoot>
-                          </table>
-                          <div class="footer">
-                            <p>ধন্যবাদ!</p>
-                          </div>
-                        </body>
-                        </html>
-                      `;
-                      const printWindow = window.open('', '_blank');
-                      printWindow.document.write(printContent);
-                      printWindow.document.close();
-                      printWindow.print();
+                      let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Purchase Invoice</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { width: 80mm; }
+body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+.center { text-align:center; }
+.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
+.row { display:flex; justify-content:space-between; margin:2px 0; }
+table { width:100%; border-collapse:collapse; font-size:10px; }
+th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
+td { padding:3px 0; }
+td:nth-child(2) { text-align:center; }
+td:nth-child(3), td:nth-child(4) { text-align:right; }
+.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
+.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
+  <div>${viewPurchase.id}</div>
+  <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+  <div>Supplier: ${viewPurchase.supplier}</div>
+</div>
+<table>
+  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <tbody>`;
+                      viewPurchase.items.forEach(item => {
+                        const qty = item.stock||0;
+                        const price = item.buyP||0;
+                        html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${qty} ${item.unit||'পিস'}</td><td>৳${price.toFixed(2)}</td><td>৳${(qty*price).toFixed(2)}</td></tr>`;
+                      });
+                      html += `</tbody>
+</table>
+<div class="total row"><span>সর্বমোট:</span><span>৳${grandTotal.toFixed(2)}</span></div>
+<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+<script>window.onload=function(){window.print();}</script>
+</body>
+</html>`;
+                      const win = window.open('','','width=320,height=600');
+                      win.document.open();
+                      win.document.write(html);
+                      win.document.close();
                     }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
                     <div style={{textAlign:'right'}}>
                       <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
@@ -2387,19 +2373,18 @@ function ReportsScreen({sales, customers, purchases}) {
     <head>
       <title>পারচেজ হিস্ট্রি</title>
       <style>
-        @page { size: A4 landscape; margin: 12.7mm; }
+        @page { size: 80mm auto; margin: 0; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Arial,sans-serif; padding:12px; font-size:12px; }
-        .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
-        .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
-        .header p { color:#666; font-size:11px; }
-        table { width:100%; border-collapse:collapse; margin-bottom:12px; }
-        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
-        td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
-        tr:nth-child(even) { background:#fafafa; }
-        .total-row { background:#e0f7f0 !important; font-weight:700; }
-        .total-row td { border:1px solid #b2dfdb; font-size:12px; color:#00897b; }
-        .footer { margin-top:12px; text-align:center; color:#999; font-size:10px; }
+        html { width: 80mm; }
+        body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:10px; color:#000; background:#fff; }
+        .header { text-align:center; margin-bottom:8px; border-bottom:1px dashed #000; padding-bottom:4px; }
+        .header h1 { color:#00897b; font-size:14px; margin-bottom:2px; }
+        .header p { color:#666; font-size:9px; }
+        .purchase-item { margin-bottom:8px; border-bottom:1px dotted #ccc; padding-bottom:4px; }
+        .purchase-item:last-child { border-bottom:none; }
+        .purchase-header { display:flex; justify-content:space-between; font-size:9px; }
+        .purchase-total { text-align:right; font-weight:bold; font-size:10px; }
+        .footer { margin-top:8px; text-align:center; color:#999; font-size:8px; border-top:1px dashed #000; padding-top:4px; }
         @media print { body { padding:0; } }
       </style>
     </head>
@@ -2407,44 +2392,29 @@ function ReportsScreen({sales, customers, purchases}) {
       <div class="header">
         <h1>📦 পারচেজ হিস্ট্রি</h1>
         <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>তারিখ</th>
-            <th>পারচেজ আইডি</th>
-            <th>সরবরাহকারী</th>
-            <th style="text-align:center;">পণ্য</th>
-            <th style="text-align:right;">মোট খরচ</th>
-          </tr>
-        </thead>
-        <tbody>`;
+      </div>`;
     
     purchases.forEach(p => {
       html += `
-          <tr>
-            <td>${new Date(p.date).toLocaleDateString('bn-BD')}</td>
-            <td style="font-family:monospace;color:#00897b;font-weight:600;">${p.id}</td>
-            <td>${p.supplier}</td>
-            <td style="text-align:center;">${p.totalItems}টি</td>
-            <td style="text-align:right;font-weight:600;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-          </tr>`;
+      <div class="purchase-item">
+        <div class="purchase-header">
+          <span>${p.id}</span>
+          <span>${new Date(p.date).toLocaleDateString('bn-BD')}</span>
+        </div>
+        <div style="font-size:9px;">${p.supplier}</div>
+        <div class="purchase-total">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+      </div>`;
     });
     
     html += `
-        </tbody>
-        <tfoot>
-          <tr class="total-row">
-            <td colspan="4" style="text-align:right;">মোট পারচেজ এমাউন্ট:</td>
-            <td style="text-align:right;">৳${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-          </tr>
-        </tfoot>
-      </table>
-      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${purchases.length}টি পারচেজ</div>
+      <div class="footer">
+        <div>মোট: ৳${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>প্রিন্ট: ${new Date().toLocaleString('bn-BD')} | ${purchases.length}টি পারচেজ</div>
+      </div>
     </body>
     </html>`;
     
-    const win = window.open('', '', 'width=1000,height=600');
+    const win = window.open('', '', 'width=320,height=600');
     win.document.write(html);
     win.document.close();
     setTimeout(() => win.print(), 250);
@@ -2459,19 +2429,18 @@ function ReportsScreen({sales, customers, purchases}) {
     <head>
       <title>বিক্রয় ইতিহাস</title>
       <style>
-        @page { size: A4 landscape; margin: 12.7mm; }
+        @page { size: 80mm auto; margin: 0; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Arial,sans-serif; padding:12px; font-size:12px; }
-        .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
-        .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
-        .header p { color:#666; font-size:11px; }
-        table { width:100%; border-collapse:collapse; margin-bottom:12px; }
-        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
-        td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
-        tr:nth-child(even) { background:#fafafa; }
-        .total-row { background:#e8f5e9 !important; font-weight:700; }
-        .total-row td { border:1px solid #a5d6a7; color:#2e7d32; font-size:12px; }
-        .footer { margin-top:12px; text-align:center; color:#999; font-size:10px; }
+        html { width: 80mm; }
+        body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:10px; color:#000; background:#fff; }
+        .header { text-align:center; margin-bottom:8px; border-bottom:1px dashed #000; padding-bottom:4px; }
+        .header h1 { color:#00897b; font-size:14px; margin-bottom:2px; }
+        .header p { color:#666; font-size:9px; }
+        .sale-item { margin-bottom:8px; border-bottom:1px dotted #ccc; padding-bottom:4px; }
+        .sale-item:last-child { border-bottom:none; }
+        .sale-header { display:flex; justify-content:space-between; font-size:9px; }
+        .sale-total { text-align:right; font-weight:bold; font-size:10px; }
+        .footer { margin-top:8px; text-align:center; color:#999; font-size:8px; border-top:1px dashed #000; padding-top:4px; }
         @media print { body { padding:0; } }
       </style>
     </head>
@@ -2479,50 +2448,31 @@ function ReportsScreen({sales, customers, purchases}) {
       <div class="header">
         <h1>🧾 বিক্রয় ইতিহাস</h1>
         <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>তারিখ</th>
-            <th>বিল নং</th>
-            <th>কাস্টমার</th>
-            <th style="text-align:center;">পণ্য</th>
-            <th style="text-align:right;">মোট</th>
-            <th style="text-align:right;">পরিশোধ</th>
-            <th style="text-align:right;">বাকি</th>
-          </tr>
-        </thead>
-        <tbody>`;
+      </div>`;
     
     fs.forEach(s => {
       html += `
-          <tr>
-            <td>${new Date(s.date).toLocaleDateString('bn-BD')}</td>
-            <td style="font-family:monospace;color:#00897b;font-weight:600;">#${s.id.slice(-6).toUpperCase()}</td>
-            <td>${s.custName}</td>
-            <td style="text-align:center;">${(s.items||[]).length}টি</td>
-            <td style="text-align:right;font-weight:600;">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;color:#2e7d32;">৳${s.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;color:${s.due>0?'#c62828':'#999'};">৳${s.due.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-          </tr>`;
+      <div class="sale-item">
+        <div class="sale-header">
+          <span>#${s.id.slice(-6).toUpperCase()}</span>
+          <span>${new Date(s.date).toLocaleDateString('bn-BD')}</span>
+        </div>
+        <div style="font-size:9px;">${s.custName}</div>
+        <div class="sale-total">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+      </div>`;
     });
     
     html += `
-        </tbody>
-        <tfoot>
-          <tr class="total-row">
-            <td colspan="4" style="text-align:right;">মোট:</td>
-            <td style="text-align:right;">৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;">৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;">৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-          </tr>
-        </tfoot>
-      </table>
-      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${fs.length}টি বিক্রয়</div>
+      <div class="footer">
+        <div>মোট: ৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>পরিশোধ: ৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>বাকি: ৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+        <div>প্রিন্ট: ${new Date().toLocaleString('bn-BD')} | ${fs.length}টি বিক্রয়</div>
+      </div>
     </body>
     </html>`;
     
-    const win = window.open('', '', 'width=1000,height=600');
+    const win = window.open('', '', 'width=320,height=600');
     win.document.write(html);
     win.document.close();
     setTimeout(() => win.print(), 250);
