@@ -646,17 +646,11 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState([]);
   const [supplierQ, setSupplierQ] = useState('');
-  const [showSupplierDrop, setShowSupplierDrop] = useState(false);
-  const [newSupplierName, setNewSupplierName] = useState('');
-  const [showNewSupplier, setShowNewSupplier] = useState(false);
   const [barcodeVal, setBarcodeVal] = useState('');
   const [barcodeSuggestions, setBarcodeSuggestions] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [form, setForm] = useState({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
   const [viewPurchase, setViewPurchase] = useState(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
-  const [productNameQ, setProductNameQ] = useState('');
-  const [showProductDrop, setShowProductDrop] = useState(false);
   const [csvData, setCsvData] = useState([]);
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
@@ -990,102 +984,36 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
               {/* Supplier/Company + Category inline */}
               <div style={{display:'flex',gap:8,marginBottom:12}}>
                 {/* Supplier/Company */}
-                <div style={{flex:1,position:'relative'}}>
+                <div style={{flex:1}}>
                   <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
-                  <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
-                    onFocus={()=>setShowSupplierDrop(true)} 
-                    onMouseDown={() => { setShowSupplierDrop(true); }}
-                    placeholder="কোম্পানির নাম বা কোড লিখুন..."
+                  <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));}}
+                    placeholder="কোম্পানির নাম লিখুন..."
                     style={{...input,fontSize:13}} />
-                  {showSupplierDrop && (
-                    <div 
-                      onMouseDown={(e) => e.preventDefault()}
-                      style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                      {filteredCompanies.map((c,i)=>(
-                        <div key={i} onClick={()=>{setSupplierQ(c.name);setForm(f=>({...f,company:c.name}));setShowSupplierDrop(false);}}
-                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
-                          <span>{c.name}</span>
-                          {c.code && <span style={{fontSize:11,color:T.teal,fontWeight:600}}>{c.code}</span>}
-                        </div>
-                      ))}
-                      {filteredCompanies.length === 0 && (
-                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো কোম্পানি পাওয়া যায়নি</div>
-                      )}
-                      <div onClick={()=>{setShowNewSupplier(true);}}
-                        style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600}}>+ নতুন কোম্পানি যোগ করুন</div>
-                    </div>
-                  )}
                 </div>
               </div>
 
               {/* Category */}
               <div style={{marginBottom:12}}>
                 <label style={label}>📂 ক্যাটাগরি</label>
-                <div style={{position:'relative'}}>
-                  <input 
-                    value={form.cat} 
-                    onChange={e=>setForm(f=>({...f,cat:e.target.value}))}
-                    placeholder="ক্যাটাগরি লিখুন..."
-                    style={{...input,fontSize:13}} />
-                  {allCategories.length > 0 && (
-                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                      {allCategories.map((cat,i)=>(
-                        <div key={i} onClick={()=>setForm(f=>({...f,cat:cat}))} 
-                          onMouseDown={(e)=>{e.preventDefault();setForm(f=>({...f,cat:cat}));}}
-                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
-                          <span>{cat}</span>
-                          <span style={{fontSize:11,color:T.gray400}}>{products.filter(p=>p.cat===cat).length}টি</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <input 
+                  value={form.cat} 
+                  onChange={e=>setForm(f=>({...f,cat:e.target.value}))}
+                  placeholder="ক্যাটাগরি লিখুন..."
+                  style={{...input,fontSize:13}} />
               </div>
 
               {/* Barcode + Product Name */}
               <div style={{display:'flex',gap:8,marginBottom:12}}>
-                <div style={{flex:1,position:'relative'}}>
+                <div style={{flex:1}}>
                   <label style={label}>④ বারকোড</label>
                   <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
                     style={{...input,fontSize:13}} />
-                  {barcodeSuggestions.length > 0 && (
-                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                      {barcodeSuggestions.map(p=>(
-                        <div key={p.id} onClick={()=>selectProduct(p)}
-                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>
-                          <div style={{fontSize:13,fontWeight:600}}>{p.name}</div>
-                          <div style={{fontSize:11,color:T.gray400}}>{p.company} • {p.barcode}</div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
-                <div style={{flex:2,position:'relative'}}>
+                <div style={{flex:2}}>
                   <label style={label}>③ পণ্যের নাম *</label>
-                  <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
-                    onFocus={()=>{setShowProductDrop(true);}}
-                    onMouseDown={() => { setShowProductDrop(true); }}
+                  <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} 
                     placeholder="পণ্যের নাম লিখুন..."
                     style={{...input,fontSize:13}} />
-                  {showProductDrop && (
-                    <div 
-                      onMouseDown={(e) => e.preventDefault()}
-                      style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                      {filteredProducts.length > 0 ? filteredProducts.map((p,i)=>(
-                        <div key={p.id} onClick={()=>selectProduct(p)}
-                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,background:T.white}}>
-                          <div style={{fontSize:13,fontWeight:600}}>{p.name}</div>
-                          <div style={{fontSize:11,color:T.gray400}}>৳{p.sellP} • স্টক: {p.stock} {p.unit}</div>
-                        </div>
-                      )) : (
-                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো পণ্য পাওয়া যায়নি</div>
-                      )}
-                      <div onClick={()=>{setShowProductDrop(false);}}
-                        style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`,background:T.tealLight}}>
-                        ➕ নতুন পণ্য তৈরি করুন
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 
