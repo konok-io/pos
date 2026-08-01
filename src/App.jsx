@@ -113,10 +113,10 @@ export default function App() {
   }, []);
 
   const upd = {
-    products: v => { setProducts(v); db.set(STORAGE_KEYS.products, v); },
-    customers: v => { setCustomers(v); db.set(STORAGE_KEYS.customers, v); },
-    sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); },
-    settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); },
+    products: v => { setProducts(v); db.set(STORAGE_KEYS.products, v); return Promise.resolve(); },
+    customers: v => { setCustomers(v); db.set(STORAGE_KEYS.customers, v); return Promise.resolve(); },
+    sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); return Promise.resolve(); },
+    settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); return Promise.resolve(); },
   };
 
   if (!ready) return (
