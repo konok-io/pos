@@ -305,7 +305,6 @@ export default function App() {
 function POSScreen({products, customers, sales, settings, categories, upd}) {
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
-  const [selCat, setSelCat] = useState('সব');
   const [selCust, setSelCust] = useState(null);
   const [custQ, setCustQ] = useState('');
   const [showCustDrop, setShowCustDrop] = useState(false);
@@ -322,33 +321,54 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
 
   useEffect(() => { searchRef.current?.focus(); }, []);
 
-  const cats = ['স্টক শেষ', 'সব', ...new Set([
+  // Close category dropdown when clicking outside
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (!e.target.closest('[data-cat-dropdown]')) {
+        setShowCatDrop(false);
+      }
+    };
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
+
+  const [selCat, setSelCat] = useState('সব');
+  const [catSearch, setCatSearch] = useState('');
+  const [showCatDrop, setShowCatDrop] = useState(false);
+  
+  // Calculate counts for each category (only products with stock > 0)
+  const catCounts = {};
+  products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0).forEach(p => {
+    catCounts[p.cat] = (catCounts[p.cat] || 0) + 1;
+  });
+  
+  // Get all categories sorted by product count (highest first)
+  const allCategories = [...new Set([
     ...products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).map(p=>p.cat).filter(Boolean),
     ...categories.map(c=>c.name).filter(Boolean)
-  ])];
+  ])].sort((a, b) => (catCounts[b] || 0) - (catCounts[a] || 0));
   
-  // Calculate counts for each category
-  const catCounts = {};
-  products.filter(p => !p.name?.includes('(ক্যাটাগরি)')).forEach(p => {
-    if (p.stock > 0) {
-      catCounts[p.cat] = (catCounts[p.cat] || 0) + 1;
-    }
-  });
+  // Filter categories for dropdown
+  const filteredCats = allCategories.filter(c => 
+    !catSearch || c.toLowerCase().includes(catSearch.toLowerCase())
+  );
+  
   const outOfStockCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock <= 0).length;
   const allCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0).length;
   
   const filtered = products.filter(p => {
     const isCategory = p.name?.includes('(ক্যাটাগরি)');
     if (isCategory) return false;
-    // সব or specific category: exclude out of stock
-    const matchCat = selCat==='সব' || p.cat===selCat;
-    const excludeOutOfStock = selCat==='সব' && p.stock<=0;
+    // সব: exclude out of stock
+    if (selCat === 'সব') {
+      return p.stock > 0 && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
+    }
     // স্টক শেষ: only show out of stock
-    const matchStock = selCat==='স্টক শেষ' ? p.stock<=0 : true;
-    const matchQ = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
-    if (selCat==='সব') return matchCat && !excludeOutOfStock && matchQ;
-    if (selCat==='স্টক শেষ') return matchStock && matchQ;
-    return matchCat && matchQ;
+    if (selCat === 'স্টক শেষ') {
+      return p.stock <= 0 && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
+    }
+    // Specific category: show products in that category with stock > 0
+    return p.cat === selCat && p.stock > 0 && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
   }).sort((a, b) => a.stock - b.stock);
 
   const addToCart = (prod) => {
@@ -623,19 +643,53 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         </div>
 
         {/* Category filter */}
-        <div style={{padding:'10px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,overflowX:'auto'}}>
-          {cats.map(c=>{
-            const count = c==='স্টক শেষ' ? outOfStockCount : c==='সব' ? allCount : (catCounts[c] || 0);
-            return (
-            <button key={c} onClick={()=>setSelCat(c)} style={{
-              ...btn(selCat===c?'primary':'ghost','sm'),
-              borderRadius:20, whiteSpace:'nowrap',
-              background:selCat===c?(c==='স্টক শেষ'?T.red:T.teal):(c==='স্টক শেষ'?T.redLight:T.gray100),
-              color:selCat===c?T.white:(c==='স্টক শেষ'?T.red:T.gray600),
-              border:'none',
-              padding:'6px 14px',
-            }}>{c} {count > 0 && <span style={{opacity:0.7}}>({count})</span>}</button>
-          )})}
+        <div style={{padding:'10px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+          {/* সব button */}
+          <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
+            ...btn(selCat==='সব'?'primary':'ghost','sm'),
+            borderRadius:20, whiteSpace:'nowrap',
+            background:selCat==='সব'?T.teal:T.gray100,
+            color:selCat==='সব'?T.white:T.gray600,
+            border:'none',
+            padding:'6px 14px',
+          }}>সব {allCount > 0 && <span style={{opacity:0.7}}>({allCount})</span>}</button>
+          
+          {/* স্টক শেষ button */}
+          <button onClick={()=>{setSelCat('স্টক শেষ');setCatSearch('');}} style={{
+            ...btn(selCat==='স্টক শেষ'?'primary':'ghost','sm'),
+            borderRadius:20, whiteSpace:'nowrap',
+            background:selCat==='স্টক শেষ'?T.red:T.redLight,
+            color:selCat==='স্টক শেষ'?T.white:T.red,
+            border:'none',
+            padding:'6px 14px',
+          }}>স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
+          
+          {/* Category search dropdown */}
+          <div style={{position:'relative',flex:1,minWidth:200}} data-cat-dropdown>
+            <input 
+              value={selCat === 'সব' || selCat === 'স্টক শেষ' ? catSearch : selCat} 
+              onChange={e=>{setSelCat('সব');setCatSearch(e.target.value);setShowCatDrop(true);}} 
+              onFocus={()=>setShowCatDrop(true)}
+              placeholder="ক্যাটাগরি সার্চ করুন..."
+              style={{...input,borderRadius:20,padding:'6px 14px',fontSize:13,height:'auto'}}
+            />
+            {showCatDrop && (
+              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>
+                {filteredCats.length === 0 ? (
+                  <div style={{padding:'12px',color:T.gray400,textAlign:'center'}}>কোনো ক্যাটাগরি পাওয়া যায়নি</div>
+                ) : filteredCats.map(c=>(
+                  <div key={c} onClick={()=>{setSelCat(c);setCatSearch('');setShowCatDrop(false);}} style={{
+                    padding:'10px 14px',cursor:'pointer',display:'flex',justifyContent:'space-between',
+                    background:selCat===c?T.tealLight:'transparent',
+                    borderBottom:`1px solid ${T.gray100}`,
+                  }}>
+                    <span style={{color:selCat===c?T.teal:T.gray900}}>{c}</span>
+                    <span style={{color:T.gray400,fontSize:12}}>{catCounts[c] || 0}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Product grid */}
