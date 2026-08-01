@@ -1492,7 +1492,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
               <label style={label}>① 🏢 কোম্পানি নির্বাচন করুন *</label>
               <input value={productForm.company} onChange={e=>{setProductForm(f=>({...f,company:e.target.value,cat:''}));setCompanyQ(e.target.value);setShowCompanyDrop(true);}} 
                 onFocus={()=>setShowCompanyDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..." style={input} />
-              {showCompanyDrop && companyQ && (
+              {showCompanyDrop && (
                 <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
                   {filteredCompanies.filter(c=>!companyQ || c.name.toLowerCase().includes(companyQ.toLowerCase()) || (c.code||'').toLowerCase().includes(companyQ.toLowerCase())).map(c=>(
                     <div key={c.id} onClick={()=>{setProductForm(f=>({...f,company:c.name,cat:''}));setCompanyQ('');setShowCompanyDrop(false);}}
@@ -1508,17 +1508,18 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
             {/* Step 2: Category */}
             <div style={{marginBottom:12,position:'relative'}}>
-              <label style={label}>② 📂 ক্যাটাগরি করুন *</label>
+              <label style={label}>② 📂 ক্যাটাগরি নির্বাচন করুন *</label>
               <input value={productForm.cat} onChange={e=>{setProductForm(f=>({...f,cat:e.target.value}));setCatQ(e.target.value);setShowCatDrop(true);}} 
-                onFocus={()=>{if(productForm.company) setShowCatDrop(true);}} placeholder={productForm.company?"ক্যাটাগরি লিখুন...":"প্রথমে কোম্পানি সিলেক্ট করুন"} 
-                disabled={!productForm.company} style={{...input,opacity:productForm.company?1:0.5}} />
-              {showCatDrop && catQ && productForm.company && (
+                onFocus={()=>setShowCatDrop(true)} placeholder="ক্যাটাগরির নাম লিখুন..." 
+                />
+                
+              {showCatDrop && (
                 <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
-                  {filteredCats.map(c=>(
+                  {allCategories.filter(c=>!catQ || c.toLowerCase().includes(catQ.toLowerCase())).map(c=>(
                     <div key={c} onClick={()=>{setProductForm(f=>({...f,cat:c}));setCatQ('');setShowCatDrop(false);}}
                       style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>{c}</div>
                   ))}
-                  {filteredCats.length === 0 && <div style={{padding:'8px 12px',color:T.gray400}}>কোনো ক্যাটাগরি নেই</div>}
+                  {allCategories.length === 0 && <div style={{padding:'8px 12px',color:T.gray400}}>কোনো ক্যাটাগরি নেই</div>}
                 </div>
               )}
             </div>
@@ -1668,7 +1669,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
               <label style={label}>① 🏢 কোম্পানি নির্বাচন করুন *</label>
               <input value={productForm.company} onChange={e=>{setProductForm(f=>({...f,company:e.target.value,cat:''}));setCompanyQ(e.target.value);setShowCompanyDrop(true);}} 
                 onFocus={()=>setShowCompanyDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..." style={input} />
-              {showCompanyDrop && companyQ && (
+              {showCompanyDrop && (
                 <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
                   {filteredCompanies.filter(c=>!companyQ || c.name.toLowerCase().includes(companyQ.toLowerCase()) || (c.code||'').toLowerCase().includes(companyQ.toLowerCase())).map(c=>(
                     <div key={c.id} onClick={()=>{setProductForm(f=>({...f,company:c.name,cat:''}));setCompanyQ('');setShowCompanyDrop(false);}}
@@ -1684,17 +1685,18 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
             {/* Step 2: Category */}
             <div style={{marginBottom:12,position:'relative'}}>
-              <label style={label}>② 📂 ক্যাটাগরি করুন *</label>
+              <label style={label}>② 📂 ক্যাটাগরি নির্বাচন করুন *</label>
               <input value={productForm.cat} onChange={e=>{setProductForm(f=>({...f,cat:e.target.value}));setCatQ(e.target.value);setShowCatDrop(true);}} 
-                onFocus={()=>{if(productForm.company) setShowCatDrop(true);}} placeholder={productForm.company?"ক্যাটাগরি লিখুন...":"প্রথমে কোম্পানি সিলেক্ট করুন"} 
-                disabled={!productForm.company} style={{...input,opacity:productForm.company?1:0.5}} />
-              {showCatDrop && catQ && productForm.company && (
+                onFocus={()=>setShowCatDrop(true)} placeholder="ক্যাটাগরির নাম লিখুন..." 
+                />
+                
+              {showCatDrop && (
                 <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
-                  {filteredCats.map(c=>(
+                  {allCategories.filter(c=>!catQ || c.toLowerCase().includes(catQ.toLowerCase())).map(c=>(
                     <div key={c} onClick={()=>{setProductForm(f=>({...f,cat:c}));setCatQ('');setShowCatDrop(false);}}
                       style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>{c}</div>
                   ))}
-                  {filteredCats.length === 0 && <div style={{padding:'8px 12px',color:T.gray400}}>কোনো ক্যাটাগরি নেই</div>}
+                  {allCategories.length === 0 && <div style={{padding:'8px 12px',color:T.gray400}}>কোনো ক্যাটাগরি নেই</div>}
                 </div>
               )}
             </div>
