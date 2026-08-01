@@ -322,10 +322,10 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
 
   useEffect(() => { searchRef.current?.focus(); }, []);
 
-  const cats = ['সব', ...new Set([
+  const cats = ['স্টক শেষ', 'সব', ...new Set([
     ...products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).map(p=>p.cat).filter(Boolean),
     ...categories.map(c=>c.name).filter(Boolean)
-  ]), 'স্টক শেষ'];
+  ])];
   const filtered = products.filter(p => {
     const isCategory = p.name?.includes('(ক্যাটাগরি)');
     if (isCategory) return false;
@@ -612,8 +612,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             <button key={c} onClick={()=>setSelCat(c)} style={{
               ...btn(selCat===c?'primary':'ghost','sm'),
               borderRadius:20, whiteSpace:'nowrap',
-              background:selCat===c?(c==='স্টক শেষ'?T.red:T.teal):T.gray100,
-              color:selCat===c?T.white:T.gray600,
+              background:selCat===c?(c==='স্টক শেষ'?T.red:T.teal):(c==='স্টক শেষ'?T.redLight:T.gray100),
+              color:selCat===c?T.white:(c==='স্টক শেষ'?T.red:T.gray600),
               border:'none',
               padding:'6px 14px',
             }}>{c}</button>
