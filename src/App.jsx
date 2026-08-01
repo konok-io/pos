@@ -195,7 +195,7 @@ export default function App() {
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
-  const props = {products, customers, sales, settings, suppliers, categories, upd};
+  const props = {products, customers, sales, settings, suppliers, categories, purchases, upd};
 
   return (
     <>
@@ -272,8 +272,10 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   useEffect(() => { searchRef.current?.focus(); }, []);
 
-  const cats = ['সব', ...new Set(products.map(p=>p.cat).filter(Boolean))];
+  const cats = ['সব', ...new Set(products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).map(p=>p.cat).filter(Boolean))];
   const filtered = products.filter(p => {
+    const isCategory = p.name?.includes('(ক্যাটাগরি)');
+    if (isCategory) return false;
     const matchCat = selCat==='সব' || p.cat===selCat;
     const matchQ = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
     return matchCat && matchQ;
@@ -1076,14 +1078,14 @@ function ProductsScreen({products, suppliers, categories, upd}) {
                   </div>
                   {showProductList && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
-                      {products.filter(p=>p.name.toLowerCase().includes((form.name||'').toLowerCase())).slice(0,20).map((p,i)=>(
+                      {products.filter(p=>!p.name?.includes('(ক্যাটাগরি)') && p.name.toLowerCase().includes((form.name||'').toLowerCase())).slice(0,20).map((p,i)=>(
                         <div key={i} onClick={()=>{setForm(f=>({...f,name:p.name}));setShowProductList(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                           <div style={{fontWeight:600}}>{p.name}</div>
                           <div style={{fontSize:11,color:T.gray400}}>{p.company} • {p.cat}</div>
                         </div>
                       ))}
-                      {form.name && !products.some(p=>p.name.toLowerCase()===(form.name||'').toLowerCase()) && (
+                      {form.name && !products.some(p=>!p.name?.includes('(ক্যাটাগরি)') && p.name.toLowerCase()===(form.name||'').toLowerCase()) && (
                         <div onClick={()=>{setShowProductList(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
                           + নতুন পণ্য তৈরি করুন: "{form.name}"
@@ -1251,7 +1253,7 @@ function ProductsScreen({products, suppliers, categories, upd}) {
 /* ═══════════════════════════════════════════
    SUPPLIERS SCREEN
 ═══════════════════════════════════════════ */
-function SuppliersScreen({suppliers, products, purchases, upd}) {
+function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
@@ -1612,9 +1614,9 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                 </tr>
               </thead>
               <tbody>
-                {products.length === 0 ? (
+                {products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).length === 0 ? (
                   <tr><td colSpan={8} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পণ্য পাওয়া যায়নি</td></tr>
-                ) : products.filter(p => !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.company||'').toLowerCase().includes(search.toLowerCase())).map((p,i)=>(
+                ) : products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.company||'').toLowerCase().includes(search.toLowerCase()))).map((p,i)=>(
                   <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                     <td style={{padding:'10px 12px',fontWeight:600,fontSize:14}}>{p.name}</td>
                     <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
@@ -2003,10 +2005,11 @@ function InventoryScreen({products, suppliers, upd}) {
   const [adjType, setAdjType] = useState('add');
   const [adjNote, setAdjNote] = useState('');
 
-  const filtered = products.filter(p=>!search||p.name.toLowerCase().includes(search.toLowerCase()));
-  const lowStock = products.filter(p=>p.stock>0&&p.stock<=p.minStock);
-  const outOfStock = products.filter(p=>p.stock<=0);
-  const totalValue = products.reduce((s,p)=>s+p.sellP*p.stock,0);
+  const realProducts = products.filter(p=>!p.name?.includes('(ক্যাটাগরি)'));
+  const filtered = realProducts.filter(p=>!search||p.name.toLowerCase().includes(search.toLowerCase()));
+  const lowStock = realProducts.filter(p=>p.stock>0&&p.stock<=p.minStock);
+  const outOfStock = realProducts.filter(p=>p.stock<=0);
+  const totalValue = realProducts.reduce((s,p)=>s+p.sellP*p.stock,0);
 
   const adjust = async () => {
     const qty = parseInt(adjQty)||0;
