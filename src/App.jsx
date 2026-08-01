@@ -414,7 +414,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
           />
           {selCust && (
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:T.tealLight,borderRadius:8}}>
-              <span style={{fontSize:12,color:T.teal,fontWeight:600}}>✓ {selCust.name} {selCust.credit>0?`(বাকি: ${fmt(selCust.credit)})`:''}</span>
+              <span style={{fontSize:12,color:T.teal,fontWeight:600}}>✓ {selCust.name} {selCust.credit>0 && <span style={{color:T.red}}>(বাকি: {fmt(selCust.credit)})</span>}</span>
               <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:12,background:'none',border:'none',color:T.gray400,cursor:'pointer'}}>✕</button>
             </div>
           )}
