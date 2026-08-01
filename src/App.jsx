@@ -803,22 +803,22 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
     setBarcodeVal(val);
     setForm(f => ({...f, barcode: val}));
     
-    // Filter by selected company if one is selected
-    let filteredProducts = products;
-    if (form.company) {
-      filteredProducts = products.filter(p => 
-        (p.company||'').toLowerCase() === form.company.toLowerCase()
-      );
-    }
-    
+    // Search in all products (ignore company filter for barcode search)
     if (val.length >= 1) {
-      const matches = filteredProducts.filter(p => 
-        p.barcode?.includes(val) || p.name.toLowerCase().includes(val.toLowerCase())
+      const trimmedVal = val.trim().toLowerCase();
+      const matches = products.filter(p => 
+        !p.name?.includes('(ক্যাটাগরি)') && (
+          (p.barcode||'').toLowerCase().includes(trimmedVal) || 
+          p.name.toLowerCase().includes(trimmedVal)
+        )
       ).slice(0, 5);
       setBarcodeSuggestions(matches);
       
-      // Auto-fill if exact barcode match found
-      const exactMatch = filteredProducts.find(p => p.barcode === val);
+      // Auto-fill if exact barcode match found (search all products)
+      const exactMatch = products.find(p => 
+        !p.name?.includes('(ক্যাটাগরি)') && 
+        (p.barcode||'').toLowerCase().trim() === trimmedVal
+      );
       if (exactMatch) {
         selectProduct(exactMatch);
       }
