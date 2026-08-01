@@ -1065,39 +1065,33 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   style={{...input,fontSize:13}} />
               </div>
 
-              {/* Unit */}
-              <div style={{marginBottom:12}}>
-                <label style={label}>📥 একক</label>
-                <input value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} placeholder="পিস, কেজি, লিটার..."
-                  style={{...input,fontSize:13}} />
-              </div>
-
-              {/* Stock */}
-              <div style={{marginBottom:12}}>
-                <label style={label}>📥 স্টক</label>
-                <input value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} type="number" placeholder="পণ্যের পরিমাণ..."
-                  style={{...input,fontSize:13}} />
-              </div>
-
-              {/* Purchase Price */}
-              <div style={{marginBottom:12}}>
-                <label style={label}>💰 ক্রয়মূল্য</label>
-                <input value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} type="number" placeholder="ক্রয়মূল্য..."
-                  style={{...input,fontSize:13}} />
-              </div>
-
-              {/* Selling Price */}
-              <div style={{marginBottom:12}}>
-                <label style={label}>💵 বিক্রয়মূল্য</label>
-                <input value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} type="number" placeholder="বিক্রয়মূল্য..."
-                  style={{...input,fontSize:13}} />
-              </div>
-
-              {/* Min Stock */}
-              <div style={{marginBottom:12}}>
-                <label style={label}>⚠️ মিন স্টক (সতর্কতা সীমা)</label>
-                <input value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} type="number" placeholder="5"
-                  style={{...input,fontSize:13}} />
+              {/* Inline Fields: Unit, Stock, Prices, Min Stock */}
+              <div style={{display:'flex',gap:8,marginBottom:12,flexWrap:'wrap'}}>
+                <div style={{flex:'1 1 100px',minWidth:80}}>
+                  <label style={label}>📥 একক</label>
+                  <input value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} placeholder="পিস..."
+                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                </div>
+                <div style={{flex:'1 1 80px',minWidth:70}}>
+                  <label style={label}>📥 স্টক</label>
+                  <input value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} type="number" placeholder="০"
+                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                </div>
+                <div style={{flex:'1 1 90px',minWidth:80}}>
+                  <label style={label}>💰 ক্রয়মূল্য</label>
+                  <input value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} type="number" placeholder="০"
+                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                </div>
+                <div style={{flex:'1 1 90px',minWidth:80}}>
+                  <label style={label}>💵 বিক্রয়মূল্য</label>
+                  <input value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} type="number" placeholder="০"
+                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                </div>
+                <div style={{flex:'1 1 80px',minWidth:70}}>
+                  <label style={label}>⚠️ মিন স্টক</label>
+                  <input value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} type="number" placeholder="৫"
+                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                </div>
               </div>
 
               <button onClick={addToPurchase} style={{...btn('primary'),width:'100%',padding:'10px'}}>
