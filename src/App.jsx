@@ -1320,6 +1320,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
   const saveCompany = async () => {
     if (!form.name?.trim()) { alert('কোম্পানির নাম দিন'); return; }
+    
     // Generate company code (C-00001, C-00002, etc.)
     const maxCode = suppliers.reduce((max, s) => {
       const match = s.code?.match(/C-(\d+)/);
@@ -1331,12 +1332,16 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
       // Convert auto to real supplier
       const newS = { id: genId(), code: newCode, name: form.name.trim(), phone: form.phone||'', address: form.address||'' };
       await upd.suppliers([...suppliers, newS]);
+      setForm({name:'',phone:'',address:'',isAuto:false});
+      alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
     } else if (modal.mode === 'add') {
       await upd.suppliers([...suppliers, {...form, id: genId(), code: newCode}]);
+      setForm({name:'',phone:'',address:'',isAuto:false});
+      alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
     } else {
       await upd.suppliers(suppliers.map(s => s.id === modal.id ? {...form, id: modal.id} : s));
+      setModal(null);
     }
-    setModal(null);
   };
 
   const saveProduct = async () => {
@@ -1657,7 +1662,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                 <h3 style={{margin:'0 0 16px'}}>{modal.mode === 'add' ? '🏢 নতুন কোম্পানি যোগ করুন' : '✏️ কোম্পানি সম্পাদনা করুন'}</h3>
                 <div style={{marginBottom:12}}>
                   <label style={label}>🏢 কোম্পানির নাম *</label>
-                  <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="কোম্পানির নাম" style={input} />
+                  <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="কোম্পানির নাম" style={input} autoFocus />
                 </div>
                 {modal.mode === 'add' && (
                   <div style={{marginBottom:12,background:T.gray50,padding:10,borderRadius:8}}>
@@ -1674,9 +1679,14 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                   <input value={form.address||''} onChange={e=>setForm(f=>({...f,address:e.target.value}))} placeholder="ঠিকানা" style={input} />
                 </div>
                 <div style={{display:'flex',gap:8}}>
-                  <button onClick={()=>setModal(null)} style={{...btn(),flex:1}}>বাতিল</button>
-                  <button onClick={saveCompany} style={{...btn('primary'),flex:1}}>💾 সংরক্ষণ</button>
+                  <button onClick={()=>setModal(null)} style={{...btn(),flex:1}}>✕ বন্ধ করুন</button>
+                  <button onClick={saveCompany} style={{...btn('primary'),flex:1}} disabled={!form.name?.trim()}>💾 সংরক্ষণ করুন</button>
                 </div>
+                {modal.mode === 'add' && (
+                  <div style={{marginTop:12,fontSize:11,color:T.gray500,textAlign:'center'}}>
+                    💡 সংরক্ষণের পর আবার নতুন কোম্পানি যোগ করতে পারবেন
+                  </div>
+                )}
               </>
             )}
 
