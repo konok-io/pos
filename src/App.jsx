@@ -41,6 +41,7 @@ const STORAGE_KEYS = {
   sales: 'pos_sales',
   settings: 'pos_settings',
   suppliers: 'pos_suppliers',
+  categories: 'pos_categories',
   purchases: 'pos_purchases',
 };
 
@@ -49,6 +50,7 @@ const DEMO = {
   products: [],
   customers: [],
   suppliers: [],
+  categories: [],
 };
 
 /* ─────────────── DESIGN TOKENS ─────────────── */
@@ -111,6 +113,7 @@ export default function App() {
   const [sales, setSales] = useState([]);
   const [settings, setSettings] = useState({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
   const [suppliers, setSuppliers] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [ready, setReady] = useState(false);
 
@@ -155,6 +158,7 @@ export default function App() {
 
     setSales(savedSales || []);
     setSuppliers(savedSuppliers);
+    setCategories(savedCategories || []);
     setPurchases(savedPurchases);
 
     const defaultSettings = {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
@@ -169,6 +173,7 @@ export default function App() {
     sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); return Promise.resolve(); },
     settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); return Promise.resolve(); },
     suppliers: v => { setSuppliers(v); db.set(STORAGE_KEYS.suppliers, v); return Promise.resolve(); },
+    categories: v => { setCategories(v); db.set(STORAGE_KEYS.categories, v); return Promise.resolve(); },
     purchases: v => { setPurchases(v); db.set(STORAGE_KEYS.purchases, v); return Promise.resolve(); },
   };
 
@@ -190,7 +195,7 @@ export default function App() {
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
-  const props = {products, customers, sales, settings, suppliers, purchases, upd};
+  const props = {products, customers, sales, settings, suppliers, categories, upd};
 
   return (
     <>
@@ -641,7 +646,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
 /* ═══════════════════════════════════════════
    PRODUCTS SCREEN
 ═══════════════════════════════════════════ */
-function ProductsScreen({products, suppliers, purchases, upd}) {
+function ProductsScreen({products, suppliers, categories, upd}) {
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState([]);
@@ -751,8 +756,8 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   ];
   const uniqueCompanies = [...new Set(allCompanies)].sort();
 
-  // Get all unique categories from products
-  const uniqueCategories = [...new Set(products.map(p => p.cat).filter(Boolean))].sort();
+  // Get all unique categories from categories state (not from products)
+  const uniqueCategories = [...new Set(categories.map(c => c.name).filter(Boolean))].sort();
 
   // Filter products for table
   const filtered = products.filter(p=>
@@ -1276,8 +1281,8 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
-  // Get categories from products
-  const allCategories = [...new Set(products.map(p => p.cat).filter(Boolean))];
+  // Get categories from categories state (not from products)
+  const allCategories = [...new Set(categories.map(c => c.name).filter(Boolean))];
   
   // Get products by company
   const companyProducts = form.company 
@@ -1286,7 +1291,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
     
   // Get categories for selected company
   const companyCategories = form.company 
-    ? [...new Set(companyProducts.map(p => p.cat).filter(Boolean))]
+    ? categories.filter(c => c.company?.toLowerCase() === form.company.toLowerCase()).map(c => c.name)
     : [];
 
   // Filter companies for dropdown
@@ -1378,9 +1383,9 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
     if (!catForm.company) { alert('কোম্পানি সিলেক্ট করুন'); return; }
     
     // Check if category already exists for this company
-    const exists = products.some(p => 
-      (p.company||'').toLowerCase() === catForm.company.toLowerCase() && 
-      (p.cat||'').toLowerCase() === catForm.name.trim().toLowerCase()
+    const exists = categories.some(c => 
+      (c.company||'').toLowerCase() === catForm.company.toLowerCase() && 
+      c.name.toLowerCase() === catForm.name.trim().toLowerCase()
     );
     
     if (exists) {
@@ -1388,24 +1393,16 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
       return;
     }
     
-    // Create a dummy product to save category
-    const newP = {
+    // Save category to categories state
+    const newCat = {
       id: genId(),
-      name: `${catForm.name.trim()} (ক্যাটাগরি)`,
-      barcode: `CAT-${Date.now()}`,
-      company: catForm.company,
-      cat: catForm.name.trim(),
-      unit: 'পিস',
-      buyP: 0,
-      sellP: 0,
-      stock: 0,
-      minStock: 0
+      name: catForm.name.trim(),
+      company: catForm.company
     };
-    await upd.products([...products, newP]);
+    await upd.categories([...categories, newCat]);
     setCatForm({name:'',company:''});
     setCatCompanyQ('');
     setShowCatCompanyDrop(false);
-    setProductForm(f=>({...f,company:catForm.company,cat:catForm.name.trim()}));
     alert('ক্যাটাগরি যোগ করা হয়েছে!');
   };
 
@@ -1590,21 +1587,23 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
             <table style={{width:'100%',borderCollapse:'collapse',background:T.white}}>
               <thead>
                 <tr style={{background:T.tealLight}}>
-                  {['ক্রম','ক্যাটাগরির নাম','পণ্য সংখ্যা',''].map((h,i)=>(
+                  {['ক্রম','কোম্পানি','ক্যাটাগরির নাম','পণ্য সংখ্যা',''].map((h,i)=>(
                     <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {allCategories.length === 0 ? (
-                  <tr><td colSpan={4} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ক্যাটাগরি পাওয়া যায়নি</td></tr>
-                ) : allCategories.filter(c => !search || c.toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
-                  <tr key={cat} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                {categories.length === 0 ? (
+                  <tr><td colSpan={5} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ক্যাটাগরি পাওয়া যায়নি</td></tr>
+                ) : categories.filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.company.toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
+                  <tr key={cat.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                     <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{i+1}</td>
-                    <td style={{padding:'10px 12px',fontWeight:600,fontSize:14}}>{cat}</td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat).length}</td>
+                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{cat.company}</td>
+                    <td style={{padding:'10px 12px',fontWeight:600,fontSize:14}}>{cat.name}</td>
+                    <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
                     <td style={{padding:'10px 12px',whiteSpace:'nowrap'}}>
-                      <button onClick={()=>{setCatForm({name:cat,company:products.find(p=>p.cat===cat)?.company||''});setModal({mode:'editCat',catName:cat});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
+                      <button onClick={()=>{setCatForm({name:cat.name,company:cat.company});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
+                      <button onClick={async ()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){await upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
                     </td>
                   </tr>
                 ))}
@@ -1747,7 +1746,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                     onFocus={()=>setShowCatDrop(true)} placeholder="ক্যাটাগরির নাম..." style={input} />
                   {showCatDrop && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                      {allCategories.filter(c=>!catQ || c.toLowerCase().includes(catQ.toLowerCase())).map(c=>(
+                      {companyCategories.filter(c=>!catQ || c.toLowerCase().includes(catQ.toLowerCase())).map(c=>(
                         <div key={c} onClick={()=>{setProductForm(f=>({...f,cat:c}));setCatQ('');setShowCatDrop(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>{c}</div>
                       ))}
