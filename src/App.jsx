@@ -244,12 +244,19 @@ function POSScreen({products, customers, sales, settings, upd}) {
   const subtotal = cart.reduce((s,i)=>s+i.sellP*i.qty,0);
   const disc = parseFloat(discount)||0;
   const total = Math.max(0, subtotal-disc);
-  const paidAmt = parseFloat(paid)||total;
+  const paidAmt = paid === '' ? 0 : (parseFloat(paid) || 0);
   const due = total - paidAmt;
   const change = paidAmt > total ? paidAmt - total : 0;
 
-  const checkout = async () => {
+  const checkout = () => {
     if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
+
+    // Confirmation dialog
+    const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
+    const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
+    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${dueText}${dueCreditText}`;
+
+    if (!window.confirm(confirmMsg)) return;
 
     const sale = {
       id:genId(), date:now(),
@@ -265,15 +272,15 @@ function POSScreen({products, customers, sales, settings, upd}) {
     });
 
     let newCusts = [...customers];
-    if (selCust && sale.due>0) {
-      newCusts = newCusts.map(c=>c.id===selCust.id ? {...c,credit:(c.credit||0)+sale.due} : c);
+    if (selCust && due > 0) {
+      newCusts = newCusts.map(c=>c.id===selCust.id ? {...c,credit:(c.credit||0)+due} : c);
     }
 
     const newSales = [...sales, sale];
 
-    await upd.products(newProds);
-    await upd.customers(newCusts);
-    await upd.sales(newSales);
+    upd.products(newProds);
+    upd.customers(newCusts);
+    upd.sales(newSales);
 
     setReceipt({sale, settings});
     setCart([]); setDiscount(''); setPaid(''); setSelCust(null); setCustQ('');
@@ -474,12 +481,18 @@ function POSScreen({products, customers, sales, settings, upd}) {
           <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
             <label style={{...label,margin:0,whiteSpace:'nowrap'}}>পরিশোধ (৳)</label>
             <input value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
-              placeholder={total.toFixed(0)} style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}/>
+              placeholder="পুরো মূল্য দিতে টাইপ করুন" style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}/>
           </div>
-          {paid && (
+          {due > 0 && (
             <div style={{fontSize:14,marginBottom:10,padding:'8px 12px',borderRadius:8,
               background:due>0?T.redLight:T.greenLight, color:due>0?T.red:T.green, fontWeight:600}}>
-              {due>0 ? `⚠️ বাকি থাকবে: ${fmt(due)}` : `💵 ফেরত দিন: ${fmt(change)}`}
+              {due>0 ? `⚠️ বাকি থাকবে: ${fmt(due)}${selCust ? ' (কাস্টমার হিসাবে যোগ হবে)' : ''}` : `💵 ফেরত দিন: ${fmt(change)}`}
+            </div>
+          )}
+          {paidAmt > total && (
+            <div style={{fontSize:14,marginBottom:10,padding:'8px 12px',borderRadius:8,
+              background:T.greenLight, color:T.green, fontWeight:600}}>
+              💵 ফেরত দিতে হবে: {fmt(change)}
             </div>
           )}
           <div style={{display:'flex',gap:10}}>
