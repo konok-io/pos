@@ -982,8 +982,29 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
       totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
     };
 
-    // Prepare new products
-    const newProducts = purchaseItems.map(item => ({ ...item, id: genId() }));
+    // Check for existing products and update stock, or create new ones
+    const updatedProducts = [...products];
+    const newProductsToAdd = [];
+    
+    for (const item of purchaseItems) {
+      // Find existing product by company AND barcode
+      const existingIndex = updatedProducts.findIndex(
+        p => p.company === item.company && p.barcode === item.barcode && p.barcode !== ''
+      );
+      
+      if (existingIndex !== -1) {
+        // Update existing product stock
+        updatedProducts[existingIndex] = {
+          ...updatedProducts[existingIndex],
+          stock: (updatedProducts[existingIndex].stock || 0) + (item.stock || 0),
+          buyP: item.buyP || updatedProducts[existingIndex].buyP,
+          sellP: item.sellP || updatedProducts[existingIndex].sellP
+        };
+      } else {
+        // Create new product
+        newProductsToAdd.push({ ...item, id: genId() });
+      }
+    }
     
     // Prepare new supplier if needed
     let newSupplierArr = null;
@@ -997,7 +1018,7 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
     if (newSupplierArr) {
       promises.push(upd.suppliers(newSupplierArr));
     }
-    promises.push(upd.products([...products, ...newProducts]));
+    promises.push(upd.products([...updatedProducts, ...newProductsToAdd]));
     promises.push(upd.purchases([...purchases, purchase]));
 
     // Execute all updates
@@ -1580,7 +1601,31 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     if (!productForm.cat) { alert('ক্যাটাগরি সিলেক্ট করুন'); return; }
     if (!productForm.name?.trim()) { alert('পণ্যের নাম দিন'); return; }
     
-    // Check for duplicate product name
+    // Check for duplicate by company AND barcode (if barcode is provided)
+    const barcode = productForm.barcode?.trim() || '';
+    if (barcode) {
+      const existingIndex = products.findIndex(
+        p => p.company === productForm.company && p.barcode === barcode
+      );
+      if (existingIndex !== -1) {
+        // Update existing product - add stock
+        const existing = products[existingIndex];
+        const updatedProducts = [...products];
+        updatedProducts[existingIndex] = {
+          ...existing,
+          stock: (existing.stock || 0) + (productForm.stock || 0),
+          buyP: productForm.buyP || existing.buyP,
+          sellP: productForm.sellP || existing.sellP,
+          minStock: productForm.minStock || existing.minStock
+        };
+        await upd.products(updatedProducts);
+        setProductForm({company:productForm.company,cat:productForm.cat,name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:0,minStock:5});
+        alert(`✅ পণ্যের স্টক আপডেট হয়েছে!\nপণ্য: ${productForm.name}\nনতুন স্টক: ${updatedProducts[existingIndex].stock}`);
+        return;
+      }
+    }
+    
+    // Check for duplicate product name (only if no barcode match)
     const exists = products.some(p => p.name.toLowerCase().trim() === productForm.name.toLowerCase().trim());
     if (exists) { alert('❌ এই পণ্যের নাম ইতিমধ্যে আছে!'); return; }
     
@@ -1594,14 +1639,14 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     const newP = {
       id: newId,
       name: productForm.name.trim(),
-      barcode: productForm.barcode?.trim() || '',
+      barcode: barcode,
       company: productForm.company,
       cat: productForm.cat,
-      unit: 'পিস',
-      buyP: 0,
-      sellP: 0,
-      stock: 0,
-      minStock: 5
+      unit: productForm.unit || 'পিস',
+      buyP: parseFloat(productForm.buyP) || 0,
+      sellP: parseFloat(productForm.sellP) || 0,
+      stock: parseFloat(productForm.stock) || 0,
+      minStock: parseFloat(productForm.minStock) || 5
     };
     await upd.products([...products, newP]);
     setProductForm({company:productForm.company,cat:productForm.cat,name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:0,minStock:5});
