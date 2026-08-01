@@ -1536,7 +1536,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
         {/* PRODUCTS TAB */}
         {activeTab === 'products' && (
           <div style={{...card,maxWidth:600,margin:'0 auto'}}>
-            <h3 style={{margin:'0 0 16px',color:T.teal}}>📦 পণ্য যোগ করুন - ধাপে ধাপে</h3>
+            <h3 style={{margin:'0 0 16px',color:T.teal}}>📦 নতুন পণ্য যুক্ত করুন - ধাপে ধাপে</h3>
             
             {/* Step 1: Company */}
             <div style={{marginBottom:12,position:'relative'}}>
