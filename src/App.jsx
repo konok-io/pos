@@ -1414,7 +1414,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
   }
 
   return (
-    <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+    <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
       {/* Sub tabs */}
       <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
         <button onClick={()=>setActiveTab('companies')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='companies'?700:400,color:activeTab==='companies'?T.teal:T.gray500,borderBottom:activeTab==='companies'?`2px solid ${T.teal}`:'none',fontSize:13}}>
@@ -1436,7 +1436,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
         </div>
       </div>
 
-      <div style={{flex:1,overflow:'auto',padding:12}}>
+      <div style={{overflow:'auto',padding:12}}>
         {/* PRODUCTS TAB */}
         {activeTab === 'products' && (
           <div style={{...card,maxWidth:600,margin:'0 auto'}}>
