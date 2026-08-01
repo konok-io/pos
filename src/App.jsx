@@ -1539,11 +1539,9 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
             <div style={{marginBottom:12,position:'relative'}}>
               <label style={label}>② 📂 ক্যাটাগরি নির্বাচন করুন *</label>
               <input value={productForm.cat} onChange={e=>{setProductForm(f=>({...f,cat:e.target.value}));setCatQ(e.target.value);setShowCatDrop(true);}} 
-                onFocus={()=>setShowCatDrop(true)} placeholder="ক্যাটাগরির নাম লিখুন..." 
-                />
-                
+                onFocus={()=>setShowCatDrop(true)} placeholder="ক্যাটাগরির নাম লিখুন..." style={input} />
               {showCatDrop && (
-                <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
+                <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                   {allCategories.filter(c=>!catQ || c.toLowerCase().includes(catQ.toLowerCase())).map(c=>(
                     <div key={c} onClick={()=>{setProductForm(f=>({...f,cat:c}));setCatQ('');setShowCatDrop(false);}}
                       style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>{c}</div>
