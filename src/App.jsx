@@ -715,11 +715,26 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   const handleBarcode = (val) => {
     setBarcodeVal(val);
     setForm(f => ({...f, barcode: val}));
-    if (val.length >= 2) {
-      const matches = products.filter(p => 
+    
+    // Filter by selected company if one is selected
+    let filteredProducts = products;
+    if (form.company) {
+      filteredProducts = products.filter(p => 
+        (p.company||'').toLowerCase() === form.company.toLowerCase()
+      );
+    }
+    
+    if (val.length >= 1) {
+      const matches = filteredProducts.filter(p => 
         p.barcode?.includes(val) || p.name.toLowerCase().includes(val.toLowerCase())
       ).slice(0, 5);
       setBarcodeSuggestions(matches);
+      
+      // Auto-fill if exact barcode match found
+      const exactMatch = filteredProducts.find(p => p.barcode === val);
+      if (exactMatch) {
+        selectProduct(exactMatch);
+      }
     } else {
       setBarcodeSuggestions([]);
     }
