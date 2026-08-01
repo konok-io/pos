@@ -1727,43 +1727,34 @@ function BarcodeScreen({purchases, products}) {
   // Print all barcodes (A4 size)
   const printBarcodes = () => {
     if (!selectedPurchase) return;
-    
+
     let html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Barcode Labels</title>
 <style>
-@page { size: A4; margin: 10mm; }
+@page { size: A4; margin: 15mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; padding: 10mm; background: #fff; }
-.header { text-align: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #333; }
-.header h2 { color: #333; margin-bottom: 5px; }
-.header p { color: #666; font-size: 12px; }
-.barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.barcode-item { border: 1px solid #ddd; padding: 10px; text-align: center; page-break-inside: avoid; }
-.barcode-name { font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #333; min-height: 28px; }
-.barcode-value { font-size: 10px; font-family: 'Libre Barcode 39', cursive; margin: 5px 0; }
-.barcode-text { font-size: 10px; color: #666; }
-.barcode-count { font-size: 9px; color: #999; margin-top: 3px; }
+.barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.barcode-item { border: 1px solid #ddd; padding: 8px; text-align: center; page-break-inside: avoid; min-height: 95px; }
+.barcode-price { font-size: 14px; font-weight: bold; color: #000; margin-bottom: 6px; }
+.barcode-value { font-size: 80px; font-family: 'Libre Barcode 39', cursive; line-height: 1; margin: 2px 0; }
+.barcode-number { font-size: 11px; font-family: monospace; color: #333; margin-top: 4px; letter-spacing: 1px; }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
 </head>
 <body>
-<div class="header">
-  <h2>📊 বারকোড লেবেল</h2>
-  <p>পারচেজ: ${selectedPurchase.id} | ${new Date(selectedPurchase.date).toLocaleDateString('bn-BD')}</p>
-</div>
 <div class="barcode-grid">`;
 
     selectedPurchase.items.forEach((item, idx) => {
       const count = barcodeCounts[idx] || 0;
       for (let i = 0; i < count; i++) {
         html += `<div class="barcode-item">
-  <div class="barcode-name">${item.name}</div>
+  <div class="barcode-price">৳${item.sellP || 0}</div>
   <div class="barcode-value">*${item.barcode || item.id}*</div>
-  <div class="barcode-text">৳${item.sellP || 0} | ${item.company || ''}</div>
-  <div class="barcode-count">${i + 1}/${count}</div>
+  <div class="barcode-number">${item.barcode || item.id}</div>
 </div>`;
       }
     });
@@ -1864,17 +1855,17 @@ body { font-family: Arial, sans-serif; padding: 10mm; background: #fff; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; background: #fff; }
 .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-.name { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333; }
-.value { font-size: 60px; font-family: 'Libre Barcode 39', cursive; margin-bottom: 15px; }
-.text { font-size: 14px; color: #666; margin-top: 10px; }
+.price { font-size: 24px; font-weight: bold; color: #000; margin-bottom: 20px; }
+.value { font-size: 120px; font-family: 'Libre Barcode 39', cursive; line-height: 1; margin-bottom: 15px; }
+.number { font-size: 16px; font-family: monospace; color: #333; letter-spacing: 2px; }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="container">
-<div class="name">${item.name}</div>
+<div class="price">৳${item.sellP || 0}</div>
 <div class="value">*${item.barcode || item.id}*</div>
-<div class="text">৳${item.sellP || 0} | ${item.company || ''}</div>
+<div class="number">${item.barcode || item.id}</div>
 </div>
 </body>
 </html>`;
