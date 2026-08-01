@@ -662,6 +662,8 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   const [productNameQ, setProductNameQ] = useState('');
   const [showProductDrop, setShowProductDrop] = useState(false);
   const [csvData, setCsvData] = useState([]);
+  const [showCategoryDrop, setShowCategoryDrop] = useState(false);
+  const [categoryQ, setCategoryQ] = useState('');
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
@@ -991,28 +993,53 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
             <div style={{...card,padding:16}}>
               <h3 style={{margin:'0 0 16px',fontSize:14,color:T.teal}}>পণ্য যোগ করুন</h3>
               
-              {/* Supplier/Company */}
-              <div style={{marginBottom:12,position:'relative'}}>
-                <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
-                <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
-                  onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..."
-                  style={{...input,fontSize:13}} />
-                {showSupplierDrop && (
-                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                    {filteredCompanies.map((c,i)=>(
-                      <div key={i} onClick={()=>{setSupplierQ(c.name);setForm(f=>({...f,company:c.name}));setShowSupplierDrop(false);}}
-                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
-                        <span>{c.name}</span>
-                        {c.code && <span style={{fontSize:11,color:T.teal,fontWeight:600}}>{c.code}</span>}
-                      </div>
-                    ))}
-                    {filteredCompanies.length === 0 && (
-                      <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো কোম্পানি পাওয়া যায়নি</div>
-                    )}
-                    <div onClick={()=>{setShowNewSupplier(true);}}
-                      style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600}}>+ নতুন কোম্পানি যোগ করুন</div>
-                  </div>
-                )}
+              {/* Supplier/Company + Category inline */}
+              <div style={{display:'flex',gap:8,marginBottom:12}}>
+                {/* Supplier/Company */}
+                <div style={{flex:1,position:'relative'}}>
+                  <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
+                  <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
+                    onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..."
+                    style={{...input,fontSize:13}} />
+                  {showSupplierDrop && (
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
+                      {filteredCompanies.map((c,i)=>(
+                        <div key={i} onClick={()=>{setSupplierQ(c.name);setForm(f=>({...f,company:c.name}));setShowSupplierDrop(false);}}
+                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
+                          <span>{c.name}</span>
+                          {c.code && <span style={{fontSize:11,color:T.teal,fontWeight:600}}>{c.code}</span>}
+                        </div>
+                      ))}
+                      {filteredCompanies.length === 0 && (
+                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো কোম্পানি পাওয়া যায়নি</div>
+                      )}
+                      <div onClick={()=>{setShowNewSupplier(true);}}
+                        style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600}}>+ নতুন কোম্পানি যোগ করুন</div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Category with Dropdown */}
+                <div style={{flex:1,position:'relative'}}>
+                  <label style={label}>📂 ক্যাটাগরি</label>
+                  <input value={categoryQ} onChange={e=>{setCategoryQ(e.target.value);setForm(f=>({...f,cat:e.target.value}));setShowCategoryDrop(true);}}
+                    onFocus={()=>{setShowCategoryDrop(true);setCategoryQ(form.cat||'');}} placeholder="ক্যাটাগরি নির্বাচন করুন..."
+                    style={{...input,fontSize:13}} />
+                  {showCategoryDrop && allCategories.length > 0 && (
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
+                      {allCategories.filter(c => !categoryQ || c.toLowerCase().includes(categoryQ.toLowerCase())).map((cat,i)=>(
+                        <div key={i} onClick={()=>{setCategoryQ(cat);setForm(f=>({...f,cat:cat}));setShowCategoryDrop(false);}}
+                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
+                          <span>{cat}</span>
+                          <span style={{fontSize:11,color:T.gray400}}>{products.filter(p=>p.cat===cat).length}টি</span>
+                        </div>
+                      ))}
+                      {allCategories.filter(c => !categoryQ || c.toLowerCase().includes(categoryQ.toLowerCase())).length === 0 && (
+                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো ক্যাটাগরি পাওয়া যায়নি</div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Barcode + Product Name */}
@@ -1056,13 +1083,6 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                     </div>
                   )}
                 </div>
-              </div>
-
-              {/* Category */}
-              <div style={{marginBottom:12}}>
-                <label style={label}>📂 ক্যাটাগরি</label>
-                <input value={form.cat} onChange={e=>setForm(f=>({...f,cat:e.target.value}))} placeholder="ক্যাটাগরি..."
-                  style={{...input,fontSize:13}} />
               </div>
 
               {/* Inline Fields: Unit, Stock, Prices, Min Stock */}
