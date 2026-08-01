@@ -1344,7 +1344,6 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
         </div>
         <button style={btn('primary')} onClick={()=>{setShowAddForm(true);setPurchaseItems([]);}}>📦 নতুন পণ্য সংরক্ষণ</button>
-        <button style={btn()} onClick={()=>setShowPurchaseHistory(true)}>📋 পারচেজ হিস্ট্রি</button>
         <span style={{fontSize:12,color:T.gray400}}>{products.length}টি পণ্য</span>
       </div>
 
@@ -2241,10 +2240,11 @@ function InventoryScreen({products, suppliers, upd}) {
 /* ═══════════════════════════════════════════
    REPORTS SCREEN
 ═══════════════════════════════════════════ */
-function ReportsScreen({sales, customers}) {
+function ReportsScreen({sales, customers, purchases}) {
   const [period, setPeriod] = useState('today');
   const [from, setFrom] = useState(today());
   const [to, setTo] = useState(today());
+  const [viewPurchase, setViewPurchase] = useState(null);
 
   const filterSales = () => {
     const n = new Date();
@@ -2331,6 +2331,34 @@ function ReportsScreen({sales, customers}) {
           ))}
         </div>
 
+        {/* Purchase History */}
+        <div style={{...card,marginBottom:14}}>
+          <h3 style={{margin:'0 0 12px',fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>📦 পারচেজ হিস্ট্রি ({purchases.length}টি)</h3>
+          <div style={{overflow:'auto'}}>
+            <table style={{width:'100%',borderCollapse:'collapse'}}>
+              <thead>
+                <tr style={{background:T.gray50}}>
+                  {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ'].map(h=>(
+                    <th key={h} style={{padding:'8px 10px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray400,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {purchases.length===0 ? <tr><td colSpan={5} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</td></tr>
+                : [...purchases].reverse().map((p,i)=>(
+                  <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewPurchase(p)}>
+                    <td style={{padding:'9px 10px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
+                    <td style={{padding:'9px 10px',fontSize:12,fontFamily:'monospace',color:T.teal,fontWeight:600}}>{p.id}</td>
+                    <td style={{padding:'9px 10px',fontSize:12}}>{p.supplier}</td>
+                    <td style={{padding:'9px 10px',fontSize:12,color:T.gray400}}>{p.totalItems}টি</td>
+                    <td style={{padding:'9px 10px',fontWeight:600,fontSize:13,color:T.green}}>{fmt(p.items.reduce((s,i)=>s+(i.stock||0)*(i.buyP||0),0))}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* Sales history */}
         <div style={card}>
           <h3 style={{margin:'0 0 12px',fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>বিক্রয় ইতিহাস ({fs.length}টি বিল)</h3>
@@ -2362,6 +2390,58 @@ function ReportsScreen({sales, customers}) {
           </div>
         </div>
       </div>
+
+      {/* Purchase Detail Modal */}
+      {viewPurchase && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setViewPurchase(null)}>
+          <div style={{background:T.white,borderRadius:12,padding:20,width:500,maxHeight:'80vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:16,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
+              <div>
+                <div style={{fontWeight:800,fontSize:18,color:T.teal}}>{viewPurchase.id}</div>
+                <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
+              </div>
+              <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+            </div>
+            <table style={{width:'100%',borderCollapse:'collapse'}}>
+              <thead>
+                <tr style={{background:T.gray50}}>
+                  <th style={{padding:8,textAlign:'left',fontSize:11,color:T.gray600}}>পণ্যের নাম</th>
+                  <th style={{padding:8,textAlign:'center',fontSize:11,color:T.gray600}}>পরিমাণ</th>
+                  <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>দাম</th>
+                  <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>মোট</th>
+                </tr>
+              </thead>
+              <tbody>
+                {viewPurchase.items.map((item,i) => {
+                  const qty = item.stock || 0;
+                  const price = item.buyP || 0;
+                  const total = qty * price;
+                  return (
+                    <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
+                      <td style={{padding:10,fontSize:13}}>
+                        <div style={{fontWeight:600}}>{item.name}</div>
+                        <div style={{fontSize:11,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
+                      </td>
+                      <td style={{padding:10,textAlign:'center',fontWeight:600}}>{qty} {item.unit || 'পিস'}</td>
+                      <td style={{padding:10,textAlign:'right',fontSize:13}}>{fmt(price)}</td>
+                      <td style={{padding:10,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(total)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr style={{background:T.tealLight}}>
+                  <td colSpan={3} style={{padding:10,fontWeight:700,fontSize:13}}>সর্বমোট</td>
+                  <td style={{padding:10,textAlign:'right',fontWeight:800,fontSize:16,color:T.teal}}>
+                    {fmt(viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0))}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
