@@ -1300,8 +1300,15 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
     if (!productForm.name?.trim()) { alert('পণ্যের নাম দিন'); return; }
     if (!productForm.barcode?.trim()) { alert('বারকোড দিন'); return; }
     
+    // Generate product ID (P-00001, P-00002, etc.)
+    const maxId = products.reduce((max, p) => {
+      const match = p.id?.match(/P-(\d+)/);
+      return match ? Math.max(max, parseInt(match[1])) : max;
+    }, 50);
+    const newId = `P-${String(maxId + 1).padStart(5, '0')}`;
+    
     const newP = {
-      id: genId(),
+      id: newId,
       name: productForm.name.trim(),
       barcode: productForm.barcode.trim(),
       company: productForm.company,
@@ -1314,7 +1321,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
     };
     await upd.products([...products, newP]);
     setProductForm({company:productForm.company,cat:productForm.cat,name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:'0',minStock:'5'});
-    alert('পণ্য সংরক্ষিত হয়েছে!');
+    alert(`পণ্য সংরক্ষিত হয়েছে! আইডি: ${newId}`);
   };
 
   const saveCategory = async () => {
