@@ -494,7 +494,6 @@ ${r.sale.discount > 0 ? `<div class="row"><span>ছাড়:</span><span>-৳${
 ${r.sale.change > 0 ? `<div class="row"><span>ফেরত:</span><span>৳${r.sale.change.toFixed(2)}</span></div>` : ''}
 ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${r.sale.due.toFixed(2)}</span></div>` : ''}
 <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-<script>window.onload = function() { window.print(); }</script>
 </body>
 </html>`;
 
@@ -502,6 +501,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
     w.document.open();
     w.document.write(html);
     w.document.close();
+    w.onload = function() { setTimeout(() => w.print(), 100); };
   };
 
   if (receipt) return (
@@ -1104,13 +1104,13 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </table>
 <div class="total row"><span>সর্বমোট:</span><span>৳${grandTotal.toFixed(2)}</span></div>
 <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-<script>window.onload=function(){window.print();}</script>
 </body>
 </html>`;
                       const win = window.open('','','width=320,height=600');
                       win.document.open();
                       win.document.write(html);
                       win.document.close();
+                      win.onload = function() { setTimeout(() => win.print(), 100); };
                     }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
                     <div style={{textAlign:'right'}}>
                       <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
@@ -2415,9 +2415,10 @@ function ReportsScreen({sales, customers, purchases}) {
     </html>`;
     
     const win = window.open('', '', 'width=320,height=600');
+    win.document.open();
     win.document.write(html);
     win.document.close();
-    setTimeout(() => win.print(), 250);
+    win.onload = function() { setTimeout(() => win.print(), 100); };
   };
 
   const printSales = () => {
@@ -2473,9 +2474,10 @@ function ReportsScreen({sales, customers, purchases}) {
     </html>`;
     
     const win = window.open('', '', 'width=320,height=600');
+    win.document.open();
     win.document.write(html);
     win.document.close();
-    setTimeout(() => win.print(), 250);
+    win.onload = function() { setTimeout(() => win.print(), 100); };
   };
 
   const statCards = [
@@ -2672,13 +2674,13 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </table>
 <div class="total row"><span>সর্বমোট:</span><span>৳${total.toFixed(2)}</span></div>
 <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-<script>window.onload=function(){window.print();}</script>
 </body>
 </html>`;
                   const win = window.open('','','width=320,height=600');
                   win.document.open();
                   win.document.write(html);
                   win.document.close();
+                  win.onload = function() { setTimeout(() => win.print(), 100); };
                 }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
               </div>
@@ -2782,13 +2784,13 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 <div class="row"><span>পরিশোধ:</span><span>৳${s.paid.toFixed(2)}</span></div>`;
                   if(s.due > 0) html += `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${s.due.toFixed(2)}</span></div>`;
                   html += `<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-<script>window.onload=function(){window.print();}</script>
 </body>
 </html>`;
                   const win = window.open('','','width=320,height=600');
                   win.document.open();
                   win.document.write(html);
                   win.document.close();
+                  win.onload = function() { setTimeout(() => win.print(), 100); };
                 }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
               </div>
