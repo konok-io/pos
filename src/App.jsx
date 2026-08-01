@@ -226,6 +226,14 @@ export default function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // Check if reset was done
+    const wasReset = sessionStorage.getItem('pos_reset_done');
+    if (wasReset) {
+      sessionStorage.removeItem('pos_reset_done');
+      setReady(true);
+      return;
+    }
+
     // Load from localStorage or use DEMO data
     const savedProducts = db.get(STORAGE_KEYS.products);
     const savedCustomers = db.get(STORAGE_KEYS.customers);
@@ -2233,6 +2241,7 @@ function SettingsScreen({settings, products, suppliers, purchases, upd}) {
             <button style={btn('danger','sm')} onClick={async()=>{
               if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
                 localStorage.clear();
+                sessionStorage.setItem('pos_reset_done', 'true');
                 alert('সব ডেটা মুছে ফেলা হয়েছে।');
                 window.location.reload();
               }
