@@ -2303,19 +2303,19 @@ function ReportsScreen({sales, customers, purchases}) {
     <head>
       <title>পারচেজ হিস্ট্রি</title>
       <style>
-        @page { size: A4 landscape; margin: 15mm; }
+        @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Arial,sans-serif; padding:15px; font-size:12px; }
-        .header { text-align:center; margin-bottom:15px; border-bottom:2px solid #00897b; padding-bottom:10px; }
-        .header h1 { color:#00897b; font-size:22px; margin-bottom:5px; }
-        .header p { color:#666; font-size:12px; }
-        table { width:100%; border-collapse:collapse; margin-bottom:15px; }
-        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:8px 6px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
-        td { border:1px solid #e0e0e0; padding:7px 6px; font-size:11px; }
+        body { font-family:'Segoe UI',Arial,sans-serif; padding:12px; font-size:12px; }
+        .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
+        .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
+        .header p { color:#666; font-size:11px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
+        td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
         tr:nth-child(even) { background:#fafafa; }
         .total-row { background:#e0f7f0 !important; font-weight:700; }
-        .total-row td { border:1px solid #b2dfdb; font-size:13px; color:#00897b; }
-        .footer { margin-top:15px; text-align:center; color:#999; font-size:10px; }
+        .total-row td { border:1px solid #b2dfdb; font-size:12px; color:#00897b; }
+        .footer { margin-top:12px; text-align:center; color:#999; font-size:10px; }
         @media print { body { padding:0; } }
       </style>
     </head>
@@ -2375,19 +2375,19 @@ function ReportsScreen({sales, customers, purchases}) {
     <head>
       <title>বিক্রয় ইতিহাস</title>
       <style>
-        @page { size: A4 landscape; margin: 15mm; }
+        @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Arial,sans-serif; padding:15px; font-size:12px; }
-        .header { text-align:center; margin-bottom:15px; border-bottom:2px solid #00897b; padding-bottom:10px; }
-        .header h1 { color:#00897b; font-size:22px; margin-bottom:5px; }
-        .header p { color:#666; font-size:12px; }
-        table { width:100%; border-collapse:collapse; margin-bottom:15px; }
-        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:8px 6px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
-        td { border:1px solid #e0e0e0; padding:7px 6px; font-size:11px; }
+        body { font-family:'Segoe UI',Arial,sans-serif; padding:12px; font-size:12px; }
+        .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
+        .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
+        .header p { color:#666; font-size:11px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
+        td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
         tr:nth-child(even) { background:#fafafa; }
         .total-row { background:#e8f5e9 !important; font-weight:700; }
         .total-row td { border:1px solid #a5d6a7; color:#2e7d32; font-size:12px; }
-        .footer { margin-top:15px; text-align:center; color:#999; font-size:10px; }
+        .footer { margin-top:12px; text-align:center; color:#999; font-size:10px; }
         @media print { body { padding:0; } }
       </style>
     </head>
