@@ -599,7 +599,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
   };
 
   if (receipt) return (
-    <div style={{display:'flex',flexDirection:'column',height:'100%',alignItems:'center',justifyContent:'center',gap:20,background:T.greenLight}}>
+    <div style={{display:'flex',flexDirection:'column',height:'100%',alignItems:'center',justifyContent:'center',gap:20,background:T.greenLight}} onKeyDown={e=>{if(e.key==='Enter'){printReceipt(receipt);setTimeout(()=>setReceipt(null),500);}}}>
       <div style={{fontSize:72}}>✅</div>
       <div style={{fontSize:24,fontWeight:800,color:T.green}}>বিক্রয় সম্পন্ন!</div>
       <div style={{...card,width:340,textAlign:'center',padding:24}}>
@@ -612,7 +612,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         </div>
         <div style={{fontSize:13,color:T.gray400,marginBottom:20}}>কাস্টমার: {receipt.sale.custName}</div>
         <div style={{display:'flex',gap:10,justifyContent:'center'}}>
-          <button style={btn('primary')} onClick={()=>printReceipt(receipt)}>🖨️ প্রিন্ট রসিদ</button>
+          <button autoFocus style={btn('primary')} onClick={()=>{printReceipt(receipt);setTimeout(()=>setReceipt(null),500);}}>🖨️ প্রিন্ট ও বন্ধ করুন</button>
           <button style={btn()} onClick={()=>setReceipt(null)}>+ নতুন বিল</button>
         </div>
       </div>
