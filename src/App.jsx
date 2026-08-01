@@ -330,6 +330,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
   const change = paidAmt > total ? paidAmt - total : 0;
 
   const checkout = async () => {
+    alert('বিক্রয় বাটনে ক্লিক হয়েছে!');
     if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
     if (due > 0 && !selCust) { 
       alert('⚠️ পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন!');
