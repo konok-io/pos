@@ -331,9 +331,8 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   const checkout = async () => {
     if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
-    if (paidAmt < total) { 
-      if (!selCust) { alert('⚠️ পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন!'); }
-      else { alert('⚠️ পরিশোধের টাকা পুরো মূল্যের চেয়ে কম!'); }
+    if (paidAmt < total && !selCust) { 
+      alert('⚠️ পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন!');
       return; 
     }
 
@@ -598,13 +597,15 @@ function POSScreen({products, customers, sales, settings, upd}) {
               🗑️ ক্লিয়ার
             </button>
             <button onClick={checkout} 
-              disabled={!cart.length || paidAmt < total}
+              disabled={!cart.length || (paidAmt < total && !selCust)}
               style={{
                 ...btn('sell'), flex:2, justifyContent:'center', fontSize:15, padding:'12px',
-                opacity: cart.length && paidAmt >= total ? 1 : 0.5,
-                cursor: cart.length && paidAmt >= total ? 'pointer' : 'not-allowed',
+                opacity: cart.length && (paidAmt >= total || selCust) ? 1 : 0.5,
+                cursor: cart.length && (paidAmt >= total || selCust) ? 'pointer' : 'not-allowed',
               }}>
-              {paidAmt < total && cart.length ? (selCust ? '⚠️ পূর্ণ পরিশোধ করুন' : '⚠️ পূর্ণ পরিশোধ বা গ্রাহক সিলেক্ট করুন') : '✓ বিক্রয় সম্পন্ন'}
+              {paidAmt < total && cart.length && selCust ? '✓ বাকি বিক্রয় করুন' : 
+               paidAmt < total && cart.length ? '⚠️ পূর্ণ পরিশোধ বা গ্রাহক সিলেক্ট করুন' : 
+               '✓ বিক্রয় সম্পন্ন'}
             </button>
           </div>
         </div>
