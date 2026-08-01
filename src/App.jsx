@@ -107,7 +107,7 @@ function Modal({onClose, title, children, width=460}) {
 
 /* ─────────────── MAIN APP ─────────────── */
 export default function App() {
-  const [tab, setTab] = useState('pos');
+  const [tab, setTab] = useState(() => localStorage.getItem('pos_current_tab') || 'pos');
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
@@ -118,6 +118,14 @@ export default function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    // Restore tab from localStorage
+    const savedTab = localStorage.getItem('pos_current_tab');
+    if (savedTab) {
+      setTab(savedTab);
+    }
+    
+    // Clear saved tab after restore
+    localStorage.removeItem('pos_current_tab');
     // Check if reset was done - flag stays forever to prevent DEMO loading
     const wasReset = db.get('pos_reset_done');
     
@@ -219,6 +227,12 @@ export default function App() {
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, upd};
 
+  // Hard refresh function - saves current tab and forces reload from server
+  const handleHardRefresh = () => {
+    localStorage.setItem('pos_current_tab', tab);
+    window.location.href = window.location.pathname;
+  };
+
   return (
     <>
       <GlobalStyle />
@@ -226,6 +240,9 @@ export default function App() {
       {/* Header */}
       <div style={{background:T.tealDark,color:T.white,padding:'0 20px',height:56,display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,boxShadow:'0 2px 8px rgba(0,0,0,0.15)'}}>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <button onClick={handleHardRefresh} style={{background:'rgba(255,255,255,0.15)',border:'none',borderRadius:8,cursor:'pointer',padding:'8px 12px',color:T.white,fontSize:16,display:'flex',alignItems:'center',gap:4}} title="হার্ড রিফ্রেশ">
+            🔄 <span style={{fontSize:12}}>রিফ্রেশ</span>
+          </button>
           <div style={{width:38,height:38,background:'rgba(255,255,255,0.15)',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>🏪</div>
           <div>
             <div style={{fontWeight:700,fontSize:16,lineHeight:1.2}}>{settings.name}</div>
