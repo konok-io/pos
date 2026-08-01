@@ -609,15 +609,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
     };
   };
 
-  // Auto-print receipt when popup appears
-  useEffect(() => {
-    if (receipt) {
-      printReceipt(receipt);
-    }
-  }, [receipt]);
-
   if (receipt) return (
-    <div style={{display:'flex',flexDirection:'column',height:'100%',alignItems:'center',justifyContent:'center',gap:20,background:T.greenLight}} onKeyDown={e=>{if(e.key==='Enter'){setReceipt(null);searchRef.current?.focus();}}} tabIndex={0}>
+    <div style={{display:'flex',flexDirection:'column',height:'100%',alignItems:'center',justifyContent:'center',gap:20,background:T.greenLight}} onKeyDown={e=>{if(e.key==='Enter'){printReceipt(receipt);setTimeout(()=>{setReceipt(null);searchRef.current?.focus();},500);}}} tabIndex={0}>
       <div style={{fontSize:72}}>✅</div>
       <div style={{fontSize:24,fontWeight:800,color:T.green}}>বিক্রয় সম্পন্ন!</div>
       <div style={{...card,width:340,textAlign:'center',padding:24}}>
@@ -630,7 +623,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         </div>
         <div style={{fontSize:13,color:T.gray400,marginBottom:20}}>কাস্টমার: {receipt.sale.custName}</div>
         <div style={{display:'flex',gap:10,justifyContent:'center'}}>
-          <button autoFocus style={btn('primary')} onClick={()=>{setReceipt(null);searchRef.current?.focus();}}>✅ বন্ধ করুন</button>
+          <button autoFocus style={btn('primary')} onClick={()=>{printReceipt(receipt);setTimeout(()=>{setReceipt(null);searchRef.current?.focus();},500);}}>✅ বন্ধ করুন</button>
         </div>
       </div>
     </div>
