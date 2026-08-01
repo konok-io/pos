@@ -2245,6 +2245,7 @@ function ReportsScreen({sales, customers, purchases}) {
   const [from, setFrom] = useState(today());
   const [to, setTo] = useState(today());
   const [viewPurchase, setViewPurchase] = useState(null);
+  const [viewSale, setViewSale] = useState(null);
 
   const filterSales = () => {
     const n = new Date();
@@ -2376,7 +2377,7 @@ function ReportsScreen({sales, customers, purchases}) {
                 : [...fs].reverse().map((s,i)=>(
                   <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                     <td style={{padding:'9px 10px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
-                    <td style={{padding:'9px 10px',fontSize:12,fontFamily:'monospace',color:T.teal}}>#{s.id.slice(-6).toUpperCase()}</td>
+                    <td style={{padding:'9px 10px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600}} onClick={()=>setViewSale(s)}>#{s.id.slice(-6).toUpperCase()}</td>
                     <td style={{padding:'9px 10px',fontSize:12}}>{s.custName}</td>
                     <td style={{padding:'9px 10px',fontSize:12,color:T.gray400}}>{(s.items||[]).length}টি</td>
                     <td style={{padding:'9px 10px',fontWeight:600,fontSize:13}}>{fmt(s.total)}</td>
@@ -2440,6 +2441,75 @@ function ReportsScreen({sales, customers, purchases}) {
                     {fmt(viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0))}
                   </td>
                 </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Sale Detail Modal */}
+      {viewSale && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setViewSale(null)}>
+          <div style={{background:T.white,borderRadius:12,padding:20,width:500,maxHeight:'80vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:16,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
+              <div>
+                <div style={{fontWeight:800,fontSize:18,color:T.teal}}>#{viewSale.id.slice(-6).toUpperCase()}</div>
+                <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:13,marginTop:4}}>👤 কাস্টমার: {viewSale.custName}</div>
+                {viewSale.phone && <div style={{fontSize:12,color:T.gray500,marginTop:2}}>📱 {viewSale.phone}</div>}
+              </div>
+              <div style={{display:'flex',gap:8}}>
+                <button onClick={()=>window.print()} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+              </div>
+            </div>
+            <table style={{width:'100%',borderCollapse:'collapse'}}>
+              <thead>
+                <tr style={{background:T.gray50}}>
+                  <th style={{padding:8,textAlign:'left',fontSize:11,color:T.gray600}}>পণ্যের নাম</th>
+                  <th style={{padding:8,textAlign:'center',fontSize:11,color:T.gray600}}>পরিমাণ</th>
+                  <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>দাম</th>
+                  <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>মোট</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(viewSale.items||[]).map((item,i) => (
+                  <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
+                    <td style={{padding:10,fontSize:13}}>
+                      <div style={{fontWeight:600}}>{item.name}</div>
+                      <div style={{fontSize:11,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
+                    </td>
+                    <td style={{padding:10,textAlign:'center',fontWeight:600}}>{item.qty} {item.unit || 'পিস'}</td>
+                    <td style={{padding:10,textAlign:'right',fontSize:13}}>{fmt(item.sellP)}</td>
+                    <td style={{padding:10,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(item.qty * item.sellP)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr style={{background:T.gray100}}>
+                  <td colSpan={3} style={{padding:10,fontWeight:600,fontSize:13}}>সাবটোটাল</td>
+                  <td style={{padding:10,textAlign:'right',fontWeight:700,fontSize:14}}>{fmt(viewSale.total)}</td>
+                </tr>
+                {viewSale.vatEnabled && viewSale.vat > 0 && (
+                  <tr style={{background:T.gray100}}>
+                    <td colSpan={3} style={{padding:10,fontSize:13,color:T.gray600}}>ভ্যাট ({viewSale.vatRate}%)</td>
+                    <td style={{padding:10,textAlign:'right',fontSize:13,color:T.gray600}}>{fmt(viewSale.vat)}</td>
+                  </tr>
+                )}
+                <tr style={{background:T.greenLight}}>
+                  <td colSpan={3} style={{padding:10,fontWeight:700,fontSize:13,color:T.green}}>মোট</td>
+                  <td style={{padding:10,textAlign:'right',fontWeight:800,fontSize:16,color:T.green}}>{fmt(viewSale.total + (viewSale.vat||0))}</td>
+                </tr>
+                <tr style={{background:T.greenLight}}>
+                  <td colSpan={3} style={{padding:10,fontWeight:600,fontSize:13,color:T.green}}>পরিশোধ হয়েছে</td>
+                  <td style={{padding:10,textAlign:'right',fontWeight:700,fontSize:14,color:T.green}}>{fmt(viewSale.paid)}</td>
+                </tr>
+                {viewSale.due > 0 && (
+                  <tr style={{background:T.redLight}}>
+                    <td colSpan={3} style={{padding:10,fontWeight:700,fontSize:13,color:T.red}}>বাকি</td>
+                    <td style={{padding:10,textAlign:'right',fontWeight:800,fontSize:14,color:T.red}}>{fmt(viewSale.due)}</td>
+                  </tr>
+                )}
               </tfoot>
             </table>
           </div>
