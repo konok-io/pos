@@ -1572,8 +1572,8 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                 <label style={label}>① 🏢 কোম্পানি নির্বাচন করুন *</label>
                 <input value={catForm.company} onChange={e=>{setCatForm(f=>({...f,company:e.target.value}));setCatCompanyQ(e.target.value);setShowCatCompanyDrop(true);}} 
                   onFocus={()=>setShowCatCompanyDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..." style={input} />
-                {showCatCompanyDrop && catCompanyQ && (
-                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
+                {showCatCompanyDrop && (
+                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                     {filteredCompanies.filter(c=>!catCompanyQ || c.name.toLowerCase().includes(catCompanyQ.toLowerCase()) || (c.code||'').toLowerCase().includes(catCompanyQ.toLowerCase())).map(c=>(
                       <div key={c.id} onClick={()=>{setCatForm(f=>({...f,company:c.name}));setCatCompanyQ('');setShowCatCompanyDrop(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
@@ -1595,28 +1595,16 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
               <button onClick={saveCategory} style={{...btn('primary'),width:'100%'}} disabled={!catForm.name || !catForm.company}>💾 ক্যাটাগরি যোগ করুন</button>
             </div>
 
-            {/* Categories list by company */}
-            <h4 style={{margin:'0 0 12px',color:T.gray700}}>বিদ্যমান ক্যাটাগরি</h4>
-            {suppliers.length === 0 ? (
-              <div style={{textAlign:'center',padding:30,color:T.gray400}}>কোনো কোম্পানি নেই</div>
+            {/* All Categories Grid */}
+            <h4 style={{margin:'0 0 12px',color:T.gray700}}>📂 বিদ্যমান ক্যাটাগরি ({allCategories.length})</h4>
+            {allCategories.length === 0 ? (
+              <div style={{textAlign:'center',padding:30,color:T.gray400}}>কোনো ক্যাটাগরি নেই</div>
             ) : (
-              suppliers.map(sup => {
-                const supCats = [...new Set(products.filter(p => (p.company||'').toLowerCase() === sup.name.toLowerCase()).map(p => p.cat).filter(Boolean))];
-                if (supCats.length === 0) return null;
-                return (
-                  <div key={sup.id} style={{...card,marginBottom:12}}>
-                    <div style={{fontWeight:700,marginBottom:8,display:'flex',alignItems:'center',gap:6}}>
-                      🏢 {sup.name}
-                      {sup.code && <span style={{fontSize:11,color:T.teal}}>{sup.code}</span>}
-                    </div>
-                    <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
-                      {supCats.map(cat => (
-                        <span key={cat} style={{background:T.tealLight,padding:'4px 12px',borderRadius:20,fontSize:12,color:T.teal}}>{cat}</span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })
+              <div style={{display:'flex',flexWrap:'wrap',gap:8}}>
+                {allCategories.map(cat => (
+                  <span key={cat} style={{background:T.tealLight,padding:'8px 16px',borderRadius:20,fontSize:13,color:T.teal,fontWeight:600}}>{cat}</span>
+                ))}
+              </div>
             )}
           </>
         )}
