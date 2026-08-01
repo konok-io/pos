@@ -894,7 +894,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
             <label style={{...label,margin:0,whiteSpace:'nowrap'}}>পরিশোধ (৳)</label>
             <input ref={paidRef} value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
-              placeholder="পুরো মূল্য দিতে টাইপ করুন" style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}/>
+              placeholder="পুরো মূল্য দিতে টাইপ করুন" style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}
+              onKeyDown={e=>{if(e.key==='Enter'&&cart.length) checkout();}}/>
           </div>
           {due > 0 && (
             <div style={{fontSize:14,marginBottom:10,padding:'8px 12px',borderRadius:8,
