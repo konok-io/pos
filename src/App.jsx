@@ -372,7 +372,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
               background:T.white, border:`1.5px solid ${p.stock<=0?T.gray200:p.stock<=p.minStock?T.amber+'80':T.gray200}`,
               borderRadius:12, padding:'14px 12px', cursor:p.stock>0?'pointer':'not-allowed',
               opacity:p.stock<=0?0.5:1, textAlign:'left', transition:'all 0.2s',
-              boxShadow:'0 2px 8px rgba(0,0,0,0.08)', fontFamily:'inherit',
+              boxShadow:'0 2px 8px rgba(0,0,0,0.08)',
               outline:'none',
             }}>
               <div style={{fontSize:10,color:T.gray400,marginBottom:4,fontWeight:600,textTransform:'uppercase'}}>{p.cat}</div>
