@@ -691,11 +691,12 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
           row[h] = values[idx] || '';
         });
         
-        // Get company and category from CSV
+        // Get company code, company name and category from CSV
+        const csvCompanyCode = (row['কোম্পানি কোড'] || row['company code'] || '').trim();
         const csvCompany = (row['কোম্পানি'] || row['company'] || supplierQ || '').trim();
         const csvCategory = (row['ক্যাটাগরি'] || row['category'] || '').trim();
         
-        // Validate company
+        // Validate company by name
         if (csvCompany && !existingCompanies.includes(csvCompany.toLowerCase())) {
           errors.push(`পণ্য ${i}: "${csvCompany}" কোম্পানি ডাটাবেজে নেই`);
           continue;
@@ -955,24 +956,29 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
             <div style={{...card,padding:16,marginBottom:16,background:T.tealLight,border:`1px dashed ${T.teal}`}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
                 <h3 style={{margin:0,fontSize:14,color:T.teal}}>📥 CSV আমদানি করুন</h3>
-                <button onClick={() => {
-                  const csv = 'পণ্যের নাম,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক\nমিনিকেট চাল,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,100,10\nব্রিলিয়ান্ট চাল,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,80,10\nসুজি চিপস,সুজি,স্ন্যাকস,003,পিস,20,25,200,20';
-                  const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = 'পণ্যের_তালিকা.csv';
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }} style={{...btn('ghost'),fontSize:11,padding:'4px 10px'}}>
-                  📥 ডেমো CSV ডাউনলোড
-                </button>
               </div>
-              <div style={{display:'flex',justifyContent:'flex-end'}}>
-                <input type="file" accept=".csv" onChange={handleCsvImport} id="csvInput" style={{display:'none'}} />
-                <label htmlFor="csvInput" style={{...btn('primary'),cursor:'pointer',fontSize:13,padding:'10px 20px'}}>
-                  📁 পণ্যের CSV আপলোড করুন
-                </label>
+              <div style={{display:'flex',flexDirection:'column',gap:8,alignItems:'flex-start'}}>
+                <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+                  <input type="file" accept=".csv" onChange={handleCsvImport} id="csvInput" style={{display:'none'}} />
+                  <label htmlFor="csvInput" style={{...btn('primary'),cursor:'pointer',fontSize:13,padding:'10px 20px'}}>
+                    📁 পণ্যের CSV আপলোড করুন
+                  </label>
+                  <button onClick={() => {
+                    const csv = 'পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,80,10\nসুজি চিপস,S001,সুজি,স্ন্যাকস,003,পিস,20,25,200,20\nপারফেক্ট সাবান,P001,পারফেক্ট,সৌন্দর্য,004,পিস,35,45,150,15';
+                    const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'পণ্যের_তালিকা.csv';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }} style={{...btn('ghost'),fontSize:12,padding:'8px 16px'}}>
+                    📥 ডেমো CSV ডাউনলোড
+                  </button>
+                </div>
+                <div style={{fontSize:11,color:T.gray600}}>
+                  💡 CSV ফাইলে কোম্পানি কোড, কোম্পানির নাম ও ক্যাটাগরি অবশ্যই ডাটাবেজে থাকতে হবে
+                </div>
               </div>
               {csvData.length > 0 && (
                 <div style={{marginTop:8,fontSize:12,color:T.teal,fontWeight:600}}>
