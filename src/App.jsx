@@ -1729,7 +1729,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         {/* CATEGOR/* Company Modal */}
       {/* Unified Modal for all tabs */}
       {modal && (
-        <div style={{...overlay}} onClick={()=>setModal(null)}>
+        <div style={{...overlay}} onClick={()=>{setShowCompanyDrop(false);setShowCatDrop(false);setShowCatCompanyDrop(false);setShowProductDrop(false);setModal(null);}}>
           <div style={{...card,width:activeTab==='products'?500:380,padding:24}} onClick={e=>e.stopPropagation()}>
             {/* Company Form */}
             {(modal.mode === 'add' || modal.mode === 'edit') && activeTab === 'companies' && (
