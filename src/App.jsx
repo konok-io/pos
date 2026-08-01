@@ -625,7 +625,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
               <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:12,background:'none',border:'none',color:T.gray400,cursor:'pointer'}}>✕</button>
             </div>
           )}
-          {showCustDrop && custQ && !selCust && (
+          {showCustDrop && !selCust && (
             <div style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
               {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).map(c=>(
                 <div key={c.id} onClick={()=>{setSelCust(c);setCustQ(c.name);setShowCustDrop(false);}}
@@ -998,7 +998,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
                   onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..."
                   style={{...input,fontSize:13}} />
-                {showSupplierDrop && supplierQ && (
+                {showSupplierDrop && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                     {filteredCompanies.map((c,i)=>(
                       <div key={i} onClick={()=>{setSupplierQ(c.name);setForm(f=>({...f,company:c.name}));setShowSupplierDrop(false);}}
