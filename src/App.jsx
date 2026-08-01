@@ -836,6 +836,7 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
       }
     } else {
       setBarcodeSuggestions([]);
+      // Don't reset form when barcode is cleared - user might want to enter new product manually
     }
   };
 
