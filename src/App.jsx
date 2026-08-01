@@ -532,16 +532,18 @@ function POSScreen({products, customers, sales, settings, upd}) {
         {/* Customer */}
         <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray200}`,position:'relative'}}>
           <label style={label}>👥 কাস্টমার (ঐচ্ছিক)</label>
-          <input value={custQ} onChange={e=>{setCustQ(e.target.value);setShowCustDrop(true);}}
-            onFocus={()=>setShowCustDrop(true)}
-            placeholder="নাম বা ফোন নম্বর..."
-            style={{...input,fontSize:13,borderRadius:8}}
-          />
-          {due > 0 && !selCust && cart.length > 0 && (
-            <div style={{marginTop:10,padding:'10px 12px',borderRadius:8,background:T.blue50,border:`1px solid ${T.blue200}`,textAlign:'center'}}>
-              <div style={{fontSize:12,color:T.blue700,marginBottom:8}}>বাকিতে বিক্রয় করতে চাইলে কাস্টমার যোগ করুন</div>
-              <button onClick={()=>setShowAddCust(true)} style={{...btn('primary'),fontSize:12,padding:'6px 12px'}}>👤 কাস্টমার যোগ করুন</button>
-            </div>
+          <div style={{display:'flex',gap:8}}>
+            <input value={custQ} onChange={e=>{setCustQ(e.target.value);setShowCustDrop(true);}}
+              onFocus={()=>setShowCustDrop(true)}
+              placeholder="নাম বা ফোন..."
+              style={{...input,fontSize:13,borderRadius:8,flex:1}}
+            />
+            {due > 0 && !selCust && cart.length > 0 && (
+              <button onClick={()=>setShowAddCust(true)} style={{...btn('primary'),fontSize:12,padding:'8px 12px',whiteSpace:'nowrap'}}>👤 যোগ</button>
+            )}
+          </div>
+          {due > 0 && !selCust && cart.length > 0 && !custQ && (
+            <div style={{fontSize:11,color:T.blue600,marginTop:4}}>বাকিতে বিক্রয় করতে কাস্টমার যোগ করুন</div>
           )}
           {selCust && (
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:T.tealLight,borderRadius:8}}>
