@@ -803,8 +803,8 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
     setBarcodeVal(val);
     setForm(f => ({...f, barcode: val}));
     
-    // Search in all products (ignore company filter for barcode search)
-    if (val.length >= 1) {
+    // Only search when at least 3 characters typed
+    if (val.length >= 3) {
       const trimmedVal = val.trim().toLowerCase();
       
       // Find exact match by barcode OR by name (case insensitive)
@@ -820,7 +820,7 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
         selectProduct(exactMatch);
         setBarcodeSuggestions([]);
       } else {
-        // Show suggestions if no exact match
+        // Show suggestions if no exact match (but don't auto-fill)
         const matches = products.filter(p => 
           !p.name?.includes('(ক্যাটাগরি)') && (
             (p.barcode||'').toLowerCase().includes(trimmedVal) || 
@@ -828,15 +828,9 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
           )
         ).slice(0, 5);
         setBarcodeSuggestions(matches);
-        
-        // Auto-fill first suggestion if exists
-        if (matches.length > 0) {
-          selectProduct(matches[0]);
-        }
       }
     } else {
       setBarcodeSuggestions([]);
-      // Don't reset form when barcode is cleared - user might want to enter new product manually
     }
   };
 
