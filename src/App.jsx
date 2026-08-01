@@ -767,7 +767,7 @@ function ProductsScreen({products, suppliers, categories, upd}) {
       }
       
       if (items.length > 0) {
-        setPurchaseItems([...purchaseItems, ...items]);
+        setPurchaseItems(prevItems => [...prevItems, ...items]);
         setCsvData(items);
         alert(`✅ ${items.length}টি পণ্য আপলোড হয়েছে!`);
       } else {
@@ -875,34 +875,40 @@ function ProductsScreen({products, suppliers, categories, upd}) {
   const savePurchase = async () => {
     if (purchaseItems.length === 0) { alert('কমপক্ষে একটি পণ্য যোগ করুন'); return; }
     
-    const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
-    const purchase = {
-      id: purchaseId,
-      date: now(),
-      supplier: form.company || 'সাধারণ',
-      items: purchaseItems,
-      totalItems: purchaseItems.length,
-      totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
-    };
+    try {
+      const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
+      const purchase = {
+        id: purchaseId,
+        date: now(),
+        supplier: form.company || 'সাধারণ',
+        items: purchaseItems,
+        totalItems: purchaseItems.length,
+        totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
+      };
 
-    // Add new supplier if not exists
-    if (form.company && !suppliers.find(s => s.name === form.company)) {
-      const newSupplier = { id: genId(), name: form.company, phone: '', address: '' };
-      await upd.suppliers([...suppliers, newSupplier]);
+      // Add new supplier if not exists
+      if (form.company && !suppliers.find(s => s.name === form.company)) {
+        const newSupplier = { id: genId(), name: form.company, phone: '', address: '' };
+        await upd.suppliers([...suppliers, newSupplier]);
+      }
+
+      // Save all products
+      const newProducts = purchaseItems.map(item => ({ ...item, id: genId() }));
+      await upd.products([...products, ...newProducts]);
+      
+      // Save purchase record
+      await upd.purchases([...purchases, purchase]);
+
+      setPurchaseItems([]);
+      setCsvData([]);
+      setForm({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
+      setSupplierQ('');
+      setShowAddForm(false);
+      alert(`✅ ${purchaseItems.length}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
+    } catch (err) {
+      console.error('Save error:', err);
+      alert('❌ সংরক্ষণ ব্যর্থ হয়েছে। আবার চেষ্টা করুন।');
     }
-
-    // Save all products
-    const newProducts = purchaseItems.map(item => ({ ...item, id: genId() }));
-    await upd.products([...products, ...newProducts]);
-    
-    // Save purchase record
-    await upd.purchases([...purchases, purchase]);
-
-    setPurchaseItems([]);
-    setForm({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
-    setSupplierQ('');
-    setShowAddForm(false);
-    alert(`✅ ${purchaseItems.length}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
   };
 
   // Delete product
