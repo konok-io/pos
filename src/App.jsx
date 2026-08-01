@@ -326,6 +326,17 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     ...products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).map(p=>p.cat).filter(Boolean),
     ...categories.map(c=>c.name).filter(Boolean)
   ])];
+  
+  // Calculate counts for each category
+  const catCounts = {};
+  products.filter(p => !p.name?.includes('(ক্যাটাগরি)')).forEach(p => {
+    if (p.stock > 0) {
+      catCounts[p.cat] = (catCounts[p.cat] || 0) + 1;
+    }
+  });
+  const outOfStockCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock <= 0).length;
+  const allCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0).length;
+  
   const filtered = products.filter(p => {
     const isCategory = p.name?.includes('(ক্যাটাগরি)');
     if (isCategory) return false;
@@ -613,7 +624,9 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
 
         {/* Category filter */}
         <div style={{padding:'10px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,overflowX:'auto'}}>
-          {cats.map(c=>(
+          {cats.map(c=>{
+            const count = c==='স্টক শেষ' ? outOfStockCount : c==='সব' ? allCount : (catCounts[c] || 0);
+            return (
             <button key={c} onClick={()=>setSelCat(c)} style={{
               ...btn(selCat===c?'primary':'ghost','sm'),
               borderRadius:20, whiteSpace:'nowrap',
@@ -621,8 +634,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               color:selCat===c?T.white:(c==='স্টক শেষ'?T.red:T.gray600),
               border:'none',
               padding:'6px 14px',
-            }}>{c}</button>
-          ))}
+            }}>{c} {count > 0 && <span style={{opacity:0.7}}>({count})</span>}</button>
+          )})}
         </div>
 
         {/* Product grid */}
