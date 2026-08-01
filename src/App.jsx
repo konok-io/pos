@@ -1729,7 +1729,7 @@ function BarcodeScreen({purchases, products}) {
     setBarcodeCounts(prev => ({...prev, [idx]: n}));
   };
   
-  // Print all barcodes
+  // Print all barcodes (A4 size)
   const printBarcodes = () => {
     if (!selectedPurchase) return;
     
@@ -1739,19 +1739,27 @@ function BarcodeScreen({purchases, products}) {
 <meta charset="UTF-8">
 <title>Barcode Labels</title>
 <style>
-@page { size: 80mm auto; margin: 0; }
+@page { size: A4; margin: 10mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 2mm; }
-.barcode-item { margin-bottom: 8mm; text-align: center; border-bottom: 1px dashed #000; padding-bottom: 4mm; }
-.barcode-item:last-child { border-bottom: none; }
-.barcode-name { font-size: 11px; font-weight: bold; margin-bottom: 2mm; }
-.barcode-value { font-size: 14px; font-family: 'Libre Barcode 39', cursive; margin-bottom: 2mm; }
-.barcode-text { font-size: 10px; margin-top: 1mm; }
-.barcode-count { font-size: 9px; color: #666; }
+body { font-family: Arial, sans-serif; padding: 10mm; background: #fff; }
+.header { text-align: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #333; }
+.header h2 { color: #333; margin-bottom: 5px; }
+.header p { color: #666; font-size: 12px; }
+.barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.barcode-item { border: 1px solid #ddd; padding: 10px; text-align: center; page-break-inside: avoid; }
+.barcode-name { font-size: 11px; font-weight: bold; margin-bottom: 5px; color: #333; min-height: 28px; }
+.barcode-value { font-size: 10px; font-family: 'Libre Barcode 39', cursive; margin: 5px 0; }
+.barcode-text { font-size: 10px; color: #666; }
+.barcode-count { font-size: 9px; color: #999; margin-top: 3px; }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
 </head>
-<body>`;
+<body>
+<div class="header">
+  <h2>📊 বারকোড লেবেল</h2>
+  <p>পারচেজ: ${selectedPurchase.id} | ${new Date(selectedPurchase.date).toLocaleDateString('bn-BD')}</p>
+</div>
+<div class="barcode-grid">`;
 
     selectedPurchase.items.forEach((item, idx) => {
       const count = barcodeCounts[idx] || 0;
@@ -1765,22 +1773,16 @@ body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 2
       }
     });
 
-    html += `</body></html>`;
+    html += `</div></body></html>`;
 
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-    document.body.appendChild(iframe);
-    const iframeDoc = iframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write(html);
-    iframeDoc.close();
-    iframe.contentWindow.onload = function() {
-      setTimeout(() => {
-        iframe.contentWindow.print();
-        document.body.removeChild(iframe);
-      }, 100);
-    };
+    // A4 print - window.open for preview and printer selection
+    const win = window.open('', '', 'width=900,height=700');
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.onload = function() { setTimeout(() => win.print(), 100); };
   };
+
   
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',background:T.gray50}}>
@@ -1856,40 +1858,37 @@ body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 2
                     style={{...input,width:60,textAlign:'center',padding:'6px'}}
                   />
                   <button onClick={()=>{
-                    // Print single barcode
+                    // Print single barcode (A4 size)
                     const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Barcode</title>
 <style>
-@page { size: 80mm auto; margin: 0; }
+@page { size: A4; margin: 20mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 2mm; text-align: center; }
-.name { font-size: 11px; font-weight: bold; margin-bottom: 3mm; }
-.value { font-size: 18px; font-family: 'Libre Barcode 39', cursive; margin-bottom: 3mm; }
-.text { font-size: 10px; margin-top: 2mm; }
+body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; background: #fff; }
+.container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+.name { font-size: 16px; font-weight: bold; margin-bottom: 15px; color: #333; }
+.value { font-size: 60px; font-family: 'Libre Barcode 39', cursive; margin-bottom: 15px; }
+.text { font-size: 14px; color: #666; margin-top: 10px; }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
 </head>
 <body>
+<div class="container">
 <div class="name">${item.name}</div>
 <div class="value">*${item.barcode || item.id}*</div>
 <div class="text">৳${item.sellP || 0} | ${item.company || ''}</div>
+</div>
 </body>
 </html>`;
-                    const iframe = document.createElement('iframe');
-                    iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-                    document.body.appendChild(iframe);
-                    iframe.contentWindow.document.open();
-                    iframe.contentWindow.document.write(html);
-                    iframe.contentWindow.document.close();
-                    iframe.contentWindow.onload = function() {
-                      setTimeout(() => {
-                        iframe.contentWindow.print();
-                        document.body.removeChild(iframe);
-                      }, 100);
-                    };
+                    // A4 print - window.open for preview and printer selection
+                    const win = window.open('', '', 'width=800,height=600');
+                    win.document.open();
+                    win.document.write(html);
+                    win.document.close();
+                    win.onload = function() { setTimeout(() => win.print(), 100); };
                   }} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️</button>
                 </div>
               </div>
