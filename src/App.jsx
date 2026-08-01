@@ -388,7 +388,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Sale Receipt</title>
     <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Courier New',monospace;width:3in;margin:0;padding:0.08in;font-size:11px;color:#000}
+    body{font-family:'Courier New',monospace;width:3in;margin:0 auto;padding:0.08in;font-size:11px;color:#000}
     .center{text-align:center}
     .border{border-bottom:1px dashed #000;padding-bottom:5px;margin-bottom:5px}
     .row{display:flex;justify-content:space-between;margin:2px 0}
@@ -399,7 +399,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     td:nth-child(3),td:nth-child(4){text-align:right}
     .total{border-top:1px dashed #000;margin-top:5px;padding-top:5px;font-weight:bold}
     .footer{text-align:center;margin-top:10px;border-top:1px dashed #000;padding-top:5px;font-size:9px}
-    @media print{@page{margin:0}}
+    @media print{@page{size:3in;margin:0}}
     </style></head><body>
     <div class="center border">
       <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
@@ -425,7 +425,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     <script>window.onload=function(){window.print();}</script>
     </body></html>`;
     
-    const w = window.open('', '', 'width=400,height=800');
+    const w = window.open('', '', 'width=350,height=700');
     w.document.open();
     w.document.write(html);
     w.document.close();
