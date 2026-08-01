@@ -105,38 +105,38 @@ const DEMO = {
   ]
 ,
   suppliers: [
-    {id:'s001',code:'C-001',name:'মিনিকেট রাইস',phone:'01711111111',address:'ঢাকা'},
-    {id:'s002',code:'C-002',name:'ব্রিলিয়ান্ট',phone:'01722222222',address:'ঢাকা'},
-    {id:'s003',code:'C-003',name:'সিআরআরএস',phone:'01733333333',address:'ঢাকা'},
-    {id:'s004',code:'C-004',name:'এসআর ফুডস',phone:'01744444444',address:'ঢাকা'},
-    {id:'s005',code:'C-005',name:'প্রিমিয়াম অয়েল',phone:'01755555555',address:'ঢাকা'},
-    {id:'s006',code:'C-006',name:'এসআর সুগার',phone:'01766666666',address:'ঢাকা'},
-    {id:'s007',code:'C-007',name:'এসআর অ্যাটা',phone:'01777777777',address:'ঢাকা'},
-    {id:'s008',code:'C-008',name:'আয়োডিন সল্ট',phone:'01788888888',address:'ঢাকা'},
-    {id:'s009',code:'C-009',name:'এসআর মসলা',phone:'01799999999',address:'ঢাকা'},
-    {id:'s010',code:'C-010',name:'এসবি ফুডস',phone:'01811111111',address:'ঢাকা'},
-    {id:'s011',code:'C-011',name:'ক্যাডবেরি',phone:'01822222222',address:'ঢাকা'},
-    {id:'s012',code:'C-012',name:'প্রিঙ্গলস',phone:'01833333333',address:'ঢাকা'},
-    {id:'s013',code:'C-013',name:'মগর',phone:'01844444444',address:'ঢাকা'},
-    {id:'s014',code:'C-014',name:'লিপটন',phone:'01855555555',address:'ঢাকা'},
-    {id:'s015',code:'C-015',name:'নেসকে',phone:'01866666666',address:'ঢাকা'},
-    {id:'s016',code:'C-016',name:'ডানোন',phone:'01877777777',address:'ঢাকা'},
-    {id:'s017',code:'C-017',name:'আইসম',phone:'01888888888',address:'ঢাকা'},
-    {id:'s018',code:'C-018',name:'মিনিমুটস',phone:'01899999999',address:'ঢাকা'},
-    {id:'s019',code:'C-019',name:'কোকাকোলা',phone:'01911111111',address:'ঢাকা'},
-    {id:'s020',code:'C-020',name:'প্রিজ',phone:'01922222222',address:'ঢাকা'},
-    {id:'s021',code:'C-021',name:'এপি ফিল্টার্ড',phone:'01933333333',address:'ঢাকা'},
-    {id:'s022',code:'C-022',name:'রেডবুল',phone:'01944444444',address:'ঢাকা'},
-    {id:'s023',code:'C-023',name:'স্থানীয়',phone:'01955555555',address:'স্থানীয় বাজার'},
-    {id:'s024',code:'C-024',name:'ফার্মা',phone:'01966666666',address:'ঢাকা'},
-    {id:'s025',code:'C-025',name:'মিঠাই',phone:'01977777777',address:'ঢাকা'},
-    {id:'s026',code:'C-026',name:'পারফেক্ট',phone:'01988888888',address:'ঢাকা'},
-    {id:'s027',code:'C-027',name:'ন্যাচারাল প্রেস',phone:'01999999999',address:'ঢাকা'},
-    {id:'s028',code:'C-028',name:'ফ্রেশ অয়েল',phone:'01511111111',address:'ঢাকা'},
-    {id:'s029',code:'C-029',name:'হেল্পার',phone:'01522222222',address:'ঢাকা'},
-    {id:'s030',code:'C-030',name:'পাঠান',phone:'01533333333',address:'ঢাকা'},
-    {id:'s031',code:'C-031',name:'বাসমতি',phone:'01544444444',address:'ঢাকা'},
-    {id:'s032',code:'C-032',name:'মধু ফার্ম',phone:'01555555555',address:'ঢাকা'},
+    {id:'s001',code:'C-00001',name:'মিনিকেট রাইস',phone:'01711111111',address:'ঢাকা'},
+    {id:'s002',code:'C-00002',name:'ব্রিলিয়ান্ট',phone:'01722222222',address:'ঢাকা'},
+    {id:'s003',code:'C-00003',name:'সিআরআরএস',phone:'01733333333',address:'ঢাকা'},
+    {id:'s004',code:'C-00004',name:'এসআর ফুডস',phone:'01744444444',address:'ঢাকা'},
+    {id:'s005',code:'C-00005',name:'প্রিমিয়াম অয়েল',phone:'01755555555',address:'ঢাকা'},
+    {id:'s006',code:'C-00006',name:'এসআর সুগার',phone:'01766666666',address:'ঢাকা'},
+    {id:'s007',code:'C-00007',name:'এসআর অ্যাটা',phone:'01777777777',address:'ঢাকা'},
+    {id:'s008',code:'C-00008',name:'আয়োডিন সল্ট',phone:'01788888888',address:'ঢাকা'},
+    {id:'s009',code:'C-00009',name:'এসআর মসলা',phone:'01799999999',address:'ঢাকা'},
+    {id:'s010',code:'C-00010',name:'এসবি ফুডস',phone:'01811111111',address:'ঢাকা'},
+    {id:'s011',code:'C-00011',name:'ক্যাডবেরি',phone:'01822222222',address:'ঢাকা'},
+    {id:'s012',code:'C-00012',name:'প্রিঙ্গলস',phone:'01833333333',address:'ঢাকা'},
+    {id:'s013',code:'C-00013',name:'মগর',phone:'01844444444',address:'ঢাকা'},
+    {id:'s014',code:'C-00014',name:'লিপটন',phone:'01855555555',address:'ঢাকা'},
+    {id:'s015',code:'C-00015',name:'নেসকে',phone:'01866666666',address:'ঢাকা'},
+    {id:'s016',code:'C-00016',name:'ডানোন',phone:'01877777777',address:'ঢাকা'},
+    {id:'s017',code:'C-00017',name:'আইসম',phone:'01888888888',address:'ঢাকা'},
+    {id:'s018',code:'C-00018',name:'মিনিমুটস',phone:'01899999999',address:'ঢাকা'},
+    {id:'s019',code:'C-00019',name:'কোকাকোলা',phone:'01911111111',address:'ঢাকা'},
+    {id:'s020',code:'C-00020',name:'প্রিজ',phone:'01922222222',address:'ঢাকা'},
+    {id:'s021',code:'C-00021',name:'এপি ফিল্টার্ড',phone:'01933333333',address:'ঢাকা'},
+    {id:'s022',code:'C-00022',name:'রেডবুল',phone:'01944444444',address:'ঢাকা'},
+    {id:'s023',code:'C-00023',name:'স্থানীয়',phone:'01955555555',address:'স্থানীয় বাজার'},
+    {id:'s024',code:'C-00024',name:'ফার্মা',phone:'01966666666',address:'ঢাকা'},
+    {id:'s025',code:'C-00025',name:'মিঠাই',phone:'01977777777',address:'ঢাকা'},
+    {id:'s026',code:'C-00026',name:'পারফেক্ট',phone:'01988888888',address:'ঢাকা'},
+    {id:'s027',code:'C-00027',name:'ন্যাচারাল প্রেস',phone:'01999999999',address:'ঢাকা'},
+    {id:'s028',code:'C-00028',name:'ফ্রেশ অয়েল',phone:'01511111111',address:'ঢাকা'},
+    {id:'s029',code:'C-00029',name:'হেল্পার',phone:'01522222222',address:'ঢাকা'},
+    {id:'s030',code:'C-00030',name:'পাঠান',phone:'01533333333',address:'ঢাকা'},
+    {id:'s031',code:'C-00031',name:'বাসমতি',phone:'01544444444',address:'ঢাকা'},
+    {id:'s032',code:'C-00032',name:'মধু ফার্ম',phone:'01555555555',address:'ঢাকা'},
   ],
 };
 
@@ -997,7 +997,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
               {/* Barcode + Product Name */}
               <div style={{display:'flex',gap:8,marginBottom:12}}>
                 <div style={{flex:1,position:'relative'}}>
-                  <label style={label}>🔢 বারকোড</label>
+                  <label style={label}>④ বারকোড</label>
                   <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
                     style={{...input,fontSize:13}} />
                   {barcodeSuggestions.length > 0 && (
@@ -1013,7 +1013,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   )}
                 </div>
                 <div style={{flex:2,position:'relative'}}>
-                  <label style={label}>📦 পণ্যের নাম *</label>
+                  <label style={label}>③ পণ্যের নাম *</label>
                   <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
                     placeholder="পণ্যের নাম লিখুন..."
                     style={{...input,fontSize:13}} />
@@ -1030,7 +1030,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                       )}
                       <div onClick={()=>{setShowProductDrop(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`,background:T.tealLight}}>
-                        ➕ নতুন পণ্য যোগ করুন
+                        ➕ পণ্য যোগ করুন - ধাপে ধাপে
                       </div>
                     </div>
                   )}
@@ -1273,12 +1273,12 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
   const saveCompany = async () => {
     if (!form.name?.trim()) { alert('কোম্পানির নাম দিন'); return; }
-    // Generate company code (C-001, C-002, etc.)
+    // Generate company code (C-00001, C-00002, etc.)
     const maxCode = suppliers.reduce((max, s) => {
       const match = s.code?.match(/C-(\d+)/);
       return match ? Math.max(max, parseInt(match[1])) : max;
     }, 0);
-    const newCode = `C-${String(maxCode + 1).padStart(3, '0')}`;
+    const newCode = `C-${String(maxCode + 1).padStart(5, '0')}`;
     
     if (form.isAuto) {
       // Convert auto to real supplier
@@ -1529,11 +1529,11 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
         {/* PRODUCTS TAB */}
         {activeTab === 'products' && (
           <div style={{...card,maxWidth:600,margin:'0 auto'}}>
-            <h3 style={{margin:'0 0 16px',color:T.teal}}>📦 নতুন পণ্য যোগ করুন</h3>
+            <h3 style={{margin:'0 0 16px',color:T.teal}}>📦 পণ্য যোগ করুন - ধাপে ধাপে</h3>
             
             {/* Step 1: Company */}
             <div style={{marginBottom:12,position:'relative'}}>
-              <label style={label}>🏢 কোম্পানি নির্বাচন করুন *</label>
+              <label style={label}>① 🏢 কোম্পানি নির্বাচন করুন *</label>
               <input value={productForm.company} onChange={e=>{setProductForm(f=>({...f,company:e.target.value,cat:''}));setCompanyQ(e.target.value);setShowCompanyDrop(true);}} 
                 onFocus={()=>setShowCompanyDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..." style={input} />
               {showCompanyDrop && companyQ && (
@@ -1552,7 +1552,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
             {/* Step 2: Category */}
             <div style={{marginBottom:12,position:'relative'}}>
-              <label style={label}>📂 ক্যাটাগরি নির্বাচন করুন *</label>
+              <label style={label}>② 📂 ক্যাটাগরি করুন *</label>
               <input value={productForm.cat} onChange={e=>{setProductForm(f=>({...f,cat:e.target.value}));setCatQ(e.target.value);setShowCatDrop(true);}} 
                 onFocus={()=>{if(productForm.company) setShowCatDrop(true);}} placeholder={productForm.company?"ক্যাটাগরি লিখুন...":"প্রথমে কোম্পানি সিলেক্ট করুন"} 
                 disabled={!productForm.company} style={{...input,opacity:productForm.company?1:0.5}} />
@@ -1569,13 +1569,13 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
             {/* Step 3: Product Name */}
             <div style={{marginBottom:12}}>
-              <label style={label}>📦 পণ্যের নাম *</label>
+              <label style={label}>③ পণ্যের নাম *</label>
               <input value={productForm.name} onChange={e=>setProductForm(f=>({...f,name:e.target.value}))} placeholder="পণ্যের নাম লিখুন" style={input} />
             </div>
 
             {/* Step 4: Barcode */}
             <div style={{marginBottom:12}}>
-              <label style={label}>🔢 বারকোড *</label>
+              <label style={label}>④ বারকোড *</label>
               <input value={productForm.barcode} onChange={e=>setProductForm(f=>({...f,barcode:e.target.value}))} placeholder="বারকোড নম্বর" style={input} />
             </div>
 
@@ -1611,7 +1611,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
             <div style={{...card,maxWidth:500,margin:'0 auto 16px'}}>
               <h4 style={{margin:'0 0 12px',color:T.teal}}>📂 নতুন ক্যাটাগরি যোগ করুন</h4>
               <div style={{marginBottom:12}}>
-                <label style={label}>🏢 কোম্পানি *</label>
+                <label style={label}>① 🏢 কোম্পানি *</label>
                 <select value={productForm.company} onChange={e=>setProductForm(f=>({...f,company:e.target.value,cat:''}))} style={{...input,padding:'8px 12px'}}>
                   <option value="">কোম্পানি সিলেক্ট করুন</option>
                   {suppliers.map(s=>(
@@ -1659,14 +1659,14 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
           <div style={{...card,width:380,padding:24}} onClick={e=>e.stopPropagation()}>
             <h3 style={{margin:'0 0 16px'}}>{modal.mode === 'add' ? '🏢 নতুন কোম্পানি যোগ করুন' : '✏️ কোম্পানি সম্পাদনা করুন'}</h3>
             <div style={{marginBottom:12}}>
-              <label style={label}>🏢 কোম্পানির নাম *</label>
+              <label style={label}>① 🏢 কোম্পানির নাম *</label>
               <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="কোম্পানির নাম" style={input} />
             </div>
             {modal.mode === 'add' && (
               <div style={{marginBottom:12,background:T.gray50,padding:10,borderRadius:8}}>
                 <label style={label}>🔢 কোম্পানি আইডি</label>
                 <div style={{fontWeight:700,color:T.teal,fontSize:15}}>
-                  C-{String(suppliers.length + 1).padStart(3, '0')}
+                  C-{String(suppliers.length + 1).padStart(5, '0')}
                 </div>
                 <div style={{fontSize:11,color:T.gray500}}>অটোমেটিক তৈরি হবে</div>
               </div>
