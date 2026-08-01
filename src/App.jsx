@@ -792,9 +792,9 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
       barcode: p.barcode || '',
       company: p.company || '',
       cat: p.cat || '',
-      unit: p.unit || 'পিস',
-      buyP: p.buyP || '',
-      sellP: p.sellP || '',
+      unit: 'পিস',
+      buyP: '',
+      sellP: '',
       stock: '',
       minStock: p.minStock || '5'
     });
@@ -814,10 +814,10 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
       barcode: form.barcode || '',
       company: form.company,
       cat: form.cat || '',
-      unit: form.unit || 'পিস',
-      buyP: +form.buyP || 0,
-      sellP: +form.sellP || 0,
-      stock: +form.stock || 0,
+      unit: 'পিস',
+      buyP: 0,
+      sellP: 0,
+      stock: 0,
       minStock: +form.minStock || 5
     };
     setPurchaseItems([...purchaseItems, item]);
@@ -1096,14 +1096,9 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                       <div style={{flex:1}}>
                         <div style={{fontWeight:600,fontSize:13}}>{item.name}</div>
                         <div style={{fontSize:11,color:T.gray500}}>{item.company} • {item.barcode}</div>
-                        <div style={{fontSize:12,marginTop:4}}>
-                          <span style={{color:T.teal}}>৳{item.buyP}</span> → <span style={{color:T.green}}>৳{item.sellP}</span>
-                        </div>
+                        {item.cat && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>📂 {item.cat}</div>}
                       </div>
-                      <div style={{textAlign:'right'}}>
-                        <div style={{fontWeight:700,fontSize:14}}>{item.stock} {item.unit}</div>
-                        <button onClick={()=>removeItem(item.id)} style={{fontSize:11,color:T.red,background:'none',border:'none',cursor:'pointer',marginTop:4}}>✕ মুছুন</button>
-                      </div>
+                      <button onClick={()=>removeItem(item.id)} style={{fontSize:11,color:T.red,background:'none',border:'none',cursor:'pointer',padding:'4px 8px'}}>✕ মুছুন</button>
                     </div>
                   </div>
                 ))
