@@ -338,6 +338,11 @@ function POSScreen({products, customers, sales, settings, upd}) {
     if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
     if (due > 0 && !selCust) { alert('⚠️ বাকি বিক্রয় করতে গ্রাহক সিলেক্ট করুন অথবা পূর্ণ পরিশোধ করুন!'); return; }
 
+    // Due sale confirmation
+    if (due > 0 && selCust) {
+      if (!confirm(`⚠️ আপনি কি সত্যিই বাকিতে বিক্রয় করতে চান?\nবাকি: ৳${due.toFixed(0)}\nগ্রাহক: ${selCust.name}\nএই বাকি ${selCust.name} এর হিসাবে যোগ হবে।`)) return;
+    }
+
     // Confirmation dialog
     const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
     const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
