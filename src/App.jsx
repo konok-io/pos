@@ -713,7 +713,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
     ? products.filter(p => (p.company||'').toLowerCase() === form.company.toLowerCase())
     : [];
 
-  // Filter products for dropdown
+  // Filter products for dropdown - search by name or barcode
   const filteredProducts = companyProducts.filter(p => 
     !productNameQ || p.name.toLowerCase().includes(productNameQ.toLowerCase()) || (p.barcode||'').includes(productNameQ)
   );
@@ -969,26 +969,26 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 <div style={{flex:2,position:'relative'}}>
                   <label style={label}>📦 পণ্যের নাম *</label>
                   <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
-                    onFocus={()=>setShowProductDrop(true)} placeholder="পণ্যের নাম লিখুন বা সিলেক্ট করুন..."
+                    onFocus={()=>setShowProductDrop(true)} placeholder="পণ্যের নাম লিখুন..."
                     style={{...input,fontSize:13}} />
                   {showProductDrop && form.company && (
-                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:180,overflow:'auto'}}>
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                       {filteredProducts.length > 0 ? filteredProducts.map((p,i)=>(
                         <div key={p.id} onClick={()=>selectProduct(p)}
-                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>
+                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,background:T.white}}>
                           <div style={{fontSize:13,fontWeight:600}}>{p.name}</div>
-                          <div style={{fontSize:11,color:T.gray400}}>৳{p.sellP} • {p.stock} {p.unit}</div>
+                          <div style={{fontSize:11,color:T.gray400}}>৳{p.sellP} • স্টক: {p.stock} {p.unit}</div>
                         </div>
-                      )) : (
-                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>এই কোম্পানিতে কোনো পণ্য নেই</div>
-                      )}
-                      <div onClick={()=>{setShowProductDrop(false);setProductNameQ('');}}
-                        style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
+                      )) : productNameQ ? (
+                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>এই নামে কোনো পণ্য নেই</div>
+                      ) : null}
+                      <div onClick={()=>{setShowProductDrop(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`,background:T.tealLight}}>
                         ➕ নতুন পণ্য যোগ করুন
                       </div>
                     </div>
                   )}
-                  {!form.company && (
+                  {showProductDrop && !form.company && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,padding:'8px 12px',fontSize:12,color:T.gray500}}>
                       প্রথমে কোম্পানি সিলেক্ট করুন
                     </div>
