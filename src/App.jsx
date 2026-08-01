@@ -537,6 +537,12 @@ function POSScreen({products, customers, sales, settings, upd}) {
             placeholder="নাম বা ফোন নম্বর..."
             style={{...input,fontSize:13,borderRadius:8}}
           />
+          {due > 0 && !selCust && cart.length > 0 && (
+            <div style={{marginTop:10,padding:'10px 12px',borderRadius:8,background:T.blue50,border:`1px solid ${T.blue200}`,textAlign:'center'}}>
+              <div style={{fontSize:12,color:T.blue700,marginBottom:8}}>বাকিতে বিক্রয় করতে চাইলে কাস্টমার যোগ করুন</div>
+              <button onClick={()=>setShowAddCust(true)} style={{...btn('primary'),fontSize:12,padding:'6px 12px'}}>👤 কাস্টমার যোগ করুন</button>
+            </div>
+          )}
           {selCust && (
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:T.tealLight,borderRadius:8}}>
               <span style={{fontSize:12,color:T.teal,fontWeight:600}}>✓ {selCust.name} {selCust.credit>0 && <span style={{color:T.red}}>(বাকি: {fmt(selCust.credit)})</span>}</span>
@@ -614,12 +620,6 @@ function POSScreen({products, customers, sales, settings, upd}) {
             <input value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
               placeholder="পুরো মূল্য দিতে টাইপ করুন" style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}/>
           </div>
-          {due > 0 && !selCust && cart.length > 0 && (
-            <div style={{marginBottom:10,padding:'10px 12px',borderRadius:8,background:T.blue50,border:`1px solid ${T.blue200}`,textAlign:'center'}}>
-              <div style={{fontSize:13,color:T.blue700,marginBottom:8}}>বাকিতে বিক্রয় করতে চাইলে কাস্টমার যোগ করুন</div>
-              <button onClick={()=>setShowAddCust(true)} style={{...btn('primary'),fontSize:13,padding:'8px 16px'}}>👤 কাস্টমার যোগ করুন</button>
-            </div>
-          )}
           {due > 0 && (
             <div style={{fontSize:14,marginBottom:10,padding:'8px 12px',borderRadius:8,
               background:due>0?T.redLight:T.greenLight, color:due>0?T.red:T.green, fontWeight:600}}>
