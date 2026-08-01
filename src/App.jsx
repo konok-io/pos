@@ -734,11 +734,6 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
     ? products.filter(p => (p.company||'').toLowerCase() === form.company.toLowerCase())
     : [];
 
-  // Filter products for dropdown - search by name or barcode
-  const filteredProducts = companyProducts.filter(p => 
-    !productNameQ || p.name.toLowerCase().includes(productNameQ.toLowerCase()) || (p.barcode||'').includes(productNameQ)
-  );
-
   // Filter products for table
   const filtered = products.filter(p=>
     !search || p.name.toLowerCase().includes(search.toLowerCase()) || 
