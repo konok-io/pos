@@ -968,7 +968,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                     style={{...input,fontSize:13,flex:1}} />
                   <button type="button" onClick={()=>setShowCompanyList(!showCompanyList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
                 </div>
-                {showCompanyList && uniqueCompanies.length > 0 && (
+                {showCompanyList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                     {uniqueCompanies.filter(c=>c.toLowerCase().includes(supplierQ.toLowerCase())).map((c,i)=>(
                       <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowCompanyList(false);}}
@@ -976,6 +976,12 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                         {c}
                       </div>
                     ))}
+                    {supplierQ && !uniqueCompanies.some(c=>c.toLowerCase()===supplierQ.toLowerCase()) && (
+                      <div onClick={()=>{setForm(f=>({...f,company:supplierQ}));setShowCompanyList(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
+                        + নতুন কোম্পানি যুক্ত করুন: "{supplierQ}"
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -993,7 +999,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                     style={{...input,fontSize:13,flex:1}} />
                   <button type="button" onClick={()=>setShowCategoryList(!showCategoryList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
                 </div>
-                {showCategoryList && uniqueCategories.length > 0 && (
+                {showCategoryList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                     {uniqueCategories.filter(c=>c.toLowerCase().includes((form.cat||'').toLowerCase())).map((c,i)=>(
                       <div key={i} onClick={()=>{setForm(f=>({...f,cat:c}));setShowCategoryList(false);}}
@@ -1001,6 +1007,12 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                         {c}
                       </div>
                     ))}
+                    {form.cat && !uniqueCategories.some(c=>c.toLowerCase()===(form.cat||'').toLowerCase()) && (
+                      <div onClick={()=>{setShowCategoryList(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
+                        + নতুন ক্যাটাগরি যুক্ত করুন: "{form.cat}"
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -1022,7 +1034,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                       style={{...input,fontSize:13,flex:1}} />
                     <button type="button" onClick={()=>setShowProductList(!showProductList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
                   </div>
-                  {showProductList && products.length > 0 && (
+                  {showProductList && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                       {products.filter(p=>p.name.toLowerCase().includes((form.name||'').toLowerCase())).slice(0,20).map((p,i)=>(
                         <div key={i} onClick={()=>{setForm(f=>({...f,name:p.name}));setShowProductList(false);}}
@@ -1031,6 +1043,12 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                           <div style={{fontSize:11,color:T.gray400}}>{p.company} • {p.cat}</div>
                         </div>
                       ))}
+                      {form.name && !products.some(p=>p.name.toLowerCase()===(form.name||'').toLowerCase()) && (
+                        <div onClick={()=>{setShowProductList(false);}}
+                          style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
+                          + নতুন পণ্য তৈরি করুন: "{form.name}"
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
