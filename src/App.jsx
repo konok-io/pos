@@ -862,17 +862,6 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
     await upd.products(products.filter(p=>p.id!==id));
   };
 
-  // Add new supplier
-  const addSupplier = () => {
-    if (!newSupplierName.trim()) return;
-    const newS = { id: genId(), name: newSupplierName.trim(), phone: '', address: '' };
-    upd.suppliers([...suppliers, newS]);
-    setForm(f => ({...f, company: newSupplierName.trim()}));
-    setSupplierQ(newSupplierName.trim());
-    setShowNewSupplier(false);
-    setNewSupplierName('');
-  };
-
   // Purchase history view
   if (showPurchaseHistory) {
     return (
@@ -1105,21 +1094,6 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
             )}
           </div>
         </div>
-
-        {/* New Supplier Modal */}
-        {showNewSupplier && (
-          <div style={{...overlay}} onClick={()=>setShowNewSupplier(false)}>
-            <div style={{...card,width:320,padding:20}} onClick={e=>e.stopPropagation()}>
-              <h3 style={{margin:'0 0 12px'}}>🏢 নতুন কোম্পানি যোগ করুন</h3>
-              <input value={newSupplierName} onChange={e=>setNewSupplierName(e.target.value)} placeholder="কোম্পানির নাম"
-                style={{...input,marginBottom:12}} autoFocus />
-              <div style={{display:'flex',gap:8}}>
-                <button onClick={()=>setShowNewSupplier(false)} style={{...btn(),flex:1}}>বাতিল</button>
-                <button onClick={addSupplier} style={{...btn('primary'),flex:1}}>✓ যোগ করুন</button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
