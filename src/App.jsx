@@ -2313,7 +2313,7 @@ function ReportsScreen({sales, customers}) {
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
-function SettingsScreen({settings, products, suppliers, purchases, upd}) {
+function SettingsScreen({settings, products, suppliers, categories, purchases, upd}) {
   const [form, setForm] = useState(settings);
   const [saved, setSaved] = useState(false);
 
@@ -2394,18 +2394,31 @@ function SettingsScreen({settings, products, suppliers, purchases, upd}) {
         <div style={{...card,borderColor:T.red+'40'}}>
           <h3 style={{margin:'0 0 10px',fontSize:15,fontWeight:700,color:T.red}}>⚠️ ডেটা ম্যানেজমেন্ট</h3>
           <p style={{fontSize:13,color:T.gray600,margin:'0 0 14px',lineHeight:1.6}}>সতর্কতা: নিচের অপশনগুলো ব্যবহারে ডেটা স্থায়ীভাবে মুছে যাবে।</p>
-          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12}}>
             <button style={btn('danger','sm')} onClick={async()=>{
-              if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
-            }}>বিক্রয় ইতিহাস মুছুন</button>
+              if(confirm('সব পণ্য মুছে ফেলবেন?')) { await upd.products([]); alert('পণ্য মুছা হয়েছে।'); }
+            }}>📦 পণ্য রিসেট ({products.length}টি)</button>
             <button style={btn('danger','sm')} onClick={async()=>{
-              if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                localStorage.clear();
-                db.set('pos_reset_done', true);
-                alert('সব ডেটা মুছে ফেলা হয়েছে।');
-                window.location.reload();
-              }
-            }}>সম্পূর্ণ রিসেট</button>
+              if(confirm('সব কোম্পানি মুছে ফেলবেন?')) { await upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); }
+            }}>🏢 কোম্পানি রিসেট ({suppliers.length}টি)</button>
+            <button style={btn('danger','sm')} onClick={async()=>{
+              if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { await upd.categories([]); alert('ক্যাটাগরি মুছা হয়েছে।'); }
+            }}>📂 ক্যাটাগরি রিসেট ({categories.length}টি)</button>
+          </div>
+          <div style={{borderTop:`1px solid ${T.gray200}`,paddingTop:12,marginTop:4}}>
+            <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
+              <button style={btn('danger','sm')} onClick={async()=>{
+                if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
+              }}>🛒 বিক্রয় ইতিহাস মুছুন ({sales.length}টি)</button>
+              <button style={btn('danger','sm')} onClick={async()=>{
+                if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
+                  localStorage.clear();
+                  db.set('pos_reset_done', true);
+                  alert('সব ডেটা মুছে ফেলা হয়েছে।');
+                  window.location.reload();
+                }
+              }}>💥 সম্পূর্ণ রিসেট</button>
+            </div>
           </div>
         </div>
       </div>
