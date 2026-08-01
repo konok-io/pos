@@ -875,8 +875,10 @@ function ProductsScreen({products, suppliers, categories, upd}) {
   const savePurchase = async () => {
     if (purchaseItems.length === 0) { alert('কমপক্ষে একটি পণ্য যোগ করুন'); return; }
     
+    const savedCount = purchaseItems.length;
+    const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
+    
     try {
-      const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
       const purchase = {
         id: purchaseId,
         date: now(),
@@ -904,7 +906,7 @@ function ProductsScreen({products, suppliers, categories, upd}) {
       setForm({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
       setSupplierQ('');
       setShowAddForm(false);
-      alert(`✅ ${purchaseItems.length}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
+      alert(`✅ ${savedCount}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
     } catch (err) {
       console.error('Save error:', err);
       alert('❌ সংরক্ষণ ব্যর্থ হয়েছে। আবার চেষ্টা করুন।');
