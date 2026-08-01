@@ -2401,7 +2401,10 @@ function ReportsScreen({sales, customers, purchases}) {
                 <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
                 <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
               </div>
-              <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+              <div style={{display:'flex',gap:8}}>
+                <button onClick={()=>window.print()} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+              </div>
             </div>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
