@@ -626,7 +626,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
             </div>
           )}
           {showCustDrop && custQ && !selCust && (
-            <div style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 6px 20px rgba(0,0,0,0.12)',zIndex:50,maxHeight:180,overflow:'auto'}}>
+            <div style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
               {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).map(c=>(
                 <div key={c.id} onClick={()=>{setSelCust(c);setCustQ(c.name);setShowCustDrop(false);}}
                   style={{padding:'10px 14px',cursor:'pointer',fontSize:13,borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
@@ -999,7 +999,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..."
                   style={{...input,fontSize:13}} />
                 {showSupplierDrop && supplierQ && (
-                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
+                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                     {filteredCompanies.map((c,i)=>(
                       <div key={i} onClick={()=>{setSupplierQ(c.name);setForm(f=>({...f,company:c.name}));setShowSupplierDrop(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
@@ -1023,7 +1023,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
                     style={{...input,fontSize:13}} />
                   {barcodeSuggestions.length > 0 && (
-                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                       {barcodeSuggestions.map(p=>(
                         <div key={p.id} onClick={()=>selectProduct(p)}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>
@@ -1250,6 +1250,18 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
   const [showCatDrop, setShowCatDrop] = useState(false);
   const [catCompanyQ, setCatCompanyQ] = useState('');
   const [showCatCompanyDrop, setShowCatCompanyDrop] = useState(false);
+
+  // Click outside to close dropdowns
+  useEffect(() => {
+    const handleClick = () => {
+      setShowCompanyDrop(false);
+      setShowCatDrop(false);
+      setShowCatCompanyDrop(false);
+      setShowCustDrop(false);
+    };
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
@@ -1522,7 +1534,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
               <input value={productForm.company} onChange={e=>{setProductForm(f=>({...f,company:e.target.value,cat:''}));setCompanyQ(e.target.value);setShowCompanyDrop(true);}} 
                 onFocus={()=>setShowCompanyDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..." style={input} />
               {showCompanyDrop && (
-                <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
+                <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                   {filteredCompanies.filter(c=>!companyQ || c.name.toLowerCase().includes(companyQ.toLowerCase()) || (c.code||'').toLowerCase().includes(companyQ.toLowerCase())).map(c=>(
                     <div key={c.id} onClick={()=>{setProductForm(f=>({...f,company:c.name,cat:''}));setCompanyQ('');setShowCompanyDrop(false);}}
                       style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
