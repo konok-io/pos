@@ -1734,14 +1734,14 @@ function BarcodeScreen({purchases, products}) {
 <meta charset="UTF-8">
 <title>Barcode Labels</title>
 <style>
-@page { size: A4; margin: 15mm; }
+@page { size: A4; margin: 10mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: Arial, sans-serif; padding: 10mm; background: #fff; }
-.barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.barcode-item { border: 1px solid #ddd; padding: 8px; text-align: center; page-break-inside: avoid; min-height: 95px; }
-.barcode-price { font-size: 14px; font-weight: bold; color: #000; margin-bottom: 6px; }
-.barcode-value { font-size: 80px; font-family: 'Libre Barcode 39', cursive; line-height: 1; margin: 2px 0; }
-.barcode-number { font-size: 11px; font-family: monospace; color: #333; margin-top: 4px; letter-spacing: 1px; }
+body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
+.barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.barcode-item { border: 1px solid #ddd; padding: 5px; text-align: center; page-break-inside: avoid; }
+.barcode-price { font-size: 13px; font-weight: bold; color: #000; margin-bottom: 2px; }
+.barcode-value { font-size: 70px; font-family: 'Libre Barcode 39', cursive; line-height: 0.9; }
+.barcode-number { font-size: 10px; font-family: monospace; color: #333; margin-top: 2px; letter-spacing: 0.5px; }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
 </head>
@@ -1851,13 +1851,13 @@ body { font-family: Arial, sans-serif; padding: 10mm; background: #fff; }
 <meta charset="UTF-8">
 <title>Barcode</title>
 <style>
-@page { size: A4; margin: 20mm; }
+@page { size: A4; margin: 25mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; background: #fff; }
 .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-.price { font-size: 24px; font-weight: bold; color: #000; margin-bottom: 20px; }
-.value { font-size: 120px; font-family: 'Libre Barcode 39', cursive; line-height: 1; margin-bottom: 15px; }
-.number { font-size: 16px; font-family: monospace; color: #333; letter-spacing: 2px; }
+.price { font-size: 28px; font-weight: bold; color: #000; margin-bottom: 10px; }
+.value { font-size: 100px; font-family: 'Libre Barcode 39', cursive; line-height: 1; }
+.number { font-size: 14px; font-family: monospace; color: #333; margin-top: 5px; }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
 </head>
