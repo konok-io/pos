@@ -670,7 +670,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
 /* ═══════════════════════════════════════════
    PRODUCTS SCREEN
 ═══════════════════════════════════════════ */
-function ProductsScreen({products, suppliers, categories, upd}) {
+function ProductsScreen({products, suppliers, categories, purchases, upd}) {
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState([]);
@@ -2313,7 +2313,7 @@ function ReportsScreen({sales, customers}) {
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
-function SettingsScreen({settings, products, suppliers, categories, purchases, upd}) {
+function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
   const [form, setForm] = useState(settings);
   const [saved, setSaved] = useState(false);
 
