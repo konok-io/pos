@@ -591,11 +591,20 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
 </body>
 </html>`;
 
-    const w = window.open('', '', 'width=320,height=600');
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-    w.onload = function() { setTimeout(() => w.print(), 100); };
+    // Create iframe for silent printing (no new tab)
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+    document.body.appendChild(iframe);
+    const iframeDoc = iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close();
+    iframe.contentWindow.onload = function() {
+      setTimeout(() => {
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
+      }, 100);
+    };
   };
 
   if (receipt) return (
