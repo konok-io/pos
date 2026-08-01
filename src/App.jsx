@@ -1479,6 +1479,10 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const saveCompany = async () => {
     if (!form.name?.trim()) { alert('কোম্পানির নাম দিন'); return; }
     
+    // Check for duplicate company name
+    const exists = suppliers.some(s => s.name.toLowerCase().trim() === form.name.toLowerCase().trim());
+    if (exists) { alert('❌ এই কোম্পানির নাম ইতিমধ্যে আছে!'); return; }
+    
     // Generate company code (C-00001, C-00002, etc.)
     const maxCode = suppliers.reduce((max, s) => {
       const match = s.code?.match(/C-(\d+)/);
@@ -1507,6 +1511,10 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     if (!productForm.cat) { alert('ক্যাটাগরি সিলেক্ট করুন'); return; }
     if (!productForm.name?.trim()) { alert('পণ্যের নাম দিন'); return; }
     
+    // Check for duplicate product name
+    const exists = products.some(p => p.name.toLowerCase().trim() === productForm.name.toLowerCase().trim());
+    if (exists) { alert('❌ এই পণ্যের নাম ইতিমধ্যে আছে!'); return; }
+    
     // Generate product ID (P-00001, P-00002, etc.)
     const maxId = products.reduce((max, p) => {
       const match = p.id?.match(/P-(\d+)/);
@@ -1534,15 +1542,9 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const saveCategory = async () => {
     if (!catForm.name?.trim()) { alert('ক্যাটাগরির নাম দিন'); return; }
     
-    // Check if category already exists
-    const exists = categories.some(c => 
-      c.name.toLowerCase() === catForm.name.trim().toLowerCase()
-    );
-    
-    if (exists) {
-      alert('এই ক্যাটাগরি ইতিমধ্যে আছে');
-      return;
-    }
+    // Check for duplicate category name
+    const exists = categories.some(c => c.name.toLowerCase().trim() === catForm.name.toLowerCase().trim());
+    if (exists) { alert('❌ এই ক্যাটাগরির নাম ইতিমধ্যে আছে!'); return; }
     
     // Save category to categories state
     const newCat = {
