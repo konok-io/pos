@@ -1254,14 +1254,19 @@ function SettingsScreen({settings, products, upd}) {
             <button style={btn('danger','sm')} onClick={async()=>{
               if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
             }}>বিক্রয় ইতিহাস মুছুন</button>
-            <button style={btn('danger','sm')} onClick={()=>{
+            <button style={btn('danger','sm')} onClick={async ()=>{
               const confirmReset = confirm('⚠️ সম্পূর্ণ রিসেট করবেন?\n\nএতে সব পণ্য, কাস্টমার ও বিক্রয় ইতিহাস মুছে যাবে এবং ডেমো ডেটা লোড হবে।\n\nএটি পূর্বাবস্থায় ফেরানো যাবে না!');
               if (confirmReset) {
-                upd.products(DEMO.products);
-                upd.customers(DEMO.customers);
-                upd.sales([]);
-                upd.settings({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
-                alert('✓ সম্পূর্ণ রিসেট হয়েছে!\nডেমো ডেটা লোড করা হয়েছে।');
+                try {
+                  await upd.products(DEMO.products);
+                  await upd.customers(DEMO.customers);
+                  await upd.sales([]);
+                  await upd.settings({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+                  alert('✓ সম্পূর্ণ রিসেট হয়েছে!\nডেমো ডেটা লোড করা হয়েছে।');
+                  setTimeout(() => window.location.reload(), 100);
+                } catch(e) {
+                  alert('রিসেটে সমস্যা হয়েছে!');
+                }
               }
             }}>🔄 সম্পূর্ণ রিসেট</button>
           </div>
