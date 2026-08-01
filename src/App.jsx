@@ -290,6 +290,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
   const [newCustPhone, setNewCustPhone] = useState('');
   const [newCustAddr, setNewCustAddr] = useState('');
   const searchRef = useRef();
+  const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
   useEffect(() => { searchRef.current?.focus(); }, []);
 
