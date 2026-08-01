@@ -658,8 +658,6 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   const [productNameQ, setProductNameQ] = useState('');
   const [showProductDrop, setShowProductDrop] = useState(false);
   const [csvData, setCsvData] = useState([]);
-  const [showCategoryDrop, setShowCategoryDrop] = useState(false);
-  const [categoryQ, setCategoryQ] = useState('');
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
@@ -1018,35 +1016,27 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                     </div>
                   )}
                 </div>
+              </div>
 
-                {/* Category with Dropdown */}
-                <div style={{flex:1,position:'relative'}}>
-                  <label style={label}>📂 ক্যাটাগরি</label>
+              {/* Category */}
+              <div style={{marginBottom:12}}>
+                <label style={label}>📂 ক্যাটাগরি</label>
+                <div style={{position:'relative'}}>
                   <input 
                     value={form.cat} 
-                    onChange={e=>{setForm(f=>({...f,cat:e.target.value}));setCategoryQ(e.target.value);setShowCategoryDrop(true);}}
-                    onFocus={()=>{setShowCategoryDrop(true);setCategoryQ('');}} 
-                    onMouseDown={(e) => { if(!showCategoryDrop) { setShowCategoryDrop(true); setCategoryQ(''); } }}
+                    onChange={e=>setForm(f=>({...f,cat:e.target.value}))}
                     placeholder="ক্যাটাগরি লিখুন..."
                     style={{...input,fontSize:13}} />
-                  {showCategoryDrop && (
-                    <div 
-                      onMouseDown={(e) => e.preventDefault()}
-                      style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                      {allCategories.length > 0 && allCategories.filter(c => !categoryQ || c.toLowerCase().includes(categoryQ.toLowerCase())).map((cat,i)=>(
-                        <div key={i} onClick={()=>{setForm(f=>({...f,cat:cat}));setCategoryQ(cat);setShowCategoryDrop(false);}}
+                  {allCategories.length > 0 && (
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
+                      {allCategories.map((cat,i)=>(
+                        <div key={i} onClick={()=>setForm(f=>({...f,cat:cat}))} 
+                          onMouseDown={(e)=>{e.preventDefault();setForm(f=>({...f,cat:cat}));}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
                           <span>{cat}</span>
                           <span style={{fontSize:11,color:T.gray400}}>{products.filter(p=>p.cat===cat).length}টি</span>
                         </div>
                       ))}
-                      {allCategories.length === 0 && (
-                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো ক্যাটাগরি নেই</div>
-                      )}
-                      <div onClick={()=>{if(categoryQ.trim()){setForm(f=>({...f,cat:categoryQ.trim()}));setCategoryQ(categoryQ.trim());setShowCategoryDrop(false);}}}
-                        style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`,background:T.tealLight}}>
-                        + নতুন ক্যাটাগরি তৈরি করুন
-                      </div>
                     </div>
                   )}
                 </div>
