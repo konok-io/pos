@@ -158,8 +158,28 @@ export default function App() {
 
     setSales(savedSales || []);
     setSuppliers(savedSuppliers);
-    setCategories(savedCategories || []);
     setPurchases(savedPurchases);
+
+    // Migrate old category products to new categories state
+    if (savedCategories && savedCategories.length > 0) {
+      setCategories(savedCategories);
+    } else if (savedProducts) {
+      const oldCategories = savedProducts
+        .filter(p => p.name?.includes('(ক্যাটাগরি)'))
+        .map(p => ({ id: p.id, name: p.cat, company: p.company }));
+      if (oldCategories.length > 0) {
+        setCategories(oldCategories);
+        db.set(STORAGE_KEYS.categories, oldCategories);
+        // Remove old category products from products
+        const realProducts = savedProducts.filter(p => !p.name?.includes('(ক্যাটাগরি)'));
+        setProducts(realProducts);
+        db.set(STORAGE_KEYS.products, realProducts);
+      } else {
+        setCategories([]);
+      }
+    } else {
+      setCategories([]);
+    }
 
     const defaultSettings = {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
     setSettings(savedSettings ? {...defaultSettings, ...savedSettings} : defaultSettings);
@@ -1585,7 +1605,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           📂 ক্যাটাগরি ({allCategories.length})
         </button>
         <button onClick={()=>setActiveTab('products')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='products'?700:400,color:activeTab==='products'?T.teal:T.gray500,borderBottom:activeTab==='products'?`2px solid ${T.teal}`:'none',fontSize:13}}>
-          📦 পণ্য ({products.length})
+          📦 পণ্য ({products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).length})
         </button>
         {/* Search and Add button - right aligned - changes based on tab */}
         <div style={{marginLeft:'auto',display:'flex',gap:8,alignItems:'center',paddingRight:12}}>
