@@ -1021,20 +1021,24 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   <input value={categoryQ} onChange={e=>{setCategoryQ(e.target.value);setForm(f=>({...f,cat:e.target.value}));setShowCategoryDrop(true);}}
                     onFocus={()=>{setShowCategoryDrop(true);setCategoryQ(form.cat||'');}} 
                     onBlur={() => setTimeout(() => setShowCategoryDrop(false), 200)}
-                    placeholder="ক্যাটাগরি নির্বাচন করুন..."
+                    placeholder="ক্যাটাগরি লিখুন..."
                     style={{...input,fontSize:13}} />
-                  {showCategoryDrop && allCategories.length > 0 && (
+                  {showCategoryDrop && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                      {allCategories.filter(c => !categoryQ || c.toLowerCase().includes(categoryQ.toLowerCase())).map((cat,i)=>(
+                      {allCategories.length > 0 && allCategories.filter(c => !categoryQ || c.toLowerCase().includes(categoryQ.toLowerCase())).map((cat,i)=>(
                         <div key={i} onClick={()=>{setCategoryQ(cat);setForm(f=>({...f,cat:cat}));setShowCategoryDrop(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
                           <span>{cat}</span>
                           <span style={{fontSize:11,color:T.gray400}}>{products.filter(p=>p.cat===cat).length}টি</span>
                         </div>
                       ))}
-                      {allCategories.filter(c => !categoryQ || c.toLowerCase().includes(categoryQ.toLowerCase())).length === 0 && (
-                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো ক্যাটাগরি পাওয়া যায়নি</div>
+                      {allCategories.length === 0 && (
+                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো ক্যাটাগরি নেই</div>
                       )}
+                      <div onClick={()=>{if(categoryQ.trim()){setForm(f=>({...f,cat:categoryQ.trim()}));setShowCategoryDrop(false);}}}
+                        style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`,background:T.tealLight}}>
+                        + নতুন ক্যাটাগরি তৈরি করুন
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1061,6 +1065,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 <div style={{flex:2,position:'relative'}}>
                   <label style={label}>③ পণ্যের নাম *</label>
                   <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
+                    onFocus={()=>{setShowProductDrop(true);}}
                     onBlur={() => setTimeout(() => setShowProductDrop(false), 200)}
                     placeholder="পণ্যের নাম লিখুন..."
                     style={{...input,fontSize:13}} />
@@ -1073,11 +1078,11 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                           <div style={{fontSize:11,color:T.gray400}}>৳{p.sellP} • স্টক: {p.stock} {p.unit}</div>
                         </div>
                       )) : (
-                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>এই নামে কোনো পণ্য নেই</div>
+                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো পণ্য পাওয়া যায়নি</div>
                       )}
                       <div onClick={()=>{setShowProductDrop(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`,background:T.tealLight}}>
-                        ➕ পণ্য যোগ করুন - ধাপে ধাপে
+                        ➕ নতুন পণ্য তৈরি করুন
                       </div>
                     </div>
                   )}
