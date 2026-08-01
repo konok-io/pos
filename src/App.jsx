@@ -1951,7 +1951,7 @@ function CustomersScreen({customers, sales, upd}) {
 /* ═══════════════════════════════════════════
    INVENTORY SCREEN
 ═══════════════════════════════════════════ */
-function InventoryScreen({products, upd}) {
+function InventoryScreen({products, suppliers, upd}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
   const [adjQty, setAdjQty] = useState('');
