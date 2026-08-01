@@ -2231,15 +2231,17 @@ function SettingsScreen({settings, products, upd}) {
               if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
             }}>বিক্রয় ইতিহাস মুছুন</button>
             <button style={btn('danger','sm')} onClick={async()=>{
-              if(confirm('⚠️ সব ডেটা ডিফল্টে রিসেট হবে। চালিয়ে যেতে চান?')) {
-                await upd.products(DEMO.products);
-                await upd.customers(DEMO.customers);
+              if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
+                await upd.products([]);
+                await upd.customers([]);
+                await upd.suppliers([]);
                 await upd.sales([]);
+                await upd.purchases([]);
                 await upd.settings({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
                 alert('সব ডেটা মুছে ফেলা হয়েছে।');
                 window.location.reload();
               }
-            }}>ডেমো ডাটা লোড করুন</button>
+            }}>সম্পূর্ণ রিসেট</button>
           </div>
         </div>
       </div>
