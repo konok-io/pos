@@ -659,7 +659,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
       {/* ── LEFT: Products ── */}
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0}}>
         {/* Filter row */}
-        <div style={{padding:'12px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+        <div style={{padding:'12px 16px',background:T.white,borderBottom:`1px solid ${T.teal}`,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
           {/* সব button */}
           <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
             ...btn(selCat==='সব'?'primary':'ghost','sm'),
@@ -687,7 +687,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:14}}>🔍</span>
             <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)}
               placeholder="পণ্যের নাম..."
-              style={{...input,paddingLeft:34,height:36,fontSize:13,borderRadius:7,border:search?`1px solid ${T.teal}`:undefined}}
+              style={{...input,paddingLeft:34,height:36,fontSize:13,borderRadius:7,border:`1px solid ${T.teal}`}}
               onKeyDown={e=>{if(e.key==='Enter'&&filtered.length>0) addToCart(filtered[0]);}}
             />
           </div>
@@ -699,7 +699,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
               onFocus={()=>setShowCompDrop(true)}
               placeholder="কোম্পানি..."
-              style={{...input,borderRadius:7,padding:'8px 28px 8px 12px',fontSize:13,height:36,border:selComp!=='সব কোম্পানি'?`1px solid ${T.teal}`:undefined}}
+              style={{...input,borderRadius:7,padding:'8px 28px 8px 12px',fontSize:13,height:36,border:`1px solid ${T.teal}`}}
             />
             {selComp !== 'সব কোম্পানি' && (
               <button onClick={()=>{setSelComp('সব কোম্পানি');setCompSearch('');}} style={{
@@ -709,7 +709,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               }}>✕</button>
             )}
             {showCompDrop && (
-              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.gray200}`,borderRadius:7,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
+              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
                 {filteredComps.length === 0 ? (
                   <div style={{padding:'10px 12px',color:T.gray400,fontSize:12}}>কোনো কোম্পানি পাওয়া যায়নি</div>
                 ) : filteredComps.map(c=>(
@@ -734,7 +734,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               onChange={e=>{setSelCat('সব');setCatSearch(e.target.value);setShowCatDrop(true);}} 
               onFocus={()=>setShowCatDrop(true)}
               placeholder="ক্যাটাগরি..."
-              style={{...input,borderRadius:7,padding:'8px 28px 8px 12px',fontSize:13,height:36,border:selCat!=='সব' && selCat!=='স্টক শেষ'?`1px solid ${T.teal}`:undefined}}
+              style={{...input,borderRadius:7,padding:'8px 28px 8px 12px',fontSize:13,height:36,border:`1px solid ${T.teal}`}}
             />
             {selCat !== 'সব' && selCat !== 'স্টক শেষ' && (
               <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
@@ -744,7 +744,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               }}>✕</button>
             )}
             {showCatDrop && (
-              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.gray200}`,borderRadius:7,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
+              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
                 {filteredCats.length === 0 ? (
                   <div style={{padding:'10px 12px',color:T.gray400,fontSize:12}}>কোনো ক্যাটাগরি পাওয়া যায়নি</div>
                 ) : filteredCats.map(c=>(
