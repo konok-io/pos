@@ -331,8 +331,11 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   const checkout = () => {
     if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
-    if (due > 0 && !selCust) { alert('⚠️ বাকি বিক্রয় করতে গ্রাহক সিলেক্ট করুন!'); return; }
-    if (paidAmt < total) { alert('⚠️ পরিশোধের টাকা পুরো মূল্যের চেয়ে কম! সম্পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন।'); return; }
+    if (paidAmt < total) { 
+      if (!selCust) { alert('⚠️ পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন!'); }
+      else { alert('⚠️ পরিশোধের টাকা পুরো মূল্যের চেয়ে কম!'); }
+      return; 
+    }
 
     // Confirmation dialog
     const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
@@ -598,7 +601,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
                 opacity: cart.length && paidAmt >= total ? 1 : 0.5,
                 cursor: cart.length && paidAmt >= total ? 'pointer' : 'not-allowed',
               }}>
-              {paidAmt < total && cart.length ? `⚠️ পূর্ণ পরিশোধ করুন` : '✓ বিক্রয় সম্পন্ন'}
+              {paidAmt < total && cart.length ? (selCust ? '⚠️ পূর্ণ পরিশোধ করুন' : '⚠️ পূর্ণ পরিশোধ বা গ্রাহক সিলেক্ট করুন') : '✓ বিক্রয় সম্পন্ন'}
             </button>
           </div>
         </div>
