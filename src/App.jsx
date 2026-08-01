@@ -317,6 +317,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const [newCustPhone, setNewCustPhone] = useState('');
   const [newCustAddr, setNewCustAddr] = useState('');
   const searchRef = useRef();
+  const paidRef = useRef();
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
   useEffect(() => { searchRef.current?.focus(); }, []);
@@ -688,7 +689,10 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)}
               placeholder="পণ্যের নাম..."
               style={{...input,paddingLeft:34,height:36,fontSize:13,borderRadius:7,border:`1px solid ${T.teal}`}}
-              onKeyDown={e=>{if(e.key==='Enter'&&filtered.length>0) addToCart(filtered[0]);}}
+              onKeyDown={e=>{
+                if(e.key==='Enter'&&filtered.length>0) addToCart(filtered[0]);
+                if(e.key==='Tab'){e.preventDefault();paidRef.current?.focus();}
+              }}
             />
           </div>
           
@@ -889,7 +893,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           </div>
           <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
             <label style={{...label,margin:0,whiteSpace:'nowrap'}}>পরিশোধ (৳)</label>
-            <input value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
+            <input ref={paidRef} value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
               placeholder="পুরো মূল্য দিতে টাইপ করুন" style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}/>
           </div>
           {due > 0 && (
