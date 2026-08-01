@@ -446,7 +446,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
                   <div style={{display:'flex',alignItems:'center',gap:5}}>
                     <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:28,height:28,border:`1px solid ${T.gray200}`,borderRadius:6,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
                     <input value={item.qty} onChange={e=>updQty(item.id,e.target.value)} type="number"
-                      style={{width:42,height:28,textAlign:'center',border:`1px solid ${T.gray200}`,borderRadius:6,fontSize:13,fontFamily:'inherit'}}/>
+                      style={{width:42,height:28,textAlign:'center',border:`1px solid ${T.gray200}`,borderRadius:6,fontSize:13}}/>
                     <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:28,height:28,border:`1px solid ${T.gray200}`,borderRadius:6,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
                     <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:28,height:28,border:'none',borderRadius:6,background:T.redLight,color:T.red,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
                   </div>

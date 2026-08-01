@@ -45,6 +45,15 @@ button {
   font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
 }
 
+/* All inputs use Bangla font */
+input {
+  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+input::placeholder {
+  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
+}
+
 /* Numbers only - use English font */
 input[type="number"],
 input[type="tel"],
