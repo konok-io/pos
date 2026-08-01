@@ -243,6 +243,8 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   const checkout = () => {
     if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
+    if (due > 0 && !selCust) { alert('⚠️ বাকি বিক্রয় করতে গ্রাহক সিলেক্ট করুন!'); return; }
+    if (paidAmt < total) { alert('⚠️ পরিশোধের টাকা পুরো মূল্যের চেয়ে কম! সম্পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন।'); return; }
 
     // Confirmation dialog
     const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
@@ -493,11 +495,14 @@ function POSScreen({products, customers, sales, settings, upd}) {
               style={{...btn('ghost'),flex:1,justifyContent:'center',padding:'12px'}}>
               🗑️ ক্লিয়ার
             </button>
-            <button onClick={checkout} disabled={!cart.length} style={{
-              ...btn('sell'), flex:2, justifyContent:'center', fontSize:15, padding:'12px',
-              opacity:cart.length?1:0.5,
-            }}>
-              ✓ বিক্রয় সম্পন্ন
+            <button onClick={checkout} 
+              disabled={!cart.length || paidAmt < total}
+              style={{
+                ...btn('sell'), flex:2, justifyContent:'center', fontSize:15, padding:'12px',
+                opacity: cart.length && paidAmt >= total ? 1 : 0.5,
+                cursor: cart.length && paidAmt >= total ? 'pointer' : 'not-allowed',
+              }}>
+              {paidAmt < total && cart.length ? `⚠️ পূর্ণ পরিশোধ করুন` : '✓ বিক্রয় সম্পন্ন'}
             </button>
           </div>
         </div>
