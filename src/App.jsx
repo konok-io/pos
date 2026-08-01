@@ -2246,11 +2246,12 @@ function ReportsScreen({sales, customers, purchases}) {
   const [to, setTo] = useState(today());
   const [viewPurchase, setViewPurchase] = useState(null);
   const [viewSale, setViewSale] = useState(null);
+  const [purchaseSearch, setPurchaseSearch] = useState('');
 
-  const filterSales = () => {
+  const filterByPeriod = (items, dateField = 'date') => {
     const n = new Date();
-    return sales.filter(s => {
-      const d = new Date(s.date);
+    return items.filter(item => {
+      const d = new Date(item[dateField]);
       if(period==='today')  return d.toDateString()===n.toDateString();
       if(period==='week')   return d >= new Date(n.getFullYear(),n.getMonth(),n.getDate()-6);
       if(period==='month')  return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();
@@ -2258,6 +2259,20 @@ function ReportsScreen({sales, customers, purchases}) {
       return true;
     });
   };
+
+  const filterSales = () => {
+    return filterByPeriod(sales);
+  };
+
+  const filterPurchases = () => {
+    return filterByPeriod(purchases);
+  };
+
+  const filteredPurchases = filterPurchases().filter(p => 
+    !purchaseSearch || 
+    p.id.toLowerCase().includes(purchaseSearch.toLowerCase()) ||
+    (p.supplier||'').toLowerCase().includes(purchaseSearch.toLowerCase())
+  );
 
   const fs = filterSales();
   const totalSales = fs.reduce((s,i)=>s+i.total,0);
@@ -2275,6 +2290,100 @@ function ReportsScreen({sales, customers, purchases}) {
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
     a.download='sales-report.csv'; a.click();
+  };
+
+  const printPurchases = () => {
+    const printContent = document.createElement('div');
+    printContent.innerHTML = `
+      <div style="font-family:Arial,sans-serif;padding:20px;">
+        <h2 style="text-align:center;margin-bottom:5px;">📦 পারচেজ হিস্ট্রি</h2>
+        <p style="text-align:center;color:#666;margin-bottom:20px;">${period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to}</p>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f0f0f0;">
+              <th style="border:1px solid #ddd;padding:8px;text-align:left;">তারিখ</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:left;">পারচেজ আইডি</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:left;">সরবরাহকারী</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:center;">পণ্য</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:right;">মোট খরচ</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filterPurchases().map(p => `
+              <tr>
+                <td style="border:1px solid #ddd;padding:8px;">${new Date(p.date).toLocaleDateString('en-GB')}</td>
+                <td style="border:1px solid #ddd;padding:8px;">${p.id}</td>
+                <td style="border:1px solid #ddd;padding:8px;">${p.supplier}</td>
+                <td style="border:1px solid #ddd;padding:8px;text-align:center;">${p.totalItems}টি</td>
+                <td style="border:1px solid #ddd;padding:8px;text-align:right;">${fmt(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0))}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="background:#e0f7f0;font-weight:bold;">
+              <td colspan="4" style="border:1px solid #ddd;padding:10px;text-align:right;">মোট পারচেজ এমাউন্ট:</td>
+              <td style="border:1px solid #ddd;padding:10px;text-align:right;color:#00897b;">${fmt(filterPurchases().reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0))}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    `;
+    const win = window.open('', '', 'width=800,height=600');
+    win.document.write('<html><head><title>পারচেজ হিস্ট্রি</title></head><body>');
+    win.document.write(printContent.innerHTML);
+    win.document.write('</body></html>');
+    win.document.close();
+    win.print();
+  };
+
+  const printSales = () => {
+    const printContent = document.createElement('div');
+    printContent.innerHTML = `
+      <div style="font-family:Arial,sans-serif;padding:20px;">
+        <h2 style="text-align:center;margin-bottom:5px;">🧾 বিক্রয় ইতিহাস</h2>
+        <p style="text-align:center;color:#666;margin-bottom:20px;">${period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to}</p>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#f0f0f0;">
+              <th style="border:1px solid #ddd;padding:8px;text-align:left;">তারিখ</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:left;">বিল নং</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:left;">কাস্টমার</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:center;">পণ্য</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:right;">মোট</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:right;">পরিশোধ</th>
+              <th style="border:1px solid #ddd;padding:8px;text-align:right;">বাকি</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${fs.map(s => `
+              <tr>
+                <td style="border:1px solid #ddd;padding:8px;">${new Date(s.date).toLocaleDateString('en-GB')}</td>
+                <td style="border:1px solid #ddd;padding:8px;">#${s.id.slice(-6).toUpperCase()}</td>
+                <td style="border:1px solid #ddd;padding:8px;">${s.custName}</td>
+                <td style="border:1px solid #ddd;padding:8px;text-align:center;">${(s.items||[]).length}টি</td>
+                <td style="border:1px solid #ddd;padding:8px;text-align:right;">${fmt(s.total)}</td>
+                <td style="border:1px solid #ddd;padding:8px;text-align:right;">${fmt(s.paid)}</td>
+                <td style="border:1px solid #ddd;padding:8px;text-align:right;">${fmt(s.due)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="background:#e8f5e9;font-weight:bold;">
+              <td colspan="3" style="border:1px solid #ddd;padding:10px;text-align:right;">মোট:</td>
+              <td style="border:1px solid #ddd;padding:10px;text-align:right;">${fmt(totalSales)}</td>
+              <td style="border:1px solid #ddd;padding:10px;text-align:right;">${fmt(totalPaid)}</td>
+              <td style="border:1px solid #ddd;padding:10px;text-align:right;">${fmt(totalDue)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    `;
+    const win = window.open('', '', 'width=900,height=600');
+    win.document.write('<html><head><title>বিক্রয় ইতিহাস</title></head><body>');
+    win.document.write(printContent.innerHTML);
+    win.document.write('</body></html>');
+    win.document.close();
+    win.print();
   };
 
   const statCards = [
@@ -2334,7 +2443,13 @@ function ReportsScreen({sales, customers, purchases}) {
 
         {/* Purchase History */}
         <div style={{...card,marginBottom:14}}>
-          <h3 style={{margin:'0 0 12px',fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>📦 পারচেজ হিস্ট্রি ({purchases.length}টি)</h3>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <h3 style={{margin:0,fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>📦 পারচেজ হিস্ট্রি ({filterPurchases().length}টি)</h3>
+            <div style={{display:'flex',gap:8,alignItems:'center'}}>
+              <input value={purchaseSearch} onChange={e=>setPurchaseSearch(e.target.value)} placeholder="খুঁজুন..." style={{...input,padding:'6px 10px',fontSize:12,width:150}}/>
+              <button onClick={printPurchases} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
+            </div>
+          </div>
           <div style={{overflow:'auto'}}>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
@@ -2345,8 +2460,8 @@ function ReportsScreen({sales, customers, purchases}) {
                 </tr>
               </thead>
               <tbody>
-                {purchases.length===0 ? <tr><td colSpan={5} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</td></tr>
-                : [...purchases].reverse().map((p,i)=>(
+                {filteredPurchases.length===0 ? <tr><td colSpan={5} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</td></tr>
+                : [...filteredPurchases].reverse().map((p,i)=>(
                   <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewPurchase(p)}>
                     <td style={{padding:'9px 10px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
                     <td style={{padding:'9px 10px',fontSize:12,fontFamily:'monospace',color:T.teal,fontWeight:600}}>{p.id}</td>
@@ -2356,13 +2471,22 @@ function ReportsScreen({sales, customers, purchases}) {
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr style={{background:T.tealLight}}>
+                  <td colSpan={4} style={{padding:'10px',fontWeight:700,fontSize:13}}>মোট পারচেজ এমাউন্ট:</td>
+                  <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0),0))}</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
 
         {/* Sales history */}
         <div style={card}>
-          <h3 style={{margin:'0 0 12px',fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>বিক্রয় ইতিহাস ({fs.length}টি বিল)</h3>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+            <h3 style={{margin:0,fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>বিক্রয় ইতিহাস ({fs.length}টি বিল)</h3>
+            <button onClick={printSales} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
+          </div>
           <div style={{overflow:'auto'}}>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
@@ -2387,6 +2511,15 @@ function ReportsScreen({sales, customers, purchases}) {
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                <tr style={{background:T.greenLight}}>
+                  <td colSpan={4} style={{padding:'10px',fontWeight:700,fontSize:13,color:T.green}}>মোট:</td>
+                  <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.green}}>{fmt(totalSales)}</td>
+                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalPaid)}</td>
+                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:totalDue>0?T.red:T.gray400}}>{fmt(totalDue)}</td>
+                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalProfit)}</td>
+                </tr>
+              </tfoot>
             </table>
           </div>
         </div>
