@@ -689,6 +689,8 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   const [form, setForm] = useState({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
   const [viewPurchase, setViewPurchase] = useState(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
+  const [productNameQ, setProductNameQ] = useState('');
+  const [showProductDrop, setShowProductDrop] = useState(false);
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
@@ -702,6 +704,16 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   // Filter companies for dropdown
   const filteredCompanies = uniqueCompanies.filter(c => 
     !supplierQ || c.toLowerCase().includes(supplierQ.toLowerCase())
+  );
+
+  // Get products of selected company
+  const companyProducts = form.company 
+    ? products.filter(p => (p.company||'').toLowerCase() === form.company.toLowerCase())
+    : [];
+
+  // Filter products for dropdown
+  const filteredProducts = companyProducts.filter(p => 
+    !productNameQ || p.name.toLowerCase().includes(productNameQ.toLowerCase()) || (p.barcode||'').includes(productNameQ)
   );
 
   // Filter products for table
@@ -936,7 +948,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
 
               {/* Barcode + Product Name */}
               <div style={{display:'flex',gap:8,marginBottom:12}}>
-                <div style={{flex:1}}>
+                <div style={{flex:1,position:'relative'}}>
                   <label style={label}>🔢 বারকোড</label>
                   <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
                     style={{...input,fontSize:13}} />
@@ -952,10 +964,33 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                     </div>
                   )}
                 </div>
-                <div style={{flex:2}}>
+                <div style={{flex:2,position:'relative'}}>
                   <label style={label}>📦 পণ্যের নাম *</label>
-                  <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="পণ্যের নাম..."
+                  <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
+                    onFocus={()=>setShowProductDrop(true)} placeholder="পণ্যের নাম লিখুন বা সিলেক্ট করুন..."
                     style={{...input,fontSize:13}} />
+                  {showProductDrop && form.company && (
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:180,overflow:'auto'}}>
+                      {filteredProducts.length > 0 ? filteredProducts.map((p,i)=>(
+                        <div key={p.id} onClick={()=>selectProduct(p)}
+                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>
+                          <div style={{fontSize:13,fontWeight:600}}>{p.name}</div>
+                          <div style={{fontSize:11,color:T.gray400}}>৳{p.sellP} • {p.stock} {p.unit}</div>
+                        </div>
+                      )) : (
+                        <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>এই কোম্পানিতে কোনো পণ্য নেই</div>
+                      )}
+                      <div onClick={()=>{setShowProductDrop(false);setProductNameQ('');}}
+                        style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
+                        ➕ নতুন পণ্য যোগ করুন
+                      </div>
+                    </div>
+                  )}
+                  {!form.company && (
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,padding:'8px 12px',fontSize:12,color:T.gray500}}>
+                      প্রথমে কোম্পানি সিলেক্ট করুন
+                    </div>
+                  )}
                 </div>
               </div>
 
