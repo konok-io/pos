@@ -699,8 +699,15 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
               onFocus={()=>setShowCompDrop(true)}
               placeholder="কোম্পানি..."
-              style={{...input,borderRadius:20,padding:'8px 12px',fontSize:13,height:40,border:selComp!=='সব কোম্পানি'?`1.5px solid ${T.teal}`:undefined}}
+              style={{...input,borderRadius:20,padding:'8px 30px 8px 12px',fontSize:13,height:40,border:selComp!=='সব কোম্পানি'?`1.5px solid ${T.teal}`:undefined}}
             />
+            {selComp !== 'সব কোম্পানি' && (
+              <button onClick={()=>{setSelComp('সব কোম্পানি');setCompSearch('');}} style={{
+                position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',
+                background:'none',border:'none',cursor:'pointer',padding:4,
+                color:T.gray400,fontSize:14,lineHeight:1
+              }}>✕</button>
+            )}
             {showCompDrop && (
               <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>
                 {filteredComps.length === 0 ? (
@@ -726,8 +733,15 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               onChange={e=>{setSelCat('সব');setCatSearch(e.target.value);setShowCatDrop(true);}} 
               onFocus={()=>setShowCatDrop(true)}
               placeholder="ক্যাটাগরি..."
-              style={{...input,borderRadius:20,padding:'8px 12px',fontSize:13,height:40,border:selCat!=='সব' && selCat!=='স্টক শেষ'?`1.5px solid ${T.teal}`:undefined}}
+              style={{...input,borderRadius:20,padding:'8px 30px 8px 12px',fontSize:13,height:40,border:selCat!=='সব' && selCat!=='স্টক শেষ'?`1.5px solid ${T.teal}`:undefined}}
             />
+            {selCat !== 'সব' && selCat !== 'স্টক শেষ' && (
+              <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
+                position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',
+                background:'none',border:'none',cursor:'pointer',padding:4,
+                color:T.gray400,fontSize:14,lineHeight:1
+              }}>✕</button>
+            )}
             {showCatDrop && (
               <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>
                 {filteredCats.length === 0 ? (
