@@ -274,7 +274,7 @@ export default function App() {
 /* ═══════════════════════════════════════════
    POS SCREEN
 ═══════════════════════════════════════════ */
-function POSScreen({products, customers, sales, settings, upd}) {
+function POSScreen({products, customers, sales, settings, categories, upd}) {
   const [cart, setCart] = useState([]);
   const [search, setSearch] = useState('');
   const [selCat, setSelCat] = useState('সব');
@@ -294,7 +294,10 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   useEffect(() => { searchRef.current?.focus(); }, []);
 
-  const cats = ['সব', ...new Set(products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).map(p=>p.cat).filter(Boolean))];
+  const cats = ['সব', ...new Set([
+    ...products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).map(p=>p.cat).filter(Boolean),
+    ...categories.map(c=>c.name).filter(Boolean)
+  ])];
   const filtered = products.filter(p => {
     const isCategory = p.name?.includes('(ক্যাটাগরি)');
     if (isCategory) return false;
