@@ -304,7 +304,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     const matchCat = selCat==='সব' || p.cat===selCat;
     const matchQ = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
     return matchCat && matchQ;
-  });
+  }).sort((a, b) => a.stock - b.stock);
 
   const addToCart = (prod) => {
     setCart(prev => {
