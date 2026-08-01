@@ -2293,97 +2293,153 @@ function ReportsScreen({sales, customers, purchases}) {
   };
 
   const printPurchases = () => {
-    const printContent = document.createElement('div');
-    printContent.innerHTML = `
-      <div style="font-family:Arial,sans-serif;padding:20px;">
-        <h2 style="text-align:center;margin-bottom:5px;">📦 পারচেজ হিস্ট্রি</h2>
-        <p style="text-align:center;color:#666;margin-bottom:20px;">${period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to}</p>
-        <table style="width:100%;border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f0f0f0;">
-              <th style="border:1px solid #ddd;padding:8px;text-align:left;">তারিখ</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:left;">পারচেজ আইডি</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:left;">সরবরাহকারী</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:center;">পণ্য</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:right;">মোট খরচ</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${filterPurchases().map(p => `
-              <tr>
-                <td style="border:1px solid #ddd;padding:8px;">${new Date(p.date).toLocaleDateString('en-GB')}</td>
-                <td style="border:1px solid #ddd;padding:8px;">${p.id}</td>
-                <td style="border:1px solid #ddd;padding:8px;">${p.supplier}</td>
-                <td style="border:1px solid #ddd;padding:8px;text-align:center;">${p.totalItems}টি</td>
-                <td style="border:1px solid #ddd;padding:8px;text-align:right;">${fmt(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0))}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-          <tfoot>
-            <tr style="background:#e0f7f0;font-weight:bold;">
-              <td colspan="4" style="border:1px solid #ddd;padding:10px;text-align:right;">মোট পারচেজ এমাউন্ট:</td>
-              <td style="border:1px solid #ddd;padding:10px;text-align:right;color:#00897b;">${fmt(filterPurchases().reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0))}</td>
-            </tr>
-          </tfoot>
-        </table>
+    const purchases = filterPurchases();
+    const total = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0);
+    const periodLabel = period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to;
+    
+    let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>পারচেজ হিস্ট্রি</title>
+      <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',Arial,sans-serif; padding:20px; font-size:13px; }
+        .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #00897b; padding-bottom:15px; }
+        .header h1 { color:#00897b; font-size:24px; margin-bottom:5px; }
+        .header p { color:#666; font-size:13px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:20px; }
+        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:10px 8px; text-align:left; font-size:11px; color:#00897b; font-weight:700; }
+        td { border:1px solid #e0e0e0; padding:8px; font-size:12px; }
+        tr:nth-child(even) { background:#fafafa; }
+        .total-row { background:#e0f7f0 !important; font-weight:700; }
+        .total-row td { border:1px solid #b2dfdb; font-size:14px; color:#00897b; }
+        .footer { margin-top:20px; text-align:center; color:#999; font-size:11px; }
+        @media print { body { padding:0; } }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>📦 পারচেজ হিস্ট্রি</h1>
+        <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
       </div>
-    `;
+      <table>
+        <thead>
+          <tr>
+            <th>তারিখ</th>
+            <th>পারচেজ আইডি</th>
+            <th>সরবরাহকারী</th>
+            <th style="text-align:center;">পণ্য</th>
+            <th style="text-align:right;">মোট খরচ</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    
+    purchases.forEach(p => {
+      html += `
+          <tr>
+            <td>${new Date(p.date).toLocaleDateString('bn-BD')}</td>
+            <td style="font-family:monospace;color:#00897b;font-weight:600;">${p.id}</td>
+            <td>${p.supplier}</td>
+            <td style="text-align:center;">${p.totalItems}টি</td>
+            <td style="text-align:right;font-weight:600;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>`;
+    });
+    
+    html += `
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="4" style="text-align:right;">মোট পারচেজ এমাউন্ট:</td>
+            <td style="text-align:right;">৳${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${purchases.length}টি পারচেজ</div>
+    </body>
+    </html>`;
+    
     const win = window.open('', '', 'width=800,height=600');
-    win.document.write('<html><head><title>পারচেজ হিস্ট্রি</title></head><body>');
-    win.document.write(printContent.innerHTML);
-    win.document.write('</body></html>');
+    win.document.write(html);
     win.document.close();
-    win.print();
+    setTimeout(() => win.print(), 250);
   };
 
   const printSales = () => {
-    const printContent = document.createElement('div');
-    printContent.innerHTML = `
-      <div style="font-family:Arial,sans-serif;padding:20px;">
-        <h2 style="text-align:center;margin-bottom:5px;">🧾 বিক্রয় ইতিহাস</h2>
-        <p style="text-align:center;color:#666;margin-bottom:20px;">${period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to}</p>
-        <table style="width:100%;border-collapse:collapse;">
-          <thead>
-            <tr style="background:#f0f0f0;">
-              <th style="border:1px solid #ddd;padding:8px;text-align:left;">তারিখ</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:left;">বিল নং</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:left;">কাস্টমার</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:center;">পণ্য</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:right;">মোট</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:right;">পরিশোধ</th>
-              <th style="border:1px solid #ddd;padding:8px;text-align:right;">বাকি</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${fs.map(s => `
-              <tr>
-                <td style="border:1px solid #ddd;padding:8px;">${new Date(s.date).toLocaleDateString('en-GB')}</td>
-                <td style="border:1px solid #ddd;padding:8px;">#${s.id.slice(-6).toUpperCase()}</td>
-                <td style="border:1px solid #ddd;padding:8px;">${s.custName}</td>
-                <td style="border:1px solid #ddd;padding:8px;text-align:center;">${(s.items||[]).length}টি</td>
-                <td style="border:1px solid #ddd;padding:8px;text-align:right;">${fmt(s.total)}</td>
-                <td style="border:1px solid #ddd;padding:8px;text-align:right;">${fmt(s.paid)}</td>
-                <td style="border:1px solid #ddd;padding:8px;text-align:right;">${fmt(s.due)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-          <tfoot>
-            <tr style="background:#e8f5e9;font-weight:bold;">
-              <td colspan="3" style="border:1px solid #ddd;padding:10px;text-align:right;">মোট:</td>
-              <td style="border:1px solid #ddd;padding:10px;text-align:right;">${fmt(totalSales)}</td>
-              <td style="border:1px solid #ddd;padding:10px;text-align:right;">${fmt(totalPaid)}</td>
-              <td style="border:1px solid #ddd;padding:10px;text-align:right;">${fmt(totalDue)}</td>
-            </tr>
-          </tfoot>
-        </table>
+    const periodLabel = period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to;
+    
+    let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>বিক্রয় ইতিহাস</title>
+      <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI',Arial,sans-serif; padding:20px; font-size:13px; }
+        .header { text-align:center; margin-bottom:20px; border-bottom:2px solid #00897b; padding-bottom:15px; }
+        .header h1 { color:#00897b; font-size:24px; margin-bottom:5px; }
+        .header p { color:#666; font-size:13px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:20px; }
+        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:10px 8px; text-align:left; font-size:11px; color:#00897b; font-weight:700; }
+        td { border:1px solid #e0e0e0; padding:8px; font-size:12px; }
+        tr:nth-child(even) { background:#fafafa; }
+        .total-row { background:#e8f5e9 !important; font-weight:700; }
+        .total-row td { border:1px solid #a5d6a7; color:#2e7d32; }
+        .footer { margin-top:20px; text-align:center; color:#999; font-size:11px; }
+        @media print { body { padding:0; } }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>🧾 বিক্রয় ইতিহাস</h1>
+        <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
       </div>
-    `;
+      <table>
+        <thead>
+          <tr>
+            <th>তারিখ</th>
+            <th>বিল নং</th>
+            <th>কাস্টমার</th>
+            <th style="text-align:center;">পণ্য</th>
+            <th style="text-align:right;">মোট</th>
+            <th style="text-align:right;">পরিশোধ</th>
+            <th style="text-align:right;">বাকি</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    
+    fs.forEach(s => {
+      html += `
+          <tr>
+            <td>${new Date(s.date).toLocaleDateString('bn-BD')}</td>
+            <td style="font-family:monospace;color:#00897b;font-weight:600;">#${s.id.slice(-6).toUpperCase()}</td>
+            <td>${s.custName}</td>
+            <td style="text-align:center;">${(s.items||[]).length}টি</td>
+            <td style="text-align:right;font-weight:600;">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#2e7d32;">৳${s.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:${s.due>0?'#c62828':'#999'};">৳${s.due.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>`;
+    });
+    
+    html += `
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="4" style="text-align:right;">মোট:</td>
+            <td style="text-align:right;">৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${fs.length}টি বিক্রয়</div>
+    </body>
+    </html>`;
+    
     const win = window.open('', '', 'width=900,height=600');
-    win.document.write('<html><head><title>বিক্রয় ইতিহাস</title></head><body>');
-    win.document.write(printContent.innerHTML);
-    win.document.write('</body></html>');
+    win.document.write(html);
     win.document.close();
-    win.print();
+    setTimeout(() => win.print(), 250);
   };
 
   const statCards = [
