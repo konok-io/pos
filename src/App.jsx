@@ -598,15 +598,45 @@ function POSScreen({products, customers, sales, settings, upd}) {
               🗑️ ক্লিয়ার
             </button>
             <button 
-              onClick={checkout}
+              onClick={() => {
+                alert('বিক্রয় বাটনে ক্লিক হয়েছে!');
+                if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
+                if (due > 0 && !selCust) { alert('পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন!'); return; }
+                const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
+                const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
+                const vatText = vatAmount > 0 ? `\nভ্যাট: ৳${vatAmount.toFixed(0)}` : '';
+                const changeText = change > 0 ? `\nফেরত: ৳${change.toFixed(0)}` : '';
+                const msg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${changeText}${dueCreditText}`;
+                if (!confirm(msg)) return;
+                const sale = {
+                  id: genId(), date: now(),
+                  custId: selCust?.id || null, custName: selCust?.name || 'সাধারণ ক্রেতা',
+                  items: cart.map(i => ({ ...i, total: i.sellP * i.qty, profit: (i.sellP - i.buyP) * i.qty })),
+                  subtotal, discount: disc, vatPercent, vatAmount, total,
+                  paid: paidAmt, due: Math.max(0, due), change,
+                };
+                const newProds = products.map(p => {
+                  const ci = cart.find(i => i.id === p.id);
+                  return ci ? { ...p, stock: p.stock - ci.qty } : p;
+                });
+                let newCusts = [...customers];
+                if (selCust && due > 0) {
+                  newCusts = newCusts.map(c => c.id === selCust.id ? { ...c, credit: (c.credit || 0) + due } : c);
+                }
+                const newSales = [...sales, sale];
+                setReceipt({ sale, settings });
+                setCart([]); setDiscount(''); setPaid(''); setSelCust(null); setCustQ('');
+                upd.products(newProds);
+                upd.customers(newCusts);
+                upd.sales(newSales);
+              }}
               style={{
                 ...btn('sell'), 
-                flex:2, 
-                justifyContent:'center', 
-                fontSize:15, 
-                padding:'12px',
+                flex: 2, 
+                justifyContent: 'center', 
+                fontSize: 15, 
+                padding: '12px',
                 opacity: (!cart.length || (due > 0 && !selCust)) ? 0.5 : 1,
-                cursor: (!cart.length || (due > 0 && !selCust)) ? 'not-allowed' : 'pointer',
               }}>
               {!cart.length ? 'পণ্য যোগ করুন' : 
                (due > 0 && !selCust) ? '⚠️ পূর্ণ পরিশোধ করুন বা গ্রাহক সিলেক্ট করুন' : 
