@@ -888,17 +888,21 @@ function ProductsScreen({products, suppliers, categories, upd}) {
         totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
       };
 
-      // Add new supplier if not exists
+      // Prepare new products
+      const newProducts = purchaseItems.map(item => ({ ...item, id: genId() }));
+      
+      // Prepare new supplier if needed
+      let newSupplierList = suppliers;
       if (form.company && !suppliers.find(s => s.name === form.company)) {
         const newSupplier = { id: genId(), name: form.company, phone: '', address: '' };
-        await upd.suppliers([...suppliers, newSupplier]);
+        newSupplierList = [...suppliers, newSupplier];
       }
 
-      // Save all products
-      const newProducts = purchaseItems.map(item => ({ ...item, id: genId() }));
+      // Sequential updates to ensure state is fresh
+      if (newSupplierList !== suppliers) {
+        await upd.suppliers(newSupplierList);
+      }
       await upd.products([...products, ...newProducts]);
-      
-      // Save purchase record
       await upd.purchases([...purchases, purchase]);
 
       setPurchaseItems([]);
@@ -909,7 +913,8 @@ function ProductsScreen({products, suppliers, categories, upd}) {
       alert(`✅ ${savedCount}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
     } catch (err) {
       console.error('Save error:', err);
-      alert('❌ সংরক্ষণ ব্যর্থ হয়েছে। আবার চেষ্টা করুন।');
+      console.error('Error details:', err.message, err.stack);
+      alert('❌ সংরক্ষণ ব্যর্থ হয়েছে।\n' + (err.message || 'আবার চেষ্টা করুন।'));
     }
   };
 
