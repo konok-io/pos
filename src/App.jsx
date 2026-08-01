@@ -703,9 +703,15 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   ];
   const uniqueCompanies = [...new Set(allCompanies)];
 
-  // Filter companies for dropdown
-  const filteredCompanies = uniqueCompanies.filter(c => 
-    !supplierQ || c.toLowerCase().includes(supplierQ.toLowerCase())
+  // Create company list with code for filtering
+  const companyList = uniqueCompanies.map(name => {
+    const sup = suppliers.find(s => s.name.toLowerCase() === name.toLowerCase());
+    return { name, code: sup?.code || '' };
+  });
+
+  // Filter companies for dropdown - search by name or code
+  const filteredCompanies = companyList.filter(c => 
+    !supplierQ || c.name.toLowerCase().includes(supplierQ.toLowerCase()) || c.code.toLowerCase().includes(supplierQ.toLowerCase())
   );
 
   // Get products of selected company
@@ -933,13 +939,16 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
               <div style={{marginBottom:12,position:'relative'}}>
                 <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
                 <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
-                  onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম লিখুন..."
+                  onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..."
                   style={{...input,fontSize:13}} />
                 {showSupplierDrop && supplierQ && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
                     {filteredCompanies.map((c,i)=>(
-                      <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowSupplierDrop(false);}}
-                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>{c}</div>
+                      <div key={i} onClick={()=>{setSupplierQ(c.name);setForm(f=>({...f,company:c.name}));setShowSupplierDrop(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
+                        <span>{c.name}</span>
+                        {c.code && <span style={{fontSize:11,color:T.teal,fontWeight:600}}>{c.code}</span>}
+                      </div>
                     ))}
                     {filteredCompanies.length === 0 && (
                       <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো কোম্পানি পাওয়া যায়নি</div>
@@ -1192,17 +1201,24 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
   ];
 
   const filtered = allSuppliers.filter(s => 
-    !search || s.name.toLowerCase().includes(search.toLowerCase()) || (s.phone||'').includes(search)
+    !search || s.name.toLowerCase().includes(search.toLowerCase()) || (s.phone||'').includes(search) || (s.code||'').toLowerCase().includes(search.toLowerCase())
   );
 
   const save = async () => {
     if (!form.name?.trim()) { alert('কোম্পানির নাম দিন'); return; }
+    // Generate company code (C-001, C-002, etc.)
+    const maxCode = suppliers.reduce((max, s) => {
+      const match = s.code?.match(/C-(\d+)/);
+      return match ? Math.max(max, parseInt(match[1])) : max;
+    }, 0);
+    const newCode = `C-${String(maxCode + 1).padStart(3, '0')}`;
+    
     if (form.isAuto) {
       // Convert auto to real supplier
-      const newS = { id: genId(), name: form.name.trim(), phone: form.phone||'', address: form.address||'' };
+      const newS = { id: genId(), code: newCode, name: form.name.trim(), phone: form.phone||'', address: form.address||'' };
       await upd.suppliers([...suppliers, newS]);
     } else if (modal.mode === 'add') {
-      await upd.suppliers([...suppliers, {...form, id: genId()}]);
+      await upd.suppliers([...suppliers, {...form, id: genId(), code: newCode}]);
     } else {
       await upd.suppliers(suppliers.map(s => s.id === modal.id ? {...form, id: modal.id} : s));
     }
@@ -1259,6 +1275,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
         <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
           <button style={btn()} onClick={()=>setViewSupplier(null)}>← ফিরে যান</button>
           <span style={{fontWeight:700,fontSize:15}}>🏢 {viewSupplier.name}</span>
+          {viewSupplier.code && <span style={{fontSize:12,color:T.teal,fontWeight:600,marginLeft:8}}>{viewSupplier.code}</span>}
         </div>
         <div style={{flex:1,overflow:'auto',padding:12}}>
           {/* Stats */}
@@ -1343,6 +1360,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                   <div>
                     <div style={{fontWeight:700,fontSize:15,display:'flex',alignItems:'center',gap:6}}>
                       🏢 {s.name}
+                      {s.code && <span style={{fontSize:11,color:T.teal,fontWeight:600,marginLeft:4}}>{s.code}</span>}
                       {s.isAuto && <span style={{fontSize:10,background:T.gray100,padding:'2px 6px',borderRadius:4}}>অটো</span>}
                     </div>
                     {s.phone && <div style={{fontSize:12,color:T.gray500,marginTop:2}}>📱 {s.phone}</div>}
