@@ -852,6 +852,7 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
       stock: '',
       minStock: p.minStock || '5'
     });
+    setSupplierQ(p.company || ''); // Also update supplierQ for the dropdown
     setBarcodeVal(p.barcode || '');
     setBarcodeSuggestions([]);
     setSelectedProduct(p);
