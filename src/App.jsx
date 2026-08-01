@@ -335,10 +335,11 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   }).sort((a, b) => a.stock - b.stock);
 
   const addToCart = (prod) => {
+    if (prod.stock <= 0) { alert(`"${prod.name}" এর স্টক শেষ!`); return; }
     setCart(prev => {
       const ex = prev.find(i=>i.id===prod.id);
       if (ex) {
-        if (prod.stock > 0 && ex.qty >= prod.stock) { alert(`সর্বোচ্চ স্টক: ${prod.stock} ${prod.unit}`); return prev; }
+        if (ex.qty >= prod.stock) { alert(`সর্বোচ্চ স্টক: ${prod.stock} ${prod.unit}`); return prev; }
         return prev.map(i=>i.id===prod.id ? {...i,qty:i.qty+1} : i);
       }
       return [...prev, {id:prod.id,name:prod.name,sellP:prod.sellP,buyP:prod.buyP,qty:1,unit:prod.unit,maxQ:prod.stock}];
@@ -351,7 +352,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     const n = parseInt(q) || 0;
     if (n < 1) { setCart(prev=>prev.filter(i=>i.id!==id)); return; }
     const prod = products.find(p=>p.id===id);
-    if (prod && prod.stock > 0 && n > prod.stock) { alert(`সর্বোচ্চ স্টক: ${prod.stock}`); return; }
+    if (prod && n > prod.stock) { alert(`সর্বোচ্চ স্টক: ${prod.stock}`); return; }
     setCart(prev=>prev.map(i=>i.id===id ? {...i,qty:n} : i));
   };
 
@@ -623,7 +624,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           {filtered.map(p => (
             <button key={p.id} onClick={()=>addToCart(p)} style={{
               background:T.white, border:`1.5px solid ${p.stock<=0?T.red+'60':p.stock<=p.minStock?T.amber+'80':T.gray200}`,
-              borderRadius:12, padding:'14px 12px', cursor:'pointer',
+              borderRadius:12, padding:'14px 12px', cursor:p.stock>0?'pointer':'not-allowed',
               textAlign:'left', transition:'all 0.2s',
               boxShadow:'0 2px 8px rgba(0,0,0,0.08)',
               outline:'none',
