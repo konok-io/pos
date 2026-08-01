@@ -1608,7 +1608,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           🏢 কোম্পানি ({allSuppliers.length})
         </button>
         <button onClick={()=>setActiveTab('categories')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='categories'?700:400,color:activeTab==='categories'?T.teal:T.gray500,borderBottom:activeTab==='categories'?`2px solid ${T.teal}`:'none',fontSize:13}}>
-          📂 ক্যাটাগরি ({allCategories.length})
+          📂 ক্যাটাগরি ({categories.length})
         </button>
         <button onClick={()=>setActiveTab('products')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='products'?700:400,color:activeTab==='products'?T.teal:T.gray500,borderBottom:activeTab==='products'?`2px solid ${T.teal}`:'none',fontSize:13}}>
           📦 পণ্য ({products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).length})
