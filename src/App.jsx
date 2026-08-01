@@ -792,9 +792,9 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
       barcode: p.barcode || '',
       company: p.company || '',
       cat: p.cat || '',
-      unit: 'পিস',
-      buyP: '',
-      sellP: '',
+      unit: p.unit || 'পিস',
+      buyP: p.buyP || '',
+      sellP: p.sellP || '',
       stock: '',
       minStock: p.minStock || '5'
     });
@@ -814,10 +814,10 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
       barcode: form.barcode || '',
       company: form.company,
       cat: form.cat || '',
-      unit: 'পিস',
-      buyP: 0,
-      sellP: 0,
-      stock: 0,
+      unit: form.unit || 'পিস',
+      buyP: +form.buyP || 0,
+      sellP: +form.sellP || 0,
+      stock: +form.stock || 0,
       minStock: +form.minStock || 5
     };
     setPurchaseItems([...purchaseItems, item]);
@@ -1065,6 +1065,34 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   style={{...input,fontSize:13}} />
               </div>
 
+              {/* Unit */}
+              <div style={{marginBottom:12}}>
+                <label style={label}>📥 একক</label>
+                <input value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} placeholder="পিস, কেজি, লিটার..."
+                  style={{...input,fontSize:13}} />
+              </div>
+
+              {/* Stock */}
+              <div style={{marginBottom:12}}>
+                <label style={label}>📥 স্টক</label>
+                <input value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} type="number" placeholder="পণ্যের পরিমাণ..."
+                  style={{...input,fontSize:13}} />
+              </div>
+
+              {/* Purchase Price */}
+              <div style={{marginBottom:12}}>
+                <label style={label}>💰 ক্রয়মূল্য</label>
+                <input value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} type="number" placeholder="ক্রয়মূল্য..."
+                  style={{...input,fontSize:13}} />
+              </div>
+
+              {/* Selling Price */}
+              <div style={{marginBottom:12}}>
+                <label style={label}>💵 বিক্রয়মূল্য</label>
+                <input value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} type="number" placeholder="বিক্রয়মূল্য..."
+                  style={{...input,fontSize:13}} />
+              </div>
+
               {/* Min Stock */}
               <div style={{marginBottom:12}}>
                 <label style={label}>⚠️ মিন স্টক (সতর্কতা সীমা)</label>
@@ -1097,8 +1125,14 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                         <div style={{fontWeight:600,fontSize:13}}>{item.name}</div>
                         <div style={{fontSize:11,color:T.gray500}}>{item.company} • {item.barcode}</div>
                         {item.cat && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>📂 {item.cat}</div>}
+                        <div style={{fontSize:12,marginTop:4}}>
+                          <span style={{color:T.teal}}>৳{item.buyP || 0}</span> → <span style={{color:T.green}}>৳{item.sellP || 0}</span>
+                        </div>
                       </div>
-                      <button onClick={()=>removeItem(item.id)} style={{fontSize:11,color:T.red,background:'none',border:'none',cursor:'pointer',padding:'4px 8px'}}>✕ মুছুন</button>
+                      <div style={{textAlign:'right'}}>
+                        <div style={{fontWeight:700,fontSize:14}}>{item.stock || 0} {item.unit}</div>
+                        <button onClick={()=>removeItem(item.id)} style={{fontSize:11,color:T.red,background:'none',border:'none',cursor:'pointer',marginTop:4}}>✕ মুছুন</button>
+                      </div>
                     </div>
                   </div>
                 ))
