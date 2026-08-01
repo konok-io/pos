@@ -1221,11 +1221,13 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(null);
   const [activeTab, setActiveTab] = useState('companies'); // companies, products, categories
   const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:'0',minStock:'5'});
-  const [catForm, setCatForm] = useState({name:''});
+  const [catForm, setCatForm] = useState({name:'',company:''});
   const [companyQ, setCompanyQ] = useState('');
   const [showCompanyDrop, setShowCompanyDrop] = useState(false);
   const [catQ, setCatQ] = useState('');
   const [showCatDrop, setShowCatDrop] = useState(false);
+  const [catCompanyQ, setCatCompanyQ] = useState('');
+  const [showCatCompanyDrop, setShowCatCompanyDrop] = useState(false);
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
@@ -1317,11 +1319,11 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
   const saveCategory = async () => {
     if (!catForm.name?.trim()) { alert('ক্যাটাগরির নাম দিন'); return; }
-    if (!productForm.company) { alert('প্রথমে কোম্পানি সিলেক্ট করুন'); return; }
+    if (!catForm.company) { alert('কোম্পানি সিলেক্ট করুন'); return; }
     
     // Check if category already exists for this company
     const exists = products.some(p => 
-      (p.company||'').toLowerCase() === productForm.company.toLowerCase() && 
+      (p.company||'').toLowerCase() === catForm.company.toLowerCase() && 
       (p.cat||'').toLowerCase() === catForm.name.trim().toLowerCase()
     );
     
@@ -1335,7 +1337,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
       id: genId(),
       name: `${catForm.name.trim()} (ক্যাটাগরি)`,
       barcode: `CAT-${Date.now()}`,
-      company: productForm.company,
+      company: catForm.company,
       cat: catForm.name.trim(),
       unit: 'পিস',
       buyP: 0,
@@ -1344,8 +1346,10 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
       minStock: 0
     };
     await upd.products([...products, newP]);
-    setCatForm({name:''});
-    setProductForm(f=>({...f,cat:catForm.name.trim()}));
+    setCatForm({name:'',company:''});
+    setCatCompanyQ('');
+    setShowCatCompanyDrop(false);
+    setProductForm(f=>({...f,company:catForm.company,cat:catForm.name.trim()}));
     alert('ক্যাটাগরি যোগ করা হয়েছে!');
   };
 
@@ -1562,20 +1566,37 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
           <>
             <div style={{...card,maxWidth:500,margin:'0 auto 16px'}}>
               <h4 style={{margin:'0 0 12px',color:T.teal}}>📂 নতুন ক্যাটাগরি যোগ করুন</h4>
-              <div style={{marginBottom:12}}>
-                <label style={label}>① 🏢 কোম্পানি *</label>
-                <select value={productForm.company} onChange={e=>setProductForm(f=>({...f,company:e.target.value,cat:''}))} style={{...input,padding:'8px 12px'}}>
-                  <option value="">কোম্পানি সিলেক্ট করুন</option>
-                  {suppliers.map(s=>(
-                    <option key={s.id} value={s.name}>{s.name} {s.code && `(${s.code})`}</option>
-                  ))}
-                </select>
+              
+              {/* Step 1: Category Name - shows company dropdown when typing */}
+              <div style={{marginBottom:12,position:'relative'}}>
+                <label style={label}>① 📂 ক্যাটাগরির নাম *</label>
+                <input value={catForm.name} onChange={e=>{setCatForm(f=>({...f,name:e.target.value}));setCatCompanyQ('');setShowCatCompanyDrop(true);}} 
+                  onFocus={()=>setShowCatCompanyDrop(true)} placeholder="ক্যাটাগরির নাম লিখুন..." style={input} />
+                {showCatCompanyDrop && catForm.name && (
+                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
+                    <div style={{padding:'6px 12px',fontSize:11,color:T.gray500,background:T.gray50}}>🏢 কোম্পানি সিলেক্ট করুন:</div>
+                    {filteredCompanies.filter(c=>!catCompanyQ || c.name.toLowerCase().includes(catCompanyQ.toLowerCase()) || (c.code||'').toLowerCase().includes(catCompanyQ.toLowerCase())).map(c=>(
+                      <div key={c.id} onClick={()=>{setCatForm(f=>({...f,company:c.name}));setCatCompanyQ('');setShowCatCompanyDrop(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
+                        <span>{c.name}</span>
+                        {c.code && <span style={{fontSize:11,color:T.teal}}>{c.code}</span>}
+                      </div>
+                    ))}
+                    {filteredCompanies.length === 0 && <div style={{padding:'8px 12px',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</div>}
+                  </div>
+                )}
               </div>
-              <div style={{marginBottom:12}}>
-                <label style={label}>📂 ক্যাটাগরির নাম *</label>
-                <input value={catForm.name} onChange={e=>setCatForm({name:e.target.value})} placeholder="ক্যাটাগরির নাম লিখুন" style={input} />
-              </div>
-              <button onClick={saveCategory} style={{...btn('primary'),width:'100%'}}>💾 ক্যাটাগরি যোগ করুন</button>
+
+              {/* Selected Company Display */}
+              {catForm.company && (
+                <div style={{marginBottom:12,padding:10,background:T.tealLight,borderRadius:8,display:'flex',alignItems:'center',gap:8}}>
+                  <span style={{fontSize:12,color:T.gray600}}>🏢 কোম্পানি:</span>
+                  <span style={{fontWeight:600,color:T.teal}}>{catForm.company}</span>
+                  <button onClick={()=>setCatForm(f=>({...f,company:''}))} style={{marginLeft:'auto',padding:'2px 8px',fontSize:11,background:T.red+'20',color:T.red,border:'none',borderRadius:4,cursor:'pointer'}}>✕</button>
+                </div>
+              )}
+
+              <button onClick={saveCategory} style={{...btn('primary'),width:'100%'}} disabled={!catForm.name || !catForm.company}>💾 ক্যাটাগরি যোগ করুন</button>
             </div>
 
             {/* Categories list by company */}
