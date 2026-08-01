@@ -1410,13 +1410,11 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(null);
   const [activeTab, setActiveTab] = useState('companies'); // companies, products, categories
   const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:''});
-  const [catForm, setCatForm] = useState({name:'',company:''});
+  const [catForm, setCatForm] = useState({name:''});
   const [companyQ, setCompanyQ] = useState('');
   const [showCompanyDrop, setShowCompanyDrop] = useState(false);
   const [catQ, setCatQ] = useState('');
   const [showCatDrop, setShowCatDrop] = useState(false);
-  const [catCompanyQ, setCatCompanyQ] = useState('');
-  const [showCatCompanyDrop, setShowCatCompanyDrop] = useState(false);
 
   // Click outside to close dropdowns - only close when clicking outside the modal
   useEffect(() => {
@@ -1535,30 +1533,25 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
   const saveCategory = async () => {
     if (!catForm.name?.trim()) { alert('ক্যাটাগরির নাম দিন'); return; }
-    if (!catForm.company) { alert('কোম্পানি সিলেক্ট করুন'); return; }
     
-    // Check if category already exists for this company
+    // Check if category already exists
     const exists = categories.some(c => 
-      (c.company||'').toLowerCase() === catForm.company.toLowerCase() && 
       c.name.toLowerCase() === catForm.name.trim().toLowerCase()
     );
     
     if (exists) {
-      alert('এই ক্যাটাগরি ইতিমধ্যে এই কোম্পানিতে আছে');
+      alert('এই ক্যাটাগরি ইতিমধ্যে আছে');
       return;
     }
     
     // Save category to categories state
     const newCat = {
       id: genId(),
-      name: catForm.name.trim(),
-      company: catForm.company
+      name: catForm.name.trim()
     };
     await upd.categories([...categories, newCat]);
-    alert(`✅ ক্যাটাগরি যোগ করা হয়েছে!\nকোম্পানি: ${catForm.company}\nক্যাটাগরি: ${catForm.name.trim()}`);
-    setCatForm({name:'',company:''});
-    setCatCompanyQ('');
-    setShowCatCompanyDrop(false);
+    alert(`✅ ক্যাটাগরি যোগ করা হয়েছে!\nক্যাটাগরি: ${catForm.name.trim()}`);
+    setCatForm({name:''});
   };
 
   const del = async (id) => {
@@ -1794,23 +1787,22 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             <table style={{width:'100%',borderCollapse:'collapse',background:T.white}}>
               <thead>
                 <tr style={{background:T.tealLight}}>
-                  {['ক্রম','কোম্পানি','ক্যাটাগরির নাম','পণ্য সংখ্যা',''].map((h,i)=>(
+                  {['ক্রম','ক্যাটাগরির নাম','পণ্য সংখ্যা',''].map((h,i)=>(
                     <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {categories.length === 0 ? (
-                  <tr><td colSpan={5} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ক্যাটাগরি পাওয়া যায়নি</td></tr>
-                ) : categories.filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.company.toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
+                  <tr><td colSpan={4} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ক্যাটাগরি পাওয়া যায়নি</td></tr>
+                ) : categories.filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
                   <tr key={cat.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                     <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{i+1}</td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{cat.company}</td>
                     <td style={{padding:'10px 12px',fontWeight:600,fontSize:14}}>{cat.name}</td>
                     <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
                     <td style={{padding:'10px 12px',whiteSpace:'nowrap'}}>
                       <button onClick={()=>setViewCategory(cat)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
-                      <button onClick={()=>{setCatForm({name:cat.name,company:cat.company});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
+                      <button onClick={()=>{setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
                       <button onClick={async ()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){await upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
                     </td>
                   </tr>
@@ -1901,29 +1893,13 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             {(modal.mode === 'add' || modal.mode === 'editCat') && activeTab === 'categories' && (
               <>
                 <h3 style={{margin:'0 0 16px'}}>{modal.mode === 'add' ? '📂 নতুন ক্যাটাগরি যোগ করুন' : '✏️ ক্যাটাগরি সম্পাদনা করুন'}</h3>
-                <div style={{marginBottom:12,position:'relative'}}>
-                  <label style={label}>🏢 কোম্পানি নির্বাচন করুন *</label>
-                  <input value={catForm.company||''} onChange={e=>{setCatForm(f=>({...f,company:e.target.value}));setCatCompanyQ(e.target.value);setShowCatCompanyDrop(true);}} 
-                    onFocus={()=>setShowCatCompanyDrop(true)} placeholder="কোম্পানির নাম..." style={input} />
-                  {showCatCompanyDrop && (
-                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
-                      {filteredCompanies.filter(c=>!catCompanyQ || c.name.toLowerCase().includes(catCompanyQ.toLowerCase())).map(c=>(
-                        <div key={c.id} onClick={()=>{setCatForm(f=>({...f,company:c.name}));setCatCompanyQ('');setShowCatCompanyDrop(false);}}
-                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
-                          <span>{c.name}</span>
-                          {c.code && <span style={{fontSize:11,color:T.teal}}>{c.code}</span>}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
                 <div style={{marginBottom:16}}>
                   <label style={label}>📂 ক্যাটাগরির নাম *</label>
                   <input value={catForm.name||''} onChange={e=>setCatForm(f=>({...f,name:e.target.value}))} placeholder="ক্যাটাগরির নাম" style={input} />
                 </div>
                 <div style={{display:'flex',gap:8}}>
                   <button onClick={()=>setModal(null)} style={{...btn(),flex:1}}>✕ বন্ধ করুন</button>
-                  <button onClick={saveCategory} style={{...btn('primary'),flex:1}} disabled={!catForm.name || !catForm.company}>💾 সংরক্ষণ করুন</button>
+                  <button onClick={saveCategory} style={{...btn('primary'),flex:1}} disabled={!catForm.name?.trim()}>💾 সংরক্ষণ করুন</button>
                 </div>
               </>
             )}
