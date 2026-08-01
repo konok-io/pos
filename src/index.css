@@ -41,12 +41,23 @@ body {
   font-family: 'BanglaFont', 'EnglishFont', 'Segoe UI', system-ui, sans-serif;
 }
 
-/* Bangla text styling */
-[lang="bn"], .bangla {
-  font-family: 'BanglaFont', 'Segoe UI', sans-serif;
+/* English numbers - always use English font */
+.english-num,
+input[type="number"],
+input[type="text"],
+input,
+.price,
+.amount,
+.quantity,
+.total,
+button,
+th, td {
+  font-family: 'EnglishFont', 'Segoe UI', system-ui, sans-serif !important;
+  font-variant-numeric: lining-nums;
+  -webkit-font-variant-numeric: lining-nums;
 }
 
-/* English text styling */
-[lang="en"], .english {
-  font-family: 'EnglishFont', 'Segoe UI', sans-serif;
+/* All text elements use EnglishFont for numbers */
+* {
+  font-variant-numeric: lining-nums;
 }
