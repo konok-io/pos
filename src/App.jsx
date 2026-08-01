@@ -1039,7 +1039,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
                     placeholder="পণ্যের নাম লিখুন..."
                     style={{...input,fontSize:13}} />
-                  {showProductDrop && form.company && productNameQ && (
+                  {showProductDrop && form.company && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                       {filteredProducts.length > 0 ? filteredProducts.map((p,i)=>(
                         <div key={p.id} onClick={()=>selectProduct(p)}
@@ -1258,6 +1258,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
       setShowCatDrop(false);
       setShowCatCompanyDrop(false);
       setShowCustDrop(false);
+      setShowProductDrop(false);
     };
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
