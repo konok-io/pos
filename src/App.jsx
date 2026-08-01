@@ -878,44 +878,43 @@ function ProductsScreen({products, suppliers, categories, upd}) {
     const savedCount = purchaseItems.length;
     const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
     
-    try {
-      const purchase = {
-        id: purchaseId,
-        date: now(),
-        supplier: form.company || 'সাধারণ',
-        items: purchaseItems,
-        totalItems: purchaseItems.length,
-        totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
-      };
+    const purchase = {
+      id: purchaseId,
+      date: now(),
+      supplier: form.company || 'সাধারণ',
+      items: purchaseItems,
+      totalItems: purchaseItems.length,
+      totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
+    };
 
-      // Prepare new products
-      const newProducts = purchaseItems.map(item => ({ ...item, id: genId() }));
-      
-      // Prepare new supplier if needed
-      let newSupplierList = suppliers;
-      if (form.company && !suppliers.find(s => s.name === form.company)) {
-        const newSupplier = { id: genId(), name: form.company, phone: '', address: '' };
-        newSupplierList = [...suppliers, newSupplier];
-      }
-
-      // Sequential updates to ensure state is fresh
-      if (newSupplierList !== suppliers) {
-        await upd.suppliers(newSupplierList);
-      }
-      await upd.products([...products, ...newProducts]);
-      await upd.purchases([...purchases, purchase]);
-
-      setPurchaseItems([]);
-      setCsvData([]);
-      setForm({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
-      setSupplierQ('');
-      setShowAddForm(false);
-      alert(`✅ ${savedCount}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
-    } catch (err) {
-      console.error('Save error:', err);
-      console.error('Error details:', err.message, err.stack);
-      alert('❌ সংরক্ষণ ব্যর্থ হয়েছে।\n' + (err.message || 'আবার চেষ্টা করুন।'));
+    // Prepare new products
+    const newProducts = purchaseItems.map(item => ({ ...item, id: genId() }));
+    
+    // Prepare new supplier if needed
+    let newSupplierArr = null;
+    if (form.company && !suppliers.find(s => s.name === form.company)) {
+      const newSupplier = { id: genId(), name: form.company, phone: '', address: '' };
+      newSupplierArr = [...suppliers, newSupplier];
     }
+
+    // Build promises array
+    const promises = [];
+    if (newSupplierArr) {
+      promises.push(upd.suppliers(newSupplierArr));
+    }
+    promises.push(upd.products([...products, ...newProducts]));
+    promises.push(upd.purchases([...purchases, purchase]));
+
+    // Execute all updates
+    await Promise.all(promises);
+
+    // Clear form after successful save
+    setPurchaseItems([]);
+    setCsvData([]);
+    setForm({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
+    setSupplierQ('');
+    setShowAddForm(false);
+    alert(`✅ ${savedCount}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
   };
 
   // Delete product
