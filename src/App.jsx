@@ -646,6 +646,9 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState([]);
   const [supplierQ, setSupplierQ] = useState('');
+  const [showCompanyList, setShowCompanyList] = useState(false);
+  const [showCategoryList, setShowCategoryList] = useState(false);
+  const [showProductList, setShowProductList] = useState(false);
   const [barcodeVal, setBarcodeVal] = useState('');
   const [barcodeSuggestions, setBarcodeSuggestions] = useState([]);
   const [form, setForm] = useState({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
@@ -716,23 +719,10 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
     ...suppliers.map(s => s.name),
     ...products.map(p => p.company).filter(Boolean)
   ];
-  const uniqueCompanies = [...new Set(allCompanies)];
+  const uniqueCompanies = [...new Set(allCompanies)].sort();
 
-  // Create company list with code for filtering
-  const companyList = uniqueCompanies.map(name => {
-    const sup = suppliers.find(s => s.name.toLowerCase() === name.toLowerCase());
-    return { name, code: sup?.code || '' };
-  });
-
-  // Filter companies for dropdown - search by name or code
-  const filteredCompanies = companyList.filter(c => 
-    !supplierQ || c.name.toLowerCase().includes(supplierQ.toLowerCase()) || c.code.toLowerCase().includes(supplierQ.toLowerCase())
-  );
-
-  // Get products of selected company
-  const companyProducts = form.company 
-    ? products.filter(p => (p.company||'').toLowerCase() === form.company.toLowerCase())
-    : [];
+  // Get all unique categories from products
+  const uniqueCategories = [...new Set(products.map(p => p.cat).filter(Boolean))].sort();
 
   // Filter products for table
   const filtered = products.filter(p=>
@@ -965,25 +955,54 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
             <div style={{...card,padding:16}}>
               <h3 style={{margin:'0 0 16px',fontSize:14,color:T.teal}}>পণ্য যোগ করুন</h3>
               
-              {/* Supplier/Company + Category inline */}
-              <div style={{display:'flex',gap:8,marginBottom:12}}>
-                {/* Supplier/Company */}
-                <div style={{flex:1}}>
-                  <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
-                  <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));}}
+              {/* Supplier/Company */}
+              <div style={{marginBottom:12, position:'relative'}}>
+                <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
+                <div style={{display:'flex',gap:4}}>
+                  <input 
+                    value={supplierQ} 
+                    onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));}}
+                    onClick={()=>setShowCompanyList(!showCompanyList)}
+                    onBlur={()=>setTimeout(()=>setShowCompanyList(false),200)}
                     placeholder="কোম্পানির নাম লিখুন..."
-                    style={{...input,fontSize:13}} />
+                    style={{...input,fontSize:13,flex:1}} />
+                  <button type="button" onClick={()=>setShowCompanyList(!showCompanyList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
                 </div>
+                {showCompanyList && uniqueCompanies.length > 0 && (
+                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
+                    {uniqueCompanies.map((c,i)=>(
+                      <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowCompanyList(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
+                        {c}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Category */}
-              <div style={{marginBottom:12}}>
+              <div style={{marginBottom:12, position:'relative'}}>
                 <label style={label}>📂 ক্যাটাগরি</label>
-                <input 
-                  value={form.cat} 
-                  onChange={e=>setForm(f=>({...f,cat:e.target.value}))}
-                  placeholder="ক্যাটাগরি লিখুন..."
-                  style={{...input,fontSize:13}} />
+                <div style={{display:'flex',gap:4}}>
+                  <input 
+                    value={form.cat} 
+                    onChange={e=>setForm(f=>({...f,cat:e.target.value}))}
+                    onClick={()=>setShowCategoryList(!showCategoryList)}
+                    onBlur={()=>setTimeout(()=>setShowCategoryList(false),200)}
+                    placeholder="ক্যাটাগরি লিখুন..."
+                    style={{...input,fontSize:13,flex:1}} />
+                  <button type="button" onClick={()=>setShowCategoryList(!showCategoryList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
+                </div>
+                {showCategoryList && uniqueCategories.length > 0 && (
+                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
+                    {uniqueCategories.map((c,i)=>(
+                      <div key={i} onClick={()=>{setForm(f=>({...f,cat:c}));setShowCategoryList(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
+                        {c}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Barcode + Product Name */}
@@ -993,11 +1012,27 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
                     style={{...input,fontSize:13}} />
                 </div>
-                <div style={{flex:2}}>
+                <div style={{flex:2, position:'relative'}}>
                   <label style={label}>③ পণ্যের নাম *</label>
-                  <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} 
-                    placeholder="পণ্যের নাম লিখুন..."
-                    style={{...input,fontSize:13}} />
+                  <div style={{display:'flex',gap:4}}>
+                    <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} 
+                      onClick={()=>setShowProductList(!showProductList)}
+                      onBlur={()=>setTimeout(()=>setShowProductList(false),200)}
+                      placeholder="পণ্যের নাম লিখুন..."
+                      style={{...input,fontSize:13,flex:1}} />
+                    <button type="button" onClick={()=>setShowProductList(!showProductList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
+                  </div>
+                  {showProductList && products.length > 0 && (
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
+                      {products.slice(0,20).map((p,i)=>(
+                        <div key={i} onClick={()=>{setForm(f=>({...f,name:p.name}));setShowProductList(false);}}
+                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
+                          <div style={{fontWeight:600}}>{p.name}</div>
+                          <div style={{fontSize:11,color:T.gray400}}>{p.company} • {p.cat}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
