@@ -903,12 +903,25 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
   // Get all unique categories from categories state (not from products)
   const uniqueCategories = [...new Set(categories.map(c => c.name).filter(Boolean))].sort();
 
-  // Filter products for table
-  const filtered = products.filter(p=>
-    !search || p.name.toLowerCase().includes(search.toLowerCase()) || 
-    (p.company||'').toLowerCase().includes(search.toLowerCase()) || 
-    (p.barcode||'').includes(search)
-  );
+  // Filter and sort products - low stock first
+  const filtered = products
+    .filter(p=>
+      !search || p.name.toLowerCase().includes(search.toLowerCase()) || 
+      (p.company||'').toLowerCase().includes(search.toLowerCase()) || 
+      (p.barcode||'').includes(search)
+    )
+    .sort((a, b) => {
+      // Out of stock first
+      if (a.stock <= 0 && b.stock > 0) return -1;
+      if (b.stock <= 0 && a.stock > 0) return 1;
+      // Low stock second
+      const aLow = a.stock > 0 && a.stock <= a.minStock;
+      const bLow = b.stock > 0 && b.stock <= b.minStock;
+      if (aLow && !bLow) return -1;
+      if (bLow && !aLow) return 1;
+      // Sort by stock ascending
+      return a.stock - b.stock;
+    });
 
   // Handle barcode input
   const handleBarcode = (val) => {
