@@ -1,3 +1,12 @@
+/* ─────────────── BANGLA FONT ─────────────── */
+@font-face {
+  font-family: 'Bangla';
+  src: url('/fonts/bangla.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -12,6 +21,7 @@ html, body {
 
 body {
   margin: 0;
+  font-family: 'Bangla', 'Segoe UI', system-ui, sans-serif !important;
 }
 
 #root {
@@ -20,4 +30,5 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  font-family: 'Bangla', 'Segoe UI', system-ui, sans-serif !important;
 }

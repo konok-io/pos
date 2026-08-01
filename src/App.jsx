@@ -147,7 +147,7 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
-      <div style={{display:'flex',flexDirection:'column',height:'100vh',width:'100%',background:T.gray50,fontFamily:'"Segoe UI",system-ui,-apple-system,sans-serif',color:T.gray900,overflow:'hidden'}}>
+      <div style={{display:'flex',flexDirection:'column',height:'100vh',width:'100%',background:T.gray50,fontFamily:'Bangla, "Segoe UI", system-ui, sans-serif',color:T.gray900,overflow:'hidden'}}>
       {/* Header */}
       <div style={{background:T.tealDark,color:T.white,padding:'0 20px',height:56,display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,boxShadow:'0 2px 8px rgba(0,0,0,0.15)'}}>
         <div style={{display:'flex',alignItems:'center',gap:12}}>
