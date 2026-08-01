@@ -1293,10 +1293,12 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   // Click outside to close dropdowns
   useEffect(() => {
     const handleClick = () => {
-      setShowCompanyDrop(false);
-      setShowCatDrop(false);
-      setShowCatCompanyDrop(false);
-      setShowProductDrop(false);
+      setTimeout(() => {
+        setShowCompanyDrop(false);
+        setShowCatDrop(false);
+        setShowCatCompanyDrop(false);
+        setShowProductDrop(false);
+      }, 10);
     };
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
