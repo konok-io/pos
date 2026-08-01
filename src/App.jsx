@@ -385,36 +385,40 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   };
 
   const printReceipt = (r) => {
-    const w = window.open('','_blank','width=400,height=600');
+    const w = window.open('','_blank','width=350,height=600');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>রসিদ</title>
-    <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:monospace,serif;width:300px;margin:auto;padding:10px;font-size:13px;color:#000}
-    .c{text-align:center}.b{font-weight:bold}.l{border-top:1px dashed #000;margin:6px 0}
-    table{width:100%}td{padding:2px 0}.r{text-align:right}.big{font-size:16px}
+    <style>*{margin:0;padding:0;box-sizing:border-box}@page { size: 80mm 200mm; margin: 2mm; }
+    body{font-family:'Courier New',monospace;width:76mm;margin:auto;padding:2mm;font-size:11px;color:#000}
+    .c{text-align:center}.b{font-weight:bold}.l{border-top:1px dashed #000;margin:5px 0}
+    table{width:100%}td{padding:2px 0}.r{text-align:right}.big{font-size:14px}
+    .header{text-align:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #000}
+    .footer{text-align:center;margin-top:8px;padding-top:6px;border-top:1px dashed #000;font-size:10px}
     @media print{body{width:100%}}</style></head><body>
-    <div class="c b" style="font-size:16px">${r.settings.name}</div>
-    ${r.settings.address ? `<div class="c">${r.settings.address}</div>` : ''}
-    ${r.settings.phone ? `<div class="c">📞 ${r.settings.phone}</div>` : ''}
-    <div class="l"></div>
-    <div>তারিখ: ${new Date(r.sale.date).toLocaleString('en-GB')}</div>
-    <div>বিল নং: #${r.sale.id.slice(-8).toUpperCase()}</div>
-    <div>কাস্টমার: ${r.sale.custName}</div>
+    <div class="header">
+      <div class="b" style="font-size:14px">${r.settings.name}</div>
+      ${r.settings.address ? `<div style="font-size:10px">${r.settings.address}</div>` : ''}
+      ${r.settings.phone ? `<div style="font-size:10px">📞 ${r.settings.phone}</div>` : ''}
+    </div>
+    <div style="font-size:10px">
+      <div>তারিখ: ${new Date(r.sale.date).toLocaleString('bn-BD')}</div>
+      <div>বিল নং: #${r.sale.id.slice(-8).toUpperCase()}</div>
+      <div>কাস্টমার: ${r.sale.custName}</div>
+    </div>
     <div class="l"></div>
     <table><tr><td class="b">পণ্য</td><td class="b">পরি.</td><td class="b r">মূল্য</td></tr>
-    <tr><td colspan="3"><div class="l"></div></td></tr>
-    ${r.sale.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}${i.unit}</td><td class="r">৳${i.total.toFixed(0)}</td></tr>`).join('')}
+    ${r.sale.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}${i.unit}</td><td class="r">৳${i.total.toFixed(2)}</td></tr>`).join('')}
     </table>
     <div class="l"></div>
     <table>
-      <tr><td>সাবটোটাল</td><td class="r">৳${r.sale.subtotal.toFixed(0)}</td></tr>
-      ${r.sale.discount>0?`<tr><td>ছাড়</td><td class="r">-৳${r.sale.discount.toFixed(0)}</td></tr>`:''}
-      ${r.sale.vatAmount>0?`<tr><td>ভ্যাট (${r.sale.vatPercent}%)</td><td class="r">৳${r.sale.vatAmount.toFixed(0)}</td></tr>`:''}
-      <tr class="b"><td class="big">মোট</td><td class="big r">৳${r.sale.total.toFixed(0)}</td></tr>
-      <tr><td>পরিশোধ</td><td class="r">৳${r.sale.paid.toFixed(0)}</td></tr>
-      ${r.sale.change>0?`<tr><td>ফেরত</td><td class="r">৳${r.sale.change.toFixed(0)}</td></tr>`:''}
-      ${r.sale.due>0?`<tr class="b"><td>বাকি</td><td class="r" style="color:red">৳${r.sale.due.toFixed(0)}</td></tr>`:''}
+      <tr><td>সাবটোটাল</td><td class="r">৳${(r.sale.subtotal||r.sale.total).toFixed(2)}</td></tr>
+      ${r.sale.discount>0?`<tr><td>ছাড়</td><td class="r">-৳${r.sale.discount.toFixed(2)}</td></tr>`:''}
+      ${r.sale.vatAmount>0?`<tr><td>ভ্যাট (${r.sale.vatPercent}%)</td><td class="r">৳${r.sale.vatAmount.toFixed(2)}</td></tr>`:''}
+      <tr class="b"><td class="big">মোট</td><td class="big r">৳${r.sale.total.toFixed(2)}</td></tr>
+      <tr><td>পরিশোধ</td><td class="r">৳${r.sale.paid.toFixed(2)}</td></tr>
+      ${r.sale.change>0?`<tr><td>ফেরত</td><td class="r">৳${r.sale.change.toFixed(2)}</td></tr>`:''}
+      ${r.sale.due>0?`<tr class="b"><td>বাকি</td><td class="r" style="color:red">৳${r.sale.due.toFixed(2)}</td></tr>`:''}
     </table>
-    <div class="l"></div>
-    <div class="c" style="margin-top:8px">ধন্যবাদ! আবার আসবেন 🙏</div>
+    <div class="footer">ধন্যবাদ! আবার আসবেন 🙏<br>${new Date().toLocaleString('bn-BD')}</div>
     <script>window.onload=()=>{window.print();setTimeout(()=>window.close(),500)}</script>
     </body></html>`);
     w.document.close();
