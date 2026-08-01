@@ -2430,18 +2430,19 @@ function ReportsScreen({sales, customers, purchases}) {
     <head>
       <title>পারচেজ হিস্ট্রি</title>
       <style>
-        @page { size: 80mm auto; margin: 0; }
+        @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        html { width: 80mm; }
-        body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:10px; color:#000; background:#fff; }
-        .header { text-align:center; margin-bottom:8px; border-bottom:1px dashed #000; padding-bottom:4px; }
-        .header h1 { color:#00897b; font-size:14px; margin-bottom:2px; }
-        .header p { color:#666; font-size:9px; }
-        .purchase-item { margin-bottom:8px; border-bottom:1px dotted #ccc; padding-bottom:4px; }
-        .purchase-item:last-child { border-bottom:none; }
-        .purchase-header { display:flex; justify-content:space-between; font-size:9px; }
-        .purchase-total { text-align:right; font-weight:bold; font-size:10px; }
-        .footer { margin-top:8px; text-align:center; color:#999; font-size:8px; border-top:1px dashed #000; padding-top:4px; }
+        body { font-family:'Segoe UI',Arial,sans-serif; padding:12px; font-size:12px; }
+        .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
+        .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
+        .header p { color:#666; font-size:11px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
+        td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
+        tr:nth-child(even) { background:#fafafa; }
+        .total-row { background:#e0f7f0 !important; font-weight:700; }
+        .total-row td { border:1px solid #b2dfdb; font-size:12px; color:#00897b; }
+        .footer { margin-top:12px; text-align:center; color:#999; font-size:10px; }
         @media print { body { padding:0; } }
       </style>
     </head>
@@ -2449,29 +2450,44 @@ function ReportsScreen({sales, customers, purchases}) {
       <div class="header">
         <h1>📦 পারচেজ হিস্ট্রি</h1>
         <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
-      </div>`;
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>তারিখ</th>
+            <th>পারচেজ আইডি</th>
+            <th>সরবরাহকারী</th>
+            <th style="text-align:center;">পণ্য</th>
+            <th style="text-align:right;">মোট খরচ</th>
+          </tr>
+        </thead>
+        <tbody>`;
     
     purchases.forEach(p => {
       html += `
-      <div class="purchase-item">
-        <div class="purchase-header">
-          <span>${p.id}</span>
-          <span>${new Date(p.date).toLocaleDateString('bn-BD')}</span>
-        </div>
-        <div style="font-size:9px;">${p.supplier}</div>
-        <div class="purchase-total">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-      </div>`;
+          <tr>
+            <td>${new Date(p.date).toLocaleDateString('bn-BD')}</td>
+            <td style="font-family:monospace;color:#00897b;font-weight:600;">${p.id}</td>
+            <td>${p.supplier}</td>
+            <td style="text-align:center;">${p.totalItems}টি</td>
+            <td style="text-align:right;font-weight:600;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>`;
     });
     
     html += `
-      <div class="footer">
-        <div>মোট: ৳${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>প্রিন্ট: ${new Date().toLocaleString('bn-BD')} | ${purchases.length}টি পারচেজ</div>
-      </div>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="4" style="text-align:right;">মোট পারচেজ এমাউন্ট:</td>
+            <td style="text-align:right;">৳${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${purchases.length}টি পারচেজ</div>
     </body>
     </html>`;
     
-    const win = window.open('', '', 'width=320,height=600');
+    const win = window.open('', '', 'width=1000,height=600');
     win.document.open();
     win.document.write(html);
     win.document.close();
@@ -2487,18 +2503,19 @@ function ReportsScreen({sales, customers, purchases}) {
     <head>
       <title>বিক্রয় ইতিহাস</title>
       <style>
-        @page { size: 80mm auto; margin: 0; }
+        @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        html { width: 80mm; }
-        body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:10px; color:#000; background:#fff; }
-        .header { text-align:center; margin-bottom:8px; border-bottom:1px dashed #000; padding-bottom:4px; }
-        .header h1 { color:#00897b; font-size:14px; margin-bottom:2px; }
-        .header p { color:#666; font-size:9px; }
-        .sale-item { margin-bottom:8px; border-bottom:1px dotted #ccc; padding-bottom:4px; }
-        .sale-item:last-child { border-bottom:none; }
-        .sale-header { display:flex; justify-content:space-between; font-size:9px; }
-        .sale-total { text-align:right; font-weight:bold; font-size:10px; }
-        .footer { margin-top:8px; text-align:center; color:#999; font-size:8px; border-top:1px dashed #000; padding-top:4px; }
+        body { font-family:'Segoe UI',Arial,sans-serif; padding:12px; font-size:12px; }
+        .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
+        .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
+        .header p { color:#666; font-size:11px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
+        td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
+        tr:nth-child(even) { background:#fafafa; }
+        .total-row { background:#e8f5e9 !important; font-weight:700; }
+        .total-row td { border:1px solid #a5d6a7; color:#2e7d32; font-size:12px; }
+        .footer { margin-top:12px; text-align:center; color:#999; font-size:10px; }
         @media print { body { padding:0; } }
       </style>
     </head>
@@ -2506,31 +2523,50 @@ function ReportsScreen({sales, customers, purchases}) {
       <div class="header">
         <h1>🧾 বিক্রয় ইতিহাস</h1>
         <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
-      </div>`;
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>তারিখ</th>
+            <th>বিল নং</th>
+            <th>কাস্টমার</th>
+            <th style="text-align:center;">পণ্য</th>
+            <th style="text-align:right;">মোট</th>
+            <th style="text-align:right;">পরিশোধ</th>
+            <th style="text-align:right;">বাকি</th>
+          </tr>
+        </thead>
+        <tbody>`;
     
     fs.forEach(s => {
       html += `
-      <div class="sale-item">
-        <div class="sale-header">
-          <span>#${s.id.slice(-6).toUpperCase()}</span>
-          <span>${new Date(s.date).toLocaleDateString('bn-BD')}</span>
-        </div>
-        <div style="font-size:9px;">${s.custName}</div>
-        <div class="sale-total">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-      </div>`;
+          <tr>
+            <td>${new Date(s.date).toLocaleDateString('bn-BD')}</td>
+            <td style="font-family:monospace;color:#00897b;font-weight:600;">#${s.id.slice(-6).toUpperCase()}</td>
+            <td>${s.custName}</td>
+            <td style="text-align:center;">${(s.items||[]).length}টি</td>
+            <td style="text-align:right;font-weight:600;">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#2e7d32;">৳${s.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:${s.due>0?'#c62828':'#999'};">৳${s.due.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>`;
     });
     
     html += `
-      <div class="footer">
-        <div>মোট: ৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>পরিশোধ: ৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>বাকি: ৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-        <div>প্রিন্ট: ${new Date().toLocaleString('bn-BD')} | ${fs.length}টি বিক্রয়</div>
-      </div>
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="4" style="text-align:right;">মোট:</td>
+            <td style="text-align:right;">৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${fs.length}টি বিক্রয়</div>
     </body>
     </html>`;
     
-    const win = window.open('', '', 'width=320,height=600');
+    const win = window.open('', '', 'width=1000,height=600');
     win.document.open();
     win.document.write(html);
     win.document.close();
