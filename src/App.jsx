@@ -596,15 +596,20 @@ function POSScreen({products, customers, sales, settings, upd}) {
               style={{...btn('ghost'),flex:1,justifyContent:'center',padding:'12px'}}>
               🗑️ ক্লিয়ার
             </button>
-            <button onClick={checkout} 
-              disabled={!cart.length || (due > 0 && !selCust)}
+            <button 
+              onClick={checkout}
               style={{
-                ...btn('sell'), flex:2, justifyContent:'center', fontSize:15, padding:'12px',
-                opacity: cart.length && !(due > 0 && !selCust) ? 1 : 0.5,
-                cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
+                ...btn('sell'), 
+                flex:2, 
+                justifyContent:'center', 
+                fontSize:15, 
+                padding:'12px',
+                opacity: (!cart.length || (due > 0 && !selCust)) ? 0.5 : 1,
+                cursor: (!cart.length || (due > 0 && !selCust)) ? 'not-allowed' : 'pointer',
               }}>
-              {due > 0 && cart.length && selCust ? '✓ পূর্ণ পরিশোধ করুন বা বাকি বিক্রয় করুন' : 
-               due > 0 && cart.length ? '⚠️ পূর্ণ পরিশোধ করুন বা গ্রাহক সিলেক্ট করুন' : 
+              {!cart.length ? 'পণ্য যোগ করুন' : 
+               (due > 0 && !selCust) ? '⚠️ পূর্ণ পরিশোধ করুন বা গ্রাহক সিলেক্ট করুন' : 
+               (due > 0 && selCust) ? '✓ পূর্ণ পরিশোধ করুন বা বাকি বিক্রয় করুন' :
                '✓ বিক্রয় সম্পন্ন'}
             </button>
           </div>
