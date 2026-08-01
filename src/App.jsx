@@ -116,6 +116,15 @@ export default function App() {
   const [categories, setCategories] = useState([]);
   const [purchases, setPurchases] = useState([]);
   const [ready, setReady] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Update time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     // Restore tab from localStorage
@@ -250,8 +259,8 @@ export default function App() {
           </div>
         </div>
         <div style={{fontSize:12,opacity:0.8,textAlign:'right'}}>
-          <div>{new Date().toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
-          <div>{new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
+          <div>{currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
+          <div>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
         </div>
       </div>
 
