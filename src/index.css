@@ -1,7 +1,15 @@
-/* ─────────────── BANGLA FONT ─────────────── */
+/* ─────────────── FONTS ─────────────── */
 @font-face {
-  font-family: 'Bangla';
+  font-family: 'BanglaFont';
   src: url('/fonts/bangla.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'EnglishFont';
+  src: url('/fonts/English.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -21,7 +29,7 @@ html, body {
 
 body {
   margin: 0;
-  font-family: 'Bangla', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: 'BanglaFont', 'EnglishFont', 'Segoe UI', system-ui, sans-serif;
 }
 
 #root {
@@ -30,5 +38,15 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Bangla', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: 'BanglaFont', 'EnglishFont', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* Bangla text styling */
+[lang="bn"], .bangla {
+  font-family: 'BanglaFont', 'Segoe UI', sans-serif;
+}
+
+/* English text styling */
+[lang="en"], .english {
+  font-family: 'EnglishFont', 'Segoe UI', sans-serif;
 }
