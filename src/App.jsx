@@ -770,6 +770,8 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
     setBarcodeVal(p.barcode || '');
     setBarcodeSuggestions([]);
     setSelectedProduct(p);
+    setShowProductDrop(false);
+    setProductNameQ('');
   };
 
   // Add product to purchase list
