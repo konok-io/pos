@@ -806,21 +806,33 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
     // Search in all products (ignore company filter for barcode search)
     if (val.length >= 1) {
       const trimmedVal = val.trim().toLowerCase();
-      const matches = products.filter(p => 
-        !p.name?.includes('(ক্যাটাগরি)') && (
-          (p.barcode||'').toLowerCase().includes(trimmedVal) || 
-          p.name.toLowerCase().includes(trimmedVal)
-        )
-      ).slice(0, 5);
-      setBarcodeSuggestions(matches);
       
-      // Auto-fill if exact barcode match found (search all products)
+      // Find exact match by barcode OR by name (case insensitive)
       const exactMatch = products.find(p => 
         !p.name?.includes('(ক্যাটাগরি)') && 
-        (p.barcode||'').toLowerCase().trim() === trimmedVal
+        (
+          (p.barcode||'').toLowerCase().trim() === trimmedVal ||
+          p.name.toLowerCase().trim() === trimmedVal
+        )
       );
+      
       if (exactMatch) {
         selectProduct(exactMatch);
+        setBarcodeSuggestions([]);
+      } else {
+        // Show suggestions if no exact match
+        const matches = products.filter(p => 
+          !p.name?.includes('(ক্যাটাগরি)') && (
+            (p.barcode||'').toLowerCase().includes(trimmedVal) || 
+            p.name.toLowerCase().includes(trimmedVal)
+          )
+        ).slice(0, 5);
+        setBarcodeSuggestions(matches);
+        
+        // Auto-fill first suggestion if exists
+        if (matches.length > 0) {
+          selectProduct(matches[0]);
+        }
       }
     } else {
       setBarcodeSuggestions([]);
