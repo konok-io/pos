@@ -28,25 +28,18 @@ const db = {
   },
   set(k, v) {
     try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.error(e); }
+  },
+  clear() {
+    Object.values(STORAGE_KEYS).forEach(k => localStorage.removeItem(k));
   }
 };
 
-/* ─────────────── SAMPLE DATA ─────────────── */
-const DEMO = {
-  products: [
-    {id:'p1',name:'চাল (মিনিকেট)',barcode:'001',cat:'খাদ্যপণ্য',buyP:55,sellP:65,stock:100,unit:'কেজি',minStock:10},
-    {id:'p2',name:'ডাল (মসুর)',barcode:'002',cat:'খাদ্যপণ্য',buyP:90,sellP:110,stock:50,unit:'কেজি',minStock:5},
-    {id:'p3',name:'সয়াবিন তেল',barcode:'003',cat:'তেল',buyP:140,sellP:165,stock:30,unit:'লিটার',minStock:5},
-    {id:'p4',name:'চিনি',barcode:'004',cat:'খাদ্যপণ্য',buyP:115,sellP:130,stock:20,unit:'কেজি',minStock:5},
-    {id:'p5',name:'আটা',barcode:'005',cat:'খাদ্যপণ্য',buyP:38,sellP:48,stock:40,unit:'কেজি',minStock:10},
-    {id:'p6',name:'লবণ',barcode:'006',cat:'মশলা',buyP:18,sellP:25,stock:60,unit:'কেজি',minStock:10},
-    {id:'p7',name:'হলুদ (গুড়া)',barcode:'007',cat:'মশলা',buyP:140,sellP:180,stock:15,unit:'কেজি',minStock:3},
-    {id:'p8',name:'মরিচ (গুড়া)',barcode:'008',cat:'মশলা',buyP:200,sellP:250,stock:10,unit:'কেজি',minStock:3},
-  ],
-  customers: [
-    {id:'c1',name:'রহিম সাহেব',phone:'01712345678',address:'পল্লবী',credit:500},
-    {id:'c2',name:'করিম ভাই',phone:'01898765432',address:'মিরপুর',credit:0},
-  ]
+/* ─────────────── STORAGE KEYS ─────────────── */
+const STORAGE_KEYS = {
+  products: 'pos_products',
+  customers: 'pos_customers',
+  sales: 'pos_sales',
+  settings: 'pos_settings',
 };
 
 /* ─────────────── DESIGN TOKENS ─────────────── */
@@ -107,22 +100,22 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
-  const [settings, setSettings] = useState({name:'আমার ব্যবসা',address:'',phone:''});
+  const [settings, setSettings] = useState({name:'',address:'',phone:''});
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setProducts(db.get('products') || DEMO.products);
-    setCustomers(db.get('customers') || DEMO.customers);
-    setSales(db.get('sales') || []);
-    setSettings(db.get('settings') || {name:'আমার ব্যবসা',address:'',phone:''});
+    setProducts(db.get(STORAGE_KEYS.products) || []);
+    setCustomers(db.get(STORAGE_KEYS.customers) || []);
+    setSales(db.get(STORAGE_KEYS.sales) || []);
+    setSettings(db.get(STORAGE_KEYS.settings) || {name:'',address:'',phone:''});
     setReady(true);
   }, []);
 
   const upd = {
-    products: v => { setProducts(v); db.set('products', v); },
-    customers: v => { setCustomers(v); db.set('customers', v); },
-    sales: v => { setSales(v); db.set('sales', v); },
-    settings: v => { setSettings(v); db.set('settings', v); },
+    products: v => { setProducts(v); db.set(STORAGE_KEYS.products, v); },
+    customers: v => { setCustomers(v); db.set(STORAGE_KEYS.customers, v); },
+    sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); },
+    settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); },
   };
 
   if (!ready) return (
@@ -1123,11 +1116,12 @@ function SettingsScreen({settings, products, upd}) {
               if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
             }}>বিক্রয় ইতিহাস মুছুন</button>
             <button style={btn('danger','sm')} onClick={async()=>{
-              if(confirm('⚠️ সব ডেটা রিসেট করবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                await upd.products(DEMO.products);
-                await upd.customers(DEMO.customers);
+              if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
+                await upd.products([]);
+                await upd.customers([]);
                 await upd.sales([]);
-                alert('ডেটা রিসেট হয়েছে। ডেমো ডেটা লোড করা হয়েছে।');
+                await upd.settings({name:'',address:'',phone:''});
+                alert('সব ডেটা মুছে ফেলা হয়েছে।');
                 window.location.reload();
               }
             }}>সম্পূর্ণ রিসেট</button>
