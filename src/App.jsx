@@ -711,7 +711,12 @@ function ProductsScreen({products, suppliers, categories, upd}) {
         ...suppliers.map(s => s.name.toLowerCase()),
         ...products.map(p => (p.company||'').toLowerCase()).filter(Boolean)
       ];
-      const existingCategories = [...new Set(products.map(p => (p.cat||'').toLowerCase()).filter(Boolean))];
+      const existingCategories = [
+        ...new Set([
+          ...products.map(p => (p.cat||'').toLowerCase()).filter(Boolean),
+          ...categories.map(c => (c.name||'').toLowerCase()).filter(Boolean)
+        ])
+      ];
       
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim());
