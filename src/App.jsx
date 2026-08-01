@@ -1568,7 +1568,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
         {activeTab === 'companies' && (
           <>
             {filtered.length === 0 ? (
-              <div style={{textAlign:'center',padding:40,color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</div>
+              <div style={{textAlign:'center',padding:'60px 20px',color:T.gray400,fontSize:14}}>কোনো কোম্পানি পাওয়া যায়নি</div>
             ) : (
               <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:12}}>
                 {filtered.map(s => (
