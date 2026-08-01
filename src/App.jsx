@@ -969,68 +969,6 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
-  // Auto-print purchase invoice when viewPurchase opens
-  useEffect(() => {
-    if (viewPurchase) {
-      const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
-      let html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Purchase Invoice</title>
-<style>
-@page { size: 80mm auto; margin: 0; }
-* { margin:0; padding:0; box-sizing:border-box; }
-html { width: 80mm; }
-body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
-.center { text-align:center; }
-.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
-.row { display:flex; justify-content:space-between; margin:2px 0; }
-table { width:100%; border-collapse:collapse; font-size:10px; }
-th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
-td { padding:3px 0; }
-td:nth-child(2) { text-align:center; }
-td:nth-child(3), td:nth-child(4) { text-align:right; }
-.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
-.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
-</style>
-</head>
-<body>
-<div class="center border">
-  <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
-  <div>${viewPurchase.id}</div>
-  <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-  <div>Supplier: ${viewPurchase.supplier}</div>
-</div>
-<table>
-  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
-  <tbody>`;
-      viewPurchase.items.forEach(item => {
-        const qty = item.stock||0;
-        const price = item.buyP||0;
-        html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${qty} ${item.unit||'পিস'}</td><td>৳${price.toFixed(2)}</td><td>৳${(qty*price).toFixed(2)}</td></tr>`;
-      });
-      html += `</tbody>
-</table>
-<div class="total row"><span>সর্বমোট:</span><span>৳${grandTotal.toFixed(2)}</span></div>
-<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-</body>
-</html>`;
-      const iframe = document.createElement('iframe');
-      iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-      document.body.appendChild(iframe);
-      const iframeDoc = iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(html);
-      iframeDoc.close();
-      iframe.contentWindow.onload = function() {
-        setTimeout(() => {
-          iframe.contentWindow.print();
-          document.body.removeChild(iframe);
-        }, 100);
-      };
-    }
-  }, [viewPurchase]);
 
   // Handle CSV Import
   const handleCsvImport = (e) => {
@@ -1352,9 +1290,66 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
                     <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
                   </div>
-                  <div style={{textAlign:'right'}}>
-                    <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
-                    <div style={{fontWeight:800,fontSize:20,color:T.teal}}>{viewPurchase.totalItems}টি</div>
+                  <div style={{display:'flex',gap:8,alignItems:'flex-start'}}>
+                    <button onClick={()=>{
+                      const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
+                      let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Purchase Invoice</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { width: 80mm; }
+body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+.center { text-align:center; }
+.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
+.row { display:flex; justify-content:space-between; margin:2px 0; }
+table { width:100%; border-collapse:collapse; font-size:10px; }
+th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
+td { padding:3px 0; }
+td:nth-child(2) { text-align:center; }
+td:nth-child(3), td:nth-child(4) { text-align:right; }
+.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
+.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
+  <div>${viewPurchase.id}</div>
+  <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+  <div>Supplier: ${viewPurchase.supplier}</div>
+</div>
+<table>
+  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <tbody>`;
+                      viewPurchase.items.forEach(item => {
+                        const qty = item.stock||0;
+                        const price = item.buyP||0;
+                        html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${qty} ${item.unit||'পিস'}</td><td>৳${price.toFixed(2)}</td><td>৳${(qty*price).toFixed(2)}</td></tr>`;
+                      });
+                      html += `</tbody>
+</table>
+<div class="total row"><span>সর্বমোট:</span><span>৳${grandTotal.toFixed(2)}</span></div>
+<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+</body>
+</html>`;
+                      const iframe = document.createElement('iframe');
+                      iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+                      document.body.appendChild(iframe);
+                      iframe.contentWindow.document.open();
+                      iframe.contentWindow.document.write(html);
+                      iframe.contentWindow.document.close();
+                      iframe.contentWindow.onload = function() {
+                        setTimeout(() => {
+                          iframe.contentWindow.print();
+                          document.body.removeChild(iframe);
+                        }, 100);
+                      };
+                    }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
+                    <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px',fontSize:12}}>✕</button>
                   </div>
                 </div>
               </div>
@@ -2807,135 +2802,6 @@ function ReportsScreen({sales, customers, purchases}) {
   const [viewSale, setViewSale] = useState(null);
   const [purchaseSearch, setPurchaseSearch] = useState('');
 
-  // Auto-print purchase invoice in reports
-  useEffect(() => {
-    if (viewPurchase) {
-      const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
-      let html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Purchase Invoice</title>
-<style>
-@page { size: 80mm auto; margin: 0; }
-* { margin:0; padding:0; box-sizing:border-box; }
-html { width: 80mm; }
-body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
-.center { text-align:center; }
-.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
-.row { display:flex; justify-content:space-between; margin:2px 0; }
-table { width:100%; border-collapse:collapse; font-size:10px; }
-th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
-td { padding:3px 0; }
-td:nth-child(2) { text-align:center; }
-td:nth-child(3), td:nth-child(4) { text-align:right; }
-.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
-.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
-</style>
-</head>
-<body>
-<div class="center border">
-  <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
-  <div>${viewPurchase.id}</div>
-  <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-  <div>Supplier: ${viewPurchase.supplier}</div>
-</div>
-<table>
-  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
-  <tbody>`;
-      viewPurchase.items.forEach(item => {
-        const qty = item.stock||0;
-        const price = item.buyP||0;
-        html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${qty} ${item.unit||'পিস'}</td><td>৳${price.toFixed(2)}</td><td>৳${(qty*price).toFixed(2)}</td></tr>`;
-      });
-      html += `</tbody>
-</table>
-<div class="total row"><span>সর্বমোট:</span><span>৳${grandTotal.toFixed(2)}</span></div>
-<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-</body>
-</html>`;
-      const iframe = document.createElement('iframe');
-      iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-      document.body.appendChild(iframe);
-      const iframeDoc = iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(html);
-      iframeDoc.close();
-      iframe.contentWindow.onload = function() {
-        setTimeout(() => {
-          iframe.contentWindow.print();
-          document.body.removeChild(iframe);
-        }, 100);
-      };
-    }
-  }, [viewPurchase]);
-
-  // Auto-print sale receipt in reports
-  useEffect(() => {
-    if (viewSale) {
-      const total = (viewSale.total || 0) + (viewSale.vat || 0);
-      let html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Sale Receipt</title>
-<style>
-@page { size: 80mm auto; margin: 0; }
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { width: 80mm; }
-body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 2mm; font-size: 11px; color: #000; background: #fff; }
-.center { text-align: center; }
-.border { border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px; }
-.row { display: flex; justify-content: space-between; margin: 2px 0; }
-table { width: 100%; border-collapse: collapse; font-size: 10px; }
-th { border-bottom: 1px dashed #000; padding: 3px 0; text-align: left; }
-td { padding: 3px 0; }
-td:nth-child(2) { text-align: center; }
-td:nth-child(3), td:nth-child(4) { text-align: right; }
-.total { border-top: 1px dashed #000; margin-top: 5px; padding-top: 5px; font-weight: bold; }
-.footer { text-align: center; margin-top: 10px; border-top: 1px dashed #000; padding-top: 5px; font-size: 9px; }
-</style>
-</head>
-<body>
-<div class="center border">
-  <div style="font-size:14px;font-weight:bold;">${viewSale.settings?.shopName || '🛒 POS Sale'}</div>
-  <div>${viewSale.id}</div>
-  <div>${new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
-  ${viewSale.custName ? '<div>Customer: '+viewSale.custName+'</div>' : ''}
-  ${viewSale.phone ? '<div>Phone: '+viewSale.phone+'</div>' : ''}
-</div>
-<table>
-  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
-  <tbody>`;
-      (viewSale.items||[]).forEach(item => {
-        html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${item.qty} ${item.unit||'পিস'}</td><td>৳${item.sellP.toFixed(2)}</td><td>৳${(item.qty*item.sellP).toFixed(2)}</td></tr>`;
-      });
-      html += `</tbody>
-</table>
-<div class="total row"><span>সাবটোটাল:</span><span>৳${viewSale.total.toFixed(2)}</span></div>`;
-      if(viewSale.vat > 0) html += `<div class="row"><span>VAT (${viewSale.vatRate}%):</span><span>৳${viewSale.vat.toFixed(2)}</span></div>`;
-      html += `<div class="total row"><span>মোট:</span><span>৳${total.toFixed(2)}</span></div>
-<div class="row"><span>পরিশোধ:</span><span>৳${viewSale.paid.toFixed(2)}</span></div>`;
-      if(viewSale.due > 0) html += `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${viewSale.due.toFixed(2)}</span></div>`;
-      html += `<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-</body>
-</html>`;
-      const iframe = document.createElement('iframe');
-      iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-      document.body.appendChild(iframe);
-      const iframeDoc = iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(html);
-      iframeDoc.close();
-      iframe.contentWindow.onload = function() {
-        setTimeout(() => {
-          iframe.contentWindow.print();
-          document.body.removeChild(iframe);
-        }, 100);
-      };
-    }
-  }, [viewSale]);
-
   const filterByPeriod = (items, dateField = 'date') => {
     const n = new Date();
     return items.filter(item => {
@@ -3284,7 +3150,67 @@ td:nth-child(3), td:nth-child(4) { text-align: right; }
                 <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
                 <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
               </div>
-              <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+              <div style={{display:'flex',gap:8}}>
+                <button onClick={()=>{
+                  const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
+                  let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Purchase Invoice</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { width: 80mm; }
+body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+.center { text-align:center; }
+.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
+.row { display:flex; justify-content:space-between; margin:2px 0; }
+table { width:100%; border-collapse:collapse; font-size:10px; }
+th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
+td { padding:3px 0; }
+td:nth-child(2) { text-align:center; }
+td:nth-child(3), td:nth-child(4) { text-align:right; }
+.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
+.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
+  <div>${viewPurchase.id}</div>
+  <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+  <div>Supplier: ${viewPurchase.supplier}</div>
+</div>
+<table>
+  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <tbody>`;
+                  viewPurchase.items.forEach(item => {
+                    const qty = item.stock||0;
+                    const price = item.buyP||0;
+                    html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${qty} ${item.unit||'পিস'}</td><td>৳${price.toFixed(2)}</td><td>৳${(qty*price).toFixed(2)}</td></tr>`;
+                  });
+                  html += `</tbody>
+</table>
+<div class="total row"><span>সর্বমোট:</span><span>৳${grandTotal.toFixed(2)}</span></div>
+<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+</body>
+</html>`;
+                  const iframe = document.createElement('iframe');
+                  iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+                  document.body.appendChild(iframe);
+                  iframe.contentWindow.document.open();
+                  iframe.contentWindow.document.write(html);
+                  iframe.contentWindow.document.close();
+                  iframe.contentWindow.onload = function() {
+                    setTimeout(() => {
+                      iframe.contentWindow.print();
+                      document.body.removeChild(iframe);
+                    }, 100);
+                  };
+                }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+              </div>
             </div>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
@@ -3337,7 +3263,70 @@ td:nth-child(3), td:nth-child(4) { text-align: right; }
                 <div style={{fontSize:13,marginTop:4}}>👤 কাস্টমার: {viewSale.custName}</div>
                 {viewSale.phone && <div style={{fontSize:12,color:T.gray500,marginTop:2}}>📱 {viewSale.phone}</div>}
               </div>
-              <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+              <div style={{display:'flex',gap:8}}>
+                <button onClick={()=>{
+                  const total = viewSale.total + (viewSale.vat||0);
+                  let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sale Receipt</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { width: 80mm; }
+body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+.center { text-align:center; }
+.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
+.row { display:flex; justify-content:space-between; margin:2px 0; }
+table { width:100%; border-collapse:collapse; font-size:10px; }
+th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
+td { padding:3px 0; }
+td:nth-child(2) { text-align:center; }
+td:nth-child(3), td:nth-child(4) { text-align:right; }
+.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
+.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
+  <div>#${viewSale.id.slice(-6).toUpperCase()}</div>
+  <div>${new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
+  <div>Customer: ${viewSale.custName}</div>
+  ${viewSale.phone ? '<div>Phone: '+viewSale.phone+'</div>' : ''}
+</div>
+<table>
+  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <tbody>`;
+                  (viewSale.items||[]).forEach(item => {
+                    html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${item.qty} ${item.unit||'পিস'}</td><td>৳${item.sellP.toFixed(2)}</td><td>৳${(item.qty*item.sellP).toFixed(2)}</td></tr>`;
+                  });
+                  html += `</tbody>
+</table>
+<div class="total row"><span>সাবটোটাল:</span><span>৳${viewSale.total.toFixed(2)}</span></div>`;
+                  if(viewSale.vat > 0) html += `<div class="row"><span>VAT (${viewSale.vatRate}%):</span><span>৳${viewSale.vat.toFixed(2)}</span></div>`;
+                  html += `<div class="total row"><span>মোট:</span><span>৳${total.toFixed(2)}</span></div>
+<div class="row"><span>পরিশোধ:</span><span>৳${viewSale.paid.toFixed(2)}</span></div>`;
+                  if(viewSale.due > 0) html += `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${viewSale.due.toFixed(2)}</span></div>`;
+                  html += `<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+</body>
+</html>`;
+                  const iframe = document.createElement('iframe');
+                  iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+                  document.body.appendChild(iframe);
+                  iframe.contentWindow.document.open();
+                  iframe.contentWindow.document.write(html);
+                  iframe.contentWindow.document.close();
+                  iframe.contentWindow.onload = function() {
+                    setTimeout(() => {
+                      iframe.contentWindow.print();
+                      document.body.removeChild(iframe);
+                    }, 100);
+                  };
+                }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+              </div>
             </div>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
