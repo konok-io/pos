@@ -221,7 +221,7 @@ export default function App() {
 
   const tabs = [
     {id:'pos',icon:'🛒',label:'বিক্রয়'},
-    {id:'products',icon:'📦',label:'পণ্য'},
+    {id:'products',icon:'📦',label:'সকল পণ্য'},
     {id:'suppliers',icon:'🏢',label:'কোম্পানি'},
     {id:'customers',icon:'👥',label:'কাস্টমার'},
     {id:'inventory',icon:'🏭',label:'স্টক'},
