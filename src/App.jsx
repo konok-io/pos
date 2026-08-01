@@ -363,6 +363,13 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   useEffect(() => { searchRef.current?.focus(); }, []);
 
+  // Click outside to close customer dropdown
+  useEffect(() => {
+    const handleClick = () => setShowCustDrop(false);
+    document.addEventListener('click', handleClick);
+    return () => document.removeEventListener('click', handleClick);
+  }, []);
+
   const cats = ['সব', ...new Set(products.map(p=>p.cat).filter(Boolean))];
   const filtered = products.filter(p => {
     const matchCat = selCat==='সব' || p.cat===selCat;
@@ -1257,7 +1264,6 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
       setShowCompanyDrop(false);
       setShowCatDrop(false);
       setShowCatCompanyDrop(false);
-      setShowCustDrop(false);
       setShowProductDrop(false);
     };
     document.addEventListener('click', handleClick);
