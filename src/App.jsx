@@ -2681,41 +2681,51 @@ function ReportsScreen({sales, customers, purchases}) {
                 <button onClick={()=>{
                   const p = viewPurchase;
                   const total = p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0);
-                  let html = `<!DOCTYPE html><html><head><title>Purchase Invoice</title><style>
-                    * { margin:0; padding:0; box-sizing:border-box; }
-                    body { font-family:'Courier New',monospace; width:3in; margin:0; padding:0.08in; font-size:11px; }
-                    .center { text-align:center; }
-                    .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
-                    .row { display:flex; justify-content:space-between; margin:2px 0; }
-                    table { width:100%; border-collapse:collapse; font-size:10px; }
-                    th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
-                    td { padding:3px 0; }
-                    td:nth-child(2) { text-align:center; }
-                    td:nth-child(3), td:nth-child(4) { text-align:right; }
-                    .total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
-                    .footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
-                    @media print { @page { margin: 0; } }
-                  </style></head><body>
-                    <div class="center border">
-                      <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
-                      <div>${p.id}</div>
-                      <div>${new Date(p.date).toLocaleDateString('bn-BD')}</div>
-                      <div>Supplier: ${p.supplier}</div>
-                    </div>
-                    <table>
-                      <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
-                      <tbody>`;
+                  let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Purchase Invoice</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { width: 80mm; }
+body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+.center { text-align:center; }
+.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
+.row { display:flex; justify-content:space-between; margin:2px 0; }
+table { width:100%; border-collapse:collapse; font-size:10px; }
+th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
+td { padding:3px 0; }
+td:nth-child(2) { text-align:center; }
+td:nth-child(3), td:nth-child(4) { text-align:right; }
+.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
+.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
+  <div>${p.id}</div>
+  <div>${new Date(p.date).toLocaleDateString('bn-BD')}</div>
+  <div>Supplier: ${p.supplier}</div>
+</div>
+<table>
+  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <tbody>`;
                   p.items.forEach(item => {
                     const qty = item.stock||0;
                     const price = item.buyP||0;
                     html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${qty} ${item.unit||'পিস'}</td><td>৳${price.toFixed(2)}</td><td>৳${(qty*price).toFixed(2)}</td></tr>`;
                   });
-                  html += `</tbody></table>
-                    <div class="total row"><span>সর্বমোট:</span><span>৳${total.toFixed(2)}</span></div>
-                    <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-                    <script>window.onload=function(){window.print();}</script>
-                  </body></html>`;
-                  const win = window.open('','','width=400,height=800');
+                  html += `</tbody>
+</table>
+<div class="total row"><span>সর্বমোট:</span><span>৳${total.toFixed(2)}</span></div>
+<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+<script>window.onload=function(){window.print();}</script>
+</body>
+</html>`;
+                  const win = window.open('','','width=320,height=600');
                   win.document.open();
                   win.document.write(html);
                   win.document.close();
@@ -2778,44 +2788,54 @@ function ReportsScreen({sales, customers, purchases}) {
                 <button onClick={()=>{
                   const s = viewSale;
                   const total = s.total + (s.vat||0);
-                  let html = `<!DOCTYPE html><html><head><title>Sale Receipt</title><style>
-                    * { margin:0; padding:0; box-sizing:border-box; }
-                    body { font-family:'Courier New',monospace; width:3in; margin:0; padding:0.08in; font-size:11px; }
-                    .center { text-align:center; }
-                    .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
-                    .row { display:flex; justify-content:space-between; margin:2px 0; }
-                    table { width:100%; border-collapse:collapse; font-size:10px; }
-                    th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
-                    td { padding:3px 0; }
-                    td:nth-child(2) { text-align:center; }
-                    td:nth-child(3), td:nth-child(4) { text-align:right; }
-                    .total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
-                    .footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
-                    @media print { @page { margin: 0; } }
-                  </style></head><body>
-                    <div class="center border">
-                      <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
-                      <div>#${s.id.slice(-6).toUpperCase()}</div>
-                      <div>${new Date(s.date).toLocaleDateString('bn-BD')}</div>
-                      <div>Customer: ${s.custName}</div>
-                      ${s.phone ? '<div>Phone: '+s.phone+'</div>' : ''}
-                    </div>
-                    <table>
-                      <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
-                      <tbody>`;
+                  let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sale Receipt</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { width: 80mm; }
+body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+.center { text-align:center; }
+.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
+.row { display:flex; justify-content:space-between; margin:2px 0; }
+table { width:100%; border-collapse:collapse; font-size:10px; }
+th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
+td { padding:3px 0; }
+td:nth-child(2) { text-align:center; }
+td:nth-child(3), td:nth-child(4) { text-align:right; }
+.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
+.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
+  <div>#${s.id.slice(-6).toUpperCase()}</div>
+  <div>${new Date(s.date).toLocaleDateString('bn-BD')}</div>
+  <div>Customer: ${s.custName}</div>
+  ${s.phone ? '<div>Phone: '+s.phone+'</div>' : ''}
+</div>
+<table>
+  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <tbody>`;
                   (s.items||[]).forEach(item => {
                     html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${item.qty} ${item.unit||'পিস'}</td><td>৳${item.sellP.toFixed(2)}</td><td>৳${(item.qty*item.sellP).toFixed(2)}</td></tr>`;
                   });
-                  html += `</tbody></table>
-                    <div class="total row"><span>সাবটোটাল:</span><span>৳${s.total.toFixed(2)}</span></div>`;
+                  html += `</tbody>
+</table>
+<div class="total row"><span>সাবটোটাল:</span><span>৳${s.total.toFixed(2)}</span></div>`;
                   if(s.vat > 0) html += `<div class="row"><span>VAT (${s.vatRate}%):</span><span>৳${s.vat.toFixed(2)}</span></div>`;
                   html += `<div class="total row"><span>মোট:</span><span>৳${total.toFixed(2)}</span></div>
-                    <div class="row"><span>পরিশোধ:</span><span>৳${s.paid.toFixed(2)}</span></div>`;
-                  if(s.due > 0) html += `<div class="row" style="color:#c00;"><span>বাকি:</span><span>৳${s.due.toFixed(2)}</span></div>`;
+<div class="row"><span>পরিশোধ:</span><span>৳${s.paid.toFixed(2)}</span></div>`;
+                  if(s.due > 0) html += `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${s.due.toFixed(2)}</span></div>`;
                   html += `<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-                    <script>window.onload=function(){window.print();}</script>
-                  </body></html>`;
-                  const win = window.open('','','width=400,height=800');
+<script>window.onload=function(){window.print();}</script>
+</body>
+</html>`;
+                  const win = window.open('','','width=320,height=600');
                   win.document.open();
                   win.document.write(html);
                   win.document.close();
