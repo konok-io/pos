@@ -385,8 +385,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   };
 
   const printReceipt = (r) => {
-    const w = window.open('','_blank','width=350,height=600');
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>রসিদ</title>
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>রসিদ</title>
     <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:'Courier New',monospace;width:3in;margin:0;padding:0.08in;font-size:11px;color:#000}
@@ -394,6 +393,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     table{width:100%}td{padding:2px 0}.r{text-align:right}.big{font-size:14px}
     .header{text-align:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #000}
     .footer{text-align:center;margin-top:8px;padding-top:6px;border-top:1px dashed #000;font-size:10px}
+    @media print { @page { margin: 0; } }
     </style></head><body>
     <div class="header">
       <div class="b" style="font-size:14px">${r.settings.name}</div>
@@ -420,8 +420,12 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
       ${r.sale.due>0?`<tr class="b"><td>বাকি</td><td class="r" style="color:red">৳${r.sale.due.toFixed(2)}</td></tr>`:''}
     </table>
     <div class="footer">ধন্যবাদ! আবার আসবেন 🙏<br>${new Date().toLocaleString('bn-BD')}</div>
-    <script>window.onload=()=>{window.print();setTimeout(()=>window.close(),500)}</script>
-    </body></html>`);
+    <script>window.onload=function(){window.print();}</script>
+    </body></html>`;
+    
+    const w = window.open('', '', 'width=350,height=600');
+    w.document.open();
+    w.document.write(html);
     w.document.close();
   };
 
@@ -2615,6 +2619,7 @@ function ReportsScreen({sales, customers, purchases}) {
                     td:nth-child(3), td:nth-child(4) { text-align:right; }
                     .total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
                     .footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+                    @media print { @page { margin: 0; } }
                   </style></head><body>
                     <div class="center border">
                       <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
@@ -2633,11 +2638,12 @@ function ReportsScreen({sales, customers, purchases}) {
                   html += `</tbody></table>
                     <div class="total row"><span>সর্বমোট:</span><span>৳${total.toFixed(2)}</span></div>
                     <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+                    <script>window.onload=function(){window.print();}</script>
                   </body></html>`;
                   const win = window.open('','','width=350,height=600');
+                  win.document.open();
                   win.document.write(html);
                   win.document.close();
-                  setTimeout(() => win.print(), 250);
                 }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
               </div>
@@ -2710,6 +2716,7 @@ function ReportsScreen({sales, customers, purchases}) {
                     td:nth-child(3), td:nth-child(4) { text-align:right; }
                     .total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
                     .footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+                    @media print { @page { margin: 0; } }
                   </style></head><body>
                     <div class="center border">
                       <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
@@ -2731,11 +2738,12 @@ function ReportsScreen({sales, customers, purchases}) {
                     <div class="row"><span>পরিশোধ:</span><span>৳${s.paid.toFixed(2)}</span></div>`;
                   if(s.due > 0) html += `<div class="row" style="color:#c00;"><span>বাকি:</span><span>৳${s.due.toFixed(2)}</span></div>`;
                   html += `<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+                    <script>window.onload=function(){window.print();}</script>
                   </body></html>`;
                   const win = window.open('','','width=350,height=600');
+                  win.document.open();
                   win.document.write(html);
                   win.document.close();
-                  setTimeout(() => win.print(), 250);
                 }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
               </div>
