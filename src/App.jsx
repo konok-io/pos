@@ -965,9 +965,76 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
                     <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
                     <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
                   </div>
-                  <div style={{textAlign:'right'}}>
-                    <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
-                    <div style={{fontWeight:800,fontSize:20,color:T.teal}}>{viewPurchase.totalItems}টি</div>
+                  <div style={{textAlign:'right',display:'flex',gap:8}}>
+                    <button onClick={() => {
+                      const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
+                      const printContent = `
+                        <html>
+                        <head>
+                          <title>Purchase Invoice - ${viewPurchase.id}</title>
+                          <style>
+                            body { font-family: 'Bangla', sans-serif; padding: 20px; }
+                            h2 { text-align: center; color: #0F766E; }
+                            .header { margin-bottom: 20px; }
+                            .info { margin-bottom: 20px; }
+                            table { width: 100%; border-collapse: collapse; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                            th { background: #f0fdfa; }
+                            .total { background: #f0fdfa; font-weight: bold; }
+                            .footer { margin-top: 20px; text-align: center; color: #666; }
+                            @media print { button { display: none; } }
+                          </style>
+                        </head>
+                        <body>
+                          <h2>🧾 Purchase Invoice</h2>
+                          <div class="info">
+                            <p><strong>Invoice ID:</strong> ${viewPurchase.id}</p>
+                            <p><strong>Date:</strong> ${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</p>
+                            <p><strong>Supplier:</strong> ${viewPurchase.supplier}</p>
+                          </div>
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>পণ্যের নাম</th>
+                                <th>কোম্পানি/ক্যাটাগরি</th>
+                                <th>পরিমাণ</th>
+                                <th>দাম</th>
+                                <th>মোট</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              ${viewPurchase.items.map(item => `
+                                <tr>
+                                  <td>${item.name}</td>
+                                  <td>${item.company} / ${item.cat || '-'}</td>
+                                  <td>${item.stock || 0} ${item.unit || 'পিস'}</td>
+                                  <td>${fmt(item.buyP || 0)}</td>
+                                  <td>${fmt((item.stock || 0) * (item.buyP || 0))}</td>
+                                </tr>
+                              `).join('')}
+                            </tbody>
+                            <tfoot>
+                              <tr class="total">
+                                <td colspan="4">সর্বমোট</td>
+                                <td>${fmt(grandTotal)}</td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                          <div class="footer">
+                            <p>ধন্যবাদ!</p>
+                          </div>
+                        </body>
+                        </html>
+                      `;
+                      const printWindow = window.open('', '_blank');
+                      printWindow.document.write(printContent);
+                      printWindow.document.close();
+                      printWindow.print();
+                    }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
+                    <div style={{textAlign:'right'}}>
+                      <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
+                      <div style={{fontWeight:800,fontSize:20,color:T.teal}}>{viewPurchase.totalItems}টি</div>
+                    </div>
                   </div>
                 </div>
               </div>
