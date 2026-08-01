@@ -1227,7 +1227,7 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
                   {showProductList && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                       {products.filter(p=>!p.name?.includes('(ক্যাটাগরি)') && p.name.toLowerCase().includes((form.name||'').toLowerCase())).slice(0,20).map((p,i)=>(
-                        <div key={i} onClick={()=>{setForm(f=>({...f,name:p.name}));setShowProductList(false);}}
+                        <div key={i} onClick={()=>{selectProduct(p);setShowProductList(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                           <div style={{fontWeight:600}}>{p.name}</div>
                           <div style={{fontSize:11,color:T.gray400}}>{p.company} • {p.cat}</div>
