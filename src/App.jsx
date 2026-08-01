@@ -325,13 +325,14 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const cats = ['সব', ...new Set([
     ...products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).map(p=>p.cat).filter(Boolean),
     ...categories.map(c=>c.name).filter(Boolean)
-  ])];
+  ]), 'স্টক শেষ'];
   const filtered = products.filter(p => {
     const isCategory = p.name?.includes('(ক্যাটাগরি)');
     if (isCategory) return false;
-    const matchCat = selCat==='সব' || p.cat===selCat;
+    const matchCat = selCat==='সব' || selCat==='স্টক শেষ' || p.cat===selCat;
+    const matchStock = selCat!=='স্টক শেষ' || p.stock<=0;
     const matchQ = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
-    return matchCat && matchQ;
+    return matchCat && matchStock && matchQ;
   }).sort((a, b) => a.stock - b.stock);
 
   const addToCart = (prod) => {
@@ -611,7 +612,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             <button key={c} onClick={()=>setSelCat(c)} style={{
               ...btn(selCat===c?'primary':'ghost','sm'),
               borderRadius:20, whiteSpace:'nowrap',
-              background:selCat===c?T.teal:T.gray100,
+              background:selCat===c?(c==='স্টক শেষ'?T.red:T.teal):T.gray100,
               color:selCat===c?T.white:T.gray600,
               border:'none',
               padding:'6px 14px',
