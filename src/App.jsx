@@ -712,7 +712,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
       if (items.length > 0) {
         setPurchaseItems([...purchaseItems, ...items]);
         setCsvData(items);
-        alert(`${items.length}টি পণ্য আমদানি হয়েছে!`);
+        alert(`${items.length}টি পণ্য আপলোড হয়েছে!`);
       } else {
         alert('কোনো পণ্য পাওয়া যায়নি। CSV ফরম্যাট সঠিক নয়।');
       }
@@ -983,7 +983,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
               </div>
               {csvData.length > 0 && (
                 <div style={{marginTop:8,fontSize:12,color:T.teal,fontWeight:600}}>
-                  ✓ {csvData.length}টি পণ্য আমদানি হয়েছে
+                  ✓ {csvData.length}টি পণ্য আপলোড হয়েছে
                 </div>
               )}
             </div>
