@@ -623,19 +623,20 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         <div style={{flex:1,overflow:'auto',padding:16,display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:12,alignContent:'start',background:T.gray50}}>
           {filtered.map(p => (
             <button key={p.id} onClick={()=>addToCart(p)} style={{
-              background:T.white, border:`1.5px solid ${p.stock<=0?T.red+'60':p.stock<=p.minStock?T.amber+'80':T.gray200}`,
+              background:p.stock<=0?T.redLight:p.stock<=p.minStock?T.amberLight:T.white, 
+              border:`1.5px solid ${p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.gray200}`,
               borderRadius:12, padding:'14px 12px', cursor:p.stock>0?'pointer':'not-allowed',
               textAlign:'left', transition:'all 0.2s',
               boxShadow:'0 2px 8px rgba(0,0,0,0.08)',
               outline:'none',
             }}>
-              <div style={{fontSize:10,color:T.gray400,marginBottom:4,fontWeight:600,textTransform:'uppercase'}}>{p.cat}</div>
-              <div style={{fontWeight:600,fontSize:14,marginBottom:8,lineHeight:1.4,color:T.gray900}}>{p.name}</div>
-              <div style={{fontSize:18,fontWeight:800,color:T.teal}}>{fmt(p.sellP)}</div>
-              <div style={{fontSize:11,marginTop:4,color:T.gray400}}>/{p.unit}</div>
+              <div style={{fontSize:10,color:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.gray400,marginBottom:4,fontWeight:600,textTransform:'uppercase'}}>{p.cat}</div>
+              <div style={{fontWeight:600,fontSize:14,marginBottom:8,lineHeight:1.4,color:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.gray900}}>{p.name}</div>
+              <div style={{fontSize:18,fontWeight:800,color:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.teal}}>{fmt(p.sellP)}</div>
+              <div style={{fontSize:11,marginTop:4,color:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.gray400}}>/{p.unit}</div>
               <div style={{marginTop:8,display:'inline-block',padding:'3px 8px',borderRadius:10,fontSize:11,fontWeight:600,
-                background:p.stock<=0?T.redLight:p.stock<=p.minStock?T.amberLight:T.tealLight,
-                color:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.teal}}>
+                background:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.tealLight,
+                color:p.stock<=0?'#fff':p.stock<=p.minStock?'#fff':T.teal}}>
                 স্টক: {p.stock}
               </div>
             </button>
