@@ -960,13 +960,26 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
             
             {/* CSV Import Section */}
             <div style={{...card,padding:16,marginBottom:16,background:T.tealLight,border:`1px dashed ${T.teal}`}}>
-              <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 CSV আমদানি করুন</h3>
-              <div style={{display:'flex',gap:8,alignItems:'center'}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+                <h3 style={{margin:0,fontSize:14,color:T.teal}}>📥 CSV আমদানি করুন</h3>
+                <button onClick={() => {
+                  const csv = 'পণ্যের নাম,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক\nমিনিকেট চাল,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,100,10\nব্রিলিয়ান্ট চাল,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,80,10\nসুজি চিপস,সুজি,স্ন্যাকস,003,পিস,20,25,200,20';
+                  const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'পণ্যের_তালিকা.csv';
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }} style={{...btn('ghost'),fontSize:11,padding:'4px 10px'}}>
+                  📥 ডেমো CSV ডাউনলোড
+                </button>
+              </div>
+              <div style={{display:'flex',justifyContent:'flex-end'}}>
                 <input type="file" accept=".csv" onChange={handleCsvImport} id="csvInput" style={{display:'none'}} />
-                <label htmlFor="csvInput" style={{...btn(),cursor:'pointer',fontSize:13,padding:'8px 16px'}}>
-                  📁 CSV ফাইল বাছুন
+                <label htmlFor="csvInput" style={{...btn('primary'),cursor:'pointer',fontSize:13,padding:'10px 20px'}}>
+                  📁 পণ্যের CSV আপলোড করুন
                 </label>
-                <span style={{fontSize:12,color:T.gray500}}>পণ্যের CSV আপলোড করুন</span>
               </div>
               {csvData.length > 0 && (
                 <div style={{marginTop:8,fontSize:12,color:T.teal,fontWeight:600}}>
