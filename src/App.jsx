@@ -100,14 +100,15 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
-  const [settings, setSettings] = useState({name:'',address:'',phone:''});
+  const [settings, setSettings] = useState({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     setProducts(db.get(STORAGE_KEYS.products) || []);
     setCustomers(db.get(STORAGE_KEYS.customers) || []);
     setSales(db.get(STORAGE_KEYS.sales) || []);
-    setSettings(db.get(STORAGE_KEYS.settings) || {name:'',address:'',phone:''});
+    const savedSettings = db.get(STORAGE_KEYS.settings) || {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
+    setSettings({...{vatEnabled:true,vatPercent:15}, ...savedSettings});
     setReady(true);
   }, []);
 
@@ -199,6 +200,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
   const [custQ, setCustQ] = useState('');
   const [showCustDrop, setShowCustDrop] = useState(false);
   const [discount, setDiscount] = useState('');
+  const [vatPercent, setVatPercent] = useState(settings.vatPercent || 15);
   const [paid, setPaid] = useState('');
   const [receipt, setReceipt] = useState(null);
   const searchRef = useRef();
@@ -236,7 +238,11 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   const subtotal = cart.reduce((s,i)=>s+i.sellP*i.qty,0);
   const disc = parseFloat(discount)||0;
-  const total = Math.max(0, subtotal-disc);
+  const afterDiscount = Math.max(0, subtotal-disc);
+  const vatEnabled = settings.vatEnabled !== false;
+  const vatRate = vatPercent || 0;
+  const vatAmount = vatEnabled ? Math.round(afterDiscount * vatRate / 100) : 0;
+  const total = afterDiscount + vatAmount;
   const paidAmt = paid === '' ? 0 : (parseFloat(paid) || 0);
   const due = total - paidAmt;
   const change = paidAmt > total ? paidAmt - total : 0;
@@ -249,7 +255,8 @@ function POSScreen({products, customers, sales, settings, upd}) {
     // Confirmation dialog
     const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
     const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
-    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${dueText}${dueCreditText}`;
+    const vatText = vatAmount > 0 ? `\nভ্যাট (${vatPercent}%): ৳${vatAmount.toFixed(0)}` : '';
+    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${dueCreditText}`;
 
     if (!window.confirm(confirmMsg)) return;
 
@@ -257,7 +264,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
       id:genId(), date:now(),
       custId:selCust?.id||null, custName:selCust?.name||'সাধারণ ক্রেতা',
       items:cart.map(i=>({...i,total:i.sellP*i.qty,profit:(i.sellP-i.buyP)*i.qty})),
-      subtotal, discount:disc, total,
+      subtotal, discount:disc, vatPercent, vatAmount, total,
       paid:paidAmt, due:Math.max(0,due), change,
     };
 
@@ -304,6 +311,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
     <table>
       <tr><td>সাবটোটাল</td><td class="r">৳${r.sale.subtotal.toFixed(0)}</td></tr>
       ${r.sale.discount>0?`<tr><td>ছাড়</td><td class="r">-৳${r.sale.discount.toFixed(0)}</td></tr>`:''}
+      ${r.sale.vatAmount>0?`<tr><td>ভ্যাট (${r.sale.vatPercent}%)</td><td class="r">৳${r.sale.vatAmount.toFixed(0)}</td></tr>`:''}
       <tr class="b"><td class="big">মোট</td><td class="big r">৳${r.sale.total.toFixed(0)}</td></tr>
       <tr><td>পরিশোধ</td><td class="r">৳${r.sale.paid.toFixed(0)}</td></tr>
       ${r.sale.change>0?`<tr><td>ফেরত</td><td class="r">৳${r.sale.change.toFixed(0)}</td></tr>`:''}
@@ -467,8 +475,14 @@ function POSScreen({products, customers, sales, settings, upd}) {
           <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
             <label style={{...label,margin:0,whiteSpace:'nowrap'}}>ছাড় (৳)</label>
             <input value={discount} onChange={e=>setDiscount(e.target.value)} type="number" min="0"
-              style={{...input,width:110,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
+              style={{...input,width:100,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
+            <label style={{...label,margin:0,whiteSpace:'nowrap'}}>ভ্যাট (%)</label>
+            <input value={vatPercent} onChange={e=>setVatPercent(e.target.value)} type="number" min="0" max="100"
+              style={{...input,width:70,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
           </div>
+          {vatAmount > 0 && (
+            <div style={{fontSize:12,color:T.amber,marginBottom:8}}>ভ্যাট (৳{vatAmount.toFixed(0)}) যোগ হয়েছে</div>
+          )}
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 14px',background:T.tealLight,borderRadius:10,marginBottom:10}}>
             <span style={{fontWeight:700,fontSize:16}}>মোট দেনা</span>
             <span style={{fontWeight:800,fontSize:24,color:T.teal}}>{fmt(total)}</span>
@@ -518,10 +532,10 @@ function ProductsScreen({products, upd}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
-  const blank = {name:'',barcode:'',cat:'',buyP:'',sellP:'',stock:'',unit:'পিস',minStock:'5'};
+  const blank = {name:'',company:'',barcode:'',cat:'',buyP:'',sellP:'',stock:'',unit:'পিস',minStock:'5'};
 
   const filtered = products.filter(p=>
-    !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search)
+    !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.company||'').toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search)
   );
 
   const save = async () => {
@@ -541,8 +555,8 @@ function ProductsScreen({products, upd}) {
   };
 
   const exportCSV = () => {
-    const header = ['পণ্যের নাম','বারকোড','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','স্টক','একক','মিনস্টক'];
-    const rows = products.map(p=>[p.name,p.barcode||'',p.cat||'',p.buyP,p.sellP,p.stock,p.unit||'',p.minStock||0]);
+    const header = ['পণ্যের নাম','কোম্পানি','বারকোড','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','স্টক','একক','মিনস্টক'];
+    const rows = products.map(p=>[p.name,p.company||'',p.barcode||'',p.cat||'',p.buyP,p.sellP,p.stock,p.unit||'',p.minStock||0]);
     const csv = [header,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
@@ -556,7 +570,7 @@ function ProductsScreen({products, upd}) {
       const lines = ev.target.result.replace(/^\uFEFF/,'').split('\n').slice(1).filter(l=>l.trim());
       const imported = lines.map(l=>{
         const c = l.split(',').map(s=>s.replace(/^"|"$/g,'').trim());
-        return {id:genId(),name:c[0],barcode:c[1],cat:c[2],buyP:+c[3]||0,sellP:+c[4]||0,stock:+c[5]||0,unit:c[6]||'পিস',minStock:+c[7]||0};
+        return {id:genId(),name:c[0],company:c[1],barcode:c[2],cat:c[3],buyP:+c[4]||0,sellP:+c[5]||0,stock:+c[6]||0,unit:c[7]||'পিস',minStock:+c[8]||0};
       }).filter(p=>p.name);
       await upd.products([...products,...imported]);
       alert(`✅ ${imported.length}টি পণ্য সফলভাবে ইম্পোর্ট হয়েছে!`);
@@ -584,14 +598,14 @@ function ProductsScreen({products, upd}) {
         <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
           <thead>
             <tr style={{background:T.tealLight}}>
-              {['পণ্যের নাম','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','স্টক','একক',''].map((h,i)=>(
+              {['পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','স্টক','একক',''].map((h,i)=>(
                 <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.length===0 ? (
-              <tr><td colSpan={8} style={{padding:40,textAlign:'center',color:T.gray400}}>পণ্য পাওয়া যায়নি</td></tr>
+              <tr><td colSpan={9} style={{padding:40,textAlign:'center',color:T.gray400}}>পণ্য পাওয়া যায়নি</td></tr>
             ) : filtered.map((p,i)=>{
               const profitPct = p.buyP>0 ? Math.round((p.sellP-p.buyP)/p.buyP*100) : 0;
               const isLowStock = p.stock <= p.minStock;
@@ -601,6 +615,7 @@ function ProductsScreen({products, upd}) {
                     <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
                     {p.barcode && <div style={{fontSize:11,color:T.gray400,fontFamily:'monospace'}}>{p.barcode}</div>}
                   </td>
+                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
                   <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
                   <td style={{padding:'10px 12px',fontSize:13}}>{fmt(p.buyP)}</td>
                   <td style={{padding:'10px 12px',fontWeight:700,fontSize:14}}>{fmt(p.sellP)}</td>
@@ -632,6 +647,7 @@ function ProductsScreen({products, upd}) {
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
             {[
               {k:'name',l:'পণ্যের নাম *',full:true},
+              {k:'company',l:'কোম্পানি/ব্র্যান্ড'},
               {k:'barcode',l:'বারকোড'},
               {k:'cat',l:'ক্যাটাগরি'},
               {k:'unit',l:'একক (কেজি/পিস/লিটার...)'},
@@ -875,7 +891,7 @@ function InventoryScreen({products, upd}) {
         <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
           <thead>
             <tr style={{background:T.tealLight}}>
-              {['পণ্যের নাম','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
+              {['পণ্যের নাম','কোম্পানি','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
                 <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>{h}</th>
               ))}
             </tr>
@@ -888,6 +904,7 @@ function InventoryScreen({products, upd}) {
               return (
                 <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                   <td style={{padding:'10px 12px',fontWeight:600}}>{p.name}</td>
+                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
                   <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
                   <td style={{padding:'10px 12px',fontWeight:800,fontSize:18,color:stColor}}>{fmtN(p.stock)}</td>
                   <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
@@ -1090,10 +1107,42 @@ function SettingsScreen({settings, products, upd}) {
               </div>
             ))}
           </div>
-          <div style={{marginTop:16,display:'flex',alignItems:'center',gap:10}}>
-            <button onClick={save} style={btn('primary')}>💾 সেটিংস সংরক্ষণ</button>
-            {saved && <span style={{color:T.green,fontSize:13,fontWeight:600}}>✓ সংরক্ষিত হয়েছে!</span>}
+        </div>
+
+        {/* VAT Settings */}
+        <div style={{...card,width:'100%'}}>
+          <h3 style={{margin:'0 0 18px',fontSize:15,fontWeight:700}}>💰 ভ্যাট/ট্যাক্স সেটিংস</h3>
+          <div style={{display:'flex',flexDirection:'column',gap:14}}>
+            <div style={{display:'flex',alignItems:'center',gap:12}}>
+              <label style={{...label,margin:0}}>ভ্যাট সক্রিয় করুন</label>
+              <button 
+                onClick={()=>setForm(p=>({...p,vatEnabled:!p.vatEnabled}))}
+                style={{
+                  padding:'8px 20px', borderRadius:8, fontWeight:600, fontSize:13, cursor:'pointer',
+                  background: form.vatEnabled ? T.green : T.gray200,
+                  color: form.vatEnabled ? T.white : T.gray600,
+                  border:'none', transition:'all 0.2s',
+                }}>
+                {form.vatEnabled ? '✅ চালু' : '❌ বন্ধ'}
+              </button>
+            </div>
+            {form.vatEnabled && (
+              <div style={{display:'flex',alignItems:'center',gap:12}}>
+                <label style={{...label,margin:0}}>ডিফল্ট ভ্যাট শতাংশ</label>
+                <input 
+                  value={form.vatPercent||15} 
+                  onChange={e=>setForm(p=>({...p,vatPercent:parseFloat(e.target.value)||0}))} 
+                  type="number" min="0" max="100" 
+                  style={{...input,width:80,padding:'8px 12px',fontSize:14}}/>
+                <span style={{fontSize:14,color:T.gray600}}>%</span>
+              </div>
+            )}
           </div>
+        </div>
+
+        <div style={{display:'flex',alignItems:'center',gap:10}}>
+          <button onClick={save} style={btn('primary')}>💾 সেটিংস সংরক্ষণ</button>
+          {saved && <span style={{color:T.green,fontSize:13,fontWeight:600}}>✓ সংরক্ষিত হয়েছে!</span>}
         </div>
 
         {/* Stats */}
@@ -1125,7 +1174,7 @@ function SettingsScreen({settings, products, upd}) {
                 await upd.products([]);
                 await upd.customers([]);
                 await upd.sales([]);
-                await upd.settings({name:'',address:'',phone:''});
+                await upd.settings({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
                 alert('সব ডেটা মুছে ফেলা হয়েছে।');
                 window.location.reload();
               }
