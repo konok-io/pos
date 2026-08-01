@@ -385,47 +385,120 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   };
 
   const printReceipt = (r) => {
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Sale Receipt</title>
-    <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Courier New',monospace;width:3in;margin:0 auto;padding:0.08in;font-size:11px;color:#000}
-    .center{text-align:center}
-    .border{border-bottom:1px dashed #000;padding-bottom:5px;margin-bottom:5px}
-    .row{display:flex;justify-content:space-between;margin:2px 0}
-    table{width:100%;border-collapse:collapse;font-size:10px}
-    th{border-bottom:1px dashed #000;padding:3px 0;text-align:left}
-    td{padding:3px 0}
-    td:nth-child(2){text-align:center}
-    td:nth-child(3),td:nth-child(4){text-align:right}
-    .total{border-top:1px dashed #000;margin-top:5px;padding-top:5px;font-weight:bold}
-    .footer{text-align:center;margin-top:10px;border-top:1px dashed #000;padding-top:5px;font-size:9px}
-    @media print{@page{size:3in;margin:0}}
-    </style></head><body>
-    <div class="center border">
-      <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
-      <div>#${r.sale.id.slice(-8).toUpperCase()}</div>
-      <div>${new Date(r.sale.date).toLocaleDateString('bn-BD')}</div>
-      <div>Customer: ${r.sale.custName}</div>
-      ${r.sale.phone?'<div>Phone: '+r.sale.phone+'</div>':''}
-    </div>
-    <table>
-      <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
-      <tbody>
-      ${r.sale.items.map(i=>`<tr><td>${i.name}<br><span style="font-size:9px;color:#666;">${i.company||''}</span></td><td>${i.qty} ${i.unit||'পিস'}</td><td>৳${i.sellP.toFixed(2)}</td><td>৳${i.total.toFixed(2)}</td></tr>`).join('')}
-      </tbody>
-    </table>
-    <div class="total row"><span>সাবটোটাল:</span><span>৳${(r.sale.subtotal||r.sale.total).toFixed(2)}</span></div>
-    ${r.sale.vatAmount>0?`<div class="row"><span>VAT (${r.sale.vatPercent}%):</span><span>৳${r.sale.vatAmount.toFixed(2)}</span></div>`:''}
-    ${r.sale.discount>0?`<div class="row"><span>ছাড়:</span><span>-৳${r.sale.discount.toFixed(2)}</span></div>`:''}
-    <div class="total row"><span>মোট:</span><span>৳${r.sale.total.toFixed(2)}</span></div>
-    <div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toFixed(2)}</span></div>
-    ${r.sale.change>0?`<div class="row"><span>ফেরত:</span><span>৳${r.sale.change.toFixed(2)}</span></div>`:''}
-    ${r.sale.due>0?`<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${r.sale.due.toFixed(2)}</span></div>`:''}
-    <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-    <script>window.onload=function(){window.print();}</script>
-    </body></html>`;
-    
-    const w = window.open('', '', 'width=350,height=700');
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sale Receipt</title>
+<style>
+@page {
+  size: 80mm auto;
+  margin: 0;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  width: 80mm;
+}
+body {
+  font-family: 'Courier New', monospace;
+  width: 80mm;
+  margin: 0;
+  padding: 2mm;
+  font-size: 11px;
+  color: #000;
+  background: #fff;
+}
+.center {
+  text-align: center;
+}
+.border {
+  border-bottom: 1px dashed #000;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 2px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+}
+th {
+  border-bottom: 1px dashed #000;
+  padding: 3px 0;
+  text-align: left;
+}
+td {
+  padding: 3px 0;
+}
+td:nth-child(2) {
+  text-align: center;
+}
+td:nth-child(3),
+td:nth-child(4) {
+  text-align: right;
+}
+.total {
+  border-top: 1px dashed #000;
+  margin-top: 5px;
+  padding-top: 5px;
+  font-weight: bold;
+}
+.footer {
+  text-align: center;
+  margin-top: 10px;
+  border-top: 1px dashed #000;
+  padding-top: 5px;
+  font-size: 9px;
+}
+</style>
+</head>
+<body>
+<div class="center border">
+  <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
+  <div>#${r.sale.id.slice(-8).toUpperCase()}</div>
+  <div>${new Date(r.sale.date).toLocaleDateString('bn-BD')}</div>
+  <div>Customer: ${r.sale.custName}</div>
+  ${r.sale.phone ? '<div>Phone: ' + r.sale.phone + '</div>' : ''}
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>পণ্য</th>
+      <th>পরিমাণ</th>
+      <th>দাম</th>
+      <th>মোট</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${r.sale.items.map(i => `<tr>
+      <td>${i.name}<br><span style="font-size:9px;color:#666;">${i.company || ''}</span></td>
+      <td>${i.qty} ${i.unit || 'পিস'}</td>
+      <td>৳${i.sellP.toFixed(2)}</td>
+      <td>৳${i.total.toFixed(2)}</td>
+    </tr>`).join('')}
+  </tbody>
+</table>
+<div class="total row"><span>সাবটোটাল:</span><span>৳${(r.sale.subtotal || r.sale.total).toFixed(2)}</span></div>
+${r.sale.vatAmount > 0 ? `<div class="row"><span>VAT (${r.sale.vatPercent}%):</span><span>৳${r.sale.vatAmount.toFixed(2)}</span></div>` : ''}
+${r.sale.discount > 0 ? `<div class="row"><span>ছাড়:</span><span>-৳${r.sale.discount.toFixed(2)}</span></div>` : ''}
+<div class="total row"><span>মোট:</span><span>৳${r.sale.total.toFixed(2)}</span></div>
+<div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toFixed(2)}</span></div>
+${r.sale.change > 0 ? `<div class="row"><span>ফেরত:</span><span>৳${r.sale.change.toFixed(2)}</span></div>` : ''}
+${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${r.sale.due.toFixed(2)}</span></div>` : ''}
+<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+<script>window.onload = function() { window.print(); }</script>
+</body>
+</html>`;
+
+    const w = window.open('', '', 'width=320,height=600');
     w.document.open();
     w.document.write(html);
     w.document.close();
