@@ -1416,7 +1416,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
       {/* Sub tabs */}
-      <div style={{display:'flex',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
+      <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
         <button onClick={()=>setActiveTab('companies')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='companies'?700:400,color:activeTab==='companies'?T.teal:T.gray500,borderBottom:activeTab==='companies'?`2px solid ${T.teal}`:'none',fontSize:13}}>
           🏢 কোম্পানি ({allSuppliers.length})
         </button>
@@ -1426,6 +1426,14 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
         <button onClick={()=>setActiveTab('products')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='products'?700:400,color:activeTab==='products'?T.teal:T.gray500,borderBottom:activeTab==='products'?`2px solid ${T.teal}`:'none',fontSize:13}}>
           📦 নতুন পণ্য
         </button>
+        {/* Search and Add button - right aligned */}
+        <div style={{marginLeft:'auto',display:'flex',gap:8,alignItems:'center',paddingRight:12}}>
+          <div style={{position:'relative'}}>
+            <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="কোম্পানি খুঁজুন..." style={{...input,paddingLeft:32,padding:'6px 12px',fontSize:12}}/>
+          </div>
+          <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{setForm({name:'',phone:'',address:'',code:''});setModal({mode:'add'});}}>🏢 নতুন কোম্পানি</button>
+        </div>
       </div>
 
       <div style={{flex:1,overflow:'auto',padding:12}}>
@@ -1559,14 +1567,6 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
       {/* COMPANIES TAB */}
         {activeTab === 'companies' && (
           <>
-            <div style={{marginBottom:16,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
-              <div style={{position:'relative',flex:'1 1 200px'}}>
-                <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
-                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="কোম্পানি খুঁজুন..." style={{...input,paddingLeft:32}}/>
-              </div>
-              <button style={btn('primary')} onClick={()=>{setForm({name:'',phone:'',address:'',code:''});setModal({mode:'add'});}}>🏢 নতুন কোম্পানি</button>
-            </div>
-
             {filtered.length === 0 ? (
               <div style={{textAlign:'center',padding:40,color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</div>
             ) : (
