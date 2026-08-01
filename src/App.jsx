@@ -675,6 +675,14 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
       
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
       const items = [];
+      const errors = [];
+      
+      // Get existing companies and categories
+      const existingCompanies = [
+        ...suppliers.map(s => s.name.toLowerCase()),
+        ...products.map(p => (p.company||'').toLowerCase()).filter(Boolean)
+      ];
+      const existingCategories = [...new Set(products.map(p => (p.cat||'').toLowerCase()).filter(Boolean))];
       
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim());
@@ -683,13 +691,29 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
           row[h] = values[idx] || '';
         });
         
+        // Get company and category from CSV
+        const csvCompany = (row['কোম্পানি'] || row['company'] || supplierQ || '').trim();
+        const csvCategory = (row['ক্যাটাগরি'] || row['category'] || '').trim();
+        
+        // Validate company
+        if (csvCompany && !existingCompanies.includes(csvCompany.toLowerCase())) {
+          errors.push(`পণ্য ${i}: "${csvCompany}" কোম্পানি ডাটাবেজে নেই`);
+          continue;
+        }
+        
+        // Validate category
+        if (csvCategory && !existingCategories.includes(csvCategory.toLowerCase())) {
+          errors.push(`পণ্য ${i}: "${csvCategory}" ক্যাটাগরি ডাটাবেজে নেই`);
+          continue;
+        }
+        
         // Map CSV columns to product fields
         const item = {
           id: genId(),
           name: row['পণ্যের নাম'] || row['নাম'] || row['name'] || '',
           barcode: row['বারকোড'] || row['barcode'] || '',
-          company: row['কোম্পানি'] || row['company'] || supplierQ || '',
-          cat: row['ক্যাটাগরি'] || row['category'] || '',
+          company: csvCompany,
+          cat: csvCategory,
           unit: row['একক'] || row['unit'] || 'পিস',
           buyP: parseFloat(row['ক্রয়মূল্য'] || row['buyprice'] || row['buy'] || 0),
           sellP: parseFloat(row['বিক্রয়মূল্য'] || row['sellprice'] || row['sell'] || 0),
@@ -702,10 +726,15 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
         }
       }
       
+      if (errors.length > 0) {
+        alert('❌ আপলোড ব্যর্থ!\n\n' + errors.slice(0, 5).join('\n') + (errors.length > 5 ? '\n...এবং আরও ' + (errors.length - 5) + 'টি ত্রুটি' : ''));
+        return;
+      }
+      
       if (items.length > 0) {
         setPurchaseItems([...purchaseItems, ...items]);
         setCsvData(items);
-        alert(`${items.length}টি পণ্য আপলোড হয়েছে!`);
+        alert(`✅ ${items.length}টি পণ্য আপলোড হয়েছে!`);
       } else {
         alert('কোনো পণ্য পাওয়া যায়নি। CSV ফরম্যাট সঠিক নয়।');
       }
