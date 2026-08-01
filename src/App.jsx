@@ -2249,7 +2249,20 @@ function InventoryScreen({products, suppliers, upd}) {
   const [adjNote, setAdjNote] = useState('');
 
   const realProducts = products.filter(p=>!p.name?.includes('(ক্যাটাগরি)'));
-  const filtered = realProducts.filter(p=>!search||p.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = realProducts
+    .filter(p=>!search||p.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      // Out of stock first (stock <= 0)
+      if (a.stock <= 0 && b.stock > 0) return -1;
+      if (b.stock <= 0 && a.stock > 0) return 1;
+      // Low stock second (stock > 0 && stock <= minStock)
+      const aLow = a.stock > 0 && a.stock <= a.minStock;
+      const bLow = b.stock > 0 && b.stock <= b.minStock;
+      if (aLow && !bLow) return -1;
+      if (bLow && !aLow) return 1;
+      // Sort by stock level ascending (lowest first)
+      return a.stock - b.stock;
+    });
   const lowStock = realProducts.filter(p=>p.stock>0&&p.stock<=p.minStock);
   const outOfStock = realProducts.filter(p=>p.stock<=0);
   const totalValue = realProducts.reduce((s,p)=>s+p.sellP*p.stock,0);
