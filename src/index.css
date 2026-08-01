@@ -19,6 +19,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif;
 }
 
 html, body {
@@ -29,7 +30,6 @@ html, body {
 
 body {
   margin: 0;
-  font-family: 'BanglaFont', 'EnglishFont', 'Segoe UI', system-ui, sans-serif;
 }
 
 #root {
@@ -38,26 +38,16 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'BanglaFont', 'EnglishFont', 'Segoe UI', system-ui, sans-serif;
 }
 
-/* English numbers - always use English font */
-.english-num,
+/* Numbers only - use English font */
 input[type="number"],
-input[type="text"],
-input,
+input[type="tel"],
 .price,
 .amount,
 .quantity,
 .total,
-button,
-th, td {
+.currency,
+.english {
   font-family: 'EnglishFont', 'Segoe UI', system-ui, sans-serif !important;
-  font-variant-numeric: lining-nums;
-  -webkit-font-variant-numeric: lining-nums;
-}
-
-/* All text elements use EnglishFont for numbers */
-* {
-  font-variant-numeric: lining-nums;
 }
