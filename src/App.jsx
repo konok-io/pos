@@ -961,8 +961,8 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 <div style={{display:'flex',gap:4}}>
                   <input 
                     value={supplierQ} 
-                    onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));}}
-                    onClick={()=>setShowCompanyList(!showCompanyList)}
+                    onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));setShowCompanyList(true);}}
+                    onClick={()=>setShowCompanyList(true)}
                     onBlur={()=>setTimeout(()=>setShowCompanyList(false),200)}
                     placeholder="কোম্পানির নাম লিখুন..."
                     style={{...input,fontSize:13,flex:1}} />
@@ -970,7 +970,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 </div>
                 {showCompanyList && uniqueCompanies.length > 0 && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
-                    {uniqueCompanies.map((c,i)=>(
+                    {uniqueCompanies.filter(c=>c.toLowerCase().includes(supplierQ.toLowerCase())).map((c,i)=>(
                       <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowCompanyList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                         {c}
@@ -986,8 +986,8 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 <div style={{display:'flex',gap:4}}>
                   <input 
                     value={form.cat} 
-                    onChange={e=>setForm(f=>({...f,cat:e.target.value}))}
-                    onClick={()=>setShowCategoryList(!showCategoryList)}
+                    onChange={e=>{setForm(f=>({...f,cat:e.target.value}));setShowCategoryList(true);}}
+                    onClick={()=>setShowCategoryList(true)}
                     onBlur={()=>setTimeout(()=>setShowCategoryList(false),200)}
                     placeholder="ক্যাটাগরি লিখুন..."
                     style={{...input,fontSize:13,flex:1}} />
@@ -995,7 +995,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 </div>
                 {showCategoryList && uniqueCategories.length > 0 && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
-                    {uniqueCategories.map((c,i)=>(
+                    {uniqueCategories.filter(c=>c.toLowerCase().includes((form.cat||'').toLowerCase())).map((c,i)=>(
                       <div key={i} onClick={()=>{setForm(f=>({...f,cat:c}));setShowCategoryList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                         {c}
@@ -1015,8 +1015,8 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 <div style={{flex:2, position:'relative'}}>
                   <label style={label}>③ পণ্যের নাম *</label>
                   <div style={{display:'flex',gap:4}}>
-                    <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} 
-                      onClick={()=>setShowProductList(!showProductList)}
+                    <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setShowProductList(true);}} 
+                      onClick={()=>setShowProductList(true)}
                       onBlur={()=>setTimeout(()=>setShowProductList(false),200)}
                       placeholder="পণ্যের নাম লিখুন..."
                       style={{...input,fontSize:13,flex:1}} />
@@ -1024,7 +1024,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   </div>
                   {showProductList && products.length > 0 && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
-                      {products.slice(0,20).map((p,i)=>(
+                      {products.filter(p=>p.name.toLowerCase().includes((form.name||'').toLowerCase())).slice(0,20).map((p,i)=>(
                         <div key={i} onClick={()=>{setForm(f=>({...f,name:p.name}));setShowProductList(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                           <div style={{fontWeight:600}}>{p.name}</div>
