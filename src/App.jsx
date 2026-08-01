@@ -285,6 +285,10 @@ function POSScreen({products, customers, sales, settings, upd}) {
   const [vatPercent, setVatPercent] = useState(settings.vatPercent || 15);
   const [paid, setPaid] = useState('');
   const [receipt, setReceipt] = useState(null);
+  const [showAddCust, setShowAddCust] = useState(false);
+  const [newCustName, setNewCustName] = useState('');
+  const [newCustPhone, setNewCustPhone] = useState('');
+  const [newCustAddr, setNewCustAddr] = useState('');
   const searchRef = useRef();
 
   useEffect(() => { searchRef.current?.focus(); }, []);
@@ -421,6 +425,42 @@ function POSScreen({products, customers, sales, settings, upd}) {
         <div style={{display:'flex',gap:10,justifyContent:'center'}}>
           <button style={btn('primary')} onClick={()=>printReceipt(receipt)}>🖨️ প্রিন্ট রসিদ</button>
           <button style={btn()} onClick={()=>setReceipt(null)}>+ নতুন বিল</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Add Customer Popup
+  if (showAddCust) return (
+    <div style={{...overlay}}>
+      <div style={{...card,width:360,padding:24}}>
+        <div style={{fontSize:18,fontWeight:700,marginBottom:16,textAlign:'center'}}>👤 নতুন কাস্টমার যোগ করুন</div>
+        <div style={{marginBottom:12}}>
+          <label style={{fontSize:12,color:T.gray500,marginBottom:4,display:'block'}}>নাম *</label>
+          <input value={newCustName} onChange={e=>setNewCustName(e.target.value)} 
+            placeholder="কাস্টমারের নাম" style={{...input,height:42}} autoFocus />
+        </div>
+        <div style={{marginBottom:12}}>
+          <label style={{fontSize:12,color:T.gray500,marginBottom:4,display:'block'}}>ফোন</label>
+          <input value={newCustPhone} onChange={e=>setNewCustPhone(e.target.value)} 
+            placeholder="মোবাইল নম্বর" style={{...input,height:42}} />
+        </div>
+        <div style={{marginBottom:20}}>
+          <label style={{fontSize:12,color:T.gray500,marginBottom:4,display:'block'}}>ঠিকানা</label>
+          <input value={newCustAddr} onChange={e=>setNewCustAddr(e.target.value)} 
+            placeholder="ঠিকানা" style={{...input,height:42}} />
+        </div>
+        <div style={{display:'flex',gap:10}}>
+          <button onClick={()=>{setShowAddCust(false);setNewCustName('');setNewCustPhone('');setNewCustAddr('');}} 
+            style={{...btn('ghost'),flex:1}}>বাতিল</button>
+          <button onClick={()=>{
+            if (!newCustName.trim()) { alert('নাম দিন!'); return; }
+            const newC = {id:genId(),name:newCustName.trim(),phone:newCustPhone.trim(),address:newCustAddr.trim(),credit:0};
+            upd.customers([...customers, newC]);
+            setSelCust(newC);
+            setShowAddCust(false);
+            setNewCustName('');setNewCustPhone('');setNewCustAddr('');
+          }} style={{...btn('primary'),flex:2}}>✓ কাস্টমার যোগ করুন</button>
         </div>
       </div>
     </div>
@@ -573,6 +613,12 @@ function POSScreen({products, customers, sales, settings, upd}) {
             <input value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
               placeholder="পুরো মূল্য দিতে টাইপ করুন" style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}/>
           </div>
+          {due > 0 && !selCust && cart.length > 0 && (
+            <div style={{marginBottom:10,padding:'10px 12px',borderRadius:8,background:T.blue50,border:`1px solid ${T.blue200}`,textAlign:'center'}}>
+              <div style={{fontSize:13,color:T.blue700,marginBottom:8}}>বাকিতে বিক্রয় করতে চাইলে কাস্টমার যোগ করুন</div>
+              <button onClick={()=>setShowAddCust(true)} style={{...btn('primary'),fontSize:13,padding:'8px 16px'}}>👤 কাস্টমার যোগ করুন</button>
+            </div>
+          )}
           {due > 0 && (
             <div style={{fontSize:14,marginBottom:10,padding:'8px 12px',borderRadius:8,
               background:due>0?T.redLight:T.greenLight, color:due>0?T.red:T.green, fontWeight:600}}>
@@ -597,8 +643,8 @@ function POSScreen({products, customers, sales, settings, upd}) {
                 opacity: cart.length && !(due > 0 && !selCust) ? 1 : 0.5,
                 cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
               }}>
-              {due > 0 && !selCust && cart.length ? `⚠️ পূর্ণ পরিশোধ বা গ্রাহক সিলেক্ট করুন` : 
-               due > 0 && selCust && cart.length ? `✓ বাকি বিক্রয় করুন` : 
+              {due > 0 && !selCust && cart.length ? `⚠️ পূর্ণ পরিশোধ করুন` : 
+               due > 0 && selCust && cart.length ? `✓ পূর্ণ পরিশোধ করুন বা বাকি বিক্রয় করুন` : 
                '✓ বিক্রয় সম্পন্ন'}
             </button>
           </div>
