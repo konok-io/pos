@@ -513,7 +513,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
           <div style={{display:'flex',gap:8}}>
             <input value={custQ} onChange={e=>{setCustQ(e.target.value);setShowCustDrop(true);}}
               onFocus={()=>setShowCustDrop(true)}
-              onBlur={() => setTimeout(() => setShowCustDrop(false), 200)}
+              onMouseDown={() => { setShowCustDrop(true); }}
               placeholder="নাম বা ফোন..."
               style={{...input,fontSize:13,borderRadius:8,flex:1}}
             />
@@ -531,7 +531,9 @@ function POSScreen({products, customers, sales, settings, upd}) {
             </div>
           )}
           {showCustDrop && !selCust && (
-            <div style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
+            <div 
+              onMouseDown={(e) => e.preventDefault()}
+              style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
               {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).map(c=>(
                 <div key={c.id} onClick={()=>{setSelCust(c);setCustQ(c.name);setShowCustDrop(false);}}
                   style={{padding:'10px 14px',cursor:'pointer',fontSize:13,borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
@@ -994,11 +996,13 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
                   <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
                     onFocus={()=>setShowSupplierDrop(true)} 
-                    onBlur={() => setTimeout(() => setShowSupplierDrop(false), 200)}
+                    onMouseDown={() => { setShowSupplierDrop(true); }}
                     placeholder="কোম্পানির নাম বা কোড লিখুন..."
                     style={{...input,fontSize:13}} />
                   {showSupplierDrop && (
-                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
+                    <div 
+                      onMouseDown={(e) => e.preventDefault()}
+                      style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                       {filteredCompanies.map((c,i)=>(
                         <div key={i} onClick={()=>{setSupplierQ(c.name);setForm(f=>({...f,company:c.name}));setShowSupplierDrop(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
@@ -1018,13 +1022,17 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 {/* Category with Dropdown */}
                 <div style={{flex:1,position:'relative'}}>
                   <label style={label}>📂 ক্যাটাগরি</label>
-                  <input value={form.cat} onChange={e=>{setForm(f=>({...f,cat:e.target.value}));setCategoryQ(e.target.value);setShowCategoryDrop(true);}}
+                  <input 
+                    value={form.cat} 
+                    onChange={e=>{setForm(f=>({...f,cat:e.target.value}));setCategoryQ(e.target.value);setShowCategoryDrop(true);}}
                     onFocus={()=>{setShowCategoryDrop(true);setCategoryQ('');}} 
-                    onBlur={() => setTimeout(() => setShowCategoryDrop(false), 200)}
+                    onMouseDown={(e) => { if(!showCategoryDrop) { setShowCategoryDrop(true); setCategoryQ(''); } }}
                     placeholder="ক্যাটাগরি লিখুন..."
                     style={{...input,fontSize:13}} />
                   {showCategoryDrop && (
-                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
+                    <div 
+                      onMouseDown={(e) => e.preventDefault()}
+                      style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                       {allCategories.length > 0 && allCategories.filter(c => !categoryQ || c.toLowerCase().includes(categoryQ.toLowerCase())).map((cat,i)=>(
                         <div key={i} onClick={()=>{setForm(f=>({...f,cat:cat}));setCategoryQ(cat);setShowCategoryDrop(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
@@ -1066,11 +1074,13 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   <label style={label}>③ পণ্যের নাম *</label>
                   <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
                     onFocus={()=>{setShowProductDrop(true);}}
-                    onBlur={() => setTimeout(() => setShowProductDrop(false), 200)}
+                    onMouseDown={() => { setShowProductDrop(true); }}
                     placeholder="পণ্যের নাম লিখুন..."
                     style={{...input,fontSize:13}} />
                   {showProductDrop && (
-                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
+                    <div 
+                      onMouseDown={(e) => e.preventDefault()}
+                      style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
                       {filteredProducts.length > 0 ? filteredProducts.map((p,i)=>(
                         <div key={p.id} onClick={()=>selectProduct(p)}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,background:T.white}}>
