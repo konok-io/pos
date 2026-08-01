@@ -71,7 +71,7 @@ const btn = (type='default',size='md') => {
     background: bg, color, border,
     borderRadius:7, cursor:'pointer', fontWeight:600,
     display:'inline-flex', alignItems:'center', gap:5,
-    transition:'all 0.15s', fontFamily:'inherit',
+    transition:'all 0.15s',
   };
 };
 const input = {
