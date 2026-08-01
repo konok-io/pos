@@ -425,7 +425,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     <script>window.onload=function(){window.print();}</script>
     </body></html>`;
     
-    const w = window.open('', '', 'width=350,height=600');
+    const w = window.open('', '', 'width=400,height=800');
     w.document.open();
     w.document.write(html);
     w.document.close();
@@ -2642,7 +2642,7 @@ function ReportsScreen({sales, customers, purchases}) {
                     <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
                     <script>window.onload=function(){window.print();}</script>
                   </body></html>`;
-                  const win = window.open('','','width=350,height=600');
+                  const win = window.open('','','width=400,height=800');
                   win.document.open();
                   win.document.write(html);
                   win.document.close();
@@ -2742,7 +2742,7 @@ function ReportsScreen({sales, customers, purchases}) {
                   html += `<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
                     <script>window.onload=function(){window.print();}</script>
                   </body></html>`;
-                  const win = window.open('','','width=350,height=600');
+                  const win = window.open('','','width=400,height=800');
                   win.document.open();
                   win.document.write(html);
                   win.document.close();
