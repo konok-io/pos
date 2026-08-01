@@ -226,6 +226,7 @@ export default function App() {
   const tabs = [
     {id:'pos',icon:'🛒',label:'বিক্রয়'},
     {id:'products',icon:'📦',label:'সকল পণ্য'},
+    {id:'barcode',icon:'📊',label:'বারকোড'},
     {id:'suppliers',icon:'🏢',label:'সরবরাহকারী/কোম্পানি'},
     {id:'customers',icon:'👥',label:'কাস্টমার'},
     {id:'inventory',icon:'🏭',label:'স্টক'},
@@ -288,6 +289,7 @@ export default function App() {
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
         {tab==='pos'       && <POSScreen {...props} />}
         {tab==='products'  && <ProductsScreen {...props} />}
+        {tab==='barcode'   && <BarcodeScreen {...props} />}
         {tab==='suppliers' && <SuppliersScreen {...props} />}
         {tab==='customers' && <CustomersScreen {...props} />}
         {tab==='inventory' && <InventoryScreen {...props} />}
@@ -1684,6 +1686,215 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   BARCODE SCREEN
+═══════════════════════════════════════════ */
+function BarcodeScreen({purchases, products}) {
+  const [purchaseId, setPurchaseId] = useState('');
+  const [selectedPurchase, setSelectedPurchase] = useState(null);
+  const [barcodeCounts, setBarcodeCounts] = useState({});
+  
+  // Find purchase by ID
+  const findPurchase = () => {
+    const found = purchases.find(p => p.id.toLowerCase().includes(purchaseId.toLowerCase()));
+    if (found) {
+      setSelectedPurchase(found);
+      // Initialize counts for each product
+      const counts = {};
+      found.items.forEach((item, idx) => {
+        counts[idx] = item.stock || 1;
+      });
+      setBarcodeCounts(counts);
+    } else {
+      alert('পারচেজ আইডি পাওয়া যায়নি!');
+    }
+  };
+  
+  // Update count for a product
+  const updateCount = (idx, count) => {
+    const n = parseInt(count) || 0;
+    setBarcodeCounts(prev => ({...prev, [idx]: n}));
+  };
+  
+  // Print all barcodes
+  const printBarcodes = () => {
+    if (!selectedPurchase) return;
+    
+    let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Barcode Labels</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 2mm; }
+.barcode-item { margin-bottom: 8mm; text-align: center; border-bottom: 1px dashed #000; padding-bottom: 4mm; }
+.barcode-item:last-child { border-bottom: none; }
+.barcode-name { font-size: 11px; font-weight: bold; margin-bottom: 2mm; }
+.barcode-value { font-size: 14px; font-family: 'Libre Barcode 39', cursive; margin-bottom: 2mm; }
+.barcode-text { font-size: 10px; margin-top: 1mm; }
+.barcode-count { font-size: 9px; color: #666; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
+</head>
+<body>`;
+
+    selectedPurchase.items.forEach((item, idx) => {
+      const count = barcodeCounts[idx] || 0;
+      for (let i = 0; i < count; i++) {
+        html += `<div class="barcode-item">
+  <div class="barcode-name">${item.name}</div>
+  <div class="barcode-value">*${item.barcode || item.id}*</div>
+  <div class="barcode-text">৳${item.sellP || 0} | ${item.company || ''}</div>
+  <div class="barcode-count">${i + 1}/${count}</div>
+</div>`;
+      }
+    });
+
+    html += `</body></html>`;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+    document.body.appendChild(iframe);
+    const iframeDoc = iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(html);
+    iframeDoc.close();
+    iframe.contentWindow.onload = function() {
+      setTimeout(() => {
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
+      }, 100);
+    };
+  };
+  
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',background:T.gray50}}>
+      {/* Header */}
+      <div style={{padding:16,background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+        <div style={{fontWeight:700,fontSize:16,marginBottom:12}}>📊 বারকোড প্রিন্ট</div>
+        <div style={{display:'flex',gap:8}}>
+          <input 
+            value={purchaseId} 
+            onChange={e=>setPurchaseId(e.target.value)}
+            placeholder="পারচেজ আইডি লিখুন (যেমন: PO-12345678)"
+            style={{...input,flex:1,padding:'10px 12px'}}
+            onKeyDown={e=>{if(e.key==='Enter')findPurchase();}}
+          />
+          <button onClick={findPurchase} style={{...btn('primary'),padding:'10px 20px'}}>🔍 খুঁজুন</button>
+        </div>
+        
+        {/* Recent Purchases */}
+        {purchases.length > 0 && (
+          <div style={{marginTop:12}}>
+            <div style={{fontSize:12,color:T.gray500,marginBottom:6}}>সাম্প্রতিক পারচেজ:</div>
+            <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+              {purchases.slice(-5).reverse().map(p => (
+                <button key={p.id} onClick={()=>{
+                  setPurchaseId(p.id);
+                  setSelectedPurchase(p);
+                  const counts = {};
+                  p.items.forEach((item, idx) => {
+                    counts[idx] = item.stock || 1;
+                  });
+                  setBarcodeCounts(counts);
+                }} style={{
+                  padding:'4px 10px',border:`1px solid ${T.gray200}`,borderRadius:20,
+                  background:T.white,fontSize:11,cursor:'pointer',color:T.gray600
+                }}>{p.id}</button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Products List */}
+      {selectedPurchase ? (
+        <div style={{flex:1,overflow:'auto',padding:16}}>
+          <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div>
+              <div style={{fontWeight:700,color:T.teal}}>{selectedPurchase.id}</div>
+              <div style={{fontSize:12,color:T.gray500}}>{new Date(selectedPurchase.date).toLocaleDateString('bn-BD')} • {selectedPurchase.supplier}</div>
+            </div>
+            <button onClick={printBarcodes} style={{...btn('primary'),padding:'10px 20px'}}>🖨️ সব বারকোড প্রিন্ট করুন</button>
+          </div>
+          
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {selectedPurchase.items.map((item, idx) => (
+              <div key={idx} style={{
+                padding:14,background:T.white,borderRadius:10,
+                border:`1px solid ${T.gray200}`,display:'flex',alignItems:'center',gap:12
+              }}>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:14,marginBottom:2}}>{item.name}</div>
+                  <div style={{fontSize:12,color:T.gray500}}>
+                    বারকোড: <span style={{fontFamily:'monospace',color:T.teal}}>{item.barcode || item.id}</span>
+                  </div>
+                  <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | কোম্পানি: {item.company || '-'}</div>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
+                  <input 
+                    type="number" 
+                    min="1"
+                    value={barcodeCounts[idx] || 1}
+                    onChange={e=>updateCount(idx, e.target.value)}
+                    style={{...input,width:60,textAlign:'center',padding:'6px'}}
+                  />
+                  <button onClick={()=>{
+                    // Print single barcode
+                    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Barcode</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Courier New', monospace; width: 80mm; margin: 0; padding: 2mm; text-align: center; }
+.name { font-size: 11px; font-weight: bold; margin-bottom: 3mm; }
+.value { font-size: 18px; font-family: 'Libre Barcode 39', cursive; margin-bottom: 3mm; }
+.text { font-size: 10px; margin-top: 2mm; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="name">${item.name}</div>
+<div class="value">*${item.barcode || item.id}*</div>
+<div class="text">৳${item.sellP || 0} | ${item.company || ''}</div>
+</body>
+</html>`;
+                    const iframe = document.createElement('iframe');
+                    iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+                    document.body.appendChild(iframe);
+                    iframe.contentWindow.document.open();
+                    iframe.contentWindow.document.write(html);
+                    iframe.contentWindow.document.close();
+                    iframe.contentWindow.onload = function() {
+                      setTimeout(() => {
+                        iframe.contentWindow.print();
+                        document.body.removeChild(iframe);
+                      }, 100);
+                    };
+                  }} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray400}}>
+          <div style={{textAlign:'center'}}>
+            <div style={{fontSize:48,marginBottom:12}}>📊</div>
+            <div>পারচেজ আইডি দিন বা উপরের তালিকা থেকে সিলেক্ট করুন</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
