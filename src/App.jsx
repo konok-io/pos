@@ -1256,6 +1256,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
   const [viewSupplier, setViewSupplier] = useState(null);
+  const [viewCategory, setViewCategory] = useState(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(null);
   const [activeTab, setActiveTab] = useState('companies'); // companies, products, categories
   const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:''});
@@ -1519,6 +1520,58 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
     );
   }
 
+  // View single category
+  if (viewCategory) {
+    const catProducts = products.filter(p => p.cat === viewCategory.name);
+    
+    return (
+      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+        <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+          <button style={btn()} onClick={()=>setViewCategory(null)}>← ফিরে যান</button>
+          <span style={{fontWeight:700,fontSize:15}}>📂 {viewCategory.name}</span>
+          <span style={{fontSize:12,color:T.gray500,marginLeft:8}}>({viewCategory.company})</span>
+        </div>
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          {/* Stats */}
+          <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:12,marginBottom:16}}>
+            <div style={{...card,padding:16,textAlign:'center'}}>
+              <div style={{fontSize:24,fontWeight:800,color:T.teal}}>{catProducts.length}</div>
+              <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
+            </div>
+            <div style={{...card,padding:16,textAlign:'center'}}>
+              <div style={{fontSize:24,fontWeight:800,color:T.orange}}>{catProducts.reduce((s,p)=>s+p.stock,0)}</div>
+              <div style={{fontSize:12,color:T.gray500}}>মোট স্টক</div>
+            </div>
+          </div>
+
+          {/* Products List */}
+          <div style={{...card,padding:0}}>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📦 পণ্য তালিকা</div>
+            {catProducts.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পণ্য নেই</div>
+            ) : (
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <tbody>
+                  {catProducts.map(p => (
+                    <tr key={p.id} style={{borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'8px 12px'}}>
+                        <div style={{fontWeight:600,fontSize:13}}>{p.name}</div>
+                        <div style={{fontSize:11,color:T.gray400}}>{p.barcode}</div>
+                      </td>
+                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:600}}>{p.stock} {p.unit}</td>
+                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:600,color:T.orange}}>{fmt(p.buyP)}</td>
+                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:700,color:T.teal}}>{fmt(p.sellP)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
       {/* Sub tabs */}
@@ -1602,6 +1655,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                     <td style={{padding:'10px 12px',fontWeight:600,fontSize:14}}>{cat.name}</td>
                     <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
                     <td style={{padding:'10px 12px',whiteSpace:'nowrap'}}>
+                      <button onClick={()=>setViewCategory(cat)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
                       <button onClick={()=>{setCatForm({name:cat.name,company:cat.company});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
                       <button onClick={async ()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){await upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
                     </td>
