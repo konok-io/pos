@@ -222,6 +222,7 @@ export default function App() {
   const tabs = [
     {id:'pos',icon:'🛒',label:'বিক্রয়'},
     {id:'products',icon:'📦',label:'পণ্য'},
+    {id:'suppliers',icon:'🏢',label:'কোম্পানি'},
     {id:'customers',icon:'👥',label:'কাস্টমার'},
     {id:'inventory',icon:'🏭',label:'স্টক'},
     {id:'reports',icon:'📊',label:'রিপোর্ট'},
@@ -271,6 +272,7 @@ export default function App() {
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
         {tab==='pos'       && <POSScreen {...props} />}
         {tab==='products'  && <ProductsScreen {...props} />}
+        {tab==='suppliers' && <SuppliersScreen {...props} />}
         {tab==='customers' && <CustomersScreen {...props} />}
         {tab==='inventory' && <InventoryScreen {...props} />}
         {tab==='reports'   && <ReportsScreen {...props} />}
@@ -1156,6 +1158,235 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   SUPPLIERS SCREEN
+═══════════════════════════════════════════ */
+function SuppliersScreen({suppliers, products, purchases, upd}) {
+  const [search, setSearch] = useState('');
+  const [modal, setModal] = useState(null);
+  const [form, setForm] = useState({});
+  const [viewSupplier, setViewSupplier] = useState(null);
+  const [showPurchaseHistory, setShowPurchaseHistory] = useState(null);
+
+  const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
+
+  // Get products count for each supplier
+  const getProductsCount = (company) => products.filter(p => (p.company||'').toLowerCase() === company.toLowerCase()).length;
+  
+  // Get purchases for a supplier
+  const getSupplierPurchases = (company) => purchases.filter(p => (p.supplier||'').toLowerCase() === company.toLowerCase());
+
+  // Get all unique companies from products
+  const allCompanies = [...new Set(products.map(p => p.company).filter(Boolean))];
+  
+  // Combine suppliers and product companies
+  const allSuppliers = [
+    ...suppliers,
+    ...allCompanies.filter(c => !suppliers.find(s => s.name.toLowerCase() === c.toLowerCase())).map(c => ({ id: `auto-${c}`, name: c, phone: '', address: '', isAuto: true }))
+  ];
+
+  const filtered = allSuppliers.filter(s => 
+    !search || s.name.toLowerCase().includes(search.toLowerCase()) || (s.phone||'').includes(search)
+  );
+
+  const save = async () => {
+    if (!form.name?.trim()) { alert('কোম্পানির নাম দিন'); return; }
+    if (form.isAuto) {
+      // Convert auto to real supplier
+      const newS = { id: genId(), name: form.name.trim(), phone: form.phone||'', address: form.address||'' };
+      await upd.suppliers([...suppliers, newS]);
+    } else if (modal.mode === 'add') {
+      await upd.suppliers([...suppliers, {...form, id: genId()}]);
+    } else {
+      await upd.suppliers(suppliers.map(s => s.id === modal.id ? {...form, id: modal.id} : s));
+    }
+    setModal(null);
+  };
+
+  const del = async (id) => {
+    if (!confirm('এই কোম্পানি মুছে ফেলবেন?')) return;
+    await upd.suppliers(suppliers.filter(s => s.id !== id));
+  };
+
+  // Purchase history for supplier
+  const supplierPurchases = showPurchaseHistory ? getSupplierPurchases(showPurchaseHistory.name) : [];
+
+  if (showPurchaseHistory) {
+    return (
+      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+        <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+          <button style={btn()} onClick={()=>setShowPurchaseHistory(null)}>← ফিরে যান</button>
+          <span style={{fontWeight:700,fontSize:15}}>📦 {showPurchaseHistory.name} - পারচেজ হিস্ট্রি</span>
+          <span style={{fontSize:12,color:T.gray500,marginLeft:'auto'}}>{supplierPurchases.length}টি পারচেজ</span>
+        </div>
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          {supplierPurchases.length === 0 ? (
+            <div style={{textAlign:'center',padding:40,color:T.gray400}}>কোনো পারচেজ রেকর্ড নেই</div>
+          ) : (
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {[...supplierPurchases].reverse().map(p => (
+                <div key={p.id} style={{padding:14,background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`}}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
+                    <div style={{fontWeight:700,color:T.teal}}>{p.id}</div>
+                    <div style={{fontSize:12,color:T.gray500}}>{new Date(p.date).toLocaleDateString('bn-BD')}</div>
+                  </div>
+                  <div style={{display:'flex',gap:16,fontSize:13}}>
+                    <span>📦 {p.totalItems}টি পণ্য</span>
+                    <span>📋 {p.totalStock} একক</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // View single supplier
+  if (viewSupplier) {
+    const supProducts = products.filter(p => (p.company||'').toLowerCase() === viewSupplier.name.toLowerCase());
+    const supPurchases = getSupplierPurchases(viewSupplier.name);
+    
+    return (
+      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+        <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+          <button style={btn()} onClick={()=>setViewSupplier(null)}>← ফিরে যান</button>
+          <span style={{fontWeight:700,fontSize:15}}>🏢 {viewSupplier.name}</span>
+        </div>
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          {/* Stats */}
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:16}}>
+            <div style={{...card,padding:16,textAlign:'center'}}>
+              <div style={{fontSize:24,fontWeight:800,color:T.teal}}>{supProducts.length}</div>
+              <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
+            </div>
+            <div style={{...card,padding:16,textAlign:'center'}}>
+              <div style={{fontSize:24,fontWeight:800,color:T.green}}>{supPurchases.length}</div>
+              <div style={{fontSize:12,color:T.gray500}}>পারচেজ সংখ্যা</div>
+            </div>
+            <div style={{...card,padding:16,textAlign:'center'}}>
+              <div style={{fontSize:24,fontWeight:800,color:T.orange}}>{supPurchases.reduce((s,p)=>s+p.totalStock,0)}</div>
+              <div style={{fontSize:12,color:T.gray500}}>মোট একক</div>
+            </div>
+          </div>
+          
+          {/* Actions */}
+          <div style={{display:'flex',gap:8,marginBottom:16}}>
+            <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ হিস্ট্রি</button>
+            {!viewSupplier.isAuto && (
+              <button style={btn()} onClick={()=>{setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️ সম্পাদনা</button>
+            )}
+          </div>
+
+          {/* Products List */}
+          <div style={{...card,padding:0}}>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📦 পণ্য তালিকা</div>
+            {supProducts.length === 0 ? (
+              <div style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পণ্য নেই</div>
+            ) : (
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.tealLight}}>
+                    <th style={{padding:'8px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্য</th>
+                    <th style={{padding:'8px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>স্টক</th>
+                    <th style={{padding:'8px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>বিক্রয়মূল্য</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {supProducts.map(p => (
+                    <tr key={p.id} style={{borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'8px 12px'}}>
+                        <div style={{fontWeight:600,fontSize:13}}>{p.name}</div>
+                        <div style={{fontSize:11,color:T.gray400}}>{p.barcode}</div>
+                      </td>
+                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:600}}>{p.stock} {p.unit}</td>
+                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:700,color:T.teal}}>{fmt(p.sellP)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+      <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
+        <div style={{position:'relative',flex:'1 1 200px',minWidth:150}}>
+          <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="কোম্পানি খুঁজুন..." style={{...input,paddingLeft:32}}/>
+        </div>
+        <button style={btn('primary')} onClick={()=>{setForm({name:'',phone:'',address:''});setModal({mode:'add'});}}>🏢 নতুন কোম্পানি</button>
+        <span style={{fontSize:12,color:T.gray400}}>{allSuppliers.length}টি কোম্পানি</span>
+      </div>
+
+      <div style={{flex:1,overflow:'auto',padding:12}}>
+        {filtered.length === 0 ? (
+          <div style={{textAlign:'center',padding:40,color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</div>
+        ) : (
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:12}}>
+            {filtered.map(s => (
+              <div key={s.id} style={{...card,padding:0,overflow:'hidden'}}>
+                <div style={{padding:14,borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+                  <div>
+                    <div style={{fontWeight:700,fontSize:15,display:'flex',alignItems:'center',gap:6}}>
+                      🏢 {s.name}
+                      {s.isAuto && <span style={{fontSize:10,background:T.gray100,padding:'2px 6px',borderRadius:4}}>অটো</span>}
+                    </div>
+                    {s.phone && <div style={{fontSize:12,color:T.gray500,marginTop:2}}>📱 {s.phone}</div>}
+                    {s.address && <div style={{fontSize:12,color:T.gray500}}>📍 {s.address}</div>}
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontSize:20,fontWeight:800,color:T.teal}}>{getProductsCount(s.name)}</div>
+                    <div style={{fontSize:11,color:T.gray400}}>পণ্য</div>
+                  </div>
+                </div>
+                <div style={{padding:'8px 14px',display:'flex',gap:8}}>
+                  <button onClick={()=>setViewSupplier(s)} style={{...btn(),flex:1,fontSize:12,padding:'8px'}}>👁️ বিস্তারিত</button>
+                  {!s.isAuto && (
+                    <>
+                      <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('ghost'),padding:'8px'}}>✏️</button>
+                      <button onClick={()=>del(s.id)} style={{...btn('danger'),padding:'8px'}}>🗑️</button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {modal && (
+        <div style={{...overlay}} onClick={()=>setModal(null)}>
+          <div style={{...card,width:360,padding:24}} onClick={e=>e.stopPropagation()}>
+            <h3 style={{margin:'0 0 16px'}}>{modal.mode === 'add' ? '🏢 নতুন কোম্পানি যোগ করুন' : '✏️ কোম্পানি সম্পাদনা করুন'}</h3>
+            <div style={{marginBottom:12}}>
+              <label style={label}>কোম্পানির নাম *</label>
+              <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="কোম্পানির নাম" style={input} />
+            </div>
+            <div style={{marginBottom:12}}>
+              <label style={label}>ফোন নম্বর</label>
+              <input value={form.phone||''} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} placeholder="মোবাইল নম্বর" style={input} />
+            </div>
+            <div style={{marginBottom:16}}>
+              <label style={label}>ঠিকানা</label>
+              <input value={form.address||''} onChange={e=>setForm(f=>({...f,address:e.target.value}))} placeholder="ঠিকানা" style={input} />
+            </div>
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={()=>setModal(null)} style={{...btn(),flex:1}}>বাতিল</button>
+              <button onClick={save} style={{...btn('primary'),flex:1}}>💾 সংরক্ষণ</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
