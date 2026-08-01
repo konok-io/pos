@@ -1329,11 +1329,20 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
-                      const win = window.open('','','width=320,height=600');
-                      win.document.open();
-                      win.document.write(html);
-                      win.document.close();
-                      win.onload = function() { setTimeout(() => win.print(), 100); };
+                      // Thermal print - iframe (no new tab)
+                      const iframe = document.createElement('iframe');
+                      iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+                      document.body.appendChild(iframe);
+                      const iframeDoc = iframe.contentWindow.document;
+                      iframeDoc.open();
+                      iframeDoc.write(html);
+                      iframeDoc.close();
+                      iframe.contentWindow.onload = function() {
+                        setTimeout(() => {
+                          iframe.contentWindow.print();
+                          document.body.removeChild(iframe);
+                        }, 100);
+                      };
                     }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
                     <div style={{textAlign:'right'}}>
                       <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
@@ -2904,6 +2913,7 @@ function ReportsScreen({sales, customers, purchases}) {
     </body>
     </html>`;
     
+    // Large paper print - window.open for preview and printer selection
     const win = window.open('', '', 'width=1000,height=600');
     win.document.open();
     win.document.write(html);
@@ -3186,11 +3196,20 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
-                  const win = window.open('','','width=320,height=600');
-                  win.document.open();
-                  win.document.write(html);
-                  win.document.close();
-                  win.onload = function() { setTimeout(() => win.print(), 100); };
+                  // Thermal print - iframe (no new tab)
+                  const iframe = document.createElement('iframe');
+                  iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+                  document.body.appendChild(iframe);
+                  const iframeDoc = iframe.contentWindow.document;
+                  iframeDoc.open();
+                  iframeDoc.write(html);
+                  iframeDoc.close();
+                  iframe.contentWindow.onload = function() {
+                    setTimeout(() => {
+                      iframe.contentWindow.print();
+                      document.body.removeChild(iframe);
+                    }, 100);
+                  };
                 }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
               </div>
@@ -3296,11 +3315,20 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                   html += `<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
-                  const win = window.open('','','width=320,height=600');
-                  win.document.open();
-                  win.document.write(html);
-                  win.document.close();
-                  win.onload = function() { setTimeout(() => win.print(), 100); };
+                  // Thermal print - iframe (no new tab)
+                  const iframe = document.createElement('iframe');
+                  iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+                  document.body.appendChild(iframe);
+                  const iframeDoc = iframe.contentWindow.document;
+                  iframeDoc.open();
+                  iframeDoc.write(html);
+                  iframeDoc.close();
+                  iframe.contentWindow.onload = function() {
+                    setTimeout(() => {
+                      iframe.contentWindow.print();
+                      document.body.removeChild(iframe);
+                    }, 100);
+                  };
                 }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
               </div>
