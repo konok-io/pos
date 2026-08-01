@@ -1289,6 +1289,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [showCatDrop, setShowCatDrop] = useState(false);
   const [catCompanyQ, setCatCompanyQ] = useState('');
   const [showCatCompanyDrop, setShowCatCompanyDrop] = useState(false);
+  const [categorySuccess, setCategorySuccess] = useState('');
 
   // Click outside to close dropdowns
   useEffect(() => {
@@ -1426,7 +1427,8 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     setCatForm({name:'',company:''});
     setCatCompanyQ('');
     setShowCatCompanyDrop(false);
-    alert('ক্যাটাগরি যোগ করা হয়েছে!');
+    // Keep modal open and show success
+    setCategorySuccess('✅ ক্যাটাগরি যোগ করা হয়েছে!');
   };
 
   const del = async (id) => {
@@ -1789,8 +1791,13 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                   <label style={label}>📂 ক্যাটাগরির নাম *</label>
                   <input value={catForm.name||''} onChange={e=>setCatForm(f=>({...f,name:e.target.value}))} placeholder="ক্যাটাগরির নাম" style={input} />
                 </div>
+                {categorySuccess && (
+                  <div style={{marginBottom:12,padding:'10px 12px',background:T.tealLight,color:T.teal,borderRadius:8,fontWeight:600,textAlign:'center'}}>
+                    {categorySuccess}
+                  </div>
+                )}
                 <div style={{display:'flex',gap:8}}>
-                  <button onClick={()=>setModal(null)} style={{...btn(),flex:1}}>বাতিল</button>
+                  <button onClick={()=>{setModal(null);setCategorySuccess('');}} style={{...btn(),flex:1}}>✕ বন্ধ করুন</button>
                   <button onClick={saveCategory} style={{...btn('primary'),flex:1}} disabled={!catForm.name || !catForm.company}>💾 সংরক্ষণ</button>
                 </div>
               </>
