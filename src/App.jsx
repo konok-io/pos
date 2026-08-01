@@ -329,7 +329,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
   const due = total - paidAmt;
   const change = paidAmt > total ? paidAmt - total : 0;
 
-  const checkout = () => {
+  const checkout = async () => {
     if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
     if (paidAmt < total) { 
       if (!selCust) { alert('⚠️ পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন!'); }
@@ -341,7 +341,8 @@ function POSScreen({products, customers, sales, settings, upd}) {
     const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
     const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
     const vatText = vatAmount > 0 ? `\nভ্যাট (${vatPercent}%): ৳${vatAmount.toFixed(0)}` : '';
-    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${dueCreditText}`;
+    const changeText = change > 0 ? `\nফেরত: ৳${change.toFixed(0)}` : '';
+    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${changeText}${dueCreditText}`;
 
     if (!window.confirm(confirmMsg)) return;
 
@@ -365,12 +366,14 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
     const newSales = [...sales, sale];
 
-    upd.products(newProds);
-    upd.customers(newCusts);
-    upd.sales(newSales);
-
+    // First update the receipt state to show success
     setReceipt({sale, settings});
     setCart([]); setDiscount(''); setPaid(''); setSelCust(null); setCustQ('');
+
+    // Then save to database
+    await upd.products(newProds);
+    await upd.customers(newCusts);
+    await upd.sales(newSales);
   };
 
   const printReceipt = (r) => {
