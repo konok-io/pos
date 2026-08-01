@@ -42,67 +42,6 @@ const STORAGE_KEYS = {
   settings: 'pos_settings',
 };
 
-/* ─────────────── DEMO DATA ─────────────── */
-const DEMO = {
-  products: [
-    {id:'p001',name:'মিনিকেট চাল',company:'মিনিকেট রাইস',barcode:'001',cat:'খাদ্যপণ্য',buyP:55,sellP:65,stock:100,unit:'কেজি',minStock:10},
-    {id:'p002',name:'ব্রিলিয়ান্ট চাল',company:'ব্রিলিয়ান্ট',barcode:'002',cat:'খাদ্যপণ্য',buyP:52,sellP:62,stock:80,unit:'কেজি',minStock:10},
-    {id:'p003',name:'সিআরআরএস চাল',company:'সিআরআরএস',barcode:'003',cat:'খাদ্যপণ্য',buyP:48,sellP:58,stock:120,unit:'কেজি',minStock:10},
-    {id:'p004',name:'মসুর ডাল',company:'এসআর ফুডস',barcode:'004',cat:'খাদ্যপণ্য',buyP:90,sellP:110,stock:50,unit:'কেজি',minStock:5},
-    {id:'p005',name:'সয়াবিন তেল ৫লিটার',company:'প্রিমিয়াম অয়েল',barcode:'005',cat:'তেল',buyP:680,sellP:780,stock:30,unit:'লিটার',minStock:5},
-    {id:'p006',name:'সয়াবিন তেল ১লিটার',company:'প্রিমিয়াম অয়েল',barcode:'006',cat:'তেল',buyP:145,sellP:175,stock:80,unit:'লিটার',minStock:10},
-    {id:'p007',name:'চিনি',company:'এসআর সুগার',barcode:'007',cat:'খাদ্যপণ্য',buyP:115,sellP:130,stock:60,unit:'কেজি',minStock:10},
-    {id:'p008',name:'আটা',company:'এসআর অ্যাটা',barcode:'008',cat:'খাদ্যপণ্য',buyP:38,sellP:48,stock:80,unit:'কেজি',minStock:10},
-    {id:'p009',name:'লবণ',company:'আয়োডিন সল্ট',barcode:'009',cat:'মশলা',buyP:18,sellP:25,stock:100,unit:'কেজি',minStock:10},
-    {id:'p010',name:'হলুদ গুড়া',company:'এসআর মসলা',barcode:'010',cat:'মশলা',buyP:140,sellP:180,stock:40,unit:'কেজি',minStock:5},
-    {id:'p011',name:'মরিচ গুড়া',company:'এসআর মসলা',barcode:'011',cat:'মশলা',buyP:200,sellP:250,stock:30,unit:'কেজি',minStock:3},
-    {id:'p012',name:'বিস্কুট সুগার',company:'এসবি ফুডস',barcode:'012',cat:'স্ন্যাকস',buyP:35,sellP:45,stock:200,unit:'পিস',minStock:20},
-    {id:'p013',name:'বিস্কুট গোল্ড',company:'এসবি ফুডস',barcode:'013',cat:'স্ন্যাকস',buyP:40,sellP:55,stock:180,unit:'পিস',minStock:20},
-    {id:'p014',name:'চকলেট ডার্ক',company:'ক্যাডবেরি',barcode:'014',cat:'স্ন্যাকস',buyP:60,sellP:80,stock:100,unit:'পিস',minStock:10},
-    {id:'p015',name:'চিপস লবণ',company:'প্রিঙ্গলস',barcode:'015',cat:'স্ন্যাকস',buyP:80,sellP:100,stock:120,unit:'পিস',minStock:15},
-    {id:'p016',name:'নুডলস মগর',company:'মগর',barcode:'016',cat:'স্ন্যাকস',buyP:35,sellP:48,stock:200,unit:'পিস',minStock:20},
-    {id:'p017',name:'চা ব্যাগ',company:'লিপটন',barcode:'017',cat:'পানীয়',buyP:120,sellP:162,stock:70,unit:'পিস',minStock:10},
-    {id:'p018',name:'কফি ইনস্ট্যান্ট',company:'নেসকে',barcode:'018',cat:'পানীয়',buyP:150,sellP:195,stock:50,unit:'গ্রাম',minStock:10},
-    {id:'p019',name:'মিল্ক পাউডার ১কেজি',company:'ডানোন',barcode:'019',cat:'দুধ',buyP:450,sellP:550,stock:30,unit:'কেজি',minStock:5},
-    {id:'p020',name:'ফ্লেভার্ড মিল্ক',company:'আইসম',barcode:'020',cat:'দুধ',buyP:30,sellP:42,stock:150,unit:'পিস',minStock:20},
-    {id:'p021',name:'আইসক্রিম কাপ',company:'মিনিমুটস',barcode:'021',cat:'আইসক্রিম',buyP:35,sellP:48,stock:100,unit:'পিস',minStock:15},
-    {id:'p022',name:'সফট ড্রিংকস',company:'কোকাকোলা',barcode:'022',cat:'পানীয়',buyP:20,sellP:30,stock:300,unit:'পিস',minStock:30},
-    {id:'p023',name:'জুস আপেল',company:'প্রিজ',barcode:'023',cat:'পানীয়',buyP:45,sellP:62,stock:120,unit:'পিস',minStock:15},
-    {id:'p024',name:'মিনারেল ওয়াটার',company:'এপি ফিল্টার্ড',barcode:'024',cat:'পানীয়',buyP:15,sellP:22,stock:400,unit:'পিস',minStock:50},
-    {id:'p025',name:'এনার্জি ড্রিংক',company:'রেডবুল',barcode:'025',cat:'পানীয়',buyP:90,sellP:120,stock:80,unit:'পিস',minStock:10},
-    {id:'p026',name:'আলু',company:'স্থানীয়',barcode:'026',cat:'সবজি',buyP:25,sellP:35,stock:200,unit:'কেজি',minStock:20},
-    {id:'p027',name:'পটল',company:'স্থানীয়',barcode:'027',cat:'সবজি',buyP:40,sellP:55,stock:100,unit:'কেজি',minStock:15},
-    {id:'p028',name:'বেগুন',company:'স্থানীয়',barcode:'028',cat:'সবজি',buyP:35,sellP:48,stock:90,unit:'কেজি',minStock:15},
-    {id:'p029',name:'টমেটো',company:'স্থানীয়',barcode:'029',cat:'সবজি',buyP:45,sellP:62,stock:120,unit:'কেজি',minStock:15},
-    {id:'p030',name:'পিয়াজ',company:'স্থানীয়',barcode:'030',cat:'সবজি',buyP:30,sellP:42,stock:150,unit:'কেজি',minStock:20},
-    {id:'p031',name:'আম',company:'স্থানীয়',barcode:'031',cat:'ফল',buyP:80,sellP:108,stock:100,unit:'কেজি',minStock:15},
-    {id:'p032',name:'কলা',company:'স্থানীয়',barcode:'032',cat:'ফল',buyP:15,sellP:22,stock:300,unit:'পিস',minStock:30},
-    {id:'p033',name:'পেয়ারা',company:'স্থানীয়',barcode:'033',cat:'ফল',buyP:35,sellP:48,stock:120,unit:'পিস',minStock:15},
-    {id:'p034',name:'মুরগি (ব্রয়লার)',company:'ফার্মা',barcode:'034',cat:'মুরগি',buyP:120,sellP:155,stock:40,unit:'পিস',minStock:10},
-    {id:'p035',name:'ডিম (মুরগি)',company:'ফার্মা',barcode:'035',cat:'ডিম',buyP:10,sellP:14,stock:500,unit:'পিস',minStock:50},
-    {id:'p036',name:'ইলিশ মাছ',company:'স্থানীয়',barcode:'036',cat:'মাছ',buyP:800,sellP:1000,stock:5,unit:'কেজি',minStock:1},
-    {id:'p037',name:'রুই মাছ',company:'স্থানীয়',barcode:'037',cat:'মাছ',buyP:350,sellP:450,stock:8,unit:'কেজি',minStock:2},
-    {id:'p038',name:'গরুর মাংস',company:'স্থানীয়',barcode:'038',cat:'মাংস',buyP:550,sellP:700,stock:10,unit:'কেজি',minStock:2},
-    {id:'p039',name:'খাসির মাংস',company:'স্থানীয়',barcode:'039',cat:'মাংস',buyP:480,sellP:620,stock:12,unit:'কেজি',minStock:2},
-    {id:'p040',name:'চিনি (প্রিমিয়াম)',company:'মিঠাই',barcode:'040',cat:'খাদ্যপণ্য',buyP:125,sellP:145,stock:50,unit:'কেজি',minStock:10},
-    {id:'p041',name:'পারফেক্ট চাল',company:'পারফেক্ট',barcode:'041',cat:'খাদ্যপণ্য',buyP:50,sellP:60,stock:90,unit:'কেজি',minStock:10},
-    {id:'p042',name:'সরিষার তেল ১লিটার',company:'ন্যাচারাল প্রেস',barcode:'042',cat:'তেল',buyP:180,sellP:220,stock:40,unit:'লিটার',minStock:5},
-    {id:'p043',name:'ভোজ্যতেল ৫লিটার',company:'ফ্রেশ অয়েল',barcode:'043',cat:'তেল',buyP:750,sellP:920,stock:25,unit:'লিটার',minStock:3},
-    {id:'p044',name:'গরম মশলা',company:'এসআর মসলা',barcode:'044',cat:'মশলা',buyP:130,sellP:165,stock:30,unit:'কেজি',minStock:3},
-    {id:'p045',name:'কারি পাউডার',company:'এসআর মসলা',barcode:'045',cat:'মশলা',buyP:150,sellP:190,stock:25,unit:'কেজি',minStock:3},
-    {id:'p046',name:'টমেটো কেচাপ',company:'হেল্পার',barcode:'046',cat:'সস',buyP:45,sellP:60,stock:80,unit:'পিস',minStock:10},
-    {id:'p047',name:'সয়া সস',company:'হেল্পার',barcode:'047',cat:'সস',buyP:65,sellP:85,stock:70,unit:'মিলি',minStock:10},
-    {id:'p048',name:'পাঠান চাউল',company:'পাঠান',barcode:'048',cat:'খাদ্যপণ্য',buyP:75,sellP:95,stock:60,unit:'কেজি',minStock:10},
-    {id:'p049',name:'বাসমতি চাউল',company:'বাসমতি',barcode:'049',cat:'খাদ্যপণ্য',buyP:150,sellP:190,stock:40,unit:'কেজি',minStock:5},
-    {id:'p050',name:'মধু',company:'মধু ফার্ম',barcode:'050',cat:'খাদ্যপণ্য',buyP:250,sellP:338,stock:40,unit:'গ্রাম',minStock:5},
-  ],
-  customers: [
-    {id:'c001',name:'রহিম সাহেব',phone:'01712345678',address:'পল্লবী',credit:500},
-    {id:'c002',name:'করিম ভাই',phone:'01898765432',address:'মিরপুর',credit:0},
-    {id:'c003',name:'জামাল ভাই',phone:'01912345678',address:'উত্তরা',credit:200},
-  ]
-};
-
 /* ─────────────── DESIGN TOKENS ─────────────── */
 const T = {
   teal:'#0F766E', tealDark:'#115E59', tealLight:'#F0FDFA', tealMid:'#CCFBF1',
@@ -161,44 +100,22 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
-  const [settings, setSettings] = useState({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+  const [settings, setSettings] = useState({name:'',address:'',phone:''});
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Load from localStorage or use DEMO data
-    const savedProducts = db.get(STORAGE_KEYS.products);
-    const savedCustomers = db.get(STORAGE_KEYS.customers);
-    const savedSales = db.get(STORAGE_KEYS.sales);
-    const savedSettings = db.get(STORAGE_KEYS.settings);
-
-    // If no data exists, load DEMO data
-    if (!savedProducts || savedProducts.length === 0) {
-      setProducts(DEMO.products);
-      db.set(STORAGE_KEYS.products, DEMO.products);
-    } else {
-      setProducts(savedProducts);
-    }
-
-    if (!savedCustomers || savedCustomers.length === 0) {
-      setCustomers(DEMO.customers);
-      db.set(STORAGE_KEYS.customers, DEMO.customers);
-    } else {
-      setCustomers(savedCustomers);
-    }
-
-    setSales(savedSales || []);
-
-    const defaultSettings = {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
-    setSettings(savedSettings ? {...defaultSettings, ...savedSettings} : defaultSettings);
-
+    setProducts(db.get(STORAGE_KEYS.products) || []);
+    setCustomers(db.get(STORAGE_KEYS.customers) || []);
+    setSales(db.get(STORAGE_KEYS.sales) || []);
+    setSettings(db.get(STORAGE_KEYS.settings) || {name:'',address:'',phone:''});
     setReady(true);
   }, []);
 
   const upd = {
-    products: v => { setProducts(v); db.set(STORAGE_KEYS.products, v); return Promise.resolve(); },
-    customers: v => { setCustomers(v); db.set(STORAGE_KEYS.customers, v); return Promise.resolve(); },
-    sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); return Promise.resolve(); },
-    settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); return Promise.resolve(); },
+    products: v => { setProducts(v); db.set(STORAGE_KEYS.products, v); },
+    customers: v => { setCustomers(v); db.set(STORAGE_KEYS.customers, v); },
+    sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); },
+    settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); },
   };
 
   if (!ready) return (
@@ -282,7 +199,6 @@ function POSScreen({products, customers, sales, settings, upd}) {
   const [custQ, setCustQ] = useState('');
   const [showCustDrop, setShowCustDrop] = useState(false);
   const [discount, setDiscount] = useState('');
-  const [vatPercent, setVatPercent] = useState(settings.vatPercent || 15);
   const [paid, setPaid] = useState('');
   const [receipt, setReceipt] = useState(null);
   const searchRef = useRef();
@@ -320,29 +236,18 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   const subtotal = cart.reduce((s,i)=>s+i.sellP*i.qty,0);
   const disc = parseFloat(discount)||0;
-  const afterDiscount = Math.max(0, subtotal-disc);
-  const vatEnabled = settings.vatEnabled !== false;
-  const vatRate = vatPercent || 0;
-  const vatAmount = vatEnabled ? Math.round(afterDiscount * vatRate / 100) : 0;
-  const total = afterDiscount + vatAmount;
+  const total = Math.max(0, subtotal-disc);
   const paidAmt = paid === '' ? 0 : (parseFloat(paid) || 0);
   const due = total - paidAmt;
   const change = paidAmt > total ? paidAmt - total : 0;
 
-  const checkout = async () => {
-    alert('বিক্রয় বাটনে ক্লিক হয়েছে!');
+  const checkout = () => {
     if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
-    if (due > 0 && !selCust) { 
-      alert('⚠️ পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন!');
-      return; 
-    }
 
     // Confirmation dialog
     const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
     const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
-    const vatText = vatAmount > 0 ? `\nভ্যাট (${vatPercent}%): ৳${vatAmount.toFixed(0)}` : '';
-    const changeText = change > 0 ? `\nফেরত: ৳${change.toFixed(0)}` : '';
-    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${changeText}${dueCreditText}`;
+    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${dueText}${dueCreditText}`;
 
     if (!window.confirm(confirmMsg)) return;
 
@@ -350,7 +255,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
       id:genId(), date:now(),
       custId:selCust?.id||null, custName:selCust?.name||'সাধারণ ক্রেতা',
       items:cart.map(i=>({...i,total:i.sellP*i.qty,profit:(i.sellP-i.buyP)*i.qty})),
-      subtotal, discount:disc, vatPercent, vatAmount, total,
+      subtotal, discount:disc, total,
       paid:paidAmt, due:Math.max(0,due), change,
     };
 
@@ -366,14 +271,12 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
     const newSales = [...sales, sale];
 
-    // First update the receipt state to show success
+    upd.products(newProds);
+    upd.customers(newCusts);
+    upd.sales(newSales);
+
     setReceipt({sale, settings});
     setCart([]); setDiscount(''); setPaid(''); setSelCust(null); setCustQ('');
-
-    // Then save to database
-    await upd.products(newProds);
-    await upd.customers(newCusts);
-    await upd.sales(newSales);
   };
 
   const printReceipt = (r) => {
@@ -399,7 +302,6 @@ function POSScreen({products, customers, sales, settings, upd}) {
     <table>
       <tr><td>সাবটোটাল</td><td class="r">৳${r.sale.subtotal.toFixed(0)}</td></tr>
       ${r.sale.discount>0?`<tr><td>ছাড়</td><td class="r">-৳${r.sale.discount.toFixed(0)}</td></tr>`:''}
-      ${r.sale.vatAmount>0?`<tr><td>ভ্যাট (${r.sale.vatPercent}%)</td><td class="r">৳${r.sale.vatAmount.toFixed(0)}</td></tr>`:''}
       <tr class="b"><td class="big">মোট</td><td class="big r">৳${r.sale.total.toFixed(0)}</td></tr>
       <tr><td>পরিশোধ</td><td class="r">৳${r.sale.paid.toFixed(0)}</td></tr>
       ${r.sale.change>0?`<tr><td>ফেরত</td><td class="r">৳${r.sale.change.toFixed(0)}</td></tr>`:''}
@@ -563,14 +465,8 @@ function POSScreen({products, customers, sales, settings, upd}) {
           <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
             <label style={{...label,margin:0,whiteSpace:'nowrap'}}>ছাড় (৳)</label>
             <input value={discount} onChange={e=>setDiscount(e.target.value)} type="number" min="0"
-              style={{...input,width:100,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
-            <label style={{...label,margin:0,whiteSpace:'nowrap'}}>ভ্যাট (%)</label>
-            <input value={vatPercent} onChange={e=>setVatPercent(e.target.value)} type="number" min="0" max="100"
-              style={{...input,width:70,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
+              style={{...input,width:110,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
           </div>
-          {vatAmount > 0 && (
-            <div style={{fontSize:12,color:T.amber,marginBottom:8}}>ভ্যাট (৳{vatAmount.toFixed(0)}) যোগ হয়েছে</div>
-          )}
           <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 14px',background:T.tealLight,borderRadius:10,marginBottom:10}}>
             <span style={{fontWeight:700,fontSize:16}}>মোট দেনা</span>
             <span style={{fontWeight:800,fontSize:24,color:T.teal}}>{fmt(total)}</span>
@@ -597,51 +493,11 @@ function POSScreen({products, customers, sales, settings, upd}) {
               style={{...btn('ghost'),flex:1,justifyContent:'center',padding:'12px'}}>
               🗑️ ক্লিয়ার
             </button>
-            <button 
-              onClick={() => {
-                alert('বিক্রয় বাটনে ক্লিক হয়েছে!');
-                if (!cart.length) { alert('কার্টে কোনো পণ্য নেই!'); return; }
-                if (due > 0 && !selCust) { alert('পূর্ণ পরিশোধ করুন অথবা গ্রাহক সিলেক্ট করুন!'); return; }
-                const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
-                const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
-                const vatText = vatAmount > 0 ? `\nভ্যাট: ৳${vatAmount.toFixed(0)}` : '';
-                const changeText = change > 0 ? `\nফেরত: ৳${change.toFixed(0)}` : '';
-                const msg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${changeText}${dueCreditText}`;
-                if (!confirm(msg)) return;
-                const sale = {
-                  id: genId(), date: now(),
-                  custId: selCust?.id || null, custName: selCust?.name || 'সাধারণ ক্রেতা',
-                  items: cart.map(i => ({ ...i, total: i.sellP * i.qty, profit: (i.sellP - i.buyP) * i.qty })),
-                  subtotal, discount: disc, vatPercent, vatAmount, total,
-                  paid: paidAmt, due: Math.max(0, due), change,
-                };
-                const newProds = products.map(p => {
-                  const ci = cart.find(i => i.id === p.id);
-                  return ci ? { ...p, stock: p.stock - ci.qty } : p;
-                });
-                let newCusts = [...customers];
-                if (selCust && due > 0) {
-                  newCusts = newCusts.map(c => c.id === selCust.id ? { ...c, credit: (c.credit || 0) + due } : c);
-                }
-                const newSales = [...sales, sale];
-                setReceipt({ sale, settings });
-                setCart([]); setDiscount(''); setPaid(''); setSelCust(null); setCustQ('');
-                upd.products(newProds);
-                upd.customers(newCusts);
-                upd.sales(newSales);
-              }}
-              style={{
-                ...btn('sell'), 
-                flex: 2, 
-                justifyContent: 'center', 
-                fontSize: 15, 
-                padding: '12px',
-                opacity: (!cart.length || (due > 0 && !selCust)) ? 0.5 : 1,
-              }}>
-              {!cart.length ? 'পণ্য যোগ করুন' : 
-               (due > 0 && !selCust) ? '⚠️ পূর্ণ পরিশোধ করুন বা গ্রাহক সিলেক্ট করুন' : 
-               (due > 0 && selCust) ? '✓ পূর্ণ পরিশোধ করুন বা বাকি বিক্রয় করুন' :
-               '✓ বিক্রয় সম্পন্ন'}
+            <button onClick={checkout} disabled={!cart.length} style={{
+              ...btn('sell'), flex:2, justifyContent:'center', fontSize:15, padding:'12px',
+              opacity:cart.length?1:0.5,
+            }}>
+              ✓ বিক্রয় সম্পন্ন
             </button>
           </div>
         </div>
@@ -657,10 +513,10 @@ function ProductsScreen({products, upd}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});
-  const blank = {name:'',company:'',barcode:'',cat:'',buyP:'',sellP:'',stock:'',unit:'পিস',minStock:'5'};
+  const blank = {name:'',barcode:'',cat:'',buyP:'',sellP:'',stock:'',unit:'পিস',minStock:'5'};
 
   const filtered = products.filter(p=>
-    !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.company||'').toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search)
+    !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search)
   );
 
   const save = async () => {
@@ -680,8 +536,8 @@ function ProductsScreen({products, upd}) {
   };
 
   const exportCSV = () => {
-    const header = ['পণ্যের নাম','কোম্পানি','বারকোড','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','স্টক','একক','মিনস্টক'];
-    const rows = products.map(p=>[p.name,p.company||'',p.barcode||'',p.cat||'',p.buyP,p.sellP,p.stock,p.unit||'',p.minStock||0]);
+    const header = ['পণ্যের নাম','বারকোড','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','স্টক','একক','মিনস্টক'];
+    const rows = products.map(p=>[p.name,p.barcode||'',p.cat||'',p.buyP,p.sellP,p.stock,p.unit||'',p.minStock||0]);
     const csv = [header,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
@@ -695,7 +551,7 @@ function ProductsScreen({products, upd}) {
       const lines = ev.target.result.replace(/^\uFEFF/,'').split('\n').slice(1).filter(l=>l.trim());
       const imported = lines.map(l=>{
         const c = l.split(',').map(s=>s.replace(/^"|"$/g,'').trim());
-        return {id:genId(),name:c[0],company:c[1],barcode:c[2],cat:c[3],buyP:+c[4]||0,sellP:+c[5]||0,stock:+c[6]||0,unit:c[7]||'পিস',minStock:+c[8]||0};
+        return {id:genId(),name:c[0],barcode:c[1],cat:c[2],buyP:+c[3]||0,sellP:+c[4]||0,stock:+c[5]||0,unit:c[6]||'পিস',minStock:+c[7]||0};
       }).filter(p=>p.name);
       await upd.products([...products,...imported]);
       alert(`✅ ${imported.length}টি পণ্য সফলভাবে ইম্পোর্ট হয়েছে!`);
@@ -723,14 +579,14 @@ function ProductsScreen({products, upd}) {
         <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
           <thead>
             <tr style={{background:T.tealLight}}>
-              {['পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','স্টক','একক',''].map((h,i)=>(
+              {['পণ্যের নাম','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','স্টক','একক',''].map((h,i)=>(
                 <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.length===0 ? (
-              <tr><td colSpan={9} style={{padding:40,textAlign:'center',color:T.gray400}}>পণ্য পাওয়া যায়নি</td></tr>
+              <tr><td colSpan={8} style={{padding:40,textAlign:'center',color:T.gray400}}>পণ্য পাওয়া যায়নি</td></tr>
             ) : filtered.map((p,i)=>{
               const profitPct = p.buyP>0 ? Math.round((p.sellP-p.buyP)/p.buyP*100) : 0;
               const isLowStock = p.stock <= p.minStock;
@@ -740,7 +596,6 @@ function ProductsScreen({products, upd}) {
                     <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
                     {p.barcode && <div style={{fontSize:11,color:T.gray400,fontFamily:'monospace'}}>{p.barcode}</div>}
                   </td>
-                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
                   <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
                   <td style={{padding:'10px 12px',fontSize:13}}>{fmt(p.buyP)}</td>
                   <td style={{padding:'10px 12px',fontWeight:700,fontSize:14}}>{fmt(p.sellP)}</td>
@@ -772,7 +627,6 @@ function ProductsScreen({products, upd}) {
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
             {[
               {k:'name',l:'পণ্যের নাম *',full:true},
-              {k:'company',l:'কোম্পানি/ব্র্যান্ড'},
               {k:'barcode',l:'বারকোড'},
               {k:'cat',l:'ক্যাটাগরি'},
               {k:'unit',l:'একক (কেজি/পিস/লিটার...)'},
@@ -1016,7 +870,7 @@ function InventoryScreen({products, upd}) {
         <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
           <thead>
             <tr style={{background:T.tealLight}}>
-              {['পণ্যের নাম','কোম্পানি','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
+              {['পণ্যের নাম','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
                 <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>{h}</th>
               ))}
             </tr>
@@ -1029,7 +883,6 @@ function InventoryScreen({products, upd}) {
               return (
                 <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                   <td style={{padding:'10px 12px',fontWeight:600}}>{p.name}</td>
-                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
                   <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
                   <td style={{padding:'10px 12px',fontWeight:800,fontSize:18,color:stColor}}>{fmtN(p.stock)}</td>
                   <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
@@ -1232,42 +1085,10 @@ function SettingsScreen({settings, products, upd}) {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* VAT Settings */}
-        <div style={{...card,width:'100%'}}>
-          <h3 style={{margin:'0 0 18px',fontSize:15,fontWeight:700}}>💰 ভ্যাট/ট্যাক্স সেটিংস</h3>
-          <div style={{display:'flex',flexDirection:'column',gap:14}}>
-            <div style={{display:'flex',alignItems:'center',gap:12}}>
-              <label style={{...label,margin:0}}>ভ্যাট সক্রিয় করুন</label>
-              <button 
-                onClick={()=>setForm(p=>({...p,vatEnabled:!p.vatEnabled}))}
-                style={{
-                  padding:'8px 20px', borderRadius:8, fontWeight:600, fontSize:13, cursor:'pointer',
-                  background: form.vatEnabled ? T.green : T.gray200,
-                  color: form.vatEnabled ? T.white : T.gray600,
-                  border:'none', transition:'all 0.2s',
-                }}>
-                {form.vatEnabled ? '✅ চালু' : '❌ বন্ধ'}
-              </button>
-            </div>
-            {form.vatEnabled && (
-              <div style={{display:'flex',alignItems:'center',gap:12}}>
-                <label style={{...label,margin:0}}>ডিফল্ট ভ্যাট শতাংশ</label>
-                <input 
-                  value={form.vatPercent||15} 
-                  onChange={e=>setForm(p=>({...p,vatPercent:parseFloat(e.target.value)||0}))} 
-                  type="number" min="0" max="100" 
-                  style={{...input,width:80,padding:'8px 12px',fontSize:14}}/>
-                <span style={{fontSize:14,color:T.gray600}}>%</span>
-              </div>
-            )}
+          <div style={{marginTop:16,display:'flex',alignItems:'center',gap:10}}>
+            <button onClick={save} style={btn('primary')}>💾 সেটিংস সংরক্ষণ</button>
+            {saved && <span style={{color:T.green,fontSize:13,fontWeight:600}}>✓ সংরক্ষিত হয়েছে!</span>}
           </div>
-        </div>
-
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <button onClick={save} style={btn('primary')}>💾 সেটিংস সংরক্ষণ</button>
-          {saved && <span style={{color:T.green,fontSize:13,fontWeight:600}}>✓ সংরক্ষিত হয়েছে!</span>}
         </div>
 
         {/* Stats */}
@@ -1294,21 +1115,16 @@ function SettingsScreen({settings, products, upd}) {
             <button style={btn('danger','sm')} onClick={async()=>{
               if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
             }}>বিক্রয় ইতিহাস মুছুন</button>
-            <button style={btn('danger','sm')} onClick={async ()=>{
-              const confirmReset = confirm('⚠️ সম্পূর্ণ রিসেট করবেন?\n\nএতে সব পণ্য, কাস্টমার ও বিক্রয় ইতিহাস মুছে যাবে এবং ডেমো ডেটা লোড হবে।\n\nএটি পূর্বাবস্থায় ফেরানো যাবে না!');
-              if (confirmReset) {
-                try {
-                  await upd.products(DEMO.products);
-                  await upd.customers(DEMO.customers);
-                  await upd.sales([]);
-                  await upd.settings({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
-                  alert('✓ সম্পূর্ণ রিসেট হয়েছে!\nডেমো ডেটা লোড করা হয়েছে।');
-                  setTimeout(() => window.location.reload(), 100);
-                } catch(e) {
-                  alert('রিসেটে সমস্যা হয়েছে!');
-                }
+            <button style={btn('danger','sm')} onClick={async()=>{
+              if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
+                await upd.products([]);
+                await upd.customers([]);
+                await upd.sales([]);
+                await upd.settings({name:'',address:'',phone:''});
+                alert('সব ডেটা মুছে ফেলা হয়েছে।');
+                window.location.reload();
               }
-            }}>🔄 সম্পূর্ণ রিসেট</button>
+            }}>সম্পূর্ণ রিসেট</button>
           </div>
         </div>
       </div>
