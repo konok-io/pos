@@ -692,9 +692,16 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
-  // Filter suppliers for dropdown
-  const filteredSuppliers = suppliers.filter(s => 
-    !supplierQ || s.name.toLowerCase().includes(supplierQ.toLowerCase())
+  // Get all unique companies from products and suppliers
+  const allCompanies = [
+    ...suppliers.map(s => s.name),
+    ...products.map(p => p.company).filter(Boolean)
+  ];
+  const uniqueCompanies = [...new Set(allCompanies)];
+
+  // Filter companies for dropdown
+  const filteredCompanies = uniqueCompanies.filter(c => 
+    !supplierQ || c.toLowerCase().includes(supplierQ.toLowerCase())
   );
 
   // Filter products for table
@@ -899,10 +906,13 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                   style={{...input,fontSize:13}} />
                 {showSupplierDrop && supplierQ && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
-                    {filteredSuppliers.map(s=>(
-                      <div key={s.id} onClick={()=>{setSupplierQ(s.name);setForm(f=>({...f,company:s.name}));setShowSupplierDrop(false);}}
-                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>{s.name}</div>
+                    {filteredCompanies.map((c,i)=>(
+                      <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowSupplierDrop(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>{c}</div>
                     ))}
+                    {filteredCompanies.length === 0 && (
+                      <div style={{padding:'8px 12px',color:T.gray400,fontSize:13}}>কোনো কোম্পানি পাওয়া যায়নি</div>
+                    )}
                     <div onClick={()=>{setShowNewSupplier(true);}}
                       style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600}}>+ নতুন কোম্পানি যোগ করুন</div>
                   </div>
