@@ -329,10 +329,15 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const filtered = products.filter(p => {
     const isCategory = p.name?.includes('(ক্যাটাগরি)');
     if (isCategory) return false;
-    const matchCat = selCat==='সব' || selCat==='স্টক শেষ' || p.cat===selCat;
-    const matchStock = selCat!=='স্টক শেষ' || p.stock<=0;
+    // সব or specific category: exclude out of stock
+    const matchCat = selCat==='সব' || p.cat===selCat;
+    const excludeOutOfStock = selCat==='সব' && p.stock<=0;
+    // স্টক শেষ: only show out of stock
+    const matchStock = selCat==='স্টক শেষ' ? p.stock<=0 : true;
     const matchQ = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
-    return matchCat && matchStock && matchQ;
+    if (selCat==='সব') return matchCat && !excludeOutOfStock && matchQ;
+    if (selCat==='স্টক শেষ') return matchStock && matchQ;
+    return matchCat && matchQ;
   }).sort((a, b) => a.stock - b.stock);
 
   const addToCart = (prod) => {
