@@ -543,7 +543,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
             )}
           </div>
           {due > 0 && !selCust && cart.length > 0 && !custQ && (
-            <div style={{fontSize:11,color:T.red500,marginTop:4,textAlign:'center'}}>বাকিতে বিক্রয় করতে কাস্টমার যোগ করুন</div>
+            <div style={{fontSize:11,color:T.red,marginTop:4,textAlign:'center'}}>বাকিতে বিক্রয় করতে কাস্টমার যোগ করুন</div>
           )}
           {selCust && (
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:T.tealLight,borderRadius:8}}>
