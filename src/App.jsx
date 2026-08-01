@@ -126,15 +126,14 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Save tab to localStorage when it changes
   useEffect(() => {
-    // Restore tab from localStorage
-    const savedTab = localStorage.getItem('pos_current_tab');
-    if (savedTab) {
-      setTab(savedTab);
+    if (tab) {
+      localStorage.setItem('pos_current_tab', tab);
     }
-    
-    // Clear saved tab after restore
-    localStorage.removeItem('pos_current_tab');
+  }, [tab]);
+
+  useEffect(() => {
     // Check if reset was done - flag stays forever to prevent DEMO loading
     const wasReset = db.get('pos_reset_done');
     
@@ -239,7 +238,10 @@ export default function App() {
   // Hard refresh function - saves current tab and forces reload from server
   const handleHardRefresh = () => {
     localStorage.setItem('pos_current_tab', tab);
-    window.location.href = window.location.pathname;
+    // Small delay to ensure localStorage is saved before reload
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 10);
   };
 
   return (
@@ -1523,13 +1525,18 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [viewSupplier, setViewSupplier] = useState(null);
   const [viewCategory, setViewCategory] = useState(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(null);
-  const [activeTab, setActiveTab] = useState('companies'); // companies, products, categories
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('pos_suppliers_tab') || 'companies'); // companies, products, categories
   const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:''});
   const [catForm, setCatForm] = useState({name:''});
   const [companyQ, setCompanyQ] = useState('');
   const [showCompanyDrop, setShowCompanyDrop] = useState(false);
   const [catQ, setCatQ] = useState('');
   const [showCatDrop, setShowCatDrop] = useState(false);
+
+  // Save activeTab to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('pos_suppliers_tab', activeTab);
+  }, [activeTab]);
 
   // Click outside to close dropdowns - only close when clicking outside the modal
   useEffect(() => {
