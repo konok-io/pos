@@ -40,6 +40,8 @@ const STORAGE_KEYS = {
   customers: 'pos_customers',
   sales: 'pos_sales',
   settings: 'pos_settings',
+  suppliers: 'pos_suppliers',
+  purchases: 'pos_purchases',
 };
 
 /* ─────────────── DEMO DATA ─────────────── */
@@ -162,6 +164,8 @@ export default function App() {
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
   const [settings, setSettings] = useState({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+  const [suppliers, setSuppliers] = useState([]);
+  const [purchases, setPurchases] = useState([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -170,6 +174,8 @@ export default function App() {
     const savedCustomers = db.get(STORAGE_KEYS.customers);
     const savedSales = db.get(STORAGE_KEYS.sales);
     const savedSettings = db.get(STORAGE_KEYS.settings);
+    const savedSuppliers = db.get(STORAGE_KEYS.suppliers) || [];
+    const savedPurchases = db.get(STORAGE_KEYS.purchases) || [];
 
     // If no data exists, load DEMO data
     if (!savedProducts || savedProducts.length === 0) {
@@ -187,6 +193,8 @@ export default function App() {
     }
 
     setSales(savedSales || []);
+    setSuppliers(savedSuppliers);
+    setPurchases(savedPurchases);
 
     const defaultSettings = {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
     setSettings(savedSettings ? {...defaultSettings, ...savedSettings} : defaultSettings);
@@ -199,6 +207,8 @@ export default function App() {
     customers: v => { setCustomers(v); db.set(STORAGE_KEYS.customers, v); return Promise.resolve(); },
     sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); return Promise.resolve(); },
     settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); return Promise.resolve(); },
+    suppliers: v => { setSuppliers(v); db.set(STORAGE_KEYS.suppliers, v); return Promise.resolve(); },
+    purchases: v => { setPurchases(v); db.set(STORAGE_KEYS.purchases, v); return Promise.resolve(); },
   };
 
   if (!ready) return (
@@ -218,7 +228,7 @@ export default function App() {
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
-  const props = {products, customers, sales, settings, upd};
+  const props = {products, customers, sales, settings, suppliers, purchases, upd};
 
   return (
     <>
@@ -665,56 +675,370 @@ function POSScreen({products, customers, sales, settings, upd}) {
 /* ═══════════════════════════════════════════
    PRODUCTS SCREEN
 ═══════════════════════════════════════════ */
-function ProductsScreen({products, upd}) {
+function ProductsScreen({products, suppliers, purchases, upd}) {
   const [search, setSearch] = useState('');
-  const [modal, setModal] = useState(null);
-  const [form, setForm] = useState({});
-  const blank = {name:'',company:'',barcode:'',cat:'',buyP:'',sellP:'',stock:'',unit:'পিস',minStock:'5'};
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [purchaseItems, setPurchaseItems] = useState([]);
+  const [supplierQ, setSupplierQ] = useState('');
+  const [showSupplierDrop, setShowSupplierDrop] = useState(false);
+  const [newSupplierName, setNewSupplierName] = useState('');
+  const [showNewSupplier, setShowNewSupplier] = useState(false);
+  const [barcodeVal, setBarcodeVal] = useState('');
+  const [barcodeSuggestions, setBarcodeSuggestions] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [form, setForm] = useState({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
+  const [viewPurchase, setViewPurchase] = useState(null);
+  const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
 
-  const filtered = products.filter(p=>
-    !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.company||'').toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search)
+  const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
+
+  // Filter suppliers for dropdown
+  const filteredSuppliers = suppliers.filter(s => 
+    !supplierQ || s.name.toLowerCase().includes(supplierQ.toLowerCase())
   );
 
-  const save = async () => {
-    if (!form.name.trim()) { alert('পণ্যের নাম দিন'); return; }
-    const row = {...form, buyP:+form.buyP||0, sellP:+form.sellP||0, stock:+form.stock||0, minStock:+form.minStock||0};
-    if (modal.mode==='add') {
-      await upd.products([...products, {...row, id:genId()}]);
+  // Filter products for table
+  const filtered = products.filter(p=>
+    !search || p.name.toLowerCase().includes(search.toLowerCase()) || 
+    (p.company||'').toLowerCase().includes(search.toLowerCase()) || 
+    (p.barcode||'').includes(search)
+  );
+
+  // Handle barcode input
+  const handleBarcode = (val) => {
+    setBarcodeVal(val);
+    setForm(f => ({...f, barcode: val}));
+    if (val.length >= 2) {
+      const matches = products.filter(p => 
+        p.barcode?.includes(val) || p.name.toLowerCase().includes(val.toLowerCase())
+      ).slice(0, 5);
+      setBarcodeSuggestions(matches);
     } else {
-      await upd.products(products.map(p=>p.id===modal.id ? {...row, id:modal.id} : p));
+      setBarcodeSuggestions([]);
     }
-    setModal(null);
   };
 
+  // Select product from suggestions
+  const selectProduct = (p) => {
+    setForm({
+      name: p.name,
+      barcode: p.barcode || '',
+      company: p.company || '',
+      cat: p.cat || '',
+      unit: p.unit || 'পিস',
+      buyP: p.buyP || '',
+      sellP: p.sellP || '',
+      stock: '',
+      minStock: p.minStock || '5'
+    });
+    setBarcodeVal(p.barcode || '');
+    setBarcodeSuggestions([]);
+    setSelectedProduct(p);
+  };
+
+  // Add product to purchase list
+  const addToPurchase = () => {
+    if (!form.name?.trim()) { alert('পণ্যের নাম দিন'); return; }
+    const item = {
+      id: genId(),
+      name: form.name,
+      barcode: form.barcode || '',
+      company: form.company,
+      cat: form.cat || '',
+      unit: form.unit || 'পিস',
+      buyP: +form.buyP || 0,
+      sellP: +form.sellP || 0,
+      stock: +form.stock || 0,
+      minStock: +form.minStock || 5
+    };
+    setPurchaseItems([...purchaseItems, item]);
+    // Reset form
+    setForm({name:'',barcode:'',company:form.company,cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
+    setBarcodeVal('');
+    setSelectedProduct(null);
+  };
+
+  // Remove item from purchase list
+  const removeItem = (id) => {
+    setPurchaseItems(purchaseItems.filter(i => i.id !== id));
+  };
+
+  // Save purchase with all items
+  const savePurchase = async () => {
+    if (purchaseItems.length === 0) { alert('কমপক্ষে একটি পণ্য যোগ করুন'); return; }
+    
+    const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
+    const purchase = {
+      id: purchaseId,
+      date: now(),
+      supplier: form.company || 'সাধারণ',
+      items: purchaseItems,
+      totalItems: purchaseItems.length,
+      totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
+    };
+
+    // Add new supplier if not exists
+    if (form.company && !suppliers.find(s => s.name === form.company)) {
+      const newSupplier = { id: genId(), name: form.company, phone: '', address: '' };
+      await upd.suppliers([...suppliers, newSupplier]);
+    }
+
+    // Save all products
+    const newProducts = purchaseItems.map(item => ({ ...item, id: genId() }));
+    await upd.products([...products, ...newProducts]);
+    
+    // Save purchase record
+    await upd.purchases([...purchases, purchase]);
+
+    setPurchaseItems([]);
+    setForm({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
+    setSupplierQ('');
+    setShowAddForm(false);
+    alert(`✅ ${purchaseItems.length}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
+  };
+
+  // Delete product
   const del = async (id) => {
     if (!confirm('এই পণ্যটি মুছে ফেলবেন?')) return;
     await upd.products(products.filter(p=>p.id!==id));
   };
 
-  const exportCSV = () => {
-    const header = ['পণ্যের নাম','কোম্পানি','বারকোড','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','স্টক','একক','মিনস্টক'];
-    const rows = products.map(p=>[p.name,p.company||'',p.barcode||'',p.cat||'',p.buyP,p.sellP,p.stock,p.unit||'',p.minStock||0]);
-    const csv = [header,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
-    a.download='products.csv'; a.click();
+  // Add new supplier
+  const addSupplier = () => {
+    if (!newSupplierName.trim()) return;
+    const newS = { id: genId(), name: newSupplierName.trim(), phone: '', address: '' };
+    upd.suppliers([...suppliers, newS]);
+    setForm(f => ({...f, company: newSupplierName.trim()}));
+    setSupplierQ(newSupplierName.trim());
+    setShowNewSupplier(false);
+    setNewSupplierName('');
   };
 
-  const importCSV = (e) => {
-    const file = e.target.files[0]; if(!file) return;
-    const reader = new FileReader();
-    reader.onload = async ev => {
-      const lines = ev.target.result.replace(/^\uFEFF/,'').split('\n').slice(1).filter(l=>l.trim());
-      const imported = lines.map(l=>{
-        const c = l.split(',').map(s=>s.replace(/^"|"$/g,'').trim());
-        return {id:genId(),name:c[0],company:c[1],barcode:c[2],cat:c[3],buyP:+c[4]||0,sellP:+c[5]||0,stock:+c[6]||0,unit:c[7]||'পিস',minStock:+c[8]||0};
-      }).filter(p=>p.name);
-      await upd.products([...products,...imported]);
-      alert(`✅ ${imported.length}টি পণ্য সফলভাবে ইম্পোর্ট হয়েছে!`);
-    };
-    reader.readAsText(file,'UTF-8');
-    e.target.value='';
-  };
+  // Purchase history view
+  if (showPurchaseHistory) {
+    return (
+      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+        <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+          <button style={btn()} onClick={()=>setShowPurchaseHistory(false)}>← ফিরে যান</button>
+          <span style={{fontWeight:700,fontSize:15}}>📦 পারচেজ হিস্ট্রি</span>
+        </div>
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          {purchases.length === 0 ? (
+            <div style={{textAlign:'center',padding:40,color:T.gray400}}>কোনো পারচেজ রেকর্ড নেই</div>
+          ) : (
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {[...purchases].reverse().map(p => (
+                <div key={p.id} onClick={()=>setViewPurchase(p)} 
+                  style={{padding:14,background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`,cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                  <div>
+                    <div style={{fontWeight:700,color:T.teal}}>{p.id}</div>
+                    <div style={{fontSize:12,color:T.gray500}}>{new Date(p.date).toLocaleDateString('bn-BD')} • {p.supplier}</div>
+                  </div>
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontWeight:700}}>{p.totalItems}টি পণ্য</div>
+                    <div style={{fontSize:12,color:T.gray500}}>{p.totalStock} একক</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        {viewPurchase && (
+          <div style={{...overlay}} onClick={()=>setViewPurchase(null)}>
+            <div style={{...card,width:400,maxHeight:'80vh',overflow:'auto',padding:20}} onClick={e=>e.stopPropagation()}>
+              <div style={{marginBottom:16}}>
+                <div style={{fontWeight:800,fontSize:16,color:T.teal}}>{viewPurchase.id}</div>
+                <div style={{fontSize:12,color:T.gray500}}>{new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:13}}>সরবরাহকারী: {viewPurchase.supplier}</div>
+              </div>
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.gray50}}>
+                    <th style={{padding:8,textAlign:'left',fontSize:11}}>পণ্য</th>
+                    <th style={{padding:8,textAlign:'right',fontSize:11}}>পরিমাণ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {viewPurchase.items.map((item,i) => (
+                    <tr key={i} style={{borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:8,fontSize:13}}>{item.name}<br/><span style={{fontSize:11,color:T.gray400}}>{item.company}</span></td>
+                      <td style={{padding:8,textAlign:'right',fontWeight:600}}>{item.stock} {item.unit}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <button onClick={()=>setViewPurchase(null)} style={{...btn(),marginTop:12,width:'100%'}}>বন্ধ করুন</button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Add product form
+  if (showAddForm) {
+    return (
+      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+        <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+          <button style={btn()} onClick={()=>{setShowAddForm(false);setPurchaseItems([]);}}>← ফিরে যান</button>
+          <span style={{fontWeight:700,fontSize:15}}>📦 নতুন পণ্য সংরক্ষণ</span>
+          <span style={{fontSize:12,color:T.gray500,marginLeft:'auto'}}>{purchaseItems.length}টি পণ্য যোগ হয়েছে</span>
+        </div>
+        
+        <div style={{display:'flex',flex:1,overflow:'hidden'}}>
+          {/* Left: Form */}
+          <div style={{flex:1,padding:16,overflow:'auto',borderRight:`1px solid ${T.gray200}`}}>
+            <div style={{...card,padding:16}}>
+              <h3 style={{margin:'0 0 16px',fontSize:14,color:T.teal}}>পণ্য যোগ করুন</h3>
+              
+              {/* Supplier/Company */}
+              <div style={{marginBottom:12,position:'relative'}}>
+                <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
+                <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
+                  onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম লিখুন..."
+                  style={{...input,fontSize:13}} />
+                {showSupplierDrop && supplierQ && (
+                  <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
+                    {filteredSuppliers.map(s=>(
+                      <div key={s.id} onClick={()=>{setSupplierQ(s.name);setForm(f=>({...f,company:s.name}));setShowSupplierDrop(false);}}
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>{s.name}</div>
+                    ))}
+                    <div onClick={()=>{setShowNewSupplier(true);}}
+                      style={{padding:'8px 12px',cursor:'pointer',color:T.teal,fontWeight:600}}>+ নতুন কোম্পানি যোগ করুন</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Barcode + Product Name */}
+              <div style={{display:'flex',gap:8,marginBottom:12}}>
+                <div style={{flex:1}}>
+                  <label style={label}>🔢 বারকোড</label>
+                  <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
+                    style={{...input,fontSize:13}} />
+                  {barcodeSuggestions.length > 0 && (
+                    <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
+                      {barcodeSuggestions.map(p=>(
+                        <div key={p.id} onClick={()=>selectProduct(p)}
+                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`}}>
+                          <div style={{fontSize:13,fontWeight:600}}>{p.name}</div>
+                          <div style={{fontSize:11,color:T.gray400}}>{p.company} • {p.barcode}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div style={{flex:2}}>
+                  <label style={label}>📦 পণ্যের নাম *</label>
+                  <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="পণ্যের নাম..."
+                    style={{...input,fontSize:13}} />
+                </div>
+              </div>
+
+              {/* Category */}
+              <div style={{marginBottom:12}}>
+                <label style={label}>📂 ক্যাটাগরি</label>
+                <input value={form.cat} onChange={e=>setForm(f=>({...f,cat:e.target.value}))} placeholder="ক্যাটাগরি..."
+                  style={{...input,fontSize:13}} />
+              </div>
+
+              {/* Unit + Buy/Sell */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:12}}>
+                <div>
+                  <label style={label}>📏 একক</label>
+                  <input value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} placeholder="পিস/কেজি..."
+                    style={{...input,fontSize:13}} />
+                </div>
+                <div>
+                  <label style={label}>💰 ক্রয়মূল্য</label>
+                  <input value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} type="number" placeholder="৳"
+                    style={{...input,fontSize:13}} />
+                </div>
+                <div>
+                  <label style={label}>💵 বিক্রয়মূল্য</label>
+                  <input value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} type="number" placeholder="৳"
+                    style={{...input,fontSize:13}} />
+                </div>
+              </div>
+
+              {/* Stock */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:12}}>
+                <div>
+                  <label style={label}>📦 স্টক পরিমাণ *</label>
+                  <input value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} type="number" placeholder="পরিমাণ"
+                    style={{...input,fontSize:13}} />
+                </div>
+                <div>
+                  <label style={label}>⚠️ মিন স্টক</label>
+                  <input value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} type="number" placeholder="সতর্কতা"
+                    style={{...input,fontSize:13}} />
+                </div>
+              </div>
+
+              <button onClick={addToPurchase} style={{...btn('primary'),width:'100%',padding:'10px'}}>
+                ➕ পণ্য তালিকায় যোগ করুন
+              </button>
+            </div>
+          </div>
+
+          {/* Right: Purchase Items List */}
+          <div style={{width:360,display:'flex',flexDirection:'column',background:T.gray50,overflow:'hidden'}}>
+            <div style={{padding:12,background:T.white,borderBottom:`1px solid ${T.gray200}`,fontWeight:700}}>
+              📋 পণ্য তালিকা ({purchaseItems.length})
+            </div>
+            <div style={{flex:1,overflow:'auto',padding:8}}>
+              {purchaseItems.length === 0 ? (
+                <div style={{textAlign:'center',padding:40,color:T.gray400}}>
+                  <div style={{fontSize:32,marginBottom:8}}>📦</div>
+                  <div>কোনো পণ্য যোগ হয়নি</div>
+                </div>
+              ) : (
+                purchaseItems.map((item,i)=>(
+                  <div key={item.id} style={{padding:10,background:T.white,borderRadius:8,marginBottom:6,border:`1px solid ${T.gray200}`}}>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+                      <div style={{flex:1}}>
+                        <div style={{fontWeight:600,fontSize:13}}>{item.name}</div>
+                        <div style={{fontSize:11,color:T.gray500}}>{item.company} • {item.barcode}</div>
+                        <div style={{fontSize:12,marginTop:4}}>
+                          <span style={{color:T.teal}}>৳{item.buyP}</span> → <span style={{color:T.green}}>৳{item.sellP}</span>
+                        </div>
+                      </div>
+                      <div style={{textAlign:'right'}}>
+                        <div style={{fontWeight:700,fontSize:14}}>{item.stock} {item.unit}</div>
+                        <button onClick={()=>removeItem(item.id)} style={{fontSize:11,color:T.red,background:'none',border:'none',cursor:'pointer',marginTop:4}}>✕ মুছুন</button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            {purchaseItems.length > 0 && (
+              <div style={{padding:12,background:T.white,borderTop:`1px solid ${T.gray200}`}}>
+                <div style={{display:'flex',gap:8}}>
+                  <button onClick={()=>setPurchaseItems([])} style={{...btn('ghost'),flex:1}}>সব মুছুন</button>
+                  <button onClick={savePurchase} style={{...btn('primary'),flex:2}}>💾 সংরক্ষণ করুন</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* New Supplier Modal */}
+        {showNewSupplier && (
+          <div style={{...overlay}} onClick={()=>setShowNewSupplier(false)}>
+            <div style={{...card,width:320,padding:20}} onClick={e=>e.stopPropagation()}>
+              <h3 style={{margin:'0 0 12px'}}>🏢 নতুন কোম্পানি যোগ করুন</h3>
+              <input value={newSupplierName} onChange={e=>setNewSupplierName(e.target.value)} placeholder="কোম্পানির নাম"
+                style={{...input,marginBottom:12}} autoFocus />
+              <div style={{display:'flex',gap:8}}>
+                <button onClick={()=>setShowNewSupplier(false)} style={{...btn(),flex:1}}>বাতিল</button>
+                <button onClick={addSupplier} style={{...btn('primary'),flex:1}}>✓ যোগ করুন</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
@@ -723,11 +1047,8 @@ function ProductsScreen({products, upd}) {
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
         </div>
-        <button style={btn('primary')} onClick={()=>{setForm({...blank});setModal({mode:'add'});}}>+ নতুন পণ্য</button>
-        <button style={btn()} onClick={exportCSV}>📤 CSV রপ্তানি</button>
-        <label style={{...btn(),cursor:'pointer'}}>
-          📥 CSV আমদানি <input type="file" accept=".csv" onChange={importCSV} style={{display:'none'}}/>
-        </label>
+        <button style={btn('primary')} onClick={()=>{setShowAddForm(true);setPurchaseItems([]);}}>📦 নতুন পণ্য সংরক্ষণ</button>
+        <button style={btn()} onClick={()=>setShowPurchaseHistory(true)}>📋 পারচেজ হিস্ট্রি</button>
         <span style={{fontSize:12,color:T.gray400}}>{products.length}টি পণ্য</span>
       </div>
 
@@ -767,10 +1088,7 @@ function ProductsScreen({products, upd}) {
                   </td>
                   <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
                   <td style={{padding:'10px 12px'}}>
-                    <div style={{display:'flex',gap:4}}>
-                      <button style={btn('ghost','sm')} onClick={()=>{setForm({...p});setModal({mode:'edit',id:p.id});}}>✏️</button>
-                      <button style={btn('danger','sm')} onClick={()=>del(p.id)}>🗑️</button>
-                    </div>
+                    <button style={btn('danger','sm')} onClick={()=>del(p.id)}>🗑️</button>
                   </td>
                 </tr>
               );
@@ -778,39 +1096,6 @@ function ProductsScreen({products, upd}) {
           </tbody>
         </table>
       </div>
-
-      {modal && (
-        <Modal onClose={()=>setModal(null)} title={modal.mode==='add'?'নতুন পণ্য যোগ করুন':'পণ্য সম্পাদনা করুন'}>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}>
-            {[
-              {k:'name',l:'পণ্যের নাম *',full:true},
-              {k:'company',l:'কোম্পানি/ব্র্যান্ড'},
-              {k:'barcode',l:'বারকোড'},
-              {k:'cat',l:'ক্যাটাগরি'},
-              {k:'unit',l:'একক (কেজি/পিস/লিটার...)'},
-              {k:'buyP',l:'ক্রয়মূল্য (৳)',t:'number'},
-              {k:'sellP',l:'বিক্রয়মূল্য (৳)',t:'number'},
-              {k:'stock',l:'বর্তমান স্টক',t:'number'},
-              {k:'minStock',l:'ন্যূনতম স্টক সতর্কতা',t:'number'},
-            ].map(f=>(
-              <div key={f.k} style={f.full?{gridColumn:'1/-1'}:{}}>
-                <label style={label}>{f.l}</label>
-                <input value={form[f.k]||''} onChange={e=>setForm(p=>({...p,[f.k]:e.target.value}))}
-                  type={f.t||'text'} style={input} min={f.t?'0':undefined}/>
-              </div>
-            ))}
-          </div>
-          {form.buyP && form.sellP && +form.buyP>0 && (
-            <div style={{marginTop:12,padding:'8px 12px',background:T.greenLight,borderRadius:8,fontSize:13,color:T.green,fontWeight:600}}>
-              📈 লাভ: {fmt(form.sellP-form.buyP)} প্রতি {form.unit||'একক'} ({Math.round((form.sellP-form.buyP)/form.buyP*100)}%)
-            </div>
-          )}
-          <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:18}}>
-            <button onClick={()=>setModal(null)} style={btn()}>বাতিল</button>
-            <button onClick={save} style={btn('primary')}>💾 সংরক্ষণ করুন</button>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 }
