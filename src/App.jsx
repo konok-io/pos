@@ -20,12 +20,14 @@ const now = () => new Date().toISOString();
 
 /* ─────────────── STORAGE ─────────────── */
 const db = {
-  async get(k) {
-    try { const r = await window.storage.get(k); return r ? JSON.parse(r.value) : null; }
-    catch { return null; }
+  get(k) {
+    try {
+      const v = localStorage.getItem(k);
+      return v ? JSON.parse(v) : null;
+    } catch { return null; }
   },
-  async set(k, v) {
-    try { await window.storage.set(k, JSON.stringify(v)); } catch(e) { console.error(e); }
+  set(k, v) {
+    try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.error(e); }
   }
 };
 
@@ -109,20 +111,18 @@ export default function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      setProducts(await db.get('products') || DEMO.products);
-      setCustomers(await db.get('customers') || DEMO.customers);
-      setSales(await db.get('sales') || []);
-      setSettings(await db.get('settings') || {name:'আমার ব্যবসা',address:'',phone:''});
-      setReady(true);
-    })();
+    setProducts(db.get('products') || DEMO.products);
+    setCustomers(db.get('customers') || DEMO.customers);
+    setSales(db.get('sales') || []);
+    setSettings(db.get('settings') || {name:'আমার ব্যবসা',address:'',phone:''});
+    setReady(true);
   }, []);
 
   const upd = {
-    products: async v => { setProducts(v); await db.set('products', v); },
-    customers: async v => { setCustomers(v); await db.set('customers', v); },
-    sales: async v => { setSales(v); await db.set('sales', v); },
-    settings: async v => { setSettings(v); await db.set('settings', v); },
+    products: v => { setProducts(v); db.set('products', v); },
+    customers: v => { setCustomers(v); db.set('customers', v); },
+    sales: v => { setSales(v); db.set('sales', v); },
+    settings: v => { setSettings(v); db.set('settings', v); },
   };
 
   if (!ready) return (
