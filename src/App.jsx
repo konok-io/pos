@@ -1294,6 +1294,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                   <tr style={{background:T.tealLight}}>
                     <th style={{padding:'8px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্য</th>
                     <th style={{padding:'8px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>স্টক</th>
+                    <th style={{padding:'8px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>ক্রয়মূল্য</th>
                     <th style={{padding:'8px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>বিক্রয়মূল্য</th>
                   </tr>
                 </thead>
@@ -1305,6 +1306,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                         <div style={{fontSize:11,color:T.gray400}}>{p.barcode}</div>
                       </td>
                       <td style={{padding:'8px 12px',textAlign:'right',fontWeight:600}}>{p.stock} {p.unit}</td>
+                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:600,color:T.orange}}>{fmt(p.buyP)}</td>
                       <td style={{padding:'8px 12px',textAlign:'right',fontWeight:700,color:T.teal}}>{fmt(p.sellP)}</td>
                     </tr>
                   ))}
