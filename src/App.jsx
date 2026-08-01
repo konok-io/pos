@@ -1210,7 +1210,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
   const [viewSupplier, setViewSupplier] = useState(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(null);
   const [activeTab, setActiveTab] = useState('companies'); // companies, products, categories
-  const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:'0',minStock:'5'});
+  const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:''});
   const [catForm, setCatForm] = useState({name:'',company:''});
   const [companyQ, setCompanyQ] = useState('');
   const [showCompanyDrop, setShowCompanyDrop] = useState(false);
@@ -1300,7 +1300,6 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
     if (!productForm.company) { alert('কোম্পানি সিলেক্ট করুন'); return; }
     if (!productForm.cat) { alert('ক্যাটাগরি সিলেক্ট করুন'); return; }
     if (!productForm.name?.trim()) { alert('পণ্যের নাম দিন'); return; }
-    if (!productForm.barcode?.trim()) { alert('বারকোড দিন'); return; }
     
     // Generate product ID (P-00001, P-00002, etc.)
     const maxId = products.reduce((max, p) => {
@@ -1312,17 +1311,17 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
     const newP = {
       id: newId,
       name: productForm.name.trim(),
-      barcode: productForm.barcode.trim(),
+      barcode: productForm.barcode?.trim() || '',
       company: productForm.company,
       cat: productForm.cat,
-      unit: productForm.unit || 'পিস',
-      buyP: parseFloat(productForm.buyP) || 0,
-      sellP: parseFloat(productForm.sellP) || 0,
-      stock: parseInt(productForm.stock) || 0,
-      minStock: parseInt(productForm.minStock) || 5
+      unit: 'পিস',
+      buyP: 0,
+      sellP: 0,
+      stock: 0,
+      minStock: 5
     };
     await upd.products([...products, newP]);
-    setProductForm({company:productForm.company,cat:productForm.cat,name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:'0',minStock:'5'});
+    setProductForm({company:productForm.company,cat:productForm.cat,name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:0,minStock:5});
     alert(`পণ্য সংরক্ষিত হয়েছে! আইডি: ${newId}`);
   };
 
@@ -1674,7 +1673,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
               <>
                 <h3 style={{margin:'0 0 16px'}}>{modal.mode === 'add' ? '📦 নতুন পণ্য যোগ করুন' : '✏️ পণ্য সম্পাদনা করুন'}</h3>
                 <div style={{marginBottom:12,position:'relative'}}>
-                  <label style={label}>① 🏢 কোম্পানি নির্বাচন করুন *</label>
+                  <label style={label}>🏢 কোম্পানি নির্বাচন করুন *</label>
                   <input value={productForm.company||''} onChange={e=>{setProductForm(f=>({...f,company:e.target.value,cat:''}));setCompanyQ(e.target.value);setShowCompanyDrop(true);}} 
                     onFocus={()=>setShowCompanyDrop(true)} placeholder="কোম্পানির নাম..." style={input} />
                   {showCompanyDrop && (
@@ -1690,7 +1689,7 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                   )}
                 </div>
                 <div style={{marginBottom:12,position:'relative'}}>
-                  <label style={label}>② 📂 ক্যাটাগরি নির্বাচন করুন *</label>
+                  <label style={label}>📂 ক্যাটাগরি নির্বাচন করুন *</label>
                   <input value={productForm.cat||''} onChange={e=>{setProductForm(f=>({...f,cat:e.target.value}));setCatQ(e.target.value);setShowCatDrop(true);}} 
                     onFocus={()=>setShowCatDrop(true)} placeholder="ক্যাটাগরির নাম..." style={input} />
                   {showCatDrop && (
@@ -1703,32 +1702,12 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                   )}
                 </div>
                 <div style={{marginBottom:12}}>
-                  <label style={label}>③ পণ্যের নাম *</label>
+                  <label style={label}>📦 পণ্যের নাম *</label>
                   <input value={productForm.name||''} onChange={e=>setProductForm(f=>({...f,name:e.target.value}))} placeholder="পণ্যের নাম" style={input} />
                 </div>
-                <div style={{marginBottom:12}}>
-                  <label style={label}>④ বারকোড</label>
+                <div style={{marginBottom:16}}>
+                  <label style={label}>🔢 বারকোড</label>
                   <input value={productForm.barcode||''} onChange={e=>setProductForm(f=>({...f,barcode:e.target.value}))} placeholder="বারকোড নম্বর" style={input} />
-                </div>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
-                  <div>
-                    <label style={label}>📏 একক</label>
-                    <input value={productForm.unit||''} onChange={e=>setProductForm(f=>({...f,unit:e.target.value}))} placeholder="পিস/কেজি" style={input} />
-                  </div>
-                  <div>
-                    <label style={label}>📥 স্টক</label>
-                    <input value={productForm.stock||''} onChange={e=>setProductForm(f=>({...f,stock:e.target.value}))} type="number" placeholder="0" style={input} />
-                  </div>
-                </div>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
-                  <div>
-                    <label style={label}>💰 ক্রয়মূল্য</label>
-                    <input value={productForm.buyP||''} onChange={e=>setProductForm(f=>({...f,buyP:e.target.value}))} type="number" placeholder="0" style={input} />
-                  </div>
-                  <div>
-                    <label style={label}>💵 বিক্রয়মূল্য</label>
-                    <input value={productForm.sellP||''} onChange={e=>setProductForm(f=>({...f,sellP:e.target.value}))} type="number" placeholder="0" style={input} />
-                  </div>
                 </div>
                 <div style={{display:'flex',gap:8}}>
                   <button onClick={()=>setModal(null)} style={{...btn(),flex:1}}>বাতিল</button>
