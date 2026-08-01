@@ -387,13 +387,16 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const printReceipt = (r) => {
     const w = window.open('','_blank','width=350,height=600');
     w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>রসিদ</title>
-    <style>*{margin:0;padding:0;box-sizing:border-box}@page { size: 80mm 200mm; margin: 2mm; }
-    body{font-family:'Courier New',monospace;width:76mm;margin:auto;padding:2mm;font-size:11px;color:#000}
+    <style>
+    @page { size: 3in 8in; margin: 0; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Courier New',monospace;width:3in;margin:0;padding:0.08in;font-size:11px;color:#000}
     .c{text-align:center}.b{font-weight:bold}.l{border-top:1px dashed #000;margin:5px 0}
     table{width:100%}td{padding:2px 0}.r{text-align:right}.big{font-size:14px}
     .header{text-align:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #000}
     .footer{text-align:center;margin-top:8px;padding-top:6px;border-top:1px dashed #000;font-size:10px}
-    @media print{body{width:100%}}</style></head><body>
+    @media print { size: 3in 8in; margin: 0; }
+    </style></head><body>
     <div class="header">
       <div class="b" style="font-size:14px">${r.settings.name}</div>
       ${r.settings.address ? `<div style="font-size:10px">${r.settings.address}</div>` : ''}
@@ -2602,9 +2605,9 @@ function ReportsScreen({sales, customers, purchases}) {
                   const p = viewPurchase;
                   const total = p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0);
                   let html = `<!DOCTYPE html><html><head><title>Purchase Invoice</title><style>
-                    @page { size: 80mm 200mm; margin: 2mm; }
+                    @page { size: 3in 8in; margin: 0; }
                     * { margin:0; padding:0; box-sizing:border-box; }
-                    body { font-family:'Courier New',monospace; width:76mm; padding:2mm; font-size:11px; }
+                    body { font-family:'Courier New',monospace; width:3in; margin:0; padding:0.08in; font-size:11px; }
                     .center { text-align:center; }
                     .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
                     .row { display:flex; justify-content:space-between; margin:2px 0; }
@@ -2615,6 +2618,7 @@ function ReportsScreen({sales, customers, purchases}) {
                     td:nth-child(3), td:nth-child(4) { text-align:right; }
                     .total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
                     .footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+                    @media print { size: 3in 8in; margin: 0; }
                   </style></head><body>
                     <div class="center border">
                       <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
@@ -2698,9 +2702,9 @@ function ReportsScreen({sales, customers, purchases}) {
                   const s = viewSale;
                   const total = s.total + (s.vat||0);
                   let html = `<!DOCTYPE html><html><head><title>Sale Receipt</title><style>
-                    @page { size: 80mm 200mm; margin: 2mm; }
+                    @page { size: 3in 8in; margin: 0; }
                     * { margin:0; padding:0; box-sizing:border-box; }
-                    body { font-family:'Courier New',monospace; width:76mm; padding:2mm; font-size:11px; }
+                    body { font-family:'Courier New',monospace; width:3in; margin:0; padding:0.08in; font-size:11px; }
                     .center { text-align:center; }
                     .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
                     .row { display:flex; justify-content:space-between; margin:2px 0; }
@@ -2711,6 +2715,7 @@ function ReportsScreen({sales, customers, purchases}) {
                     td:nth-child(3), td:nth-child(4) { text-align:right; }
                     .total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
                     .footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
+                    @media print { size: 3in 8in; margin: 0; }
                   </style></head><body>
                     <div class="center border">
                       <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
