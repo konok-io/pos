@@ -128,11 +128,13 @@ export default function App() {
     const savedSettings = db.get(STORAGE_KEYS.settings);
     const savedSuppliers = db.get(STORAGE_KEYS.suppliers) || [];
     const savedPurchases = db.get(STORAGE_KEYS.purchases) || [];
+    const savedCategories = db.get(STORAGE_KEYS.categories) || [];
 
     // If reset was done, always use empty data (never load DEMO)
     if (wasReset) {
       setProducts(savedProducts || []);
       setCustomers(savedCustomers || []);
+      setCategories(savedCategories);
       setSuppliers(savedSuppliers);
       setSales(savedSales || []);
       setPurchases(savedPurchases);
