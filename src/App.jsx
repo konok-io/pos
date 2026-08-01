@@ -1566,42 +1566,37 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
 
       {/* COMPANIES TAB */}
         {activeTab === 'companies' && (
-          <>
-            {filtered.length === 0 ? (
-              <div style={{textAlign:'center',padding:20,color:T.gray400,fontSize:14}}>কোনো কোম্পানি পাওয়া যায়নি</div>
-            ) : (
-              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))',gap:12}}>
-                {filtered.map(s => (
-                  <div key={s.id} style={{...card,padding:0,overflow:'hidden'}}>
-                    <div style={{padding:14,borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
-                      <div>
-                        <div style={{fontWeight:700,fontSize:15,display:'flex',alignItems:'center',gap:6}}>
-                          🏢 {s.name}
-                          {s.code && <span style={{fontSize:11,color:T.teal,fontWeight:600,marginLeft:4}}>{s.code}</span>}
-                          {s.isAuto && <span style={{fontSize:10,background:T.gray100,padding:'2px 6px',borderRadius:4}}>অটো</span>}
-                        </div>
-                        {s.phone && <div style={{fontSize:12,color:T.gray500,marginTop:2}}>📱 {s.phone}</div>}
-                        {s.address && <div style={{fontSize:12,color:T.gray500}}>📍 {s.address}</div>}
-                      </div>
-                      <div style={{textAlign:'right'}}>
-                        <div style={{fontSize:20,fontWeight:800,color:T.teal}}>{getProductsCount(s.name)}</div>
-                        <div style={{fontSize:11,color:T.gray400}}>পণ্য</div>
-                      </div>
-                    </div>
-                    <div style={{padding:'8px 14px',display:'flex',gap:8}}>
-                      <button onClick={()=>setViewSupplier(s)} style={{...btn(),flex:1,fontSize:12,padding:'8px'}}>👁️ বিস্তারিত</button>
-                      {!s.isAuto && (
-                        <>
-                          <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('ghost'),padding:'8px'}}>✏️</button>
-                          <button onClick={()=>del(s.id)} style={{...btn('danger'),padding:'8px'}}>🗑️</button>
-                        </>
-                      )}
-                    </div>
-                  </div>
+          <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
+            <thead>
+              <tr style={{background:T.tealLight}}>
+                {['কোম্পানি কোড','কোম্পানির নাম','ফোন','ঠিকানা','পণ্য সংখ্যা',''].map((h,i)=>(
+                  <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                 ))}
-              </div>
-            )}
-          </>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={6} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
+              ) : filtered.map((s,i)=>(
+                <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                  <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{s.code||'-'}</td>
+                  <td style={{padding:'10px 12px',fontWeight:600,fontSize:14}}>{s.name}</td>
+                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{s.phone||'-'}</td>
+                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{s.address||'-'}</td>
+                  <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{getProductsCount(s.name)}</td>
+                  <td style={{padding:'10px 12px',whiteSpace:'nowrap'}}>
+                    <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
+                    {!s.isAuto && (
+                      <>
+                        <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
+                        <button onClick={()=>del(s.id)} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
 
         {/* CATEGOR/* Company Modal */}
