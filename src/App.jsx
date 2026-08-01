@@ -321,11 +321,14 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
 
   useEffect(() => { searchRef.current?.focus(); }, []);
 
-  // Close category dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClick = (e) => {
       if (!e.target.closest('[data-cat-dropdown]')) {
         setShowCatDrop(false);
+      }
+      if (!e.target.closest('[data-comp-dropdown]')) {
+        setShowCompDrop(false);
       }
     };
     document.addEventListener('click', handleClick);
@@ -333,13 +336,22 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   }, []);
 
   const [selCat, setSelCat] = useState('সব');
+  const [selComp, setSelComp] = useState('সব কোম্পানি');
   const [catSearch, setCatSearch] = useState('');
   const [showCatDrop, setShowCatDrop] = useState(false);
+  const [compSearch, setCompSearch] = useState('');
+  const [showCompDrop, setShowCompDrop] = useState(false);
   
   // Calculate counts for each category (only products with stock > 0)
   const catCounts = {};
   products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0).forEach(p => {
     catCounts[p.cat] = (catCounts[p.cat] || 0) + 1;
+  });
+  
+  // Calculate counts for each company (only products with stock > 0)
+  const compCounts = {};
+  products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0).forEach(p => {
+    compCounts[p.company] = (compCounts[p.company] || 0) + 1;
   });
   
   // Get all categories sorted by product count (highest first)
@@ -348,9 +360,19 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     ...categories.map(c=>c.name).filter(Boolean)
   ])].sort((a, b) => (catCounts[b] || 0) - (catCounts[a] || 0));
   
+  // Get all companies sorted by product count (highest first)
+  const allCompanies = [...new Set([
+    ...products.filter(p=>!p.name?.includes('(ক্যাটাগরি)')).map(p=>p.company).filter(Boolean)
+  ])].sort((a, b) => (compCounts[b] || 0) - (compCounts[a] || 0));
+  
   // Filter categories for dropdown
   const filteredCats = allCategories.filter(c => 
     !catSearch || c.toLowerCase().includes(catSearch.toLowerCase())
+  );
+  
+  // Filter companies for dropdown
+  const filteredComps = allCompanies.filter(c => 
+    !compSearch || c.toLowerCase().includes(compSearch.toLowerCase())
   );
   
   const outOfStockCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock <= 0).length;
@@ -359,16 +381,20 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const filtered = products.filter(p => {
     const isCategory = p.name?.includes('(ক্যাটাগরি)');
     if (isCategory) return false;
+    
+    // Company filter
+    const matchComp = selComp === 'সব কোম্পানি' || p.company === selComp;
+    
     // সব: exclude out of stock
     if (selCat === 'সব') {
-      return p.stock > 0 && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
+      return p.stock > 0 && matchComp && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
     }
     // স্টক শেষ: only show out of stock
     if (selCat === 'স্টক শেষ') {
-      return p.stock <= 0 && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
+      return p.stock <= 0 && matchComp && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
     }
     // Specific category: show products in that category with stock > 0
-    return p.cat === selCat && p.stock > 0 && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
+    return p.cat === selCat && p.stock > 0 && matchComp && (!search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search));
   }).sort((a, b) => a.stock - b.stock);
 
   const addToCart = (prod) => {
@@ -642,8 +668,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           </div>
         </div>
 
-        {/* Category filter */}
-        <div style={{padding:'10px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+        {/* Category and Company filter */}
+        <div style={{padding:'10px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:12,alignItems:'center',flexWrap:'wrap'}}>
           {/* সব button */}
           <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
             ...btn(selCat==='সব'?'primary':'ghost','sm'),
@@ -664,14 +690,41 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             padding:'6px 14px',
           }}>স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
           
-          {/* Category search dropdown */}
-          <div style={{position:'relative',flex:1,minWidth:200}} data-cat-dropdown>
+          {/* Company dropdown */}
+          <div style={{position:'relative',minWidth:180}} data-comp-dropdown>
+            <input 
+              value={selComp === 'সব কোম্পানি' ? compSearch : selComp} 
+              onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
+              onFocus={()=>setShowCompDrop(true)}
+              placeholder="কোম্পানি..."
+              style={{...input,borderRadius:20,padding:'6px 14px',fontSize:13,height:'auto',border:selComp!=='সব কোম্পানি'?`1.5px solid ${T.teal}`:undefined}}
+            />
+            {showCompDrop && (
+              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>
+                {filteredComps.length === 0 ? (
+                  <div style={{padding:'12px',color:T.gray400,textAlign:'center'}}>কোনো কোম্পানি পাওয়া যায়নি</div>
+                ) : filteredComps.map(c=>(
+                  <div key={c} onClick={()=>{setSelComp(c);setCompSearch('');setShowCompDrop(false);}} style={{
+                    padding:'10px 14px',cursor:'pointer',display:'flex',justifyContent:'space-between',
+                    background:selComp===c?T.tealLight:'transparent',
+                    borderBottom:`1px solid ${T.gray100}`,
+                  }}>
+                    <span style={{color:selComp===c?T.teal:T.gray900}}>{c}</span>
+                    <span style={{color:T.gray400,fontSize:12}}>{compCounts[c] || 0}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          {/* Category dropdown */}
+          <div style={{position:'relative',minWidth:180}} data-cat-dropdown>
             <input 
               value={selCat === 'সব' || selCat === 'স্টক শেষ' ? catSearch : selCat} 
               onChange={e=>{setSelCat('সব');setCatSearch(e.target.value);setShowCatDrop(true);}} 
               onFocus={()=>setShowCatDrop(true)}
-              placeholder="ক্যাটাগরি সার্চ করুন..."
-              style={{...input,borderRadius:20,padding:'6px 14px',fontSize:13,height:'auto'}}
+              placeholder="ক্যাটাগরি..."
+              style={{...input,borderRadius:20,padding:'6px 14px',fontSize:13,height:'auto',border:selCat!=='সব' && selCat!=='স্টক শেষ'?`1.5px solid ${T.teal}`:undefined}}
             />
             {showCatDrop && (
               <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,marginTop:4,maxHeight:250,overflowY:'auto',boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>
