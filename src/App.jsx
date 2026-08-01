@@ -1567,14 +1567,13 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
             <div style={{...card,maxWidth:500,margin:'0 auto 16px'}}>
               <h4 style={{margin:'0 0 12px',color:T.teal}}>📂 নতুন ক্যাটাগরি যোগ করুন</h4>
               
-              {/* Step 1: Category Name - shows company dropdown when typing */}
+              {/* Step 1: Company */}
               <div style={{marginBottom:12,position:'relative'}}>
-                <label style={label}>① 📂 ক্যাটাগরির নাম *</label>
-                <input value={catForm.name} onChange={e=>{setCatForm(f=>({...f,name:e.target.value}));setCatCompanyQ('');setShowCatCompanyDrop(true);}} 
-                  onFocus={()=>setShowCatCompanyDrop(true)} placeholder="ক্যাটাগরির নাম লিখুন..." style={input} />
-                {showCatCompanyDrop && catForm.name && (
+                <label style={label}>① 🏢 কোম্পানি নির্বাচন করুন *</label>
+                <input value={catForm.company} onChange={e=>{setCatForm(f=>({...f,company:e.target.value}));setCatCompanyQ(e.target.value);setShowCatCompanyDrop(true);}} 
+                  onFocus={()=>setShowCatCompanyDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..." style={input} />
+                {showCatCompanyDrop && catCompanyQ && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:150,overflow:'auto'}}>
-                    <div style={{padding:'6px 12px',fontSize:11,color:T.gray500,background:T.gray50}}>🏢 কোম্পানি সিলেক্ট করুন:</div>
                     {filteredCompanies.filter(c=>!catCompanyQ || c.name.toLowerCase().includes(catCompanyQ.toLowerCase()) || (c.code||'').toLowerCase().includes(catCompanyQ.toLowerCase())).map(c=>(
                       <div key={c.id} onClick={()=>{setCatForm(f=>({...f,company:c.name}));setCatCompanyQ('');setShowCatCompanyDrop(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
@@ -1587,14 +1586,11 @@ function SuppliersScreen({suppliers, products, purchases, upd}) {
                 )}
               </div>
 
-              {/* Selected Company Display */}
-              {catForm.company && (
-                <div style={{marginBottom:12,padding:10,background:T.tealLight,borderRadius:8,display:'flex',alignItems:'center',gap:8}}>
-                  <span style={{fontSize:12,color:T.gray600}}>🏢 কোম্পানি:</span>
-                  <span style={{fontWeight:600,color:T.teal}}>{catForm.company}</span>
-                  <button onClick={()=>setCatForm(f=>({...f,company:''}))} style={{marginLeft:'auto',padding:'2px 8px',fontSize:11,background:T.red+'20',color:T.red,border:'none',borderRadius:4,cursor:'pointer'}}>✕</button>
-                </div>
-              )}
+              {/* Step 2: Category Name */}
+              <div style={{marginBottom:12}}>
+                <label style={label}>② 📂 ক্যাটাগরির নাম *</label>
+                <input value={catForm.name} onChange={e=>setCatForm(f=>({...f,name:e.target.value}))} placeholder="ক্যাটাগরির নাম লিখুন" style={input} disabled={!catForm.company} />
+              </div>
 
               <button onClick={saveCategory} style={{...btn('primary'),width:'100%'}} disabled={!catForm.name || !catForm.company}>💾 ক্যাটাগরি যোগ করুন</button>
             </div>
