@@ -519,7 +519,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
       {/* ── RIGHT: Cart ── */}
       <div style={{width:360,display:'flex',flexDirection:'column',background:T.white,borderLeft:`1px solid ${T.gray200}`,boxShadow:'-2px 0 10px rgba(0,0,0,0.05)'}}>
         {/* Customer */}
-        <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray200}`,position:'relative'}} className="dropdown-container">
+        <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray200}`,position:'relative'}} className="dropdown-container" onClick={(e) => e.stopPropagation()}>
           <label style={label}>👥 কাস্টমার (ঐচ্ছিক)</label>
           <div style={{display:'flex',gap:8}}>
             <input value={custQ} onChange={e=>{setCustQ(e.target.value);setShowCustDrop(true);}}
@@ -1013,7 +1013,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
               {/* Supplier/Company + Category inline */}
               <div style={{display:'flex',gap:8,marginBottom:12}}>
                 {/* Supplier/Company */}
-                <div style={{flex:1,position:'relative'}} className="dropdown-container">
+                <div style={{flex:1,position:'relative'}} className="dropdown-container" onClick={(e) => e.stopPropagation()}>
                   <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
                   <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
                     onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..."
@@ -1037,7 +1037,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 </div>
 
                 {/* Category with Dropdown */}
-                <div style={{flex:1,position:'relative'}} className="dropdown-container">
+                <div style={{flex:1,position:'relative'}} className="dropdown-container" onClick={(e) => e.stopPropagation()}>
                   <label style={label}>📂 ক্যাটাগরি</label>
                   <input value={categoryQ} onChange={e=>{setCategoryQ(e.target.value);setForm(f=>({...f,cat:e.target.value}));setShowCategoryDrop(true);}}
                     onFocus={()=>{setShowCategoryDrop(true);setCategoryQ(form.cat||'');}} placeholder="ক্যাটাগরি নির্বাচন করুন..."
@@ -1061,7 +1061,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
 
               {/* Barcode + Product Name */}
               <div style={{display:'flex',gap:8,marginBottom:12}}>
-                <div style={{flex:1,position:'relative'}} className="dropdown-container">
+                <div style={{flex:1,position:'relative'}} className="dropdown-container" onClick={(e) => e.stopPropagation()}>
                   <label style={label}>④ বারকোড</label>
                   <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
                     style={{...input,fontSize:13}} />
@@ -1077,7 +1077,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                     </div>
                   )}
                 </div>
-                <div style={{flex:2,position:'relative'}} className="dropdown-container">
+                <div style={{flex:2,position:'relative'}} className="dropdown-container" onClick={(e) => e.stopPropagation()}>
                   <label style={label}>③ পণ্যের নাম *</label>
                   <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
                     placeholder="পণ্যের নাম লিখুন..."
