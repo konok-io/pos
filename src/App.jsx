@@ -2145,7 +2145,7 @@ function ReportsScreen({sales, customers}) {
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
-function SettingsScreen({settings, products, upd}) {
+function SettingsScreen({settings, products, suppliers, purchases, upd}) {
   const [form, setForm] = useState(settings);
   const [saved, setSaved] = useState(false);
 
@@ -2232,12 +2232,7 @@ function SettingsScreen({settings, products, upd}) {
             }}>বিক্রয় ইতিহাস মুছুন</button>
             <button style={btn('danger','sm')} onClick={async()=>{
               if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                await upd.products([]);
-                await upd.customers([]);
-                await upd.suppliers([]);
-                await upd.sales([]);
-                await upd.purchases([]);
-                await upd.settings({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+                localStorage.clear();
                 alert('সব ডেটা মুছে ফেলা হয়েছে।');
                 window.location.reload();
               }
