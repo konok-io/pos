@@ -267,11 +267,15 @@ function POSScreen({products, customers, sales, settings, upd}) {
 
   useEffect(() => { searchRef.current?.focus(); }, []);
 
-  // Click outside to close customer dropdown
+  // Close all dropdowns when clicking outside
   useEffect(() => {
-    const handleClick = () => setShowCustDrop(false);
-    document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.dropdown-container')) {
+        setShowCustDrop(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const cats = ['সব', ...new Set(products.map(p=>p.cat).filter(Boolean))];
@@ -515,7 +519,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
       {/* ── RIGHT: Cart ── */}
       <div style={{width:360,display:'flex',flexDirection:'column',background:T.white,borderLeft:`1px solid ${T.gray200}`,boxShadow:'-2px 0 10px rgba(0,0,0,0.05)'}}>
         {/* Customer */}
-        <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray200}`,position:'relative'}}>
+        <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray200}`,position:'relative'}} className="dropdown-container">
           <label style={label}>👥 কাস্টমার (ঐচ্ছিক)</label>
           <div style={{display:'flex',gap:8}}>
             <input value={custQ} onChange={e=>{setCustQ(e.target.value);setShowCustDrop(true);}}
@@ -666,6 +670,19 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   const [categoryQ, setCategoryQ] = useState('');
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
+
+  // Close all dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.dropdown-container')) {
+        setShowSupplierDrop(false);
+        setShowProductDrop(false);
+        setShowCategoryDrop(false);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
 
   // Handle CSV Import
   const handleCsvImport = (e) => {
@@ -996,7 +1013,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
               {/* Supplier/Company + Category inline */}
               <div style={{display:'flex',gap:8,marginBottom:12}}>
                 {/* Supplier/Company */}
-                <div style={{flex:1,position:'relative'}}>
+                <div style={{flex:1,position:'relative'}} className="dropdown-container">
                   <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
                   <input value={supplierQ} onChange={e=>{setSupplierQ(e.target.value);setShowSupplierDrop(true);setForm(f=>({...f,company:e.target.value}));}}
                     onFocus={()=>setShowSupplierDrop(true)} placeholder="কোম্পানির নাম বা কোড লিখুন..."
@@ -1020,7 +1037,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                 </div>
 
                 {/* Category with Dropdown */}
-                <div style={{flex:1,position:'relative'}}>
+                <div style={{flex:1,position:'relative'}} className="dropdown-container">
                   <label style={label}>📂 ক্যাটাগরি</label>
                   <input value={categoryQ} onChange={e=>{setCategoryQ(e.target.value);setForm(f=>({...f,cat:e.target.value}));setShowCategoryDrop(true);}}
                     onFocus={()=>{setShowCategoryDrop(true);setCategoryQ(form.cat||'');}} placeholder="ক্যাটাগরি নির্বাচন করুন..."
@@ -1044,7 +1061,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
 
               {/* Barcode + Product Name */}
               <div style={{display:'flex',gap:8,marginBottom:12}}>
-                <div style={{flex:1,position:'relative'}}>
+                <div style={{flex:1,position:'relative'}} className="dropdown-container">
                   <label style={label}>④ বারকোড</label>
                   <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
                     style={{...input,fontSize:13}} />
@@ -1060,7 +1077,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
                     </div>
                   )}
                 </div>
-                <div style={{flex:2,position:'relative'}}>
+                <div style={{flex:2,position:'relative'}} className="dropdown-container">
                   <label style={label}>③ পণ্যের নাম *</label>
                   <input value={form.name} onChange={e=>{setForm(f=>({...f,name:e.target.value}));setProductNameQ(e.target.value);setShowProductDrop(true);}} 
                     placeholder="পণ্যের নাম লিখুন..."
