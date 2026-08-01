@@ -647,7 +647,7 @@ function POSScreen({products, customers, sales, settings, upd}) {
                 cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
               }}>
               {due > 0 && !selCust && cart.length ? `⚠️ পূর্ণ পরিশোধ করুন` : 
-               due > 0 && selCust && cart.length ? `✓ পূর্ণ পরিশোধ করুন বা বাকি বিক্রয় করুন` : 
+               due > 0 && selCust && cart.length ? `✓ বাকি/পূর্ণ পরিশোধ` : 
                '✓ বিক্রয় সম্পন্ন'}
             </button>
           </div>
