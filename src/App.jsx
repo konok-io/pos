@@ -102,6 +102,28 @@ const DEMO = {
     {id:'c001',name:'রহিম সাহেব',phone:'01712345678',address:'পল্লবী',credit:500},
     {id:'c002',name:'করিম ভাই',phone:'01898765432',address:'মিরপুর',credit:0},
     {id:'c003',name:'জামাল ভাই',phone:'01912345678',address:'উত্তরা',credit:200},
+  ],
+  suppliers: [
+    {id:'S-00001',name:'মিনিকেট রাইস',code:'C-00001'},
+    {id:'S-00002',name:'ব্রিলিয়ান্ট',code:'C-00002'},
+    {id:'S-00003',name:'সিআরআরএস',code:'C-00003'},
+    {id:'S-00004',name:'এসআর ফুডস',code:'C-00004'},
+    {id:'S-00005',name:'প্রিমিয়াম অয়েল',code:'C-00005'},
+    {id:'S-00006',name:'এসআর সুগার',code:'C-00006'},
+    {id:'S-00007',name:'এসআর অ্যাটা',code:'C-00007'},
+    {id:'S-00008',name:'আয়োডিন সল্ট',code:'C-00008'},
+    {id:'S-00009',name:'এসআর মসলা',code:'C-00009'},
+    {id:'S-00010',name:'এসবি ফুডস',code:'C-00010'},
+    {id:'S-00011',name:'ক্যাডবেরি',code:'C-00011'},
+    {id:'S-00012',name:'প্রিঙ্গলস',code:'C-00012'},
+    {id:'S-00013',name:'মগর',code:'C-00013'},
+    {id:'S-00014',name:'লিপটন',code:'C-00014'},
+    {id:'S-00015',name:'নেসকে',code:'C-00015'},
+    {id:'S-00016',name:'ডানোন',code:'C-00016'},
+    {id:'S-00017',name:'আইসম',code:'C-00017'},
+    {id:'S-00018',name:'মিনিমুটস',code:'C-00018'},
+    {id:'S-00019',name:'কোকাকোলা',code:'C-00019'},
+    {id:'S-00020',name:'প্রিজ',code:'C-00020'},
   ]
 ,
   suppliers: [
@@ -2197,15 +2219,15 @@ function SettingsScreen({settings, products, upd}) {
               if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
             }}>বিক্রয় ইতিহাস মুছুন</button>
             <button style={btn('danger','sm')} onClick={async()=>{
-              if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                await upd.products([]);
-                await upd.customers([]);
+              if(confirm('⚠️ সব ডেটা ডিফল্টে রিসেট হবে। চালিয়ে যেতে চান?')) {
+                await upd.products(DEMO.products);
+                await upd.customers(DEMO.customers);
                 await upd.sales([]);
                 await upd.settings({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
                 alert('সব ডেটা মুছে ফেলা হয়েছে।');
                 window.location.reload();
               }
-            }}>সম্পূর্ণ রিসেট</button>
+            }}>ডেমো ডাটা লোড করুন</button>
           </div>
         </div>
       </div>
