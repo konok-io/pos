@@ -115,21 +115,10 @@ export default function App() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Check if reset was done - use localStorage to persist across sessions
+    // Check if reset was done - flag stays forever to prevent DEMO loading
     const wasReset = db.get('pos_reset_done');
-    if (wasReset) {
-      setProducts([]);
-      setCustomers([]);
-      setSuppliers([]);
-      setSales([]);
-      setPurchases([]);
-      setSettings({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
-      db.remove('pos_reset_done');
-      setReady(true);
-      return;
-    }
-
-    // Load from localStorage or use DEMO data
+    
+    // Load from localStorage
     const savedProducts = db.get(STORAGE_KEYS.products);
     const savedCustomers = db.get(STORAGE_KEYS.customers);
     const savedSales = db.get(STORAGE_KEYS.sales);
@@ -137,7 +126,19 @@ export default function App() {
     const savedSuppliers = db.get(STORAGE_KEYS.suppliers) || [];
     const savedPurchases = db.get(STORAGE_KEYS.purchases) || [];
 
-    // If no data exists, load DEMO data
+    // If reset was done, always use empty data (never load DEMO)
+    if (wasReset) {
+      setProducts(savedProducts || []);
+      setCustomers(savedCustomers || []);
+      setSuppliers(savedSuppliers);
+      setSales(savedSales || []);
+      setPurchases(savedPurchases);
+      setSettings(savedSettings ? {...{name:'',address:'',phone:'',vatEnabled:true,vatPercent:15}, ...savedSettings} : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setReady(true);
+      return;
+    }
+
+    // If no data exists and not reset, load DEMO data
     if (!savedProducts || savedProducts.length === 0) {
       setProducts(DEMO.products);
       db.set(STORAGE_KEYS.products, DEMO.products);
