@@ -1290,15 +1290,17 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [catCompanyQ, setCatCompanyQ] = useState('');
   const [showCatCompanyDrop, setShowCatCompanyDrop] = useState(false);
 
-  // Click outside to close dropdowns
+  // Click outside to close dropdowns - only close when clicking outside the modal
   useEffect(() => {
-    const handleClick = () => {
-      setTimeout(() => {
+    const handleClick = (e) => {
+      // Only close if clicking outside the modal
+      const modal = document.querySelector('[data-modal]');
+      if (modal && !modal.contains(e.target)) {
         setShowCompanyDrop(false);
         setShowCatDrop(false);
         setShowCatCompanyDrop(false);
         setShowProductDrop(false);
-      }, 10);
+      }
     };
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
@@ -1731,8 +1733,8 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         {/* CATEGOR/* Company Modal */}
       {/* Unified Modal for all tabs */}
       {modal && (
-        <div style={{...overlay}} onClick={e => e.stopPropagation()}>
-          <div style={{...card,width:activeTab==='products'?500:380,padding:24}} onClick={e=>{e.stopPropagation();setShowCompanyDrop(false);setShowCatDrop(false);setShowCatCompanyDrop(false);setShowProductDrop(false);}}>
+        <div style={{...overlay}} onClick={e => e.stopPropagation()} data-modal>
+          <div style={{...card,width:activeTab==='products'?500:380,padding:24}} onClick={e=>{e.stopPropagation()}} data-modal>
             {/* Company Form */}
             {(modal.mode === 'add' || modal.mode === 'edit') && activeTab === 'companies' && (
               <>
