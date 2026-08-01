@@ -5,24 +5,8 @@ const GlobalStyle = () => {
   useEffect(() => {
     document.body.style.margin = '0';
     document.body.style.padding = '0';
-    document.body.style.width = '100%';
-    document.body.style.maxWidth = '100%';
-    document.body.style.overflowX = 'hidden';
     document.documentElement.style.margin = '0';
     document.documentElement.style.padding = '0';
-    document.documentElement.style.width = '100%';
-    document.documentElement.style.maxWidth = '100%';
-    document.documentElement.style.overflowX = 'hidden';
-    // Override root element styles
-    const root = document.getElementById('root');
-    if (root) {
-      root.style.width = '100%';
-      root.style.maxWidth = '100%';
-      root.style.margin = '0';
-      root.style.padding = '0';
-      root.style.border = 'none';
-      root.style.textAlign = 'left';
-    }
   }, []);
   return null;
 };
@@ -163,34 +147,35 @@ export default function App() {
   return (
     <>
       <GlobalStyle />
-      <div style={{display:'flex',flexDirection:'column',height:'100vh',width:'100vw',maxWidth:'100vw',minWidth:'100vw',position:'absolute',left:0,right:0,top:0,bottom:0,background:T.gray50,fontFamily:'"Segoe UI",system-ui,-apple-system,sans-serif',color:T.gray900,overflowX:'hidden',margin:0,padding:0}}>
+      <div style={{display:'flex',flexDirection:'column',height:'100vh',width:'100%',background:T.gray50,fontFamily:'"Segoe UI",system-ui,-apple-system,sans-serif',color:T.gray900,overflow:'hidden'}}>
       {/* Header */}
-      <div style={{background:T.tealDark,color:T.white,padding:'0 16px',height:52,display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0}}>
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <div style={{width:34,height:34,background:'rgba(255,255,255,0.15)',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18}}>🏪</div>
+      <div style={{background:T.tealDark,color:T.white,padding:'0 20px',height:56,display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:0,boxShadow:'0 2px 8px rgba(0,0,0,0.15)'}}>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <div style={{width:38,height:38,background:'rgba(255,255,255,0.15)',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',fontSize:20}}>🏪</div>
           <div>
-            <div style={{fontWeight:700,fontSize:15,lineHeight:1.2}}>{settings.name}</div>
-            <div style={{fontSize:11,opacity:0.65}}>POS ম্যানেজমেন্ট সিস্টেম</div>
+            <div style={{fontWeight:700,fontSize:16,lineHeight:1.2}}>{settings.name}</div>
+            <div style={{fontSize:11,opacity:0.7}}>POS ম্যানেজমেন্ট সিস্টেম</div>
           </div>
         </div>
-        <div style={{fontSize:12,opacity:0.7,textAlign:'right'}}>
+        <div style={{fontSize:12,opacity:0.8,textAlign:'right'}}>
           <div>{new Date().toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
           <div>{new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
         </div>
       </div>
 
       {/* Nav Tabs */}
-      <div style={{display:'flex',background:T.white,borderBottom:`1px solid ${T.gray200}`,padding:'0 8px',flexShrink:0,overflowX:'auto'}}>
+      <div style={{display:'flex',background:T.white,borderBottom:`1px solid ${T.gray200}`,padding:'0 12px',flexShrink:0,overflowX:'auto',boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
         {tabs.map(t => (
           <button key={t.id} onClick={()=>setTab(t.id)} style={{
-            padding:'10px 14px', border:'none', background:'none', cursor:'pointer',
-            borderBottom: tab===t.id ? `2px solid ${T.teal}` : '2px solid transparent',
-            color: tab===t.id ? T.teal : T.gray400,
+            padding:'12px 16px', border:'none', background:'none', cursor:'pointer',
+            borderBottom: tab===t.id ? `3px solid ${T.teal}` : '3px solid transparent',
+            color: tab===t.id ? T.teal : T.gray500,
             fontWeight: tab===t.id ? 700 : 500,
-            fontSize:13, display:'flex', alignItems:'center', gap:5,
+            fontSize:14, display:'flex', alignItems:'center', gap:6,
             whiteSpace:'nowrap', fontFamily:'inherit',
+            transition:'all 0.2s',
           }}>
-            <span style={{fontSize:14}}>{t.icon}</span>
+            <span style={{fontSize:15}}>{t.icon}</span>
             <span>{t.label}</span>
           </button>
         ))}
@@ -351,23 +336,23 @@ function POSScreen({products, customers, sales, settings, upd}) {
   );
 
   return (
-    <div style={{display:'flex',height:'100%',overflow:'hidden',width:'100%'}}>
+    <div style={{display:'flex',height:'100%',overflow:'hidden',width:'100%',background:T.gray50}}>
       {/* ── LEFT: Products ── */}
-      <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',borderRight:`1px solid ${T.gray200}`,minWidth:0}}>
+      <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0}}>
         {/* Search bar */}
-        <div style={{padding:'10px 12px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8}}>
+        <div style={{padding:'14px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:10,boxShadow:'0 1px 3px rgba(0,0,0,0.05)'}}>
           <div style={{position:'relative',flex:1}}>
-            <span style={{position:'absolute',left:12,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:16}}>🔍</span>
+            <span style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:16}}>🔍</span>
             <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder="পণ্যের নাম বা বারকোড লিখুন... (Enter চাপুন)"
-              style={{...input,paddingLeft:38,height:42,fontSize:14}}
+              placeholder="পণ্যের নাম বা বারকোড লিখুন..."
+              style={{...input,paddingLeft:42,height:46,fontSize:14,borderRadius:10}}
               onKeyDown={e=>{if(e.key==='Enter'&&filtered.length>0) addToCart(filtered[0]);}}
             />
           </div>
         </div>
 
         {/* Category filter */}
-        <div style={{padding:'8px 12px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,overflowX:'auto'}}>
+        <div style={{padding:'10px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,overflowX:'auto'}}>
           {cats.map(c=>(
             <button key={c} onClick={()=>setSelCat(c)} style={{
               ...btn(selCat===c?'primary':'ghost','sm'),
@@ -375,25 +360,26 @@ function POSScreen({products, customers, sales, settings, upd}) {
               background:selCat===c?T.teal:T.gray100,
               color:selCat===c?T.white:T.gray600,
               border:'none',
+              padding:'6px 14px',
             }}>{c}</button>
           ))}
         </div>
 
         {/* Product grid */}
-        <div style={{flex:1,overflow:'auto',padding:12,display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(148px,1fr))',gap:8,alignContent:'start'}}>
+        <div style={{flex:1,overflow:'auto',padding:16,display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:12,alignContent:'start',background:T.gray50}}>
           {filtered.map(p => (
             <button key={p.id} onClick={()=>addToCart(p)} style={{
               background:T.white, border:`1.5px solid ${p.stock<=0?T.gray200:p.stock<=p.minStock?T.amber+'80':T.gray200}`,
-              borderRadius:10, padding:'12px 10px', cursor:p.stock>0?'pointer':'not-allowed',
-              opacity:p.stock<=0?0.5:1, textAlign:'left', transition:'all 0.15s',
-              boxShadow:'0 1px 3px rgba(0,0,0,0.06)', fontFamily:'inherit',
+              borderRadius:12, padding:'14px 12px', cursor:p.stock>0?'pointer':'not-allowed',
+              opacity:p.stock<=0?0.5:1, textAlign:'left', transition:'all 0.2s',
+              boxShadow:'0 2px 8px rgba(0,0,0,0.08)', fontFamily:'inherit',
               outline:'none',
             }}>
-              <div style={{fontSize:10,color:T.gray400,marginBottom:3,fontWeight:600,textTransform:'uppercase'}}>{p.cat}</div>
-              <div style={{fontWeight:600,fontSize:13,marginBottom:6,lineHeight:1.4,color:T.gray900}}>{p.name}</div>
-              <div style={{fontSize:17,fontWeight:800,color:T.teal}}>{fmt(p.sellP)}</div>
-              <div style={{fontSize:10,marginTop:4,color:T.gray400}}>/{p.unit}</div>
-              <div style={{marginTop:5,display:'inline-block',padding:'2px 7px',borderRadius:10,fontSize:10,fontWeight:600,
+              <div style={{fontSize:10,color:T.gray400,marginBottom:4,fontWeight:600,textTransform:'uppercase'}}>{p.cat}</div>
+              <div style={{fontWeight:600,fontSize:14,marginBottom:8,lineHeight:1.4,color:T.gray900}}>{p.name}</div>
+              <div style={{fontSize:18,fontWeight:800,color:T.teal}}>{fmt(p.sellP)}</div>
+              <div style={{fontSize:11,marginTop:4,color:T.gray400}}>/{p.unit}</div>
+              <div style={{marginTop:8,display:'inline-block',padding:'3px 8px',borderRadius:10,fontSize:11,fontWeight:600,
                 background:p.stock<=0?T.redLight:p.stock<=p.minStock?T.amberLight:T.tealLight,
                 color:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.teal}}>
                 স্টক: {p.stock}
@@ -402,40 +388,40 @@ function POSScreen({products, customers, sales, settings, upd}) {
           ))}
           {filtered.length===0 && (
             <div style={{gridColumn:'1/-1',textAlign:'center',padding:'60px 20px',color:T.gray400}}>
-              <div style={{fontSize:40,marginBottom:8}}>📦</div>
-              <div style={{fontSize:14}}>কোনো পণ্য পাওয়া যায়নি</div>
+              <div style={{fontSize:48,marginBottom:12}}>📦</div>
+              <div style={{fontSize:15}}>কোনো পণ্য পাওয়া যায়নি</div>
             </div>
           )}
         </div>
       </div>
 
       {/* ── RIGHT: Cart ── */}
-      <div style={{width:340,display:'flex',flexDirection:'column',background:T.white}}>
+      <div style={{width:360,display:'flex',flexDirection:'column',background:T.white,borderLeft:`1px solid ${T.gray200}`,boxShadow:'-2px 0 10px rgba(0,0,0,0.05)'}}>
         {/* Customer */}
-        <div style={{padding:'10px 12px',borderBottom:`1px solid ${T.gray200}`,position:'relative'}}>
+        <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray200}`,position:'relative'}}>
           <label style={label}>👥 কাস্টমার (ঐচ্ছিক)</label>
           <input value={custQ} onChange={e=>{setCustQ(e.target.value);setShowCustDrop(true);}}
             onFocus={()=>setShowCustDrop(true)}
             placeholder="নাম বা ফোন নম্বর..."
-            style={{...input,fontSize:13}}
+            style={{...input,fontSize:13,borderRadius:8}}
           />
           {selCust && (
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:5,padding:'4px 8px',background:T.tealLight,borderRadius:6}}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:T.tealLight,borderRadius:8}}>
               <span style={{fontSize:12,color:T.teal,fontWeight:600}}>✓ {selCust.name} {selCust.credit>0?`(বাকি: ${fmt(selCust.credit)})`:''}</span>
               <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:12,background:'none',border:'none',color:T.gray400,cursor:'pointer'}}>✕</button>
             </div>
           )}
           {showCustDrop && custQ && !selCust && (
-            <div style={{position:'absolute',left:12,right:12,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 6px 20px rgba(0,0,0,0.1)',zIndex:50,maxHeight:180,overflow:'auto'}}>
+            <div style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 6px 20px rgba(0,0,0,0.12)',zIndex:50,maxHeight:180,overflow:'auto'}}>
               {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).map(c=>(
                 <div key={c.id} onClick={()=>{setSelCust(c);setCustQ(c.name);setShowCustDrop(false);}}
-                  style={{padding:'9px 12px',cursor:'pointer',fontSize:13,borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
+                  style={{padding:'10px 14px',cursor:'pointer',fontSize:13,borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
                   <span><strong>{c.name}</strong>{c.phone?` · ${c.phone}`:''}</span>
                   {c.credit>0 && <span style={{color:T.red,fontSize:11}}>বাকি {fmt(c.credit)}</span>}
                 </div>
               ))}
               {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).length===0 && (
-                <div style={{padding:'9px 12px',fontSize:13,color:T.gray400}}>কাস্টমার পাওয়া যায়নি</div>
+                <div style={{padding:'10px 14px',fontSize:13,color:T.gray400}}>কাস্টমার পাওয়া যায়নি</div>
               )}
             </div>
           )}
@@ -444,25 +430,25 @@ function POSScreen({products, customers, sales, settings, upd}) {
         {/* Cart Items */}
         <div style={{flex:1,overflow:'auto'}}>
           {cart.length===0 ? (
-            <div style={{textAlign:'center',padding:'50px 20px',color:T.gray400}}>
-              <div style={{fontSize:44,marginBottom:10}}>🛒</div>
-              <div style={{fontSize:14,fontWeight:500}}>কার্ট খালি</div>
+            <div style={{textAlign:'center',padding:'60px 20px',color:T.gray400}}>
+              <div style={{fontSize:52,marginBottom:12}}>🛒</div>
+              <div style={{fontSize:15,fontWeight:500}}>কার্ট খালি</div>
               <div style={{fontSize:12,marginTop:4}}>বাম দিক থেকে পণ্য যোগ করুন</div>
             </div>
           ) : (
-            <div style={{padding:'6px 10px'}}>
+            <div style={{padding:'8px 14px'}}>
               {cart.map(item=>(
-                <div key={item.id} style={{display:'flex',alignItems:'center',gap:8,padding:'9px 0',borderBottom:`1px solid ${T.gray100}`}}>
+                <div key={item.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:`1px solid ${T.gray100}`}}>
                   <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:13,fontWeight:600,color:T.gray900,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name}</div>
-                    <div style={{fontSize:12,color:T.teal,marginTop:1}}>{fmt(item.sellP)} × {item.qty} = <strong>{fmt(item.sellP*item.qty)}</strong></div>
+                    <div style={{fontSize:14,fontWeight:600,color:T.gray900,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name}</div>
+                    <div style={{fontSize:13,color:T.teal,marginTop:2}}>{fmt(item.sellP)} × {item.qty} = <strong>{fmt(item.sellP*item.qty)}</strong></div>
                   </div>
-                  <div style={{display:'flex',alignItems:'center',gap:4}}>
-                    <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:26,height:26,border:`1px solid ${T.gray200}`,borderRadius:6,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
+                  <div style={{display:'flex',alignItems:'center',gap:5}}>
+                    <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:28,height:28,border:`1px solid ${T.gray200}`,borderRadius:6,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
                     <input value={item.qty} onChange={e=>updQty(item.id,e.target.value)} type="number"
-                      style={{width:40,height:26,textAlign:'center',border:`1px solid ${T.gray200}`,borderRadius:6,fontSize:13,fontFamily:'inherit'}}/>
-                    <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:26,height:26,border:`1px solid ${T.gray200}`,borderRadius:6,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
-                    <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:26,height:26,border:'none',borderRadius:6,background:T.redLight,color:T.red,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+                      style={{width:42,height:28,textAlign:'center',border:`1px solid ${T.gray200}`,borderRadius:6,fontSize:13,fontFamily:'inherit'}}/>
+                    <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:28,height:28,border:`1px solid ${T.gray200}`,borderRadius:6,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
+                    <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:28,height:28,border:'none',borderRadius:6,background:T.redLight,color:T.red,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
                   </div>
                 </div>
               ))}
@@ -471,38 +457,38 @@ function POSScreen({products, customers, sales, settings, upd}) {
         </div>
 
         {/* Totals */}
-        <div style={{borderTop:`1.5px solid ${T.gray200}`,padding:'12px 12px 8px'}}>
-          <div style={{display:'flex',justifyContent:'space-between',fontSize:13,color:T.gray600,marginBottom:6}}>
+        <div style={{borderTop:`2px solid ${T.gray200}`,padding:'14px 16px 10px',background:T.white}}>
+          <div style={{display:'flex',justifyContent:'space-between',fontSize:14,color:T.gray600,marginBottom:8}}>
             <span>সাবটোটাল ({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
             <span style={{fontWeight:600}}>{fmt(subtotal)}</span>
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
             <label style={{...label,margin:0,whiteSpace:'nowrap'}}>ছাড় (৳)</label>
             <input value={discount} onChange={e=>setDiscount(e.target.value)} type="number" min="0"
-              style={{...input,width:100,padding:'5px 8px',fontSize:13}}/>
+              style={{...input,width:110,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
           </div>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',background:T.tealLight,borderRadius:8,marginBottom:8}}>
-            <span style={{fontWeight:700,fontSize:15}}>মোট দেনা</span>
-            <span style={{fontWeight:800,fontSize:22,color:T.teal}}>{fmt(total)}</span>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 14px',background:T.tealLight,borderRadius:10,marginBottom:10}}>
+            <span style={{fontWeight:700,fontSize:16}}>মোট দেনা</span>
+            <span style={{fontWeight:800,fontSize:24,color:T.teal}}>{fmt(total)}</span>
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
+          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
             <label style={{...label,margin:0,whiteSpace:'nowrap'}}>পরিশোধ (৳)</label>
             <input value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
-              placeholder={total.toFixed(0)} style={{...input,padding:'5px 8px',fontSize:14,fontWeight:600}}/>
+              placeholder={total.toFixed(0)} style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}/>
           </div>
           {paid && (
-            <div style={{fontSize:13,marginBottom:8,padding:'5px 10px',borderRadius:6,
+            <div style={{fontSize:14,marginBottom:10,padding:'8px 12px',borderRadius:8,
               background:due>0?T.redLight:T.greenLight, color:due>0?T.red:T.green, fontWeight:600}}>
               {due>0 ? `⚠️ বাকি থাকবে: ${fmt(due)}` : `💵 ফেরত দিন: ${fmt(change)}`}
             </div>
           )}
-          <div style={{display:'flex',gap:8}}>
+          <div style={{display:'flex',gap:10}}>
             <button onClick={()=>{setCart([]);setDiscount('');setPaid('');setSelCust(null);setCustQ('');}}
-              style={{...btn('ghost'),flex:1,justifyContent:'center'}}>
+              style={{...btn('ghost'),flex:1,justifyContent:'center',padding:'12px'}}>
               🗑️ ক্লিয়ার
             </button>
             <button onClick={checkout} disabled={!cart.length} style={{
-              ...btn('sell'), flex:2, justifyContent:'center', fontSize:15, padding:'12px 0',
+              ...btn('sell'), flex:2, justifyContent:'center', fontSize:15, padding:'12px',
               opacity:cart.length?1:0.5,
             }}>
               ✓ বিক্রয় সম্পন্ন
