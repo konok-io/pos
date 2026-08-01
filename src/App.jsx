@@ -661,8 +661,65 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
   const [productNameQ, setProductNameQ] = useState('');
   const [showProductDrop, setShowProductDrop] = useState(false);
+  const [csvData, setCsvData] = useState([]);
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
+
+  // Handle CSV Import
+  const handleCsvImport = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      if (lines.length < 2) {
+        alert('CSV ফাইলে কমপক্ষে হেডার ও একটি পণ্য থাকতে হবে');
+        return;
+      }
+      
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const items = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        const row = {};
+        headers.forEach((h, idx) => {
+          row[h] = values[idx] || '';
+        });
+        
+        // Map CSV columns to product fields
+        const item = {
+          id: genId(),
+          name: row['পণ্যের নাম'] || row['নাম'] || row['name'] || '',
+          barcode: row['বারকোড'] || row['barcode'] || '',
+          company: row['কোম্পানি'] || row['company'] || supplierQ || '',
+          cat: row['ক্যাটাগরি'] || row['category'] || '',
+          unit: row['একক'] || row['unit'] || 'পিস',
+          buyP: parseFloat(row['ক্রয়মূল্য'] || row['buyprice'] || row['buy'] || 0),
+          sellP: parseFloat(row['বিক্রয়মূল্য'] || row['sellprice'] || row['sell'] || 0),
+          stock: parseFloat(row['স্টক'] || row['stock'] || 0),
+          minStock: parseFloat(row['মিনস্টক'] || row['minstock'] || 5)
+        };
+        
+        if (item.name) {
+          items.push(item);
+        }
+      }
+      
+      if (items.length > 0) {
+        setPurchaseItems([...purchaseItems, ...items]);
+        setCsvData(items);
+        alert(`${items.length}টি পণ্য আমদানি হয়েছে!`);
+      } else {
+        alert('কোনো পণ্য পাওয়া যায়নি। CSV ফরম্যাট সঠিক নয়।');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
 
   // Get all unique companies from products and suppliers
   const allCompanies = [
@@ -892,7 +949,7 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
     return (
       <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
         <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
-          <button style={btn()} onClick={()=>{setShowAddForm(false);setPurchaseItems([]);}}>← ফিরে যান</button>
+          <button style={btn()} onClick={()=>{setShowAddForm(false);setPurchaseItems([]);setCsvData([]);}}>← ফিরে যান</button>
           <span style={{fontWeight:700,fontSize:15}}>📦 নতুন পণ্য সংরক্ষণ</span>
           <span style={{fontSize:12,color:T.gray500,marginLeft:'auto'}}>{purchaseItems.length}টি পণ্য যোগ হয়েছে</span>
         </div>
@@ -900,6 +957,24 @@ function ProductsScreen({products, suppliers, purchases, upd}) {
         <div style={{display:'flex',flex:1,overflow:'hidden'}}>
           {/* Left: Form */}
           <div style={{flex:1,padding:16,overflow:'auto',borderRight:`1px solid ${T.gray200}`}}>
+            
+            {/* CSV Import Section */}
+            <div style={{...card,padding:16,marginBottom:16,background:T.tealLight,border:`1px dashed ${T.teal}`}}>
+              <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 CSV আমদানি করুন</h3>
+              <div style={{display:'flex',gap:8,alignItems:'center'}}>
+                <input type="file" accept=".csv" onChange={handleCsvImport} id="csvInput" style={{display:'none'}} />
+                <label htmlFor="csvInput" style={{...btn(),cursor:'pointer',fontSize:13,padding:'8px 16px'}}>
+                  📁 CSV ফাইল বাছুন
+                </label>
+                <span style={{fontSize:12,color:T.gray500}}>পণ্যের CSV আপলোড করুন</span>
+              </div>
+              {csvData.length > 0 && (
+                <div style={{marginTop:8,fontSize:12,color:T.teal,fontWeight:600}}>
+                  ✓ {csvData.length}টি পণ্য আমদানি হয়েছে
+                </div>
+              )}
+            </div>
+            
             <div style={{...card,padding:16}}>
               <h3 style={{margin:'0 0 16px',fontSize:14,color:T.teal}}>পণ্য যোগ করুন</h3>
               
