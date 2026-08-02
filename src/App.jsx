@@ -118,7 +118,6 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isFullscreenLocked, setIsFullscreenLocked] = useState(false);
 
   // Update time every second
   useEffect(() => {
@@ -135,22 +134,14 @@ export default function App() {
     }
   }, [tab]);
 
-  // Listen for fullscreen changes - re-enter if user tries to exit while locked
+  // Listen for fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
-      const nowFullscreen = !!document.fullscreenElement;
-      setIsFullscreen(nowFullscreen);
-      // If fullscreen was locked and user tried to exit (pressed ESC or clicked outside)
-      if (isFullscreenLocked && !nowFullscreen) {
-        // Re-enter fullscreen immediately
-        setTimeout(() => {
-          document.documentElement.requestFullscreen().catch(() => {});
-        }, 10);
-      }
+      setIsFullscreen(!!document.fullscreenElement);
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, [isFullscreenLocked]);
+  }, []);
 
   // Auto-enter fullscreen on page load if it was requested before reload
   useEffect(() => {
@@ -297,16 +288,14 @@ export default function App() {
     }, 10);
   };
 
-  // Fullscreen toggle function - lock when entering, unlock when exiting via button
+  // Fullscreen toggle function
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       localStorage.setItem('pos_want_fullscreen', 'true');
-      setIsFullscreenLocked(true);
       document.documentElement.requestFullscreen().catch(err => {
         console.log('Fullscreen error:', err);
       });
     } else {
-      setIsFullscreenLocked(false);
       localStorage.removeItem('pos_want_fullscreen');
       document.exitFullscreen();
     }
@@ -334,7 +323,7 @@ export default function App() {
             <div>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
           </div>
           <button onClick={toggleFullscreen} style={{background:isFullscreen?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.15)',border:'none',borderRadius:8,cursor:'pointer',padding:'8px 12px',color:T.white,fontSize:16,display:'flex',alignItems:'center',gap:4}} title={isFullscreen?"ফুল স্ক্রিন বন্ধ করুন":"ফুল স্ক্রিন করুন"}>
-            {isFullscreen ? (isFullscreenLocked ? '🔒' : '⛶') : '⛶'}
+            {isFullscreen ? '✕' : '⛶'}
           </button>
         </div>
       </div>
