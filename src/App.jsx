@@ -1702,6 +1702,7 @@ function BarcodeScreen({purchases, products}) {
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [barcodeCounts, setBarcodeCounts] = useState({});
   const [barcodeSearchResult, setBarcodeSearchResult] = useState(null);
+  const [selectedItems, setSelectedItems] = useState([]); // Selected items from search
   
   // Find purchase by ID or barcode
   const findPurchase = () => {
@@ -2094,19 +2095,29 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
         </div>
       ) : barcodeSearchResult ? (
         <div style={{flex:1,overflow:'auto',padding:16}}>
-          <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
             <div>
               <div style={{fontWeight:700,color:T.teal}}>🔍 বারকোড সার্চ রেজাল্ট</div>
               <div style={{fontSize:12,color:T.gray500}}>{barcodeSearchResult.length}টি পণ্য পাওয়া গেছে</div>
             </div>
-            <button onClick={()=>{setBarcodeSearchResult(null);setPurchaseId('');}} style={{...btn(),padding:'8px 16px'}}>✕ বন্ধ করুন</button>
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={()=>{
+                setPurchaseId('');
+                setBarcodeSearchResult(null);
+              }} style={{...btn('ghost'),padding:'8px 16px'}}>+ নতুন সার্চ</button>
+              <button onClick={()=>{setBarcodeSearchResult(null);setPurchaseId('');setSelectedItems([]);}} style={{...btn(),padding:'8px 16px'}}>✕ বন্ধ করুন</button>
+            </div>
           </div>
           
           <div style={{display:'flex',flexDirection:'column',gap:10}}>
-            {barcodeSearchResult.map((item, idx) => (
+            {barcodeSearchResult.map((item, idx) => {
+              const isSelected = selectedItems.some(si => si.barcode === item.barcode);
+              return (
               <div key={idx} style={{
                 padding:16,background:T.white,borderRadius:10,
-                border:`1px solid ${T.teal}`,display:'flex',alignItems:'center',gap:12
+                border:`1px solid ${isSelected ? T.green : T.teal}`,
+                display:'flex',alignItems:'center',gap:12,
+                opacity: isSelected ? 0.7 : 1
               }}>
                 <div style={{flex:1}}>
                   <div style={{fontWeight:600,fontSize:15,marginBottom:4}}>{item.name}</div>
@@ -2128,15 +2139,81 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
                       style={{...input,width:60,textAlign:'center',padding:'6px'}}
                     />
                   </div>
-                  <button onClick={()=>{
-                    const countInput = document.getElementById(`bc-count-${idx}`);
-                    const count = parseInt(countInput?.value) || 1;
-                    printSingleBarcode(item, count);
-                  }} style={{...btn('primary'),padding:'8px 16px'}}>🖨️ প্রিন্ট করুন</button>
+                  <button 
+                    onClick={()=>{
+                      if (isSelected) {
+                        setSelectedItems(selectedItems.filter(si => si.barcode !== item.barcode));
+                      } else {
+                        const countInput = document.getElementById(`bc-count-${idx}`);
+                        const count = parseInt(countInput?.value) || 1;
+                        setSelectedItems([...selectedItems, {...item, printCount: count}]);
+                      }
+                    }} 
+                    style={{
+                      ...btn(isSelected ? 'ghost' : 'success'),
+                      padding:'6px 12px',
+                      fontSize:12
+                    }}>
+                    {isSelected ? '✓ সিলেক্টেড' : '✓ সিলেক্ট করুন'}
+                  </button>
+                  {!isSelected && (
+                    <button onClick={()=>{
+                      const countInput = document.getElementById(`bc-count-${idx}`);
+                      const count = parseInt(countInput?.value) || 1;
+                      printSingleBarcode(item, count);
+                    }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
+                  )}
+                </div>
+              </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : selectedItems.length > 0 ? (
+        <div style={{flex:1,overflow:'auto',padding:16}}>
+          <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
+            <div>
+              <div style={{fontWeight:700,color:T.green}}>✓ সিলেক্টেড আইটেম ({selectedItems.length})</div>
+            </div>
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={()=>{
+                setPurchaseId('');
+                setBarcodeSearchResult(null);
+              }} style={{...btn('ghost'),padding:'8px 16px'}}>+ নতুন সার্চ</button>
+              <button onClick={()=>setSelectedItems([])} style={{...btn('danger'),padding:'8px 16px'}}>✕ সব সরান</button>
+            </div>
+          </div>
+          
+          <div style={{display:'flex',flexDirection:'column',gap:8}}>
+            {selectedItems.map((item, idx) => (
+              <div key={idx} style={{
+                padding:12,background:T.white,borderRadius:10,
+                border:`1px solid ${T.green}`,display:'flex',alignItems:'center',gap:12
+              }}>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:14}}>{item.name}</div>
+                  <div style={{fontSize:11,color:T.gray500}}>
+                    বারকোড: {item.barcode} | কাউন্ট: {item.printCount}
+                  </div>
+                </div>
+                <div style={{display:'flex',gap:6}}>
+                  <button onClick={()=>printSingleBarcode(item, item.printCount)} style={{...btn('primary'),padding:'6px 10px',fontSize:12}}>🖨️</button>
+                  <button onClick={()=>setSelectedItems(selectedItems.filter((_,i) => i !== idx))} style={{...btn('danger'),padding:'6px 10px',fontSize:12}}>✕</button>
                 </div>
               </div>
             ))}
           </div>
+          
+          <button 
+            onClick={()=>{
+              if (selectedItems.length === 0) return;
+              selectedItems.forEach(item => {
+                printSingleBarcode(item, item.printCount || 1);
+              });
+            }}
+            style={{...btn('primary'),width:'100%',marginTop:16,padding:'12px'}}>
+            🖨️ সব প্রিন্ট করুন ({selectedItems.length}টি)
+          </button>
         </div>
       ) : (
         <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray400}}>
