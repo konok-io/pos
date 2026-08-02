@@ -117,6 +117,18 @@ function Modal({onClose, title, children, width=460}) {
 
 /* ─────────────── DYNAMIC MENU COMPONENT ─────────────── */
 function DynamicMenu({tab, setTab, tabs}) {
+  const menuRef = useRef(null);
+
+  const scrollMenu = (direction) => {
+    if (menuRef.current) {
+      const scrollAmount = 150;
+      menuRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   // Menu groups for POS system
   const menuGroups = [
     { id: 'sales', items: tabs.filter(t => ['pos'].includes(t.id)) },
@@ -171,15 +183,39 @@ function DynamicMenu({tab, setTab, tabs}) {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      overflowX: 'auto',
-      gap: 2,
       marginLeft: 24,
       marginRight: 16,
-      padding: '4px 8px',
-      background: 'rgba(15,118,110,0.03)',
-      borderRadius: 12,
-      border: `1px solid ${T.gray200}`,
     }}>
+      {/* Left Arrow */}
+      <button onClick={() => scrollMenu('left')} style={{
+        width: 28,
+        height: 28,
+        border: 'none',
+        background: T.gray100,
+        borderRadius: 6,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 14,
+        color: T.gray600,
+        marginRight: 8,
+        flexShrink: 0,
+      }}>◀</button>
+
+      {/* Menu Container */}
+      <div ref={menuRef} style={{
+        display: 'flex',
+        alignItems: 'center',
+        overflowX: 'auto',
+        gap: 2,
+        padding: '4px 8px',
+        background: 'rgba(15,118,110,0.03)',
+        borderRadius: 12,
+        border: `1px solid ${T.gray200}`,
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+      }}>
       {/* Menu Groups with Dividers */}
       {menuGroups.map((group, groupIdx) => (
         <div key={group.id} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -189,6 +225,24 @@ function DynamicMenu({tab, setTab, tabs}) {
           )}
         </div>
       ))}
+      </div>
+
+      {/* Right Arrow */}
+      <button onClick={() => scrollMenu('right')} style={{
+        width: 28,
+        height: 28,
+        border: 'none',
+        background: T.gray100,
+        borderRadius: 6,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 14,
+        color: T.gray600,
+        marginLeft: 8,
+        flexShrink: 0,
+      }}>▶</button>
     </div>
   );
 }
