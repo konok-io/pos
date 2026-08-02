@@ -123,66 +123,151 @@ function DynamicMenu({tab, setTab, tabs}) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMoreMenu]);
 
-  // Define menu groups
-  const primaryTabs = tabs.filter(t => ['pos', 'products', 'newproduct', 'suppliers', 'customers'].includes(t.id));
+  // Menu groups for POS system
+  const menuGroups = [
+    { id: 'sales', label: '📦 বিক্রয়', items: tabs.filter(t => ['pos'].includes(t.id)) },
+    { id: 'inventory', label: '📦 পণ্য', items: tabs.filter(t => ['products', 'newproduct'].includes(t.id)) },
+    { id: 'management', label: '🏢 ব্যবস্থাপনা', items: tabs.filter(t => ['suppliers', 'customers'].includes(t.id)) },
+  ];
+
   const secondaryTabs = tabs.filter(t => !['pos', 'products', 'newproduct', 'suppliers', 'customers'].includes(t.id));
 
-  const renderMenuButton = (t) => (
-    <button key={t.id} onClick={() => {
-      setTab(t.id);
-      setShowMoreMenu(false);
-    }} style={{
-      padding:'8px 12px', border:'none', background:'transparent', cursor:'pointer',
-      color: tab===t.id ? T.white : T.gray600,
-      fontWeight: tab===t.id ? 600 : 500,
-      fontSize:13, display:'flex', alignItems:'center', gap:5,
-      whiteSpace:'nowrap', fontFamily:'inherit',
-      transition:'all 0.2s',
-      background: tab===t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
-      borderRadius:8,
-      boxShadow: tab===t.id ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
-      width:'100%', textAlign:'left',
-    }}>
-      <span style={{fontSize:14}}>{t.icon}</span>
-      <span>{t.label}</span>
-    </button>
-  );
+  const renderMenuButton = (t, isDropdown = false) => {
+    const isActive = tab === t.id;
+    return (
+      <button key={t.id} onClick={() => {
+        setTab(t.id);
+        setShowMoreMenu(false);
+      }} style={{
+        padding: isDropdown ? '10px 14px' : '8px 14px',
+        border: 'none',
+        background: isActive 
+          ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' 
+          : isDropdown ? 'transparent' : 'transparent',
+        cursor:'pointer',
+        color: isActive ? T.white : isDropdown ? T.gray700 : T.gray600,
+        fontWeight: isActive ? 600 : 500,
+        fontSize: 13,
+        display:'flex', 
+        alignItems:'center', 
+        gap:8,
+        whiteSpace:'nowrap', 
+        fontFamily:'inherit',
+        transition:'all 0.2s',
+        borderRadius: 8,
+        boxShadow: isActive ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
+        width: isDropdown ? '100%' : 'auto',
+        textAlign: isDropdown ? 'left' : 'center',
+      }}
+      onMouseOver={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.background = isDropdown ? T.tealLight : 'rgba(15,118,110,0.08)';
+          e.currentTarget.style.color = T.teal;
+        }
+      }}
+      onMouseOut={(e) => {
+        if (!isActive) {
+          e.currentTarget.style.background = isDropdown ? 'transparent' : 'transparent';
+          e.currentTarget.style.color = isDropdown ? T.gray700 : T.gray600;
+        }
+      }}>
+        <span style={{fontSize: isDropdown ? 16 : 15}}>{t.icon}</span>
+        <span>{t.label}</span>
+      </button>
+    );
+  };
 
   return (
-    <div style={{display:'flex',flex:1,alignItems:'center',overflowX:'auto',gap:2,marginLeft:24,marginRight:16}}>
-      {/* Primary Tabs - Always visible */}
-      {primaryTabs.map(t => renderMenuButton(t))}
+    <div style={{
+      display: 'flex',
+      flex: 1,
+      alignItems: 'center',
+      overflowX: 'auto',
+      gap: 4,
+      marginLeft: 24,
+      marginRight: 16,
+      padding: '4px 8px',
+      background: 'rgba(15,118,110,0.03)',
+      borderRadius: 12,
+      border: `1px solid ${T.gray200}`,
+    }}>
+      {/* Menu Groups */}
+      {menuGroups.map(group => (
+        <div key={group.id} style={{ display: 'flex', gap: 2 }}>
+          {group.items.map(t => renderMenuButton(t))}
+          <div style={{ width: 1, background: T.gray200, margin: '8px 4px', borderRadius: 2 }} />
+        </div>
+      ))}
 
-      {/* More Menu for secondary tabs */}
+      {/* More Menu for other tabs */}
       {secondaryTabs.length > 0 && (
-        <div style={{position:'relative'}} ref={moreMenuRef}>
+        <div style={{ position: 'relative' }} ref={moreMenuRef}>
           <button 
             onClick={() => setShowMoreMenu(!showMoreMenu)} 
             style={{
-              padding:'8px 12px', border:'none', background: showMoreMenu ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent', 
+              padding: '8px 14px',
+              border: 'none',
+              background: showMoreMenu ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'rgba(255,255,255,0.8)', 
               cursor:'pointer',
               color: showMoreMenu ? T.white : T.gray600,
               fontWeight: 500,
-              fontSize:13, display:'flex', alignItems:'center', gap:5,
-              whiteSpace:'nowrap', fontFamily:'inherit',
+              fontSize: 13,
+              display:'flex', 
+              alignItems:'center', 
+              gap: 6,
+              whiteSpace:'nowrap', 
+              fontFamily:'inherit',
               transition:'all 0.2s',
-              borderRadius:8,
-              boxShadow: showMoreMenu ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
+              borderRadius: 8,
+              boxShadow: showMoreMenu ? '0 4px 12px rgba(15,118,110,0.3)' : '0 1px 3px rgba(0,0,0,0.05)',
+              border: showMoreMenu ? 'none' : `1px solid ${T.gray200}`,
+            }}
+            onMouseOver={(e) => {
+              if (!showMoreMenu) {
+                e.currentTarget.style.borderColor = T.teal;
+                e.currentTarget.style.color = T.teal;
+              }
+            }}
+            onMouseOut={(e) => {
+              if (!showMoreMenu) {
+                e.currentTarget.style.borderColor = T.gray200;
+                e.currentTarget.style.color = T.gray600;
+              }
             }}>
-            <span style={{fontSize:14}}>📋</span>
-            <span>আরও</span>
-            <span style={{fontSize:10,transform: showMoreMenu ? 'rotate(0deg)' : 'rotate(180deg)', transition:'transform 0.2s'}}>▼</span>
+            <span style={{fontSize:15}}>⚙️</span>
+            <span>অন্যান্য</span>
+            <span style={{fontSize:10, transform: showMoreMenu ? 'rotate(0deg)' : 'rotate(180deg)', transition:'transform 0.2s'}}>▼</span>
           </button>
           
           {/* Dropdown Menu - Opens UPWARD */}
           {showMoreMenu && (
             <div style={{
-              position:'absolute', bottom:'100%', right:0, marginBottom:4,
-              background:T.white, borderRadius:10, padding:6,
-              boxShadow:'0 8px 24px rgba(0,0,0,0.15)', border:`1px solid ${T.gray200}`,
-              zIndex:100, minWidth:160,
+              position:'absolute', 
+              bottom:'100%', 
+              right: 0, 
+              marginBottom: 8,
+              background: T.white, 
+              borderRadius: 12, 
+              padding: 8,
+              boxShadow: '0 12px 40px rgba(0,0,0,0.18)', 
+              border: `1px solid ${T.gray200}`,
+              zIndex: 100, 
+              minWidth: 180,
             }}>
-              {secondaryTabs.map(t => renderMenuButton(t))}
+              <div style={{ 
+                padding: '8px 12px 12px',
+                borderBottom: `1px solid ${T.gray100}`,
+                marginBottom: 8
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: T.gray400, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  সরঞ্জাম ও রিপোর্ট
+                </span>
+              </div>
+              {secondaryTabs.map(t => (
+                <div key={t.id} style={{ marginBottom: 2 }}>
+                  {renderMenuButton(t, true)}
+                </div>
+              ))}
             </div>
           )}
         </div>
