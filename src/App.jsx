@@ -929,10 +929,10 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             <div style={{display:'flex',height:'100%',background:T.white,borderRadius:12,overflow:'hidden',position:'relative'}}>
               <img src={settings.bannerImage} alt="Welcome" style={{width:'100%',height:'100%',objectFit:'cover',position:'absolute',inset:0}}/>
               {/* Business Info - Top Right */}
-              <div style={{position:'absolute',top:20,right:20,textAlign:'center',padding:'16px 20px',background:'rgba(255,255,255,0.25)',borderRadius:16,backdropFilter:'blur(8px)',maxWidth:300}}>
-                <div style={{fontSize:24,fontWeight:800,color:T.teal,marginBottom:8}}>{settings.name}</div>
-                {settings.phone && <div style={{fontSize:14,color:'#1F2937',marginTop:4}}>📞 {settings.phone}</div>}
-                {settings.address && <div style={{fontSize:13,color:'#4B5563',marginTop:4}}>📍 {settings.address}</div>}
+              <div style={{position:'absolute',top:20,right:20,textAlign:'center',padding:'20px 24px',background:'rgba(255,255,255,0.25)',borderRadius:16,backdropFilter:'blur(8px)',maxWidth:320}}>
+                <div style={{fontSize:28,fontWeight:800,color:T.teal,marginBottom:8}}>{settings.name}</div>
+                {settings.phone && <div style={{fontSize:16,color:'#1F2937',marginTop:6}}>📞 {settings.phone}</div>}
+                {settings.address && <div style={{fontSize:15,color:'#4B5563',marginTop:6}}>📍 {settings.address}</div>}
               </div>
             </div>
           ) : (
