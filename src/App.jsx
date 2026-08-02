@@ -847,13 +847,53 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           </div>
         </div>
 
-        {/* Product grid - Removed for faster loading. Will add new design later */}
-        <div style={{flex:1,overflow:'auto',padding:16,background:T.gray50,display:'flex',alignItems:'center',justifyContent:'center'}}>
-          <div style={{textAlign:'center',padding:'60px 20px',color:T.gray400}}>
-            <div style={{fontSize:48,marginBottom:12}}>🔍</div>
-            <div style={{fontSize:15}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
-            <div style={{fontSize:12,marginTop:8}}>উপরের সার্চ বক্সে পণ্য লিখুন</div>
-          </div>
+        {/* Product grid - Show products when company or category is selected */}
+        <div style={{flex:1,overflow:'auto',padding:16,background:T.gray50}}>
+          {selComp !== 'সব কোম্পানি' || (selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ') ? (
+            <div>
+              <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                <span style={{fontSize:13,fontWeight:600,color:T.gray600}}>
+                  {selComp !== 'সব কোম্পানি' && `🏢 ${selComp} (${filtered.length}টি পণ্য)`}
+                  {selComp === 'সব কোম্পানি' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && `📁 ${selCat} (${filtered.length}টি পণ্য)`}
+                  {selComp !== 'সব কোম্পানি' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && ' - ' + selCat}
+                </span>
+                <button onClick={()=>{setSelComp('সব কোম্পানি');setSelCat('স্টক আছে');setCompSearch('');setCatSearch('');}} style={{fontSize:11,padding:'4px 10px',border:'none',borderRadius:5,background:T.gray200,cursor:'pointer',color:T.gray600}}>✕ মুছুন</button>
+              </div>
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:10}}>
+                {filtered.map(p => (
+                  <button key={p.id} onClick={()=>addToCart(p)} style={{
+                    background:p.stock<=0?T.redLight:p.stock<=p.minStock?T.amberLight:T.white, 
+                    border:`1.5px solid ${p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.gray200}`,
+                    borderRadius:10, padding:'12px 10px', cursor:p.stock>0?'pointer':'not-allowed',
+                    textAlign:'left', transition:'all 0.15s',
+                    boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
+                    outline:'none',
+                  }}>
+                    <div style={{fontSize:11,fontWeight:600,marginBottom:4,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.name}</div>
+                    <div style={{fontSize:16,fontWeight:800,color:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.teal}}>{fmt(p.sellP)}</div>
+                    <div style={{fontSize:10,color:T.gray400,marginTop:2}}>/{p.unit}</div>
+                    <div style={{marginTop:6,padding:'2px 6px',borderRadius:8,fontSize:10,fontWeight:600,display:'inline-block',
+                      background:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.tealLight,
+                      color:p.stock<=0?'#fff':p.stock<=p.minStock?'#fff':T.teal}}>
+                      {p.stock}
+                    </div>
+                  </button>
+                ))}
+                {filtered.length === 0 && (
+                  <div style={{gridColumn:'1/-1',textAlign:'center',padding:'40px',color:T.gray400}}>
+                    <div style={{fontSize:36,marginBottom:8}}>📦</div>
+                    <div>কোনো পণ্য পাওয়া যায়নি</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'60px 20px'}}>
+              <div style={{fontSize:48,marginBottom:12}}>🔍</div>
+              <div style={{fontSize:15,color:T.gray500}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
+              <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা কোম্পানি/ক্যাটাগরি সিলেক্ট করুন</div>
+            </div>
+          )}
         </div>
       </div>
 
