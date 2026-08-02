@@ -970,32 +970,29 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         {/* Cart Items */}
         <div style={{flex:1,overflow:'auto',background:'#fafbfc'}}>
           {cart.length===0 ? (
-            <div style={{textAlign:'center',padding:'40px 20px',background:T.white,margin:12,borderRadius:12,border:'1px solid #e5e7eb'}}>
-              <div style={{fontSize:48,marginBottom:10}}>🛒</div>
-              <div style={{fontSize:14,fontWeight:600,color:T.gray600,marginBottom:4}}>কার্ট খালি</div>
-              <div style={{fontSize:12,color:T.gray400}}>বাম দিক থেকে পণ্য যোগ করুন</div>
+            <div style={{textAlign:'center',padding:'30px 16px',background:T.white,margin:8,borderRadius:8,border:'1px solid #e5e7eb'}}>
+              <div style={{fontSize:36,marginBottom:8}}>🛒</div>
+              <div style={{fontSize:13,fontWeight:600,color:T.gray500,marginBottom:3}}>কার্ট খালি</div>
+              <div style={{fontSize:11,color:T.gray400}}>বাম দিক থেকে পণ্য যোগ করুন</div>
             </div>
           ) : (
             <div style={{padding:'8px 16px'}}>
               {cart.map(item=>(
-                <div key={item.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 12px',background:T.white,borderRadius:10,marginBottom:6,border:'1px solid #e5e7eb',boxShadow:'0 1px 3px rgba(0,0,0,0.03)'}}>
-                  {/* Product Icon */}
-                  <div style={{width:40,height:40,background:'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0}}>
-                    📦
-                  </div>
-                  
+                <div key={item.id} style={{display:'flex',alignItems:'center',padding:'6px 8px',background:T.white,borderBottom:'1px dashed #e5e7eb',gap:8}}>
+                  {/* Product Name & Qty */}
                   <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:13,fontWeight:600,color:T.gray900,marginBottom:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name}</div>
-                    <div style={{fontSize:11,color:T.gray400}}>{fmt(item.sellP)} × {item.qty}</div>
-                  </div>
-                  
-                  <div style={{textAlign:'right',marginLeft:8}}>
-                    <div style={{fontWeight:700,fontSize:14,color:T.gray900,marginBottom:4}}>{fmt(item.sellP*item.qty)}</div>
-                    <div style={{display:'flex',alignItems:'center',gap:4,justifyContent:'flex-end'}}>
-                      <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:24,height:24,border:'1px solid #e5e7eb',borderRadius:6,background:T.white,cursor:'pointer',fontSize:12,display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
-                      <span style={{minWidth:24,textAlign:'center',fontWeight:600,fontSize:12}}>{item.qty}</span>
-                      <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:24,height:24,border:'1px solid #e5e7eb',borderRadius:6,background:T.white,cursor:'pointer',fontSize:12,display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
-                      <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:24,height:24,border:'none',borderRadius:6,background:'#fee2e2',color:T.red,cursor:'pointer',fontSize:10,display:'flex',alignItems:'center',justifyContent:'center',marginLeft:2}}>✕</button>
+                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8}}>
+                      <span style={{fontSize:12,fontWeight:600,color:T.gray900,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{item.name}</span>
+                      <span style={{fontSize:12,fontWeight:700,color:T.teal,flexShrink:0}}>{fmt(item.sellP*item.qty)}</span>
+                    </div>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:2}}>
+                      <span style={{fontSize:10,color:T.gray400}}>{item.qty} × {fmt(item.sellP)}</span>
+                      <div style={{display:'flex',alignItems:'center',gap:4}}>
+                        <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:20,height:20,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>−</button>
+                        <span style={{fontSize:11,fontWeight:600,minWidth:16,textAlign:'center'}}>{item.qty}</span>
+                        <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:20,height:20,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>+</button>
+                        <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:20,height:20,border:'none',borderRadius:4,background:T.redLight,cursor:'pointer',fontSize:9,display:'flex',alignItems:'center',justifyContent:'center',color:T.red,marginLeft:4}}>✕</button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1004,70 +1001,81 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           )}
         </div>
 
-        {/* Totals - Compact Summary Section */}
-        <div style={{padding:'12px 16px',background:T.white,borderTop:'1.5px solid #e5e7eb',flexShrink:0}}>
-          {/* Compact Summary Row */}
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-            <div style={{display:'flex',alignItems:'center',gap:6}}>
-              <span style={{fontSize:12,color:T.gray400}}>সাবটোটাল</span>
-              <span style={{fontSize:11,color:T.gray400}}>({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
+        {/* Totals - Thermal Receipt Style */}
+        <div style={{padding:'10px 12px',background:T.white,borderTop:'1px solid #e5e7eb',flexShrink:0}}>
+          {/* Receipt-style Summary */}
+          <div style={{border:'1px solid #e5e7eb',borderRadius:8,overflow:'hidden',marginBottom:8}}>
+            {/* Header */}
+            <div style={{background:T.gray100,padding:'6px 10px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db'}}>
+              <span style={{fontSize:10,color:T.gray600,fontWeight:600}}>সাবটোটাল ({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
+              <span style={{fontSize:11,fontWeight:600,color:T.gray700}}>{fmt(subtotal)}</span>
             </div>
-            <span style={{fontWeight:600,fontSize:14,color:T.gray700}}>{fmt(subtotal)}</span>
+            
+            {/* Discount Row */}
+            {(parseFloat(discount)||0) > 0 && (
+              <div style={{padding:'5px 10px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db',background:T.greenLight}}>
+                <span style={{fontSize:10,color:T.green}}>ছাড়</span>
+                <span style={{fontSize:10,fontWeight:600,color:T.green}}>−{fmt(parseFloat(discount)||0)}</span>
+              </div>
+            )}
+            
+            {/* VAT Row */}
+            {vatAmount > 0 && (
+              <div style={{padding:'5px 10px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db',background:T.amberLight}}>
+                <span style={{fontSize:10,color:T.amber}}>ভ্যাট ({vatPercent}%)</span>
+                <span style={{fontSize:10,fontWeight:600,color:T.amber}}>+{fmt(vatAmount)}</span>
+              </div>
+            )}
+            
+            {/* Grand Total */}
+            <div style={{padding:'8px 10px',display:'flex',justifyContent:'space-between',alignItems:'center',background:T.gray900}}>
+              <span style={{fontSize:12,color:T.white,fontWeight:700}}>মোট দেনা</span>
+              <span style={{fontSize:18,color:T.white,fontWeight:800}}>{fmt(total)}</span>
+            </div>
           </div>
           
-          {/* Discount & VAT Inline */}
-          <div style={{display:'flex',gap:8,marginBottom:10}}>
+          {/* Discount & VAT Inputs */}
+          <div style={{display:'flex',gap:6,marginBottom:8}}>
             <input value={discount} onChange={e=>setDiscount(e.target.value)} type="number" min="0"
-              placeholder="ছাড় (৳)"
-              style={{flex:1,border:'1px solid #e5e7eb',borderRadius:8,padding:'6px 10px',fontSize:12,outline:'none',background:'#fafbfc',width:'100%',boxSizing:'border-box',color:T.green}}/>
+              placeholder="ছাড়"
+              style={{flex:1,border:'1px solid #e5e7eb',borderRadius:6,padding:'5px 8px',fontSize:11,outline:'none',background:'#fafbfc',width:'100%',boxSizing:'border-box',color:T.green}}/>
             <input value={vatPercent} onChange={e=>setVatPercent(e.target.value)} type="number" min="0" max="100"
-              placeholder="ভ্যাট %"
-              style={{width:60,border:'1px solid #e5e7eb',borderRadius:8,padding:'6px 8px',fontSize:12,outline:'none',background:'#fafbfc',boxSizing:'border-box',color:T.amber,textAlign:'center'}}/>
+              placeholder="ভ্যাট"
+              style={{width:55,border:'1px solid #e5e7eb',borderRadius:6,padding:'5px 6px',fontSize:11,outline:'none',background:'#fafbfc',boxSizing:'border-box',color:T.amber,textAlign:'center'}}/>
           </div>
           
-          {/* Grand Total - Prominent */}
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:T.gray900,color:T.white,padding:'10px 14px',borderRadius:10,marginBottom:10}}>
-            <div>
-              <span style={{fontWeight:600,fontSize:13}}>মোট দেনা</span>
-              {(parseFloat(discount)||0) > 0 && <span style={{fontSize:10,opacity:0.7,display:'block'}}>ছাড় −{fmt(parseFloat(discount)||0)}</span>}
-              {vatAmount > 0 && <span style={{fontSize:10,opacity:0.7}}>ভ্যাট +{fmt(vatAmount)}</span>}
-            </div>
-            <span style={{fontWeight:800,fontSize:22}}>{fmt(total)}</span>
-          </div>
-          
-          {/* Payment Input - Compact */}
+          {/* Payment Input */}
           <input ref={paidRef} value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
             placeholder="পরিশোধ (৳)" 
-            style={{...input,padding:'8px 12px',fontSize:13,fontWeight:600,borderRadius:8,marginBottom:8,border:'1.5px solid #e5e7eb',background:'#fafbfc'}}
+            style={{...input,padding:'7px 10px',fontSize:12,fontWeight:600,borderRadius:6,marginBottom:6,border:'1.5px solid #e5e7eb',background:'#fafbfc'}}
             onKeyDown={e=>{if(e.key==='Enter'&&cart.length) checkout();}}/>
           
-          {/* Due/Change Alert - Compact */}
+          {/* Due/Change Alert */}
           {due > 0 && (
-            <div style={{fontSize:12,marginBottom:8,padding:'6px 10px',borderRadius:8,
+            <div style={{fontSize:11,marginBottom:6,padding:'5px 8px',borderRadius:6,
               background:T.redLight, color:T.red, fontWeight:600,textAlign:'center'}}>
               ⚠️ বাকি: {fmt(due)}{selCust ? '' : ' (কাস্টমার দরকার)'}
             </div>
           )}
           {paidAmt > total && (
-            <div style={{fontSize:12,marginBottom:8,padding:'6px 10px',borderRadius:8,
+            <div style={{fontSize:11,marginBottom:6,padding:'5px 8px',borderRadius:6,
               background:T.greenLight, color:T.green, fontWeight:600,textAlign:'center'}}>
               💵 ফেরত: {fmt(change)}
             </div>
           )}
           
-          {/* Action Buttons - Compact */}
-          <div style={{display:'grid',gridTemplateColumns:'auto 1fr',gap:8}}>
+          {/* Action Buttons */}
+          <div style={{display:'grid',gridTemplateColumns:'auto 1fr',gap:6}}>
             <button onClick={()=>{setCart([]);setDiscount('');setPaid('');setSelCust(null);setCustQ('');}}
-              style={{padding:'10px 12px',borderRadius:10,border:'1px solid #e5e7eb',background:T.white,color:T.gray600,fontWeight:600,fontSize:13,cursor:'pointer'}}>
+              style={{padding:'8px 10px',borderRadius:8,border:'1px solid #e5e7eb',background:T.white,color:T.gray600,fontWeight:600,fontSize:12,cursor:'pointer'}}>
               🗑️
             </button>
             <button onClick={checkout} 
               disabled={!cart.length || (due > 0 && !selCust)}
               style={{
-                padding:'10px 12px',borderRadius:10,border:'none',
+                padding:'8px 10px',borderRadius:8,border:'none',
                 background: cart.length && !(due > 0 && !selCust) ? T.orange : '#e5e7eb',
-                color:T.white,fontWeight:700,fontSize:14,cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
-                transition:'all 0.15s'
+                color:T.white,fontWeight:700,fontSize:13,cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
               }}>
               ✓ বিক্রয় সম্পন্ন
             </button>
