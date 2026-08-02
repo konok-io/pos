@@ -582,21 +582,21 @@ export default function App() {
     const savedCategories = db.get(STORAGE_KEYS.categories) || [];
 
     if (wasReset) {
-      setProducts(savedProducts || []);
-      setCustomers(savedCustomers || []);
-      setCategories(savedCategories);
-      setSuppliers(savedSuppliers);
-      setSales(savedSales || []);
-      setPurchases(savedPurchases);
-      setSettings(savedSettings ? {...{name:'',address:'',phone:'',vatEnabled:true,vatPercent:15}, ...savedSettings} : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setProducts([...savedProducts] || []);
+      setCustomers([...savedCustomers] || []);
+      setCategories([...savedCategories]);
+      setSuppliers([...savedSuppliers]);
+      setSales([...savedSales] || []);
+      setPurchases([...savedPurchases]);
+      setSettings({...savedSettings} || {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
     } else {
-      setProducts(savedProducts || DEMO.products);
-      setCustomers(savedCustomers || DEMO.customers);
-      setSales(savedSales || []);
-      setSuppliers(savedSuppliers);
-      setPurchases(savedPurchases);
-      setCategories(savedCategories);
-      setSettings(savedSettings ? {...{name:'',address:'',phone:'',vatEnabled:true,vatPercent:15}, ...savedSettings} : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setProducts([...savedProducts] || [...DEMO.products]);
+      setCustomers([...savedCustomers] || [...DEMO.customers]);
+      setSales([...savedSales] || []);
+      setSuppliers([...savedSuppliers]);
+      setPurchases([...savedPurchases]);
+      setCategories([...savedCategories]);
+      setSettings({...savedSettings} || {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
     }
   };
 
