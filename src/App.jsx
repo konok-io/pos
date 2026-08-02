@@ -245,6 +245,17 @@ export default function App() {
     }, 10);
   };
 
+  // Fullscreen toggle function
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.log('Fullscreen error:', err);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
   return (
     <>
       <GlobalStyle />
@@ -261,9 +272,14 @@ export default function App() {
             <div style={{fontSize:11,opacity:0.7}}>POS ম্যানেজমেন্ট সিস্টেম</div>
           </div>
         </div>
-        <div style={{fontSize:12,opacity:0.8,textAlign:'right'}}>
-          <div>{currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
-          <div>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <div style={{fontSize:12,opacity:0.8,textAlign:'right'}}>
+            <div>{currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
+            <div>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
+          </div>
+          <button onClick={toggleFullscreen} style={{background:'rgba(255,255,255,0.15)',border:'none',borderRadius:8,cursor:'pointer',padding:'8px 12px',color:T.white,fontSize:16,display:'flex',alignItems:'center',gap:4}} title="ফুল স্ক্রিন">
+            ⛶
+          </button>
         </div>
       </div>
 
