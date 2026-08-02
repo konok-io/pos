@@ -258,13 +258,27 @@ export default function App() {
   // Fullscreen toggle function
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
+      localStorage.setItem('pos_want_fullscreen', 'true');
       document.documentElement.requestFullscreen().catch(err => {
         console.log('Fullscreen error:', err);
       });
     } else {
+      localStorage.removeItem('pos_want_fullscreen');
       document.exitFullscreen();
     }
   };
+
+  // Auto-enter fullscreen on page load if it was requested before reload
+  useEffect(() => {
+    if (!ready) return;
+    const wantFullscreen = localStorage.getItem('pos_want_fullscreen');
+    if (wantFullscreen === 'true') {
+      localStorage.removeItem('pos_want_fullscreen');
+      setTimeout(() => {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }, 500);
+    }
+  }, [ready]);
 
   return (
     <>
