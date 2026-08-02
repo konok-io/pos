@@ -43,6 +43,16 @@ const STORAGE_KEYS = {
   suppliers: 'pos_suppliers',
   categories: 'pos_categories',
   purchases: 'pos_purchases',
+  users: 'pos_users',
+  auth: 'pos_auth',
+};
+
+/* ─────────────── DEFAULT SUPER ADMIN ─────────────── */
+const DEFAULT_SUPER_ADMIN = {
+  email: 'admin@konok.io',
+  password: '@rsm@k@1A',
+  role: 'super_admin',
+  name: 'Super Admin',
 };
 
 /* ─────────────── DEMO DATA ─────────────── */
@@ -183,8 +193,158 @@ function DynamicMenu({tab, setTab, tabs}) {
   );
 }
 
+/* ═══════════════════════════════════════════
+   LOGIN SCREEN
+═══════════════════════════════════════════ */
+function LoginScreen({ onLogin }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    // Simulate network delay
+    await new Promise(r => setTimeout(r, 500));
+
+    // Check credentials
+    const users = db.get(STORAGE_KEYS.users) || [];
+    const allUsers = [DEFAULT_SUPER_ADMIN, ...users];
+    
+    const user = allUsers.find(u => u.email === email && u.password === password);
+    
+    if (user) {
+      const authData = {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        loginTime: new Date().toISOString(),
+      };
+      db.set(STORAGE_KEYS.auth, authData);
+      onLogin(authData);
+    } else {
+      setError('❌ ইমেইল বা পাসওয়ার্ড ভুল!');
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 20,
+    }}>
+      <div style={{
+        background: T.white,
+        borderRadius: 20,
+        padding: 40,
+        width: '100%',
+        maxWidth: 420,
+        boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+      }}>
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{
+            width: 72, height: 72,
+            background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+            borderRadius: 18,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 36,
+            margin: '0 auto 16px',
+            boxShadow: '0 8px 20px rgba(15,118,110,0.4)',
+          }}>🏪</div>
+          <h1 style={{ margin: '0 0 8px', fontSize: 24, fontWeight: 800, color: T.gray900 }}>
+            POS সিস্টেম
+          </h1>
+          <p style={{ margin: 0, fontSize: 14, color: T.gray500 }}>
+            লগইন করে এগিয়ে যান
+          </p>
+        </div>
+
+        {/* Login Form */}
+        <form onSubmit={handleLogin}>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ ...label, marginBottom: 8 }}>📧 ইমেইল</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@konok.io"
+              required
+              style={{ ...input, padding: '14px 16px', fontSize: 15 }}
+            />
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ ...label, marginBottom: 8 }}>🔐 পাসওয়ার্ড</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="পাসওয়ার্ড লিখুন"
+              required
+              style={{ ...input, padding: '14px 16px', fontSize: 15 }}
+            />
+          </div>
+
+          {error && (
+            <div style={{
+              padding: '12px 16px',
+              background: T.redLight,
+              borderRadius: 10,
+              marginBottom: 20,
+              color: T.red,
+              fontSize: 14,
+              fontWeight: 500,
+            }}>
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: loading ? T.gray400 : 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+              color: T.white,
+              border: 'none',
+              borderRadius: 12,
+              fontSize: 16,
+              fontWeight: 700,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              boxShadow: loading ? 'none' : '0 8px 20px rgba(15,118,110,0.4)',
+              transition: 'all 0.3s',
+            }}
+          >
+            {loading ? '⏳ লোড হচ্ছে...' : '🔓 লগইন করুন'}
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <p style={{ margin: 0, fontSize: 12, color: T.gray400 }}>
+            © ২০২৪ konok.io
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─────────────── MAIN APP ─────────────── */
 export default function App() {
+  const [currentUser, setCurrentUser] = useState(() => db.get(STORAGE_KEYS.auth));
+  const [showLogin, setShowLogin] = useState(() => !db.get(STORAGE_KEYS.auth));
   const [tab, setTab] = useState(() => localStorage.getItem('pos_current_tab') || 'pos');
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -381,6 +541,24 @@ export default function App() {
     }
   };
 
+  // Handle login from LoginScreen
+  const handleLogin = (userData) => {
+    setCurrentUser(userData);
+    setShowLogin(false);
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem(STORAGE_KEYS.auth);
+    setCurrentUser(null);
+    setShowLogin(true);
+  };
+
+  // Show login screen if not authenticated
+  if (showLogin || !currentUser) {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
   return (
     <>
       <GlobalStyle />
@@ -402,6 +580,27 @@ export default function App() {
           
           {/* Actions Section */}
           <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0,marginLeft:24}}>
+            {/* User Info */}
+            <div style={{display:'flex',alignItems:'center',gap:10,borderRight:'1px solid #e5e7eb',paddingRight:14}}>
+              <div style={{
+                width:32,height:32,
+                background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius:8,
+                display:'flex',
+                alignItems:'center',
+                justifyContent:'center',
+                fontSize:14,
+                color:T.white,
+                fontWeight:700
+              }}>
+                {currentUser.name?.charAt(0).toUpperCase() || 'A'}
+              </div>
+              <div>
+                <div style={{fontSize:12,fontWeight:600,color:T.gray900}}>{currentUser.name}</div>
+                <div style={{fontSize:10,color:T.gray400}}>{currentUser.role === 'super_admin' ? 'সুপার এডমিন' : 'এডমিন'}</div>
+              </div>
+            </div>
+
             {/* Refresh Button */}
             <button onClick={handleHardRefresh} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="রিফ্রেশ">
               🔄
@@ -412,8 +611,13 @@ export default function App() {
               {isFullscreen ? '✕' : '⛶'}
             </button>
             
+            {/* Logout Button */}
+            <button onClick={handleLogout} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="লগআউট">
+              🚪
+            </button>
+
             {/* Date & Time - Rightmost */}
-            <div style={{textAlign:'right',borderLeft:'1px solid #e5e7eb',paddingLeft:14}}>
+            <div style={{textAlign:'right',paddingLeft:14}}>
               <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
               <div style={{fontSize:11,color:T.gray400}}>{currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
             </div>
@@ -5269,6 +5473,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const [form, setForm] = useState(settings);
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
+  const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
+  const [showUserModal, setShowUserModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [userForm, setUserForm] = useState({ email: '', password: '', name: '', role: 'admin' });
+
+  const currentUser = db.get(STORAGE_KEYS.auth);
+  const isSuperAdmin = currentUser?.role === 'super_admin';
 
   const save = async () => {
     await upd.settings(form);
@@ -5298,8 +5509,46 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     { id: 'display', icon: '🖼️', label: 'ডিসপ্লে' },
     { id: 'tax', icon: '💰', label: 'ট্যাক্স' },
     { id: 'reports', icon: '📊', label: 'রিপোর্ট' },
+    { id: 'users', icon: '👥', label: 'ইউজার' },
     { id: 'data', icon: '💾', label: 'ডেটা' },
   ];
+
+  const openUserModal = (user = null) => {
+    if (user) {
+      setEditingUser(user);
+      setUserForm({ email: user.email, password: user.password, name: user.name, role: user.role });
+    } else {
+      setEditingUser(null);
+      setUserForm({ email: '', password: '', name: '', role: 'admin' });
+    }
+    setShowUserModal(true);
+  };
+
+  const saveUser = () => {
+    if (!userForm.email || !userForm.password || !userForm.name) {
+      alert('সব তথ্য পূরণ করুন!');
+      return;
+    }
+    if (editingUser) {
+      const updated = users.map(u => u.id === editingUser.id ? { ...u, ...userForm } : u);
+      setUsers(updated);
+      db.set(STORAGE_KEYS.users, updated);
+    } else {
+      const newUser = { ...userForm, id: genId() };
+      const updated = [...users, newUser];
+      setUsers(updated);
+      db.set(STORAGE_KEYS.users, updated);
+    }
+    setShowUserModal(false);
+  };
+
+  const deleteUser = (id) => {
+    if (confirm('এই ইউজার মুছে ফেলতে চান?')) {
+      const updated = users.filter(u => u.id !== id);
+      setUsers(updated);
+      db.set(STORAGE_KEYS.users, updated);
+    }
+  };
 
   const ToggleButton = ({active, onClick, children}) => (
     <button onClick={onClick} style={{
@@ -5558,6 +5807,147 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
             </SectionCard>
           )}
 
+          {/* Users Management */}
+          {activeSection === 'users' && (
+            isSuperAdmin ? (
+              <SectionCard title="ইউজার ম্যানেজমেন্ট" icon="👥">
+                <div style={{marginBottom:20,display:'flex',justifyContent:'flex-end'}}>
+                  <button onClick={() => openUserModal()} style={{
+                    padding:'10px 20px',
+                    background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                    color:T.white,
+                    border:'none',
+                    borderRadius:10,
+                    fontSize:14,
+                    fontWeight:600,
+                    cursor:'pointer',
+                    display:'flex',
+                    alignItems:'center',
+                    gap:8,
+                  }}>
+                    ➕ নতুন ইউজার
+                  </button>
+                </div>
+                
+                <div style={{marginBottom:20,padding:16,background:T.tealLight,borderRadius:10,border:`1px solid ${T.tealMid}`}}>
+                  <p style={{margin:0,fontSize:13,color:T.tealDark,lineHeight:1.6}}>
+                    👑 সুপার এডমিন (admin@konok.io) সবসময় সক্রিয় থাকে এবং মুছে যায় না।
+                  </p>
+                </div>
+
+                {/* User List */}
+                <div style={{display:'flex',flexDirection:'column',gap:12}}>
+                  {/* Super Admin */}
+                  <div style={{
+                    padding:16,
+                    background:T.tealLight,
+                    borderRadius:10,
+                    border:`2px solid ${T.teal}`,
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'space-between'
+                  }}>
+                    <div style={{display:'flex',alignItems:'center',gap:12}}>
+                      <div style={{
+                        width:40,height:40,
+                        background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                        borderRadius:10,
+                        display:'flex',
+                        alignItems:'center',
+                        justifyContent:'center',
+                        fontSize:18,
+                        color:T.white
+                      }}>👑</div>
+                      <div>
+                        <div style={{fontSize:14,fontWeight:700,color:T.gray900}}>Super Admin</div>
+                        <div style={{fontSize:12,color:T.gray500}}>admin@konok.io</div>
+                      </div>
+                    </div>
+                    <span style={{
+                      padding:'4px 12px',
+                      background:T.teal,
+                      color:T.white,
+                      borderRadius:6,
+                      fontSize:12,
+                      fontWeight:600
+                    }}>👑 সুপার এডমিন</span>
+                  </div>
+
+                  {/* Other Users */}
+                  {users.map(u => (
+                    <div key={u.id} style={{
+                      padding:16,
+                      background:T.gray50,
+                      borderRadius:10,
+                      border:`1px solid ${T.gray200}`,
+                      display:'flex',
+                      alignItems:'center',
+                      justifyContent:'space-between'
+                    }}>
+                      <div style={{display:'flex',alignItems:'center',gap:12}}>
+                        <div style={{
+                          width:40,height:40,
+                          background:T.teal,
+                          borderRadius:10,
+                          display:'flex',
+                          alignItems:'center',
+                          justifyContent:'center',
+                          fontSize:18,
+                          color:T.white
+                        }}>{u.name?.charAt(0).toUpperCase()}</div>
+                        <div>
+                          <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{u.name}</div>
+                          <div style={{fontSize:12,color:T.gray500}}>{u.email}</div>
+                        </div>
+                      </div>
+                      <div style={{display:'flex',alignItems:'center',gap:8}}>
+                        <span style={{
+                          padding:'4px 12px',
+                          background:T.gray200,
+                          color:T.gray600,
+                          borderRadius:6,
+                          fontSize:12,
+                          fontWeight:600
+                        }}>এডমিন</span>
+                        <button onClick={() => openUserModal(u)} style={{
+                          padding:'6px 12px',
+                          background:T.white,
+                          border:`1px solid ${T.gray200}`,
+                          borderRadius:8,
+                          cursor:'pointer',
+                          fontSize:13,
+                        }}>✏️</button>
+                        <button onClick={() => deleteUser(u.id)} style={{
+                          padding:'6px 12px',
+                          background:T.redLight,
+                          border:`1px solid ${T.red}30`,
+                          borderRadius:8,
+                          cursor:'pointer',
+                          fontSize:13,
+                        }}>🗑️</button>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {users.length === 0 && (
+                    <div style={{textAlign:'center',padding:40,color:T.gray400}}>
+                      <div style={{fontSize:40,marginBottom:12}}>👥</div>
+                      <div>কোনো ইউজার নেই</div>
+                    </div>
+                  )}
+                </div>
+              </SectionCard>
+            ) : (
+              <SectionCard title="ইউজার ম্যানেজমেন্ট" icon="👥">
+                <div style={{textAlign:'center',padding:40}}>
+                  <div style={{fontSize:60,marginBottom:16}}>🔒</div>
+                  <h3 style={{margin:'0 0 12px',color:T.gray700}}>এক্সেস সীমাবদ্ধ</h3>
+                  <p style={{margin:0,color:T.gray500}}>শুধুমাত্র সুপার এডমিন এই পেজ দেখতে পারবেন।</p>
+                </div>
+              </SectionCard>
+            )
+          )}
+
           {/* Data Management */}
           {activeSection === 'data' && (
             <>
@@ -5643,6 +6033,77 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
           )}
         </div>
       </div>
+
+      {/* User Modal */}
+      {showUserModal && (
+        <div style={{
+          position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',
+          display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,padding:20
+        }}>
+          <div style={{
+            background:T.white,borderRadius:16,padding:32,width:'100%',maxWidth:420,
+            boxShadow:'0 25px 50px rgba(0,0,0,0.25)'
+          }}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
+              <h3 style={{margin:0,fontSize:18,fontWeight:700,color:T.gray900}}>
+                {editingUser ? '✏️ ইউজার এডিট করুন' : '➕ নতুন ইউজার যোগ করুন'}
+              </h3>
+              <button onClick={() => setShowUserModal(false)} style={{
+                padding:'8px 12px',background:T.gray100,border:'none',borderRadius:8,cursor:'pointer',fontSize:16
+              }}>✕</button>
+            </div>
+
+            <div style={{display:'flex',flexDirection:'column',gap:16}}>
+              <div>
+                <label style={{...label,marginBottom:8}}>👤 নাম</label>
+                <input
+                  type="text"
+                  value={userForm.name}
+                  onChange={e => setUserForm(p => ({...p, name: e.target.value}))}
+                  style={{...input,padding:'12px 14px',fontSize:14}}
+                  placeholder="ইউজারের নাম"
+                />
+              </div>
+              <div>
+                <label style={{...label,marginBottom:8}}>📧 ইমেইল</label>
+                <input
+                  type="email"
+                  value={userForm.email}
+                  onChange={e => setUserForm(p => ({...p, email: e.target.value}))}
+                  style={{...input,padding:'12px 14px',fontSize:14}}
+                  placeholder="email@example.com"
+                />
+              </div>
+              <div>
+                <label style={{...label,marginBottom:8}}>🔐 পাসওয়ার্ড</label>
+                <input
+                  type="text"
+                  value={userForm.password}
+                  onChange={e => setUserForm(p => ({...p, password: e.target.value}))}
+                  style={{...input,padding:'12px 14px',fontSize:14}}
+                  placeholder="পাসওয়ার্ড"
+                />
+              </div>
+            </div>
+
+            <div style={{display:'flex',gap:12,marginTop:24}}>
+              <button onClick={() => setShowUserModal(false)} style={{
+                flex:1,padding:'12px',background:T.gray100,border:'none',borderRadius:10,
+                fontSize:14,fontWeight:600,cursor:'pointer',color:T.gray600
+              }}>বাতিল</button>
+              <button onClick={saveUser} style={{
+                flex:1,padding:'12px',
+                background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                border:'none',borderRadius:10,
+                fontSize:14,fontWeight:600,cursor:'pointer',color:T.white,
+                boxShadow:'0 4px 12px rgba(15,118,110,0.3)'
+              }}>
+                💾 সংরক্ষণ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
