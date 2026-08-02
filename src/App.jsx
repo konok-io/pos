@@ -401,12 +401,6 @@ export default function App() {
           
           {/* Actions Section */}
           <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0,marginLeft:24}}>
-            {/* Date & Time */}
-            <div style={{textAlign:'right',borderRight:'1px solid #e5e7eb',paddingRight:14}}>
-              <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
-              <div style={{fontSize:11,color:T.gray400}}>{currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
-            </div>
-            
             {/* Refresh Button */}
             <button onClick={handleHardRefresh} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="রিফ্রেশ">
               🔄
@@ -416,6 +410,12 @@ export default function App() {
             <button onClick={toggleFullscreen} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background: isFullscreen ? T.white : T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color: T.gray500}} title={isFullscreen?"ফুল স্ক্রিন বন্ধ":"ফুল স্ক্রিন"}>
               {isFullscreen ? '✕' : '⛶'}
             </button>
+            
+            {/* Date & Time - Rightmost */}
+            <div style={{textAlign:'right',borderLeft:'1px solid #e5e7eb',paddingLeft:14}}>
+              <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
+              <div style={{fontSize:11,color:T.gray400}}>{currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
+            </div>
           </div>
         </div>
       </div>
