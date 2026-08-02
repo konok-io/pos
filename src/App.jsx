@@ -171,10 +171,10 @@ function DynamicMenu({tab, setTab, tabs}) {
     }}>
       {/* Menu Groups with Dividers */}
       {menuGroups.map((group, groupIdx) => (
-        <div key={group.id} style={{ display: 'flex', gap: 2 }}>
+        <div key={group.id} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {group.items.map(t => renderMenuButton(t))}
           {groupIdx < menuGroups.length - 1 && (
-            <div style={{ width: 1, background: T.gray200, margin: '6px 4px', borderRadius: 2, alignSelf: 'center', height: 20 }} />
+            <div style={{ width: 1, background: T.gray200, margin: '0 4px', borderRadius: 2, height: 20 }} />
           )}
         </div>
       ))}
