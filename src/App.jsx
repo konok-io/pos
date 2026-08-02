@@ -2604,23 +2604,17 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           const row = rows[i];
           const rowNum = i + 2;
           
-          // Get company info
-          const csvCompanyCode = (row['কোম্পানি কোড'] || row['company code'] || row['কোম্পানি আইডি'] || '').trim();
-          const csvCompany = (row['কোম্পানি'] || row['company'] || row['কোম্পানির নাম'] || '').trim();
-          const csvPhone = (row['ফোন'] || row['phone'] || '').trim();
-          const csvAddress = (row['ঠিকানা'] || row['address'] || '').trim();
-          
-          // Get category info
-          const csvCategory = (row['ক্যাটাগরি'] || row['category'] || row['ক্যাটাগরির নাম'] || '').trim();
-          
           // Get product info
-          const csvProduct = (row['পণ্য'] || row['product'] || row['পণ্যের নাম'] || '').trim();
+          const csvProduct = (row['পণ্যের নাম'] || row['পণ্য'] || row['product'] || '').trim();
+          const csvCompanyCode = (row['কোম্পানি কোড'] || row['company code'] || row['কোম্পানি আইডি'] || '').trim();
+          const csvCompany = (row['কোম্পানি'] || row['company'] || '').trim();
+          const csvCategory = (row['ক্যাটাগরি'] || row['category'] || '').trim();
           const csvBarcode = (row['বারকোড'] || row['barcode'] || '').trim();
           const csvUnit = (row['একক'] || row['unit'] || 'পিস').trim();
-          const csvBuyP = parseFloat(row['ক্রয়মূল্য'] || row['buy price'] || row['ক্রয়'] || 0) || 0;
-          const csvSellP = parseFloat(row['বিক্রয়মূল্য'] || row['sell price'] || row['বিক্রয়'] || 0) || 0;
+          const csvBuyP = parseFloat(row['ক্রয়মূল্য'] || row['buy price'] || 0) || 0;
+          const csvSellP = parseFloat(row['বিক্রয়মূল্য'] || row['sell price'] || 0) || 0;
           const csvStock = parseFloat(row['স্টক'] || row['stock'] || 0) || 0;
-          const csvMinStock = parseFloat(row['মিন স্টক'] || row['min stock'] || row['মিনিমাম স্টক'] || 5) || 5;
+          const csvMinStock = parseFloat(row['মিনস্টক'] || row['min stock'] || row['মিন স্টক'] || 5) || 5;
           
           // Validate and add company
           if (csvCompany) {
@@ -2771,11 +2765,11 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
   // Download demo CSV
   const downloadSuppliersCSV = () => {
-    const csv = `কোম্পানি কোড,কোম্পানি,ফোন,ঠিকানা,ক্যাটাগরি,পণ্য,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিন স্টক
-C-00001,মিনিকেট,01712345678,ঢাকা,খাদ্যপণ্য,মিনিকেট চাল 5kg,001,বস্তা,2500,2800,50,10
-C-00001,মিনিকেট,01712345678,ঢাকা,খাদ্যপণ্য,মিনিকেট চাল 10kg,002,বস্তা,4800,5200,30,5
-C-00002,সুজান,01812345678,চট্টগ্রাম,স্ন্যাকস,সুজি চিপস,003,পিস,20,25,200,50
-C-00002,সুজান,01812345678,চট্টগ্রাম,স্ন্যাকস,সুজি বিস্কুট,004,পিস,15,20,150,40`;
+    const csv = `পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক
+মিনিকেট চাল 5kg,C-00001,মিনিকেট,খাদ্যপণ্য,001,বস্তা,2500,2800,50,10
+মিনিকেট চাল 10kg,C-00001,মিনিকেট,খাদ্যপণ্য,002,বস্তা,4800,5200,30,5
+সুজি চিপস,C-00002,সুজান,স্ন্যাকস,003,পিস,20,25,200,50
+সুজি বিস্কুট,C-00002,সুজান,স্ন্যাকস,004,পিস,15,20,150,40`;
     const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -3062,7 +3056,7 @@ C-00002,সুজান,01812345678,চট্টগ্রাম,স্ন্য�
                   <div style={{marginTop:12,fontSize:11,color:T.gray500,lineHeight:1.6}}>
                     <div style={{fontWeight:600,marginBottom:4}}>CSV কলাম:</div>
                     <code style={{background:T.gray50,padding:'2px 6px',borderRadius:4,display:'inline-block',marginBottom:4}}>
-                      কোম্পানি কোড, কোম্পানি, ফোন, ঠিকানা, ক্যাটাগরি, পণ্য, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিন স্টক
+                      পণ্যের নাম, কোম্পানি কোড, কোম্পানি, ক্যাটাগরি, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিনস্টক
                     </code>
                     <div style={{marginTop:8}}>
                       ✅ একই কোম্পানিতে পণ্যের নাম/বারকোড ডুপ্লিকেট হবে না<br/>
