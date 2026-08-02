@@ -270,6 +270,7 @@ export default function App() {
     {id:'suppliers',icon:'🏢',label:'সরবরাহকারী/কোম্পানি'},
     {id:'customers',icon:'👥',label:'কাস্টমার'},
     {id:'inventory',icon:'🏭',label:'স্টক'},
+    {id:'income',icon:'💰',label:'আয়/ব্যয়'},
     {id:'reports',icon:'📊',label:'রিপোর্ট'},
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
@@ -356,6 +357,7 @@ export default function App() {
         {tab==='suppliers' && <SuppliersScreen {...props} />}
         {tab==='customers' && <CustomersScreen {...props} />}
         {tab==='inventory' && <InventoryScreen {...props} />}
+        {tab==='income'    && <IncomeScreen {...props} />}
         {tab==='reports'   && <ReportsScreen {...props} />}
         {tab==='settings'  && <SettingsScreen {...props} />}
       </div>
@@ -3780,6 +3782,295 @@ function InventoryScreen({products, suppliers, upd}) {
             <button onClick={adjust} style={btn('primary')}>আপডেট করুন</button>
           </div>
         </Modal>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   INCOME SCREEN
+═══════════════════════════════════════════ */
+function IncomeScreen({sales, purchases, upd}) {
+  const [period, setPeriod] = useState('month');
+  const [from, setFrom] = useState(() => {
+    const d = new Date();
+    d.setDate(1);
+    return d.toISOString().split('T')[0];
+  });
+  const [to, setTo] = useState(() => today());
+  const [showExpenseForm, setShowExpenseForm] = useState(false);
+  const [expenseForm, setExpenseForm] = useState({title:'',amount:'',note:''});
+  const [expenses, setExpenses] = useState(() => JSON.parse(localStorage.getItem('pos_expenses') || '[]'));
+
+  const card = {background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`,boxShadow:'0 2px 8px rgba(0,0,0,0.04)'};
+  const input = {width:'100%',padding:'10px 12px',border:`1.5px solid ${T.gray200}`,borderRadius:8,fontSize:13,outline:'none',boxSizing:'border-box',background:T.gray50,color:T.gray800};
+  const label = {display:'block',marginBottom:6,fontWeight:600,fontSize:13,color:T.gray600};
+  const btn = (type='ghost',size='md') => {
+    const base = {border:'none',borderRadius:8,cursor:'pointer',fontWeight:600,fontSize:size==='sm'?11:13,transition:'all 0.2s'};
+    const colors = {
+      ghost: {background:T.gray100,color:T.gray700},
+      primary: {background:T.teal,color:T.white},
+      danger: {background:T.redLight,color:T.red},
+      success: {background:T.greenLight,color:T.green}
+    };
+    const sizes = {sm:{padding:'4px 8px'},md:{padding:'8px 16px'},lg:{padding:'12px 24px'}};
+    return {...base,...colors[type],...sizes[size]};
+  };
+  const fmt = (v) => '৳' + (v||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2});
+
+  // Filter items by period
+  const getFilteredData = () => {
+    const n = new Date();
+    let startDate, endDate = new Date(to+'T23:59:59');
+    
+    if (period === 'today') {
+      startDate = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+      endDate = new Date(n.getFullYear(), n.getMonth(), n.getDate(), 23, 59, 59);
+    } else if (period === 'week') {
+      startDate = new Date(n.getFullYear(), n.getMonth(), n.getDate() - 6);
+    } else if (period === '15days') {
+      startDate = new Date(n.getFullYear(), n.getMonth(), n.getDate() - 14);
+    } else if (period === 'month') {
+      startDate = new Date(n.getFullYear(), n.getMonth(), 1);
+    } else if (period === 'custom') {
+      startDate = new Date(from);
+    }
+
+    // Filter sales (only completed)
+    const filteredSales = sales.filter(s => {
+      const d = new Date(s.date);
+      return d >= startDate && d <= endDate;
+    });
+
+    // Filter purchases
+    const filteredPurchases = purchases.filter(p => {
+      const d = new Date(p.date);
+      return d >= startDate && d <= endDate;
+    });
+
+    // Filter expenses
+    const filteredExpenses = expenses.filter(e => {
+      const d = new Date(e.date);
+      return d >= startDate && d <= endDate;
+    });
+
+    return { filteredSales, filteredPurchases, filteredExpenses, startDate, endDate };
+  };
+
+  const { filteredSales, filteredPurchases, filteredExpenses } = getFilteredData();
+
+  // Calculate totals
+  const totalIncome = filteredSales.reduce((sum, s) => sum + (s.total || 0), 0);
+  const totalPurchaseExpense = filteredPurchases.reduce((sum, p) => {
+    return sum + p.items.reduce((s, i) => s + (i.buyP || 0) * (i.stock || 0), 0);
+  }, 0);
+  const totalManualExpense = filteredExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+  const totalExpense = totalPurchaseExpense + totalManualExpense;
+  const netProfit = totalIncome - totalExpense;
+
+  // Save expense to localStorage
+  const saveExpense = async () => {
+    if (!expenseForm.title?.trim()) { alert('ব্যয়ের বিবরণ দিন'); return; }
+    if (!expenseForm.amount || expenseForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
+    
+    const newExpense = {
+      id: genId(),
+      date: new Date().toISOString(),
+      title: expenseForm.title.trim(),
+      amount: parseFloat(expenseForm.amount),
+      note: expenseForm.note || ''
+    };
+    
+    const updatedExpenses = [...expenses, newExpense];
+    setExpenses(updatedExpenses);
+    localStorage.setItem('pos_expenses', JSON.stringify(updatedExpenses));
+    
+    setExpenseForm({title:'',amount:'',note:''});
+    setShowExpenseForm(false);
+    alert('✅ ব্যয় সংরক্ষিত হয়েছে!');
+  };
+
+  // Delete expense
+  const deleteExpense = (id) => {
+    if (!confirm('এই ব্যয় মুছে ফেলবেন?')) return;
+    const updatedExpenses = expenses.filter(e => e.id !== id);
+    setExpenses(updatedExpenses);
+    localStorage.setItem('pos_expenses', JSON.stringify(updatedExpenses));
+  };
+
+  const periods = [
+    {id:'today',label:'আজ'},
+    {id:'week',label:'১ সপ্তাহ'},
+    {id:'15days',label:'১৫ দিন'},
+    {id:'month',label:'১ মাস'},
+    {id:'custom',label:'কাস্টম'}
+  ];
+
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden',background:T.gray50}}>
+      {/* Header */}
+      <div style={{padding:'12px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+          <h2 style={{margin:0,fontSize:18,fontWeight:700,color:T.teal}}>💰 আয়/ব্যয় হিসাব</h2>
+          <button onClick={()=>setShowExpenseForm(true)} style={{...btn('primary'),padding:'8px 16px'}}>
+            ➕ ব্যয় যোগ করুন
+          </button>
+        </div>
+        
+        {/* Period Filter */}
+        <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+          {periods.map(p => (
+            <button key={p.id} onClick={()=>setPeriod(p.id)} style={{
+              padding:'6px 14px',border:'none',borderRadius:20,cursor:'pointer',fontWeight:600,fontSize:12,
+              background: period === p.id ? T.teal : T.gray100,
+              color: period === p.id ? T.white : T.gray600,
+              transition:'all 0.2s'
+            }}>{p.label}</button>
+          ))}
+          
+          {period === 'custom' && (
+            <div style={{display:'flex',gap:8,alignItems:'center',marginLeft:8}}>
+              <input type="date" value={from} onChange={e=>setFrom(e.target.value)} style={{...input,padding:'6px 10px',width:'auto'}} />
+              <span>থেকে</span>
+              <input type="date" value={to} onChange={e=>setTo(e.target.value)} style={{...input,padding:'6px 10px',width:'auto'}} />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{flex:1,overflow:'auto',padding:16}}>
+        {/* Summary Cards */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:16,marginBottom:20}}>
+          {/* Income Card */}
+          <div style={{...card,padding:20,borderLeft:`4px solid ${T.green}`}}>
+            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>📈 মোট আয় (বিক্রয়)</div>
+            <div style={{fontSize:28,fontWeight:800,color:T.green}}>{fmt(totalIncome)}</div>
+            <div style={{fontSize:12,color:T.gray400,marginTop:4}}>{filteredSales.length}টি বিক্রয়</div>
+          </div>
+          
+          {/* Purchase Expense Card */}
+          <div style={{...card,padding:20,borderLeft:`4px solid ${T.orange}`}}>
+            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>📦 পারচেজ ব্যয়</div>
+            <div style={{fontSize:28,fontWeight:800,color:T.orange}}>{fmt(totalPurchaseExpense)}</div>
+            <div style={{fontSize:12,color:T.gray400,marginTop:4}}>{filteredPurchases.length}টি পারচেজ</div>
+          </div>
+          
+          {/* Manual Expense Card */}
+          <div style={{...card,padding:20,borderLeft:`4px solid ${T.red}`}}>
+            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>📝 ম্যানুয়াল ব্যয়</div>
+            <div style={{fontSize:28,fontWeight:800,color:T.red}}>{fmt(totalManualExpense)}</div>
+            <div style={{fontSize:12,color:T.gray400,marginTop:4}}>{filteredExpenses.length}টি ব্যয়</div>
+          </div>
+          
+          {/* Net Profit Card */}
+          <div style={{...card,padding:20,borderLeft:`4px solid ${netProfit >= 0 ? T.teal : T.red}`}}>
+            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>💵 নীট লাভ/ক্ষতি</div>
+            <div style={{fontSize:28,fontWeight:800,color:netProfit >= 0 ? T.teal : T.red}}>{fmt(netProfit)}</div>
+            <div style={{fontSize:12,color:T.gray400,marginTop:4}}>মোট ব্যয়: {fmt(totalExpense)}</div>
+          </div>
+        </div>
+
+        {/* Expense List */}
+        {filteredExpenses.length > 0 && (
+          <div style={{...card,padding:20,marginBottom:16}}>
+            <h3 style={{margin:'0 0 16px',fontSize:14,fontWeight:700,color:T.gray700}}>📋 ম্যানুয়াল ব্যয়সমূহ</h3>
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {filteredExpenses.map(e => (
+                <div key={e.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:T.gray50,borderRadius:8}}>
+                  <div>
+                    <div style={{fontWeight:600,fontSize:13}}>{e.title}</div>
+                    <div style={{fontSize:11,color:T.gray500}}>{new Date(e.date).toLocaleDateString('bn-BD')}{e.note ? ` • ${e.note}` : ''}</div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <span style={{fontWeight:700,color:T.red,fontSize:14}}>{fmt(e.amount)}</span>
+                    <button onClick={()=>deleteExpense(e.id)} style={{...btn('danger'),padding:'4px 8px'}}>🗑️</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Sales Details */}
+        {filteredSales.length > 0 && (
+          <div style={{...card,padding:20,marginBottom:16}}>
+            <h3 style={{margin:'0 0 16px',fontSize:14,fontWeight:700,color:T.gray700}}>🛒 বিক্রয়সমূহ ({filteredSales.length})</h3>
+            <div style={{display:'flex',flexDirection:'column',gap:6}}>
+              {filteredSales.slice(0, 10).map(s => (
+                <div key={s.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',background:T.gray50,borderRadius:6}}>
+                  <div style={{fontSize:12}}>
+                    <span style={{fontWeight:600}}>{s.id}</span>
+                    <span style={{color:T.gray500,marginLeft:8}}>{new Date(s.date).toLocaleDateString('bn-BD')}</span>
+                    {s.customer && <span style={{color:T.teal,marginLeft:8}}>{s.customer}</span>}
+                  </div>
+                  <span style={{fontWeight:700,color:T.green}}>{fmt(s.total)}</span>
+                </div>
+              ))}
+              {filteredSales.length > 10 && (
+                <div style={{textAlign:'center',color:T.gray500,fontSize:12,padding:8}}>
+                  ... এবং আরও {filteredSales.length - 10}টি
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Purchase Details */}
+        {filteredPurchases.length > 0 && (
+          <div style={{...card,padding:20,marginBottom:16}}>
+            <h3 style={{margin:'0 0 16px',fontSize:14,fontWeight:700,color:T.gray700}}>📦 পারচেজসমূহ ({filteredPurchases.length})</h3>
+            <div style={{display:'flex',flexDirection:'column',gap:6}}>
+              {filteredPurchases.slice(0, 10).map(p => {
+                const total = p.items.reduce((s, i) => s + (i.buyP || 0) * (i.stock || 0), 0);
+                return (
+                  <div key={p.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',background:T.gray50,borderRadius:6}}>
+                    <div style={{fontSize:12}}>
+                      <span style={{fontWeight:600}}>{p.id}</span>
+                      <span style={{color:T.gray500,marginLeft:8}}>{new Date(p.date).toLocaleDateString('bn-BD')}</span>
+                      {p.supplier && <span style={{color:T.orange,marginLeft:8}}>{p.supplier}</span>}
+                    </div>
+                    <span style={{fontWeight:700,color:T.orange}}>{fmt(total)}</span>
+                  </div>
+                );
+              })}
+              {filteredPurchases.length > 10 && (
+                <div style={{textAlign:'center',color:T.gray500,fontSize:12,padding:8}}>
+                  ... এবং আরও {filteredPurchases.length - 10}টি
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Add Expense Modal */}
+      {showExpenseForm && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setShowExpenseForm(false)}>
+          <div style={{...card,width:400,padding:24}} onClick={e=>e.stopPropagation()}>
+            <h3 style={{margin:'0 0 20px',fontSize:16,fontWeight:700,color:T.teal}}>➕ নতুন ব্যয় যোগ করুন</h3>
+            
+            <div style={{marginBottom:16}}>
+              <label style={label}>📝 ব্যয়ের বিবরণ *</label>
+              <input value={expenseForm.title} onChange={e=>setExpenseForm(f=>({...f,title:e.target.value}))} placeholder="যেমন: বিদ্যুৎ বিল, ভাড়া, অফিস খরচ" style={input} />
+            </div>
+            
+            <div style={{marginBottom:16}}>
+              <label style={label}>💰 পরিমাণ (৳) *</label>
+              <input type="number" value={expenseForm.amount} onChange={e=>setExpenseForm(f=>({...f,amount:e.target.value}))} placeholder="0" style={input} />
+            </div>
+            
+            <div style={{marginBottom:20}}>
+              <label style={label}>📋 নোট (ঐচ্ছিক)</label>
+              <input value={expenseForm.note} onChange={e=>setExpenseForm(f=>({...f,note:e.target.value}))} placeholder="অতিরিক্ত তথ্য" style={input} />
+            </div>
+            
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={()=>setShowExpenseForm(false)} style={{...btn(),flex:1}}>বাতিল</button>
+              <button onClick={saveExpense} style={{...btn('primary'),flex:1}}>💾 সংরক্ষণ</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
