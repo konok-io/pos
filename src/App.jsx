@@ -581,24 +581,20 @@ export default function App() {
           {/* Actions Section */}
           <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0,marginLeft:24}}>
             {/* User Info */}
-            <div style={{display:'flex',alignItems:'center',gap:10,borderRight:'1px solid #e5e7eb',paddingRight:14}}>
-              <div style={{
-                width:32,height:32,
-                background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                borderRadius:8,
-                display:'flex',
-                alignItems:'center',
-                justifyContent:'center',
-                fontSize:14,
-                color:T.white,
-                fontWeight:700
-              }}>
-                {currentUser.name?.charAt(0).toUpperCase() || 'A'}
-              </div>
-              <div>
-                <div style={{fontSize:12,fontWeight:600,color:T.gray900}}>{currentUser.name}</div>
-                <div style={{fontSize:10,color:T.gray400}}>{currentUser.role === 'super_admin' ? 'সুপার এডমিন' : 'এডমিন'}</div>
-              </div>
+            <div style={{
+              width:34,height:34,
+              background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+              borderRadius:8,
+              display:'flex',
+              alignItems:'center',
+              justifyContent:'center',
+              fontSize:16,
+              color:T.white,
+              fontWeight:700,
+              cursor:'pointer',
+              border:'1px solid #e5e7eb'
+            }}>
+              {currentUser.role === 'super_admin' ? '👑' : currentUser.name?.charAt(0).toUpperCase() || 'A'}
             </div>
 
             {/* Refresh Button */}
