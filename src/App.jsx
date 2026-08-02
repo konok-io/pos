@@ -255,11 +255,14 @@ function DynamicMenu({tab, setTab, tabs}) {
 /* ═══════════════════════════════════════════
    LOGIN SCREEN
 ═══════════════════════════════════════════ */
-function LoginScreen({ onLogin }) {
+function LoginScreen({ onLogin, settings }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const currentYear = new Date().getFullYear();
+  const businessName = settings?.name || 'yourbusiness.com';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -336,7 +339,7 @@ function LoginScreen({ onLogin }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@konok.io"
+              placeholder="admin@yourbusiness.com"
               required
               style={{ ...input, padding: '14px 16px', fontSize: 15 }}
             />
@@ -392,7 +395,7 @@ function LoginScreen({ onLogin }) {
         {/* Footer */}
         <div style={{ marginTop: 24, textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 12, color: T.gray400 }}>
-            © ২০২৪ konok.io
+            © {currentYear} {businessName}
           </p>
         </div>
       </div>
@@ -735,7 +738,7 @@ export default function App() {
 
   // Show login screen if not authenticated
   if (showLogin || !currentUser) {
-    return <LoginScreen onLogin={handleLogin} />;
+    return <LoginScreen onLogin={handleLogin} settings={settings} />;
   }
 
   return (
