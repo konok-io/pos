@@ -160,6 +160,7 @@ function DynamicMenu({tab, setTab, tabs}) {
       display: 'flex',
       flex: 1,
       alignItems: 'center',
+      justifyContent: 'center',
       overflowX: 'auto',
       gap: 2,
       marginLeft: 24,
