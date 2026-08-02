@@ -1753,7 +1753,7 @@ function BarcodeScreen({purchases, products}) {
 body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
 .barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
 .barcode-item { border: 1px solid #ddd; padding: 5px; text-align: center; page-break-inside: avoid; }
-.barcode-price { font-size: 18px; font-weight: bold; color: #000; margin-bottom: 2px; }
+.barcode-price { font-size: 18px; font-weight: bold; color: #000; margin-bottom: 0; }
 .barcode-svg { display: block; margin: 0 auto; }
 .barcode-number { font-size: 14px; font-family: monospace; color: #333; letter-spacing: 0.5px; }
 </style>
@@ -1898,7 +1898,7 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; background: #fff; }
 .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-.price { font-size: 36px; font-weight: bold; color: #000; margin-bottom: 5px; }
+.price { font-size: 36px; font-weight: bold; color: #000; margin-bottom: 0; }
 .barcode-svg { display: block; margin: 0 auto; }
 .number { font-size: 18px; font-family: monospace; color: #333; }
 </style>
