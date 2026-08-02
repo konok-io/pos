@@ -903,71 +903,87 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         </div>
       </div>
 
-      {/* ── RIGHT: Cart ── */}
-      <div style={{width:360,display:'flex',flexDirection:'column',background:T.white,borderLeft:`1px solid ${T.gray200}`,boxShadow:'-2px 0 10px rgba(0,0,0,0.05)'}}>
-        {/* Customer */}
-        <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray200}`,position:'relative'}}>
-          <label style={label}>👥 কাস্টমার (ঐচ্ছিক)</label>
-          <div style={{display:'flex',gap:8}}>
+      {/* ── RIGHT: Cart ── Modern Minimal Design */}
+      <div style={{width:360,display:'flex',flexDirection:'column',background:'#fafbfc',borderLeft:`1px solid #e5e7eb`}}>
+        {/* Cart Header */}
+        <div style={{padding:'20px',borderBottom:`1px solid #e5e7eb`,background:T.white}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14}}>
+            <h3 style={{fontSize:18,fontWeight:700,color:T.gray900,margin:0,display:'flex',alignItems:'center',gap:8}}>🛒 আমার কার্ট</h3>
+            <span style={{background:T.gray900,color:T.white,padding:'4px 14px',borderRadius:20,fontSize:13,fontWeight:600}}>{cart.length}</span>
+          </div>
+          
+          {/* Customer Input */}
+          <div style={{position:'relative'}}>
             <input value={custQ} onChange={e=>{setCustQ(e.target.value);setShowCustDrop(true);}}
               onFocus={()=>setShowCustDrop(true)}
               onMouseDown={() => { setShowCustDrop(true); }}
-              placeholder="নাম বা ফোন..."
-              style={{...input,fontSize:13,borderRadius:8,flex:1}}
+              placeholder="🔍 কাস্টমার খুঁজুন..."
+              style={{...input,fontSize:14,borderRadius:12,padding:'12px 16px',border:'2px solid #e5e7eb',background:'#fafbfc'}}
             />
             {due > 0 && !selCust && cart.length > 0 && (
-              <button onClick={()=>setShowAddCust(true)} style={{...btn('primary'),fontSize:12,padding:'8px 12px',whiteSpace:'nowrap'}}>👤 যোগ</button>
+              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:8,top:'50%',transform:'translateY(-50%)',...btn('primary'),fontSize:12,padding:'6px 10px'}}>👤</button>
             )}
           </div>
+          
           {due > 0 && !selCust && cart.length > 0 && !custQ && (
-            <div style={{fontSize:11,color:T.red,marginTop:4,textAlign:'center'}}>বাকিতে বিক্রয় করতে কাস্টমার যোগ করুন</div>
+            <div style={{fontSize:12,color:T.red,marginTop:8,textAlign:'center',padding:'6px 10px',background:T.redLight,borderRadius:8}}>⚠️ বাকিতে বিক্রয় করতে কাস্টমার যোগ করুন</div>
           )}
+          
           {selCust && (
-            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:T.tealLight,borderRadius:8}}>
-              <span style={{fontSize:12,color:T.teal,fontWeight:600}}>✓ {selCust.name} {selCust.credit>0 && <span style={{color:T.red}}>(বাকি: {fmt(selCust.credit)})</span>}</span>
-              <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:12,background:'none',border:'none',color:T.gray400,cursor:'pointer'}}>✕</button>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:10,padding:'10px 14px',background:'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',borderRadius:12,border:'1.5px solid #86efac'}}>
+              <span style={{fontSize:13,color:T.green,fontWeight:600}}>✓ {selCust.name} {selCust.credit>0 && <span style={{color:T.red,marginLeft:6}}>(বাকি: {fmt(selCust.credit)})</span>}</span>
+              <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:12,background:'none',border:'none',color:T.gray400,cursor:'pointer',padding:4}}>✕</button>
             </div>
           )}
+          
           {showCustDrop && !selCust && (
             <div 
               onMouseDown={(e) => e.preventDefault()}
-              style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto'}}>
+              style={{position:'absolute',left:20,right:20,top:'100%',background:T.white,border:'2px solid #e5e7eb',borderRadius:12,boxShadow:'0 8px 24px rgba(0,0,0,0.12)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
               {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).map(c=>(
                 <div key={c.id} onClick={()=>{setSelCust(c);setCustQ(c.name);setShowCustDrop(false);}}
-                  style={{padding:'10px 14px',cursor:'pointer',fontSize:13,borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between'}}>
+                  style={{padding:'12px 16px',cursor:'pointer',fontSize:14,borderBottom:`1px solid #f0f0f0`,display:'flex',justifyContent:'space-between'}}>
                   <span><strong>{c.name}</strong>{c.phone?` · ${c.phone}`:''}</span>
-                  {c.credit>0 && <span style={{color:T.red,fontSize:11}}>বাকি {fmt(c.credit)}</span>}
+                  {c.credit>0 && <span style={{color:T.red,fontSize:12,fontWeight:600}}>বাকি {fmt(c.credit)}</span>}
                 </div>
               ))}
               {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).length===0 && (
-                <div style={{padding:'10px 14px',fontSize:13,color:T.gray400}}>কাস্টমার পাওয়া যায়নি</div>
+                <div style={{padding:'12px 16px',fontSize:14,color:T.gray400}}>কাস্টমার পাওয়া যায়নি</div>
               )}
             </div>
           )}
         </div>
 
         {/* Cart Items */}
-        <div style={{flex:1,overflow:'auto'}}>
+        <div style={{flex:1,overflow:'auto',background:'#fafbfc'}}>
           {cart.length===0 ? (
-            <div style={{textAlign:'center',padding:'60px 20px',color:T.gray400}}>
-              <div style={{fontSize:52,marginBottom:12}}>🛒</div>
-              <div style={{fontSize:15,fontWeight:500}}>কার্ট খালি</div>
-              <div style={{fontSize:12,marginTop:4}}>বাম দিক থেকে পণ্য যোগ করুন</div>
+            <div style={{textAlign:'center',padding:'60px 30px',background:T.white,margin:16,borderRadius:16,border:'1.5px solid #e5e7eb'}}>
+              <div style={{fontSize:64,marginBottom:16}}>🛒</div>
+              <div style={{fontSize:16,fontWeight:600,color:T.gray700,marginBottom:6}}>কার্ট খালি</div>
+              <div style={{fontSize:13,color:T.gray400}}>বাম দিক থেকে পণ্য যোগ করুন</div>
             </div>
           ) : (
-            <div style={{padding:'8px 14px'}}>
+            <div style={{padding:'8px 16px'}}>
               {cart.map(item=>(
-                <div key={item.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:`1px solid ${T.gray100}`}}>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:14,fontWeight:600,color:T.gray900,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name}</div>
-                    <div style={{fontSize:13,color:T.teal,marginTop:2}}>{fmt(item.sellP)} × {item.qty} = <strong>{fmt(item.sellP*item.qty)}</strong></div>
+                <div key={item.id} style={{display:'flex',alignItems:'center',gap:14,padding:'16px',background:T.white,borderRadius:14,marginBottom:10,border:'1.5px solid #e5e7eb',boxShadow:'0 2px 8px rgba(0,0,0,0.04)'}}>
+                  {/* Product Icon */}
+                  <div style={{width:52,height:52,background:'linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,flexShrink:0}}>
+                    📦
                   </div>
-                  <div style={{display:'flex',alignItems:'center',gap:5}}>
-                    <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:28,height:28,border:`1px solid ${T.gray200}`,borderRadius:6,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
-                    <input value={item.qty} onChange={e=>updQty(item.id,e.target.value)} type="number"
-                      style={{width:42,height:28,textAlign:'center',border:`1px solid ${T.gray200}`,borderRadius:6,fontSize:13}}/>
-                    <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:28,height:28,border:`1px solid ${T.gray200}`,borderRadius:6,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
-                    <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:28,height:28,border:'none',borderRadius:6,background:T.redLight,color:T.red,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+                  
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:15,fontWeight:600,color:T.gray900,marginBottom:4,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{item.name}</div>
+                    <div style={{fontSize:12,color:T.gray400}}>প্রতি পিস • {fmt(item.sellP)}</div>
+                  </div>
+                  
+                  <div style={{textAlign:'right'}}>
+                    <div style={{fontWeight:700,fontSize:17,color:T.gray900,marginBottom:8}}>{fmt(item.sellP*item.qty)}</div>
+                    <div style={{display:'flex',alignItems:'center',gap:6,justifyContent:'flex-end'}}>
+                      <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:28,height:28,border:'1.5px solid #e5e7eb',borderRadius:8,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s'}}>−</button>
+                      <span style={{minWidth:28,textAlign:'center',fontWeight:600,fontSize:14}}>{item.qty}</span>
+                      <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:28,height:28,border:'1.5px solid #e5e7eb',borderRadius:8,background:T.white,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.15s'}}>+</button>
+                      <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:28,height:28,border:'none',borderRadius:8,background:'#fee2e2',color:T.red,cursor:'pointer',fontSize:12,display:'flex',alignItems:'center',justifyContent:'center',marginLeft:4,transition:'all 0.15s'}}>✕</button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -975,56 +991,77 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           )}
         </div>
 
-        {/* Totals */}
-        <div style={{borderTop:`2px solid ${T.gray200}`,padding:'14px 16px 10px',background:T.white}}>
-          <div style={{display:'flex',justifyContent:'space-between',fontSize:14,color:T.gray600,marginBottom:8}}>
-            <span>সাবটোটাল ({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
-            <span style={{fontWeight:600}}>{fmt(subtotal)}</span>
+        {/* Totals - Modern Summary Box */}
+        <div style={{padding:'20px',background:T.white,borderTop:'2px solid #e5e7eb'}}>
+          {/* Summary Card */}
+          <div style={{background:T.white,borderRadius:16,padding:20,border:'1.5px solid #e5e7eb',marginBottom:14}}>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:10,fontSize:14,color:T.gray500}}>
+              <span>সাবটোটাল ({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
+              <span style={{fontWeight:600,color:T.gray700}}>{fmt(subtotal)}</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:10,fontSize:14,color:T.green}}>
+              <span>ছাড়</span>
+              <span style={{fontWeight:600}}>−{fmt(parseFloat(discount)||0)}</span>
+            </div>
+            <div style={{display:'flex',justifyContent:'space-between',marginBottom:10,fontSize:14,color:T.amber}}>
+              <span>ভ্যাট ({vatPercent}%)</span>
+              <span style={{fontWeight:600}}>+{fmt(vatAmount)}</span>
+            </div>
+            
+            {/* Divider */}
+            <div style={{height:1.5,background:'linear-gradient(90deg, transparent, #e5e7eb, transparent)',margin:'14px 0'}}></div>
+            
+            {/* Grand Total */}
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',background:T.gray900,color:T.white,padding:'16px 18px',borderRadius:14,margin:'14px 0'}}>
+              <span style={{fontWeight:600,fontSize:15}}>মোট দেনা</span>
+              <span style={{fontWeight:800,fontSize:24}}>{fmt(total)}</span>
+            </div>
           </div>
-          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}>
-            <label style={{...label,margin:0,whiteSpace:'nowrap'}}>ছাড় (৳)</label>
+          
+          {/* Discount & VAT Inputs */}
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:12}}>
             <input value={discount} onChange={e=>setDiscount(e.target.value)} type="number" min="0"
-              style={{...input,width:100,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
-            <label style={{...label,margin:0,whiteSpace:'nowrap'}}>ভ্যাট (%)</label>
+              placeholder="ছাড় (৳)"
+              style={{border:'1.5px solid #e5e7eb',borderRadius:10,padding:'10px 14px',fontSize:14,outline:'none',background:'#fafbfc',width:'100%',boxSizing:'border-box'}}/>
             <input value={vatPercent} onChange={e=>setVatPercent(e.target.value)} type="number" min="0" max="100"
-              style={{...input,width:70,padding:'8px 10px',fontSize:13,borderRadius:8}}/>
+              placeholder="ভ্যাট (%)"
+              style={{border:'1.5px solid #e5e7eb',borderRadius:10,padding:'10px 14px',fontSize:14,outline:'none',background:'#fafbfc',width:'100%',boxSizing:'border-box'}}/>
           </div>
-          {vatAmount > 0 && (
-            <div style={{fontSize:12,color:T.amber,marginBottom:8}}>ভ্যাট (৳{vatAmount.toFixed(0)}) যোগ হয়েছে</div>
-          )}
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 14px',background:T.tealLight,borderRadius:10,marginBottom:10}}>
-            <span style={{fontWeight:700,fontSize:16}}>মোট দেনা</span>
-            <span style={{fontWeight:800,fontSize:24,color:T.teal}}>{fmt(total)}</span>
-          </div>
-          <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
-            <label style={{...label,margin:0,whiteSpace:'nowrap'}}>পরিশোধ (৳)</label>
-            <input ref={paidRef} value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
-              placeholder="পুরো মূল্য দিতে টাইপ করুন" style={{...input,padding:'8px 10px',fontSize:14,fontWeight:600,borderRadius:8}}
-              onKeyDown={e=>{if(e.key==='Enter'&&cart.length) checkout();}}/>
-          </div>
+          
+          {/* Payment Input */}
+          <input ref={paidRef} value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
+            placeholder="পরিশোধ (৳)" 
+            style={{...input,padding:'12px 14px',fontSize:15,fontWeight:600,borderRadius:12,marginBottom:10,border:'2px solid #e5e7eb',background:'#fafbfc'}}
+            onKeyDown={e=>{if(e.key==='Enter'&&cart.length) checkout();}}/>
+          
+          {/* Due/Change Alert */}
           {due > 0 && (
-            <div style={{fontSize:14,marginBottom:10,padding:'8px 12px',borderRadius:8,
-              background:due>0?T.redLight:T.greenLight, color:due>0?T.red:T.green, fontWeight:600}}>
-              {due>0 ? `⚠️ বাকি থাকবে: ${fmt(due)}${selCust ? ' (কাস্টমার হিসাবে যোগ হবে)' : ''}` : `💵 ফেরত দিন: ${fmt(change)}`}
+            <div style={{fontSize:14,marginBottom:10,padding:'10px 14px',borderRadius:10,
+              background:T.redLight, color:T.red, fontWeight:600,textAlign:'center'}}>
+              ⚠️ বাকি থাকবে: {fmt(due)}{selCust ? ' (কাস্টমার হিসাবে যোগ হবে)' : ''}
             </div>
           )}
           {paidAmt > total && (
-            <div style={{fontSize:14,marginBottom:10,padding:'8px 12px',borderRadius:8,
-              background:T.greenLight, color:T.green, fontWeight:600}}>
+            <div style={{fontSize:14,marginBottom:10,padding:'10px 14px',borderRadius:10,
+              background:T.greenLight, color:T.green, fontWeight:600,textAlign:'center'}}>
               💵 ফেরত দিতে হবে: {fmt(change)}
             </div>
           )}
-          <div style={{display:'flex',gap:10}}>
+          
+          {/* Action Buttons */}
+          <div style={{display:'grid',gridTemplateColumns:'1fr 2fr',gap:10}}>
             <button onClick={()=>{setCart([]);setDiscount('');setPaid('');setSelCust(null);setCustQ('');}}
-              style={{...btn('ghost'),flex:1,justifyContent:'center',padding:'12px'}}>
+              style={{padding:'14px',borderRadius:12,border:'1.5px solid #e5e7eb',background:T.white,color:T.gray600,fontWeight:600,fontSize:14,cursor:'pointer',transition:'all 0.15s'}}>
               🗑️ ক্লিয়ার
             </button>
             <button onClick={checkout} 
               disabled={!cart.length || (due > 0 && !selCust)}
               style={{
-                ...btn('sell'), flex:2, justifyContent:'center', fontSize:15, padding:'12px',
-                opacity: cart.length && !(due > 0 && !selCust) ? 1 : 0.5,
-                cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
+                padding:'14px',borderRadius:12,border:'none',
+                background: cart.length && !(due > 0 && !selCust) ? 'linear-gradient(135deg, #ea580c 0%, #c2410c 100%)' : '#e5e7eb',
+                color:T.white,fontWeight:700,fontSize:15,cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
+                boxShadow: cart.length && !(due > 0 && !selCust) ? '0 4px 12px rgba(234,88,12,0.3)' : 'none',
+                transition:'all 0.15s'
               }}>
               {due > 0 && !selCust && cart.length ? `⚠️ পূর্ণ পরিশোধ করুন` : 
                due > 0 && selCust && cart.length ? `✓ বাকি/পূর্ণ পরিশোধ` : 
