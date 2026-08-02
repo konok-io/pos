@@ -143,6 +143,17 @@ export default function App() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // Auto-enter fullscreen on page load if it was requested before reload
+  useEffect(() => {
+    const wantFullscreen = localStorage.getItem('pos_want_fullscreen');
+    if (wantFullscreen === 'true') {
+      localStorage.removeItem('pos_want_fullscreen');
+      setTimeout(() => {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }, 500);
+    }
+  }, []);
+
   useEffect(() => {
     // Check if reset was done - flag stays forever to prevent DEMO loading
     const wasReset = db.get('pos_reset_done');
@@ -267,18 +278,6 @@ export default function App() {
       document.exitFullscreen();
     }
   };
-
-  // Auto-enter fullscreen on page load if it was requested before reload
-  useEffect(() => {
-    if (!ready) return;
-    const wantFullscreen = localStorage.getItem('pos_want_fullscreen');
-    if (wantFullscreen === 'true') {
-      localStorage.removeItem('pos_want_fullscreen');
-      setTimeout(() => {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }, 500);
-    }
-  }, [ready]);
 
   return (
     <>
