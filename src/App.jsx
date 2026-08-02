@@ -5121,8 +5121,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
       return;
     }
-    if (file.size > 2 * 1024 * 1024) {
-      alert('ছবির সাইজ 2MB এর বেশি হওয়া উচিত নয়!');
+    if (file.size > 5 * 1024 * 1024) {
+      alert('ছবির সাইজ 5MB এর বেশি হওয়া উচিত নয়!');
       return;
     }
     const reader = new FileReader();
@@ -5170,7 +5170,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
           }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
              onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
             <span style={{fontSize:24}}>📁</span>
-            <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 2MB)</span>
+            <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
             <input type="file" accept="image/*" onChange={handleImageUpload} style={{display:'none'}}/>
           </label>
         </div>
