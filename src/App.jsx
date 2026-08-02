@@ -110,17 +110,20 @@ function DynamicMenu({tab, setTab, tabs}) {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const moreMenuRef = useRef(null);
 
-  // Close menu when clicking outside
+  // Close menu when clicking outside (use setTimeout to let button click fire first)
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) {
-        setShowMoreMenu(false);
-      }
+      // Delay to allow button click to fire first
+      setTimeout(() => {
+        if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) {
+          setShowMoreMenu(false);
+        }
+      }, 10);
     };
     if (showMoreMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('click', handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [showMoreMenu]);
 
   // Menu groups for POS system
@@ -135,7 +138,8 @@ function DynamicMenu({tab, setTab, tabs}) {
   const renderMenuButton = (t, isDropdown = false) => {
     const isActive = tab === t.id;
     return (
-      <button key={t.id} onClick={() => {
+      <button key={t.id} onClick={(e) => {
+        e.stopPropagation();
         setTab(t.id);
         setShowMoreMenu(false);
       }} style={{
@@ -203,7 +207,10 @@ function DynamicMenu({tab, setTab, tabs}) {
       {secondaryTabs.length > 0 && (
         <div style={{ position: 'relative' }} ref={moreMenuRef}>
           <button 
-            onClick={() => setShowMoreMenu(!showMoreMenu)} 
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowMoreMenu(!showMoreMenu);
+            }} 
             style={{
               padding: '8px 14px',
               border: 'none',
@@ -241,19 +248,21 @@ function DynamicMenu({tab, setTab, tabs}) {
           
           {/* Dropdown Menu - Opens UPWARD */}
           {showMoreMenu && (
-            <div style={{
-              position:'absolute', 
-              bottom:'100%', 
-              right: 0, 
-              marginBottom: 8,
-              background: T.white, 
-              borderRadius: 12, 
-              padding: 8,
-              boxShadow: '0 12px 40px rgba(0,0,0,0.18)', 
-              border: `1px solid ${T.gray200}`,
-              zIndex: 100, 
-              minWidth: 180,
-            }}>
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                position:'absolute', 
+                bottom:'100%', 
+                right: 0, 
+                marginBottom: 8,
+                background: T.white, 
+                borderRadius: 12, 
+                padding: 8,
+                boxShadow: '0 12px 40px rgba(0,0,0,0.18)', 
+                border: `1px solid ${T.gray200}`,
+                zIndex: 100, 
+                minWidth: 180,
+              }}>
               <div style={{ 
                 padding: '8px 12px 12px',
                 borderBottom: `1px solid ${T.gray100}`,
