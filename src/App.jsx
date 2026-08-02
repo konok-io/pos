@@ -429,7 +429,18 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const paidRef = useRef();
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
-  useEffect(() => { searchRef.current?.focus(); }, []);
+  // Auto focus search field
+  useEffect(() => { 
+    searchRef.current?.focus(); 
+  }, [tab]);
+
+  // Handle TAB key in search field to move to paid input
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Tab' && cart.length > 0) {
+      e.preventDefault();
+      paidRef.current?.focus();
+    }
+  };
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -783,7 +794,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         <div style={{padding:'8px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center'}}>
           <div style={{position:'relative',flex:1}}>
             <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:13}}>🔍</span>
-            <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)}
+            <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)} onKeyDown={handleSearchKeyDown}
               placeholder="পণ্যের নাম বা বারকোড..."
               style={{...input,paddingLeft:32,height:34,fontSize:12,borderRadius:7,border:`1.5px solid ${T.gray200}`,background:'#fafbfc'}}
             />
