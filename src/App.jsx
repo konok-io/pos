@@ -693,19 +693,6 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             fontSize:13,
           }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
           
-          {/* Product name search */}
-          <div style={{position:'relative',flex:1,minWidth:120}}>
-            <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:14}}>🔍</span>
-            <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder="পণ্যের নাম..."
-              style={{...input,paddingLeft:34,height:36,fontSize:13,borderRadius:7,border:`1px solid ${T.teal}`}}
-              onKeyDown={e=>{
-                if(e.key==='Enter'&&filtered.length>0) addToCart(filtered[0]);
-                if(e.key==='Tab'){e.preventDefault();paidRef.current?.focus();}
-              }}
-            />
-          </div>
-          
           {/* Company dropdown */}
           <div style={{position:'relative',minWidth:130}} data-comp-dropdown>
             <input 
@@ -774,6 +761,19 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
                 ))}
               </div>
             )}
+          </div>
+          
+          {/* Product name search */}
+          <div style={{position:'relative',flex:1,minWidth:120}}>
+            <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:14}}>🔍</span>
+            <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)}
+              placeholder="পণ্যের নাম..."
+              style={{...input,paddingLeft:34,height:36,fontSize:13,borderRadius:7,border:`1px solid ${T.teal}`}}
+              onKeyDown={e=>{
+                if(e.key==='Enter'&&filtered.length>0) addToCart(filtered[0]);
+                if(e.key==='Tab'){e.preventDefault();paidRef.current?.focus();}
+              }}
+            />
           </div>
         </div>
 
