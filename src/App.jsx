@@ -1750,7 +1750,11 @@ function BarcodeScreen({purchases, products}) {
   
   // Print single barcode from search result
   const printSingleBarcode = (item, count = 1) => {
-    const barcodeValue = item.barcode || item.id;
+    if (!item.barcode) {
+      alert('এই পণ্যের বারকোড নেই! প্রথমে পণ্যে বারকোড যোগ করুন।');
+      return;
+    }
+    const barcodeValue = item.barcode;
     const price = item.sellP || 0;
     const escapeJS = (str) => String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
     
@@ -2102,7 +2106,7 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
                 <div style={{flex:1}}>
                   <div style={{fontWeight:600,fontSize:15,marginBottom:4}}>{item.name}</div>
                   <div style={{fontSize:12,color:T.gray500}}>
-                    বারকোড: <span style={{fontFamily:'monospace',color:T.teal,fontWeight:600}}>{item.barcode || item.id}</span>
+                    বারকোড: <span style={{fontFamily:'monospace',color:T.teal,fontWeight:600}}>{item.barcode || 'বারকোড নেই'}</span>
                   </div>
                   <div style={{fontSize:11,color:T.gray400,marginTop:4}}>
                     মূল্য: ৳{item.sellP || 0} | কোম্পানি: {item.company || '-'} | পারচেজ: {item.purchaseId}
