@@ -107,6 +107,14 @@ function Modal({onClose, title, children, width=460}) {
 
 /* ─────────────── DYNAMIC MENU COMPONENT ─────────────── */
 function DynamicMenu({tab, setTab, tabs}) {
+  // Menu groups for POS system
+  const menuGroups = [
+    { id: 'sales', items: tabs.filter(t => ['pos'].includes(t.id)) },
+    { id: 'inventory', items: tabs.filter(t => ['products', 'newproduct'].includes(t.id)) },
+    { id: 'management', items: tabs.filter(t => ['suppliers', 'customers'].includes(t.id)) },
+    { id: 'tools', items: tabs.filter(t => ['barcode', 'inventory', 'income', 'reports', 'settings'].includes(t.id)) },
+  ];
+
   const renderMenuButton = (t) => {
     const isActive = tab === t.id;
     return (
@@ -153,7 +161,7 @@ function DynamicMenu({tab, setTab, tabs}) {
       flex: 1,
       alignItems: 'center',
       overflowX: 'auto',
-      gap: 4,
+      gap: 2,
       marginLeft: 24,
       marginRight: 16,
       padding: '4px 8px',
@@ -161,8 +169,15 @@ function DynamicMenu({tab, setTab, tabs}) {
       borderRadius: 12,
       border: `1px solid ${T.gray200}`,
     }}>
-      {/* All Menu Items */}
-      {tabs.map(t => renderMenuButton(t))}
+      {/* Menu Groups with Dividers */}
+      {menuGroups.map((group, groupIdx) => (
+        <div key={group.id} style={{ display: 'flex', gap: 2 }}>
+          {group.items.map(t => renderMenuButton(t))}
+          {groupIdx < menuGroups.length - 1 && (
+            <div style={{ width: 1, background: T.gray200, margin: '8px 6px', borderRadius: 2, alignSelf: 'center', height: 24 }} />
+          )}
+        </div>
+      ))}
     </div>
   );
 }
