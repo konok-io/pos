@@ -3932,7 +3932,7 @@ function IncomeScreen({sales, purchases, upd}) {
 <style>
 @page { size: A4; margin: 10mm; }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Nikosh',sans-serif; font-size:12px; color:#333; padding:10px; }
+body { font-family:'Courier New',monospace; font-size:11px; color:#333; padding:10px; }
 .header { text-align:center; margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:10px; }
 .header h1 { font-size:20px; margin-bottom:5px; }
 .header p { font-size:11px; color:#666; }
