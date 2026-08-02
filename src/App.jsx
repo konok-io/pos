@@ -929,8 +929,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               style={{...input,fontSize:12,borderRadius:8,padding:'8px 12px',border:'1.5px solid #e5e7eb',background:'#fafbfc'}}
             />
             {due > 0 && !selCust && cart.length > 0 && (
-              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',background:T.teal,border:'none',borderRadius:6,color:T.white,cursor:'pointer',fontSize:11,padding:'4px 8px',display:'flex',alignItems:'center',gap:4}}>
-                <span style={{fontSize:12}}>👤</span>
+              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',background:T.teal,border:'none',borderRadius:6,color:'white',cursor:'pointer',fontSize:11,padding:'4px 8px',display:'flex',alignItems:'center',gap:4,fontWeight:700}}>
+                +
               </button>
             )}
           </div>
