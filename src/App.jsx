@@ -1732,11 +1732,18 @@ function BarcodeScreen({purchases, products}) {
     const barcodeData = [];
     selectedPurchase.items.forEach((item, idx) => {
       const count = barcodeCounts[idx] || 0;
+      if (count <= 0) return; // Skip items with 0 count
       const barcodeValue = item.barcode || item.id;
       for (let i = 0; i < count; i++) {
         barcodeData.push({ value: barcodeValue, price: item.sellP || 0 });
       }
     });
+
+    // Show warning if no barcodes to print
+    if (barcodeData.length === 0) {
+      alert('কোনো বারকোড প্রিন্ট করার জন্য নেই! কাউন্ট সেট করুন অথবা প্রিন্ট থেকে বাদ দিন বাটন ব্যবহার করুন।');
+      return;
+    }
 
     // Escape function for JavaScript strings
     const escapeJS = (str) => String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
@@ -1874,20 +1881,25 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                   </div>
                   <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | কোম্পানি: {item.company || '-'}</div>
                 </div>
-                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
                   <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
                   <input 
                     type="number" 
-                    min="1"
+                    min="0"
                     value={barcodeCounts[idx] || 1}
                     onChange={e=>updateCount(idx, e.target.value)}
-                    style={{...input,width:60,textAlign:'center',padding:'6px'}}
+                    style={{...input,width:60,textAlign:'center',padding:'6px', borderColor: (barcodeCounts[idx] || 1) === 0 ? T.red : undefined }}
                   />
+                  <button onClick={()=>updateCount(idx, 0)} style={{...btn('danger'),padding:'6px 10px',fontSize:12}} title="প্রিন্ট থেকে বাদ দিন">✕</button>
                   <button onClick={()=>{
                     // Print single barcode (A4 size)
                     const barcodeValue = item.barcode || item.id;
                     const price = item.sellP || 0;
                     const count = barcodeCounts[idx] || 1;
+                    if (count <= 0) {
+                      alert('এই প্রোডাক্টের কাউন্ট ০ তাই প্রিন্ট করা সম্ভব নয়।');
+                      return;
+                    }
                     const escapeJS = (str) => String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
                     
                     // Build barcode data array
