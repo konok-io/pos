@@ -18,6 +18,19 @@ const fmtN = (n) => (+n||0).toLocaleString('en-IN');
 const today = () => new Date().toISOString().split('T')[0];
 const now = () => new Date().toISOString();
 
+/* ─────────────── STORAGE KEYS ─────────────── */
+const STORAGE_KEYS = {
+  products: 'pos_products',
+  customers: 'pos_customers',
+  sales: 'pos_sales',
+  settings: 'pos_settings',
+  suppliers: 'pos_suppliers',
+  categories: 'pos_categories',
+  purchases: 'pos_purchases',
+  users: 'pos_users',
+  auth: 'pos_auth',
+};
+
 /* ─────────────── STORAGE ─────────────── */
 const db = {
   get(k) {
@@ -32,19 +45,6 @@ const db = {
   clear() {
     Object.values(STORAGE_KEYS).forEach(k => localStorage.removeItem(k));
   }
-};
-
-/* ─────────────── STORAGE KEYS ─────────────── */
-const STORAGE_KEYS = {
-  products: 'pos_products',
-  customers: 'pos_customers',
-  sales: 'pos_sales',
-  settings: 'pos_settings',
-  suppliers: 'pos_suppliers',
-  categories: 'pos_categories',
-  purchases: 'pos_purchases',
-  users: 'pos_users',
-  auth: 'pos_auth',
 };
 
 /* ─────────────── DEFAULT SUPER ADMIN ─────────────── */
