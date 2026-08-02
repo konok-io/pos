@@ -4409,7 +4409,7 @@ function ReportsScreen({sales, customers, purchases}) {
       <style>
         @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Arial,sans-serif; padding:12px; font-size:12px; }
+        body { font-family:'Tiro Bangla',Arial,sans-serif; padding:12px; font-size:12px; }
         .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
         .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
         .header p { color:#666; font-size:11px; }
