@@ -1793,11 +1793,12 @@ ${printFiltered.map(p => {
 </tbody></table>
 <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</div>
 </body></html>`;
-          const win = window.open('','','width=1000,height=600');
+          const win = window.open('', '_blank', 'width=1000,height=600,left=100,top=100');
           win.document.open();
           win.document.write(html);
           win.document.close();
-          win.onload = () => setTimeout(() => win.print(), 100);
+          win.focus();
+          setTimeout(() => { if (!win.closed) { win.print(); } }, 250);
         }}>🖨️ প্রিন্ট</button>
         <button style={btn('primary')} onClick={()=>{setShowAddForm(true);setPurchaseItems([]);}}>📦 নতুন পণ্য সংরক্ষণ</button>
         <span style={{fontSize:12,color:T.gray400}}>{filtered.length}টি পণ্য</span>
@@ -3830,11 +3831,12 @@ ${printFiltered.map(p => {
 </tbody></table>
 <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</div>
 </body></html>`;
-          const win = window.open('','','width=1000,height=600');
+          const win = window.open('', '_blank', 'width=1000,height=600,left=100,top=100');
           win.document.open();
           win.document.write(html);
           win.document.close();
-          win.onload = () => setTimeout(() => win.print(), 100);
+          win.focus();
+          setTimeout(() => { if (!win.closed) { win.print(); } }, 250);
         }}>🖨️ প্রিন্ট</button>
         <div style={{fontSize:12,color:T.gray600}}>স্টক মূল্য: <strong style={{color:T.teal}}>{fmt(totalValue)}</strong></div>
       </div>
