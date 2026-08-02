@@ -276,6 +276,9 @@ export default function App() {
   ];
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, upd};
+  
+  // POS Search state
+  const [posSearch, setPosSearch] = useState('');
 
   // Hard refresh function - saves current tab and forces reload from server
   const handleHardRefresh = () => {
@@ -358,11 +361,36 @@ export default function App() {
             <span>{t.label}</span>
           </button>
         ))}
+        
+        {/* Search Field - After Settings tab */}
+        {tab === 'pos' && (
+          <div style={{marginLeft:8,flexShrink:0,display:'flex',alignItems:'center'}}>
+            <div style={{position:'relative',display:'flex',alignItems:'center'}}>
+              <span style={{position:'absolute',left:10,color:T.gray400,fontSize:13,pointerEvents:'none'}}>🔍</span>
+              <input 
+                value={posSearch} 
+                onChange={e=>setPosSearch(e.target.value)}
+                placeholder="পণ্য খুঁজুন..."
+                style={{
+                  paddingLeft:32,
+                  height:34,
+                  fontSize:12,
+                  borderRadius:8,
+                  border:`1.5px solid ${T.gray200}`,
+                  background:'#fafbfc',
+                  outline:'none',
+                  width:180,
+                  fontFamily:'inherit'
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Content */}
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
-        {tab==='pos'       && <POSPage {...props} />}
+        {tab==='pos'       && <POSPage {...props} posSearch={posSearch} setPosSearch={setPosSearch} />}
         {tab==='products'  && <ProductsScreen {...props} />}
         {tab==='newproduct' && <NewProductScreen {...props} />}
         {tab==='barcode'   && <BarcodeScreen {...props} />}
@@ -379,40 +407,22 @@ export default function App() {
 }
 
 /* ═══════════════════════════════════════════
-   POS PAGE (with search in header)
+   POS PAGE (wrapper for POSScreen)
 ═══════════════════════════════════════════ */
-function POSPage({products, customers, sales, settings, categories, upd}) {
-  const [posSearch, setPosSearch] = useState('');
-  const searchRef = useRef();
-  
+function POSPage({products, customers, sales, settings, categories, upd, posSearch, setPosSearch}) {
   return (
-    <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
-      {/* Search Bar in Header */}
-      <div style={{padding:'8px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center',flexShrink:0}}>
-        <div style={{position:'relative',flex:1}}>
-          <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:13}}>🔍</span>
-          <input ref={searchRef} value={posSearch} onChange={e=>setPosSearch(e.target.value)}
-            placeholder="পণ্যের নাম বা বারকোড..."
-            style={{...input,paddingLeft:32,height:34,fontSize:12,borderRadius:7,border:`1.5px solid ${T.gray200}`,background:'#fafbfc',width:'100%',boxSizing:'border-box'}}
-          />
-        </div>
-      </div>
-      
-      {/* POS Screen with search context */}
-      <POSScreen 
-        {...{products, customers, sales, settings, categories, upd}}
-        posSearch={posSearch}
-        setPosSearch={setPosSearch}
-        searchRef={searchRef}
-      />
-    </div>
+    <POSScreen 
+      {...{products, customers, sales, settings, categories, upd}}
+      posSearch={posSearch}
+      setPosSearch={setPosSearch}
+    />
   );
 }
 
 /* ═══════════════════════════════════════════
    POS SCREEN
 ═══════════════════════════════════════════ */
-function POSScreen({products, customers, sales, settings, categories, upd, posSearch, setPosSearch, searchRef}) {
+function POSScreen({products, customers, sales, settings, categories, upd, posSearch, setPosSearch}) {
   const [cart, setCart] = useState([]);
   const search = posSearch;
   const setSearch = setPosSearch;
@@ -429,8 +439,6 @@ function POSScreen({products, customers, sales, settings, categories, upd, posSe
   const [newCustAddr, setNewCustAddr] = useState('');
   const paidRef = useRef();
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
-
-  useEffect(() => { searchRef?.current?.focus(); }, []);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
