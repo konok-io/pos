@@ -267,7 +267,7 @@ export default function App() {
     {id:'products',icon:'📦',label:'সকল পণ্য'},
     {id:'newproduct',icon:'➕',label:'নতুন পণ্য'},
     {id:'barcode',icon:'📊',label:'বারকোড'},
-    {id:'suppliers',icon:'🏢',label:'সরবরাহকারী/কোম্পানি'},
+    {id:'suppliers',icon:'🏢',label:'ম্যানেজমেন্ট'},
     {id:'customers',icon:'👥',label:'কাস্টমার'},
     {id:'inventory',icon:'🏭',label:'স্টক'},
     {id:'income',icon:'💰',label:'আয়/ব্যয়'},
