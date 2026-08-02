@@ -415,7 +415,10 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
-  const [settings, setSettings] = useState({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+  const [settings, setSettings] = useState(() => {
+    const savedSettings = db.get(STORAGE_KEYS.settings);
+    return savedSettings ? savedSettings : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
+  });
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [purchases, setPurchases] = useState([]);
@@ -423,6 +426,11 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Show login screen if not authenticated - must be before all useEffects
+  if (showLogin || !currentUser) {
+    return <LoginScreen onLogin={handleLogin} settings={settings} />;
+  }
 
   // Update time every second
   useEffect(() => {
@@ -739,11 +747,6 @@ export default function App() {
       });
     };
   }, [currentUser]);
-
-  // Show login screen if not authenticated
-  if (showLogin || !currentUser) {
-    return <LoginScreen onLogin={handleLogin} settings={settings} />;
-  }
 
   return (
     <>
