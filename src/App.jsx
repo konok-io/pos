@@ -29,6 +29,7 @@ const STORAGE_KEYS = {
   purchases: 'pos_purchases',
   users: 'pos_users',
   auth: 'pos_auth',
+  productHistory: 'pos_product_history',
 };
 
 /* ─────────────── STORAGE ─────────────── */
@@ -411,6 +412,7 @@ export default function App() {
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [purchases, setPurchases] = useState([]);
+  const [productHistory, setProductHistory] = useState([]);
   const [ready, setReady] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -480,6 +482,7 @@ export default function App() {
     const savedSuppliers = db.get(STORAGE_KEYS.suppliers) || [];
     const savedPurchases = db.get(STORAGE_KEYS.purchases) || [];
     const savedCategories = db.get(STORAGE_KEYS.categories) || [];
+    const savedProductHistory = db.get(STORAGE_KEYS.productHistory) || [];
 
     // If reset was done, always use empty data (never load DEMO)
     if (wasReset) {
@@ -489,6 +492,7 @@ export default function App() {
       setSuppliers(savedSuppliers);
       setSales(savedSales || []);
       setPurchases(savedPurchases);
+      setProductHistory(savedProductHistory);
       setSettings(savedSettings ? {...{name:'',address:'',phone:'',vatEnabled:true,vatPercent:15}, ...savedSettings} : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
       setReady(true);
       return;
@@ -512,6 +516,7 @@ export default function App() {
     setSales(savedSales || []);
     setSuppliers(savedSuppliers);
     setPurchases(savedPurchases);
+    setProductHistory(savedProductHistory);
 
     // Migrate old category products to new categories state
     if (savedCategories && savedCategories.length > 0) {
@@ -540,8 +545,74 @@ export default function App() {
     setReady(true);
   }, []);
 
+  // Track product history when products are updated
+  const trackProductHistory = (oldProducts, newProducts, user) => {
+    const changes = [];
+    
+    newProducts.forEach(newP => {
+      const oldP = oldProducts.find(p => p.id === newP.id);
+      
+      if (oldP) {
+        // Check for price changes
+        if (oldP.buyP !== newP.buyP) {
+          changes.push({
+            id: genId(),
+            productId: newP.id,
+            productName: newP.name,
+            type: 'price_buy',
+            oldValue: oldP.buyP,
+            newValue: newP.buyP,
+            user: user?.name || 'Unknown',
+            userEmail: user?.email || '',
+            timestamp: now(),
+          });
+        }
+        
+        if (oldP.sellP !== newP.sellP) {
+          changes.push({
+            id: genId(),
+            productId: newP.id,
+            productName: newP.name,
+            type: 'price_sell',
+            oldValue: oldP.sellP,
+            newValue: newP.sellP,
+            user: user?.name || 'Unknown',
+            userEmail: user?.email || '',
+            timestamp: now(),
+          });
+        }
+        
+        // Check for stock changes
+        if (oldP.stock !== newP.stock) {
+          changes.push({
+            id: genId(),
+            productId: newP.id,
+            productName: newP.name,
+            type: 'stock',
+            oldValue: oldP.stock,
+            newValue: newP.stock,
+            user: user?.name || 'Unknown',
+            userEmail: user?.email || '',
+            timestamp: now(),
+          });
+        }
+      }
+    });
+    
+    if (changes.length > 0) {
+      const newHistory = [...productHistory, ...changes];
+      setProductHistory(newHistory);
+      db.set(STORAGE_KEYS.productHistory, newHistory);
+    }
+  };
+
   const upd = {
-    products: v => { setProducts(v); db.set(STORAGE_KEYS.products, v); return Promise.resolve(); },
+    products: v => { 
+      trackProductHistory(products, v, currentUser); 
+      setProducts(v); 
+      db.set(STORAGE_KEYS.products, v); 
+      return Promise.resolve(); 
+    },
     customers: v => { setCustomers(v); db.set(STORAGE_KEYS.customers, v); return Promise.resolve(); },
     sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); return Promise.resolve(); },
     settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); return Promise.resolve(); },
@@ -571,7 +642,7 @@ export default function App() {
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
-  const props = {products, customers, sales, settings, suppliers, categories, purchases, upd};
+  const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd};
 
   // Refresh data from localStorage without reloading page
   const handleHardRefresh = () => {
@@ -1460,7 +1531,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
 /* ═══════════════════════════════════════════
    PRODUCTS SCREEN
 ═══════════════════════════════════════════ */
-function ProductsScreen({products, suppliers, categories, purchases, upd}) {
+function ProductsScreen({products, suppliers, categories, purchases, productHistory, upd}) {
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState([]);
@@ -1476,6 +1547,9 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
   const [csvData, setCsvData] = useState([]);
   const [stockFilter, setStockFilter] = useState('স্টক আছে'); // স্টক আছে, স্টক শেষ
   const [loading, setLoading] = useState(true);
+  const [productTab, setProductTab] = useState('list'); // list, history
+  const [editProduct, setEditProduct] = useState(null);
+  const [viewProduct, setViewProduct] = useState(null);
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
@@ -1485,6 +1559,21 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
     const timer = setTimeout(() => setLoading(false), 300);
     return () => clearTimeout(timer);
   }, [products]);
+
+  // Handle edit product price
+  const handleEditProduct = () => {
+    if (!editProduct) return;
+    
+    const updatedProducts = products.map(p => {
+      if (p.id === editProduct.id) {
+        return { ...p, buyP: editProduct.buyP, sellP: editProduct.sellP };
+      }
+      return p;
+    });
+    
+    upd.products(updatedProducts);
+    setEditProduct(null);
+  };
 
 
   // Handle CSV Import
@@ -2168,6 +2257,69 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+      {/* Sub-tabs: List / History */}
+      <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
+        <button onClick={()=>{setProductTab('list');setStockFilter('স্টক আছে');}} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:productTab==='list'?700:400,color:productTab==='list'?T.teal:T.gray500,borderBottom:productTab==='list'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+          📋 পণ্য তালিকা
+        </button>
+        <button onClick={()=>setProductTab('history')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:productTab==='history'?700:400,color:productTab==='history'?T.teal:T.gray500,borderBottom:productTab==='history'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+          📜 হিস্ট্রি ({productHistory.length})
+        </button>
+      </div>
+
+      {/* History Tab Content */}
+      {productTab === 'history' && (
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          <div style={{...card,overflow:'hidden'}}>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📜 পণ্য পরিবর্তনের ইতিহাস</div>
+            {productHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পরিবর্তন নেই</div>
+            ) : (
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.tealLight}}>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তনের ধরন</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন মান</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন মান</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...productHistory].reverse().map((h,i)=>(
+                    <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        {new Date(h.timestamp).toLocaleString('bn-BD')}
+                      </td>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
+                      <td style={{padding:'10px 12px',fontSize:12}}>
+                        {h.type === 'price_buy' && <span style={{background:T.orangeLight,color:T.orange,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>ক্রয়মূল্য</span>}
+                        {h.type === 'price_sell' && <span style={{background:T.tealLight,color:T.teal,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>বিক্রয়মূল্য</span>}
+                        {h.type === 'stock' && <span style={{background:T.amberLight,color:T.amber,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>স্টক</span>}
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
+                        {h.type === 'stock' ? h.oldValue : fmt(h.oldValue)}
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
+                        {h.type === 'stock' ? h.newValue : fmt(h.newValue)}
+                      </td>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <div style={{fontWeight:600}}>{h.user}</div>
+                        {h.userEmail && <div style={{fontSize:11,color:T.gray400}}>{h.userEmail}</div>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* List Tab Content */}
+      {productTab === 'list' && (
+      <>
       <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
         {/* স্টক আছে ট্যাব */}
         <button onClick={()=>setStockFilter('স্টক আছে')} style={{
@@ -2276,8 +2428,10 @@ ${printFiltered.map(p => {
                       {isLowStock && <span style={{fontSize:10,color:T.red,marginLeft:4}}>⚠️ কম</span>}
                     </td>
                     <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
-                    <td style={{padding:'10px 12px'}}>
-                      <button style={btn('danger','sm')} onClick={()=>del(p.id)}>🗑️</button>
+                    <td style={{padding:'10px 12px',display:'flex',gap:6}}>
+                      <button style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setViewProduct(p)} title="দেখুন">👁️</button>
+                      <button style={{...btn('primary','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setEditProduct({...p})} title="সম্পাদনা">✏️</button>
+                      <button style={{...btn('danger','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>del(p.id)} title="মুছুন">🗑️</button>
                     </td>
                   </tr>
                 );
@@ -2286,6 +2440,99 @@ ${printFiltered.map(p => {
           </table>
         )}
       </div>
+      </>
+      )}
+
+      {/* Edit Product Modal */}
+      {editProduct && (
+        <div style={overlay}>
+          <div style={{background:T.white,borderRadius:12,padding:24,width:400,maxWidth:'90vw',boxShadow:'0 8px 32px rgba(0,0,0,0.2)'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
+              <h3 style={{margin:0,fontSize:16,color:T.teal}}>✏️ পণ্যের দাম সম্পাদনা</h3>
+              <button onClick={()=>setEditProduct(null)} style={{background:'none',border:'none',fontSize:20,cursor:'pointer',color:T.gray400}}>✕</button>
+            </div>
+            
+            <div style={{marginBottom:12}}>
+              <div style={{fontWeight:600,fontSize:14,marginBottom:8}}>{editProduct.name}</div>
+              <div style={{fontSize:12,color:T.gray400}}>{editProduct.company} • {editProduct.cat || '-'}</div>
+            </div>
+
+            <div style={{marginBottom:16}}>
+              <label style={{fontSize:12,fontWeight:600,color:T.gray600,marginBottom:6,display:'block'}}>ক্রয়মূল্য (৳)</label>
+              <input 
+                type="number" 
+                value={editProduct.buyP}
+                onChange={e=>setEditProduct({...editProduct, buyP: parseFloat(e.target.value)||0})}
+                style={{...input,padding:'10px 12px',fontSize:14}}
+              />
+            </div>
+
+            <div style={{marginBottom:20}}>
+              <label style={{fontSize:12,fontWeight:600,color:T.gray600,marginBottom:6,display:'block'}}>বিক্রয়মূল্য (৳)</label>
+              <input 
+                type="number" 
+                value={editProduct.sellP}
+                onChange={e=>setEditProduct({...editProduct, sellP: parseFloat(e.target.value)||0})}
+                style={{...input,padding:'10px 12px',fontSize:14}}
+              />
+            </div>
+
+            <div style={{display:'flex',gap:10}}>
+              <button onClick={()=>setEditProduct(null)} style={{...btn('ghost'),flex:1}}>বাতিল</button>
+              <button onClick={handleEditProduct} style={{...btn('primary'),flex:2}}>💾 সংরক্ষণ করুন</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* View Product Modal */}
+      {viewProduct && (
+        <div style={overlay}>
+          <div style={{background:T.white,borderRadius:12,padding:24,width:500,maxWidth:'90vw',boxShadow:'0 8px 32px rgba(0,0,0,0.2)'}}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
+              <h3 style={{margin:0,fontSize:16,color:T.teal}}>📋 পণ্যের বিবরণ</h3>
+              <button onClick={()=>setViewProduct(null)} style={{background:'none',border:'none',fontSize:20,cursor:'pointer',color:T.gray400}}>✕</button>
+            </div>
+            
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20}}>
+              <div>
+                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>পণ্যের নাম</div>
+                <div style={{fontWeight:600,fontSize:14}}>{viewProduct.name}</div>
+              </div>
+              <div>
+                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>বারকোড</div>
+                <div style={{fontFamily:'monospace',fontSize:13}}>{viewProduct.barcode || '-'}</div>
+              </div>
+              <div>
+                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>কোম্পানি</div>
+                <div style={{fontSize:13}}>{viewProduct.company || '-'}</div>
+              </div>
+              <div>
+                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>ক্যাটাগরি</div>
+                <div style={{fontSize:13}}>{viewProduct.cat || '-'}</div>
+              </div>
+              <div>
+                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>ক্রয়মূল্য</div>
+                <div style={{fontWeight:700,fontSize:16,color:T.orange}}>{fmt(viewProduct.buyP)}</div>
+              </div>
+              <div>
+                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>বিক্রয়মূল্য</div>
+                <div style={{fontWeight:700,fontSize:16,color:T.teal}}>{fmt(viewProduct.sellP)}</div>
+              </div>
+              <div>
+                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>স্টক</div>
+                <div style={{fontWeight:700,fontSize:16,color:viewProduct.stock <= viewProduct.minStock ? T.red : T.green}}>{viewProduct.stock} {viewProduct.unit}</div>
+              </div>
+              <div>
+                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>মিনিমাম স্টক</div>
+                <div style={{fontSize:14}}>{viewProduct.minStock} {viewProduct.unit}</div>
+              </div>
+            </div>
+
+            <button onClick={()=>setViewProduct(null)} style={{...btn(),width:'100%'}}>বন্ধ করুন</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -4166,13 +4413,14 @@ function CustomersScreen({customers, sales, upd}) {
 /* ═══════════════════════════════════════════
    INVENTORY SCREEN
 ═══════════════════════════════════════════ */
-function InventoryScreen({products, suppliers, upd}) {
+function InventoryScreen({products, suppliers, productHistory, upd}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
   const [adjQty, setAdjQty] = useState('');
   const [adjType, setAdjType] = useState('add');
   const [adjNote, setAdjNote] = useState('');
   const [loading, setLoading] = useState(true);
+  const [invTab, setInvTab] = useState('list'); // list, history
 
   // Loading effect
   useEffect(() => {
@@ -4210,6 +4458,69 @@ function InventoryScreen({products, suppliers, upd}) {
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
+      {/* Sub-tabs: List / History */}
+      <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
+        <button onClick={()=>setInvTab('list')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:invTab==='list'?700:400,color:invTab==='list'?T.teal:T.gray500,borderBottom:invTab==='list'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+          📦 স্টক তালিকা
+        </button>
+        <button onClick={()=>setInvTab('history')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:invTab==='history'?700:400,color:invTab==='history'?T.teal:T.gray500,borderBottom:invTab==='history'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+          📜 হিস্ট্রি ({productHistory.length})
+        </button>
+      </div>
+
+      {/* History Tab Content */}
+      {invTab === 'history' && (
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          <div style={{...card,overflow:'hidden'}}>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📜 স্টক পরিবর্তনের ইতিহাস</div>
+            {productHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পরিবর্তন নেই</div>
+            ) : (
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.tealLight}}>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তনের ধরন</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন মান</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন মান</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...productHistory].reverse().map((h,i)=>(
+                    <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        {new Date(h.timestamp).toLocaleString('bn-BD')}
+                      </td>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
+                      <td style={{padding:'10px 12px',fontSize:12}}>
+                        {h.type === 'price_buy' && <span style={{background:T.orangeLight,color:T.orange,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>ক্রয়মূল্য</span>}
+                        {h.type === 'price_sell' && <span style={{background:T.tealLight,color:T.teal,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>বিক্রয়মূল্য</span>}
+                        {h.type === 'stock' && <span style={{background:T.amberLight,color:T.amber,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>স্টক</span>}
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
+                        {h.type === 'stock' ? h.oldValue : fmt(h.oldValue)}
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
+                        {h.type === 'stock' ? h.newValue : fmt(h.newValue)}
+                      </td>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <div style={{fontWeight:600}}>{h.user}</div>
+                        {h.userEmail && <div style={{fontSize:11,color:T.gray400}}>{h.userEmail}</div>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* List Tab Content */}
+      {invTab === 'list' && (
+      <>
       <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
         <div style={{position:'relative',flex:'1 1 200px'}}>
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
@@ -4352,6 +4663,9 @@ ${printFiltered.map(p => {
           </div>
         </Modal>
       )}
+      </>
+      )}
+
     </div>
   );
 }
