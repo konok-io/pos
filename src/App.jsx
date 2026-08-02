@@ -2859,13 +2859,16 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
-      {/* Sub tabs - Only Companies and Categories */}
+      {/* Sub tabs - Only Companies, Categories, and CSV Import */}
       <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
         <button onClick={()=>setActiveTab('companies')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='companies'?700:400,color:activeTab==='companies'?T.teal:T.gray500,borderBottom:activeTab==='companies'?`2px solid ${T.teal}`:'none',fontSize:13}}>
           🏢 কোম্পানি ({allSuppliers.length})
         </button>
         <button onClick={()=>setActiveTab('categories')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='categories'?700:400,color:activeTab==='categories'?T.teal:T.gray500,borderBottom:activeTab==='categories'?`2px solid ${T.teal}`:'none',fontSize:13}}>
           📂 ক্যাটাগরি ({categories.length})
+        </button>
+        <button onClick={()=>setActiveTab('csv')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='csv'?700:400,color:activeTab==='csv'?T.teal:T.gray500,borderBottom:activeTab==='csv'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+          📥 CSV আমদানি
         </button>
         {/* Search and Add button - right aligned */}
         <div style={{marginLeft:'auto',display:'flex',gap:8,alignItems:'center',paddingRight:12}}>
@@ -2913,57 +2916,49 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             </table>
           </div>
         )}
+
+        {/* CSV IMPORT TAB */}
+        {activeTab === 'csv' && (
+          <div style={{...card,padding:24}}>
+            <h3 style={{margin:'0 0 16px',fontSize:16}}>📥 CSV আমদানি করুন</h3>
+            <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
+            <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:16}}>
+              <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:14,padding:'10px 20px'}}>
+                📁 CSV ফাইল নির্বাচন করুন
+              </label>
+              <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:14,padding:'10px 20px'}}>
+                📥 ডেমো CSV ডাউনলোড
+              </button>
+            </div>
+            <div style={{fontSize:13,color:T.gray600,lineHeight:1.8}}>
+              <div style={{fontWeight:600,marginBottom:8}}>CSV কলাম (Header):</div>
+              <code style={{background:T.gray50,padding:'8px 12px',borderRadius:8,display:'block',marginBottom:12}}>
+                পণ্যের নাম, কোম্পানি কোড, কোম্পানি, ক্যাটাগরি, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিনস্টক
+              </code>
+              <div style={{marginTop:12}}>
+                <div style={{fontWeight:600,marginBottom:8}}>নিয়মাবলী:</div>
+                <div>✅ কোম্পানি ও ক্যাটাগরি ডুপ্লিকেট হবে না</div>
+                <div>✅ কোম্পানি কোড খালি রাখলে অটো তৈরি হবে</div>
+                <div>📝 পণ্য যুক্ত করতে পারচেজ (ক্রয়) মেনু ব্যবহার করুন</div>
+              </div>
+            </div>
+            {csvImportResult && (
+              <div style={{marginTop:16,padding:16,background:T.tealLight,borderRadius:8}}>
+                <div style={{fontWeight:600,color:T.teal,marginBottom:8}}>✅ সর্বশেষ আমদানি ফলাফল:</div>
+                <div>🏢 নতুন কোম্পানি: {csvImportResult.companies}টি</div>
+                <div>📂 নতুন ক্যাটাগরি: {csvImportResult.categories}টি</div>
+                {csvImportResult.errors > 0 && (
+                  <div style={{color:T.red,marginTop:8}}>⚠️ ত্রুটি: {csvImportResult.errors}টি</div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* COMPANIES TAB */}
         {activeTab === 'companies' && (
-          <>
-            {/* CSV Import Section - Only for Companies and Categories */}
-            <div style={{...card,padding:16,marginBottom:16}}>
-              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-                <h3 style={{margin:0,fontSize:14,color:T.teal}}>📥 CSV আমদানি করুন</h3>
-                <button onClick={()=>setShowCsvSection(!showCsvSection)} style={{...btn(),fontSize:12,padding:'4px 8px'}}>
-                  {showCsvSection ? '🙈 লুকান' : '👁️ দেখান'}
-                </button>
-              </div>
-              {showCsvSection && (
-                <div>
-                  <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
-                  <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
-                    <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:13,padding:'8px 16px'}}>
-                      📁 CSV আপলোড করুন
-                    </label>
-                    <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:13,padding:'8px 16px'}}>
-                      📥 ডেমো CSV ডাউনলোড
-                    </button>
-                  </div>
-                  <div style={{marginTop:12,fontSize:11,color:T.gray500,lineHeight:1.6}}>
-                    <div style={{fontWeight:600,marginBottom:4}}>CSV কলাম:</div>
-                    <code style={{background:T.gray50,padding:'2px 6px',borderRadius:4,display:'inline-block',marginBottom:4}}>
-                      পণ্যের নাম, কোম্পানি কোড, কোম্পানি, ক্যাটাগরি, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিনস্টক
-                    </code>
-                    <div style={{marginTop:8}}>
-                      ✅ কোম্পানি, ক্যাটাগরি ডুপ্লিকেট হবে না<br/>
-                      ✅ কোম্পানি কোড খালি রাখলে অটো তৈরি হবে<br/>
-                      📝 পণ্য যুক্ত করতে পারচেজ (ক্রয়) মেনু ব্যবহার করুন
-                    </div>
-                  </div>
-                  {csvImportResult && (
-                    <div style={{marginTop:12,padding:12,background:T.tealLight,borderRadius:8}}>
-                      <div style={{fontWeight:600,color:T.teal,marginBottom:8}}>✅ সর্বশেষ আমদানি ফলাফল:</div>
-                      <div>🏢 কোম্পানি: {csvImportResult.companies}টি</div>
-                      <div>📂 ক্যাটাগরি: {csvImportResult.categories}টি</div>
-                      <div>📦 পণ্য: {csvImportResult.products}টি</div>
-                      {csvImportResult.errors > 0 && (
-                        <div style={{color:T.red,marginTop:4}}>⚠️ ত্রুটি: {csvImportResult.errors}টি</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-            
-            <div style={{...card,overflow:'hidden',marginBottom:16}}>
+          <div style={{...card,overflow:'hidden',marginBottom:16}}>
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
@@ -2996,11 +2991,9 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 </tbody>
               </table>
             </div>
-          </>
         )}
 
-        {/* CATEGOR/* Company Modal */}
-      {/* Unified Modal for all tabs */}
+      {/* Modal */}
       {modal && (
         <div style={{...overlay}} onClick={()=>{setShowCompanyDrop(false);setShowCatDrop(false);setShowCatCompanyDrop(false);setShowProductDrop(false);}} data-modal>
           <div style={{...card,width:activeTab==='products'?500:380,padding:24}} onClick={e=>{e.stopPropagation()}} data-modal>
