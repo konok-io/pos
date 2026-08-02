@@ -1738,6 +1738,9 @@ function BarcodeScreen({purchases, products}) {
       }
     });
 
+    // Escape function for JavaScript strings
+    const escapeJS = (str) => String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
+
     let html = `<!DOCTYPE html>
 <html>
 <head>
@@ -1762,33 +1765,40 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
       html += `<div class="barcode-item">
   <div class="barcode-price">৳${item.price}</div>
   <svg id="bc${idx}" class="barcode-svg"></svg>
-  <div class="barcode-number">${item.value}</div>
+  <div class="barcode-number">${escapeJS(item.value)}</div>
 </div>`;
     });
 
+    // Create JavaScript array string
+    const jsArray = barcodeData.map(item => `{"value":"${escapeJS(item.value)}","price":${item.price}}`).join(',');
+    
     html += `</div>
 <script>
-  barcodeData.forEach(function(item, idx) {
-    try {
-      JsBarcode("#bc" + idx, item.value, {
-        format: "CODE128",
-        width: 2,
-        height: 50,
-        displayValue: false,
-        margin: 5
-      });
-    } catch(e) {
+  window.onload = function() {
+    var barcodeData = [${jsArray}];
+    barcodeData.forEach(function(item, idx) {
       try {
-        JsBarcode("#bc" + idx, item.value.replace(/[^a-zA-Z0-9]/g, 'X'), {
+        JsBarcode("#bc" + idx, item.value, {
           format: "CODE128",
           width: 2,
           height: 50,
           displayValue: false,
           margin: 5
         });
-      } catch(e2) {}
-    }
-  });
+      } catch(e) {
+        try {
+          JsBarcode("#bc" + idx, item.value.replace(/[^a-zA-Z0-9]/g, 'X'), {
+            format: "CODE128",
+            width: 2,
+            height: 50,
+            displayValue: false,
+            margin: 5
+          });
+        } catch(e2) {}
+      }
+    });
+    setTimeout(function() { window.print(); }, 300);
+  };
 </script>
 </body></html>`;
 
@@ -1797,7 +1807,6 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
     win.document.open();
     win.document.write(html);
     win.document.close();
-    win.onload = function() { setTimeout(() => win.print(), 500); };
   };
 
   
@@ -1877,6 +1886,7 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                   <button onClick={()=>{
                     // Print single barcode (A4 size)
                     const barcodeValue = item.barcode || item.id;
+                    const price = item.sellP || 0;
                     const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -1895,29 +1905,33 @@ body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; backgr
 </head>
 <body>
 <div class="container">
-<div class="price">৳${item.sellP || 0}</div>
+<div class="price">৳${price}</div>
 <svg id="barcode" class="barcode-svg"></svg>
 <div class="number">${barcodeValue}</div>
 </div>
 <script>
-  try {
-    JsBarcode("#barcode", "${barcodeValue}", {
-      format: "CODE128",
-      width: 3,
-      height: 120,
-      displayValue: false,
-      margin: 10
-    });
-  } catch(e) {
-    // Fallback for invalid characters
-    JsBarcode("#barcode", "${barcodeValue}".replace(/[^a-zA-Z0-9]/g, 'X'), {
-      format: "CODE128",
-      width: 3,
-      height: 120,
-      displayValue: false,
-      margin: 10
-    });
-  }
+  window.onload = function() {
+    try {
+      JsBarcode("#barcode", "${barcodeValue}", {
+        format: "CODE128",
+        width: 3,
+        height: 120,
+        displayValue: false,
+        margin: 10
+      });
+    } catch(e) {
+      try {
+        JsBarcode("#barcode", "${barcodeValue}".replace(/[^a-zA-Z0-9]/g, 'X'), {
+          format: "CODE128",
+          width: 3,
+          height: 120,
+          displayValue: false,
+          margin: 10
+        });
+      } catch(e2) {}
+    }
+    setTimeout(function() { window.print(); }, 300);
+  };
 </script>
 </body>
 </html>`;
@@ -1926,7 +1940,6 @@ body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; backgr
                     win.document.open();
                     win.document.write(html);
                     win.document.close();
-                    win.onload = function() { setTimeout(() => win.print(), 500); };
                   }} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️</button>
                 </div>
               </div>
