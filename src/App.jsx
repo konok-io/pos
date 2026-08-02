@@ -148,22 +148,27 @@ export default function App() {
     const wantFullscreen = localStorage.getItem('pos_want_fullscreen');
     if (wantFullscreen === 'true') {
       localStorage.removeItem('pos_want_fullscreen');
-      // Try multiple times with increasing delays for Firefox compatibility
-      const tryFullscreen = (attempts = 0) => {
-        if (attempts > 3) return;
+      // Wait for page to fully load, then try fullscreen
+      const tryFullscreen = () => {
         try {
-          const fn = document.documentElement.requestFullscreen || 
-                     document.body.requestFullscreen ||
-                     document.querySelector('div').requestFullscreen;
-          if (fn) {
-            fn.call(document.documentElement).catch(() => {});
-          }
+          document.documentElement.requestFullscreen().then(() => {
+            setIsFullscreen(true);
+          }).catch(() => {
+            // Try again after a short delay
+            setTimeout(() => {
+              try {
+                document.documentElement.requestFullscreen().catch(() => {});
+              } catch(e) {}
+            }, 500);
+          });
         } catch(e) {}
-        if (!document.fullscreenElement && attempts < 3) {
-          setTimeout(() => tryFullscreen(attempts + 1), 300);
-        }
       };
-      setTimeout(tryFullscreen, 300);
+      // Delay to ensure page is ready
+      if (document.readyState === 'complete') {
+        setTimeout(tryFullscreen, 300);
+      } else {
+        window.addEventListener('load', () => setTimeout(tryFullscreen, 300));
+      }
     }
   }, []);
 
