@@ -3802,7 +3802,10 @@ function IncomeScreen({sales, purchases, upd}) {
   const [to, setTo] = useState(() => today());
   const [showExpenseForm, setShowExpenseForm] = useState(false);
   const [expenseForm, setExpenseForm] = useState({title:'',amount:'',note:''});
+  const [showIncomeForm, setShowIncomeForm] = useState(false);
+  const [incomeForm, setIncomeForm] = useState({title:'',amount:'',note:''});
   const [expenses, setExpenses] = useState(() => JSON.parse(localStorage.getItem('pos_expenses') || '[]'));
+  const [incomes, setIncomes] = useState(() => JSON.parse(localStorage.getItem('pos_incomes') || '[]'));
 
   const card = {background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`,boxShadow:'0 2px 8px rgba(0,0,0,0.04)'};
   const input = {width:'100%',padding:'10px 12px',border:`1.5px solid ${T.gray200}`,borderRadius:8,fontSize:13,outline:'none',boxSizing:'border-box',background:T.gray50,color:T.gray800};
@@ -3856,13 +3859,21 @@ function IncomeScreen({sales, purchases, upd}) {
       return d >= startDate && d <= endDate;
     });
 
-    return { filteredSales, filteredPurchases, filteredExpenses, startDate, endDate };
+    // Filter incomes
+    const filteredIncomes = incomes.filter(i => {
+      const d = new Date(i.date);
+      return d >= startDate && d <= endDate;
+    });
+
+    return { filteredSales, filteredPurchases, filteredExpenses, filteredIncomes, startDate, endDate };
   };
 
-  const { filteredSales, filteredPurchases, filteredExpenses } = getFilteredData();
+  const { filteredSales, filteredPurchases, filteredExpenses, filteredIncomes } = getFilteredData();
 
   // Calculate totals
-  const totalIncome = filteredSales.reduce((sum, s) => sum + (s.total || 0), 0);
+  const totalSalesIncome = filteredSales.reduce((sum, s) => sum + (s.total || 0), 0);
+  const totalManualIncome = filteredIncomes.reduce((sum, i) => sum + (i.amount || 0), 0);
+  const totalIncome = totalSalesIncome + totalManualIncome;
   const totalPurchaseExpense = filteredPurchases.reduce((sum, p) => {
     return sum + p.items.reduce((s, i) => s + (i.buyP || 0) * (i.stock || 0), 0);
   }, 0);
@@ -3898,6 +3909,36 @@ function IncomeScreen({sales, purchases, upd}) {
     const updatedExpenses = expenses.filter(e => e.id !== id);
     setExpenses(updatedExpenses);
     localStorage.setItem('pos_expenses', JSON.stringify(updatedExpenses));
+  };
+
+  // Save income
+  const saveIncome = () => {
+    if (!incomeForm.title?.trim()) { alert('আয়ের বিবরণ দিন'); return; }
+    if (!incomeForm.amount || incomeForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
+    
+    const newIncome = {
+      id: genId(),
+      date: new Date().toISOString(),
+      title: incomeForm.title.trim(),
+      amount: parseFloat(incomeForm.amount),
+      note: incomeForm.note || ''
+    };
+    
+    const updatedIncomes = [...incomes, newIncome];
+    setIncomes(updatedIncomes);
+    localStorage.setItem('pos_incomes', JSON.stringify(updatedIncomes));
+    
+    setIncomeForm({title:'',amount:'',note:''});
+    setShowIncomeForm(false);
+    alert('✅ আয় সংরক্ষিত হয়েছে!');
+  };
+
+  // Delete income
+  const deleteIncome = (id) => {
+    if (!confirm('এই আয় মুছে ফেলবেন?')) return;
+    const updatedIncomes = incomes.filter(i => i.id !== id);
+    setIncomes(updatedIncomes);
+    localStorage.setItem('pos_incomes', JSON.stringify(updatedIncomes));
   };
 
   const periods = [
@@ -4086,8 +4127,11 @@ ${filteredExpenses.length > 0 ? `
             <button onClick={printReport} style={{...btn('ghost'),padding:'8px 16px'}}>
               🖨️ প্রিন্ট
             </button>
-            <button onClick={()=>setShowExpenseForm(true)} style={{...btn('primary'),padding:'8px 16px'}}>
-              ➕ ব্যয় যোগ করুন
+            <button onClick={()=>setShowIncomeForm(true)} style={{...btn('success'),padding:'8px 16px'}}>
+              💰 আয় যোগ করুন
+            </button>
+            <button onClick={()=>setShowExpenseForm(true)} style={{...btn('danger'),padding:'8px 16px'}}>
+              📝 ব্যয় যোগ করুন
             </button>
           </div>
         </div>
@@ -4116,43 +4160,77 @@ ${filteredExpenses.length > 0 ? `
       {/* Content */}
       <div style={{flex:1,overflow:'auto',padding:16}}>
         {/* Summary Cards */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:16,marginBottom:20}}>
-          {/* Income Card */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:16,marginBottom:20}}>
+          {/* Sales Income Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${T.green}`}}>
-            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>📈 মোট আয় (বিক্রয়)</div>
+            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>🛒 বিক্রয় আয়</div>
+            <div style={{fontSize:24,fontWeight:800,color:T.green}}>{fmt(totalSalesIncome)}</div>
+            <div style={{fontSize:11,color:T.gray400,marginTop:4}}>{filteredSales.length}টি বিক্রয়</div>
+          </div>
+          
+          {/* Manual Income Card */}
+          <div style={{...card,padding:20,borderLeft:`4px solid ${T.teal}`}}>
+            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>💰 ম্যানুয়াল আয়</div>
+            <div style={{fontSize:24,fontWeight:800,color:T.teal}}>{fmt(totalManualIncome)}</div>
+            <div style={{fontSize:11,color:T.gray400,marginTop:4}}>{filteredIncomes.length}টি আয়</div>
+          </div>
+          
+          {/* Total Income Card */}
+          <div style={{...card,padding:20,borderLeft:`4px solid ${T.green}`,background:'#f0fdf4'}}>
+            <div style={{fontSize:12,color:T.gray600,marginBottom:4}}>📈 মোট আয়</div>
             <div style={{fontSize:28,fontWeight:800,color:T.green}}>{fmt(totalIncome)}</div>
-            <div style={{fontSize:12,color:T.gray400,marginTop:4}}>{filteredSales.length}টি বিক্রয়</div>
           </div>
           
           {/* Purchase Expense Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${T.orange}`}}>
             <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>📦 পারচেজ ব্যয়</div>
-            <div style={{fontSize:28,fontWeight:800,color:T.orange}}>{fmt(totalPurchaseExpense)}</div>
-            <div style={{fontSize:12,color:T.gray400,marginTop:4}}>{filteredPurchases.length}টি পারচেজ</div>
+            <div style={{fontSize:24,fontWeight:800,color:T.orange}}>{fmt(totalPurchaseExpense)}</div>
+            <div style={{fontSize:11,color:T.gray400,marginTop:4}}>{filteredPurchases.length}টি পারচেজ</div>
           </div>
           
           {/* Manual Expense Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${T.red}`}}>
             <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>📝 ম্যানুয়াল ব্যয়</div>
-            <div style={{fontSize:28,fontWeight:800,color:T.red}}>{fmt(totalManualExpense)}</div>
-            <div style={{fontSize:12,color:T.gray400,marginTop:4}}>{filteredExpenses.length}টি ব্যয়</div>
+            <div style={{fontSize:24,fontWeight:800,color:T.red}}>{fmt(totalManualExpense)}</div>
+            <div style={{fontSize:11,color:T.gray400,marginTop:4}}>{filteredExpenses.length}টি ব্যয়</div>
           </div>
           
           {/* Net Profit Card */}
-          <div style={{...card,padding:20,borderLeft:`4px solid ${netProfit >= 0 ? T.teal : T.red}`}}>
-            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>💵 নীট লাভ/ক্ষতি</div>
+          <div style={{...card,padding:20,borderLeft:`4px solid ${netProfit >= 0 ? T.teal : T.red}`,background:netProfit >= 0 ? '#f0fdfa' : '#fef2f2'}}>
+            <div style={{fontSize:12,color:T.gray600,marginBottom:4}}>💵 নীট লাভ/ক্ষতি</div>
             <div style={{fontSize:28,fontWeight:800,color:netProfit >= 0 ? T.teal : T.red}}>{fmt(netProfit)}</div>
-            <div style={{fontSize:12,color:T.gray400,marginTop:4}}>মোট ব্যয়: {fmt(totalExpense)}</div>
+            <div style={{fontSize:11,color:T.gray500,marginTop:4}}>মোট ব্যয়: {fmt(totalExpense)}</div>
           </div>
         </div>
 
+        {/* Income List */}
+        {filteredIncomes.length > 0 && (
+          <div style={{...card,padding:20,marginBottom:16,border:`1px solid ${T.green}`}}>
+            <h3 style={{margin:'0 0 16px',fontSize:14,fontWeight:700,color:T.green}}>💰 ম্যানুয়াল আয়সমূহ</h3>
+            <div style={{display:'flex',flexDirection:'column',gap:8}}>
+              {filteredIncomes.map(i => (
+                <div key={i.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:T.greenLight,borderRadius:8}}>
+                  <div>
+                    <div style={{fontWeight:600,fontSize:13}}>{i.title}</div>
+                    <div style={{fontSize:11,color:T.gray500}}>{new Date(i.date).toLocaleDateString('bn-BD')}{i.note ? ` • ${i.note}` : ''}</div>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <span style={{fontWeight:700,color:T.green,fontSize:14}}>{fmt(i.amount)}</span>
+                    <button onClick={()=>deleteIncome(i.id)} style={{...btn('danger'),padding:'4px 8px'}}>🗑️</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Expense List */}
         {filteredExpenses.length > 0 && (
-          <div style={{...card,padding:20,marginBottom:16}}>
-            <h3 style={{margin:'0 0 16px',fontSize:14,fontWeight:700,color:T.gray700}}>📋 ম্যানুয়াল ব্যয়সমূহ</h3>
+          <div style={{...card,padding:20,marginBottom:16,border:`1px solid ${T.red}`}}>
+            <h3 style={{margin:'0 0 16px',fontSize:14,fontWeight:700,color:T.red}}>📋 ম্যানুয়াল ব্যয়সমূহ</h3>
             <div style={{display:'flex',flexDirection:'column',gap:8}}>
               {filteredExpenses.map(e => (
-                <div key={e.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:T.gray50,borderRadius:8}}>
+                <div key={e.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:T.redLight,borderRadius:8}}>
                   <div>
                     <div style={{fontWeight:600,fontSize:13}}>{e.title}</div>
                     <div style={{fontSize:11,color:T.gray500}}>{new Date(e.date).toLocaleDateString('bn-BD')}{e.note ? ` • ${e.note}` : ''}</div>
@@ -4223,7 +4301,7 @@ ${filteredExpenses.length > 0 ? `
       {showExpenseForm && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setShowExpenseForm(false)}>
           <div style={{...card,width:400,padding:24}} onClick={e=>e.stopPropagation()}>
-            <h3 style={{margin:'0 0 20px',fontSize:16,fontWeight:700,color:T.teal}}>➕ নতুন ব্যয় যোগ করুন</h3>
+            <h3 style={{margin:'0 0 20px',fontSize:16,fontWeight:700,color:T.red}}>📝 নতুন ব্যয় যোগ করুন</h3>
             
             <div style={{marginBottom:16}}>
               <label style={label}>📝 ব্যয়ের বিবরণ *</label>
@@ -4242,7 +4320,36 @@ ${filteredExpenses.length > 0 ? `
             
             <div style={{display:'flex',gap:8}}>
               <button onClick={()=>setShowExpenseForm(false)} style={{...btn(),flex:1}}>বাতিল</button>
-              <button onClick={saveExpense} style={{...btn('primary'),flex:1}}>💾 সংরক্ষণ</button>
+              <button onClick={saveExpense} style={{...btn('danger'),flex:1}}>💾 সংরক্ষণ</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Income Modal */}
+      {showIncomeForm && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setShowIncomeForm(false)}>
+          <div style={{...card,width:400,padding:24}} onClick={e=>e.stopPropagation()}>
+            <h3 style={{margin:'0 0 20px',fontSize:16,fontWeight:700,color:T.green}}>💰 নতুন আয় যোগ করুন</h3>
+            
+            <div style={{marginBottom:16}}>
+              <label style={label}>📝 আয়ের বিবরণ *</label>
+              <input value={incomeForm.title} onChange={e=>setIncomeForm(f=>({...f,title:e.target.value}))} placeholder="যেমন: সার্ভিস চার্জ, ডেলিভারি ফি, অতিরিক্ত আয়" style={input} />
+            </div>
+            
+            <div style={{marginBottom:16}}>
+              <label style={label}>💰 পরিমাণ (৳) *</label>
+              <input type="number" value={incomeForm.amount} onChange={e=>setIncomeForm(f=>({...f,amount:e.target.value}))} placeholder="0" style={input} />
+            </div>
+            
+            <div style={{marginBottom:20}}>
+              <label style={label}>📋 নোট (ঐচ্ছিক)</label>
+              <input value={incomeForm.note} onChange={e=>setIncomeForm(f=>({...f,note:e.target.value}))} placeholder="অতিরিক্ত তথ্য" style={input} />
+            </div>
+            
+            <div style={{display:'flex',gap:8}}>
+              <button onClick={()=>setShowIncomeForm(false)} style={{...btn(),flex:1}}>বাতিল</button>
+              <button onClick={saveIncome} style={{...btn('success'),flex:1}}>💾 সংরক্ষণ</button>
             </div>
           </div>
         </div>
