@@ -148,9 +148,22 @@ export default function App() {
     const wantFullscreen = localStorage.getItem('pos_want_fullscreen');
     if (wantFullscreen === 'true') {
       localStorage.removeItem('pos_want_fullscreen');
-      setTimeout(() => {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }, 500);
+      // Try multiple times with increasing delays for Firefox compatibility
+      const tryFullscreen = (attempts = 0) => {
+        if (attempts > 3) return;
+        try {
+          const fn = document.documentElement.requestFullscreen || 
+                     document.body.requestFullscreen ||
+                     document.querySelector('div').requestFullscreen;
+          if (fn) {
+            fn.call(document.documentElement).catch(() => {});
+          }
+        } catch(e) {}
+        if (!document.fullscreenElement && attempts < 3) {
+          setTimeout(() => tryFullscreen(attempts + 1), 300);
+        }
+      };
+      setTimeout(tryFullscreen, 300);
     }
   }, []);
 
