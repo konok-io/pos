@@ -932,11 +932,13 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             <input value={custQ} onChange={e=>{setCustQ(e.target.value);setShowCustDrop(true);}}
               onFocus={()=>setShowCustDrop(true)}
               onMouseDown={() => { setShowCustDrop(true); }}
-              placeholder="🔍 কাস্টমার খুঁজুন..."
+              placeholder="কাস্টমার খুঁজুন..."
               style={{...input,fontSize:12,borderRadius:8,padding:'8px 12px',border:'1.5px solid #e5e7eb',background:'#fafbfc'}}
             />
             {due > 0 && !selCust && cart.length > 0 && (
-              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',...btn('primary'),fontSize:11,padding:'4px 8px'}}>👤</button>
+              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',background:T.green,border:'none',borderRadius:6,color:T.white,cursor:'pointer',fontSize:11,padding:'4px 8px',display:'flex',alignItems:'center',gap:4}}>
+                <span style={{fontSize:12}}>👤</span>
+              </button>
             )}
           </div>
           
@@ -946,7 +948,11 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           
           {selCust && (
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',borderRadius:10,border:'1px solid #86efac'}}>
-              <span style={{fontSize:12,color:T.green,fontWeight:600}}>✓ {selCust.name} {selCust.credit>0 && <span style={{color:T.red,marginLeft:4}}>(বাকি: {fmt(selCust.credit)})</span>}</span>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <span style={{color:T.green,fontSize:14}}>✓</span>
+                <span style={{fontSize:12,color:T.green,fontWeight:600}}>{selCust.name}</span>
+                {selCust.credit>0 && <span style={{color:T.red,fontSize:11,fontWeight:500}}>(বাকি: {fmt(selCust.credit)})</span>}
+              </div>
               <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:11,background:'none',border:'none',color:T.gray400,cursor:'pointer',padding:2}}>✕</button>
             </div>
           )}
