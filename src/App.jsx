@@ -5855,7 +5855,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         display:'flex',
                         alignItems:'center',
                         justifyContent:'center',
-                        fontSize:18,
+                        fontSize:22,
                         color:T.white
                       }}>👑</div>
                       <div>
@@ -5863,14 +5863,15 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         <div style={{fontSize:12,color:T.gray500}}>admin@konok.io</div>
                       </div>
                     </div>
-                    <span style={{
-                      padding:'4px 12px',
+                    <div style={{
+                      width:40,height:40,
                       background:T.teal,
-                      color:T.white,
-                      borderRadius:6,
-                      fontSize:12,
-                      fontWeight:600
-                    }}>👑 সুপার এডমিন</span>
+                      borderRadius:10,
+                      display:'flex',
+                      alignItems:'center',
+                      justifyContent:'center',
+                      fontSize:20
+                    }}>👑</div>
                   </div>
 
                   {/* Other Users */}
