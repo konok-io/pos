@@ -117,6 +117,7 @@ export default function App() {
   const [purchases, setPurchases] = useState([]);
   const [ready, setReady] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Update time every second
   useEffect(() => {
@@ -132,6 +133,15 @@ export default function App() {
       localStorage.setItem('pos_current_tab', tab);
     }
   }, [tab]);
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   useEffect(() => {
     // Check if reset was done - flag stays forever to prevent DEMO loading
@@ -246,17 +256,6 @@ export default function App() {
   };
 
   // Fullscreen toggle function
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  
-  // Listen for fullscreen changes
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-  
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
