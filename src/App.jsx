@@ -348,12 +348,12 @@ export default function App() {
             </div>
             
             {/* Refresh Button */}
-            <button onClick={handleHardRefresh} style={{width:38,height:38,borderRadius:'50%',border:'1.5px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,transition:'all 0.2s',boxShadow:'0 2px 8px rgba(0,0,0,0.04)'}} title="রিফ্রেশ">
+            <button onClick={handleHardRefresh} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="রিফ্রেশ">
               🔄
             </button>
             
             {/* Fullscreen Button */}
-            <button onClick={toggleFullscreen} style={{width:38,height:38,borderRadius:'50%',border:'none',background: isFullscreen ? T.teal : 'transparent',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,transition:'all 0.25s',boxShadow: isFullscreen ? '0 4px 12px rgba(15,118,110,0.4)' : 'none',color: isFullscreen ? 'white' : T.gray500}} title={isFullscreen?"ফুল স্ক্রিন বন্ধ":"ফুল স্ক্রিন"}>
+            <button onClick={toggleFullscreen} style={{width:34,height:34,borderRadius:8,border:'none',background: isFullscreen ? T.teal : '#f3f4f6',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,transition:'all 0.2s',color: isFullscreen ? 'white' : T.gray500}} title={isFullscreen?"ফুল স্ক্রিন বন্ধ":"ফুল স্ক্রিন"}>
               {isFullscreen ? '✕' : '⛶'}
             </button>
           </div>
