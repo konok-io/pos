@@ -1719,7 +1719,7 @@ function BarcodeScreen({purchases, products}) {
       return;
     }
     
-    // Then check if it's a barcode number - search in all purchases
+    // Then check if it's a barcode number - search in all purchases (newest first)
     const trimmedBarcode = purchaseId.trim();
     if (!trimmedBarcode) {
       alert('পারচেজ আইডি বা বারকোড নম্বর দিন!');
@@ -1727,7 +1727,8 @@ function BarcodeScreen({purchases, products}) {
     }
     
     const matchingItems = [];
-    purchases.forEach(purchase => {
+    // Reverse purchases so newest comes first
+    [...purchases].reverse().forEach(purchase => {
       purchase.items.forEach(item => {
         if (item.barcode === trimmedBarcode || (item.barcode && item.barcode.toLowerCase().includes(trimmedBarcode.toLowerCase()))) {
           matchingItems.push({
