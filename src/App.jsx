@@ -246,6 +246,17 @@ export default function App() {
   };
 
   // Fullscreen toggle function
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+  
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(err => {
@@ -277,8 +288,8 @@ export default function App() {
             <div>{currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
             <div>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
           </div>
-          <button onClick={toggleFullscreen} style={{background:'rgba(255,255,255,0.15)',border:'none',borderRadius:8,cursor:'pointer',padding:'8px 12px',color:T.white,fontSize:16,display:'flex',alignItems:'center',gap:4}} title="ফুল স্ক্রিন">
-            ⛶
+          <button onClick={toggleFullscreen} style={{background:isFullscreen?'rgba(255,255,255,0.3)':'rgba(255,255,255,0.15)',border:'none',borderRadius:8,cursor:'pointer',padding:'8px 12px',color:T.white,fontSize:16,display:'flex',alignItems:'center',gap:4}} title={isFullscreen?"ফুল স্ক্রিন বন্ধ করুন":"ফুল স্ক্রিন করুন"}>
+            {isFullscreen ? '✕' : '⛶'}
           </button>
         </div>
       </div>
