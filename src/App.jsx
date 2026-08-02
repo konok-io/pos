@@ -2433,12 +2433,19 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     const exists = suppliers.some(s => s.name.toLowerCase().trim() === form.name.toLowerCase().trim());
     if (exists) { alert('❌ এই কোম্পানির নাম ইতিমধ্যে আছে!'); return; }
     
-    // Generate company code (C-00001, C-00002, etc.)
-    const maxCode = suppliers.reduce((max, s) => {
-      const match = s.code?.match(/C-(\d+)/);
-      return match ? Math.max(max, parseInt(match[1])) : max;
-    }, 0);
-    const newCode = `C-${String(maxCode + 1).padStart(5, '0')}`;
+    // Use custom code if provided, otherwise generate auto code
+    let newCode = form.code?.trim();
+    if (!newCode) {
+      const maxCode = suppliers.reduce((max, s) => {
+        const match = s.code?.match(/C-(\d+)/);
+        return match ? Math.max(max, parseInt(match[1])) : max;
+      }, 0);
+      newCode = `C-${String(maxCode + 1).padStart(5, '0')}`;
+    } else {
+      // Check for duplicate code
+      const codeExists = suppliers.some(s => s.code === newCode);
+      if (codeExists) { alert('❌ এই কোম্পানি আইডি ইতিমধ্যে আছে!'); return; }
+    }
     
     if (form.isAuto) {
       // Convert auto to real supplier
@@ -2448,7 +2455,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
     } else if (modal.mode === 'add') {
       await upd.suppliers([...suppliers, {...form, id: genId(), code: newCode}]);
-      setForm({name:'',phone:'',address:'',isAuto:false});
+      setForm({name:'',phone:'',address:'',isAuto:false,code:''});
       alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
     } else {
       await upd.suppliers(suppliers.map(s => s.id === modal.id ? {...form, id: modal.id} : s));
@@ -2840,9 +2847,9 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                   <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="কোম্পানির নাম" style={input} autoFocus />
                 </div>
                 {modal.mode === 'add' && (
-                  <div style={{marginBottom:12,background:T.gray50,padding:10,borderRadius:8}}>
-                    <label style={label}>🔢 কোম্পানি আইডি</label>
-                    <div style={{fontWeight:700,color:T.teal,fontSize:15}}>C-{String(suppliers.length + 1).padStart(5, '0')}</div>
+                  <div style={{marginBottom:12}}>
+                    <label style={label}>🔢 কোম্পানি আইডি <span style={{fontSize:11,color:T.gray500}}>(খালি রাখলে অটো হবে)</span></label>
+                    <input value={form.code||''} onChange={e=>setForm(f=>({...f,code:e.target.value}))} placeholder={`যেমন: C-${String(suppliers.length + 1).padStart(5, '0')}`} style={input} />
                   </div>
                 )}
                 <div style={{marginBottom:12}}>
