@@ -323,17 +323,17 @@ export default function App() {
           <div style={{display:'flex',flex:1,alignItems:'center',overflowX:'auto',gap:2,marginLeft:24,marginRight:16}}>
             {tabs.map(t => (
               <button key={t.id} onClick={()=>setTab(t.id)} style={{
-                padding:'8px 10px', border:'none', background:'transparent', cursor:'pointer',
+                padding:'8px 12px', border:'none', background:'transparent', cursor:'pointer',
                 color: tab===t.id ? T.white : T.gray600,
                 fontWeight: tab===t.id ? 600 : 500,
-                fontSize:11, display:'flex', alignItems:'center', gap:4,
+                fontSize:13, display:'flex', alignItems:'center', gap:5,
                 whiteSpace:'nowrap', fontFamily:'inherit',
                 transition:'all 0.2s',
                 background: tab===t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
                 borderRadius:8,
                 boxShadow: tab===t.id ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
               }}>
-                <span style={{fontSize:12}}>{t.icon}</span>
+                <span style={{fontSize:14}}>{t.icon}</span>
                 <span>{t.label}</span>
               </button>
             ))}
