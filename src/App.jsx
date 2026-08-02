@@ -309,9 +309,9 @@ export default function App() {
       <div style={{display:'flex',flexDirection:'column',height:'100vh',width:'100%',background:T.gray50,fontFamily:'BanglaFont, "Segoe UI", system-ui, sans-serif',color:T.gray900,overflow:'hidden'}}>
       {/* Header - Modern Minimal Design */}
       <div style={{background:T.white,padding:'0 24px',flexShrink:0,boxShadow:'0 4px 20px rgba(0,0,0,0.08)'}}>
-        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',height:64,borderBottom:'1px solid #f0f0f0'}}>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',height:64}}>
           {/* Logo Section */}
-          <div style={{display:'flex',alignItems:'center',gap:14}}>
+          <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0}}>
             <div style={{width:44,height:44,background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,boxShadow:'0 4px 12px rgba(15,118,110,0.3)'}}>🏪</div>
             <div>
               <div style={{fontWeight:800,fontSize:17,color:T.gray900,lineHeight:1.2}}>{settings.name}</div>
@@ -319,8 +319,28 @@ export default function App() {
             </div>
           </div>
           
+          {/* Tabs - Fill remaining space */}
+          <div style={{display:'flex',flex:1,alignItems:'center',padding:'0 24px',overflowX:'auto',gap:4,marginLeft:24}}>
+            {tabs.map(t => (
+              <button key={t.id} onClick={()=>setTab(t.id)} style={{
+                padding:'8px 14px', border:'none', background:'transparent', cursor:'pointer',
+                color: tab===t.id ? T.white : T.gray600,
+                fontWeight: tab===t.id ? 600 : 500,
+                fontSize:12, display:'flex', alignItems:'center', gap:5,
+                whiteSpace:'nowrap', fontFamily:'inherit',
+                transition:'all 0.2s',
+                background: tab===t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                borderRadius:8,
+                boxShadow: tab===t.id ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
+              }}>
+                <span style={{fontSize:13}}>{t.icon}</span>
+                <span>{t.label}</span>
+              </button>
+            ))}
+          </div>
+          
           {/* Actions Section */}
-          <div style={{display:'flex',alignItems:'center',gap:14}}>
+          <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0,marginLeft:24}}>
             {/* Date & Time */}
             <div style={{textAlign:'right',borderRight:'1px solid #e5e7eb',paddingRight:14}}>
               <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
@@ -338,26 +358,6 @@ export default function App() {
             </button>
           </div>
         </div>
-      </div>
-
-      {/* Nav Tabs - Modern Style */}
-      <div style={{display:'flex',background:T.white,padding:'0 16px',flexShrink:0,overflowX:'auto',boxShadow:'0 2px 10px rgba(0,0,0,0.04)',alignItems:'center',gap:4}}>
-        {tabs.map(t => (
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{
-            padding:'10px 16px', border:'none', background:'transparent', cursor:'pointer',
-            color: tab===t.id ? T.white : T.gray600,
-            fontWeight: tab===t.id ? 600 : 500,
-            fontSize:13, display:'flex', alignItems:'center', gap:6,
-            whiteSpace:'nowrap', fontFamily:'inherit',
-            transition:'all 0.2s',
-            background: tab===t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
-            borderRadius:8,
-            boxShadow: tab===t.id ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
-          }}>
-            <span style={{fontSize:14}}>{t.icon}</span>
-            <span>{t.label}</span>
-          </button>
-        ))}
       </div>
 
       {/* Content */}
