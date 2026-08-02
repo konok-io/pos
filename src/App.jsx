@@ -613,7 +613,7 @@ export default function App() {
             
             {/* Logout Button */}
             <button onClick={handleLogout} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="লগআউট">
-              🚪
+              <span style={{fontSize:16}}>↩️</span>
             </button>
 
             {/* Date & Time - Rightmost */}
