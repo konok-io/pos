@@ -338,7 +338,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     return () => document.removeEventListener('click', handleClick);
   }, []);
 
-  const [selCat, setSelCat] = useState('সব');
+  const [selCat, setSelCat] = useState('স্টক আছে');
   const [selComp, setSelComp] = useState('সব কোম্পানি');
   const [catSearch, setCatSearch] = useState('');
   const [showCatDrop, setShowCatDrop] = useState(false);
@@ -390,8 +390,8 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     // Product name filter
     const matchName = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
     
-    // সব: exclude out of stock
-    if (selCat === 'সব') {
+    // স্টক আছে: only show products with stock > 0
+    if (selCat === 'স্টক আছে') {
       return p.stock > 0 && matchComp && matchName;
     }
     // স্টক শেষ: only show out of stock
@@ -671,16 +671,16 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0}}>
         {/* Filter row */}
         <div style={{padding:'12px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
-          {/* সব button */}
-          <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
-            ...btn(selCat==='সব'?'primary':'ghost','sm'),
+          {/* স্টক আছে button */}
+          <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
+            ...btn(selCat==='স্টক আছে'?'primary':'ghost','sm'),
             borderRadius:7, whiteSpace:'nowrap',
-            background:selCat==='সব'?T.teal:T.gray100,
-            color:selCat==='সব'?T.white:T.gray600,
+            background:selCat==='স্টক আছে'?T.teal:T.gray100,
+            color:selCat==='স্টক আছে'?T.white:T.gray600,
             border:'none',
             padding:'8px 14px',
             fontSize:13,
-          }}>সব {allCount > 0 && <span style={{opacity:0.7}}>({allCount})</span>}</button>
+          }}>📦 স্টক আছে {allCount > 0 && <span style={{opacity:0.7}}>({allCount})</span>}</button>
           
           {/* স্টক শেষ button */}
           <button onClick={()=>{setSelCat('স্টক শেষ');setCatSearch('');}} style={{
@@ -691,7 +691,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             border:'none',
             padding:'8px 14px',
             fontSize:13,
-          }}>স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
+          }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
           
           {/* Product name search */}
           <div style={{position:'relative',flex:1,minWidth:120}}>
@@ -744,14 +744,14 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           {/* Category dropdown */}
           <div style={{position:'relative',minWidth:130}} data-cat-dropdown>
             <input 
-              value={selCat === 'সব' || selCat === 'স্টক শেষ' ? catSearch : selCat} 
-              onChange={e=>{setSelCat('সব');setCatSearch(e.target.value);setShowCatDrop(true);}} 
+              value={selCat === 'স্টক আছে' || selCat === 'স্টক শেষ' ? catSearch : selCat} 
+              onChange={e=>{setSelCat('স্টক আছে');setCatSearch(e.target.value);setShowCatDrop(true);}} 
               onFocus={()=>setShowCatDrop(true)}
               placeholder="ক্যাটাগরি..."
               style={{...input,borderRadius:7,padding:'8px 28px 8px 12px',fontSize:13,height:36,border:`1px solid ${T.teal}`}}
             />
-            {selCat !== 'সব' && selCat !== 'স্টক শেষ' && (
-              <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
+            {selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && (
+              <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
                 position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
                 background:'none',border:'none',cursor:'pointer',padding:4,
                 color:T.gray400,fontSize:12,lineHeight:1
