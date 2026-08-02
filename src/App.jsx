@@ -2667,16 +2667,15 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         let msg = `✅ আমদানি সম্পন্ন!\n\n`;
         msg += `🏢 নতুন কোম্পানি: ${result.companies}টি\n`;
         msg += `📂 নতুন ক্যাটাগরি: ${result.categories}টি\n`;
-        msg += `📦 নতুন পণ্য: ${result.products}টি\n`;
         if (errors.length > 0) {
-          msg += `\n⚠️ ত্রুটি: ${errors.length}টি\n`;
+          msg += `\n⚠️ সমস্যা: ${errors.length}টি\n`;
           msg += errors.slice(0, 5).join('\n');
           if (errors.length > 5) msg += `\n... এবং আরও ${errors.length - 5}টি`;
         }
         alert(msg);
         
       } catch (err) {
-        alert('CSV পার্স করতে সমস্যা হয়েছে: ' + err.message);
+        alert(`❌ CSV পার্স করতে সমস্যা!\n\n${err.message}\n\nCSV ফাইল সঠিক ফরম্যাটে আছে কিনা দয়া করে পরীক্ষা করুন।`);
       }
     };
     reader.readAsText(file);
