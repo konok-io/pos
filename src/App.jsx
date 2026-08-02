@@ -429,10 +429,10 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const paidRef = useRef();
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
-  // Auto focus search field
+  // Auto focus search field on mount
   useEffect(() => { 
     searchRef.current?.focus(); 
-  }, [tab]);
+  }, []);
 
   // Handle TAB key in search field to move to paid input
   const handleSearchKeyDown = (e) => {
