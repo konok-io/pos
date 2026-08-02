@@ -888,10 +888,16 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               </div>
             </div>
           ) : (
-            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'60px 20px'}}>
-              <div style={{fontSize:48,marginBottom:12}}>🔍</div>
-              <div style={{fontSize:15,color:T.gray500}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
-              <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা কোম্পানি/ক্যাটাগরি সিলেক্ট করুন</div>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'60px 20px',background:T.white,borderRadius:12}}>
+              {settings.bannerImage ? (
+                <img src={settings.bannerImage} alt="Welcome" style={{maxWidth:'100%',maxHeight:'calc(100vh - 300px)',objectFit:'contain',borderRadius:12,boxShadow:'0 4px 20px rgba(0,0,0,0.1)'}}/>
+              ) : (
+                <>
+                  <div style={{fontSize:48,marginBottom:12}}>🔍</div>
+                  <div style={{fontSize:15,color:T.gray500}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
+                  <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা কোম্পানি/ক্যাটাগরি সিলেক্ট করুন</div>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -5108,6 +5114,24 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     setSaved(true); setTimeout(()=>setSaved(false),2000);
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      alert('ছবির সাইজ 2MB এর বেশি হওয়া উচিত নয়!');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setForm(p => ({...p, bannerImage: event.target.result}));
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div style={{height:'100%',overflow:'auto',padding:20,width:'100%'}}>
       <div style={{maxWidth:'none',display:'flex',flexDirection:'column',gap:14,width:'100%'}}>
@@ -5122,6 +5146,33 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Banner Image Settings */}
+        <div style={{...card,width:'100%'}}>
+          <h3 style={{margin:'0 0 18px',fontSize:15,fontWeight:700}}>🖼️ হোম পেজ ব্যানার ছবি</h3>
+          <p style={{fontSize:13,color:T.gray500,margin:'0 0 14px'}}>বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।</p>
+          
+          {form.bannerImage && (
+            <div style={{marginBottom:14,position:'relative',borderRadius:10,overflow:'hidden'}}>
+              <img src={form.bannerImage} alt="Banner Preview" style={{width:'100%',maxHeight:200,objectFit:'cover',display:'block'}}/>
+              <button onClick={()=>setForm(p=>({...p,bannerImage:''}))} style={{
+                position:'absolute',top:8,right:8,padding:'6px 10px',background:'rgba(0,0,0,0.7)',color:'#fff',
+                border:'none',borderRadius:6,cursor:'pointer',fontSize:12
+              }}>✕ মুছুন</button>
+            </div>
+          )}
+          
+          <label style={{
+            display:'flex',alignItems:'center',justifyContent:'center',gap:8,
+            padding:'20px',border:`2px dashed ${T.gray300}`,borderRadius:10,cursor:'pointer',
+            background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600
+          }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
+             onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
+            <span style={{fontSize:24}}>📁</span>
+            <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 2MB)</span>
+            <input type="file" accept="image/*" onChange={handleImageUpload} style={{display:'none'}}/>
+          </label>
         </div>
 
         {/* VAT Settings */}
