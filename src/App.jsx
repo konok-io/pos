@@ -1887,6 +1887,16 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                     // Print single barcode (A4 size)
                     const barcodeValue = item.barcode || item.id;
                     const price = item.sellP || 0;
+                    const count = barcodeCounts[idx] || 1;
+                    const escapeJS = (str) => String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
+                    
+                    // Build barcode data array
+                    const barcodeData = [];
+                    for (let i = 0; i < count; i++) {
+                      barcodeData.push({ value: barcodeValue, price: price });
+                    }
+                    const jsArray = barcodeData.map(item => `{"value":"${escapeJS(item.value)}","price":${item.price}}`).join(',');
+                    
                     const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -1906,33 +1916,36 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
 </head>
 <body>
 <div class="barcode-grid">
-<div class="barcode-item">
-  <div class="barcode-price">৳${price}</div>
-  <svg id="barcode" class="barcode-svg"></svg>
-  <div class="barcode-number">${barcodeValue}</div>
-</div>
+${barcodeData.map((item, i) => `<div class="barcode-item">
+  <div class="barcode-price">৳${item.price}</div>
+  <svg id="bc${i}" class="barcode-svg"></svg>
+  <div class="barcode-number">${escapeJS(item.value)}</div>
+</div>`).join('')}
 </div>
 <script>
   window.onload = function() {
-    try {
-      JsBarcode("#barcode", "${barcodeValue}", {
-        format: "CODE128",
-        width: 2,
-        height: 50,
-        displayValue: false,
-        margin: 5
-      });
-    } catch(e) {
+    var data = [${jsArray}];
+    data.forEach(function(item, idx) {
       try {
-        JsBarcode("#barcode", "${barcodeValue}".replace(/[^a-zA-Z0-9]/g, 'X'), {
+        JsBarcode("#bc" + idx, item.value, {
           format: "CODE128",
           width: 2,
           height: 50,
           displayValue: false,
           margin: 5
         });
-      } catch(e2) {}
-    }
+      } catch(e) {
+        try {
+          JsBarcode("#bc" + idx, item.value.replace(/[^a-zA-Z0-9]/g, 'X'), {
+            format: "CODE128",
+            width: 2,
+            height: 50,
+            displayValue: false,
+            margin: 5
+          });
+        } catch(e2) {}
+      }
+    });
     setTimeout(function() { window.print(); }, 300);
   };
 </script>
