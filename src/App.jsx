@@ -550,7 +550,8 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sale Receipt</title>
+<title>বিক্রয় রিসিট</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 @page {
   size: 80mm auto;
@@ -565,7 +566,7 @@ html {
   width: 80mm;
 }
 body {
-  font-family: 'Courier New', monospace;
+  font-family: 'Hind Siliguri', 'Segoe UI', sans-serif;
   width: 80mm;
   margin: 0;
   padding: 2mm;
@@ -623,11 +624,11 @@ td:nth-child(4) {
 </head>
 <body>
 <div class="center border">
-  <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
+  <div style="font-size:14px;font-weight:bold;">🧾 বিক্রয় রিসিট</div>
   <div>#${r.sale.id.slice(-8).toUpperCase()}</div>
   <div>${new Date(r.sale.date).toLocaleDateString('bn-BD')}</div>
-  <div>Customer: ${r.sale.custName}</div>
-  ${r.sale.phone ? '<div>Phone: ' + r.sale.phone + '</div>' : ''}
+  <div>গ্রাহক: ${r.sale.custName}</div>
+  ${r.sale.phone ? '<div>ফোন: ' + r.sale.phone + '</div>' : ''}
 </div>
 <table>
   <thead>
@@ -648,7 +649,7 @@ td:nth-child(4) {
   </tbody>
 </table>
 <div class="total row"><span>সাবটোটাল:</span><span>৳${(r.sale.subtotal || r.sale.total).toFixed(2)}</span></div>
-${r.sale.vatAmount > 0 ? `<div class="row"><span>VAT (${r.sale.vatPercent}%):</span><span>৳${r.sale.vatAmount.toFixed(2)}</span></div>` : ''}
+${r.sale.vatAmount > 0 ? `<div class="row"><span>ভ্যাট (${r.sale.vatPercent}%):</span><span>৳${r.sale.vatAmount.toFixed(2)}</span></div>` : ''}
 ${r.sale.discount > 0 ? `<div class="row"><span>ছাড়:</span><span>-৳${r.sale.discount.toFixed(2)}</span></div>` : ''}
 <div class="total row"><span>মোট:</span><span>৳${r.sale.total.toFixed(2)}</span></div>
 <div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toFixed(2)}</span></div>
@@ -1366,12 +1367,13 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Purchase Invoice</title>
+<title>পারচেজ হিস্ট্রি</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 @page { size: 80mm auto; margin: 0; }
 * { margin:0; padding:0; box-sizing:border-box; }
 html { width: 80mm; }
-body { font-family:'Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+body { font-family:'Hind Siliguri','Segoe UI',sans-serif; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
 .center { text-align:center; }
 .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
 .row { display:flex; justify-content:space-between; margin:2px 0; }
@@ -1386,10 +1388,10 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </head>
 <body>
 <div class="center border">
-  <div style="font-size:14px;font-weight:bold;">📦 Purchase Invoice</div>
+  <div style="font-size:14px;font-weight:bold;">📦 পারচেজ হিস্ট্রি</div>
   <div>${viewPurchase.id}</div>
   <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-  <div>Supplier: ${viewPurchase.supplier}</div>
+  <div>সরবরাহকারী: ${viewPurchase.supplier}</div>
 </div>
 <table>
   <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
@@ -4388,10 +4390,11 @@ function ReportsScreen({sales, customers, purchases}) {
     <html>
     <head>
       <title>বিক্রয় ইতিহাস</title>
+      <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
       <style>
         @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI',Arial,sans-serif; padding:12px; font-size:12px; }
+        body { font-family:'Hind Siliguri','Segoe UI',sans-serif; padding:12px; font-size:12px; }
         .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
         .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
         .header p { color:#666; font-size:11px; }
