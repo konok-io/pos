@@ -5903,12 +5903,12 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       <div style={{display:'flex',alignItems:'center',gap:8}}>
                         <span style={{
                           padding:'4px 12px',
-                          background:T.gray200,
-                          color:T.gray600,
+                          background: u.role === 'super_admin' ? T.teal : T.gray200,
+                          color: u.role === 'super_admin' ? T.white : T.gray600,
                           borderRadius:6,
                           fontSize:12,
                           fontWeight:600
-                        }}>এডমিন</span>
+                        }}>{u.role === 'super_admin' ? '👑 সুপার এডমিন' : '🛡️ এডমিন'}</span>
                         <button onClick={() => openUserModal(u)} style={{
                           padding:'6px 12px',
                           background:T.white,
@@ -6083,6 +6083,44 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{...input,padding:'12px 14px',fontSize:14}}
                   placeholder="পাসওয়ার্ড"
                 />
+              </div>
+              <div>
+                <label style={{...label,marginBottom:8}}>🎭 রোল</label>
+                <div style={{display:'flex',gap:12}}>
+                  <button
+                    type="button"
+                    onClick={() => setUserForm(p => ({...p, role: 'admin'}))}
+                    style={{
+                      flex:1,padding:'12px 16px',
+                      background: userForm.role === 'admin' ? T.teal : T.gray100,
+                      color: userForm.role === 'admin' ? T.white : T.gray600,
+                      border:'none',borderRadius:10,
+                      fontSize:14,fontWeight:600,cursor:'pointer',
+                      transition:'all 0.2s',
+                      display:'flex',alignItems:'center',justifyContent:'center',gap:8
+                    }}
+                  >
+                    🛡️ এডমিন
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUserForm(p => ({...p, role: 'super_admin'}))}
+                    style={{
+                      flex:1,padding:'12px 16px',
+                      background: userForm.role === 'super_admin' ? T.teal : T.gray100,
+                      color: userForm.role === 'super_admin' ? T.white : T.gray600,
+                      border:'none',borderRadius:10,
+                      fontSize:14,fontWeight:600,cursor:'pointer',
+                      transition:'all 0.2s',
+                      display:'flex',alignItems:'center',justifyContent:'center',gap:8
+                    }}
+                  >
+                    👑 সুপার এডমিন
+                  </button>
+                </div>
+                <p style={{margin:'8px 0 0',fontSize:12,color:T.gray500}}>
+                  সুপার এডমিন = সব ফিচার এক্সেস, এডমিন = ইউজার ম্যানেজমেন্ট ব্যতীত
+                </p>
               </div>
             </div>
 
