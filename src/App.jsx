@@ -362,7 +362,7 @@ export default function App() {
 
       {/* Content */}
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
-        {tab==='pos'       && <POSScreen {...props} />}
+        {tab==='pos'       && <POSPage {...props} />}
         {tab==='products'  && <ProductsScreen {...props} />}
         {tab==='newproduct' && <NewProductScreen {...props} />}
         {tab==='barcode'   && <BarcodeScreen {...props} />}
@@ -379,11 +379,43 @@ export default function App() {
 }
 
 /* ═══════════════════════════════════════════
+   POS PAGE (with search in header)
+═══════════════════════════════════════════ */
+function POSPage({products, customers, sales, settings, categories, upd}) {
+  const [posSearch, setPosSearch] = useState('');
+  const searchRef = useRef();
+  
+  return (
+    <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
+      {/* Search Bar in Header */}
+      <div style={{padding:'8px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center',flexShrink:0}}>
+        <div style={{position:'relative',flex:1}}>
+          <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:13}}>🔍</span>
+          <input ref={searchRef} value={posSearch} onChange={e=>setPosSearch(e.target.value)}
+            placeholder="পণ্যের নাম বা বারকোড..."
+            style={{...input,paddingLeft:32,height:34,fontSize:12,borderRadius:7,border:`1.5px solid ${T.gray200}`,background:'#fafbfc',width:'100%',boxSizing:'border-box'}}
+          />
+        </div>
+      </div>
+      
+      {/* POS Screen with search context */}
+      <POSScreen 
+        {...{products, customers, sales, settings, categories, upd}}
+        posSearch={posSearch}
+        setPosSearch={setPosSearch}
+        searchRef={searchRef}
+      />
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
    POS SCREEN
 ═══════════════════════════════════════════ */
-function POSScreen({products, customers, sales, settings, categories, upd}) {
+function POSScreen({products, customers, sales, settings, categories, upd, posSearch, setPosSearch, searchRef}) {
   const [cart, setCart] = useState([]);
-  const [search, setSearch] = useState('');
+  const search = posSearch;
+  const setSearch = setPosSearch;
   const [selCust, setSelCust] = useState(null);
   const [custQ, setCustQ] = useState('');
   const [showCustDrop, setShowCustDrop] = useState(false);
@@ -395,11 +427,10 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const [newCustName, setNewCustName] = useState('');
   const [newCustPhone, setNewCustPhone] = useState('');
   const [newCustAddr, setNewCustAddr] = useState('');
-  const searchRef = useRef();
   const paidRef = useRef();
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
-  useEffect(() => { searchRef.current?.focus(); }, []);
+  useEffect(() => { searchRef?.current?.focus(); }, []);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -749,21 +780,6 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
     <div style={{display:'flex',height:'100%',overflow:'hidden',width:'100%',background:T.gray50}}>
       {/* ── LEFT: Products ── */}
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0}}>
-        {/* Product name search */}
-        <div style={{padding:'10px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center'}}>
-          <div style={{position:'relative',flex:1}}>
-            <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:13}}>🔍</span>
-            <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)}
-              placeholder="পণ্যের নাম বা বারকোড..."
-              style={{...input,paddingLeft:32,height:34,fontSize:12,borderRadius:7,border:`1.5px solid ${T.gray200}`,background:'#fafbfc'}}
-              onKeyDown={e=>{
-                if(e.key==='Enter'&&filtered.length>0) addToCart(filtered[0]);
-                if(e.key==='Tab'){e.preventDefault();paidRef.current?.focus();}
-              }}
-            />
-          </div>
-        </div>
-        
         {/* Filter row */}
         <div style={{padding:'6px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
           {/* স্টক আছে button */}
@@ -933,7 +949,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               style={{...input,fontSize:12,borderRadius:8,padding:'8px 12px',border:'1.5px solid #e5e7eb',background:'#fafbfc'}}
             />
             {due > 0 && !selCust && cart.length > 0 && (
-              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',background:T.green,border:'none',borderRadius:6,color:T.white,cursor:'pointer',fontSize:11,padding:'4px 8px',display:'flex',alignItems:'center',gap:4}}>
+              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',background:T.teal,border:'none',borderRadius:6,color:T.white,cursor:'pointer',fontSize:11,padding:'4px 8px',display:'flex',alignItems:'center',gap:4}}>
                 <span style={{fontSize:12}}>👤</span>
               </button>
             )}
