@@ -1765,6 +1765,40 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
         </div>
+        <button style={btn('ghost')} onClick={()=>{
+          const printFiltered = filtered.length > 0 ? filtered : products.filter(p=>!p.name?.includes('(ক্যাটাগরি)'));
+          const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
+<title>পণ্যের তালিকা</title><style>
+@page { size: A4 landscape; margin: 10mm; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Tiro Bangla',Arial,sans-serif; padding:10px; font-size:11px; }
+.header { text-align:center; margin-bottom:15px; border-bottom:2px solid #00897b; padding-bottom:10px; }
+.header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
+.header p { color:#666; font-size:11px; }
+table { width:100%; border-collapse:collapse; }
+th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
+td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
+tr:nth-child(even) { background:#fafafa; }
+.footer { margin-top:15px; text-align:center; color:#999; font-size:10px; }
+</style></head><body>
+<div class="header"><h1>📦 পণ্যের তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')} | ${printFiltered.length}টি পণ্য</p></div>
+<table><thead><tr><th>কোম্পানি কোড</th><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>ক্রয়মূল্য</th><th>বিক্রয়মূল্য</th><th>লাভ</th><th>স্টক</th><th>একক</th></tr></thead><tbody>
+${printFiltered.map(p => {
+  const profit = p.sellP - p.buyP;
+  const profitPct = p.buyP > 0 ? Math.round((profit / p.buyP) * 100) : 0;
+  const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'-';
+  return `<tr><td>${supCode}</td><td>${p.name}</td><td>${p.company||'-'}</td><td>${p.cat||'-'}</td><td>৳${p.buyP.toLocaleString()}</td><td>৳${p.sellP.toLocaleString()}</td><td>৳${profit.toLocaleString()} (${profitPct}%)</td><td>${p.stock}</td><td>${p.unit}</td></tr>`;
+}).join('')}
+</tbody></table>
+<div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</div>
+</body></html>`;
+          const win = window.open('','','width=1000,height=600');
+          win.document.open();
+          win.document.write(html);
+          win.document.close();
+          win.onload = () => setTimeout(() => win.print(), 100);
+        }}>🖨️ প্রিন্ট</button>
         <button style={btn('primary')} onClick={()=>{setShowAddForm(true);setPurchaseItems([]);}}>📦 নতুন পণ্য সংরক্ষণ</button>
         <span style={{fontSize:12,color:T.gray400}}>{filtered.length}টি পণ্য</span>
       </div>
@@ -3755,6 +3789,53 @@ function InventoryScreen({products, suppliers, upd}) {
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
         </div>
+        <button style={btn('ghost')} onClick={()=>{
+          const printFiltered = filtered.length > 0 ? filtered : realProducts;
+          const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
+<title>স্টক তালিকা</title><style>
+@page { size: A4 landscape; margin: 10mm; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Tiro Bangla',Arial,sans-serif; padding:10px; font-size:11px; }
+.header { text-align:center; margin-bottom:15px; border-bottom:2px solid #00897b; padding-bottom:10px; }
+.header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
+.header p { color:#666; font-size:11px; }
+.summary { display:flex; justify-content:center; gap:20px; margin-bottom:15px; }
+.summary-item { padding:8px 16px; border-radius:8px; font-size:12px; }
+.summary-item.green { background:#e8f5e9; color:#2e7d32; }
+.summary-item.red { background:#ffebee; color:#c62828; }
+.summary-item.orange { background:#fff3e0; color:#ef6c00; }
+.summary-item.blue { background:#e0f7fa; color:#00897b; }
+table { width:100%; border-collapse:collapse; }
+th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
+td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
+tr:nth-child(even) { background:#fafafa; }
+.footer { margin-top:15px; text-align:center; color:#999; font-size:10px; }
+</style></head><body>
+<div class="header"><h1>🏭 স্টক তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')}</p></div>
+<div class="summary">
+  <div class="summary-item blue">মোট পণ্য: ${realProducts.length}টি</div>
+  <div class="summary-item green">স্টক আছে: ${realProducts.filter(p=>p.stock>0).length}টি</div>
+  <div class="summary-item orange">কম স্টক: ${lowStock.length}টি</div>
+  <div class="summary-item red">স্টক শেষ: ${outOfStock.length}টি</div>
+  <div class="summary-item blue">মোট মূল্য: ৳${totalValue.toLocaleString()}</div>
+</div>
+<table><thead><tr><th>কোম্পানি কোড</th><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>স্টক</th><th>একক</th><th>মিন স্টক</th><th>বিক্রয়মূল্য</th><th>স্টক মূল্য</th><th>অবস্থা</th></tr></thead><tbody>
+${printFiltered.map(p => {
+  const st = p.stock<=0?'শেষ':p.stock<=p.minStock?'কম':'পর্যাপ্ত';
+  const stColor = p.stock<=0?'#c62828':p.stock<=p.minStock?'#ef6c00':'#2e7d32';
+  const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'-';
+  return `<tr><td>${supCode}</td><td>${p.name}</td><td>${p.company||'-'}</td><td>${p.cat||'-'}</td><td style="font-weight:700;color:${stColor}">${p.stock}</td><td>${p.unit}</td><td>${p.minStock}</td><td>৳${p.sellP.toLocaleString()}</td><td>৳${(p.sellP*p.stock).toLocaleString()}</td><td style="color:${stColor};font-weight:600">${st}</td></tr>`;
+}).join('')}
+</tbody></table>
+<div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</div>
+</body></html>`;
+          const win = window.open('','','width=1000,height=600');
+          win.document.open();
+          win.document.write(html);
+          win.document.close();
+          win.onload = () => setTimeout(() => win.print(), 100);
+        }}>🖨️ প্রিন্ট</button>
         <div style={{fontSize:12,color:T.gray600}}>স্টক মূল্য: <strong style={{color:T.teal}}>{fmt(totalValue)}</strong></div>
       </div>
 
