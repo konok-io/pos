@@ -3906,15 +3906,188 @@ function IncomeScreen({sales, purchases, upd}) {
     {id:'custom',label:'কাস্টম'}
   ];
 
+  // Get period label
+  const getPeriodLabel = () => {
+    if (period === 'today') return 'আজকের তারিখ';
+    if (period === 'week') return 'গত ৭ দিন';
+    if (period === '15days') return 'গত ১৫ দিন';
+    if (period === 'month') return 'এই মাস';
+    return `${from} থেকে ${to}`;
+  };
+
+  // Print function
+  const printReport = () => {
+    const { filteredSales, filteredPurchases, filteredExpenses } = getFilteredData();
+    const totalIncome = filteredSales.reduce((sum, s) => sum + (s.total || 0), 0);
+    const totalPurchaseExpense = filteredPurchases.reduce((sum, p) => sum + p.items.reduce((s, i) => s + (i.buyP || 0) * (i.stock || 0), 0), 0);
+    const totalManualExpense = filteredExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
+    const totalExpense = totalPurchaseExpense + totalManualExpense;
+    const netProfit = totalIncome - totalExpense;
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>আয়-ব্যয় হিসাব</title>
+<style>
+@page { size: A4; margin: 10mm; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nikosh',sans-serif; font-size:12px; color:#333; padding:10px; }
+.header { text-align:center; margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:10px; }
+.header h1 { font-size:20px; margin-bottom:5px; }
+.header p { font-size:11px; color:#666; }
+.summary { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px; }
+.summary-item { border:1px solid #ddd; padding:10px; border-radius:5px; }
+.summary-item.green { border-left:4px solid #22c55e; }
+.summary-item.orange { border-left:4px solid #f97316; }
+.summary-item.red { border-left:4px solid #ef4444; }
+.summary-item.blue { border-left:4px solid #0d9488; }
+.label { font-size:10px; color:#666; margin-bottom:3px; }
+.amount { font-size:16px; font-weight:bold; }
+.green .amount { color:#22c55e; }
+.orange .amount { color:#f97316; }
+.red .amount { color:#ef4444; }
+.blue .amount { color:#0d9488; }
+.section { margin-bottom:15px; }
+.section-title { font-size:13px; font-weight:bold; margin-bottom:8px; padding:5px 10px; background:#f5f5f5; border-radius:4px; }
+table { width:100%; border-collapse:collapse; font-size:11px; margin-bottom:10px; }
+th { background:#0d9488; color:white; padding:6px 8px; text-align:left; }
+td { padding:5px 8px; border-bottom:1px solid #eee; }
+tr:nth-child(even) { background:#fafafa; }
+.footer { margin-top:20px; padding-top:10px; border-top:2px solid #333; display:flex; justify-content:space-between; }
+.signature { text-align:center; width:150px; }
+.signature-line { border-top:1px solid #333; margin-top:40px; padding-top:5px; font-size:10px; }
+.total-section { margin-top:15px; padding:10px; background:#f0fdfa; border-radius:8px; border:2px solid #0d9488; }
+.total-row { display:flex; justify-content:space-between; padding:3px 0; font-size:12px; }
+.total-row.grand { font-size:14px; font-weight:bold; border-top:2px solid #0d9488; margin-top:5px; padding-top:8px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📊 আয়-ব্যয় হিসাব</h1>
+  <p>${getPeriodLabel()} (${new Date().toLocaleDateString('bn-BD')})</p>
+</div>
+
+<div class="total-section">
+  <div class="total-row">
+    <span>📈 মোট আয় (বিক্রয়)</span>
+    <span style="color:#22c55e;font-weight:bold">৳${totalIncome.toLocaleString()}</span>
+  </div>
+  <div class="total-row">
+    <span>📦 পারচেজ ব্যয়</span>
+    <span style="color:#f97316">৳${totalPurchaseExpense.toLocaleString()}</span>
+  </div>
+  <div class="total-row">
+    <span>📝 ম্যানুয়াল ব্যয়</span>
+    <span style="color:#ef4444">৳${totalManualExpense.toLocaleString()}</span>
+  </div>
+  <div class="total-row">
+    <span>💵 মোট ব্যয়</span>
+    <span style="color:#ef4444">৳${totalExpense.toLocaleString()}</span>
+  </div>
+  <div class="total-row grand">
+    <span>${netProfit >= 0 ? '✅ নীট লাভ' : '⚠️ নীট ক্ষতি'}</span>
+    <span style="color:${netProfit >= 0 ? '#0d9488' : '#ef4444'}">৳${Math.abs(netProfit).toLocaleString()}</span>
+  </div>
+</div>
+
+${filteredSales.length > 0 ? `
+<div class="section">
+  <div class="section-title">🛒 বিক্রয়সমূহ (${filteredSales.length}টি) - মোট: ৳${totalIncome.toLocaleString()}</div>
+  <table>
+    <thead><tr><th>আইডি</th><th>তারিখ</th><th>গ্রাহক</th><th>পরিমাণ</th></tr></thead>
+    <tbody>
+      ${filteredSales.slice(0, 20).map(s => `
+      <tr>
+        <td>${s.id}</td>
+        <td>${new Date(s.date).toLocaleDateString('bn-BD')}</td>
+        <td>${s.customer || '-'}</td>
+        <td style="text-align:right;font-weight:bold">৳${(s.total || 0).toLocaleString()}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+  ${filteredSales.length > 20 ? `<p style="color:#666;font-size:10px">... এবং আরও ${filteredSales.length - 20}টি</p>` : ''}
+</div>` : ''}
+
+${filteredPurchases.length > 0 ? `
+<div class="section">
+  <div class="section-title">📦 পারচেজসমূহ (${filteredPurchases.length}টি) - মোট: ৳${totalPurchaseExpense.toLocaleString()}</div>
+  <table>
+    <thead><tr><th>আইডি</th><th>তারিখ</th><th>সরবরাহকারী</th><th>পরিমাণ</th></tr></thead>
+    <tbody>
+      ${filteredPurchases.slice(0, 20).map(p => {
+        const total = p.items.reduce((s, i) => s + (i.buyP || 0) * (i.stock || 0), 0);
+        return `
+      <tr>
+        <td>${p.id}</td>
+        <td>${new Date(p.date).toLocaleDateString('bn-BD')}</td>
+        <td>${p.supplier || '-'}</td>
+        <td style="text-align:right;font-weight:bold">৳${total.toLocaleString()}</td>
+      </tr>`}).join('')}
+    </tbody>
+  </table>
+  ${filteredPurchases.length > 20 ? `<p style="color:#666;font-size:10px">... এবং আরও ${filteredPurchases.length - 20}টি</p>` : ''}
+</div>` : ''}
+
+${filteredExpenses.length > 0 ? `
+<div class="section">
+  <div class="section-title">📝 ম্যানুয়াল ব্যয়সমূহ (${filteredExpenses.length}টি) - মোট: ৳${totalManualExpense.toLocaleString()}</div>
+  <table>
+    <thead><tr><th>তারিখ</th><th>বিবরণ</th><th>নোট</th><th>পরিমাণ</th></tr></thead>
+    <tbody>
+      ${filteredExpenses.map(e => `
+      <tr>
+        <td>${new Date(e.date).toLocaleDateString('bn-BD')}</td>
+        <td>${e.title}</td>
+        <td>${e.note || '-'}</td>
+        <td style="text-align:right;font-weight:bold;color:#ef4444">৳${e.amount.toLocaleString()}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+</div>` : ''}
+
+<div class="footer">
+  <div class="signature">
+    <div class="signature-line">তৈরিকারী স্বাক্ষর</div>
+  </div>
+  <div class="signature">
+    <div class="signature-line">ম্যানেজার স্বাক্ষর</div>
+  </div>
+  <div class="signature">
+    <div class="signature-line">অনুমোদনকারী স্বাক্ষর</div>
+  </div>
+</div>
+</body>
+</html>`;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
+    document.body.appendChild(iframe);
+    iframe.contentWindow.document.open();
+    iframe.contentWindow.document.write(html);
+    iframe.contentWindow.document.close();
+    iframe.contentWindow.onload = function() {
+      setTimeout(() => {
+        iframe.contentWindow.print();
+        document.body.removeChild(iframe);
+      }, 250);
+    };
+  };
+
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden',background:T.gray50}}>
       {/* Header */}
       <div style={{padding:'12px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
           <h2 style={{margin:0,fontSize:18,fontWeight:700,color:T.teal}}>💰 আয়/ব্যয় হিসাব</h2>
-          <button onClick={()=>setShowExpenseForm(true)} style={{...btn('primary'),padding:'8px 16px'}}>
-            ➕ ব্যয় যোগ করুন
-          </button>
+          <div style={{display:'flex',gap:8}}>
+            <button onClick={printReport} style={{...btn('ghost'),padding:'8px 16px'}}>
+              🖨️ প্রিন্ট
+            </button>
+            <button onClick={()=>setShowExpenseForm(true)} style={{...btn('primary'),padding:'8px 16px'}}>
+              ➕ ব্যয় যোগ করুন
+            </button>
+          </div>
         </div>
         
         {/* Period Filter */}
