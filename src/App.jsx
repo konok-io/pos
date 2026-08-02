@@ -338,7 +338,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     return () => document.removeEventListener('click', handleClick);
   }, []);
 
-  const [selCat, setSelCat] = useState('স্টক আছে');
+  const [selCat, setSelCat] = useState('সব');
   const [selComp, setSelComp] = useState('সব কোম্পানি');
   const [catSearch, setCatSearch] = useState('');
   const [showCatDrop, setShowCatDrop] = useState(false);
@@ -390,8 +390,8 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     // Product name filter
     const matchName = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
     
-    // স্টক আছে: only show products with stock > 0
-    if (selCat === 'স্টক আছে') {
+    // সব: exclude out of stock
+    if (selCat === 'সব') {
       return p.stock > 0 && matchComp && matchName;
     }
     // স্টক শেষ: only show out of stock
@@ -671,16 +671,16 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0}}>
         {/* Filter row */}
         <div style={{padding:'12px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
-          {/* স্টক আছে button */}
-          <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
-            ...btn(selCat==='স্টক আছে'?'primary':'ghost','sm'),
+          {/* সব button */}
+          <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
+            ...btn(selCat==='সব'?'primary':'ghost','sm'),
             borderRadius:7, whiteSpace:'nowrap',
-            background:selCat==='স্টক আছে'?T.teal:T.gray100,
-            color:selCat==='স্টক আছে'?T.white:T.gray600,
+            background:selCat==='সব'?T.teal:T.gray100,
+            color:selCat==='সব'?T.white:T.gray600,
             border:'none',
             padding:'8px 14px',
             fontSize:13,
-          }}>📦 স্টক আছে {allCount > 0 && <span style={{opacity:0.7}}>({allCount})</span>}</button>
+          }}>সব {allCount > 0 && <span style={{opacity:0.7}}>({allCount})</span>}</button>
           
           {/* স্টক শেষ button */}
           <button onClick={()=>{setSelCat('স্টক শেষ');setCatSearch('');}} style={{
@@ -691,7 +691,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             border:'none',
             padding:'8px 14px',
             fontSize:13,
-          }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
+          }}>স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
           
           {/* Product name search */}
           <div style={{position:'relative',flex:1,minWidth:120}}>
@@ -744,14 +744,14 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           {/* Category dropdown */}
           <div style={{position:'relative',minWidth:130}} data-cat-dropdown>
             <input 
-              value={selCat === 'স্টক আছে' || selCat === 'স্টক শেষ' ? catSearch : selCat} 
-              onChange={e=>{setSelCat('স্টক আছে');setCatSearch(e.target.value);setShowCatDrop(true);}} 
+              value={selCat === 'সব' || selCat === 'স্টক শেষ' ? catSearch : selCat} 
+              onChange={e=>{setSelCat('সব');setCatSearch(e.target.value);setShowCatDrop(true);}} 
               onFocus={()=>setShowCatDrop(true)}
               placeholder="ক্যাটাগরি..."
               style={{...input,borderRadius:7,padding:'8px 28px 8px 12px',fontSize:13,height:36,border:`1px solid ${T.teal}`}}
             />
-            {selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && (
-              <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
+            {selCat !== 'সব' && selCat !== 'স্টক শেষ' && (
+              <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
                 position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
                 background:'none',border:'none',cursor:'pointer',padding:4,
                 color:T.gray400,fontSize:12,lineHeight:1
@@ -959,6 +959,7 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
   const [viewPurchase, setViewPurchase] = useState(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
   const [csvData, setCsvData] = useState([]);
+  const [stockFilter, setStockFilter] = useState('স্টক আছে'); // স্টক আছে, স্টক শেষ
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
@@ -1066,11 +1067,15 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
 
   // Filter and sort products - low stock first
   const filtered = products
-    .filter(p=>
-      !search || p.name.toLowerCase().includes(search.toLowerCase()) || 
-      (p.company||'').toLowerCase().includes(search.toLowerCase()) || 
-      (p.barcode||'').includes(search)
-    )
+    .filter(p=> {
+      // Stock filter
+      if (stockFilter === 'স্টক আছে' && p.stock <= 0) return false;
+      if (stockFilter === 'স্টক শেষ' && p.stock > 0) return false;
+      // Search filter
+      return !search || p.name.toLowerCase().includes(search.toLowerCase()) || 
+        (p.company||'').toLowerCase().includes(search.toLowerCase()) || 
+        (p.barcode||'').includes(search);
+    })
     .sort((a, b) => {
       // Out of stock first
       if (a.stock <= 0 && b.stock > 0) return -1;
@@ -1083,6 +1088,10 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
       // Sort by stock ascending
       return a.stock - b.stock;
     });
+  
+  // Count stats
+  const stockCount = products.filter(p => p.stock > 0).length;
+  const outOfStockCount = products.filter(p => p.stock <= 0).length;
 
   // Handle barcode input
   const handleBarcode = (val) => {
@@ -1636,12 +1645,30 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
       <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
+        {/* স্টক আছে ট্যাব */}
+        <button onClick={()=>setStockFilter('স্টক আছে')} style={{
+          ...btn(stockFilter==='স্টক আছে'?'primary':'ghost','sm'),
+          borderRadius:7, whiteSpace:'nowrap',
+          background:stockFilter==='স্টক আছে'?T.teal:T.gray100,
+          color:stockFilter==='স্টক আছে'?T.white:T.gray600,
+          border:'none', padding:'8px 14px', fontSize:13,
+        }}>📦 স্টক আছে ({stockCount})</button>
+        
+        {/* স্টক শেষ ট্যাব */}
+        <button onClick={()=>setStockFilter('স্টক শেষ')} style={{
+          ...btn(stockFilter==='স্টক শেষ'?'primary':'ghost','sm'),
+          borderRadius:7, whiteSpace:'nowrap',
+          background:stockFilter==='স্টক শেষ'?T.red:T.redLight,
+          color:stockFilter==='স্টক শেষ'?T.white:T.red,
+          border:'none', padding:'8px 14px', fontSize:13,
+        }}>⚠️ স্টক শেষ ({outOfStockCount})</button>
+        
         <div style={{position:'relative',flex:'1 1 200px',minWidth:150}}>
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
         </div>
         <button style={btn('primary')} onClick={()=>{setShowAddForm(true);setPurchaseItems([]);}}>📦 নতুন পণ্য সংরক্ষণ</button>
-        <span style={{fontSize:12,color:T.gray400}}>{products.length}টি পণ্য</span>
+        <span style={{fontSize:12,color:T.gray400}}>{filtered.length}টি পণ্য</span>
       </div>
 
       <div style={{flex:1,overflow:'auto',padding:12}}>
