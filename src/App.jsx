@@ -1701,21 +1701,122 @@ function BarcodeScreen({purchases, products}) {
   const [purchaseId, setPurchaseId] = useState('');
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [barcodeCounts, setBarcodeCounts] = useState({});
+  const [barcodeSearchResult, setBarcodeSearchResult] = useState(null);
   
-  // Find purchase by ID
+  // Find purchase by ID or barcode
   const findPurchase = () => {
-    const found = purchases.find(p => p.id.toLowerCase().includes(purchaseId.toLowerCase()));
-    if (found) {
-      setSelectedPurchase(found);
+    // First check if it's a purchase ID
+    const foundById = purchases.find(p => p.id.toLowerCase().includes(purchaseId.toLowerCase()));
+    if (foundById) {
+      setSelectedPurchase(foundById);
+      setBarcodeSearchResult(null);
       // Initialize counts for each product
       const counts = {};
-      found.items.forEach((item, idx) => {
+      foundById.items.forEach((item, idx) => {
         counts[idx] = item.stock || 1;
       });
       setBarcodeCounts(counts);
-    } else {
-      alert('পারচেজ আইডি পাওয়া যায়নি!');
+      return;
     }
+    
+    // Then check if it's a barcode number - search in all purchases
+    const trimmedBarcode = purchaseId.trim();
+    if (!trimmedBarcode) {
+      alert('পারচেজ আইডি বা বারকোড নম্বর দিন!');
+      return;
+    }
+    
+    const matchingItems = [];
+    purchases.forEach(purchase => {
+      purchase.items.forEach(item => {
+        if (item.barcode === trimmedBarcode || (item.barcode && item.barcode.toLowerCase().includes(trimmedBarcode.toLowerCase()))) {
+          matchingItems.push({
+            ...item,
+            purchaseId: purchase.id,
+            purchaseDate: purchase.date
+          });
+        }
+      });
+    });
+    
+    if (matchingItems.length > 0) {
+      setSelectedPurchase(null);
+      setBarcodeSearchResult(matchingItems);
+    } else {
+      alert('এই বারকোড নম্বরে কোনো পণ্য পাওয়া যায়নি!');
+    }
+  };
+  
+  // Print single barcode from search result
+  const printSingleBarcode = (item, count = 1) => {
+    const barcodeValue = item.barcode || item.id;
+    const price = item.sellP || 0;
+    const escapeJS = (str) => String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
+    
+    const barcodeData = [];
+    for (let i = 0; i < count; i++) {
+      barcodeData.push({ value: barcodeValue, price: price });
+    }
+    const jsArray = barcodeData.map(b => `{"value":"${escapeJS(b.value)}","price":${b.price}}`).join(',');
+    
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Barcode Labels</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+@page { size: A4; margin: 10mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
+.barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.barcode-item { border: 1px solid #ddd; padding: 5px; text-align: center; page-break-inside: avoid; }
+.barcode-price { font-size: 18px; font-weight: bold; color: #000; margin-bottom: 0; }
+.barcode-svg { display: block; margin: 0 auto; }
+.barcode-number { font-size: 14px; font-family: monospace; color: #333; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+<div class="barcode-grid">
+${barcodeData.map((b, i) => `<div class="barcode-item">
+  <div class="barcode-price">৳${b.price}</div>
+  <svg id="bc${i}" class="barcode-svg"></svg>
+  <div class="barcode-number">${escapeJS(b.value)}</div>
+</div>`).join('')}
+</div>
+<script>
+  window.onload = function() {
+    var data = [${jsArray}];
+    data.forEach(function(item, idx) {
+      try {
+        JsBarcode("#bc" + idx, item.value, {
+          format: "CODE128",
+          width: 2,
+          height: 50,
+          displayValue: false,
+          margin: 5
+        });
+      } catch(e) {
+        try {
+          JsBarcode("#bc" + idx, item.value.replace(/[^a-zA-Z0-9]/g, 'X'), {
+            format: "CODE128",
+            width: 2,
+            height: 50,
+            displayValue: false,
+            margin: 5
+          });
+        } catch(e2) {}
+      }
+    });
+    setTimeout(function() { window.print(); }, 300);
+  };
+</script>
+</body></html>`;
+    
+    const win = window.open('', '', 'width=900,height=700');
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
   };
   
   // Update count for a product
@@ -1826,11 +1927,14 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
           <input 
             value={purchaseId} 
             onChange={e=>setPurchaseId(e.target.value)}
-            placeholder="পারচেজ আইডি লিখুন (যেমন: PO-12345678)"
+            placeholder="পারচেজ আইডি বা বারকোড নম্বর দিন..."
             style={{...input,flex:1,padding:'10px 12px'}}
             onKeyDown={e=>{if(e.key==='Enter')findPurchase();}}
           />
           <button onClick={findPurchase} style={{...btn('primary'),padding:'10px 20px'}}>🔍 খুঁজুন</button>
+        </div>
+        <div style={{fontSize:11,color:T.gray400,marginTop:6}}>
+          💡 পারচেজ আইডি (PO-12345678) বা বারকোড নম্বর দিয়ে সার্চ করুন
         </div>
         
         {/* Recent Purchases */}
@@ -1978,11 +2082,57 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
             })}
           </div>
         </div>
+      ) : barcodeSearchResult ? (
+        <div style={{flex:1,overflow:'auto',padding:16}}>
+          <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <div>
+              <div style={{fontWeight:700,color:T.teal}}>🔍 বারকোড সার্চ রেজাল্ট</div>
+              <div style={{fontSize:12,color:T.gray500}}>{barcodeSearchResult.length}টি পণ্য পাওয়া গেছে</div>
+            </div>
+            <button onClick={()=>{setBarcodeSearchResult(null);setPurchaseId('');}} style={{...btn(),padding:'8px 16px'}}>✕ বন্ধ করুন</button>
+          </div>
+          
+          <div style={{display:'flex',flexDirection:'column',gap:10}}>
+            {barcodeSearchResult.map((item, idx) => (
+              <div key={idx} style={{
+                padding:16,background:T.white,borderRadius:10,
+                border:`1px solid ${T.teal}`,display:'flex',alignItems:'center',gap:12
+              }}>
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:15,marginBottom:4}}>{item.name}</div>
+                  <div style={{fontSize:12,color:T.gray500}}>
+                    বারকোড: <span style={{fontFamily:'monospace',color:T.teal,fontWeight:600}}>{item.barcode || item.id}</span>
+                  </div>
+                  <div style={{fontSize:11,color:T.gray400,marginTop:4}}>
+                    মূল্য: ৳{item.sellP || 0} | কোম্পানি: {item.company || '-'} | পারচেজ: {item.purchaseId}
+                  </div>
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:8,alignItems:'center'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:6}}>
+                    <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
+                    <input 
+                      type="number" 
+                      min="1"
+                      defaultValue={1}
+                      id={`bc-count-${idx}`}
+                      style={{...input,width:60,textAlign:'center',padding:'6px'}}
+                    />
+                  </div>
+                  <button onClick={()=>{
+                    const countInput = document.getElementById(`bc-count-${idx}`);
+                    const count = parseInt(countInput?.value) || 1;
+                    printSingleBarcode(item, count);
+                  }} style={{...btn('primary'),padding:'8px 16px'}}>🖨️ প্রিন্ট করুন</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       ) : (
         <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray400}}>
           <div style={{textAlign:'center'}}>
             <div style={{fontSize:48,marginBottom:12}}>📊</div>
-            <div>পারচেজ আইডি দিন বা উপরের তালিকা থেকে সিলেক্ট করুন</div>
+            <div>পারচেজ আইডি বা বারকোড নম্বর দিন</div>
           </div>
         </div>
       )}
