@@ -2924,9 +2924,44 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                   <label style={label}>📦 পণ্যের নাম *</label>
                   <input value={productForm.name||''} onChange={e=>setProductForm(f=>({...f,name:e.target.value}))} placeholder="পণ্যের নাম" style={input} />
                 </div>
-                <div style={{marginBottom:16}}>
+                <div style={{marginBottom:12}}>
                   <label style={label}>🔢 বারকোড</label>
                   <input value={productForm.barcode||''} onChange={e=>setProductForm(f=>({...f,barcode:e.target.value}))} placeholder="বারকোড নম্বর" style={input} />
+                </div>
+                {/* New Fields */}
+                <div style={{marginBottom:12}}>
+                  <label style={label}>📥 একক *</label>
+                  <select value={productForm.unit||'পিস'} onChange={e=>setProductForm(f=>({...f,unit:e.target.value}))} style={{...input,appearance:'none',cursor:'pointer'}}>
+                    <option value="পিস">পিস</option>
+                    <option value="কেজি">কেজি</option>
+                    <option value="লিটার">লিটার</option>
+                    <option value="বাক্স">বাক্স</option>
+                    <option value="গ্রাম">গ্রাম</option>
+                    <option value="মিটার">মিটার</option>
+                    <option value="ডজন">ডজন</option>
+                    <option value="বোতল">বোতল</option>
+                    <option value="সেট">সেট</option>
+                  </select>
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
+                  <div>
+                    <label style={label}>📥 স্টক</label>
+                    <input type="number" value={productForm.stock||''} onChange={e=>setProductForm(f=>({...f,stock:e.target.value}))} placeholder="0" style={input} />
+                  </div>
+                  <div>
+                    <label style={label}>⚠️ মিন স্টক</label>
+                    <input type="number" value={productForm.minStock||5} onChange={e=>setProductForm(f=>({...f,minStock:e.target.value}))} placeholder="5" style={input} />
+                  </div>
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
+                  <div>
+                    <label style={label}>💰 ক্রয়মূল্য</label>
+                    <input type="number" value={productForm.buyP||''} onChange={e=>setProductForm(f=>({...f,buyP:e.target.value}))} placeholder="0" style={input} />
+                  </div>
+                  <div>
+                    <label style={label}>💵 বিক্রয়মূল্য</label>
+                    <input type="number" value={productForm.sellP||''} onChange={e=>setProductForm(f=>({...f,sellP:e.target.value}))} placeholder="0" style={input} />
+                  </div>
                 </div>
                 <div style={{display:'flex',gap:8}}>
                   <button onClick={()=>setModal(null)} style={{...btn(),flex:1}}>বাতিল</button>
