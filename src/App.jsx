@@ -382,11 +382,41 @@ export default function App() {
    POS SCREEN
 ═══════════════════════════════════════════ */
 function POSScreen({products, customers, sales, settings, categories, upd}) {
-  const [cart, setCart] = useState([]);
+  // Initialize cart from localStorage
+  const [cart, setCart] = useState(() => {
+    try {
+      const saved = localStorage.getItem('pos_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('pos_cart', JSON.stringify(cart));
+  }, [cart]);
+  
+  // Save selected customer
+  const [selCust, setSelCust] = useState(() => {
+    try {
+      const saved = localStorage.getItem('pos_selCust');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+  
+  const [custQ, setCustQ] = useState(() => {
+    try {
+      const saved = localStorage.getItem('pos_selCust');
+      const c = saved ? JSON.parse(saved) : null;
+      return c ? c.name : '';
+    } catch { return ''; }
+  });
+  
+  useEffect(() => {
+    localStorage.setItem('pos_selCust', JSON.stringify(selCust));
+  }, [selCust]);
+  
   const [search, setSearch] = useState('');
   const searchRef = useRef();
-  const [selCust, setSelCust] = useState(null);
-  const [custQ, setCustQ] = useState('');
   const [showCustDrop, setShowCustDrop] = useState(false);
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState(settings.vatPercent || 15);
