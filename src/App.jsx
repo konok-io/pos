@@ -308,7 +308,7 @@ export default function App() {
       <GlobalStyle />
       <div style={{display:'flex',flexDirection:'column',height:'100vh',width:'100%',background:T.gray50,fontFamily:'BanglaFont, "Segoe UI", system-ui, sans-serif',color:T.gray900,overflow:'hidden'}}>
       {/* Header - Modern Minimal Design */}
-      <div style={{background:T.white,padding:'0 24px',flexShrink:0,boxShadow:'0 4px 20px rgba(0,0,0,0.08)'}}>
+      <div style={{background:T.white,padding:'0 24px',flexShrink:0,boxShadow:'0 4px 20px rgba(0,0,0,0.08)',borderBottom:`2px solid ${T.teal}`}}>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',height:64}}>
           {/* Logo Section */}
           <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0}}>
