@@ -3073,9 +3073,21 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
   const [form, setForm] = useState({name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5'});
   const [csvData, setCsvData] = useState([]);
 
-  const card = {background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`};
-  const input = {width:'100%',padding:'10px 12px',border:`1px solid ${T.gray300}`,borderRadius:8,fontSize:13,outline:'none',boxSizing:'border-box'};
-  const label = {display:'block',marginBottom:6,fontWeight:600,fontSize:13,color:T.gray700};
+  const card = {background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`,boxShadow:'0 2px 8px rgba(0,0,0,0.04)'};
+  const input = {
+    width:'100%',padding:'10px 12px',
+    border:`1.5px solid ${T.gray200}`,
+    borderRadius:8,fontSize:13,outline:'none',boxSizing:'border-box',
+    background:T.gray50,
+    transition:'all 0.2s ease',
+    color:T.gray800
+  };
+  const inputFocus = {
+    borderColor:T.teal,
+    background:T.white,
+    boxShadow:'0 0 0 3px rgba(0,150,136,0.1)'
+  };
+  const label = {display:'block',marginBottom:6,fontWeight:600,fontSize:13,color:T.gray600};
   const btn = (type='ghost',size='md') => {
     const base = {border:'none',borderRadius:8,cursor:'pointer',fontWeight:600,fontSize:size==='sm'?11:13,transition:'all 0.2s'};
     const colors = {
@@ -3318,70 +3330,82 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
             )}
           </div>
           
-          <div style={{...card,padding:16}}>
-            <h3 style={{margin:'0 0 16px',fontSize:14,color:T.teal}}>পণ্য যোগ করুন</h3>
+          <div style={{...card,padding:20}}>
+            <h3 style={{margin:'0 0 20px',fontSize:16,color:T.teal,fontWeight:700}}>পণ্য যোগ করুন</h3>
             
             {/* Company */}
-            <div style={{marginBottom:12, position:'relative'}}>
+            <div style={{marginBottom:16, position:'relative'}}>
               <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
-              <div style={{display:'flex',gap:4}}>
+              <div style={{display:'flex',gap:8}}>
                 <input 
                   value={supplierQ} 
                   onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));setShowCompanyList(true);}}
                   onFocus={()=>setShowCompanyList(true)}
-                  placeholder="কোম্পানির নাম..."
-                  style={{...input,flex:1}} />
+                  placeholder="কোম্পানির নাম লিখুন..."
+                  style={{...input,flex:1}} 
+                  onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
                 <button type="button" onClick={()=>setShowCompanyList(!showCompanyList)} style={{...btn('ghost'),padding:'6px 12px'}}>▼</button>
               </div>
               {showCompanyList && (
                 <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                   {filteredCompanies.map((c,i)=>(
                     <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowCompanyList(false);}}
-                      style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>{c}</div>
+                      style={{padding:'10px 14px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>{c}</div>
                   ))}
                 </div>
               )}
             </div>
 
             {/* Category */}
-            <div style={{marginBottom:12, position:'relative'}}>
+            <div style={{marginBottom:16, position:'relative'}}>
               <label style={label}>📂 ক্যাটাগরি</label>
-              <div style={{display:'flex',gap:4}}>
+              <div style={{display:'flex',gap:8}}>
                 <input 
                   value={form.cat} 
                   onChange={e=>{setForm(f=>({...f,cat:e.target.value}));setShowCategoryList(true);}}
                   onFocus={()=>setShowCategoryList(true)}
-                  placeholder="ক্যাটাগরি..."
-                  style={{...input,flex:1}} />
+                  placeholder="ক্যাটাগরি নির্বাচন করুন..."
+                  style={{...input,flex:1}} 
+                  onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
                 <button type="button" onClick={()=>setShowCategoryList(!showCategoryList)} style={{...btn('ghost'),padding:'6px 12px'}}>▼</button>
               </div>
               {showCategoryList && (
                 <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                   {filteredCategories.map((c,i)=>(
                     <div key={i} onClick={()=>{setForm(f=>({...f,cat:c}));setShowCategoryList(false);}}
-                      style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>{c}</div>
+                      style={{padding:'10px 14px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>{c}</div>
                   ))}
                 </div>
               )}
             </div>
 
             {/* Product Name */}
-            <div style={{marginBottom:12}}>
+            <div style={{marginBottom:16}}>
               <label style={label}>📦 পণ্যের নাম *</label>
-              <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="পণ্যের নাম" style={input} />
+              <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="পণ্যের নাম লিখুন" 
+                style={input} 
+                onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
             </div>
 
             {/* Barcode */}
-            <div style={{marginBottom:12}}>
+            <div style={{marginBottom:16}}>
               <label style={label}>🔢 বারকোড</label>
-              <input value={barcodeVal} onChange={e=>{setBarcodeVal(e.target.value);setForm(f=>({...f,barcode:e.target.value}))}} placeholder="বারকোড" style={input} />
+              <input value={barcodeVal} onChange={e=>{setBarcodeVal(e.target.value);setForm(f=>({...f,barcode:e.target.value}))}} placeholder="বারকোড নম্বর" 
+                style={input} 
+                onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
             </div>
 
             {/* Unit & Stock */}
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
               <div>
                 <label style={label}>📥 একক</label>
-                <select value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} style={{...input,appearance:'none',cursor:'pointer'}}>
+                <select value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} style={{...input,appearance:'none',cursor:'pointer',backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 12px center',paddingRight:36}}
+                  onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})}>
                   <option value="পিস">পিস</option>
                   <option value="কেজি">কেজি</option>
                   <option value="লিটার">লিটার</option>
@@ -3395,30 +3419,42 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
               </div>
               <div>
                 <label style={label}>📥 স্টক</label>
-                <input type="number" value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} placeholder="0" style={input} />
+                <input type="number" value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} placeholder="0" 
+                  style={input} 
+                  onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
               </div>
             </div>
 
             {/* Prices */}
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
               <div>
                 <label style={label}>💰 ক্রয়মূল্য</label>
-                <input type="number" value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} placeholder="0" style={input} />
+                <input type="number" value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} placeholder="0" 
+                  style={input} 
+                  onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
               </div>
               <div>
                 <label style={label}>💵 বিক্রয়মূল্য</label>
-                <input type="number" value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} placeholder="0" style={input} />
+                <input type="number" value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} placeholder="0" 
+                  style={input} 
+                  onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
               </div>
             </div>
 
             {/* Min Stock */}
-            <div style={{marginBottom:16}}>
+            <div style={{marginBottom:20}}>
               <label style={label}>⚠️ মিন স্টক</label>
-              <input type="number" value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} placeholder="5" style={input} />
+              <input type="number" value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} placeholder="5" 
+                style={input} 
+                onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
             </div>
 
             {/* Add Button */}
-            <button onClick={addItem} style={{...btn('primary'),width:'100%',padding:'12px'}}>
+            <button onClick={addItem} style={{...btn('primary'),width:'100%',padding:'14px',fontSize:14,borderRadius:10}}>
               ➕ পণ্য তালিকায় যোগ করুন
             </button>
           </div>
