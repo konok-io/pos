@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import JsBarcode from "jsbarcode";
 
 /* ─────────────── GLOBAL CSS RESET ─────────────── */
 const GlobalStyle = () => {
@@ -1728,40 +1729,76 @@ function BarcodeScreen({purchases, products}) {
   const printBarcodes = () => {
     if (!selectedPurchase) return;
 
+    // Build data for barcodes
+    const barcodeData = [];
+    selectedPurchase.items.forEach((item, idx) => {
+      const count = barcodeCounts[idx] || 0;
+      const barcodeValue = item.barcode || item.id;
+      for (let i = 0; i < count; i++) {
+        barcodeData.push({ value: barcodeValue, price: item.sellP || 0 });
+      }
+    });
+
     let html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Barcode Labels</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <style>
 @page { size: A4; margin: 10mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
 .barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
 .barcode-item { border: 1px solid #ddd; padding: 5px; text-align: center; page-break-inside: avoid; }
-.barcode-price { font-size: 13px; font-weight: bold; color: #000; margin-bottom: 2px; }
+.barcode-price { font-size: 13px; font-weight: bold; color: #000; margin-bottom: 3px; }
+.barcode-svg { display: block; margin: 0 auto; }
+.barcode-number { font-size: 10px; font-family: monospace; color: #333; margin-top: 2px; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
 <div class="barcode-grid">`;
 
-    selectedPurchase.items.forEach((item, idx) => {
-      const count = barcodeCounts[idx] || 0;
-      for (let i = 0; i < count; i++) {
-        html += `<div class="barcode-item">
-  <div class="barcode-price">৳${item.sellP || 0}</div>
+    barcodeData.forEach((item, idx) => {
+      html += `<div class="barcode-item">
+  <div class="barcode-price">৳${item.price}</div>
+  <svg id="bc${idx}" class="barcode-svg"></svg>
+  <div class="barcode-number">${item.value}</div>
 </div>`;
-      }
     });
 
-    html += `</div></body></html>`;
+    html += `</div>
+<script>
+  barcodeData.forEach(function(item, idx) {
+    try {
+      JsBarcode("#bc" + idx, item.value, {
+        format: "CODE128",
+        width: 2,
+        height: 50,
+        displayValue: false,
+        margin: 5
+      });
+    } catch(e) {
+      try {
+        JsBarcode("#bc" + idx, item.value.replace(/[^a-zA-Z0-9]/g, 'X'), {
+          format: "CODE128",
+          width: 2,
+          height: 50,
+          displayValue: false,
+          margin: 5
+        });
+      } catch(e2) {}
+    }
+  });
+</script>
+</body></html>`;
 
     // A4 print - window.open for preview and printer selection
     const win = window.open('', '', 'width=900,height=700');
     win.document.open();
     win.document.write(html);
     win.document.close();
-    win.onload = function() { setTimeout(() => win.print(), 100); };
+    win.onload = function() { setTimeout(() => win.print(), 500); };
   };
 
   
@@ -1840,23 +1877,49 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                   />
                   <button onClick={()=>{
                     // Print single barcode (A4 size)
+                    const barcodeValue = item.barcode || item.id;
                     const html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Barcode</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <style>
 @page { size: A4; margin: 25mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; background: #fff; }
 .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
 .price { font-size: 28px; font-weight: bold; color: #000; margin-bottom: 10px; }
+.barcode-svg { display: block; margin: 0 auto; }
+.number { font-size: 14px; font-family: monospace; color: #333; margin-top: 5px; }
 </style>
 </head>
 <body>
 <div class="container">
 <div class="price">৳${item.sellP || 0}</div>
+<svg id="barcode" class="barcode-svg"></svg>
+<div class="number">${barcodeValue}</div>
 </div>
+<script>
+  try {
+    JsBarcode("#barcode", "${barcodeValue}", {
+      format: "CODE128",
+      width: 3,
+      height: 120,
+      displayValue: false,
+      margin: 10
+    });
+  } catch(e) {
+    // Fallback for invalid characters
+    JsBarcode("#barcode", "${barcodeValue}".replace(/[^a-zA-Z0-9]/g, 'X'), {
+      format: "CODE128",
+      width: 3,
+      height: 120,
+      displayValue: false,
+      margin: 10
+    });
+  }
+</script>
 </body>
 </html>`;
                     // A4 print - window.open for preview and printer selection
@@ -1864,7 +1927,7 @@ body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; backgr
                     win.document.open();
                     win.document.write(html);
                     win.document.close();
-                    win.onload = function() { setTimeout(() => win.print(), 100); };
+                    win.onload = function() { setTimeout(() => win.print(), 500); };
                   }} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️</button>
                 </div>
               </div>
