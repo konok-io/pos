@@ -171,13 +171,13 @@ function DynamicMenu({tab, setTab, tabs}) {
             }}>
             <span style={{fontSize:14}}>📋</span>
             <span>আরও</span>
-            <span style={{fontSize:10,transform: showMoreMenu ? 'rotate(180deg)' : 'rotate(0deg)', transition:'transform 0.2s'}}>▼</span>
+            <span style={{fontSize:10,transform: showMoreMenu ? 'rotate(0deg)' : 'rotate(180deg)', transition:'transform 0.2s'}}>▼</span>
           </button>
           
-          {/* Dropdown Menu */}
+          {/* Dropdown Menu - Opens UPWARD */}
           {showMoreMenu && (
             <div style={{
-              position:'absolute', top:'100%', right:0, marginTop:4,
+              position:'absolute', bottom:'100%', right:0, marginBottom:4,
               background:T.white, borderRadius:10, padding:6,
               boxShadow:'0 8px 24px rgba(0,0,0,0.15)', border:`1px solid ${T.gray200}`,
               zIndex:100, minWidth:160,
