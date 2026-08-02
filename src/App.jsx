@@ -1009,8 +1009,16 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
   const [csvData, setCsvData] = useState([]);
   const [stockFilter, setStockFilter] = useState('স্টক আছে'); // স্টক আছে, স্টক শেষ
+  const [loading, setLoading] = useState(true);
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
+
+  // Loading effect
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, [products]);
 
 
   // Handle CSV Import
@@ -1722,50 +1730,61 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
       </div>
 
       <div style={{flex:1,overflow:'auto',padding:12}}>
-        <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
-          <thead>
-            <tr style={{background:T.tealLight}}>
-              {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','স্টক','একক',''].map((h,i)=>(
-                <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.length===0 ? (
-              <tr><td colSpan={10} style={{padding:40,textAlign:'center',color:T.gray400}}>পণ্য পাওয়া যায়নি</td></tr>
-            ) : filtered.map((p,i)=>{
-              const profitPct = p.buyP>0 ? Math.round((p.sellP-p.buyP)/p.buyP*100) : 0;
-              const isLowStock = p.stock <= p.minStock;
-              const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'';
-              return (
-                <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                  <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
-                  <td style={{padding:'10px 12px'}}>
-                    <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
-                    {p.barcode && <div style={{fontSize:11,color:T.gray400,fontFamily:'monospace'}}>{p.barcode}</div>}
-                  </td>
-                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
-                  <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
-                  <td style={{padding:'10px 12px',fontSize:13}}>{fmt(p.buyP)}</td>
-                  <td style={{padding:'10px 12px',fontWeight:700,fontSize:14}}>{fmt(p.sellP)}</td>
-                  <td style={{padding:'10px 12px'}}>
-                    <span style={{fontSize:12,fontWeight:600,color:profitPct>0?T.green:T.red}}>
-                      {fmt(p.sellP-p.buyP)} ({profitPct}%)
-                    </span>
-                  </td>
-                  <td style={{padding:'10px 12px'}}>
-                    <span style={{fontWeight:700,fontSize:15,color:isLowStock?T.red:T.gray900}}>{fmtN(p.stock)}</span>
-                    {isLowStock && <span style={{fontSize:10,color:T.red,marginLeft:4}}>⚠️ কম</span>}
-                  </td>
-                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
-                  <td style={{padding:'10px 12px'}}>
-                    <button style={btn('danger','sm')} onClick={()=>del(p.id)}>🗑️</button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        {loading ? (
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 20px',gap:16}}>
+            <div style={{
+              width:48,height:48,border:'4px solid #E0E0E0',borderTop:'4px solid #00897b',
+              borderRadius:'50%',animation:'spin 1s linear infinite'
+            }}></div>
+            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+            <div style={{fontSize:14,color:T.gray500}}>পণ্যের তালিকা লোড হচ্ছে...</div>
+          </div>
+        ) : (
+          <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
+            <thead>
+              <tr style={{background:T.tealLight}}>
+                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','স্টক','একক',''].map((h,i)=>(
+                  <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length===0 ? (
+                <tr><td colSpan={10} style={{padding:40,textAlign:'center',color:T.gray400}}>পণ্য পাওয়া যায়নি</td></tr>
+              ) : filtered.map((p,i)=>{
+                const profitPct = p.buyP>0 ? Math.round((p.sellP-p.buyP)/p.buyP*100) : 0;
+                const isLowStock = p.stock <= p.minStock;
+                const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'';
+                return (
+                  <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                    <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
+                    <td style={{padding:'10px 12px'}}>
+                      <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
+                      {p.barcode && <div style={{fontSize:11,color:T.gray400,fontFamily:'monospace'}}>{p.barcode}</div>}
+                    </td>
+                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:13}}>{fmt(p.buyP)}</td>
+                    <td style={{padding:'10px 12px',fontWeight:700,fontSize:14}}>{fmt(p.sellP)}</td>
+                    <td style={{padding:'10px 12px'}}>
+                      <span style={{fontSize:12,fontWeight:600,color:profitPct>0?T.green:T.red}}>
+                        {fmt(p.sellP-p.buyP)} ({profitPct}%)
+                      </span>
+                    </td>
+                    <td style={{padding:'10px 12px'}}>
+                      <span style={{fontWeight:700,fontSize:15,color:isLowStock?T.red:T.gray900}}>{fmtN(p.stock)}</span>
+                      {isLowStock && <span style={{fontSize:10,color:T.red,marginLeft:4}}>⚠️ কম</span>}
+                    </td>
+                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
+                    <td style={{padding:'10px 12px'}}>
+                      <button style={btn('danger','sm')} onClick={()=>del(p.id)}>🗑️</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
@@ -3653,6 +3672,14 @@ function InventoryScreen({products, suppliers, upd}) {
   const [adjQty, setAdjQty] = useState('');
   const [adjType, setAdjType] = useState('add');
   const [adjNote, setAdjNote] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  // Loading effect
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, [products]);
 
   const realProducts = products.filter(p=>!p.name?.includes('(ক্যাটাগরি)'));
   const filtered = realProducts
@@ -3703,41 +3730,52 @@ function InventoryScreen({products, suppliers, upd}) {
       )}
 
       <div style={{flex:1,overflow:'auto',padding:12}}>
-        <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
-          <thead>
-            <tr style={{background:T.tealLight}}>
-              {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
-                <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((p,i)=>{
-              const st = p.stock<=0?'out':p.stock<=p.minStock?'low':'ok';
-              const stColor = {out:T.red,low:T.amber,ok:T.green}[st];
-              const stLabel = {out:'শেষ',low:'কম',ok:'পর্যাপ্ত'}[st];
-              const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'';
-              return (
-                <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                  <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
-                  <td style={{padding:'10px 12px',fontWeight:600}}>{p.name}</td>
-                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
-                  <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
-                  <td style={{padding:'10px 12px',fontWeight:800,fontSize:18,color:stColor}}>{fmtN(p.stock)}</td>
-                  <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
-                  <td style={{padding:'10px 12px',fontSize:13}}>{p.minStock}</td>
-                  <td style={{padding:'10px 12px',fontSize:13,fontWeight:600}}>{fmt(p.sellP*p.stock)}</td>
-                  <td style={{padding:'10px 12px'}}>
-                    <span style={{padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:700,background:stColor+'20',color:stColor}}>{stLabel}</span>
-                  </td>
-                  <td style={{padding:'10px 12px'}}>
-                    <button style={btn('primary','sm')} onClick={()=>{setModal(p);setAdjType('add');setAdjQty('');setAdjNote('');}}>+ স্টক</button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        {loading ? (
+          <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 20px',gap:16}}>
+            <div style={{
+              width:48,height:48,border:'4px solid #E0E0E0',borderTop:'4px solid #00897b',
+              borderRadius:'50%',animation:'spin 1s linear infinite'
+            }}></div>
+            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+            <div style={{fontSize:14,color:T.gray500}}>স্টক তালিকা লোড হচ্ছে...</div>
+          </div>
+        ) : (
+          <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
+            <thead>
+              <tr style={{background:T.tealLight}}>
+                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
+                  <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((p,i)=>{
+                const st = p.stock<=0?'out':p.stock<=p.minStock?'low':'ok';
+                const stColor = {out:T.red,low:T.amber,ok:T.green}[st];
+                const stLabel = {out:'শেষ',low:'কম',ok:'পর্যাপ্ত'}[st];
+                const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'';
+                return (
+                  <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                    <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
+                    <td style={{padding:'10px 12px',fontWeight:600}}>{p.name}</td>
+                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
+                    <td style={{padding:'10px 12px',fontWeight:800,fontSize:18,color:stColor}}>{fmtN(p.stock)}</td>
+                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
+                    <td style={{padding:'10px 12px',fontSize:13}}>{p.minStock}</td>
+                    <td style={{padding:'10px 12px',fontSize:13,fontWeight:600}}>{fmt(p.sellP*p.stock)}</td>
+                    <td style={{padding:'10px 12px'}}>
+                      <span style={{padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:700,background:stColor+'20',color:stColor}}>{stLabel}</span>
+                    </td>
+                    <td style={{padding:'10px 12px'}}>
+                      <button style={btn('primary','sm')} onClick={()=>{setModal(p);setAdjType('add');setAdjQty('');setAdjNote('');}}>+ স্টক</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {modal && (
