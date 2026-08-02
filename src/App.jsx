@@ -119,7 +119,7 @@ function DynamicMenu({tab, setTab, tabs}) {
     const isActive = tab === t.id;
     return (
       <button key={t.id} onClick={() => setTab(t.id)} style={{
-        padding: '8px 14px',
+        padding: '6px 10px',
         border: 'none',
         background: isActive 
           ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' 
@@ -127,15 +127,15 @@ function DynamicMenu({tab, setTab, tabs}) {
         cursor: 'pointer',
         color: isActive ? T.white : T.gray600,
         fontWeight: isActive ? 600 : 500,
-        fontSize: 13,
+        fontSize: 12,
         display: 'flex', 
         alignItems: 'center', 
-        gap: 8,
+        gap: 6,
         whiteSpace: 'nowrap', 
         fontFamily: 'inherit',
         transition: 'all 0.2s',
-        borderRadius: 8,
-        boxShadow: isActive ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
+        borderRadius: 6,
+        boxShadow: isActive ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
       }}
       onMouseOver={(e) => {
         if (!isActive) {
@@ -174,7 +174,7 @@ function DynamicMenu({tab, setTab, tabs}) {
         <div key={group.id} style={{ display: 'flex', gap: 2 }}>
           {group.items.map(t => renderMenuButton(t))}
           {groupIdx < menuGroups.length - 1 && (
-            <div style={{ width: 1, background: T.gray200, margin: '8px 6px', borderRadius: 2, alignSelf: 'center', height: 24 }} />
+            <div style={{ width: 1, background: T.gray200, margin: '6px 4px', borderRadius: 2, alignSelf: 'center', height: 20 }} />
           )}
         </div>
       ))}
