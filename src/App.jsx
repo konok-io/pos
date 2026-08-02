@@ -515,17 +515,35 @@ export default function App() {
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, upd};
 
-  // Hard refresh function - saves current tab and forces reload from server
+  // Refresh data from localStorage without reloading page
   const handleHardRefresh = () => {
-    localStorage.setItem('pos_current_tab', tab);
-    // Save fullscreen state to restore after reload
-    if (document.fullscreenElement) {
-      localStorage.setItem('pos_want_fullscreen', 'true');
+    const wasReset = db.get('pos_reset_done');
+    
+    const savedProducts = db.get(STORAGE_KEYS.products);
+    const savedCustomers = db.get(STORAGE_KEYS.customers);
+    const savedSales = db.get(STORAGE_KEYS.sales);
+    const savedSettings = db.get(STORAGE_KEYS.settings);
+    const savedSuppliers = db.get(STORAGE_KEYS.suppliers) || [];
+    const savedPurchases = db.get(STORAGE_KEYS.purchases) || [];
+    const savedCategories = db.get(STORAGE_KEYS.categories) || [];
+
+    if (wasReset) {
+      setProducts(savedProducts || []);
+      setCustomers(savedCustomers || []);
+      setCategories(savedCategories);
+      setSuppliers(savedSuppliers);
+      setSales(savedSales || []);
+      setPurchases(savedPurchases);
+      setSettings(savedSettings ? {...{name:'',address:'',phone:'',vatEnabled:true,vatPercent:15}, ...savedSettings} : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+    } else {
+      setProducts(savedProducts || DEMO.products);
+      setCustomers(savedCustomers || DEMO.customers);
+      setSales(savedSales || []);
+      setSuppliers(savedSuppliers);
+      setPurchases(savedPurchases);
+      setCategories(savedCategories);
+      setSettings(savedSettings ? {...{name:'',address:'',phone:'',vatEnabled:true,vatPercent:15}, ...savedSettings} : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
     }
-    // Small delay to ensure localStorage is saved before reload
-    setTimeout(() => {
-      window.location.reload(true);
-    }, 10);
   };
 
   // Fullscreen toggle function
