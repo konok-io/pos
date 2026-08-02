@@ -888,9 +888,9 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               </div>
             </div>
           ) : (
-            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'60px 20px',background:T.white,borderRadius:12}}>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'16px',background:T.white,borderRadius:12,overflow:'hidden'}}>
               {settings.bannerImage ? (
-                <img src={settings.bannerImage} alt="Welcome" style={{maxWidth:'100%',maxHeight:'calc(100vh - 300px)',objectFit:'contain',borderRadius:12,boxShadow:'0 4px 20px rgba(0,0,0,0.1)'}}/>
+                <img src={settings.bannerImage} alt="Welcome" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:12,boxShadow:'0 4px 20px rgba(0,0,0,0.1)'}}/>
               ) : (
                 <>
                   <div style={{fontSize:48,marginBottom:12}}>🔍</div>
