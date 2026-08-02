@@ -390,7 +390,7 @@ export default function App() {
 
       {/* Content */}
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
-        {tab==='pos'       && <POSPage {...props} posSearch={posSearch} setPosSearch={setPosSearch} />}
+        {tab==='pos'       && <POSScreen {...props} posSearch={posSearch} setPosSearch={setPosSearch} />}
         {tab==='products'  && <ProductsScreen {...props} />}
         {tab==='newproduct' && <NewProductScreen {...props} />}
         {tab==='barcode'   && <BarcodeScreen {...props} />}
@@ -403,19 +403,6 @@ export default function App() {
       </div>
     </div>
     </>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   POS PAGE (wrapper for POSScreen)
-═══════════════════════════════════════════ */
-function POSPage({products, customers, sales, settings, categories, upd, posSearch, setPosSearch}) {
-  return (
-    <POSScreen 
-      {...{products, customers, sales, settings, categories, upd}}
-      posSearch={posSearch}
-      setPosSearch={setPosSearch}
-    />
   );
 }
 
