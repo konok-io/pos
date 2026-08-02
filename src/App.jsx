@@ -353,7 +353,7 @@ export default function App() {
             </button>
             
             {/* Fullscreen Button */}
-            <button onClick={toggleFullscreen} style={{width:34,height:34,borderRadius:8,border:'none',background: isFullscreen ? T.teal : '#f3f4f6',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,transition:'all 0.2s',color: isFullscreen ? 'white' : T.gray500}} title={isFullscreen?"ফুল স্ক্রিন বন্ধ":"ফুল স্ক্রিন"}>
+            <button onClick={toggleFullscreen} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background: isFullscreen ? T.white : T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color: T.gray500}} title={isFullscreen?"ফুল স্ক্রিন বন্ধ":"ফুল স্ক্রিন"}>
               {isFullscreen ? '✕' : '⛶'}
             </button>
           </div>
