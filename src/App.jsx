@@ -1727,15 +1727,20 @@ function BarcodeScreen({purchases, products}) {
     }
     
     const matchingItems = [];
+    const seenBarcodes = new Set();
     // Reverse purchases so newest comes first
     [...purchases].reverse().forEach(purchase => {
       purchase.items.forEach(item => {
         if (item.barcode === trimmedBarcode || (item.barcode && item.barcode.toLowerCase().includes(trimmedBarcode.toLowerCase()))) {
-          matchingItems.push({
-            ...item,
-            purchaseId: purchase.id,
-            purchaseDate: purchase.date
-          });
+          // Only add if not already seen (deduplicate by barcode)
+          if (!seenBarcodes.has(item.barcode)) {
+            seenBarcodes.add(item.barcode);
+            matchingItems.push({
+              ...item,
+              purchaseId: purchase.id,
+              purchaseDate: purchase.date
+            });
+          }
         }
       });
     });
