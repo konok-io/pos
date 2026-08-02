@@ -1886,9 +1886,9 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                   <input 
                     type="number" 
                     min="0"
-                    value={barcodeCounts[idx] || 1}
+                    value={barcodeCounts[idx] !== undefined ? barcodeCounts[idx] : 1}
                     onChange={e=>updateCount(idx, e.target.value)}
-                    style={{...input,width:60,textAlign:'center',padding:'6px', borderColor: (barcodeCounts[idx] || 1) === 0 ? T.red : undefined }}
+                    style={{...input,width:60,textAlign:'center',padding:'6px', borderColor: barcodeCounts[idx] === 0 ? T.red : undefined }}
                   />
                   <button onClick={()=>updateCount(idx, 0)} style={{...btn('danger'),padding:'6px 10px',fontSize:12}} title="প্রিন্ট থেকে বাদ দিন">✕</button>
                   <button onClick={()=>{
