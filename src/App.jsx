@@ -2354,12 +2354,14 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [viewCategory, setViewCategory] = useState(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(null);
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('pos_suppliers_tab') || 'companies'); // companies, products, categories
-  const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:''});
+  const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:0,minStock:5});
   const [catForm, setCatForm] = useState({name:''});
   const [companyQ, setCompanyQ] = useState('');
   const [showCompanyDrop, setShowCompanyDrop] = useState(false);
   const [catQ, setCatQ] = useState('');
   const [showCatDrop, setShowCatDrop] = useState(false);
+  const [showCsvSection, setShowCsvSection] = useState(false);
+  const [csvImportResult, setCsvImportResult] = useState(null);
 
   // Save activeTab to localStorage when it changes
   useEffect(() => {
@@ -2540,6 +2542,245 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const del = async (id) => {
     if (!confirm('এই কোম্পানি মুছে ফেলবেন?')) return;
     await upd.suppliers(suppliers.filter(s => s.id !== id));
+  };
+
+  // CSV Import Handler for suppliers/products/categories
+  const handleSuppliersCsvImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target.result;
+        const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+        
+        if (lines.length < 2) {
+          alert('CSV ফাইলে কমপক্ষে হেডার ও একটি ডাটা থাকতে হবে');
+          return;
+        }
+        
+        // Parse CSV header
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        
+        // Parse data rows
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const values = [];
+          let current = '';
+          let inQuotes = false;
+          for (const char of lines[i]) {
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              values.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          values.push(current.trim());
+          
+          const row = {};
+          headers.forEach((h, idx) => {
+            row[h] = values[idx] || '';
+          });
+          rows.push(row);
+        }
+        
+        // Process data
+        let newCompanies = [...suppliers];
+        let newCategories = [...categories];
+        let newProducts = [...products];
+        const errors = [];
+        const successes = [];
+        
+        // Track for duplicate checking within CSV
+        const csvCompanies = new Set();
+        const csvCategories = new Set();
+        const csvProducts = []; // {company, barcode, name}
+        
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          const rowNum = i + 2;
+          
+          // Get company info
+          const csvCompanyCode = (row['কোম্পানি কোড'] || row['company code'] || row['কোম্পানি আইডি'] || '').trim();
+          const csvCompany = (row['কোম্পানি'] || row['company'] || row['কোম্পানির নাম'] || '').trim();
+          const csvPhone = (row['ফোন'] || row['phone'] || '').trim();
+          const csvAddress = (row['ঠিকানা'] || row['address'] || '').trim();
+          
+          // Get category info
+          const csvCategory = (row['ক্যাটাগরি'] || row['category'] || row['ক্যাটাগরির নাম'] || '').trim();
+          
+          // Get product info
+          const csvProduct = (row['পণ্য'] || row['product'] || row['পণ্যের নাম'] || '').trim();
+          const csvBarcode = (row['বারকোড'] || row['barcode'] || '').trim();
+          const csvUnit = (row['একক'] || row['unit'] || 'পিস').trim();
+          const csvBuyP = parseFloat(row['ক্রয়মূল্য'] || row['buy price'] || row['ক্রয়'] || 0) || 0;
+          const csvSellP = parseFloat(row['বিক্রয়মূল্য'] || row['sell price'] || row['বিক্রয়'] || 0) || 0;
+          const csvStock = parseFloat(row['স্টক'] || row['stock'] || 0) || 0;
+          const csvMinStock = parseFloat(row['মিন স্টক'] || row['min stock'] || row['মিনিমাম স্টক'] || 5) || 5;
+          
+          // Validate and add company
+          if (csvCompany) {
+            const companyExists = newCompanies.some(s => s.name.toLowerCase() === csvCompany.toLowerCase());
+            if (!companyExists) {
+              if (csvCompanies.has(csvCompany.toLowerCase())) {
+                errors.push(`সারি ${rowNum}: "${csvCompany}" কোম্পানি CSV-তে ডুপ্লিকেট`);
+              } else {
+                // Generate company code
+                const maxCode = newCompanies.reduce((max, s) => {
+                  const match = s.code?.match(/C-(\d+)/);
+                  return match ? Math.max(max, parseInt(match[1])) : max;
+                }, 0);
+                const newCode = csvCompanyCode || `C-${String(maxCode + 1).padStart(5, '0')}`;
+                
+                const newComp = {
+                  id: genId(),
+                  code: newCode,
+                  name: csvCompany,
+                  phone: csvPhone,
+                  address: csvAddress
+                };
+                newCompanies.push(newComp);
+                csvCompanies.add(csvCompany.toLowerCase());
+                successes.push(`🏢 কোম্পানি: ${csvCompany}`);
+              }
+            }
+          }
+          
+          // Validate and add category
+          if (csvCategory && csvCompany) {
+            const catExists = newCategories.some(c => c.name.toLowerCase() === csvCategory.toLowerCase());
+            if (!catExists) {
+              if (csvCategories.has(csvCategory.toLowerCase())) {
+                // Already added in this CSV, skip
+              } else {
+                const newCat = {
+                  id: genId(),
+                  name: csvCategory
+                };
+                newCategories.push(newCat);
+                csvCategories.add(csvCategory.toLowerCase());
+                successes.push(`📂 ক্যাটাগরি: ${csvCategory}`);
+              }
+            }
+          }
+          
+          // Validate and add product
+          if (csvProduct && csvCompany) {
+            // Check if company exists in final list
+            const companyExists = newCompanies.some(s => s.name.toLowerCase() === csvCompany.toLowerCase());
+            if (!companyExists) {
+              errors.push(`সারি ${rowNum}: "${csvCompany}" কোম্পানি পাওয়া যায়নি`);
+              continue;
+            }
+            
+            // Check category exists
+            const catExists = csvCategory ? newCategories.some(c => c.name.toLowerCase() === csvCategory.toLowerCase()) : true;
+            
+            // Check duplicate barcode in same company (within CSV)
+            if (csvBarcode) {
+              const duplicateInCsv = csvProducts.some(p => 
+                p.company.toLowerCase() === csvCompany.toLowerCase() && p.barcode === csvBarcode
+              );
+              if (duplicateInCsv) {
+                errors.push(`সারি ${rowNum}: "${csvProduct}" - বারকোড ${csvBarcode} এই কোম্পানিতে ডুপ্লিকেট`);
+                continue;
+              }
+              
+              // Check barcode exists in existing products (same company)
+              const barcodeExists = newProducts.some(p => 
+                p.company?.toLowerCase() === csvCompany.toLowerCase() && p.barcode === csvBarcode
+              );
+              if (barcodeExists) {
+                errors.push(`সারি ${rowNum}: বারকোড ${csvBarcode} "${csvCompany}" কোম্পানিতে ইতিমধ্যে আছে`);
+                continue;
+              }
+            }
+            
+            // Check duplicate product name in same company
+            const nameExists = newProducts.some(p => 
+              p.company?.toLowerCase() === csvCompany.toLowerCase() && 
+              p.name.toLowerCase() === csvProduct.toLowerCase()
+            );
+            if (nameExists) {
+              errors.push(`সারি ${rowNum}: "${csvProduct}" "${csvCompany}" কোম্পানিতে ইতিমধ্যে আছে`);
+              continue;
+            }
+            
+            // Generate product ID
+            const maxId = newProducts.reduce((max, p) => {
+              const match = p.id?.match(/P-(\d+)/);
+              return match ? Math.max(max, parseInt(match[1])) : max;
+            }, 50);
+            const newId = `P-${String(maxId + 1).padStart(5, '0')}`;
+            
+            const newProd = {
+              id: newId,
+              name: csvProduct,
+              barcode: csvBarcode,
+              company: csvCompany,
+              cat: csvCategory || '',
+              unit: csvUnit,
+              buyP: csvBuyP,
+              sellP: csvSellP,
+              stock: csvStock,
+              minStock: csvMinStock
+            };
+            newProducts.push(newProd);
+            csvProducts.push({company: csvCompany, barcode: csvBarcode, name: csvProduct});
+            successes.push(`📦 পণ্য: ${csvProduct}`);
+          }
+        }
+        
+        // Save all changes
+        await upd.suppliers(newCompanies);
+        await upd.categories(newCategories);
+        await upd.products(newProducts);
+        
+        // Show result
+        const result = {
+          companies: newCompanies.length - suppliers.length,
+          categories: newCategories.length - categories.length,
+          products: newProducts.length - products.length,
+          errors: errors.length,
+          errorList: errors
+        };
+        setCsvImportResult(result);
+        
+        let msg = `✅ আমদানি সম্পন্ন!\n\n`;
+        msg += `🏢 নতুন কোম্পানি: ${result.companies}টি\n`;
+        msg += `📂 নতুন ক্যাটাগরি: ${result.categories}টি\n`;
+        msg += `📦 নতুন পণ্য: ${result.products}টি\n`;
+        if (errors.length > 0) {
+          msg += `\n⚠️ ত্রুটি: ${errors.length}টি\n`;
+          msg += errors.slice(0, 5).join('\n');
+          if (errors.length > 5) msg += `\n... এবং আরও ${errors.length - 5}টি`;
+        }
+        alert(msg);
+        
+      } catch (err) {
+        alert('CSV পার্স করতে সমস্যা হয়েছে: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  // Download demo CSV
+  const downloadSuppliersCSV = () => {
+    const csv = `কোম্পানি কোড,কোম্পানি,ফোন,ঠিকানা,ক্যাটাগরি,পণ্য,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিন স্টক
+C-00001,মিনিকেট,01712345678,ঢাকা,খাদ্যপণ্য,মিনিকেট চাল 5kg,001,বস্তা,2500,2800,50,10
+C-00001,মিনিকেট,01712345678,ঢাকা,খাদ্যপণ্য,মিনিকেট চাল 10kg,002,বস্তা,4800,5200,30,5
+C-00002,সুজান,01812345678,চট্টগ্রাম,স্ন্যাকস,সুজি চিপস,003,পিস,20,25,200,50
+C-00002,সুজান,01812345678,চট্টগ্রাম,স্ন্যাকস,সুজি বিস্কুট,004,পিস,15,20,150,40`;
+    const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'সরবরাহকারী_পণ্য.csv';
+    a.click();
   };
 
   // Purchase history for supplier
@@ -2798,39 +3039,86 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
       {/* COMPANIES TAB */}
         {activeTab === 'companies' && (
-          <div style={{...card,overflow:'hidden',marginBottom:16}}>
-            <table style={{width:'100%',borderCollapse:'collapse',background:T.white}}>
-              <thead>
-                <tr style={{background:T.tealLight}}>
-                  {['কোম্পানি কোড','কোম্পানির নাম','ফোন','ঠিকানা','পণ্য সংখ্যা',''].map((h,i)=>(
-                    <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr><td colSpan={6} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
-                ) : filtered.map((s,i)=>(
-                  <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                    <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{s.code||'-'}</td>
-                    <td style={{padding:'10px 12px',fontWeight:600,fontSize:14}}>{s.name}</td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{s.phone||'-'}</td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{s.address||'-'}</td>
-                    <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{getProductsCount(s.name)}</td>
-                    <td style={{padding:'10px 12px',whiteSpace:'nowrap'}}>
-                      <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
-                      {!s.isAuto && (
-                        <>
-                          <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
-                          <button onClick={()=>del(s.id)} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
-                        </>
+          <>
+            {/* CSV Import Section */}
+            <div style={{...card,padding:16,marginBottom:16}}>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
+                <h3 style={{margin:0,fontSize:14,color:T.teal}}>📥 CSV আমদানি করুন</h3>
+                <button onClick={()=>setShowCsvSection(!showCsvSection)} style={{...btn(),fontSize:12,padding:'4px 8px'}}>
+                  {showCsvSection ? '🙈 লুকান' : '👁️ দেখান'}
+                </button>
+              </div>
+              {showCsvSection && (
+                <div>
+                  <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
+                  <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+                    <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:13,padding:'8px 16px'}}>
+                      📁 CSV আপলোড করুন
+                    </label>
+                    <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:13,padding:'8px 16px'}}>
+                      📥 ডেমো CSV ডাউনলোড
+                    </button>
+                  </div>
+                  <div style={{marginTop:12,fontSize:11,color:T.gray500,lineHeight:1.6}}>
+                    <div style={{fontWeight:600,marginBottom:4}}>CSV কলাম:</div>
+                    <code style={{background:T.gray50,padding:'2px 6px',borderRadius:4,display:'inline-block',marginBottom:4}}>
+                      কোম্পানি কোড, কোম্পানি, ফোন, ঠিকানা, ক্যাটাগরি, পণ্য, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিন স্টক
+                    </code>
+                    <div style={{marginTop:8}}>
+                      ✅ একই কোম্পানিতে পণ্যের নাম/বারকোড ডুপ্লিকেট হবে না<br/>
+                      ✅ ক্যাটাগরি ডুপ্লিকেট হবে না<br/>
+                      ✅ কোম্পানি কোড খালি রাখলে অটো তৈরি হবে
+                    </div>
+                  </div>
+                  {csvImportResult && (
+                    <div style={{marginTop:12,padding:12,background:T.tealLight,borderRadius:8}}>
+                      <div style={{fontWeight:600,color:T.teal,marginBottom:8}}>✅ সর্বশেষ আমদানি ফলাফল:</div>
+                      <div>🏢 কোম্পানি: {csvImportResult.companies}টি</div>
+                      <div>📂 ক্যাটাগরি: {csvImportResult.categories}টি</div>
+                      <div>📦 পণ্য: {csvImportResult.products}টি</div>
+                      {csvImportResult.errors > 0 && (
+                        <div style={{color:T.red,marginTop:4}}>⚠️ ত্রুটি: {csvImportResult.errors}টি</div>
                       )}
-                    </td>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            <div style={{...card,overflow:'hidden',marginBottom:16}}>
+              <table style={{width:'100%',borderCollapse:'collapse',background:T.white}}>
+                <thead>
+                  <tr style={{background:T.tealLight}}>
+                    {['কোম্পানি কোড','কোম্পানির নাম','ফোন','ঠিকানা','পণ্য সংখ্যা',''].map((h,i)=>(
+                      <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr><td colSpan={6} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
+                  ) : filtered.map((s,i)=>(
+                    <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{s.code||'-'}</td>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:14}}>{s.name}</td>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{s.phone||'-'}</td>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{s.address||'-'}</td>
+                      <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{getProductsCount(s.name)}</td>
+                      <td style={{padding:'10px 12px',whiteSpace:'nowrap'}}>
+                        <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
+                        {!s.isAuto && (
+                          <>
+                            <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
+                            <button onClick={()=>del(s.id)} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
 
         {/* CATEGOR/* Company Modal */}
