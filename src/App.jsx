@@ -1892,8 +1892,7 @@ ${printFiltered.map(p => {
           win.focus();
           setTimeout(() => { if (!win.closed) { win.print(); } }, 250);
         }}>🖨️ প্রিন্ট</button>
-        <button style={btn('primary')} onClick={()=>{setShowAddForm(true);setPurchaseItems([]);}}>📦 নতুন পণ্য সংরক্ষণ</button>
-        <span style={{fontSize:12,color:T.gray400}}>{filtered.length}টি পণ্য</span>
+        <span style={{fontSize:12,color:T.gray400,marginLeft:'auto'}}>{filtered.length}টি পণ্য</span>
       </div>
 
       <div style={{flex:1,overflow:'auto',padding:12}}>
