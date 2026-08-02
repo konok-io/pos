@@ -5333,9 +5333,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     </div>
   );
 
-  const FormRow = ({label, children}) => (
+  const FormRow = ({labelText, children}) => (
     <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:16}}>
-      <label style={{...label,margin:0,minWidth:160,fontSize:14,fontWeight:600}}>{label}</label>
+      <label style={{...label,margin:0,minWidth:160,fontSize:14,fontWeight:600}}>{labelText}</label>
       <div style={{flex:1}}>{children}</div>
     </div>
   );
@@ -5494,7 +5494,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
           {/* Tax Settings */}
           {activeSection === 'tax' && (
             <SectionCard title="ট্যাক্স সেটিংস" icon="💰">
-              <FormRow label="ভ্যাট সক্রিয়">
+              <FormRow labelText="ভ্যাট সক্রিয়">
                 <div style={{display:'flex',alignItems:'center',gap:12}}>
                   <ToggleButton active={form.vatEnabled} onClick={()=>setForm(p=>({...p,vatEnabled:!p.vatEnabled}))}>
                     {form.vatEnabled ? '✅ চালু' : '❌ বন্ধ'}
@@ -5503,7 +5503,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               </FormRow>
               
               {form.vatEnabled && (
-                <FormRow label="ডিফল্ট ভ্যাট %">
+                <FormRow labelText="ডিফল্ট ভ্যাট %">
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     <input 
                       value={form.vatPercent||15} 
