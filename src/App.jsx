@@ -438,7 +438,10 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const handleSearchKeyDown = (e) => {
     if (e.key === 'Tab' && cart.length > 0) {
       e.preventDefault();
-      paidRef.current?.focus();
+      if (paidRef.current) {
+        paidRef.current.focus();
+        paidRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
   };
 
