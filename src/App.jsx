@@ -1701,8 +1701,7 @@ function BarcodeScreen({purchases, products}) {
   const [purchaseId, setPurchaseId] = useState('');
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const [barcodeCounts, setBarcodeCounts] = useState({});
-  const [barcodeSearchResult, setBarcodeSearchResult] = useState(null);
-  const [selectedItems, setSelectedItems] = useState([]); // Selected items from search
+  const [barcodeListItems, setBarcodeListItems] = useState([]); // Items added from barcode search
   
   // Find purchase by ID or barcode
   const findPurchase = () => {
@@ -1710,7 +1709,7 @@ function BarcodeScreen({purchases, products}) {
     const foundById = purchases.find(p => p.id.toLowerCase().includes(purchaseId.toLowerCase()));
     if (foundById) {
       setSelectedPurchase(foundById);
-      setBarcodeSearchResult(null);
+      setBarcodeListItems([]);
       // Initialize counts for each product
       const counts = {};
       foundById.items.forEach((item, idx) => {
@@ -1720,41 +1719,148 @@ function BarcodeScreen({purchases, products}) {
       return;
     }
     
-    // Then check if it's a barcode number - search in all purchases (newest first)
+    // Then check if it's a barcode number - search in all purchases
     const trimmedBarcode = purchaseId.trim();
     if (!trimmedBarcode) {
       alert('পারচেজ আইডি বা বারকোড নম্বর দিন!');
       return;
     }
     
-    const matchingItems = [];
-    const seenBarcodes = new Set();
-    // Reverse purchases so newest comes first
+    // Search in all purchases for matching barcode
+    let foundItem = null;
     [...purchases].reverse().forEach(purchase => {
+      if (foundItem) return;
       purchase.items.forEach(item => {
+        if (foundItem) return;
         if (item.barcode === trimmedBarcode || (item.barcode && item.barcode.toLowerCase().includes(trimmedBarcode.toLowerCase()))) {
-          // Only add if not already seen (deduplicate by barcode)
-          if (!seenBarcodes.has(item.barcode)) {
-            seenBarcodes.add(item.barcode);
-            matchingItems.push({
-              ...item,
-              purchaseId: purchase.id,
-              purchaseDate: purchase.date
-            });
-          }
+          foundItem = {
+            ...item,
+            purchaseId: purchase.id,
+            purchaseDate: purchase.date
+          };
         }
       });
     });
     
-    if (matchingItems.length > 0) {
+    if (foundItem) {
       setSelectedPurchase(null);
-      setBarcodeSearchResult(matchingItems);
+      // Add to barcode list (check if already exists)
+      const exists = barcodeListItems.some(i => i.barcode === foundItem.barcode);
+      if (exists) {
+        alert('এই বারকোড ইতিমধ্যে তালিকায় আছে!');
+        return;
+      }
+      setBarcodeListItems([...barcodeListItems, {
+        ...foundItem,
+        listIdx: Date.now()
+      }]);
+      setPurchaseId('');
     } else {
       alert('এই বারকোড নম্বরে কোনো পণ্য পাওয়া যায়নি!');
     }
   };
   
-  // Print single barcode from search result
+  // Update count for barcode list item
+  const updateBarcodeListCount = (listIdx, count) => {
+    const n = parseInt(count) || 0;
+    setBarcodeListItems(items => items.map(i => 
+      i.listIdx === listIdx ? {...i, count: n} : i
+    ));
+  };
+  
+  // Remove item from barcode list
+  const removeBarcodeListItem = (listIdx) => {
+    setBarcodeListItems(items => items.filter(i => i.listIdx !== listIdx));
+  };
+  
+  // Print all barcodes from list
+  const printBarcodeList = () => {
+    if (barcodeListItems.length === 0) return;
+    
+    const barcodeData = [];
+    barcodeListItems.forEach(item => {
+      const count = item.count || 1;
+      if (count <= 0) return;
+      const barcodeValue = item.barcode;
+      for (let i = 0; i < count; i++) {
+        barcodeData.push({ value: barcodeValue, price: item.sellP || 0 });
+      }
+    });
+    
+    if (barcodeData.length === 0) {
+      alert('কোনো বারকোড প্রিন্ট করার জন্য নেই!');
+      return;
+    }
+    
+    const escapeJS = (str) => String(str).replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/'/g, "\\'");
+    
+    let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Barcode Labels</title>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+@page { size: A4; margin: 10mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
+.barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.barcode-item { border: 1px solid #ddd; padding: 5px; text-align: center; page-break-inside: avoid; }
+.barcode-price { font-size: 18px; font-weight: bold; color: #000; margin-bottom: 0; }
+.barcode-svg { display: block; margin: 0 auto; }
+.barcode-number { font-size: 14px; font-family: monospace; color: #333; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+<div class="barcode-grid">`;
+
+    barcodeData.forEach((item, idx) => {
+      html += `<div class="barcode-item">
+  <div class="barcode-price">৳${item.price}</div>
+  <svg id="bc${idx}" class="barcode-svg"></svg>
+  <div class="barcode-number">${escapeJS(item.value)}</div>
+</div>`;
+    });
+
+    const jsArray = barcodeData.map(item => `{"value":"${escapeJS(item.value)}","price":${item.price}}`).join(',');
+    
+    html += `</div>
+<script>
+  window.onload = function() {
+    var barcodeData = [${jsArray}];
+    barcodeData.forEach(function(item, idx) {
+      try {
+        JsBarcode("#bc" + idx, item.value, {
+          format: "CODE128",
+          width: 2,
+          height: 50,
+          displayValue: false,
+          margin: 5
+        });
+      } catch(e) {
+        try {
+          JsBarcode("#bc" + idx, item.value.replace(/[^a-zA-Z0-9]/g, 'X'), {
+            format: "CODE128",
+            width: 2,
+            height: 50,
+            displayValue: false,
+            margin: 5
+          });
+        } catch(e2) {}
+      }
+    });
+    setTimeout(function() { window.print(); }, 300);
+  };
+</script>
+</body></html>`;
+
+    const win = window.open('', '', 'width=900,height=700');
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+  };
+  
+  // Print single barcode
   const printSingleBarcode = (item, count = 1) => {
     if (!item.barcode) {
       alert('এই পণ্যের বারকোড নেই! প্রথমে পণ্যে বারকোড যোগ করুন।');
@@ -1957,6 +2063,7 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                 <button key={p.id} onClick={()=>{
                   setPurchaseId(p.id);
                   setSelectedPurchase(p);
+                  setBarcodeListItems([]);
                   const counts = {};
                   p.items.forEach((item, idx) => {
                     counts[idx] = item.stock || 1;
@@ -2093,127 +2200,46 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
             })}
           </div>
         </div>
-      ) : barcodeSearchResult ? (
+      ) : barcodeListItems.length > 0 ? (
         <div style={{flex:1,overflow:'auto',padding:16}}>
           <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
             <div>
-              <div style={{fontWeight:700,color:T.teal}}>🔍 বারকোড সার্চ রেজাল্ট</div>
-              <div style={{fontSize:12,color:T.gray500}}>{barcodeSearchResult.length}টি পণ্য পাওয়া গেছে</div>
+              <div style={{fontWeight:700,color:T.teal}}>📋 বারকোড লিস্ট ({barcodeListItems.length}টি)</div>
             </div>
             <div style={{display:'flex',gap:8}}>
-              <button onClick={()=>{
-                setPurchaseId('');
-                setBarcodeSearchResult(null);
-              }} style={{...btn('ghost'),padding:'8px 16px'}}>+ নতুন সার্চ</button>
-              <button onClick={()=>{setBarcodeSearchResult(null);setPurchaseId('');setSelectedItems([]);}} style={{...btn(),padding:'8px 16px'}}>✕ বন্ধ করুন</button>
-            </div>
-          </div>
-          
-          <div style={{display:'flex',flexDirection:'column',gap:10}}>
-            {barcodeSearchResult.map((item, idx) => {
-              const isSelected = selectedItems.some(si => si.barcode === item.barcode);
-              return (
-              <div key={idx} style={{
-                padding:16,background:T.white,borderRadius:10,
-                border:`1px solid ${isSelected ? T.green : T.teal}`,
-                display:'flex',alignItems:'center',gap:12,
-                opacity: isSelected ? 0.7 : 1
-              }}>
-                <div style={{flex:1}}>
-                  <div style={{fontWeight:600,fontSize:15,marginBottom:4}}>{item.name}</div>
-                  <div style={{fontSize:12,color:T.gray500}}>
-                    বারকোড: <span style={{fontFamily:'monospace',color:T.teal,fontWeight:600}}>{item.barcode || 'বারকোড নেই'}</span>
-                  </div>
-                  <div style={{fontSize:11,color:T.gray400,marginTop:4}}>
-                    মূল্য: ৳{item.sellP || 0} | কোম্পানি: {item.company || '-'} | পারচেজ: {item.purchaseId}
-                  </div>
-                </div>
-                <div style={{display:'flex',flexDirection:'column',gap:8,alignItems:'center'}}>
-                  <div style={{display:'flex',alignItems:'center',gap:6}}>
-                    <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
-                    <input 
-                      type="number" 
-                      min="1"
-                      defaultValue={1}
-                      id={`bc-count-${idx}`}
-                      style={{...input,width:60,textAlign:'center',padding:'6px'}}
-                    />
-                  </div>
-                  <button 
-                    onClick={()=>{
-                      if (isSelected) {
-                        setSelectedItems(selectedItems.filter(si => si.barcode !== item.barcode));
-                      } else {
-                        const countInput = document.getElementById(`bc-count-${idx}`);
-                        const count = parseInt(countInput?.value) || 1;
-                        setSelectedItems([...selectedItems, {...item, printCount: count}]);
-                      }
-                    }} 
-                    style={{
-                      ...btn(isSelected ? 'ghost' : 'success'),
-                      padding:'6px 12px',
-                      fontSize:12
-                    }}>
-                    {isSelected ? '✓ সিলেক্টেড' : '✓ সিলেক্ট করুন'}
-                  </button>
-                  {!isSelected && (
-                    <button onClick={()=>{
-                      const countInput = document.getElementById(`bc-count-${idx}`);
-                      const count = parseInt(countInput?.value) || 1;
-                      printSingleBarcode(item, count);
-                    }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
-                  )}
-                </div>
-              </div>
-              );
-            })}
-          </div>
-        </div>
-      ) : selectedItems.length > 0 ? (
-        <div style={{flex:1,overflow:'auto',padding:16}}>
-          <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
-            <div>
-              <div style={{fontWeight:700,color:T.green}}>✓ সিলেক্টেড আইটেম ({selectedItems.length})</div>
-            </div>
-            <div style={{display:'flex',gap:8}}>
-              <button onClick={()=>{
-                setPurchaseId('');
-                setBarcodeSearchResult(null);
-              }} style={{...btn('ghost'),padding:'8px 16px'}}>+ নতুন সার্চ</button>
-              <button onClick={()=>setSelectedItems([])} style={{...btn('danger'),padding:'8px 16px'}}>✕ সব সরান</button>
+              <button onClick={()=>setBarcodeListItems([])} style={{...btn('danger'),padding:'8px 16px'}}>✕ সব সরান</button>
+              <button onClick={printBarcodeList} style={{...btn('primary'),padding:'8px 16px'}}>🖨️ সব প্রিন্ট</button>
             </div>
           </div>
           
           <div style={{display:'flex',flexDirection:'column',gap:8}}>
-            {selectedItems.map((item, idx) => (
-              <div key={idx} style={{
-                padding:12,background:T.white,borderRadius:10,
-                border:`1px solid ${T.green}`,display:'flex',alignItems:'center',gap:12
+            {barcodeListItems.map((item, idx) => (
+              <div key={item.listIdx} style={{
+                padding:14,background:T.white,borderRadius:10,
+                border:`1px solid ${T.gray200}`,display:'flex',alignItems:'center',gap:12
               }}>
                 <div style={{flex:1}}>
-                  <div style={{fontWeight:600,fontSize:14}}>{item.name}</div>
-                  <div style={{fontSize:11,color:T.gray500}}>
-                    বারকোড: {item.barcode} | কাউন্ট: {item.printCount}
+                  <div style={{fontWeight:600,fontSize:14,marginBottom:2}}>{item.name}</div>
+                  <div style={{fontSize:12,color:T.gray500}}>
+                    বারকোড: <span style={{fontFamily:'monospace',color:T.teal}}>{item.barcode}</span>
                   </div>
+                  <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | কোম্পানি: {item.company || '-'}</div>
                 </div>
-                <div style={{display:'flex',gap:6}}>
-                  <button onClick={()=>printSingleBarcode(item, item.printCount)} style={{...btn('primary'),padding:'6px 10px',fontSize:12}}>🖨️</button>
-                  <button onClick={()=>setSelectedItems(selectedItems.filter((_,i) => i !== idx))} style={{...btn('danger'),padding:'6px 10px',fontSize:12}}>✕</button>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
+                  <input 
+                    type="number" 
+                    min="1"
+                    value={item.count || 1}
+                    onChange={e=>updateBarcodeListCount(item.listIdx, e.target.value)}
+                    style={{...input,width:60,textAlign:'center',padding:'6px'}}
+                  />
+                  <button onClick={()=>printSingleBarcode(item, item.count || 1)} style={{...btn('primary'),padding:'6px 10px',fontSize:12}}>🖨️</button>
+                  <button onClick={()=>removeBarcodeListItem(item.listIdx)} style={{...btn('danger'),padding:'6px 10px',fontSize:12}}>✕</button>
                 </div>
               </div>
             ))}
           </div>
-          
-          <button 
-            onClick={()=>{
-              if (selectedItems.length === 0) return;
-              selectedItems.forEach(item => {
-                printSingleBarcode(item, item.printCount || 1);
-              });
-            }}
-            style={{...btn('primary'),width:'100%',marginTop:16,padding:'12px'}}>
-            🖨️ সব প্রিন্ট করুন ({selectedItems.length}টি)
-          </button>
         </div>
       ) : (
         <div style={{flex:1,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray400}}>
