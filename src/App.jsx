@@ -1891,42 +1891,45 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Barcode</title>
+<title>Barcode Labels</title>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <style>
-@page { size: A4; margin: 25mm; }
+@page { size: A4; margin: 10mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; background: #fff; }
-.container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
-.price { font-size: 36px; font-weight: bold; color: #000; margin-bottom: 0; }
+body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
+.barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.barcode-item { border: 1px solid #ddd; padding: 5px; text-align: center; page-break-inside: avoid; }
+.barcode-price { font-size: 18px; font-weight: bold; color: #000; margin-bottom: 0; }
 .barcode-svg { display: block; margin: 0 auto; }
-.number { font-size: 18px; font-family: monospace; color: #333; }
+.barcode-number { font-size: 14px; font-family: monospace; color: #333; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
-<div class="container">
-<div class="price">৳${price}</div>
-<svg id="barcode" class="barcode-svg"></svg>
-<div class="number">${barcodeValue}</div>
+<div class="barcode-grid">
+<div class="barcode-item">
+  <div class="barcode-price">৳${price}</div>
+  <svg id="barcode" class="barcode-svg"></svg>
+  <div class="barcode-number">${barcodeValue}</div>
+</div>
 </div>
 <script>
   window.onload = function() {
     try {
       JsBarcode("#barcode", "${barcodeValue}", {
         format: "CODE128",
-        width: 3,
-        height: 120,
+        width: 2,
+        height: 50,
         displayValue: false,
-        margin: 10
+        margin: 5
       });
     } catch(e) {
       try {
         JsBarcode("#barcode", "${barcodeValue}".replace(/[^a-zA-Z0-9]/g, 'X'), {
           format: "CODE128",
-          width: 3,
-          height: 120,
+          width: 2,
+          height: 50,
           displayValue: false,
-          margin: 10
+          margin: 5
         });
       } catch(e2) {}
     }
@@ -1936,7 +1939,7 @@ body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; backgr
 </body>
 </html>`;
                     // A4 print - window.open for preview and printer selection
-                    const win = window.open('', '', 'width=800,height=600');
+                    const win = window.open('', '', 'width=900,height=700');
                     win.document.open();
                     win.document.write(html);
                     win.document.close();
