@@ -185,6 +185,7 @@ function DynamicMenu({tab, setTab, tabs}) {
       justifyContent: 'center',
       marginLeft: 24,
       marginRight: 16,
+      minWidth: 0,
     }}>
       {/* Left Arrow */}
       <button onClick={() => scrollMenu('left')} style={{
@@ -215,6 +216,9 @@ function DynamicMenu({tab, setTab, tabs}) {
         border: `1px solid ${T.gray200}`,
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
+        flex: 1,
+        minWidth: 0,
+        maxWidth: 'calc(100% - 80px)',
       }}>
       {/* Menu Groups with Dividers */}
       {menuGroups.map((group, groupIdx) => (
