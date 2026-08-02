@@ -701,6 +701,38 @@ export default function App() {
     setShowLogin(true);
   };
 
+  // Auto-logout after 15 minutes of inactivity
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const INACTIVITY_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+    let inactivityTimer;
+
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        handleLogout();
+      }, INACTIVITY_TIME);
+    };
+
+    // Track user activity
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach(event => {
+      document.addEventListener(event, resetTimer, { passive: true });
+    });
+
+    // Start the timer
+    resetTimer();
+
+    // Cleanup
+    return () => {
+      clearTimeout(inactivityTimer);
+      events.forEach(event => {
+        document.removeEventListener(event, resetTimer);
+      });
+    };
+  }, [currentUser]);
+
   // Show login screen if not authenticated
   if (showLogin || !currentUser) {
     return <LoginScreen onLogin={handleLogin} />;
