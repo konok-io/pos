@@ -260,6 +260,10 @@ export default function App() {
   // Hard refresh function - saves current tab and forces reload from server
   const handleHardRefresh = () => {
     localStorage.setItem('pos_current_tab', tab);
+    // Save fullscreen state to restore after reload
+    if (document.fullscreenElement) {
+      localStorage.setItem('pos_want_fullscreen', 'true');
+    }
     // Small delay to ensure localStorage is saved before reload
     setTimeout(() => {
       window.location.reload(true);
