@@ -888,15 +888,15 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               </div>
             </div>
           ) : (
-            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',padding:'16px',background:T.white,borderRadius:12,overflow:'hidden'}}>
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',background:T.white,borderRadius:12,overflow:'hidden'}}>
               {settings.bannerImage ? (
-                <img src={settings.bannerImage} alt="Welcome" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:12,boxShadow:'0 4px 20px rgba(0,0,0,0.1)'}}/>
+                <img src={settings.bannerImage} alt="Welcome" style={{width:'100%',height:'100%',objectFit:'cover',boxShadow:'0 4px 20px rgba(0,0,0,0.1)'}}/>
               ) : (
-                <>
+                <div style={{padding:'16px'}}>
                   <div style={{fontSize:48,marginBottom:12}}>🔍</div>
                   <div style={{fontSize:15,color:T.gray500}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
                   <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা কোম্পানি/ক্যাটাগরি সিলেক্ট করুন</div>
-                </>
+                </div>
               )}
             </div>
           )}
