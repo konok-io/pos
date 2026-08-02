@@ -1740,7 +1740,6 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
 .barcode-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
 .barcode-item { border: 1px solid #ddd; padding: 5px; text-align: center; page-break-inside: avoid; }
 .barcode-price { font-size: 13px; font-weight: bold; color: #000; margin-bottom: 2px; }
-.barcode-number { font-size: 10px; font-family: monospace; color: #333; margin-top: 2px; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
@@ -1751,7 +1750,6 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
       for (let i = 0; i < count; i++) {
         html += `<div class="barcode-item">
   <div class="barcode-price">৳${item.sellP || 0}</div>
-  <div class="barcode-number">${item.barcode || item.id}</div>
 </div>`;
       }
     });
@@ -1853,13 +1851,11 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
 body { font-family: Arial, sans-serif; padding: 20mm; text-align: center; background: #fff; }
 .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
 .price { font-size: 28px; font-weight: bold; color: #000; margin-bottom: 10px; }
-.number { font-size: 14px; font-family: monospace; color: #333; margin-top: 5px; }
 </style>
 </head>
 <body>
 <div class="container">
 <div class="price">৳${item.sellP || 0}</div>
-<div class="number">${item.barcode || item.id}</div>
 </div>
 </body>
 </html>`;
