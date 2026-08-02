@@ -262,7 +262,9 @@ function LoginScreen({ onLogin, settings }) {
   const [loading, setLoading] = useState(false);
 
   const currentYear = new Date().getFullYear();
-  const businessName = settings?.name || 'yourbusiness.com';
+  const businessName = settings?.name || 'আপনার দোকান';
+  const businessAddress = settings?.address || '';
+  const businessPhone = settings?.phone || '';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -324,7 +326,7 @@ function LoginScreen({ onLogin, settings }) {
             boxShadow: '0 8px 20px rgba(15,118,110,0.4)',
           }}>🏪</div>
           <h1 style={{ margin: '0 0 8px', fontSize: 24, fontWeight: 800, color: T.gray900 }}>
-            POS ম্যানেজমেন্ট সিস্টেম
+            {businessName}
           </h1>
           <p style={{ margin: 0, fontSize: 14, color: T.gray500 }}>
             লগইন করে এগিয়ে যান
@@ -396,6 +398,8 @@ function LoginScreen({ onLogin, settings }) {
         <div style={{ marginTop: 24, textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 12, color: T.gray400 }}>
             © {currentYear} {businessName}
+            {businessAddress && <> | {businessAddress}</>}
+            {businessPhone && <> | 📞 {businessPhone}</>}
           </p>
         </div>
       </div>
