@@ -566,7 +566,7 @@ html {
   width: 80mm;
 }
 body {
-  font-family: 'Hind Siliguri', 'Segoe UI', sans-serif;
+  font-family: 'Courier New', monospace;
   width: 80mm;
   margin: 0;
   padding: 2mm;
@@ -1373,7 +1373,7 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
 @page { size: 80mm auto; margin: 0; }
 * { margin:0; padding:0; box-sizing:border-box; }
 html { width: 80mm; }
-body { font-family:'Hind Siliguri','Segoe UI',sans-serif; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+body { font-family:'Courier New', monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
 .center { text-align:center; }
 .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
 .row { display:flex; justify-content:space-between; margin:2px 0; }
@@ -4497,11 +4497,10 @@ function ReportsScreen({sales, customers, purchases}) {
     <html>
     <head>
       <title>বিক্রয় ইতিহাস</title>
-      <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
       <style>
         @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Hind Siliguri','Segoe UI',sans-serif; padding:12px; font-size:12px; }
+        body { font-family:'Courier New',monospace; padding:12px; font-size:12px; }
         .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
         .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
         .header p { color:#666; font-size:11px; }
