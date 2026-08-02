@@ -276,9 +276,6 @@ export default function App() {
   ];
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, upd};
-  
-  // POS Search state
-  const [posSearch, setPosSearch] = useState('');
 
   // Hard refresh function - saves current tab and forces reload from server
   const handleHardRefresh = () => {
@@ -361,36 +358,11 @@ export default function App() {
             <span>{t.label}</span>
           </button>
         ))}
-        
-        {/* Search Field - After Settings tab */}
-        {tab === 'pos' && (
-          <div style={{marginLeft:8,flexShrink:0,display:'flex',alignItems:'center'}}>
-            <div style={{position:'relative',display:'flex',alignItems:'center'}}>
-              <span style={{position:'absolute',left:10,color:T.gray400,fontSize:13,pointerEvents:'none'}}>🔍</span>
-              <input 
-                value={posSearch} 
-                onChange={e=>setPosSearch(e.target.value)}
-                placeholder="পণ্য খুঁজুন..."
-                style={{
-                  paddingLeft:32,
-                  height:34,
-                  fontSize:12,
-                  borderRadius:8,
-                  border:`1.5px solid ${T.gray200}`,
-                  background:'#fafbfc',
-                  outline:'none',
-                  width:180,
-                  fontFamily:'inherit'
-                }}
-              />
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Content */}
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
-        {tab==='pos'       && <POSScreen {...props} posSearch={posSearch} setPosSearch={setPosSearch} />}
+        {tab==='pos'       && <POSScreen {...props} />}
         {tab==='products'  && <ProductsScreen {...props} />}
         {tab==='newproduct' && <NewProductScreen {...props} />}
         {tab==='barcode'   && <BarcodeScreen {...props} />}
@@ -409,10 +381,10 @@ export default function App() {
 /* ═══════════════════════════════════════════
    POS SCREEN
 ═══════════════════════════════════════════ */
-function POSScreen({products, customers, sales, settings, categories, upd, posSearch, setPosSearch}) {
+function POSScreen({products, customers, sales, settings, categories, upd}) {
   const [cart, setCart] = useState([]);
-  const search = posSearch;
-  const setSearch = setPosSearch;
+  const [search, setSearch] = useState('');
+  const searchRef = useRef();
   const [selCust, setSelCust] = useState(null);
   const [custQ, setCustQ] = useState('');
   const [showCustDrop, setShowCustDrop] = useState(false);
@@ -426,6 +398,8 @@ function POSScreen({products, customers, sales, settings, categories, upd, posSe
   const [newCustAddr, setNewCustAddr] = useState('');
   const paidRef = useRef();
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
+
+  useEffect(() => { searchRef.current?.focus(); }, []);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -775,6 +749,17 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
     <div style={{display:'flex',height:'100%',overflow:'hidden',width:'100%',background:T.gray50}}>
       {/* ── LEFT: Products ── */}
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0}}>
+        {/* Product name search */}
+        <div style={{padding:'8px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center'}}>
+          <div style={{position:'relative',flex:1}}>
+            <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:13}}>🔍</span>
+            <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)}
+              placeholder="পণ্যের নাম বা বারকোড..."
+              style={{...input,paddingLeft:32,height:34,fontSize:12,borderRadius:7,border:`1.5px solid ${T.gray200}`,background:'#fafbfc'}}
+            />
+          </div>
+        </div>
+        
         {/* Filter row */}
         <div style={{padding:'6px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
           {/* স্টক আছে button */}
