@@ -925,17 +925,23 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
                 )}
               </div>
             </div>
+          ) : settings.bannerImage ? (
+            <div style={{display:'flex',height:'100%',background:T.white,borderRadius:12,overflow:'hidden',position:'relative'}}>
+              <img src={settings.bannerImage} alt="Welcome" style={{width:'100%',height:'100%',objectFit:'cover',position:'absolute',inset:0}}/>
+              {/* Business Info Overlay */}
+              <div style={{position:'absolute',bottom:0,left:0,right:0,background:'linear-gradient(transparent, rgba(0,0,0,0.7))',padding:'40px 24px 20px',display:'flex',flexDirection:'column',gap:4}}>
+                <div style={{fontSize:22,fontWeight:800,color:'white',textShadow:'0 2px 4px rgba(0,0,0,0.3)'}}>{settings.name}</div>
+                {settings.phone && <div style={{fontSize:13,color:'rgba(255,255,255,0.9)',display:'flex',alignItems:'center',gap:6}}>📞 {settings.phone}</div>}
+                {settings.address && <div style={{fontSize:12,color:'rgba(255,255,255,0.8)',display:'flex',alignItems:'center',gap:6}}>📍 {settings.address}</div>}
+              </div>
+            </div>
           ) : (
             <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',background:T.white,borderRadius:12,overflow:'hidden'}}>
-              {settings.bannerImage ? (
-                <img src={settings.bannerImage} alt="Welcome" style={{width:'100%',height:'100%',objectFit:'cover',boxShadow:'0 4px 20px rgba(0,0,0,0.1)'}}/>
-              ) : (
-                <div style={{padding:'16px'}}>
-                  <div style={{fontSize:48,marginBottom:12}}>🔍</div>
-                  <div style={{fontSize:15,color:T.gray500}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
-                  <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা কোম্পানি/ক্যাটাগরি সিলেক্ট করুন</div>
-                </div>
-              )}
+              <div style={{padding:'16px'}}>
+                <div style={{fontSize:48,marginBottom:12}}>🔍</div>
+                <div style={{fontSize:15,color:T.gray500}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
+                <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা কোম্পানি/ক্যাটাগরি সিলেক্ট করুন</div>
+              </div>
             </div>
           )}
         </div>
