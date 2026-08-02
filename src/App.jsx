@@ -550,9 +550,8 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
 <html>
 <head>
 <meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700<title>বিক্রয় রিসিট</title>display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
 <title>বিক্রয় রিসিট</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 @page {
   size: 80mm auto;
@@ -567,7 +566,7 @@ html {
   width: 80mm;
 }
 body {
-  font-family: 'Hind Siliguri', 'Courier New', monospace;
+  font-family: 'Tiro Bangla', 'Courier New', monospace;
   width: 80mm;
   margin: 0;
   padding: 2mm;
@@ -1370,14 +1369,13 @@ function ProductsScreen({products, suppliers, categories, purchases, upd}) {
 <html>
 <head>
 <meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700<title>পারচেজ হিস্ট্রি</title>display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
 <title>পারচেজ হিস্ট্রি</title>
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 @page { size: 80mm auto; margin: 0; }
 * { margin:0; padding:0; box-sizing:border-box; }
 html { width: 80mm; }
-body { font-family:'Hind Siliguri','Courier New', monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+body { font-family:'Tiro Bangla','Courier New', monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
 .center { text-align:center; }
 .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
 .row { display:flex; justify-content:space-between; margin:2px 0; }
@@ -3975,12 +3973,12 @@ function IncomeScreen({sales, purchases, upd}) {
 <html>
 <head>
 <meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700<title>আয়-ব্যয় হিসাব</title>display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
 <title>আয়-ব্যয় হিসাব</title>
 <style>
 @page { size: A4; margin: 10mm; }
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Hind Siliguri','Courier New',monospace; font-size:11px; color:#333; padding:10px; }
+body { font-family:'Tiro Bangla','Courier New',monospace; font-size:11px; color:#333; padding:10px; }
 .header { text-align:center; margin-bottom:15px; border-bottom:2px solid #333; padding-bottom:10px; }
 .header h1 { font-size:20px; margin-bottom:5px; }
 .header p { font-size:11px; color:#666; }
@@ -4427,8 +4425,8 @@ function ReportsScreen({sales, customers, purchases}) {
     <!DOCTYPE html>
     <html>
     <head>
-      <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700<title>পারচেজ হিস্ট্রি</title>display=swap" rel="stylesheet">
-<title>পারচেজ হিস্ট্রি</title>
+      <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
+      <title>বিক্রয় ইতিহাস</title>
       <style>
         @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -4502,12 +4500,12 @@ function ReportsScreen({sales, customers, purchases}) {
     <!DOCTYPE html>
     <html>
     <head>
-      <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700<title>বিক্রয় ইতিহাস</title>display=swap" rel="stylesheet">
-<title>বিক্রয় ইতিহাস</title>
+      <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
+      <title>বিক্রয় ইতিহাস</title>
       <style>
         @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Hind Siliguri','Courier New',monospace; padding:12px; font-size:12px; }
+        body { font-family:'Tiro Bangla','Courier New',monospace; padding:12px; font-size:12px; }
         .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
         .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
         .header p { color:#666; font-size:11px; }
@@ -4736,7 +4734,7 @@ function ReportsScreen({sales, customers, purchases}) {
 @page { size: 80mm auto; margin: 0; }
 * { margin:0; padding:0; box-sizing:border-box; }
 html { width: 80mm; }
-body { font-family:'Hind Siliguri','Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+body { font-family:'Tiro Bangla','Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
 .center { text-align:center; }
 .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
 .row { display:flex; justify-content:space-between; margin:2px 0; }
@@ -4849,7 +4847,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 @page { size: 80mm auto; margin: 0; }
 * { margin:0; padding:0; box-sizing:border-box; }
 html { width: 80mm; }
-body { font-family:'Hind Siliguri','Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
+body { font-family:'Tiro Bangla','Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
 .center { text-align:center; }
 .border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
 .row { display:flex; justify-content:space-between; margin:2px 0; }
