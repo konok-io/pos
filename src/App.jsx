@@ -324,7 +324,7 @@ function LoginScreen({ onLogin, settings }) {
             boxShadow: '0 8px 20px rgba(15,118,110,0.4)',
           }}>🏪</div>
           <h1 style={{ margin: '0 0 8px', fontSize: 24, fontWeight: 800, color: T.gray900 }}>
-            POS সিস্টেম
+            POS ম্যানেজমেন্ট সিস্টেম
           </h1>
           <p style={{ margin: 0, fontSize: 14, color: T.gray500 }}>
             লগইন করে এগিয়ে যান
@@ -5999,7 +5999,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:24}}>
         <div>
           <h1 style={{margin:0,fontSize:24,fontWeight:800,color:T.gray900}}>⚙️ সেটিংস</h1>
-          <p style={{margin:'4px 0 0',fontSize:14,color:T.gray500}}>আপনার POS সিস্টেম কনফিগার করুন</p>
+          <p style={{margin:'4px 0 0',fontSize:14,color:T.gray500}}>আপনার POS ম্যানেজমেন্ট সিস্টেম কনফিগার করুন</p>
         </div>
         <button onClick={save} style={{
           padding:'12px 28px',
