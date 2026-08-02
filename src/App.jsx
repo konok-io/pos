@@ -670,7 +670,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
       {/* ── LEFT: Products ── */}
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0}}>
         {/* Filter row */}
-        <div style={{padding:'12px 16px',background:T.white,borderBottom:`1px solid ${T.teal}`,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+        <div style={{padding:'12px 16px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
           {/* সব button */}
           <button onClick={()=>{setSelCat('সব');setCatSearch('');}} style={{
             ...btn(selCat==='সব'?'primary':'ghost','sm'),
