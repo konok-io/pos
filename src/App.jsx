@@ -105,6 +105,92 @@ function Modal({onClose, title, children, width=460}) {
   );
 }
 
+/* ─────────────── DYNAMIC MENU COMPONENT ─────────────── */
+function DynamicMenu({tab, setTab, tabs}) {
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const moreMenuRef = useRef(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (moreMenuRef.current && !moreMenuRef.current.contains(e.target)) {
+        setShowMoreMenu(false);
+      }
+    };
+    if (showMoreMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showMoreMenu]);
+
+  // Define menu groups
+  const primaryTabs = tabs.filter(t => ['pos', 'products', 'newproduct', 'suppliers', 'customers'].includes(t.id));
+  const secondaryTabs = tabs.filter(t => !['pos', 'products', 'newproduct', 'suppliers', 'customers'].includes(t.id));
+
+  const renderMenuButton = (t) => (
+    <button key={t.id} onClick={() => {
+      setTab(t.id);
+      setShowMoreMenu(false);
+    }} style={{
+      padding:'8px 12px', border:'none', background:'transparent', cursor:'pointer',
+      color: tab===t.id ? T.white : T.gray600,
+      fontWeight: tab===t.id ? 600 : 500,
+      fontSize:13, display:'flex', alignItems:'center', gap:5,
+      whiteSpace:'nowrap', fontFamily:'inherit',
+      transition:'all 0.2s',
+      background: tab===t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+      borderRadius:8,
+      boxShadow: tab===t.id ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
+      width:'100%', textAlign:'left',
+    }}>
+      <span style={{fontSize:14}}>{t.icon}</span>
+      <span>{t.label}</span>
+    </button>
+  );
+
+  return (
+    <div style={{display:'flex',flex:1,alignItems:'center',overflowX:'auto',gap:2,marginLeft:24,marginRight:16}}>
+      {/* Primary Tabs - Always visible */}
+      {primaryTabs.map(t => renderMenuButton(t))}
+
+      {/* More Menu for secondary tabs */}
+      {secondaryTabs.length > 0 && (
+        <div style={{position:'relative'}} ref={moreMenuRef}>
+          <button 
+            onClick={() => setShowMoreMenu(!showMoreMenu)} 
+            style={{
+              padding:'8px 12px', border:'none', background: showMoreMenu ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent', 
+              cursor:'pointer',
+              color: showMoreMenu ? T.white : T.gray600,
+              fontWeight: 500,
+              fontSize:13, display:'flex', alignItems:'center', gap:5,
+              whiteSpace:'nowrap', fontFamily:'inherit',
+              transition:'all 0.2s',
+              borderRadius:8,
+              boxShadow: showMoreMenu ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
+            }}>
+            <span style={{fontSize:14}}>📋</span>
+            <span>আরও</span>
+            <span style={{fontSize:10,transform: showMoreMenu ? 'rotate(180deg)' : 'rotate(0deg)', transition:'transform 0.2s'}}>▼</span>
+          </button>
+          
+          {/* Dropdown Menu */}
+          {showMoreMenu && (
+            <div style={{
+              position:'absolute', top:'100%', right:0, marginTop:4,
+              background:T.white, borderRadius:10, padding:6,
+              boxShadow:'0 8px 24px rgba(0,0,0,0.15)', border:`1px solid ${T.gray200}`,
+              zIndex:100, minWidth:160,
+            }}>
+              {secondaryTabs.map(t => renderMenuButton(t))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─────────────── MAIN APP ─────────────── */
 export default function App() {
   const [tab, setTab] = useState(() => localStorage.getItem('pos_current_tab') || 'pos');
@@ -319,25 +405,8 @@ export default function App() {
             </div>
           </div>
           
-          {/* Tabs - Fill remaining space */}
-          <div style={{display:'flex',flex:1,alignItems:'center',overflowX:'auto',gap:2,marginLeft:24,marginRight:16}}>
-            {tabs.map(t => (
-              <button key={t.id} onClick={()=>setTab(t.id)} style={{
-                padding:'8px 12px', border:'none', background:'transparent', cursor:'pointer',
-                color: tab===t.id ? T.white : T.gray600,
-                fontWeight: tab===t.id ? 600 : 500,
-                fontSize:13, display:'flex', alignItems:'center', gap:5,
-                whiteSpace:'nowrap', fontFamily:'inherit',
-                transition:'all 0.2s',
-                background: tab===t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
-                borderRadius:8,
-                boxShadow: tab===t.id ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
-              }}>
-                <span style={{fontSize:14}}>{t.icon}</span>
-                <span>{t.label}</span>
-              </button>
-            ))}
-          </div>
+          {/* Dynamic Menu */}
+          <DynamicMenu tab={tab} setTab={setTab} tabs={tabs} />
           
           {/* Actions Section */}
           <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0,marginLeft:24}}>
