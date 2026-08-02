@@ -5268,6 +5268,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
   const [form, setForm] = useState(settings);
   const [saved, setSaved] = useState(false);
+  const [activeSection, setActiveSection] = useState('business');
 
   const save = async () => {
     await upd.settings(form);
@@ -5292,131 +5293,354 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     reader.readAsDataURL(file);
   };
 
+  const sections = [
+    { id: 'business', icon: '🏪', label: 'ব্যবসা' },
+    { id: 'display', icon: '🖼️', label: 'ডিসপ্লে' },
+    { id: 'tax', icon: '💰', label: 'ট্যাক্স' },
+    { id: 'reports', icon: '📊', label: 'রিপোর্ট' },
+    { id: 'data', icon: '💾', label: 'ডেটা' },
+  ];
+
+  const ToggleButton = ({active, onClick, children}) => (
+    <button onClick={onClick} style={{
+      padding: '8px 20px',
+      borderRadius: 8,
+      fontWeight: 600,
+      fontSize: 13,
+      cursor: 'pointer',
+      border: 'none',
+      transition: 'all 0.2s',
+      background: active ? T.green : T.gray200,
+      color: active ? T.white : T.gray600,
+    }}>
+      {children}
+    </button>
+  );
+
+  const SectionCard = ({title, icon, children}) => (
+    <div style={{
+      background: T.white,
+      borderRadius: 12,
+      padding: 24,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+      border: `1px solid ${T.gray200}`,
+    }}>
+      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20,paddingBottom:16,borderBottom:`2px solid ${T.gray100}`}}>
+        <span style={{fontSize:24}}>{icon}</span>
+        <h3 style={{margin:0,fontSize:17,fontWeight:700,color:T.gray900}}>{title}</h3>
+      </div>
+      {children}
+    </div>
+  );
+
+  const FormRow = ({label, children}) => (
+    <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:16}}>
+      <label style={{...label,margin:0,minWidth:160,fontSize:14,fontWeight:600}}>{label}</label>
+      <div style={{flex:1}}>{children}</div>
+    </div>
+  );
+
   return (
-    <div style={{height:'100%',overflow:'auto',padding:20,width:'100%'}}>
-      <div style={{maxWidth:'none',display:'flex',flexDirection:'column',gap:14,width:'100%'}}>
-        {/* Business Info */}
-        <div style={{...card,width:'100%'}}>
-          <h3 style={{margin:'0 0 18px',fontSize:15,fontWeight:700}}>🏪 ব্যবসার তথ্য</h3>
-          <div style={{display:'flex',flexDirection:'column',gap:12}}>
-            {[{k:'name',l:'ব্যবসার নাম *'},{k:'address',l:'ঠিকানা'},{k:'phone',l:'ফোন নম্বর'}].map(f=>(
-              <div key={f.k}>
-                <label style={label}>{f.l}</label>
-                <input value={form[f.k]||''} onChange={e=>setForm(p=>({...p,[f.k]:e.target.value}))} style={input}/>
-              </div>
-            ))}
-          </div>
+    <div style={{height:'100%',overflow:'auto',padding:24,width:'100%',background:T.gray50}}>
+      {/* Header */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:24}}>
+        <div>
+          <h1 style={{margin:0,fontSize:24,fontWeight:800,color:T.gray900}}>⚙️ সেটিংস</h1>
+          <p style={{margin:'4px 0 0',fontSize:14,color:T.gray500}}>আপনার POS সিস্টেম কনফিগার করুন</p>
         </div>
+        <button onClick={save} style={{
+          padding:'12px 28px',
+          background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+          color:T.white,
+          border:'none',
+          borderRadius:10,
+          fontSize:14,
+          fontWeight:600,
+          cursor:'pointer',
+          boxShadow:'0 4px 12px rgba(15,118,110,0.3)',
+          display:'flex',
+          alignItems:'center',
+          gap:8,
+        }}>
+          💾 সেটিংস সংরক্ষণ
+        </button>
+      </div>
 
-        {/* Banner Image Settings */}
-        <div style={{...card,width:'100%'}}>
-          <h3 style={{margin:'0 0 18px',fontSize:15,fontWeight:700}}>🖼️ হোম পেজ ব্যানার ছবি</h3>
-          <p style={{fontSize:13,color:T.gray500,margin:'0 0 14px'}}>বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।</p>
-          
-          {form.bannerImage && (
-            <div style={{marginBottom:14,position:'relative',borderRadius:10,overflow:'hidden'}}>
-              <img src={form.bannerImage} alt="Banner Preview" style={{width:'100%',maxHeight:200,objectFit:'cover',display:'block'}}/>
-              <button onClick={()=>setForm(p=>({...p,bannerImage:''}))} style={{
-                position:'absolute',top:8,right:8,padding:'6px 10px',background:'rgba(0,0,0,0.7)',color:'#fff',
-                border:'none',borderRadius:6,cursor:'pointer',fontSize:12
-              }}>✕ মুছুন</button>
-            </div>
-          )}
-          
-          <label style={{
-            display:'flex',alignItems:'center',justifyContent:'center',gap:8,
-            padding:'20px',border:`2px dashed ${T.gray300}`,borderRadius:10,cursor:'pointer',
-            background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600
-          }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
-             onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
-            <span style={{fontSize:24}}>📁</span>
-            <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
-            <input type="file" accept="image/*" onChange={handleImageUpload} style={{display:'none'}}/>
-          </label>
+      {saved && (
+        <div style={{
+          padding:'12px 20px',
+          background:T.greenLight,
+          border:`1px solid ${T.green}`,
+          borderRadius:10,
+          marginBottom:20,
+          display:'flex',
+          alignItems:'center',
+          gap:10,
+          color:T.green,
+          fontWeight:600,
+        }}>
+          ✅ সেটিংস সফলভাবে সংরক্ষিত হয়েছে!
         </div>
+      )}
 
-        {/* VAT Settings */}
-        <div style={{...card,width:'100%'}}>
-          <h3 style={{margin:'0 0 18px',fontSize:15,fontWeight:700}}>💰 ভ্যাট/ট্যাক্স সেটিংস</h3>
-          <div style={{display:'flex',flexDirection:'column',gap:14}}>
-            <div style={{display:'flex',alignItems:'center',gap:12}}>
-              <label style={{...label,margin:0}}>ভ্যাট সক্রিয় করুন</label>
-              <button 
-                onClick={()=>setForm(p=>({...p,vatEnabled:!p.vatEnabled}))}
-                style={{
-                  padding:'8px 20px', borderRadius:8, fontWeight:600, fontSize:13, cursor:'pointer',
-                  background: form.vatEnabled ? T.green : T.gray200,
-                  color: form.vatEnabled ? T.white : T.gray600,
-                  border:'none', transition:'all 0.2s',
-                }}>
-                {form.vatEnabled ? '✅ চালু' : '❌ বন্ধ'}
-              </button>
-            </div>
-            {form.vatEnabled && (
-              <div style={{display:'flex',alignItems:'center',gap:12}}>
-                <label style={{...label,margin:0}}>ডিফল্ট ভ্যাট শতাংশ</label>
-                <input 
-                  value={form.vatPercent||15} 
-                  onChange={e=>setForm(p=>({...p,vatPercent:parseFloat(e.target.value)||0}))} 
-                  type="number" min="0" max="100" 
-                  style={{...input,width:80,padding:'8px 12px',fontSize:14}}/>
-                <span style={{fontSize:14,color:T.gray600}}>%</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div style={{display:'flex',alignItems:'center',gap:10}}>
-          <button onClick={save} style={btn('primary')}>💾 সেটিংস সংরক্ষণ</button>
-          {saved && <span style={{color:T.green,fontSize:13,fontWeight:600}}>✓ সংরক্ষিত হয়েছে!</span>}
-        </div>
-
-        {/* Stats */}
-        <div style={card}>
-          <h3 style={{margin:'0 0 12px',fontSize:15,fontWeight:700}}>📊 সংক্ষিপ্ত পরিসংখ্যান</h3>
-          {[
-            {l:'মোট পণ্য',v:`${products.length}টি`},
-            {l:'স্টক শেষ',v:`${products.filter(p=>p.stock<=0).length}টি`,c:T.red},
-            {l:'কম স্টক',v:`${products.filter(p=>p.stock>0&&p.stock<=p.minStock).length}টি`,c:T.amber},
-            {l:'মোট স্টক মূল্য',v:fmt(products.reduce((s,p)=>s+p.sellP*p.stock,0)),c:T.teal},
-          ].map(s=>(
-            <div key={s.l} style={{display:'flex',justifyContent:'space-between',padding:'7px 0',borderBottom:`1px solid ${T.gray100}`}}>
-              <span style={{color:T.gray600,fontSize:14}}>{s.l}</span>
-              <span style={{fontWeight:700,color:s.c||T.gray900}}>{s.v}</span>
-            </div>
+      <div style={{display:'grid',gridTemplateColumns:'220px 1fr',gap:24,minHeight:'calc(100vh - 200px)'}}>
+        {/* Sidebar Navigation */}
+        <div style={{
+          background:T.white,
+          borderRadius:12,
+          padding:16,
+          boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+          border:`1px solid ${T.gray200}`,
+          height:'fit-content',
+          position:'sticky',
+          top:0,
+        }}>
+          {sections.map(s => (
+            <button
+              key={s.id}
+              onClick={() => setActiveSection(s.id)}
+              style={{
+                width:'100%',
+                padding:'14px 16px',
+                border:'none',
+                borderRadius:10,
+                cursor:'pointer',
+                display:'flex',
+                alignItems:'center',
+                gap:12,
+                marginBottom:6,
+                transition:'all 0.2s',
+                background: activeSection === s.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                color: activeSection === s.id ? T.white : T.gray600,
+                fontWeight: activeSection === s.id ? 600 : 500,
+                fontSize:14,
+                textAlign:'left',
+              }}
+            >
+              <span style={{fontSize:18}}>{s.icon}</span>
+              <span>{s.label}</span>
+            </button>
           ))}
         </div>
 
-        {/* Data management */}
-        <div style={{...card,borderColor:T.red+'40'}}>
-          <h3 style={{margin:'0 0 10px',fontSize:15,fontWeight:700,color:T.red}}>⚠️ ডেটা ম্যানেজমেন্ট</h3>
-          <p style={{fontSize:13,color:T.gray600,margin:'0 0 14px',lineHeight:1.6}}>সতর্কতা: নিচের অপশনগুলো ব্যবহারে ডেটা স্থায়ীভাবে মুছে যাবে।</p>
-          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12}}>
-            <button style={btn('danger','sm')} onClick={async()=>{
-              if(confirm('সব পণ্য মুছে ফেলবেন?')) { await upd.products([]); alert('পণ্য মুছা হয়েছে।'); }
-            }}>📦 পণ্য রিসেট ({products.length}টি)</button>
-            <button style={btn('danger','sm')} onClick={async()=>{
-              if(confirm('সব কোম্পানি মুছে ফেলবেন?')) { await upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); }
-            }}>🏢 কোম্পানি রিসেট ({suppliers.length}টি)</button>
-            <button style={btn('danger','sm')} onClick={async()=>{
-              if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { await upd.categories([]); alert('ক্যাটাগরি মুছা হয়েছে।'); }
-            }}>📂 ক্যাটাগরি রিসেট ({categories.length}টি)</button>
-          </div>
-          <div style={{borderTop:`1px solid ${T.gray200}`,paddingTop:12,marginTop:4}}>
-            <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-              <button style={btn('danger','sm')} onClick={async()=>{
-                if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
-              }}>🛒 বিক্রয় ইতিহাস মুছুন ({sales.length}টি)</button>
-              <button style={btn('danger','sm')} onClick={async()=>{
-                if(confirm('⚠️ সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                  localStorage.clear();
-                  db.set('pos_reset_done', true);
-                  alert('সব ডেটা মুছে ফেলা হয়েছে।');
-                  window.location.reload();
-                }
-              }}>💥 সম্পূর্ণ রিসেট</button>
-            </div>
-          </div>
+        {/* Content Area */}
+        <div style={{display:'flex',flexDirection:'column',gap:24}}>
+          {/* Business Info */}
+          {activeSection === 'business' && (
+            <SectionCard title="ব্যবসার তথ্য" icon="🏪">
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
+                <div>
+                  <label style={{...label,marginBottom:8}}>🏪 ব্যবসার নাম *</label>
+                  <input 
+                    value={form.name||''} 
+                    onChange={e=>setForm(p=>({...p,name:e.target.value}))} 
+                    style={{...input,padding:'12px 14px',fontSize:14}}
+                    placeholder="আপনার ব্যবসার নাম লিখুন"
+                  />
+                </div>
+                <div>
+                  <label style={{...label,marginBottom:8}}>📞 ফোন নম্বর</label>
+                  <input 
+                    value={form.phone||''} 
+                    onChange={e=>setForm(p=>({...p,phone:e.target.value}))} 
+                    style={{...input,padding:'12px 14px',fontSize:14}}
+                    placeholder="01XXXXXXXXX"
+                  />
+                </div>
+                <div style={{gridColumn:'1 / -1'}}>
+                  <label style={{...label,marginBottom:8}}>📍 ঠিকানা</label>
+                  <input 
+                    value={form.address||''} 
+                    onChange={e=>setForm(p=>({...p,address:e.target.value}))} 
+                    style={{...input,padding:'12px 14px',fontSize:14}}
+                    placeholder="আপনার ব্যবসার ঠিকানা লিখুন"
+                  />
+                </div>
+              </div>
+            </SectionCard>
+          )}
+
+          {/* Display Settings */}
+          {activeSection === 'display' && (
+            <SectionCard title="ডিসপ্লে সেটিংস" icon="🖼️">
+              <div style={{marginBottom:20}}>
+                <label style={{...label,marginBottom:8}}>হোম পেজ ব্যানার ছবি</label>
+                <p style={{fontSize:13,color:T.gray500,margin:'0 0 16px'}}>বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।</p>
+                
+                {form.bannerImage && (
+                  <div style={{marginBottom:16,position:'relative',borderRadius:12,overflow:'hidden',maxWidth:500}}>
+                    <img src={form.bannerImage} alt="Banner Preview" style={{width:'100%',maxHeight:200,objectFit:'cover',display:'block'}}/>
+                    <button onClick={()=>setForm(p=>({...p,bannerImage:''}))} style={{
+                      position:'absolute',top:10,right:10,padding:'8px 14px',background:'rgba(0,0,0,0.75)',color:'#fff',
+                      border:'none',borderRadius:8,cursor:'pointer',fontSize:13,fontWeight:600
+                    }}>✕ মুছুন</button>
+                  </div>
+                )}
+                
+                <label style={{
+                  display:'flex',alignItems:'center',justifyContent:'center',gap:12,
+                  padding:'24px',border:`2px dashed ${T.gray300}`,borderRadius:12,cursor:'pointer',
+                  background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600,maxWidth:500
+                }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
+                   onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
+                  <span style={{fontSize:28}}>📁</span>
+                  <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
+                  <input type="file" accept="image/*" onChange={handleImageUpload} style={{display:'none'}}/>
+                </label>
+              </div>
+            </SectionCard>
+          )}
+
+          {/* Tax Settings */}
+          {activeSection === 'tax' && (
+            <SectionCard title="ট্যাক্স সেটিংস" icon="💰">
+              <FormRow label="ভ্যাট সক্রিয়">
+                <div style={{display:'flex',alignItems:'center',gap:12}}>
+                  <ToggleButton active={form.vatEnabled} onClick={()=>setForm(p=>({...p,vatEnabled:!p.vatEnabled}))}>
+                    {form.vatEnabled ? '✅ চালু' : '❌ বন্ধ'}
+                  </ToggleButton>
+                </div>
+              </FormRow>
+              
+              {form.vatEnabled && (
+                <FormRow label="ডিফল্ট ভ্যাট %">
+                  <div style={{display:'flex',alignItems:'center',gap:8}}>
+                    <input 
+                      value={form.vatPercent||15} 
+                      onChange={e=>setForm(p=>({...p,vatPercent:parseFloat(e.target.value)||0}))} 
+                      type="number" min="0" max="100" 
+                      style={{...input,width:100,padding:'10px 14px',fontSize:14}}
+                    />
+                    <span style={{fontSize:14,color:T.gray600}}>%</span>
+                  </div>
+                </FormRow>
+              )}
+              
+              <div style={{marginTop:20,padding:16,background:T.tealLight,borderRadius:10,border:`1px solid ${T.tealMid}`}}>
+                <p style={{margin:0,fontSize:13,color:T.tealDark,lineHeight:1.6}}>
+                  💡 টিপ: ভ্যাট চালু থাকলে সকল বিক্রয় রসিদে ভ্যাট যোগ হবে।
+                </p>
+              </div>
+            </SectionCard>
+          )}
+
+          {/* Reports Settings */}
+          {activeSection === 'reports' && (
+            <SectionCard title="রিপোর্ট সেটিংস" icon="📊">
+              <div style={{display:'grid',gridTemplateColumns:'repeat(2, 1fr)',gap:16}}>
+                {[
+                  {l:'📦 পণ্য স্টক রিপোর্ট',v:'products'},
+                  {l:'📈 বিক্রয় রিপোর্ট',v:'sales'},
+                  {l:'💰 আয়-ব্যয় রিপোর্ট',v:'income'},
+                  {l:'👥 কাস্টমার রিপোর্ট',v:'customers'},
+                ].map(r=>(
+                  <div key={r.v} style={{
+                    padding:20,
+                    background:T.gray50,
+                    borderRadius:10,
+                    border:`1px solid ${T.gray200}`,
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'space-between'
+                  }}>
+                    <span style={{fontSize:15,fontWeight:600,color:T.gray700}}>{r.l}</span>
+                    <span style={{
+                      padding:'4px 12px',
+                      background:T.green,
+                      color:T.white,
+                      borderRadius:6,
+                      fontSize:12,
+                      fontWeight:600
+                    }}>সক্রিয়</span>
+                  </div>
+                ))}
+              </div>
+            </SectionCard>
+          )}
+
+          {/* Data Management */}
+          {activeSection === 'data' && (
+            <>
+              {/* Stats Dashboard */}
+              <div style={{display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:16}}>
+                {[
+                  {l:'📦 মোট পণ্য',v:`${products.length}`,c:T.teal,icon:'📦'},
+                  {l:'⚠️ স্টক শেষ',v:`${products.filter(p=>p.stock<=0).length}`,c:T.red,icon:'⚠️'},
+                  {l:'📉 কম স্টক',v:`${products.filter(p=>p.stock>0&&p.stock<=p.minStock).length}`,c:T.amber,icon:'📉'},
+                  {l:'💰 স্টক মূল্য',v:fmt(products.reduce((s,p)=>s+p.sellP*p.stock,0)),c:T.green,icon:'💰'},
+                ].map(s=>(
+                  <div key={s.l} style={{
+                    background:T.white,
+                    borderRadius:12,
+                    padding:20,
+                    boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+                    border:`1px solid ${T.gray200}`,
+                    textAlign:'center'
+                  }}>
+                    <div style={{fontSize:28,marginBottom:8}}>{s.icon}</div>
+                    <div style={{fontSize:24,fontWeight:800,color:s.c}}>{s.v}</div>
+                    <div style={{fontSize:12,color:T.gray500,marginTop:4}}>{s.l}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Data Reset Options */}
+              <SectionCard title="ডেটা রিসেট" icon="⚠️">
+                <div style={{marginBottom:20,padding:16,background:T.redLight,borderRadius:10,border:`1px solid ${T.red+'30'}`}}>
+                  <p style={{margin:0,fontSize:13,color:T.red,lineHeight:1.6}}>
+                    ⚠️ সতর্কতা: নিচের অপশনগুলো ব্যবহারে ডেটা স্থায়ীভাবে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।
+                  </p>
+                </div>
+                
+                <div style={{display:'grid',gridTemplateColumns:'repeat(2, 1fr)',gap:16}}>
+                  <div style={{padding:20,background:T.gray50,borderRadius:10,border:`1px solid ${T.gray200}`}}>
+                    <h4 style={{margin:'0 0 12px',fontSize:15,fontWeight:700,color:T.gray800}}>📦 পণ্য ডেটা</h4>
+                    <p style={{margin:'0 0 14px',fontSize:13,color:T.gray500}}>মোট {products.length}টি পণ্য</p>
+                    <button style={btn('danger')} onClick={async()=>{
+                      if(confirm('সব পণ্য মুছে ফেলবেন?')) { await upd.products([]); alert('পণ্য মুছা হয়েছে।'); }
+                    }}>🗑️ রিসেট করুন</button>
+                  </div>
+                  
+                  <div style={{padding:20,background:T.gray50,borderRadius:10,border:`1px solid ${T.gray200}`}}>
+                    <h4 style={{margin:'0 0 12px',fontSize:15,fontWeight:700,color:T.gray800}}>🏢 কোম্পানি ডেটা</h4>
+                    <p style={{margin:'0 0 14px',fontSize:13,color:T.gray500}}>মোট {suppliers.length}টি কোম্পানি</p>
+                    <button style={btn('danger')} onClick={async()=>{
+                      if(confirm('সব কোম্পানি মুছে ফেলবেন?')) { await upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); }
+                    }}>🗑️ রিসেট করুন</button>
+                  </div>
+                  
+                  <div style={{padding:20,background:T.gray50,borderRadius:10,border:`1px solid ${T.gray200}`}}>
+                    <h4 style={{margin:'0 0 12px',fontSize:15,fontWeight:700,color:T.gray800}}>📂 ক্যাটাগরি ডেটা</h4>
+                    <p style={{margin:'0 0 14px',fontSize:13,color:T.gray500}}>মোট {categories.length}টি ক্যাটাগরি</p>
+                    <button style={btn('danger')} onClick={async()=>{
+                      if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { await upd.categories([]); alert('ক্যাটাগরি মুছা হয়েছে।'); }
+                    }}>🗑️ রিসেট করুন</button>
+                  </div>
+                  
+                  <div style={{padding:20,background:T.gray50,borderRadius:10,border:`1px solid ${T.gray200}`}}>
+                    <h4 style={{margin:'0 0 12px',fontSize:15,fontWeight:700,color:T.gray800}}>🛒 বিক্রয় ডেটা</h4>
+                    <p style={{margin:'0 0 14px',fontSize:13,color:T.gray500}}>মোট {sales.length}টি লেনদেন</p>
+                    <button style={btn('danger')} onClick={async()=>{
+                      if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
+                    }}>🗑️ রিসেট করুন</button>
+                  </div>
+                </div>
+
+                <div style={{marginTop:24,padding:20,background:T.redLight,borderRadius:10,border:`2px solid ${T.red+'40'}`}}>
+                  <h4 style={{margin:'0 0 12px',fontSize:16,fontWeight:700,color:T.red}}>💥 সম্পূর্ণ রিসেট</h4>
+                  <p style={{margin:'0 0 16px',fontSize:13,color:T.gray600}}>সমস্ত ডেটা মুছে ফেলুন। এটি পূর্বাবস্থায় ফেরানো যাবে না।</p>
+                  <button style={{...btn('danger'),padding:'12px 24px'}} onClick={async()=>{
+                    if(confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
+                      localStorage.clear();
+                      db.set('pos_reset_done', true);
+                      alert('সব ডেটা মুছে ফেলা হয়েছে।');
+                      window.location.reload();
+                    }
+                  }}>💥 সব ডেটা মুছুন</button>
+                </div>
+              </SectionCard>
+            </>
+          )}
         </div>
       </div>
     </div>
