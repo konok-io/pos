@@ -1688,9 +1688,29 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             </div>
           ) : (
             <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',background:T.white,borderRadius:12,overflow:'hidden'}}>
-              <div style={{padding:'16px'}}>
-                <div style={{fontSize:48,marginBottom:12}}>🔍</div>
-                <div style={{fontSize:15,color:T.gray500}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
+              {/* Demo Illustration */}
+              <svg width="280" height="200" viewBox="0 0 280 200" style={{marginBottom:16}}>
+                {/* Background */}
+                <rect x="20" y="80" width="240" height="100" rx="8" fill="#F0FDFA" stroke="#0F766E" strokeWidth="2"/>
+                {/* Store/Shop Icon */}
+                <rect x="50" y="100" width="60" height="60" rx="4" fill="#0F766E"/>
+                <text x="80" y="135" textAnchor="middle" fill="white" fontSize="24">🏪</text>
+                {/* Barcode Scanner */}
+                <rect x="130" y="95" width="100" height="50" rx="6" fill="#115E59"/>
+                <rect x="140" y="105" width="80" height="30" rx="3" fill="#CCFBF1"/>
+                <text x="180" y="125" textAnchor="middle" fill="#0F766E" fontSize="14" fontWeight="bold">||||||</text>
+                {/* Shopping Items */}
+                <rect x="50" y="165" width="30" height="25" rx="3" fill="#14B8A6"/>
+                <rect x="85" y="165" width="30" height="25" rx="3" fill="#F59E0B"/>
+                <rect x="120" y="165" width="30" height="25" rx="3" fill="#EF4444"/>
+                {/* Checkmark/Success */}
+                <circle cx="220" cy="110" r="25" fill="#22C55E"/>
+                <path d="M208 110 L216 118 L232 102" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                {/* Arrow pointing down */}
+                <path d="M200 150 L220 150 L210 165 Z" fill="#6B7280"/>
+              </svg>
+              <div style={{padding:'16px',textAlign:'center'}}>
+                <div style={{fontSize:15,color:T.gray500,fontWeight:600}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
                 <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা কোম্পানি/ক্যাটাগরি সিলেক্ট করুন</div>
               </div>
             </div>
