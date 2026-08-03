@@ -6433,8 +6433,22 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
+  // Sync form with settings when they change
+  useEffect(() => {
+    setForm({
+      name: settings?.name || '',
+      address: settings?.address || '',
+      phone: settings?.phone || '',
+      vatEnabled: settings?.vatEnabled !== false,
+      vatPercent: settings?.vatPercent || 15,
+      bannerImage: settings?.bannerImage || ''
+    });
+  }, [settings]);
+
   const save = async () => {
-    await upd.settings(form);
+    // Merge form with existing settings to preserve any fields not in form
+    const updatedSettings = { ...settings, ...form };
+    await upd.settings(updatedSettings);
     setSaved(true); setTimeout(()=>setSaved(false),2000);
   };
 
