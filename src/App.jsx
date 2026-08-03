@@ -6521,6 +6521,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const handleAddressChange = (e) => {
     setForm(prev => ({...prev, address: e.target.value}));
   };
+  const handleFieldChange = (field, value) => {
+    setForm(prev => ({...prev, [field]: value}));
+  };
   const handleVatToggle = () => {
     setForm(prev => ({...prev, vatEnabled: !prev.vatEnabled}));
   };
@@ -6537,6 +6540,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       name: form.name,
       address: form.address,
       phone: form.phone,
+      email: form.email,
+      taxId: form.taxId,
       vatEnabled: form.vatEnabled,
       vatPercent: form.vatPercent,
       bannerImage: form.bannerImage
@@ -6548,7 +6553,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const sections = [
     { id: 'business', icon: '🏪', label: 'ব্যবসা' },
-    { id: 'display', icon: '🖼️', label: 'ডিসপ্লে' },
     { id: 'tax', icon: '💰', label: 'ট্যাক্স' },
     { id: 'reports', icon: '📊', label: 'রিপোর্ট' },
     { id: 'users', icon: '👥', label: 'ইউজার' },
@@ -6731,13 +6735,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   />
                 </div>
                 <div>
-                  <label style={{...label,marginBottom:8}}>📞 ফোন নম্বর</label>
+                  <label style={{...label,marginBottom:8}}>📞 মোবাইল নম্বর</label>
                   <input 
                     type="tel"
                     value={form.phone} 
                     onChange={handlePhoneChange} 
                     style={{...input,padding:'12px 14px',fontSize:14}}
-                    placeholder="01XXXXXXXXX"
+                    placeholder="মোবাইল নম্বর লিখুন"
                   />
                 </div>
                 <div style={{gridColumn:'1 / -1'}}>
@@ -6750,21 +6754,26 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     placeholder="আপনার ব্যবসার ঠিকানা লিখুন"
                   />
                 </div>
-              </div>
-            </SectionCard>
-          )}
-
-          {/* Display Settings */}
-          {activeSection === 'display' && (
-            <SectionCard title="ডিসপ্লে সেটিংস" icon="🖼️">
-              <div style={{marginBottom:20}}>
-                <label style={{...label,marginBottom:8}}>হোম পেজ ব্যানার ছবি</label>
-                <p style={{fontSize:13,color:T.gray500,margin:'0 0 16px'}}>বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।</p>
-                
-                <BannerImageUpload 
-                  value={form.bannerImage} 
-                  onChange={handleBannerChange} 
-                />
+                <div>
+                  <label style={{...label,marginBottom:8}}>📧 ইমেইল</label>
+                  <input 
+                    type="email"
+                    value={form.email || ''} 
+                    onChange={e => handleFieldChange('email', e.target.value)} 
+                    style={{...input,padding:'12px 14px',fontSize:14}}
+                    placeholder="ইমেইল লিখুন"
+                  />
+                </div>
+                <div>
+                  <label style={{...label,marginBottom:8}}>🔢 ট্যাক্স নম্বর</label>
+                  <input 
+                    type="text"
+                    value={form.taxId || ''} 
+                    onChange={e => handleFieldChange('taxId', e.target.value)} 
+                    style={{...input,padding:'12px 14px',fontSize:14}}
+                    placeholder="ট্যাক্স/ভ্যাট নম্বর"
+                  />
+                </div>
               </div>
             </SectionCard>
           )}
