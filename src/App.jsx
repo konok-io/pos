@@ -4885,10 +4885,6 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
       {invTab === 'list' && (
       <>
       <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
-        <div style={{position:'relative',flex:'1 1 200px'}}>
-          <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
-        </div>
         <button onClick={()=>{setStockFilter(stockFilter==='low'?'all':'low');setSearch('');}} style={{
           ...btn(stockFilter==='low'?'primary':'ghost'),
           background:stockFilter==='low'?T.orange:T.gray100,
@@ -4909,6 +4905,10 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
         }}>
           ✅ স্টক ঠিক আছে ({properStock.length})
         </button>
+        <div style={{position:'relative',flex:'1 1 200px'}}>
+          <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
+        </div>
         <button style={btn('ghost')} onClick={()=>{
           const printFiltered = filtered.length > 0 ? filtered : realProducts;
           const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
