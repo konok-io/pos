@@ -6493,6 +6493,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   });
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
+  
+  // DEBUG: Log re-renders to find the issue
+  const renderCount = useRef(0);
+  renderCount.current++;
+  useEffect(() => {
+    console.log('Settings re-render #' + renderCount.current, {settings: settings?.name, products: products?.length, upd: !!upd});
+  });
   const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
