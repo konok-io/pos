@@ -6478,16 +6478,16 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
-  // Initialize form directly from settings
-  const [form, setForm] = useState(() => {
-    return {
-      name: settings?.name || '',
-      address: settings?.address || '',
-      phone: settings?.phone || '',
-      vatEnabled: settings?.vatEnabled !== false,
-      vatPercent: settings?.vatPercent || 15,
-      bannerImage: settings?.bannerImage || ''
-    };
+  // Initialize form directly from settings (only on mount)
+  const [form, setForm] = useState({
+    name: settings?.name || '',
+    address: settings?.address || '',
+    phone: settings?.phone || '',
+    email: settings?.email || '',
+    taxId: settings?.taxId || '',
+    vatEnabled: settings?.vatEnabled !== false,
+    vatPercent: settings?.vatPercent || 15,
+    bannerImage: settings?.bannerImage || ''
   });
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
@@ -6498,20 +6498,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
-
-  // Sync form with settings when settings change externally
-  useEffect(() => {
-    setForm({
-      name: settings?.name || '',
-      address: settings?.address || '',
-      phone: settings?.phone || '',
-      email: settings?.email || '',
-      taxId: settings?.taxId || '',
-      vatEnabled: settings?.vatEnabled !== false,
-      vatPercent: settings?.vatPercent || 15,
-      bannerImage: settings?.bannerImage || ''
-    });
-  }, [settings]);
 
   // Simple handlers
   const handleNameChange = (e) => {
