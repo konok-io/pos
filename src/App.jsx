@@ -2,12 +2,6 @@ import { useState, useEffect, useRef } from "react";
 
 /* ─────────────── GLOBAL CSS RESET ─────────────── */
 const GlobalStyle = () => {
-  useEffect(() => {
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    document.documentElement.style.margin = '0';
-    document.documentElement.style.padding = '0';
-  }, []);
   return null;
 };
 
@@ -255,11 +249,15 @@ function DynamicMenu({tab, setTab, tabs}) {
 /* ═══════════════════════════════════════════
    LOGIN SCREEN
 ═══════════════════════════════════════════ */
-function LoginScreen({ onLogin }) {
+function LoginScreen({ onLogin, settings }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const currentYear = new Date().getFullYear();
+  const businessName = settings?.name || 'আপনার দোকান';
+  const businessAddress = settings?.address || '';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -298,101 +296,259 @@ function LoginScreen({ onLogin }) {
       alignItems: 'center',
       justifyContent: 'center',
       padding: 20,
+      position: 'relative',
+      overflow: 'hidden',
     }}>
+      {/* Background Pattern */}
       <div style={{
-        background: T.white,
-        borderRadius: 20,
-        padding: 40,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.1,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+      }} />
+
+      {/* Floating Elements */}
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        left: '5%',
+        width: 120,
+        height: 120,
+        background: 'rgba(255,255,255,0.1)',
+        borderRadius: '50%',
+        filter: 'blur(40px)',
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '15%',
+        right: '10%',
+        width: 200,
+        height: 200,
+        background: 'rgba(255,255,255,0.08)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+      }} />
+
+      {/* Login Card */}
+      <div style={{
+        background: 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: 24,
+        padding: '48px 44px',
         width: '100%',
         maxWidth: 420,
         boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+        border: '1px solid rgba(255,255,255,0.2)',
+        position: 'relative',
+        zIndex: 10,
       }}>
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          {/* Logo Icon */}
           <div style={{
             width: 72, height: 72,
             background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-            borderRadius: 18,
+            borderRadius: 20,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: 36,
-            margin: '0 auto 16px',
-            boxShadow: '0 8px 20px rgba(15,118,110,0.4)',
+            margin: '0 auto 20px',
+            boxShadow: '0 8px 24px rgba(15,118,110,0.4)',
           }}>🏪</div>
-          <h1 style={{ margin: '0 0 8px', fontSize: 24, fontWeight: 800, color: T.gray900 }}>
-            POS সিস্টেম
+          
+          <h1 style={{ 
+            margin: '0 0 6px', 
+            fontSize: 24, 
+            fontWeight: 700, 
+            color: '#1E293B',
+            letterSpacing: '-0.5px'
+          }}>
+            {businessName}
           </h1>
-          <p style={{ margin: 0, fontSize: 14, color: T.gray500 }}>
-            লগইন করে এগিয়ে যান
-          </p>
+          
+          {businessAddress && (
+            <div style={{ 
+              marginBottom: 14,
+              fontSize: 13, 
+              color: '#64748B',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              flexWrap: 'wrap'
+            }}>
+              {businessAddress}
+            </div>
+          )}
+          
+          {/* System Badge */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 18px',
+            background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+            borderRadius: 25,
+            marginTop: 6,
+            boxShadow: '0 4px 12px rgba(15,118,110,0.3)',
+          }}>
+            <span style={{ fontSize: 16 }}>💼</span>
+            <span style={{ 
+              fontSize: 13, 
+              color: '#FFFFFF',
+              fontWeight: 600,
+              letterSpacing: '0.3px'
+            }}>
+              POS ম্যানেজমেন্ট সিস্টেম
+            </span>
+          </div>
         </div>
+
+        {/* Divider */}
+        <div style={{
+          height: 1,
+          background: 'linear-gradient(90deg, transparent, #E2E8F0, transparent)',
+          marginBottom: 32,
+        }} />
 
         {/* Login Form */}
         <form onSubmit={handleLogin}>
+          {/* Email Field */}
           <div style={{ marginBottom: 20 }}>
-            <label style={{ ...label, marginBottom: 8 }}>📧 ইমেইল</label>
+            <label style={{ 
+              display: 'block',
+              marginBottom: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              color: '#475569',
+              letterSpacing: '0.2px'
+            }}>
+              📧 ইমেইল
+            </label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@konok.io"
+              placeholder="admin@yourbusiness.com"
               required
-              style={{ ...input, padding: '14px 16px', fontSize: 15 }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                fontSize: 15,
+                border: '2px solid #E2E8F0',
+                borderRadius: 12,
+                outline: 'none',
+                transition: 'all 0.2s',
+                boxSizing: 'border-box',
+                color: '#1E293B',
+                background: '#F8FAFC',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#0F766E';
+                e.target.style.boxShadow = '0 0 0 4px rgba(15,118,110,0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E2E8F0';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
-          <div style={{ marginBottom: 24 }}>
-            <label style={{ ...label, marginBottom: 8 }}>🔐 পাসওয়ার্ড</label>
+          {/* Password Field */}
+          <div style={{ marginBottom: 28 }}>
+            <label style={{ 
+              display: 'block',
+              marginBottom: 8,
+              fontSize: 13,
+              fontWeight: 600,
+              color: '#475569',
+              letterSpacing: '0.2px'
+            }}>
+              🔐 পাসওয়ার্ড
+            </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="পাসওয়ার্ড লিখুন"
               required
-              style={{ ...input, padding: '14px 16px', fontSize: 15 }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                fontSize: 15,
+                border: '2px solid #E2E8F0',
+                borderRadius: 12,
+                outline: 'none',
+                transition: 'all 0.2s',
+                boxSizing: 'border-box',
+                color: '#1E293B',
+                background: '#F8FAFC',
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#0F766E';
+                e.target.style.boxShadow = '0 0 0 4px rgba(15,118,110,0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E2E8F0';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
+          {/* Error Message */}
           {error && (
             <div style={{
-              padding: '12px 16px',
-              background: T.redLight,
-              borderRadius: 10,
-              marginBottom: 20,
-              color: T.red,
+              padding: '14px 16px',
+              background: '#FEF2F2',
+              borderRadius: 12,
+              marginBottom: 24,
+              color: '#DC2626',
               fontSize: 14,
               fontWeight: 500,
+              border: '1px solid #FECACA',
             }}>
               {error}
             </div>
           )}
 
+          {/* Login Button */}
           <button
             type="submit"
             disabled={loading}
             style={{
               width: '100%',
-              padding: '14px',
-              background: loading ? T.gray400 : 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-              color: T.white,
+              padding: '15px',
+              background: loading ? '#94A3B8' : 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+              color: '#FFFFFF',
               border: 'none',
               borderRadius: 12,
               fontSize: 16,
-              fontWeight: 700,
+              fontWeight: 600,
               cursor: loading ? 'not-allowed' : 'pointer',
-              boxShadow: loading ? 'none' : '0 8px 20px rgba(15,118,110,0.4)',
               transition: 'all 0.3s',
+              boxShadow: loading ? 'none' : '0 8px 20px rgba(15,118,110,0.4)',
+              letterSpacing: '0.3px',
             }}
+            onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
+            onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
           >
             {loading ? '⏳ লোড হচ্ছে...' : '🔓 লগইন করুন'}
           </button>
         </form>
 
         {/* Footer */}
-        <div style={{ marginTop: 24, textAlign: 'center' }}>
-          <p style={{ margin: 0, fontSize: 12, color: T.gray400 }}>
-            © ২০২৪ konok.io
+        <div style={{ marginTop: 36, textAlign: 'center' }}>
+          <p style={{ 
+            margin: 0, 
+            fontSize: 12, 
+            color: '#94A3B8',
+            letterSpacing: '0.2px'
+          }}>
+            © {currentYear} {businessName}
           </p>
         </div>
       </div>
@@ -401,14 +557,21 @@ function LoginScreen({ onLogin }) {
 }
 
 /* ─────────────── MAIN APP ─────────────── */
-export default function App() {
-  const [currentUser, setCurrentUser] = useState(() => db.get(STORAGE_KEYS.auth));
-  const [showLogin, setShowLogin] = useState(() => !db.get(STORAGE_KEYS.auth));
+const DEFAULT_SETTINGS = {name:'আমার দোকান',address:'',phone:'',vatEnabled:true,vatPercent:15};
+
+function LoginPage({ onLogin }) {
+  return <LoginScreen onLogin={onLogin} settings={DEFAULT_SETTINGS} />;
+}
+
+function MainApp({ currentUser, onLogout }) {
+  const logoutRef = useRef(onLogout);
+  logoutRef.current = onLogout;
+  
   const [tab, setTab] = useState(() => localStorage.getItem('pos_current_tab') || 'pos');
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
-  const [settings, setSettings] = useState({name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [purchases, setPurchases] = useState([]);
@@ -416,6 +579,14 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // CSS Reset
+  useEffect(() => {
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.documentElement.style.margin = '0';
+    document.documentElement.style.padding = '0';
+  }, []);
 
   // Update time every second
   useEffect(() => {
@@ -493,7 +664,7 @@ export default function App() {
       setSales(savedSales || []);
       setPurchases(savedPurchases);
       setProductHistory(savedProductHistory);
-      setSettings(savedSettings ? {...{name:'',address:'',phone:'',vatEnabled:true,vatPercent:15}, ...savedSettings} : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setSettings(savedSettings ? {...{...DEFAULT_SETTINGS}, ...savedSettings} : {...DEFAULT_SETTINGS});
       setReady(true);
       return;
     }
@@ -539,7 +710,7 @@ export default function App() {
       setCategories([]);
     }
 
-    const defaultSettings = {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
+    const defaultSettings = {...DEFAULT_SETTINGS};
     setSettings(savedSettings ? {...defaultSettings, ...savedSettings} : defaultSettings);
 
     setReady(true);
@@ -622,10 +793,10 @@ export default function App() {
   };
 
   if (!ready) return (
-    <div style={{display:'flex',height:'100vh',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:14,background:T.tealLight}}>
-      <div style={{width:56,height:56,background:T.teal,borderRadius:14,display:'flex',alignItems:'center',justifyContent:'center',fontSize:28}}>🏪</div>
-      <div style={{color:T.teal,fontWeight:700,fontSize:18}}>POS লোড হচ্ছে...</div>
-      <div style={{color:T.gray400,fontSize:13}}>আপনার ডেটা প্রস্তুত করা হচ্ছে</div>
+    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'#0F766E',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:20}}>
+      <div style={{fontSize:64}}>🏪</div>
+      <div style={{color:'white',fontSize:24,fontWeight:'bold'}}>POS সিস্টেম</div>
+      <div style={{color:'rgba(255,255,255,0.8)',fontSize:16}}>লোড হচ্ছে...</div>
     </div>
   );
 
@@ -663,7 +834,7 @@ export default function App() {
       setSuppliers([...savedSuppliers]);
       setSales([...savedSales] || []);
       setPurchases([...savedPurchases]);
-      setSettings({...savedSettings} || {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setSettings({...savedSettings} || {...DEFAULT_SETTINGS});
     } else {
       setProducts([...savedProducts] || [...DEMO.products]);
       setCustomers([...savedCustomers] || [...DEMO.customers]);
@@ -671,7 +842,7 @@ export default function App() {
       setSuppliers([...savedSuppliers]);
       setPurchases([...savedPurchases]);
       setCategories([...savedCategories]);
-      setSettings({...savedSettings} || {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setSettings({...savedSettings} || {...DEFAULT_SETTINGS});
     }
   };
 
@@ -688,30 +859,16 @@ export default function App() {
     }
   };
 
-  // Handle login from LoginScreen
-  const handleLogin = (userData) => {
-    setCurrentUser(userData);
-    setShowLogin(false);
-  };
-
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem(STORAGE_KEYS.auth);
-    setCurrentUser(null);
-    setShowLogin(true);
-  };
 
   // Auto-logout after 15 minutes of inactivity
   useEffect(() => {
-    if (!currentUser) return;
-
     const INACTIVITY_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
     let inactivityTimer;
 
     const resetTimer = () => {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
-        handleLogout();
+        logoutRef.current();
       }, INACTIVITY_TIME);
     };
 
@@ -731,12 +888,7 @@ export default function App() {
         document.removeEventListener(event, resetTimer);
       });
     };
-  }, [currentUser]);
-
-  // Show login screen if not authenticated
-  if (showLogin || !currentUser) {
-    return <LoginScreen onLogin={handleLogin} />;
-  }
+  }, []);
 
   return (
     <>
@@ -770,7 +922,7 @@ export default function App() {
             </button>
             
             {/* Logout Button */}
-            <button onClick={handleLogout} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="লগআউট">
+            <button onClick={onLogout} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="লগআউট">
               <span style={{fontSize:16}}>↩️</span>
             </button>
 
@@ -799,6 +951,12 @@ export default function App() {
     </div>
     </>
   );
+}
+
+/* ─────────────── APP WRAPPER ─────────────── */
+export default function App() {
+  const fakeUser = { email: 'admin@local', name: 'Admin', role: 'admin' };
+  return <MainApp currentUser={fakeUser} onLogout={() => {}} />;
 }
 
 /* ═══════════════════════════════════════════
@@ -5996,7 +6154,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:24}}>
         <div>
           <h1 style={{margin:0,fontSize:24,fontWeight:800,color:T.gray900}}>⚙️ সেটিংস</h1>
-          <p style={{margin:'4px 0 0',fontSize:14,color:T.gray500}}>আপনার POS সিস্টেম কনফিগার করুন</p>
+          <p style={{margin:'4px 0 0',fontSize:14,color:T.gray500}}>আপনার POS ম্যানেজমেন্ট সিস্টেম কনফিগার করুন</p>
         </div>
         <button onClick={save} style={{
           padding:'12px 28px',
