@@ -7320,6 +7320,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { upd.sales([]); alert('বিক্রয় মুছা হয়েছে।'); } } },
                   { l: '📜 হিস্ট্রি ডেটা', c: productHistory.length, btn: 'সব হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('সব হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory([]); alert('হিস্ট্রি মুছা হয়েছে।'); } } },
                   { l: '📊 স্টক হিস্ট্রি', c: productHistory.filter(h => h.type === 'stock').length, btn: 'স্টক হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('স্টক হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory(productHistory.filter(h => h.type !== 'stock')); alert('স্টক হিস্ট্রি মুছা হয়েছে।'); } } },
+                  { l: '👥 কাস্টমার ডেটা', c: customers.length, btn: 'সব কাস্টমার মুছে ফেলুন', fn: () => { if(confirm('সব কাস্টমার মুছে ফেলবেন?')) { upd.customers([]); alert('কাস্টমার মুছা হয়েছে।'); } } },
                 ].map((d, i) => (
                   <div key={i} style={{
                     padding: 24,
