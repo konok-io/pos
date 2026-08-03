@@ -567,7 +567,7 @@ function MainApp({ currentUser, onLogout }) {
   const logoutRef = useRef(onLogout);
   logoutRef.current = onLogout;
   
-  const [tab, setTab] = useState(() => localStorage.getItem('pos_current_tab') || 'pos');
+  const [tab, setTab] = useState('pos');
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
@@ -577,7 +577,7 @@ function MainApp({ currentUser, onLogout }) {
   const [purchases, setPurchases] = useState([]);
   const [productHistory, setProductHistory] = useState([]);
   const [ready, setReady] = useState(false);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // CSS Reset
@@ -588,8 +588,18 @@ function MainApp({ currentUser, onLogout }) {
     document.documentElement.style.padding = '0';
   }, []);
 
-  // Update time every second
+  // Initialize time and tab from localStorage on mount
   useEffect(() => {
+    // Initialize tab from localStorage
+    const savedTab = localStorage.getItem('pos_current_tab');
+    if (savedTab) {
+      setTab(savedTab);
+    }
+    
+    // Initialize current time
+    setCurrentTime(new Date());
+    
+    // Update time every second
     const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -928,8 +938,8 @@ function MainApp({ currentUser, onLogout }) {
 
             {/* Date & Time - Rightmost */}
             <div style={{textAlign:'right',paddingLeft:14}}>
-              <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}</div>
-              <div style={{fontSize:11,color:T.gray400}}>{currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'})}</div>
+              <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{currentTime ? currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '--:--:--'}</div>
+              <div style={{fontSize:11,color:T.gray400}}>{currentTime ? currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : '------'}</div>
             </div>
           </div>
         </div>
@@ -963,34 +973,32 @@ export default function App() {
    POS SCREEN
 ═══════════════════════════════════════════ */
 function POSScreen({products, customers, sales, settings, categories, upd}) {
-  // Initialize cart from localStorage
-  const [cart, setCart] = useState(() => {
+  // Initialize cart from localStorage in useEffect to avoid hydration issues
+  const [cart, setCart] = useState([]);
+  const [selCust, setSelCust] = useState(null);
+  const [custQ, setCustQ] = useState('');
+  
+  useEffect(() => {
     try {
-      const saved = localStorage.getItem('pos_cart');
-      return saved ? JSON.parse(saved) : [];
-    } catch { return []; }
-  });
+      const savedCart = localStorage.getItem('pos_cart');
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+      const savedCust = localStorage.getItem('pos_selCust');
+      if (savedCust) {
+        const c = JSON.parse(savedCust);
+        setSelCust(c);
+        setCustQ(c ? c.name : '');
+      }
+    } catch (e) {
+      console.error('Failed to load from localStorage:', e);
+    }
+  }, []);
   
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('pos_cart', JSON.stringify(cart));
   }, [cart]);
-  
-  // Save selected customer
-  const [selCust, setSelCust] = useState(() => {
-    try {
-      const saved = localStorage.getItem('pos_selCust');
-      return saved ? JSON.parse(saved) : null;
-    } catch { return null; }
-  });
-  
-  const [custQ, setCustQ] = useState(() => {
-    try {
-      const saved = localStorage.getItem('pos_selCust');
-      const c = saved ? JSON.parse(saved) : null;
-      return c ? c.name : '';
-    } catch { return ''; }
-  });
   
   useEffect(() => {
     localStorage.setItem('pos_selCust', JSON.stringify(selCust));
