@@ -942,6 +942,7 @@ function MainApp({ currentUser, onLogout }) {
     {id:'suppliers',icon:'🏢',label:'ম্যানেজমেন্ট'},
     {id:'customers',icon:'👥',label:'কাস্টমার'},
     {id:'inventory',icon:'🏭',label:'স্টক'},
+    {id:'lowstock',icon:'⚠️',label:'স্টক কম'},
     {id:'income',icon:'💰',label:'আয়/ব্যয়'},
     {id:'reports',icon:'📊',label:'রিপোর্ট'},
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
@@ -1047,6 +1048,7 @@ function MainApp({ currentUser, onLogout }) {
         {tab==='suppliers' && <SuppliersScreen {...props} />}
         {tab==='customers' && <CustomersScreen {...props} />}
         {tab==='inventory' && <InventoryScreen {...props} />}
+        {tab==='lowstock'  && <LowStockScreen {...props} />}
         {tab==='income'    && <IncomeScreen {...props} />}
         {tab==='reports'   && <ReportsScreen {...props} />}
         {tab==='settings'  && <SettingsScreen {...props} />}
@@ -1206,6 +1208,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   
   const outOfStockCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock <= 0).length;
   const allCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0).length;
+  const lowStockCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0 && p.stock <= p.minStock).length;
   
   const filtered = products.filter(p => {
     const isCategory = p.name?.includes('(ক্যাটাগরি)');
@@ -1223,6 +1226,10 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     // স্টক শেষ: only show out of stock
     if (selCat === 'স্টক শেষ') {
       return p.stock <= 0 && matchComp && matchName;
+    }
+    // স্টক কম: only show low stock products
+    if (selCat === 'স্টক কম') {
+      return p.stock > 0 && p.stock <= p.minStock && matchComp && matchName;
     }
     // Specific category: show products in that category with stock > 0
     return p.cat === selCat && p.stock > 0 && matchComp && matchName;
@@ -1533,6 +1540,17 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             fontSize:12,
           }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
           
+          {/* স্টক কম button */}
+          <button onClick={()=>{setSelCat('স্টক কম');setCatSearch('');}} style={{
+            ...btn(selCat==='স্টক কম'?'primary':'ghost','sm'),
+            borderRadius:7, whiteSpace:'nowrap',
+            background:selCat==='স্টক কম'?T.orange:T.orangeLight,
+            color:selCat==='স্টক কম'?T.white:T.orange,
+            border:'none',
+            padding:'6px 12px',
+            fontSize:12,
+          }}>⚠️ স্টক কম {lowStockCount > 0 && <span style={{opacity:0.7}}>({lowStockCount})</span>}</button>
+          
           {/* Company dropdown */}
           <div style={{position:'relative',minWidth:120}} data-comp-dropdown>
             <input 
@@ -1606,13 +1624,13 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
 
         {/* Product grid - Show products when company or category is selected */}
         <div style={{flex:1,overflow:'auto',padding:16,background:T.gray50}}>
-          {selComp !== 'সব কোম্পানি' || (selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ') ? (
+          {selComp !== 'সব কোম্পানি' || (selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম') ? (
             <div>
               <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                 <span style={{fontSize:13,fontWeight:600,color:T.gray600}}>
                   {selComp !== 'সব কোম্পানি' && `🏢 ${selComp} (${filtered.length}টি পণ্য)`}
-                  {selComp === 'সব কোম্পানি' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && `📁 ${selCat} (${filtered.length}টি পণ্য)`}
-                  {selComp !== 'সব কোম্পানি' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && ' - ' + selCat}
+                  {selComp === 'সব কোম্পানি' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && `📁 ${selCat} (${filtered.length}টি পণ্য)`}
+                  {selComp !== 'সব কোম্পানি' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && ' - ' + selCat}
                 </span>
                 <button onClick={()=>{setSelComp('সব কোম্পানি');setSelCat('স্টক আছে');setCompSearch('');setCatSearch('');}} style={{fontSize:11,padding:'4px 10px',border:'none',borderRadius:5,background:T.gray200,cursor:'pointer',color:T.gray600}}>✕ মুছুন</button>
               </div>
@@ -4987,6 +5005,130 @@ ${printFiltered.map(p => {
       </>
       )}
 
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   LOW STOCK SCREEN
+═══════════════════════════════════════════ */
+function LowStockScreen({products, upd}) {
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => setLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, [products]);
+
+  const realProducts = products.filter(p => !p.name?.includes('(ক্যাটাগরি)'));
+  
+  // Filter only low stock products (stock > 0 && stock <= minStock)
+  const lowStockProducts = realProducts.filter(p => p.stock > 0 && p.stock <= p.minStock);
+  
+  const filtered = lowStockProducts
+    .filter(p => !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.company||'').toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => a.stock - b.stock);
+
+  const totalValue = filtered.reduce((s, p) => s + p.sellP * p.stock, 0);
+
+  return (
+    <div style={{height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
+      {/* Header */}
+      <div style={{padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`}}>
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: 10}}>
+            <span style={{fontSize: 24}}>⚠️</span>
+            <div>
+              <div style={{fontSize: 16, fontWeight: 700, color: T.gray900}}>স্টক কম পণ্যসমূহ</div>
+              <div style={{fontSize: 12, color: T.gray500}}>মিনিমাম স্টকের নিচে পণ্য</div>
+            </div>
+          </div>
+          <div style={{textAlign: 'right'}}>
+            <div style={{fontSize: 20, fontWeight: 800, color: T.orange}}>{filtered.length}টি পণ্য</div>
+            <div style={{fontSize: 12, color: T.gray500}}>স্টক মূল্য: <strong style={{color: T.teal}}>{fmt(totalValue)}</strong></div>
+          </div>
+        </div>
+        
+        {/* Search */}
+        <div style={{position: 'relative'}}>
+          <span style={{position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400}}>🔍</span>
+          <input 
+            value={search} 
+            onChange={e => setSearch(e.target.value)} 
+            placeholder="পণ্য বা কোম্পানি খুঁজুন..." 
+            style={{...input, paddingLeft: 32, height: 36, fontSize: 13}}
+          />
+        </div>
+      </div>
+
+      {/* Product List */}
+      <div style={{flex: 1, overflow: 'auto', padding: 12}}>
+        {loading ? (
+          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 16}}>
+            <div style={{
+              width: 48, height: 48, border: '4px solid #E0E0E0', borderTop: '4px solid #ef6c00',
+              borderRadius: '50%', animation: 'spin 1s linear infinite'
+            }}></div>
+            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+            <div style={{fontSize: 14, color: T.gray500}}>লোড হচ্ছে...</div>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 16}}>
+            <div style={{fontSize: 64}}>✅</div>
+            <div style={{fontSize: 18, fontWeight: 700, color: T.green}}>সব পণ্যে পর্যাপ্ত স্টক আছে!</div>
+            <div style={{fontSize: 13, color: T.gray500}}>কোনো পণ্য স্টক কম নেই</div>
+          </div>
+        ) : (
+          <div style={{display: 'flex', flexDirection: 'column', gap: 10}}>
+            {filtered.map((p, i) => (
+              <div key={p.id} style={{
+                background: T.white, border: `1.5px solid ${T.amber}`, borderRadius: 12,
+                padding: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+              }}>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
+                  <div style={{flex: 1}}>
+                    <div style={{fontSize: 15, fontWeight: 700, color: T.gray900, marginBottom: 4}}>{p.name}</div>
+                    <div style={{fontSize: 12, color: T.gray500}}>
+                      {p.company && <span>🏢 {p.company}</span>}
+                      {p.cat && <span style={{marginLeft: 8}}>📁 {p.cat}</span>}
+                    </div>
+                  </div>
+                  <div style={{textAlign: 'right'}}>
+                    <div style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      background: T.orangeLight, color: T.orange,
+                      padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700
+                    }}>
+                      ⚠️ স্টক কম
+                    </div>
+                  </div>
+                </div>
+                
+                <div style={{display: 'flex', gap: 16, marginTop: 12, paddingTop: 12, borderTop: `1px solid ${T.gray100}`}}>
+                  <div style={{flex: 1}}>
+                    <div style={{fontSize: 11, color: T.gray500, marginBottom: 2}}>বর্তমান স্টক</div>
+                    <div style={{fontSize: 22, fontWeight: 800, color: T.orange}}>{p.stock} <span style={{fontSize: 12, fontWeight: 400, color: T.gray500}}>/ {p.unit}</span></div>
+                  </div>
+                  <div style={{flex: 1}}>
+                    <div style={{fontSize: 11, color: T.gray500, marginBottom: 2}}>মিনিমাম স্টক</div>
+                    <div style={{fontSize: 22, fontWeight: 800, color: T.gray700}}>{p.minStock} <span style={{fontSize: 12, fontWeight: 400, color: T.gray500}}>/ {p.unit}</span></div>
+                  </div>
+                  <div style={{flex: 1}}>
+                    <div style={{fontSize: 11, color: T.gray500, marginBottom: 2}}>বিক্রয় মূল্য</div>
+                    <div style={{fontSize: 22, fontWeight: 800, color: T.teal}}>{fmt(p.sellP)}</div>
+                  </div>
+                  <div style={{flex: 1}}>
+                    <div style={{fontSize: 11, color: T.gray500, marginBottom: 2}}>স্টক ঘাটতি</div>
+                    <div style={{fontSize: 22, fontWeight: 800, color: T.red}}>{p.minStock - p.stock}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
