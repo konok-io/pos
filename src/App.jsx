@@ -6676,7 +6676,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       </div>
 
       {/* Content */}
-      <div style={{ padding: 32, maxWidth: 1200 }}>
+      <div style={{ padding: 32 }}>
         {/* Business Tab */}
         {activeTab === 0 && (
           <div style={{
