@@ -6415,14 +6415,16 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
-  // Initialize form with default values first
-  const [form, setForm] = useState({
-    name: '',
-    address: '',
-    phone: '',
-    vatEnabled: true,
-    vatPercent: 15,
-    bannerImage: ''
+  // Initialize form directly from settings
+  const [form, setForm] = useState(() => {
+    return {
+      name: settings?.name || '',
+      address: settings?.address || '',
+      phone: settings?.phone || '',
+      vatEnabled: settings?.vatEnabled !== false,
+      vatPercent: settings?.vatPercent || 15,
+      bannerImage: settings?.bannerImage || ''
+    };
   });
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
@@ -6434,27 +6436,25 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
-  // Load settings into form when settings become available
-  useEffect(() => {
-    if (settings && settings.name !== undefined) {
-      setForm({
-        name: settings.name || '',
-        address: settings.address || '',
-        phone: settings.phone || '',
-        vatEnabled: settings.vatEnabled !== false,
-        vatPercent: settings.vatPercent || 15,
-        bannerImage: settings.bannerImage || ''
-      });
-    }
-  }, [settings]);
-
-  // Handler functions
-  const handleNameChange = (e) => setForm(f => ({...f, name: e.target.value}));
-  const handlePhoneChange = (e) => setForm(f => ({...f, phone: e.target.value}));
-  const handleAddressChange = (e) => setForm(f => ({...f, address: e.target.value}));
-  const handleVatToggle = () => setForm(f => ({...f, vatEnabled: !f.vatEnabled}));
-  const handleVatPercentChange = (e) => setForm(f => ({...f, vatPercent: parseFloat(e.target.value) || 0}));
-  const handleBannerChange = (data) => setForm(f => ({...f, bannerImage: data}));
+  // Simple handlers
+  const handleNameChange = (e) => {
+    setForm(prev => ({...prev, name: e.target.value}));
+  };
+  const handlePhoneChange = (e) => {
+    setForm(prev => ({...prev, phone: e.target.value}));
+  };
+  const handleAddressChange = (e) => {
+    setForm(prev => ({...prev, address: e.target.value}));
+  };
+  const handleVatToggle = () => {
+    setForm(prev => ({...prev, vatEnabled: !prev.vatEnabled}));
+  };
+  const handleVatPercentChange = (e) => {
+    setForm(prev => ({...prev, vatPercent: parseFloat(e.target.value) || 0}));
+  };
+  const handleBannerChange = (data) => {
+    setForm(prev => ({...prev, bannerImage: data}));
+  };
 
   const save = async () => {
     // Create complete settings object
@@ -6468,7 +6468,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     };
     await upd.settings(completeSettings);
     setSaved(true); 
-    setTimeout(()=>setSaved(false), 2000);
+    setTimeout(() => setSaved(false), 2000);
   };
 
   const sections = [
