@@ -6305,7 +6305,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <label style={{...label,marginBottom:8}}>হোম পেজ ব্যানার ছবি</label>
                 <p style={{fontSize:13,color:T.gray500,margin:'0 0 16px'}}>বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।</p>
                 
-                {form.bannerImage && (
+                {form.bannerImage ? (
                   <div style={{marginBottom:16,position:'relative',borderRadius:12,overflow:'hidden',maxWidth:500}}>
                     <img src={form.bannerImage} alt="Banner Preview" style={{width:'100%',maxHeight:200,objectFit:'cover',display:'block'}}/>
                     <button onClick={()=>setForm(p=>({...p,bannerImage:''}))} style={{
@@ -6313,22 +6313,22 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       border:'none',borderRadius:8,cursor:'pointer',fontSize:13,fontWeight:600
                     }}>✕ মুছুন</button>
                   </div>
+                ) : (
+                  <div style={{display:'flex',alignItems:'center',gap:12}}>
+                    <label style={{
+                      display:'flex',alignItems:'center',justifyContent:'center',gap:12,
+                      padding:'24px',border:`2px dashed ${T.gray300}`,borderRadius:12,cursor:'pointer',
+                      background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600,maxWidth:500,
+                      position:'relative',overflow:'hidden',flex:1
+                    }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
+                       onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
+                      <span style={{fontSize:28}}>📁</span>
+                      <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
+                      <input type="file" accept="image/*" onChange={handleImageUpload} 
+                        style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',opacity:0,cursor:'pointer'}}/>
+                    </label>
+                  </div>
                 )}
-                
-                <div style={{display:'flex',alignItems:'center',gap:12}}>
-                  <label style={{
-                    display:'flex',alignItems:'center',justifyContent:'center',gap:12,
-                    padding:'24px',border:`2px dashed ${T.gray300}`,borderRadius:12,cursor:'pointer',
-                    background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600,maxWidth:500,
-                    position:'relative',overflow:'hidden',flex:1
-                  }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
-                     onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
-                    <span style={{fontSize:28}}>📁</span>
-                    <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
-                    <input type="file" accept="image/*" onChange={handleImageUpload} 
-                      style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',opacity:0,cursor:'pointer'}}/>
-                  </label>
-                </div>
               </div>
             </SectionCard>
           )}
