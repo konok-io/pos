@@ -790,10 +790,10 @@ function MainApp({ currentUser, onLogout }) {
   };
 
   if (!ready) return (
-    <div style={{display:'flex',height:'100vh',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:14,background:T.tealLight}}>
-      <div style={{width:56,height:56,background:T.teal,borderRadius:14,display:'flex',alignItems:'center',justifyContent:'center',fontSize:28}}>🏪</div>
-      <div style={{color:T.teal,fontWeight:700,fontSize:18}}>POS লোড হচ্ছে...</div>
-      <div style={{color:T.gray400,fontSize:13}}>আপনার ডেটা প্রস্তুত করা হচ্ছে</div>
+    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'#0F766E',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:20}}>
+      <div style={{fontSize:64}}>🏪</div>
+      <div style={{color:'white',fontSize:24,fontWeight:'bold'}}>POS সিস্টেম</div>
+      <div style={{color:'rgba(255,255,255,0.8)',fontSize:16}}>লোড হচ্ছে...</div>
     </div>
   );
 
