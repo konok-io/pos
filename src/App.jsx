@@ -1601,42 +1601,42 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         </div>
         
         {/* Filter row */}
-        {/* Combined row with stock buttons left and dropdowns right */}
+        {/* Combined row with stock summary left and dropdowns right */}
         <div style={{padding:'6px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap',justifyContent:'space-between'}}>
-          {/* Left: Stock buttons */}
+          {/* Left: Stock summary (display only) */}
           <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
-            {/* স্টক আছে button */}
-            <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
-              ...btn(selCat==='স্টক আছে'?'primary':'ghost','sm'),
+            {/* স্টক আছে summary */}
+            <div style={{
               borderRadius:7, whiteSpace:'nowrap',
-              background:selCat==='স্টক আছে'?T.teal:T.gray100,
-              color:selCat==='স্টক আছে'?T.white:T.gray600,
+              background:T.tealLight,
+              color:T.teal,
               border:'none',
               padding:'6px 12px',
               fontSize:12,
-            }}>📦 স্টক আছে {allCount > 0 && <span style={{opacity:0.7}}>({allCount})</span>}</button>
+              fontWeight:500,
+            }}>📦 স্টক আছে <span>({allCount})</span></div>
             
-            {/* স্টক কম button */}
-            <button onClick={()=>{setSelCat('স্টক কম');setCatSearch('');}} style={{
-              ...btn(selCat==='স্টক কম'?'primary':'ghost','sm'),
+            {/* স্টক কম summary */}
+            <div style={{
               borderRadius:7, whiteSpace:'nowrap',
-              background:selCat==='স্টক কম'?T.orange:T.orangeLight,
-              color:selCat==='স্টক কম'?T.white:T.orange,
+              background:T.orangeLight,
+              color:T.orange,
               border:'none',
               padding:'6px 12px',
               fontSize:12,
-            }}>⚠️ স্টক কম {lowStockCount > 0 && <span style={{opacity:0.7}}>({lowStockCount})</span>}</button>
+              fontWeight:500,
+            }}>⚠️ স্টক কম <span>({lowStockCount})</span></div>
             
-            {/* স্টক শেষ button */}
-            <button onClick={()=>{setSelCat('স্টক শেষ');setCatSearch('');}} style={{
-              ...btn(selCat==='স্টক শেষ'?'primary':'ghost','sm'),
+            {/* স্টক শেষ summary */}
+            <div style={{
               borderRadius:7, whiteSpace:'nowrap',
-              background:selCat==='স্টক শেষ'?T.red:T.redLight,
-              color:selCat==='স্টক শেষ'?T.white:T.red,
+              background:T.redLight,
+              color:T.red,
               border:'none',
               padding:'6px 12px',
               fontSize:12,
-            }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
+              fontWeight:500,
+            }}>⚠️ স্টক শেষ <span>({outOfStockCount})</span></div>
           </div>
           
           {/* Right: Dropdowns */}
