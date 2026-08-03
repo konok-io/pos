@@ -6501,9 +6501,12 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     zatkaUsername: settings?.zatkaUsername || '',
     zatkaPassword: settings?.zatkaPassword || '',
     zatkaEnabled: settings?.zatkaEnabled || false,
+    zatcaPhase: settings?.zatcaPhase || 'phase1',
     zatcaOid: settings?.zatcaOid || '',
     zatcaCsid: settings?.zatcaCsid || '',
     zatcaPrivateKey: settings?.zatcaPrivateKey || '',
+    zatcaClientId: settings?.zatcaClientId || '',
+    zatcaClientSecret: settings?.zatcaClientSecret || '',
     vatEnabled: settings?.vatEnabled !== false,
     vatPercent: settings?.vatPercent || 15,
     bannerImage: settings?.bannerImage || ''
@@ -6887,7 +6890,54 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   </button>
                 </div>
 
-                {/* API Credentials */}
+                {/* Phase Selection */}
+                <div style={{ marginBottom: 20 }}>
+                  <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>📦 ফেজ সিলেক্ট করুন</h5>
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <button
+                      onClick={() => setForm(p => ({...p, zatcaPhase: 'phase1'}))}
+                      style={{
+                        flex: 1,
+                        padding: '14px 20px',
+                        background: form.zatcaPhase === 'phase1' ? '#0F766E' : '#fff',
+                        color: form.zatcaPhase === 'phase1' ? '#fff' : '#64748b',
+                        border: form.zatcaPhase === 'phase1' ? '2px solid #0F766E' : '2px solid #e2e8f0',
+                        borderRadius: 10,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <div style={{ marginBottom: 4 }}>📱 Phase 1 (সিমপ্লিফাইড)</div>
+                      <div style={{ fontSize: 11, fontWeight: 400, opacity: form.zatcaPhase === 'phase1' ? 0.8 : 0.6 }}>
+                        B2C - QR কোড + বেসিক ইনভয়েস (রিসিট)
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => setForm(p => ({...p, zatcaPhase: 'phase2'}))}
+                      style={{
+                        flex: 1,
+                        padding: '14px 20px',
+                        background: form.zatcaPhase === 'phase2' ? '#0F766E' : '#fff',
+                        color: form.zatcaPhase === 'phase2' ? '#fff' : '#64748b',
+                        border: form.zatcaPhase === 'phase2' ? '2px solid #0F766E' : '2px solid #e2e8f0',
+                        borderRadius: 10,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <div style={{ marginBottom: 4 }}>🏢 Phase 2 (স্ট্যান্ডার্ড)</div>
+                      <div style={{ fontSize: 11, fontWeight: 400, opacity: form.zatcaPhase === 'phase2' ? 0.8 : 0.6 }}>
+                        B2B - XML UBL + API ক্লিয়ারেন্স + রিয়েল-টাইম রিপোর্টিং
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* API Credentials - Common for both phases */}
                 <div style={{ marginBottom: 20 }}>
                   <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔑 API ক্রেডেনশিয়ালস</h5>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
@@ -6967,90 +7017,211 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   </div>
                 </div>
 
-                {/* Cryptographic IDs */}
-                <div>
-                  <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔐 ক্রিপ্টোগ্রাফিক আইডেন্টিফায়ার (ZATCA Portal থেকে পাবেন)</h5>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
-                        🏷️ OID (Organizational Identifier)
-                      </label>
-                      <input
-                        value={form.zatcaOid || ''}
-                        onChange={e => setForm(p => ({...p, zatcaOid: e.target.value}))}
-                        style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          fontSize: 14,
-                          border: '2px solid #e2e8f0',
-                          borderRadius: 8,
-                          outline: 'none',
-                          boxSizing: 'border-box',
-                          color: '#1e293b',
-                          background: '#fff'
-                        }}
-                        onFocus={e => e.target.style.borderColor = '#0F766E'}
-                        onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                        placeholder="1.2.3.4.5.6.7.8.9"
-                        disabled={!form.zatkaEnabled}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
-                        🆔 CSID (Cryptographic Stamp ID)
-                      </label>
-                      <input
-                        value={form.zatcaCsid || ''}
-                        onChange={e => setForm(p => ({...p, zatcaCsid: e.target.value}))}
-                        style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          fontSize: 14,
-                          border: '2px solid #e2e8f0',
-                          borderRadius: 8,
-                          outline: 'none',
-                          boxSizing: 'border-box',
-                          color: '#1e293b',
-                          background: '#fff'
-                        }}
-                        onFocus={e => e.target.style.borderColor = '#0F766E'}
-                        onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                        placeholder="CSID-XXXXXXXX"
-                        disabled={!form.zatkaEnabled}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
-                        🔑 প্রাইভেট কী (Private Key)
-                      </label>
-                      <input
-                        value={form.zatcaPrivateKey || ''}
-                        onChange={e => setForm(p => ({...p, zatcaPrivateKey: e.target.value}))}
-                        style={{
-                          width: '100%',
-                          padding: '12px 14px',
-                          fontSize: 14,
-                          border: '2px solid #e2e8f0',
-                          borderRadius: 8,
-                          outline: 'none',
-                          boxSizing: 'border-box',
-                          color: '#1e293b',
-                          background: '#fff'
-                        }}
-                        onFocus={e => e.target.style.borderColor = '#0F766E'}
-                        onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                        placeholder="-----BEGIN EC PRIVATE KEY-----"
-                        disabled={!form.zatkaEnabled}
-                      />
+                {/* Phase 1 Fields - CSID for Simplified Invoices */}
+                {form.zatcaPhase === 'phase1' && (
+                  <div style={{ marginBottom: 20 }}>
+                    <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔐 Phase 1 ক্রিপ্টোগ্রাফিক আইডেন্টিফায়ার</h5>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                          🏷️ OID (Organizational Identifier)
+                        </label>
+                        <input
+                          value={form.zatcaOid || ''}
+                          onChange={e => setForm(p => ({...p, zatcaOid: e.target.value}))}
+                          style={{
+                            width: '100%',
+                            padding: '12px 14px',
+                            fontSize: 14,
+                            border: '2px solid #e2e8f0',
+                            borderRadius: 8,
+                            outline: 'none',
+                            boxSizing: 'border-box',
+                            color: '#1e293b',
+                            background: '#fff'
+                          }}
+                          onFocus={e => e.target.style.borderColor = '#0F766E'}
+                          onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                          placeholder="1.2.3.4.5.6.7.8.9"
+                          disabled={!form.zatkaEnabled}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                          🆔 CSID (Cryptographic Stamp ID)
+                        </label>
+                        <input
+                          value={form.zatcaCsid || ''}
+                          onChange={e => setForm(p => ({...p, zatcaCsid: e.target.value}))}
+                          style={{
+                            width: '100%',
+                            padding: '12px 14px',
+                            fontSize: 14,
+                            border: '2px solid #e2e8f0',
+                            borderRadius: 8,
+                            outline: 'none',
+                            boxSizing: 'border-box',
+                            color: '#1e293b',
+                            background: '#fff'
+                          }}
+                          onFocus={e => e.target.style.borderColor = '#0F766E'}
+                          onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                          placeholder="CSID-XXXXXXXX"
+                          disabled={!form.zatkaEnabled}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {/* Phase 2 Fields - More complex requirements */}
+                {form.zatcaPhase === 'phase2' && (
+                  <>
+                    <div style={{ marginBottom: 20 }}>
+                      <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔐 Phase 2 ক্রিপ্টোগ্রাফিক আইডেন্টিফায়ার</h5>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                            🏷️ OID (Organizational Identifier)
+                          </label>
+                          <input
+                            value={form.zatcaOid || ''}
+                            onChange={e => setForm(p => ({...p, zatcaOid: e.target.value}))}
+                            style={{
+                              width: '100%',
+                              padding: '12px 14px',
+                              fontSize: 14,
+                              border: '2px solid #e2e8f0',
+                              borderRadius: 8,
+                              outline: 'none',
+                              boxSizing: 'border-box',
+                              color: '#1e293b',
+                              background: '#fff'
+                            }}
+                            onFocus={e => e.target.style.borderColor = '#0F766E'}
+                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                            placeholder="1.2.3.4.5.6.7.8.9"
+                            disabled={!form.zatkaEnabled}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                            🆔 CSID (Cryptographic Stamp ID)
+                          </label>
+                          <input
+                            value={form.zatcaCsid || ''}
+                            onChange={e => setForm(p => ({...p, zatcaCsid: e.target.value}))}
+                            style={{
+                              width: '100%',
+                              padding: '12px 14px',
+                              fontSize: 14,
+                              border: '2px solid #e2e8f0',
+                              borderRadius: 8,
+                              outline: 'none',
+                              boxSizing: 'border-box',
+                              color: '#1e293b',
+                              background: '#fff'
+                            }}
+                            onFocus={e => e.target.style.borderColor = '#0F766E'}
+                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                            placeholder="CSID-XXXXXXXX"
+                            disabled={!form.zatkaEnabled}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                            🔑 প্রাইভেট কী (Private Key)
+                          </label>
+                          <input
+                            value={form.zatcaPrivateKey || ''}
+                            onChange={e => setForm(p => ({...p, zatcaPrivateKey: e.target.value}))}
+                            style={{
+                              width: '100%',
+                              padding: '12px 14px',
+                              fontSize: 14,
+                              border: '2px solid #e2e8f0',
+                              borderRadius: 8,
+                              outline: 'none',
+                              boxSizing: 'border-box',
+                              color: '#1e293b',
+                              background: '#fff'
+                            }}
+                            onFocus={e => e.target.style.borderColor = '#0F766E'}
+                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                            placeholder="-----BEGIN EC PRIVATE KEY-----"
+                            disabled={!form.zatkaEnabled}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Phase 2 - OAuth2 Client Credentials */}
+                    <div style={{ marginBottom: 20 }}>
+                      <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔑 OAuth2 Client Credentials (Phase 2 এর জন্য প্রয়োজন)</h5>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                            🆔 Client ID
+                          </label>
+                          <input
+                            value={form.zatcaClientId || ''}
+                            onChange={e => setForm(p => ({...p, zatcaClientId: e.target.value}))}
+                            style={{
+                              width: '100%',
+                              padding: '12px 14px',
+                              fontSize: 14,
+                              border: '2px solid #e2e8f0',
+                              borderRadius: 8,
+                              outline: 'none',
+                              boxSizing: 'border-box',
+                              color: '#1e293b',
+                              background: '#fff'
+                            }}
+                            onFocus={e => e.target.style.borderColor = '#0F766E'}
+                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                            placeholder="Client ID from ZATCA Portal"
+                            disabled={!form.zatkaEnabled}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                            🔐 Client Secret
+                          </label>
+                          <input
+                            value={form.zatcaClientSecret || ''}
+                            onChange={e => setForm(p => ({...p, zatcaClientSecret: e.target.value}))}
+                            type="password"
+                            style={{
+                              width: '100%',
+                              padding: '12px 14px',
+                              fontSize: 14,
+                              border: '2px solid #e2e8f0',
+                              borderRadius: 8,
+                              outline: 'none',
+                              boxSizing: 'border-box',
+                              color: '#1e293b',
+                              background: '#fff'
+                            }}
+                            onFocus={e => e.target.style.borderColor = '#0F766E'}
+                            onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                            placeholder="Client Secret from ZATCA Portal"
+                            disabled={!form.zatkaEnabled}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {/* ZATCA Required Fields Info */}
-                <div style={{ marginTop: 16, padding: '12px 16px', background: '#fef3c7', borderRadius: 8, border: '1px solid #f59e0b' }}>
-                  <p style={{ margin: 0, fontSize: 12, color: '#92400e' }}>
-                    <strong>📋 ZATCA QR কোডে যা থাকবে:</strong><br/>
-                    বিক্রেতার নাম • VAT নম্বর • CR নম্বর • ইনভয়েস তারিখ • মোট পরিমাণ (VAT সহ) • VAT পরিমাণ • UUID • হ্যাশ মান
+                <div style={{ marginTop: 16, padding: '12px 16px', background: form.zatcaPhase === 'phase1' ? '#ecfdf5' : '#dbeafe', borderRadius: 8, border: `1px solid ${form.zatcaPhase === 'phase1' ? '#059669' : '#3b82f6'}` }}>
+                  <p style={{ margin: 0, fontSize: 12, color: form.zatcaPhase === 'phase1' ? '#065f46' : '#1e40af' }}>
+                    <strong>📋 {form.zatcaPhase === 'phase1' ? 'Phase 1 QR কোডে যা থাকবে:' : 'Phase 2 ইনভয়েসে যা থাকবে:'}</strong><br/>
+                    {form.zatcaPhase === 'phase1' ? (
+                      <>বিক্রেতার নাম • VAT নম্বর • CR নম্বর • ইনভয়েস তারিখ • মোট পরিমাণ (VAT সহ) • VAT পরিমাণ</>
+                    ) : (
+                      <>বিক্রেতার নাম • VAT নম্বর • CR নম্বর • ইনভয়েস তারিখ • মোট পরিমাণ (VAT সহ) • VAT পরিমাণ • UUID • হ্যাশ মান • XML UBL 2.1 ফরম্যাট • রিয়েল-টাইম ক্লিয়ারেন্স API</>
+                    )}
                   </p>
                 </div>
               </div>
