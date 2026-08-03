@@ -6529,7 +6529,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const tabs = [
     { icon: '⚙️', label: 'জেনারেল' },
-    { icon: '💰', label: 'ট্যাক্স' },
     { icon: '🖼️', label: 'ডিসপ্লে' },
     { icon: '📊', label: 'রিপোর্ট' },
     { icon: '👥', label: 'ইউজার' },
@@ -7224,124 +7223,90 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     )}
                   </p>
                 </div>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {/* Tax Tab */}
-        {activeTab === 1 && (
-          <div style={{
-            background: '#fff',
-            borderRadius: 16,
-            padding: 32,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-            border: '1px solid #e2e8f0'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
-              <div style={{
-                width: 48, height: 48,
-                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                borderRadius: 12,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 24,
-                color: '#fff'
-              }}>💰</div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ট্যাক্স সেটিংস</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ভ্যাট ও ট্যাক্স কনফিগারেশন</p>
-              </div>
-            </div>
+                {/* VAT Settings */}
+                <div style={{ marginTop: 24 }}>
+                  <h5 style={{ margin: '0 0 16px', fontSize: 14, fontWeight: 600, color: '#1e293b' }}>💰 ভ্যাট সেটিংস</h5>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '20px 24px',
+                    background: form.vatEnabled ? '#ecfdf5' : '#fef2f2',
+                    borderRadius: 12,
+                    border: `2px solid ${form.vatEnabled ? '#059669' : '#ef4444'}`
+                  }}>
+                    <div>
+                      <h4 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#1e293b' }}>
+                        ভ্যাট সক্রিয় {form.vatEnabled ? '✅' : '❌'}
+                      </h4>
+                      <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                        {form.vatEnabled ? 'সকল বিক্রয়ে ভ্যাট যোগ হবে' : 'ভ্যাট গণনা বন্ধ আছে'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setForm(p => ({...p, vatEnabled: !p.vatEnabled}))}
+                      style={{
+                        padding: '10px 20px',
+                        background: form.vatEnabled ? '#059669' : '#94a3b8',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {form.vatEnabled ? 'সক্রিয়' : 'নিষ্ক্রিয়'}
+                    </button>
+                  </div>
 
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '24px 28px',
-              background: form.vatEnabled ? '#ecfdf5' : '#fef2f2',
-              borderRadius: 14,
-              border: `2px solid ${form.vatEnabled ? '#059669' : '#ef4444'}`,
-              marginBottom: 24
-            }}>
-              <div>
-                <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>
-                  ভ্যাট সক্রিয় {form.vatEnabled ? '✅' : '❌'}
-                </h4>
-                <p style={{ margin: '6px 0 0', fontSize: 13, color: '#64748b' }}>
-                  {form.vatEnabled ? 'সকল বিক্রয়ে ভ্যাট যোগ হবে' : 'ভ্যাট গণনা বন্ধ আছে'}
-                </p>
-              </div>
-              <button
-                onClick={() => setForm(p => ({...p, vatEnabled: !p.vatEnabled}))}
-                style={{
-                  padding: '14px 32px',
-                  background: form.vatEnabled ? '#059669' : '#ef4444',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 10,
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                {form.vatEnabled ? '✅ চালু আছে' : '❌ বন্ধ আছে'}
-              </button>
-            </div>
-
-            {form.vatEnabled && (
-              <div style={{
-                padding: '24px 28px',
-                background: '#f0fdf4',
-                borderRadius: 14,
-                border: '2px solid #86efac'
-              }}>
-                <label style={{ display: 'block', marginBottom: 12, fontSize: 14, fontWeight: 600, color: '#166534' }}>
-                  ডিফল্ট ভ্যাট শতাংশ
-                </label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <input
-                    value={form.vatPercent}
-                    onChange={e => setForm(p => ({...p, vatPercent: parseFloat(e.target.value) || 0}))}
-                    type="number"
-                    min="0"
-                    max="100"
-                    style={{
-                      width: 120,
-                      padding: '14px 16px',
-                      fontSize: 18,
-                      fontWeight: 700,
+                  {form.vatEnabled && (
+                    <div style={{
+                      marginTop: 16,
+                      padding: '20px 24px',
+                      background: '#f0fdf4',
+                      borderRadius: 12,
                       border: '2px solid #86efac',
-                      borderRadius: 10,
-                      outline: 'none',
-                      textAlign: 'center',
-                      color: '#166534',
-                      background: '#fff'
-                    }}
-                  />
-                  <span style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>%</span>
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 16
+                    }}>
+                      <label style={{ fontSize: 13, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>
+                        ডিফল্ট ভ্যাট শতাংশ:
+                      </label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <input
+                          value={form.vatPercent}
+                          onChange={e => setForm(p => ({...p, vatPercent: parseFloat(e.target.value) || 0}))}
+                          type="number"
+                          min="0"
+                          max="100"
+                          style={{
+                            width: 100,
+                            padding: '12px 14px',
+                            fontSize: 16,
+                            fontWeight: 700,
+                            border: '2px solid #86efac',
+                            borderRadius: 8,
+                            outline: 'none',
+                            textAlign: 'center',
+                            color: '#166534',
+                            background: '#fff'
+                          }}
+                        />
+                        <span style={{ fontSize: 18, fontWeight: 700, color: '#166534' }}>%</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-
-            <div style={{
-              marginTop: 24,
-              padding: '20px 24px',
-              background: '#f0fdfa',
-              borderRadius: 12,
-              border: '1px solid #99f6e4'
-            }}>
-              <p style={{ margin: 0, fontSize: 13, color: '#115e59', lineHeight: 1.7 }}>
-                💡 টিপ: ভ্যাট চালু থাকলে সকল বিক্রয় রসিদে স্বয়ংক্রিয়ভাবে ভ্যাট যোগ হবে।
-              </p>
             </div>
           </div>
         )}
 
         {/* Display Tab */}
-        {activeTab === 2 && (
+        {activeTab === 1 && (
           <div style={{
             background: '#fff',
             borderRadius: 16,
@@ -7427,7 +7392,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
         )}
 
         {/* Reports Tab */}
-        {activeTab === 3 && (
+        {activeTab === 2 && (
           <div style={{
             background: '#fff',
             borderRadius: 16,
@@ -7488,7 +7453,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
         )}
 
         {/* Users Tab */}
-        {activeTab === 4 && (
+        {activeTab === 3 && (
           isSuperAdmin ? (
             <div style={{
               background: '#fff',
@@ -7674,7 +7639,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
         )}
 
         {/* Data Tab */}
-        {activeTab === 5 && (
+        {activeTab === 4 && (
           <div>
             <div style={{
               background: '#fff',
