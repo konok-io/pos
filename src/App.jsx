@@ -6489,7 +6489,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN - NEW PROFESSIONAL DESIGN
 ═══════════════════════════════════════════ */
-function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
+function SettingsScreen({settings, products, suppliers, categories, purchases, sales, customers, productHistory, upd}) {
   const [form, setForm] = useState({
     name: settings?.name || '',
     address: settings?.address || '',
