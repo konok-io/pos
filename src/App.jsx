@@ -557,6 +557,8 @@ function LoginScreen({ onLogin, settings }) {
 }
 
 /* ─────────────── MAIN APP ─────────────── */
+const DEFAULT_SETTINGS = {name:'আমার দোকান',address:'',phone:'',vatEnabled:true,vatPercent:15};
+
 export default function App() {
   const [currentUser, setCurrentUser] = useState(() => db.get(STORAGE_KEYS.auth));
   const [showLogin, setShowLogin] = useState(() => !db.get(STORAGE_KEYS.auth));
@@ -564,10 +566,7 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
-  const [settings, setSettings] = useState(() => {
-    const savedSettings = db.get(STORAGE_KEYS.settings);
-    return savedSettings ? savedSettings : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
-  });
+  const [settings, setSettings] = useState(() => DEFAULT_SETTINGS);
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [purchases, setPurchases] = useState([]);
@@ -678,7 +677,7 @@ export default function App() {
       setSales(savedSales || []);
       setPurchases(savedPurchases);
       setProductHistory(savedProductHistory);
-      setSettings(savedSettings ? {...{name:'',address:'',phone:'',vatEnabled:true,vatPercent:15}, ...savedSettings} : {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setSettings(savedSettings ? {...{...DEFAULT_SETTINGS}, ...savedSettings} : {...DEFAULT_SETTINGS});
       setReady(true);
       return;
     }
@@ -724,7 +723,7 @@ export default function App() {
       setCategories([]);
     }
 
-    const defaultSettings = {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15};
+    const defaultSettings = {...DEFAULT_SETTINGS};
     setSettings(savedSettings ? {...defaultSettings, ...savedSettings} : defaultSettings);
 
     setReady(true);
@@ -848,7 +847,7 @@ export default function App() {
       setSuppliers([...savedSuppliers]);
       setSales([...savedSales] || []);
       setPurchases([...savedPurchases]);
-      setSettings({...savedSettings} || {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setSettings({...savedSettings} || {...DEFAULT_SETTINGS});
     } else {
       setProducts([...savedProducts] || [...DEMO.products]);
       setCustomers([...savedCustomers] || [...DEMO.customers]);
@@ -856,7 +855,7 @@ export default function App() {
       setSuppliers([...savedSuppliers]);
       setPurchases([...savedPurchases]);
       setCategories([...savedCategories]);
-      setSettings({...savedSettings} || {name:'',address:'',phone:'',vatEnabled:true,vatPercent:15});
+      setSettings({...savedSettings} || {...DEFAULT_SETTINGS});
     }
   };
 
