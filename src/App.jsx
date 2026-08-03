@@ -1259,13 +1259,13 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   
   // Calculate counts for each category (only products with stock > 0)
   const catCounts = {};
-  products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0).forEach(p => {
+  products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0 && p.cat).forEach(p => {
     catCounts[p.cat] = (catCounts[p.cat] || 0) + 1;
   });
   
   // Calculate counts for each company (only products with stock > 0)
   const compCounts = {};
-  products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0).forEach(p => {
+  products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock > 0 && p.company).forEach(p => {
     compCounts[p.company] = (compCounts[p.company] || 0) + 1;
   });
   
