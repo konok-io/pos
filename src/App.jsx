@@ -6315,16 +6315,20 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   </div>
                 )}
                 
-                <label style={{
-                  display:'flex',alignItems:'center',justifyContent:'center',gap:12,
-                  padding:'24px',border:`2px dashed ${T.gray300}`,borderRadius:12,cursor:'pointer',
-                  background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600,maxWidth:500
-                }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
-                   onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
-                  <span style={{fontSize:28}}>📁</span>
-                  <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
-                  <input type="file" accept="image/*" onChange={handleImageUpload} style={{display:'none'}}/>
-                </label>
+                <div style={{display:'flex',alignItems:'center',gap:12}}>
+                  <label style={{
+                    display:'flex',alignItems:'center',justifyContent:'center',gap:12,
+                    padding:'24px',border:`2px dashed ${T.gray300}`,borderRadius:12,cursor:'pointer',
+                    background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600,maxWidth:500,
+                    position:'relative',overflow:'hidden',flex:1
+                  }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
+                     onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
+                    <span style={{fontSize:28}}>📁</span>
+                    <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
+                    <input type="file" accept="image/*" onChange={handleImageUpload} 
+                      style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',opacity:0,cursor:'pointer'}}/>
+                  </label>
+                </div>
               </div>
             </SectionCard>
           )}
