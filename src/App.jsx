@@ -6766,7 +6766,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   placeholder="01XXXXXXXXX"
                 />
               </div>
-              <div style={{ gridColumn: '1 / -1' }}>
+              <div>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
                   📍 ঠিকানা
                 </label>
