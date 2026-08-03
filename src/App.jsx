@@ -1539,7 +1539,7 @@ ${r.sale.discount > 0 ? `<div class="row"><span>ছাড়:</span><span>-৳${
 <div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toFixed(2)}</span></div>
 ${r.sale.change > 0 ? `<div class="row"><span>ফেরত:</span><span>৳${r.sale.change.toFixed(2)}</span></div>` : ''}
 ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${r.sale.due.toFixed(2)}</span></div>` : ''}
-${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:48px;height:48px;margin:0 auto 4px;padding:2px;border:2px solid #047857;"><div style="width:100%;height:100%;background:repeating-linear-gradient(0deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(90deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px),repeating-linear-gradient(-45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px);background-size:4px 4px,4px 4px,8px 8px,8px 8px;background-position:0 0,0 0,2px 2px,-2px 2px;"></div></div><div style="font-size:7px;color:#047857;font-weight:bold;">🧾 ZATCA</div><div style="font-size:6px;color:#666;">ডেমো QR</div></div>' : ''}
+${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:48px;height:48px;margin:0 auto 4px;padding:2px;border:2px solid #000;"><div style="width:100%;height:100%;background:repeating-linear-gradient(0deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(90deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px),repeating-linear-gradient(-45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px);background-size:4px 4px,4px 4px,8px 8px,8px 8px;background-position:0 0,0 0,2px 2px,-2px 2px;"></div></div><div style="font-size:7px;color:#000;font-weight:bold;">🧾 ZATCA QR</div><div style="font-size:6px;color:#666;">ডেমো</div></div>' : ''}
 <div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
@@ -7582,8 +7582,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           margin: '0 auto 6px',
                           padding: 4,
                           background: '#fff',
-                          border: '2px solid #047857',
-                          borderRadius: 4
+                          border: '2px solid #000',
+                          borderRadius: 2
                         }}>
                           <div style={{
                             width: '100%',
@@ -7596,11 +7596,11 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                             backgroundPosition: '0 0, 0 0, 2px 2px, -2px 2px'
                           }}></div>
                         </div>
-                        <div style={{ color: '#047857', fontWeight: 700, fontSize: '8px' }}>
-                          🧾 ZATCA
+                        <div style={{ color: '#000', fontWeight: 700, fontSize: '8px' }}>
+                          🧾 ZATCA QR
                         </div>
                         <div style={{ color: '#666', fontSize: '6px', marginTop: 2 }}>
-                          ডেমো QR কোড
+                          ডেমো
                         </div>
                       </div>
                     )}
