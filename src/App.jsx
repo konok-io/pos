@@ -12,6 +12,86 @@ const fmtN = (n) => (+n||0).toLocaleString('en-IN');
 const today = () => new Date().toISOString().split('T')[0];
 const now = () => new Date().toISOString();
 
+/* ─────────────── BANNER IMAGE UPLOAD ─────────────── */
+function BannerImageUpload({ value, onChange }) {
+  const [preview, setPreview] = useState(value || '');
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    setPreview(value || '');
+  }, [value]);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')) {
+      alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('ছবির সাইজ 5MB এর বেশি হওয়া উচিত নয়!');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const data = event.target.result;
+      setPreview(data);
+      onChange(data);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemove = () => {
+    setPreview('');
+    onChange('');
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  };
+
+  if (preview) {
+    return (
+      <div style={{ marginBottom: 16, position: 'relative', borderRadius: 12, overflow: 'hidden', maxWidth: 500 }}>
+        <img src={preview} alt="Preview" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', display: 'block' }} />
+        <button 
+          onClick={handleRemove}
+          style={{
+            position: 'absolute', top: 10, right: 10, padding: '8px 14px',
+            background: 'rgba(0,0,0,0.75)', color: '#fff', border: 'none', borderRadius: 8,
+            cursor: 'pointer', fontSize: 13, fontWeight: 600
+          }}
+        >
+          ✕ মুছুন
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        id="banner-upload"
+        style={{ display: 'none' }}
+      />
+      <label htmlFor="banner-upload" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+        padding: '24px', border: '2px dashed #d1d5db', borderRadius: 12,
+        background: '#f9fafb', cursor: 'pointer', fontSize: 14, color: '#6b7280', maxWidth: 500,
+        transition: 'all 0.2s'
+      }}>
+        <span style={{ fontSize: 28 }}>📁</span>
+        <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
+      </label>
+    </div>
+  );
+}
+
 /* ─────────────── STORAGE KEYS ─────────────── */
 const STORAGE_KEYS = {
   products: 'pos_products',
@@ -6066,7 +6146,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({ email: '', password: '', name: '', role: 'admin' });
-  const fileInputRef = useRef(null);
 
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
@@ -6074,38 +6153,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const save = async () => {
     await upd.settings(form);
     setSaved(true); setTimeout(()=>setSaved(false),2000);
-  };
-
-  const handleImageUpload = (e) => {
-    console.log('handleImageUpload called', e.target.files);
-    const file = e.target.files?.[0];
-    if (!file) {
-      console.log('No file selected');
-      return;
-    }
-    console.log('File selected:', file.name, file.size, file.type);
-    if (!file.type.startsWith('image/')) {
-      alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      alert('ছবির সাইজ 5MB এর বেশি হওয়া উচিত নয়!');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      console.log('Image loaded, length:', event.target.result?.length);
-      const imageData = event.target.result;
-      setForm(prev => {
-        console.log('Setting form with image, prev:', !!prev.bannerImage);
-        return {...prev, bannerImage: imageData};
-      });
-    };
-    reader.onerror = () => {
-      console.error('FileReader error');
-      alert('ছবি পড়তে সমস্যা হয়েছে!');
-    };
-    reader.readAsDataURL(file);
   };
 
   const sections = [
@@ -6320,38 +6367,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <label style={{...label,marginBottom:8}}>হোম পেজ ব্যানার ছবি</label>
                 <p style={{fontSize:13,color:T.gray500,margin:'0 0 16px'}}>বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।</p>
                 
-                {form.bannerImage ? (
-                  <div style={{marginBottom:16,position:'relative',borderRadius:12,overflow:'hidden',maxWidth:500}}>
-                    <img src={form.bannerImage} alt="Banner Preview" style={{width:'100%',maxHeight:200,objectFit:'cover',display:'block'}}/>
-                    <button onClick={()=>setForm(p=>({...p,bannerImage:''}))} style={{
-                      position:'absolute',top:10,right:10,padding:'8px 14px',background:'rgba(0,0,0,0.75)',color:'#fff',
-                      border:'none',borderRadius:8,cursor:'pointer',fontSize:13,fontWeight:600
-                    }}>✕ মুছুন</button>
-                  </div>
-                ) : (
-                  <div style={{display:'flex',alignItems:'center',gap:12}}>
-                    <button 
-                      onClick={() => fileInputRef.current?.click()}
-                      style={{
-                        display:'flex',alignItems:'center',justifyContent:'center',gap:12,
-                        padding:'24px',border:`2px dashed ${T.gray300}`,borderRadius:12,
-                        background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600,maxWidth:500,
-                        cursor:'pointer',width:'100%'
-                      }}
-                      onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
-                      onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
-                      <span style={{fontSize:28}}>📁</span>
-                      <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
-                    </button>
-                    <input 
-                      ref={fileInputRef}
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleImageUpload} 
-                      style={{display:'none'}}
-                    />
-                  </div>
-                )}
+                <BannerImageUpload 
+                  value={form.bannerImage} 
+                  onChange={(data) => setForm(p => ({...p, bannerImage: data}))} 
+                />
               </div>
             </SectionCard>
           )}
