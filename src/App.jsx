@@ -6529,7 +6529,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const tabs = [
     { icon: '⚙️', label: 'জেনারেল' },
-    { icon: '🖼️', label: 'ডিসপ্লে' },
+    { icon: '🎨', label: 'ডিজাইন' },
     { icon: '📊', label: 'রিপোর্ট' },
     { icon: '👥', label: 'ইউজার' },
     { icon: '💾', label: 'ডেটা' },
@@ -7324,9 +7324,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 justifyContent: 'center',
                 fontSize: 24,
                 color: '#fff'
-              }}>🖼️</div>
+              }}>🎨</div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডিসপ্লে সেটিংস</h3>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডিজাইন সেটিংস</h3>
                 <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>হোম পেজ ব্যানার ও প্রদর্শন</p>
               </div>
             </div>
