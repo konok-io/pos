@@ -1282,12 +1282,12 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   
   // Filter categories for dropdown
   const filteredCats = allCategories.filter(c => 
-    !catSearch || c.toLowerCase().includes(catSearch.toLowerCase())
+    !catSearch || (c||'').toLowerCase().includes((catSearch||'').toLowerCase())
   );
   
   // Filter companies for dropdown
   const filteredComps = allCompanies.filter(c => 
-    !compSearch || c.toLowerCase().includes(compSearch.toLowerCase())
+    !compSearch || (c||'').toLowerCase().includes((compSearch||'').toLowerCase())
   );
   
   const outOfStockCount = products.filter(p => !p.name?.includes('(ক্যাটাগরি)') && p.stock <= 0).length;
@@ -1828,14 +1828,14 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             <div 
               onMouseDown={(e) => e.preventDefault()}
               style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:'1.5px solid #e5e7eb',borderRadius:10,boxShadow:'0 6px 20px rgba(0,0,0,0.1)',zIndex:50,maxHeight:180,overflow:'auto',marginTop:4}}>
-              {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).map(c=>(
+              {customers.filter(c=>(c.name||'').includes(custQ)||(c.phone||'').includes(custQ)).map(c=>(
                 <div key={c.id} onClick={()=>{setSelCust(c);setCustQ(c.name);setShowCustDrop(false);}}
                   style={{padding:'10px 14px',cursor:'pointer',fontSize:13,borderBottom:`1px solid #f0f0f0`,display:'flex',justifyContent:'space-between'}}>
                   <span><strong>{c.name}</strong>{c.phone?` · ${c.phone}`:''}</span>
                   {c.credit>0 && <span style={{color:T.red,fontSize:11,fontWeight:600}}>বাকি {fmt(c.credit)}</span>}
                 </div>
               ))}
-              {customers.filter(c=>c.name.includes(custQ)||c.phone?.includes(custQ)).length===0 && (
+              {customers.filter(c=>(c.name||'').includes(custQ)||(c.phone||'').includes(custQ)).length===0 && (
                 <div style={{padding:'10px 14px',fontSize:13,color:T.gray400}}>কাস্টমার পাওয়া যায়নি</div>
               )}
             </div>
@@ -2108,7 +2108,7 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
 
   // Get all unique companies from products and suppliers
   const allCompanies = [
-    ...suppliers.map(s => s.name),
+    ...suppliers.map(s => s.name).filter(Boolean),
     ...products.map(p => p.company).filter(Boolean)
   ];
   const uniqueCompanies = [...new Set(allCompanies)].sort();
@@ -3615,18 +3615,18 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   // Combine suppliers and product companies
   const allSuppliers = [
     ...suppliers,
-    ...allCompanies.filter(c => !suppliers.find(s => s.name.toLowerCase() === c.toLowerCase())).map(c => ({ id: `auto-${c}`, name: c, phone: '', address: '', isAuto: true }))
+    ...allCompanies.filter(c => !suppliers.find(s => (s.name||'').toLowerCase() === (c||'').toLowerCase())).map(c => ({ id: `auto-${c}`, name: c, phone: '', address: '', isAuto: true }))
   ];
 
   const filtered = allSuppliers.filter(s => 
-    !search || s.name.toLowerCase().includes(search.toLowerCase()) || (s.phone||'').includes(search) || (s.code||'').toLowerCase().includes(search.toLowerCase())
+    !search || (s.name||'').toLowerCase().includes((search||'').toLowerCase()) || (s.phone||'').includes(search) || (s.code||'').toLowerCase().includes((search||'').toLowerCase())
   );
 
   const saveCompany = async () => {
     if (!form.name?.trim()) { alert('কোম্পানির নাম দিন'); return; }
     
     // Check for duplicate company name
-    const exists = suppliers.some(s => s.name.toLowerCase().trim() === form.name.toLowerCase().trim());
+    const exists = suppliers.some(s => (s.name||'').toLowerCase().trim() === (form.name||'').toLowerCase().trim());
     if (exists) { alert('❌ এই কোম্পানির নাম ইতিমধ্যে আছে!'); return; }
     
     // Use custom code if provided, otherwise generate auto code
@@ -3689,7 +3689,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     }
     
     // Check for duplicate product name (only if no barcode match)
-    const exists = products.some(p => p.name.toLowerCase().trim() === productForm.name.toLowerCase().trim());
+    const exists = products.some(p => (p.name||'').toLowerCase().trim() === (productForm.name||'').toLowerCase().trim());
     if (exists) { alert('❌ এই পণ্যের নাম ইতিমধ্যে আছে!'); return; }
     
     // Generate product ID (P-00001, P-00002, etc.)
@@ -3720,7 +3720,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     if (!catForm.name?.trim()) { alert('ক্যাটাগরির নাম দিন'); return; }
     
     // Check for duplicate category name
-    const exists = categories.some(c => c.name.toLowerCase().trim() === catForm.name.toLowerCase().trim());
+    const exists = categories.some(c => (c.name||'').toLowerCase().trim() === (catForm.name||'').toLowerCase().trim());
     if (exists) { alert('❌ এই ক্যাটাগরির নাম ইতিমধ্যে আছে!'); return; }
     
     // Save category to categories state
@@ -3802,7 +3802,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           
           // Validate and add company
           if (csvCompany) {
-            const companyExists = newCompanies.some(s => s.name.toLowerCase() === csvCompany.toLowerCase());
+            const companyExists = newCompanies.some(s => (s.name||'').toLowerCase() === (csvCompany||'').toLowerCase());
             if (!companyExists) {
               // Generate company code
               const maxCode = newCompanies.reduce((max, s) => {
@@ -3823,22 +3823,22 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                   address: ''
                 };
                 newCompanies.push(newComp);
-                csvCompanies.add(csvCompany.toLowerCase());
+                csvCompanies.add((csvCompany||'').toLowerCase());
               }
             }
           }
           
           // Validate and add category
           if (csvCategory) {
-            const catExists = newCategories.some(c => c.name.toLowerCase() === csvCategory.toLowerCase());
+            const catExists = newCategories.some(c => (c.name||'').toLowerCase() === (csvCategory||'').toLowerCase());
             if (!catExists) {
-              if (!csvCategories.has(csvCategory.toLowerCase())) {
+              if (!csvCategories.has((csvCategory||'').toLowerCase())) {
                 const newCat = {
                   id: genId(),
                   name: csvCategory
                 };
                 newCategories.push(newCat);
-                csvCategories.add(csvCategory.toLowerCase());
+                csvCategories.add((csvCategory||'').toLowerCase());
               }
             }
           }
@@ -3927,7 +3927,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
   // View single supplier
   if (viewSupplier) {
-    const supProducts = products.filter(p => (p.company||'').toLowerCase() === viewSupplier.name.toLowerCase());
+    const supProducts = products.filter(p => (p.company||'').toLowerCase() === (viewSupplier.name||'').toLowerCase());
     const supPurchases = getSupplierPurchases(viewSupplier.name);
     
     return (
@@ -4295,7 +4295,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
 
   // Get unique companies from suppliers and products
   const uniqueCompanies = [...new Set([
-    ...suppliers.map(s => s.name),
+    ...suppliers.map(s => s.name).filter(Boolean),
     ...products.map(p => p.company).filter(Boolean)
   ])].sort();
 
@@ -4307,12 +4307,12 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
 
   // Filter companies for dropdown
   const filteredCompanies = uniqueCompanies.filter(c => 
-    !supplierQ || c.toLowerCase().includes(supplierQ.toLowerCase())
+    !supplierQ || (c||'').toLowerCase().includes((supplierQ||'').toLowerCase())
   );
 
   // Filter categories for dropdown
   const filteredCategories = uniqueCategories.filter(c => 
-    !form.cat || c.toLowerCase().includes(form.cat.toLowerCase())
+    !form.cat || (c||'').toLowerCase().includes((form.cat||'').toLowerCase())
   );
 
   // Handle CSV Import
@@ -4335,7 +4335,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
       const errors = [];
       
       const existingCompanies = [
-        ...suppliers.map(s => s.name.toLowerCase()),
+        ...suppliers.map(s => (s.name||'').toLowerCase()),
         ...products.map(p => (p.company||'').toLowerCase()).filter(Boolean)
       ];
       const existingCategories = [
