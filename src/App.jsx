@@ -6271,7 +6271,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
                 <button onClick={()=>{
                   const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
                   const s = settings || {};
-                  const headerText = s.purchaseHeader || '🛒 পারচেজ ইনভয়েস';
+                  const headerText = s.purchaseIcon || s.purchaseHeader || '🛒 পারচেজ ইনভয়েস';
                   const footerText = s.purchaseFooter || 'ধন্যবাদ';
                   const fontSize = s.purchaseFontSize || 11;
                   const showLogo = s.purchaseShowLogo !== false;
@@ -6556,6 +6556,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     purchaseShowSupplier: settings?.purchaseShowSupplier !== false,
     purchaseShowPhone: settings?.purchaseShowPhone !== false,
     purchaseFontSize: settings?.purchaseFontSize || 11,
+    purchaseIcon: settings?.purchaseIcon || '',
   });
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -7708,6 +7709,28 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  আইকন
+                </label>
+                <input
+                  value={form.purchaseIcon || ''}
+                  onChange={e => setForm(p => ({...p, purchaseIcon: e.target.value}))}
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    fontSize: 14,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 8,
+                    outline: 'none',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  placeholder="🛒"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
                   ফন্ট সাইজ
                 </label>
                 <select
@@ -7734,25 +7757,103 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               </div>
             </div>
 
-            <div style={{ padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '2px solid #e2e8f0', marginBottom: 24 }}>
-              <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-                {[
-                  { key: 'purchaseShowLogo', label: 'লোগো/আইকন' },
-                  { key: 'purchaseShowAddress', label: 'ঠিকানা' },
-                  { key: 'purchaseShowSupplier', label: 'সাপ্লায়ার তথ্য' },
-                  { key: 'purchaseShowPhone', label: 'ফোন নম্বর' },
-                ].map(item => (
-                  <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={form[item.key] !== false}
-                      onChange={e => setForm(p => ({...p, [item.key]: e.target.checked}))}
-                      style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#0F766E' }}
-                    />
-                    <span style={{ fontSize: 13, color: '#475569' }}>{item.label}</span>
-                  </label>
-                ))}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+              <div>
+                <div style={{ padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '2px solid #e2e8f0' }}>
+                  <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+                    {[
+                      { key: 'purchaseShowLogo', label: 'লোগো/আইকন' },
+                      { key: 'purchaseShowAddress', label: 'ঠিকানা' },
+                      { key: 'purchaseShowSupplier', label: 'সাপ্লায়ার তথ্য' },
+                      { key: 'purchaseShowPhone', label: 'ফোন নম্বর' },
+                    ].map(item => (
+                      <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={form[item.key] !== false}
+                          onChange={e => setForm(p => ({...p, [item.key]: e.target.checked}))}
+                          style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#0F766E' }}
+                        />
+                        <span style={{ fontSize: 13, color: '#475569' }}>{item.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Purchase Preview */}
+              <div>
+                <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#1e293b' }}>👁️ প্রিভিউ</h5>
+                <div style={{
+                  background: '#f1f5f9',
+                  borderRadius: 12,
+                  padding: 16,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start'
+                }}>
+                  <div style={{
+                    background: '#fff',
+                    padding: `${form.purchaseFontSize || 11}px`,
+                    width: 240,
+                    minHeight: 300,
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                    fontSize: `${form.purchaseFontSize || 11}px`,
+                    fontFamily: "'Tiro Bangla', 'Courier New', monospace",
+                    color: '#000'
+                  }}>
+                    <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 8, marginBottom: 8 }}>
+                      {form.purchaseShowLogo !== false && (
+                        <div style={{ fontWeight: 'bold', fontSize: `${(form.purchaseFontSize || 11) + 3}px` }}>
+                          {form.purchaseIcon || form.purchaseHeader || '🛒 পারচেজ ইনভয়েস'}
+                        </div>
+                      )}
+                      {form.purchaseShowAddress !== false && form.name && (
+                        <div style={{ fontSize: `${(form.purchaseFontSize || 11) - 1}px` }}>{form.name}</div>
+                      )}
+                      {form.purchaseShowAddress !== false && form.address && (
+                        <div style={{ fontSize: `${(form.purchaseFontSize || 11) - 2}px` }}>{form.address}</div>
+                      )}
+                      {form.purchaseShowAddress !== false && form.phone && (
+                        <div style={{ fontSize: `${(form.purchaseFontSize || 11) - 2}px` }}>{form.phone}</div>
+                      )}
+                      <div style={{ fontSize: `${(form.purchaseFontSize || 11) - 1}px`, marginTop: 4 }}>#ABC12345</div>
+                      <div style={{ fontSize: `${(form.purchaseFontSize || 11) - 2}px` }}>২ আগস্ট, ২০২৬</div>
+                    </div>
+                    {form.purchaseShowSupplier !== false && (
+                      <div style={{ marginBottom: 8, fontSize: `${(form.purchaseFontSize || 11) - 1}px` }}>
+                        <div>সরবরাহকারী: সাপ্লায়ার নাম</div>
+                        {form.purchaseShowPhone && <div>ফোন: ০১৭XXXXXXXX</div>}
+                      </div>
+                    )}
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: `${(form.purchaseFontSize || 11) - 1}px` }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px dashed #000' }}>
+                          <th style={{ textAlign: 'left', padding: '4px 0' }}>পণ্য</th>
+                          <th style={{ textAlign: 'center', padding: '4px 0' }}>পরি</th>
+                          <th style={{ textAlign: 'right', padding: '4px 0' }}>দাম</th>
+                          <th style={{ textAlign: 'right', padding: '4px 0' }}>মোট</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: '4px 0' }}>পণ্য নাম</td>
+                          <td style={{ textAlign: 'center', padding: '4px 0' }}>10</td>
+                          <td style={{ textAlign: 'right', padding: '4px 0' }}>৳50</td>
+                          <td style={{ textAlign: 'right', padding: '4px 0' }}>৳500</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div style={{ borderTop: '1px dashed #000', marginTop: 8, paddingTop: 8, textAlign: 'right', fontWeight: 'bold' }}>
+                      সর্বমোট: ৳500
+                    </div>
+                    <div style={{ textAlign: 'center', borderTop: '1px dashed #000', marginTop: 12, paddingTop: 8, fontSize: `${(form.purchaseFontSize || 11) - 2}px` }}>
+                      {form.purchaseFooter || 'ধন্যবাদ'}<br/>
+                      ২ আগস্ট, ২০২৬
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
