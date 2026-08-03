@@ -4895,63 +4895,59 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
       {/* List Tab Content */}
       {invTab === 'list' && (
       <>
-      <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
+      <div style={{padding:'8px 12px',display:'flex',gap:6,alignItems:'center',background:T.gray50,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
         {filterLoading ? (
-          <div style={{display:'flex',alignItems:'center',gap:8,padding:'8px 14px',background:T.gray100,borderRadius:8}}>
+          <div style={{display:'flex',alignItems:'center',gap:6,padding:'6px 12px',background:T.white,borderRadius:6,border:`1px solid ${T.gray200}`}}>
             <div style={{
-              width:16,height:16,border:'2px solid #E0E0E0',borderTop:`2px solid ${T.teal}`,
+              width:14,height:14,border:'2px solid #E0E0E0',borderTop:`2px solid ${T.teal}`,
               borderRadius:'50%',animation:'spin 0.8s linear infinite'
             }}></div>
             <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-            <span style={{fontSize:12,color:T.gray600}}>লোড হচ্ছে...</span>
+            <span style={{fontSize:11,color:T.gray500}}>লোড হচ্ছে...</span>
           </div>
         ) : (
           <>
             <button onClick={()=>{setStockFilter('all');setSearch('');}} style={{
-              ...btn(stockFilter==='all'?'primary':'ghost'),
-              background:stockFilter==='all'?T.teal:T.gray100,
-              color:stockFilter==='all'?T.white:T.gray600,
-              border:'none',
-              padding:'8px 14px',
-              fontSize:12,
+              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:11,
+              padding:'6px 12px',transition:'all 0.15s',
+              background:stockFilter==='all'?'#00897b':'#fff',
+              color:stockFilter==='all'?'#fff':'#64748b',
+              border:stockFilter==='all'?'1px solid #00897b':`1px solid ${T.gray200}`,
             }}>
-              📋 সকল স্টক ({realProducts.length})
+              সকল <span style={{opacity:0.7}}>({realProducts.length})</span>
             </button>
             <button onClick={()=>{setStockFilter(stockFilter==='proper'?'all':'proper');setSearch('');}} style={{
-              ...btn(stockFilter==='proper'?'primary':'ghost'),
-              background:stockFilter==='proper'?T.green:T.gray100,
-              color:stockFilter==='proper'?T.white:T.gray600,
-              border:'none',
-              padding:'8px 14px',
-              fontSize:12,
+              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:11,
+              padding:'6px 12px',transition:'all 0.15s',
+              background:stockFilter==='proper'?'#16A34A':'#fff',
+              color:stockFilter==='proper'?'#fff':'#64748b',
+              border:stockFilter==='proper'?'1px solid #16A34A':`1px solid ${T.gray200}`,
             }}>
-              ✅ স্টক ঠিক আছে ({properStock.length})
+              ঠিক আছে <span style={{opacity:0.7}}>({properStock.length})</span>
             </button>
             <button onClick={()=>{setStockFilter(stockFilter==='low'?'all':'low');setSearch('');}} style={{
-              ...btn(stockFilter==='low'?'primary':'ghost'),
-              background:stockFilter==='low'?T.orange:T.gray100,
-              color:stockFilter==='low'?T.white:T.gray600,
-              border:'none',
-              padding:'8px 14px',
-              fontSize:12,
+              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:11,
+              padding:'6px 12px',transition:'all 0.15s',
+              background:stockFilter==='low'?'#EA580C':'#fff',
+              color:stockFilter==='low'?'#fff':'#64748b',
+              border:stockFilter==='low'?'1px solid #EA580C':`1px solid ${T.gray200}`,
             }}>
-              ⚠️ স্টক কম ({lowStock.length})
+              কম <span style={{opacity:0.7}}>({lowStock.length})</span>
             </button>
             <button onClick={()=>{setStockFilter(stockFilter==='out'?'all':'out');setSearch('');}} style={{
-              ...btn(stockFilter==='out'?'primary':'ghost'),
-              background:stockFilter==='out'?T.red:T.gray100,
-              color:stockFilter==='out'?T.white:T.gray600,
-              border:'none',
-              padding:'8px 14px',
-              fontSize:12,
+              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:11,
+              padding:'6px 12px',transition:'all 0.15s',
+              background:stockFilter==='out'?'#DC2626':'#fff',
+              color:stockFilter==='out'?'#fff':'#64748b',
+              border:stockFilter==='out'?'1px solid #DC2626':`1px solid ${T.gray200}`,
             }}>
-              🚨 স্টক শেষ ({outOfStock.length})
+              শেষ <span style={{opacity:0.7}}>({outOfStock.length})</span>
             </button>
           </>
         )}
-        <div style={{position:'relative',flex:'1 1 200px'}}>
-          <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
+        <div style={{position:'relative',flex:'1 1 180px'}}>
+          <span style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:12}}>🔍</span>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:28,height:32,fontSize:11,borderRadius:6}}/>
         </div>
         <button style={btn('ghost')} onClick={()=>{
           const printFiltered = filtered.length > 0 ? filtered : realProducts;
