@@ -4761,6 +4761,9 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   const lowStock = realProducts.filter(p=>p.stock>0&&p.stock<=p.minStock);
   const outOfStock = realProducts.filter(p=>p.stock<=0);
   const totalValue = realProducts.reduce((s,p)=>s+p.sellP*p.stock,0);
+  
+  // Filter only stock change history (exclude price changes)
+  const stockHistory = productHistory.filter(h => h.type === 'stock');
 
   const adjust = async () => {
     const qty = parseInt(adjQty)||0;
@@ -4778,7 +4781,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           📦 স্টক তালিকা
         </button>
         <button onClick={()=>setInvTab('history')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:invTab==='history'?700:400,color:invTab==='history'?T.teal:T.gray500,borderBottom:invTab==='history'?`2px solid ${T.teal}`:'none',fontSize:13}}>
-          📜 হিস্ট্রি ({productHistory.length})
+          📜 হিস্ট্রি ({stockHistory.length})
         </button>
       </div>
 
@@ -4787,37 +4790,41 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
         <div style={{flex:1,overflow:'auto',padding:12}}>
           <div style={{...card,overflow:'hidden'}}>
             <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📜 স্টক পরিবর্তনের ইতিহাস</div>
-            {productHistory.length === 0 ? (
-              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পরিবর্তন নেই</div>
+            {stockHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো স্টক পরিবর্তন নেই</div>
             ) : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তনের ধরন</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন মান</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন মান</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তন</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {[...productHistory].reverse().map((h,i)=>(
+                  {[...stockHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
                       </td>
                       <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
                       <td style={{padding:'10px 12px',fontSize:12}}>
-                        {h.type === 'price_buy' && <span style={{background:T.orangeLight,color:T.orange,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>ক্রয়মূল্য</span>}
-                        {h.type === 'price_sell' && <span style={{background:T.tealLight,color:T.teal,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>বিক্রয়মূল্য</span>}
-                        {h.type === 'stock' && <span style={{background:T.amberLight,color:T.amber,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>স্টক</span>}
+                        <span style={{
+                          background: h.newValue > h.oldValue ? T.greenLight : T.redLight,
+                          color: h.newValue > h.oldValue ? T.green : T.red,
+                          padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600
+                        }}>
+                          {h.newValue > h.oldValue ? '+' : ''}{h.newValue - h.oldValue}
+                        </span>
                       </td>
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
-                        {h.type === 'stock' ? h.oldValue : fmt(h.oldValue)}
+                        {h.oldValue}
                       </td>
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
-                        {h.type === 'stock' ? h.newValue : fmt(h.newValue)}
+                        {h.newValue}
                       </td>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         <div style={{fontWeight:600}}>{h.user}</div>
