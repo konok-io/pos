@@ -6505,6 +6505,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       name: settings?.name || '',
       address: settings?.address || '',
       phone: settings?.phone || '',
+      email: settings?.email || '',
+      taxId: settings?.taxId || '',
       vatEnabled: settings?.vatEnabled !== false,
       vatPercent: settings?.vatPercent || 15,
       bannerImage: settings?.bannerImage || ''
