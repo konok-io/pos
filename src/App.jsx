@@ -6496,7 +6496,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     phone: settings?.phone || '',
     email: settings?.email || '',
     taxId: settings?.taxId || '',
-    bin: settings?.bin || '',
+    crNumber: settings?.crNumber || '',
     zatkaApiUrl: settings?.zatkaApiUrl || '',
     zatkaUsername: settings?.zatkaUsername || '',
     zatkaPassword: settings?.zatkaPassword || '',
@@ -6811,7 +6811,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  🔢 ট্যাক্স/ভ্যাট নম্বর (TIN)
+                  🔢 ভ্যাট নম্বর (TIN) *
                 </label>
                 <input
                   value={form.taxId || ''}
@@ -6830,16 +6830,16 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   }}
                   onFocus={e => e.target.style.borderColor = '#0F766E'}
                   onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                  placeholder="ট্যাক্স/ভ্যাট নম্বর (TIN)"
+                  placeholder="310xxxxxx"
                 />
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  🏢 BIN (Business Identification Number)
+                  🏢 কমার্শিয়াল রেজিস্ট্রেশন (CR) *
                 </label>
                 <input
-                  value={form.bin || ''}
-                  onChange={e => setForm(p => ({...p, bin: e.target.value}))}
+                  value={form.crNumber || ''}
+                  onChange={e => setForm(p => ({...p, crNumber: e.target.value}))}
                   style={{
                     width: '100%',
                     padding: '14px 16px',
@@ -6854,17 +6854,17 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   }}
                   onFocus={e => e.target.style.borderColor = '#0F766E'}
                   onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                  placeholder="ব্যবসা সনাক্তকরণ নম্বর"
+                  placeholder="1010xxxxxx"
                 />
               </div>
               <div style={{ gridColumn: '1 / -1', padding: '20px 24px', background: '#f8fafc', borderRadius: 12, marginTop: 8, border: '2px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <div>
                     <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>
-                      🧾 জাতকা (Zatka) ট্যাক্স QR কোড {form.zatkaEnabled ? '✅ সক্রিয়' : '❌ নিষ্ক্রিয়'}
+                      🧾 ZATCA ই-ইনভয়েসিং {form.zatkaEnabled ? '✅ সক্রিয়' : '❌ নিষ্ক্রিয়'}
                     </h4>
                     <p style={{ margin: '6px 0 0', fontSize: 12, color: '#64748b' }}>
-                      বিক্রয় রিসিটে Zatka Tax QR কোড প্রদর্শন করুন
+                      সৌদি আরবের ZATCA নিয়ম অনুযায়ী ই-ইনভয়েস জমা দিন
                     </p>
                   </div>
                   <button
