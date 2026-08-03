@@ -259,12 +259,15 @@ function DynamicMenu({tab, setTab, tabs}) {
     }
   };
 
-  // Menu groups for POS system
+  // Separate first item (বিক্রয়/POS) from the rest
+  const firstItem = tabs.find(t => t.id === 'pos');
+  const otherTabs = tabs.filter(t => t.id !== 'pos');
+
+  // Menu groups for rest of the tabs
   const menuGroups = [
-    { id: 'sales', items: tabs.filter(t => ['pos'].includes(t.id)) },
-    { id: 'inventory', items: tabs.filter(t => ['products', 'newproduct'].includes(t.id)) },
-    { id: 'management', items: tabs.filter(t => ['suppliers', 'customers'].includes(t.id)) },
-    { id: 'tools', items: tabs.filter(t => ['barcode', 'inventory', 'income', 'reports', 'settings'].includes(t.id)) },
+    { id: 'inventory', items: otherTabs.filter(t => ['products', 'newproduct'].includes(t.id)) },
+    { id: 'management', items: otherTabs.filter(t => ['suppliers', 'customers'].includes(t.id)) },
+    { id: 'tools', items: otherTabs.filter(t => ['barcode', 'inventory', 'income', 'reports', 'settings'].includes(t.id)) },
   ];
 
   const renderMenuButton = (t) => {
@@ -313,70 +316,95 @@ function DynamicMenu({tab, setTab, tabs}) {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      marginLeft: 24,
-      marginRight: 16,
+      marginLeft: 30,
+      marginRight: 22,
       minWidth: 0,
     }}>
-      {/* Left Arrow */}
-      <button onClick={() => scrollMenu('left')} style={{
-        width: 28,
-        height: 28,
-        border: 'none',
-        background: T.gray100,
-        borderRadius: 6,
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 14,
-        color: T.gray600,
-        marginRight: 8,
-        flexShrink: 0,
-      }}>◀</button>
+      {/* Fixed First Item (বিক্রয়/POS) */}
+      {firstItem && (
+        <div style={{
+          flexShrink: 0,
+          padding: '4px 6px 4px 4px',
+          background: 'rgba(15,118,110,0.03)',
+          borderRadius: 12,
+          border: `1px solid ${T.gray200}`,
+          marginRight: 4,
+          position: 'relative',
+          zIndex: 2,
+          boxShadow: '2px 0 8px rgba(0,0,0,0.05)',
+        }}>
+          {renderMenuButton(firstItem)}
+        </div>
+      )}
 
-      {/* Menu Container */}
-      <div ref={menuRef} style={{
+      {/* Scrollable Menu Container with Left Arrow */}
+      <div style={{
         display: 'flex',
         alignItems: 'center',
-        overflowX: 'auto',
-        gap: 2,
-        padding: '4px 8px',
-        background: 'rgba(15,118,110,0.03)',
-        borderRadius: 12,
-        border: `1px solid ${T.gray200}`,
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none',
         flex: 1,
         minWidth: 0,
-        maxWidth: 'calc(100% - 80px)',
       }}>
-      {/* Menu Groups with Dividers */}
-      {menuGroups.map((group, groupIdx) => (
-        <div key={group.id} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {group.items.map(t => renderMenuButton(t))}
-          {groupIdx < menuGroups.length - 1 && (
-            <div style={{ width: 1, background: T.gray200, margin: '0 4px', borderRadius: 2, height: 20 }} />
-          )}
-        </div>
-      ))}
-      </div>
+        {/* Left Arrow */}
+        <button onClick={() => scrollMenu('left')} style={{
+          width: 28,
+          height: 28,
+          border: 'none',
+          background: T.gray100,
+          borderRadius: 6,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 14,
+          color: T.gray600,
+          marginRight: 4,
+          flexShrink: 0,
+          zIndex: 1,
+        }}>◀</button>
 
-      {/* Right Arrow */}
-      <button onClick={() => scrollMenu('right')} style={{
-        width: 28,
-        height: 28,
-        border: 'none',
-        background: T.gray100,
-        borderRadius: 6,
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 14,
-        color: T.gray600,
-        marginLeft: 8,
-        flexShrink: 0,
-      }}>▶</button>
+        {/* Scrollable Menu */}
+        <div ref={menuRef} style={{
+          display: 'flex',
+          alignItems: 'center',
+          overflowX: 'auto',
+          gap: 2,
+          padding: '4px 8px',
+          background: 'rgba(15,118,110,0.03)',
+          borderRadius: 12,
+          border: `1px solid ${T.gray200}`,
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          flex: 1,
+          minWidth: 0,
+        }}>
+        {/* Menu Groups with Dividers */}
+        {menuGroups.map((group, groupIdx) => (
+          <div key={group.id} style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {group.items.map(t => renderMenuButton(t))}
+            {groupIdx < menuGroups.length - 1 && (
+              <div style={{ width: 1, background: T.gray200, margin: '0 4px', borderRadius: 2, height: 20 }} />
+            )}
+          </div>
+        ))}
+        </div>
+
+        {/* Right Arrow */}
+        <button onClick={() => scrollMenu('right')} style={{
+          width: 28,
+          height: 28,
+          border: 'none',
+          background: T.gray100,
+          borderRadius: 6,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 14,
+          color: T.gray600,
+          marginLeft: 4,
+          flexShrink: 0,
+        }}>▶</button>
+      </div>
     </div>
   );
 }
@@ -1098,7 +1126,7 @@ function MainApp({ currentUser, onLogout }) {
       {/* Content */}
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
         {tab==='pos'       && <POSScreen {...props} />}
-        {tab==='products'  && <ProductsScreen {...props} />}
+        {tab==='products'  && <ProductsScreen {...props} selCat={selCat} />}
         {tab==='newproduct' && <NewProductScreen {...props} />}
         {tab==='barcode'   && <BarcodeScreen {...props} />}
         {tab==='suppliers' && <SuppliersScreen {...props} />}
@@ -1949,7 +1977,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
 /* ═══════════════════════════════════════════
    PRODUCTS SCREEN
 ═══════════════════════════════════════════ */
-function ProductsScreen({products, suppliers, categories, purchases, productHistory, upd}) {
+function ProductsScreen({products, suppliers, categories, purchases, productHistory, upd, selCat}) {
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState([]);
@@ -1976,7 +2004,7 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
     setLoading(true);
     const timer = setTimeout(() => setLoading(false), 300);
     return () => clearTimeout(timer);
-  }, [products]);
+  }, [products, selCat]);
 
   // Handle edit product price
   const handleEditProduct = () => {
