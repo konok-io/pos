@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, memo } from "react";
 
 /* ─────────────── GLOBAL CSS RESET ─────────────── */
 const GlobalStyle = () => {
@@ -1135,7 +1135,7 @@ function MainApp({ currentUser, onLogout }) {
         {tab==='lowstock'  && <LowStockScreen {...props} />}
         {tab==='income'    && <IncomeScreen {...props} />}
         {tab==='reports'   && <ReportsScreen {...props} />}
-        {tab==='settings'  && <SettingsScreen {...props} />}
+        {tab==='settings'  && <SettingsScreen key="settings" {...props} />}
       </div>
     </div>
     </>
@@ -6477,7 +6477,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
-function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
+const SettingsScreen = memo(function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
   // Initialize form directly from settings (only on mount)
   const [form, setForm] = useState({
     name: settings?.name || '',
@@ -7188,4 +7188,4 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       )}
     </div>
   );
-}
+});
