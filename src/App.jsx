@@ -7312,12 +7312,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                 {[
                   { l: '📦 পণ্য ডেটা', c: products.length, btn: 'সব পণ্য মুছে ফেলুন', fn: () => { if(confirm('সব পণ্য মুছে ফেলবেন?')) { upd.products([]); alert('পণ্য মুছা হয়েছে।'); } } },
                   { l: '🏢 কোম্পানি ডেটা', c: suppliers.length, btn: 'সব কোম্পানি মুছে ফেলুন', fn: () => { if(confirm('সব কোম্পানি মুছে ফেলবেন?')) { upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); } } },
                   { l: '📂 ক্যাটাগরি ডেটা', c: categories.length, btn: 'সব ক্যাটাগরি মুছে ফেলুন', fn: () => { if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { upd.categories([]); alert('ক্যাটাগরি মুছা হয়েছে।'); } } },
                   { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { upd.sales([]); alert('বিক্রয় মুছা হয়েছে।'); } } },
+                  { l: '📜 হিস্ট্রি ডেটা', c: productHistory.length, btn: 'সব হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('সব হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory([]); alert('হিস্ট্রি মুছা হয়েছে।'); } } },
                 ].map((d, i) => (
                   <div key={i} style={{
                     padding: 24,
