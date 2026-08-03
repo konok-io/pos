@@ -4799,6 +4799,9 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   
   // Filter only stock change history (exclude price changes)
   const stockHistory = productHistory.filter(h => h.type === 'stock');
+  
+  // Filter low stock products
+  const lowStockProducts = realProducts.filter(p => p.stock > 0 && p.stock <= p.minStock);
 
   const adjust = async () => {
     const qty = parseInt(adjQty)||0;
@@ -4810,15 +4813,77 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-      {/* Sub-tabs: List / History */}
+      {/* Sub-tabs: List / Low Stock / History */}
       <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
         <button onClick={()=>setInvTab('list')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:invTab==='list'?700:400,color:invTab==='list'?T.teal:T.gray500,borderBottom:invTab==='list'?`2px solid ${T.teal}`:'none',fontSize:13}}>
           📦 স্টক তালিকা
+        </button>
+        <button onClick={()=>setInvTab('low')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:invTab==='low'?700:400,color:invTab==='low'?T.orange:T.gray500,borderBottom:invTab==='low'?`2px solid ${T.orange}`:'none',fontSize:13}}>
+          ⚠️ স্টক কম আছে ({lowStockProducts.length})
         </button>
         <button onClick={()=>setInvTab('history')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:invTab==='history'?700:400,color:invTab==='history'?T.teal:T.gray500,borderBottom:invTab==='history'?`2px solid ${T.teal}`:'none',fontSize:13}}>
           📜 হিস্ট্রি ({stockHistory.length})
         </button>
       </div>
+
+      {/* Low Stock Tab Content */}
+      {invTab === 'low' && (
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          {lowStockProducts.length === 0 ? (
+            <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'80px 20px',gap:16}}>
+              <div style={{fontSize:64}}>✅</div>
+              <div style={{fontSize:18,fontWeight:700,color:T.green}}>সব পণ্যে পর্যাপ্ত স্টক আছে!</div>
+              <div style={{fontSize:13,color:T.gray500}}>কোনো পণ্য স্টক কম নেই</div>
+            </div>
+          ) : (
+            <div style={{display:'flex',flexDirection:'column',gap:10}}>
+              {lowStockProducts.sort((a,b) => a.stock - b.stock).map((p) => (
+                <div key={p.id} style={{
+                  background:T.white,border:`1.5px solid ${T.amber}`,borderRadius:12,
+                  padding:14,boxShadow:'0 2px 8px rgba(0,0,0,0.06)'
+                }}>
+                  <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:15,fontWeight:700,color:T.gray900,marginBottom:4}}>{p.name}</div>
+                      <div style={{fontSize:12,color:T.gray500}}>
+                        {p.company && <span>🏢 {p.company}</span>}
+                        {p.cat && <span style={{marginLeft:8}}>📁 {p.cat}</span>}
+                      </div>
+                    </div>
+                    <div style={{textAlign:'right'}}>
+                      <div style={{
+                        display:'inline-flex',alignItems:'center',gap:4,
+                        background:T.orangeLight,color:T.orange,
+                        padding:'4px 12px',borderRadius:20,fontSize:12,fontWeight:700
+                      }}>
+                        ⚠️ স্টক কম
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{display:'flex',gap:16,marginTop:12,paddingTop:12,borderTop:`1px solid ${T.gray100}`}}>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,color:T.gray500,marginBottom:2}}>বর্তমান স্টক</div>
+                      <div style={{fontSize:22,fontWeight:800,color:T.orange}}>{p.stock} <span style={{fontSize:12,fontWeight:400,color:T.gray500}}>/ {p.unit}</span></div>
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,color:T.gray500,marginBottom:2}}>মিনিমাম স্টক</div>
+                      <div style={{fontSize:22,fontWeight:800,color:T.gray700}}>{p.minStock} <span style={{fontSize:12,fontWeight:400,color:T.gray500}}>/ {p.unit}</span></div>
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,color:T.gray500,marginBottom:2}}>বিক্রয় মূল্য</div>
+                      <div style={{fontSize:22,fontWeight:800,color:T.teal}}>{fmt(p.sellP)}</div>
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:11,color:T.gray500,marginBottom:2}}>স্টক ঘাটতি</div>
+                      <div style={{fontSize:22,fontWeight:800,color:T.red}}>{p.minStock - p.stock}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* History Tab Content */}
       {invTab === 'history' && (
