@@ -1218,6 +1218,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const [newCustPhone, setNewCustPhone] = useState('');
   const [newCustAddr, setNewCustAddr] = useState('');
   const paidRef = useRef();
+  const checkoutRef = useRef();
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
   // Auto focus search field on mount
@@ -1940,7 +1941,13 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             placeholder="পরিশোধ (৳)" 
             style={{...input,padding:'10px 14px',fontSize:16,fontWeight:700,borderRadius:8,marginBottom:6,border:'2px solid #e5e7eb',background:'#fff',boxSizing:'border-box',width:'100%',textAlign:'center',color:T.gray900}}
             autoFocus={cart.length > 0}
-            onKeyDown={e=>{if(e.key==='Enter'&&cart.length) checkout();}}/>
+            onKeyDown={e=>{
+              if(e.key==='Enter'&&cart.length) checkout();
+              if(e.key==='Tab'&&cart.length>0&&!(due>0&&!selCust)) {
+                e.preventDefault();
+                checkoutRef.current?.focus();
+              }
+            }}/>
           
           {/* Due/Change Alert */}
           {due > 0 && (
@@ -1962,7 +1969,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               style={{padding:'8px 10px',borderRadius:8,border:'1px solid #e5e7eb',background:T.white,color:T.gray600,fontWeight:600,fontSize:12,cursor:'pointer'}}>
               🗑️
             </button>
-            <button onClick={checkout} 
+            <button ref={checkoutRef} onClick={checkout} 
               disabled={!cart.length || (due > 0 && !selCust)}
               style={{
                 padding:'8px 10px',borderRadius:8,border:'none',
