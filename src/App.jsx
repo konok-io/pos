@@ -564,6 +564,9 @@ function LoginPage({ onLogin }) {
 }
 
 function MainApp({ currentUser, onLogout }) {
+  const logoutRef = useRef(onLogout);
+  logoutRef.current = onLogout;
+  
   const [tab, setTab] = useState(() => localStorage.getItem('pos_current_tab') || 'pos');
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -865,7 +868,7 @@ function MainApp({ currentUser, onLogout }) {
     const resetTimer = () => {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
-        onLogout();
+        logoutRef.current();
       }, INACTIVITY_TIME);
     };
 
