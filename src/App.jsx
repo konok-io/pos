@@ -1938,7 +1938,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           {/* Payment Input */}
           <input ref={paidRef} value={paid} onChange={e=>setPaid(e.target.value)} type="number" min="0"
             placeholder="পরিশোধ (৳)" 
-            style={{...input,padding:'7px 10px',fontSize:12,fontWeight:600,borderRadius:6,marginBottom:6,border:'1.5px solid #e5e7eb',background:'#fafbfc'}}
+            style={{...input,padding:'10px 14px',fontSize:16,fontWeight:700,borderRadius:8,marginBottom:6,border:'2px solid #e5e7eb',background:'#fff',boxSizing:'border-box',width:'100%',textAlign:'center',color:T.gray900}}
+            autoFocus={cart.length > 0}
             onKeyDown={e=>{if(e.key==='Enter'&&cart.length) checkout();}}/>
           
           {/* Due/Change Alert */}
