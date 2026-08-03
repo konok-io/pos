@@ -7383,7 +7383,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
               {/* Left Column - Settings */}
               <div>
-                <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>🧾 থার্মাল রিসিট টেমপ্লেট</h4>
+                <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>🧾 বিক্রয় ইনভয়েস প্রিন্ট টেমপ্লেট</h4>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                   <div>
