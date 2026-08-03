@@ -18,12 +18,19 @@ function BannerImageUpload({ value, onChange }) {
   const inputRef = useRef(null);
 
   useEffect(() => {
+    console.log('BannerImageUpload - value changed:', value ? 'yes' : 'no');
     setPreview(value || '');
   }, [value]);
 
   const handleFileChange = (e) => {
+    console.log('handleFileChange called, files:', e.target.files);
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
+    
+    console.log('File:', file.name, file.type, file.size);
     
     if (!file.type.startsWith('image/')) {
       alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
@@ -36,14 +43,21 @@ function BannerImageUpload({ value, onChange }) {
     
     const reader = new FileReader();
     reader.onload = (event) => {
+      console.log('FileReader onload, result length:', event.target.result?.length);
       const data = event.target.result;
       setPreview(data);
       onChange(data);
+      console.log('onChange called with data');
+    };
+    reader.onerror = () => {
+      console.error('FileReader error');
+      alert('ছবি পড়তে সমস্যা হয়েছে!');
     };
     reader.readAsDataURL(file);
   };
 
   const handleRemove = () => {
+    console.log('handleRemove called');
     setPreview('');
     onChange('');
     if (inputRef.current) {
@@ -6151,7 +6165,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
   const save = async () => {
+    console.log('Saving form with bannerImage:', form.bannerImage ? 'yes (length: ' + form.bannerImage.length + ')' : 'no');
+    console.log('Full form:', JSON.stringify({...form, bannerImage: form.bannerImage ? '[IMAGE_DATA]' : ''}));
     await upd.settings(form);
+    console.log('Settings saved successfully');
     setSaved(true); setTimeout(()=>setSaved(false),2000);
   };
 
