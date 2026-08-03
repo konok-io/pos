@@ -6416,12 +6416,12 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 ═══════════════════════════════════════════ */
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
   const [form, setForm] = useState({
-    name: settings?.name || '',
-    address: settings?.address || '',
-    phone: settings?.phone || '',
-    vatEnabled: settings?.vatEnabled !== false,
-    vatPercent: settings?.vatPercent || 15,
-    bannerImage: settings?.bannerImage || ''
+    name: '',
+    address: '',
+    phone: '',
+    vatEnabled: true,
+    vatPercent: 15,
+    bannerImage: ''
   });
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
@@ -6429,21 +6429,25 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({ email: '', password: '', name: '', role: 'admin' });
+  const [initialized, setInitialized] = useState(false);
 
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
-  // Sync form with settings when they change
+  // Initialize form with settings on mount only
   useEffect(() => {
-    setForm({
-      name: settings?.name || '',
-      address: settings?.address || '',
-      phone: settings?.phone || '',
-      vatEnabled: settings?.vatEnabled !== false,
-      vatPercent: settings?.vatPercent || 15,
-      bannerImage: settings?.bannerImage || ''
-    });
-  }, [settings]);
+    if (!initialized) {
+      setForm({
+        name: settings?.name || '',
+        address: settings?.address || '',
+        phone: settings?.phone || '',
+        vatEnabled: settings?.vatEnabled !== false,
+        vatPercent: settings?.vatPercent || 15,
+        bannerImage: settings?.bannerImage || ''
+      });
+      setInitialized(true);
+    }
+  }, []);
 
   const save = async () => {
     // Merge form with existing settings to preserve any fields not in form
