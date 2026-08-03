@@ -1301,7 +1301,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     // Company filter
     const matchComp = selComp === 'সব কোম্পানি' || p.company === selComp;
     // Product name filter
-    const matchName = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
+    const matchName = !search || (p.name||'').toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
     
     // স্টক আছে: only show products with stock > 0
     if (selCat === 'স্টক আছে') {
@@ -2036,7 +2036,7 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
       
       // Get existing companies and categories
       const existingCompanies = [
-        ...suppliers.map(s => s.name.toLowerCase()),
+        ...suppliers.map(s => (s.name||'').toLowerCase()),
         ...products.map(p => (p.company||'').toLowerCase()).filter(Boolean)
       ];
       const existingCategories = [
@@ -2123,7 +2123,7 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
       if (stockFilter === 'স্টক আছে' && p.stock <= 0) return false;
       if (stockFilter === 'স্টক শেষ' && p.stock > 0) return false;
       // Search filter
-      return !search || p.name.toLowerCase().includes(search.toLowerCase()) || 
+      return !search || (p.name||'').toLowerCase().includes(search.toLowerCase()) || 
         (p.company||'').toLowerCase().includes(search.toLowerCase()) || 
         (p.barcode||'').includes(search);
     })
@@ -2155,10 +2155,10 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
       
       // Find exact match by barcode OR by name (case insensitive)
       const exactMatch = products.find(p => 
-        !p.name?.includes('(ক্যাটাগরি)') && 
+        !(p.name||'').includes('(ক্যাটাগরি)') && 
         (
           (p.barcode||'').toLowerCase().trim() === trimmedVal ||
-          p.name.toLowerCase().trim() === trimmedVal
+          (p.name||'').toLowerCase().trim() === trimmedVal
         )
       );
       
@@ -2168,9 +2168,9 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
       } else {
         // Show suggestions if no exact match (but don't auto-fill)
         const matches = products.filter(p => 
-          !p.name?.includes('(ক্যাটাগরি)') && (
+          !(p.name||'').includes('(ক্যাটাগরি)') && (
             (p.barcode||'').toLowerCase().includes(trimmedVal) || 
-            p.name.toLowerCase().includes(trimmedVal)
+            (p.name||'').toLowerCase().includes(trimmedVal)
           )
         ).slice(0, 5);
         setBarcodeSuggestions(matches);
@@ -2518,13 +2518,13 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 </div>
                 {showCompanyList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
-                    {uniqueCompanies.filter(c=>c.toLowerCase().includes(supplierQ.toLowerCase())).map((c,i)=>(
+                    {uniqueCompanies.filter(c=>c && c.toLowerCase().includes((supplierQ||'').toLowerCase())).map((c,i)=>(
                       <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowCompanyList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                         {c}
                       </div>
                     ))}
-                    {supplierQ && !uniqueCompanies.some(c=>c.toLowerCase()===supplierQ.toLowerCase()) && (
+                    {supplierQ && !uniqueCompanies.some(c=>c && c.toLowerCase()===(supplierQ||'').toLowerCase()) && (
                       <div onClick={()=>{setForm(f=>({...f,company:supplierQ}));setShowCompanyList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
                         + নতুন কোম্পানি যুক্ত করুন: "{supplierQ}"
@@ -2549,13 +2549,13 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 </div>
                 {showCategoryList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
-                    {uniqueCategories.filter(c=>c.toLowerCase().includes((form.cat||'').toLowerCase())).map((c,i)=>(
+                    {uniqueCategories.filter(c=>c && c.toLowerCase().includes((form.cat||'').toLowerCase())).map((c,i)=>(
                       <div key={i} onClick={()=>{setForm(f=>({...f,cat:c}));setShowCategoryList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                         {c}
                       </div>
                     ))}
-                    {form.cat && !uniqueCategories.some(c=>c.toLowerCase()===(form.cat||'').toLowerCase()) && (
+                    {form.cat && !uniqueCategories.some(c=>c && c.toLowerCase()===(form.cat||'').toLowerCase()) && (
                       <div onClick={()=>{setShowCategoryList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
                         + নতুন ক্যাটাগরি যুক্ত করুন: "{form.cat}"
@@ -2584,14 +2584,14 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                   </div>
                   {showProductList && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
-                      {products.filter(p=>!p.name?.includes('(ক্যাটাগরি)') && p.name.toLowerCase().includes((form.name||'').toLowerCase())).slice(0,20).map((p,i)=>(
+                      {products.filter(p=>!(p.name||'').includes('(ক্যাটাগরি)') && (p.name||'').toLowerCase().includes((form.name||'').toLowerCase())).slice(0,20).map((p,i)=>(
                         <div key={i} onClick={()=>{selectProduct(p);setShowProductList(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                           <div style={{fontWeight:600}}>{p.name}</div>
                           <div style={{fontSize:11,color:T.gray400}}>{p.company} • {p.cat}</div>
                         </div>
                       ))}
-                      {form.name && !products.some(p=>!p.name?.includes('(ক্যাটাগরি)') && p.name.toLowerCase()===(form.name||'').toLowerCase()) && (
+                      {form.name && !products.some(p=>!(p.name||'').includes('(ক্যাটাগরি)') && (p.name||'').toLowerCase()===(form.name||'').toLowerCase()) && (
                         <div onClick={()=>{setShowProductList(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
                           + নতুন পণ্য তৈরি করুন: "{form.name}"
@@ -2990,7 +2990,7 @@ function BarcodeScreen({purchases, products}) {
   // Find purchase by ID or barcode
   const findPurchase = () => {
     // First check if it's a purchase ID
-    const foundById = purchases.find(p => p.id.toLowerCase().includes(purchaseId.toLowerCase()));
+    const foundById = purchases.find(p => (p.id||'').toLowerCase().includes(purchaseId.toLowerCase()));
     if (foundById) {
       setSelectedPurchase(foundById);
       setBarcodeListItems([]);
@@ -3585,29 +3585,29 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   
   // Get products by company
   const companyProducts = form.company 
-    ? products.filter(p => (p.company||'').toLowerCase() === form.company.toLowerCase())
+    ? products.filter(p => (p.company||'').toLowerCase() === (form.company||'').toLowerCase())
     : [];
     
   // Get categories for selected company
   const companyCategories = form.company 
-    ? categories.filter(c => c.company?.toLowerCase() === form.company.toLowerCase()).map(c => c.name)
+    ? categories.filter(c => (c.company||'').toLowerCase() === (form.company||'').toLowerCase()).map(c => c.name)
     : [];
 
   // Filter companies for dropdown
   const filteredCompanies = suppliers.filter(s => 
-    !companyQ || s.name.toLowerCase().includes(companyQ.toLowerCase()) || (s.code||'').toLowerCase().includes(companyQ.toLowerCase())
+    !companyQ || (s.name||'').toLowerCase().includes((companyQ||'').toLowerCase()) || (s.code||'').toLowerCase().includes((companyQ||'').toLowerCase())
   );
 
   // Filter categories for dropdown
   const filteredCats = companyCategories.filter(c => 
-    !catQ || c.toLowerCase().includes(catQ.toLowerCase())
+    !catQ || (c||'').toLowerCase().includes((catQ||'').toLowerCase())
   );
 
   // Get products count for each supplier
-  const getProductsCount = (company) => products.filter(p => (p.company||'').toLowerCase() === company.toLowerCase()).length;
+  const getProductsCount = (company) => products.filter(p => (p.company||'').toLowerCase() === (company||'').toLowerCase()).length;
   
   // Get purchases for a supplier
-  const getSupplierPurchases = (company) => purchases.filter(p => (p.supplier||'').toLowerCase() === company.toLowerCase());
+  const getSupplierPurchases = (company) => purchases.filter(p => (p.supplier||'').toLowerCase() === (company||'').toLowerCase());
 
   // Get all unique companies from products
   const allCompanies = [...new Set(products.map(p => p.company).filter(Boolean))];
@@ -4096,7 +4096,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 <tbody>
                   {categories.length === 0 ? (
                     <tr><td colSpan={4} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ক্যাটাগরি পাওয়া যায়নি</td></tr>
-                  ) : categories.filter(c => !search || c.name.toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
+                  ) : categories.filter(c => !search || (c.name||'').toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
                     <tr key={cat.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{i+1}</td>
                       <td style={{padding:'10px 12px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat.name}</td>
@@ -4697,7 +4697,7 @@ function CustomersScreen({customers, sales, upd}) {
   const [payModal, setPayModal] = useState(null);
   const [payAmt, setPayAmt] = useState('');
 
-  const filtered = customers.filter(c=>!search||(c.name+c.phone).includes(search));
+  const filtered = customers.filter(c=>!search||((c.name||'')+(c.phone||'')).includes(search));
 
   const save = async () => {
     if(!form.name?.trim()) { alert('নাম দিন'); return; }
