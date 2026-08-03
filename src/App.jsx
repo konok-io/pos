@@ -6496,6 +6496,11 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     phone: settings?.phone || '',
     email: settings?.email || '',
     taxId: settings?.taxId || '',
+    bin: settings?.bin || '',
+    zatkaApiUrl: settings?.zatkaApiUrl || '',
+    zatkaUsername: settings?.zatkaUsername || '',
+    zatkaPassword: settings?.zatkaPassword || '',
+    zatkaEnabled: settings?.zatkaEnabled || false,
     vatEnabled: settings?.vatEnabled !== false,
     vatPercent: settings?.vatPercent || 15,
     bannerImage: settings?.bannerImage || ''
@@ -6806,7 +6811,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  🔢 ট্যাক্স/ভ্যাট নম্বর
+                  🔢 ট্যাক্স/ভ্যাট নম্বর (TIN)
                 </label>
                 <input
                   value={form.taxId || ''}
@@ -6825,8 +6830,133 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   }}
                   onFocus={e => e.target.style.borderColor = '#0F766E'}
                   onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                  placeholder="ট্যাক্স/ভ্যাট নম্বর"
+                  placeholder="ট্যাক্স/ভ্যাট নম্বর (TIN)"
                 />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  🏢 BIN (Business Identification Number)
+                </label>
+                <input
+                  value={form.bin || ''}
+                  onChange={e => setForm(p => ({...p, bin: e.target.value}))}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  placeholder="ব্যবসা সনাক্তকরণ নম্বর"
+                />
+              </div>
+              <div style={{ gridColumn: '1 / -1', padding: '20px 24px', background: '#f8fafc', borderRadius: 12, marginTop: 8, border: '2px solid #e2e8f0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>
+                      🧾 জাতকা (Zatka) ট্যাক্স QR কোড {form.zatkaEnabled ? '✅ সক্রিয়' : '❌ নিষ্ক্রিয়'}
+                    </h4>
+                    <p style={{ margin: '6px 0 0', fontSize: 12, color: '#64748b' }}>
+                      বিক্রয় রিসিটে Zatka Tax QR কোড প্রদর্শন করুন
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setForm(p => ({...p, zatkaEnabled: !p.zatkaEnabled}))}
+                    style={{
+                      padding: '10px 20px',
+                      background: form.zatkaEnabled ? '#059669' : '#94a3b8',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: 8,
+                      fontSize: 13,
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {form.zatkaEnabled ? 'সক্রিয়' : 'নিষ্ক্রিয়'}
+                  </button>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                      🌐 API URL
+                    </label>
+                    <input
+                      value={form.zatkaApiUrl || ''}
+                      onChange={e => setForm(p => ({...p, zatkaApiUrl: e.target.value}))}
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px',
+                        fontSize: 14,
+                        border: '2px solid #e2e8f0',
+                        borderRadius: 8,
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        color: '#1e293b',
+                        background: '#fff'
+                      }}
+                      onFocus={e => e.target.style.borderColor = '#0F766E'}
+                      onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                      placeholder="https://api.zatka.gov.bd"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                      👤 ইউজারনেম
+                    </label>
+                    <input
+                      value={form.zatkaUsername || ''}
+                      onChange={e => setForm(p => ({...p, zatkaUsername: e.target.value}))}
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px',
+                        fontSize: 14,
+                        border: '2px solid #e2e8f0',
+                        borderRadius: 8,
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        color: '#1e293b',
+                        background: '#fff'
+                      }}
+                      onFocus={e => e.target.style.borderColor = '#0F766E'}
+                      onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                      placeholder="Zatka ইউজারনেম"
+                      disabled={!form.zatkaEnabled}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                      🔐 পাসওয়ার্ড
+                    </label>
+                    <input
+                      value={form.zatkaPassword || ''}
+                      onChange={e => setForm(p => ({...p, zatkaPassword: e.target.value}))}
+                      type="password"
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px',
+                        fontSize: 14,
+                        border: '2px solid #e2e8f0',
+                        borderRadius: 8,
+                        outline: 'none',
+                        boxSizing: 'border-box',
+                        color: '#1e293b',
+                        background: '#fff'
+                      }}
+                      onFocus={e => e.target.style.borderColor = '#0F766E'}
+                      onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                      placeholder="Zatka পাসওয়ার্ড"
+                      disabled={!form.zatkaEnabled}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
