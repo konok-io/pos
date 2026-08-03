@@ -6580,13 +6580,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     reader.readAsDataURL(file);
   };
 
-  const stats = [
-    { label: 'মোট পণ্য', value: products.length, icon: '📦', color: '#0F766E' },
-    { label: 'স্টক শেষ', value: products.filter(p => p.stock <= 0).length, icon: '⚠️', color: '#DC2626' },
-    { label: 'কম স্টক', value: products.filter(p => p.stock > 0 && p.stock <= p.minStock).length, icon: '📉', color: '#F59E0B' },
-    { label: 'স্টক মূল্য', value: fmt(products.reduce((s, p) => s + p.sellP * p.stock, 0)), icon: '💰', color: '#059669' },
-  ];
-
   return (
     <div style={{ 
       height: '100%', 
@@ -6597,7 +6590,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       {/* Header */}
       <div style={{
         background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
-        padding: '32px 32px 48px',
+        padding: '32px 32px 24px',
         position: 'relative',
         overflow: 'hidden'
       }}>
@@ -6640,44 +6633,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
           </button>
         </div>
 
-        {/* Stats Cards */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: 16,
-          marginTop: 24,
-          position: 'relative',
-          zIndex: 1
-        }}>
-          {stats.map((stat, i) => (
-            <div key={i} style={{
-              background: 'rgba(255,255,255,0.15)',
-              backdropFilter: 'blur(10px)',
-              borderRadius: 12,
-              padding: '16px 20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
-              border: '1px solid rgba(255,255,255,0.2)',
-            }}>
-              <div style={{
-                width: 44, height: 44,
-                background: 'rgba(255,255,255,0.2)',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 22
-              }}>
-                {stat.icon}
-              </div>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>{stat.value}</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{stat.label}</div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Tab Navigation */}
