@@ -2675,7 +2675,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           </div>
 
           {/* Right: Purchase Items List */}
-          <div style={{width:320,display:'flex',flexDirection:'column',background:T.gray50,overflow:'hidden'}}>
+          <div style={{width:350,display:'flex',flexDirection:'column',background:T.gray50,overflow:'hidden'}}>
             <div style={{padding:12,background:T.white,borderBottom:`1px solid ${T.gray200}`,fontWeight:700}}>
               📋 পণ্য তালিকা ({purchaseItems.length})
             </div>
@@ -4689,7 +4689,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
         </div>
 
         {/* Right: Purchase List */}
-        <div style={{width:320,padding:12,overflow:'auto',display:'flex',flexDirection:'column',gap:8,background:T.gray50}}>
+        <div style={{width:350,padding:12,overflow:'auto',display:'flex',flexDirection:'column',gap:8,background:T.gray50}}>
           <h3 style={{margin:0,fontSize:14,fontWeight:700}}>📋 পণ্য তালিকা ({purchaseItems.length})</h3>
           
           {purchaseItems.length === 0 ? (
