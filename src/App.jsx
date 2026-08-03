@@ -303,12 +303,130 @@ function LoginScreen({ onLogin, settings }) {
       alignItems: 'center',
       justifyContent: 'center',
       padding: 20,
+      position: 'relative',
+      overflow: 'hidden',
     }}>
-      {/* Left side - Branding */}
+      {/* Background App Preview - 50% opacity */}
       <div style={{
-        display: 'none',
-        '@media (min-width: 900px)': { display: 'flex' }
-      }} />
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        opacity: 0.5,
+        background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        {/* POS Interface Preview */}
+        <div style={{
+          width: '90%',
+          maxWidth: 800,
+          background: T.white,
+          borderRadius: 16,
+          boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+          overflow: 'hidden',
+          transform: 'scale(0.85)',
+        }}>
+          {/* Mini Header */}
+          <div style={{
+            background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+            padding: '12px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+          }}>
+            <div style={{
+              width: 32, height: 32,
+              background: 'rgba(255,255,255,0.2)',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 16,
+            }}>🏪</div>
+            <span style={{color: T.white, fontWeight: 700, fontSize: 14}}>{businessName}</span>
+            <span style={{color: 'rgba(255,255,255,0.7)', fontSize: 11, marginLeft: 'auto'}}>POS ম্যানেজমেন্ট সিস্টেম</span>
+          </div>
+          {/* Mini Content */}
+          <div style={{padding: '20px', display: 'flex', gap: 16}}>
+            {/* Sidebar */}
+            <div style={{width: 60, display: 'flex', flexDirection: 'column', gap: 8}}>
+              {['💰', '📦', '🛒', '📊', '👥', '⚙️'].map((icon, i) => (
+                <div key={i} style={{
+                  height: 40, background: i === 0 ? '#F0FDFA' : '#F8FAFC',
+                  borderRadius: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 16,
+                  color: i === 0 ? '#0F766E' : '#94A3B8',
+                }}>{icon}</div>
+              ))}
+            </div>
+            {/* Main Content */}
+            <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 12}}>
+              {/* Stats Row */}
+              <div style={{display: 'flex', gap: 12}}>
+                {[
+                  {label: 'আজকের বিক্রয়', value: '৳১২,৫০০', color: '#0F766E'},
+                  {label: 'মোট পণ্য', value: '১৫০', color: '#0D9488'},
+                  {label: 'গ্রাহক', value: '৪২', color: '#F59E0B'},
+                ].map((stat, i) => (
+                  <div key={i} style={{
+                    flex: 1, padding: '12px 16px',
+                    background: '#F8FAFC',
+                    borderRadius: 10,
+                    border: '1px solid #E2E8F0',
+                  }}>
+                    <div style={{fontSize: 10, color: '#94A3B8', marginBottom: 4}}>{stat.label}</div>
+                    <div style={{fontSize: 16, fontWeight: 700, color: stat.color}}>{stat.value}</div>
+                  </div>
+                ))}
+              </div>
+              {/* Products Table */}
+              <div style={{
+                background: '#F8FAFC',
+                borderRadius: 10,
+                border: '1px solid #E2E8F0',
+                overflow: 'hidden',
+              }}>
+                <div style={{
+                  padding: '10px 14px',
+                  background: '#F0FDFA',
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#0F766E',
+                  borderBottom: '1px solid #E2E8F0',
+                }}>📦 সাম্প্রতিক পণ্যসমূহ</div>
+                {[
+                  {name: 'চাল', company: 'মদন ফুড', stock: '৫০', price: '৳৬৫'},
+                  {name: 'আটা', company: 'ফুডওয়ে', stock: '৩০', price: '৳৪৫'},
+                  {name: 'তেল', company: 'প্রাইম অয়েল', stock: '১০০', price: '৳১৮০'},
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    padding: '10px 14px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    borderBottom: i < 2 ? '1px solid #E2E8F0' : 'none',
+                    fontSize: 12,
+                  }}>
+                    <div>
+                      <div style={{fontWeight: 600, color: '#1E293B'}}>{item.name}</div>
+                      <div style={{fontSize: 10, color: '#94A3B8'}}>{item.company}</div>
+                    </div>
+                    <div style={{textAlign: 'right'}}>
+                      <div style={{fontWeight: 600, color: '#0F766E'}}>{item.price}</div>
+                      <div style={{fontSize: 10, color: '#94A3B8'}}>স্টক: {item.stock}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Login Card */}
       <div style={{
