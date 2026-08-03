@@ -6517,7 +6517,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   };
 
   const tabs = [
-    { icon: '🏪', label: 'ব্যবসা' },
+    { icon: '⚙️', label: 'জেনারেল' },
     { icon: '💰', label: 'ট্যাক্স' },
     { icon: '🖼️', label: 'ডিসপ্লে' },
     { icon: '📊', label: 'রিপোর্ট' },
@@ -6699,9 +6699,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 justifyContent: 'center',
                 fontSize: 24,
                 color: '#fff'
-              }}>🏪</div>
+              }}>⚙️</div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ব্যবসার তথ্য</h3>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>সাধারণ তথ্য</h3>
                 <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>আপনার ব্যবসার মূল তথ্য</p>
               </div>
             </div>
