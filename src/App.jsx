@@ -6080,17 +6080,25 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
+      e.target.value = '';
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       alert('ছবির সাইজ 5MB এর বেশি হওয়া উচিত নয়!');
+      e.target.value = '';
       return;
     }
     const reader = new FileReader();
     reader.onload = (event) => {
+      console.log('Image loaded, length:', event.target.result?.length);
       setForm(p => ({...p, bannerImage: event.target.result}));
     };
+    reader.onerror = () => {
+      console.error('FileReader error');
+      alert('ছবি পড়তে সমস্যা হয়েছে!');
+    };
     reader.readAsDataURL(file);
+    e.target.value = '';
   };
 
   const sections = [
