@@ -7432,7 +7432,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   </div>
                   <div>
                     <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                      লোগো ইএমওআই
+                      আইকন
                     </label>
                     <input
                       value={form.receiptLogo || ''}
