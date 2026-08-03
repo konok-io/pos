@@ -6066,6 +6066,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({ email: '', password: '', name: '', role: 'admin' });
+  const fileInputRef = useRef(null);
 
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
@@ -6078,14 +6079,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    console.log('File selected:', file.name, file.size, file.type);
     if (!file.type.startsWith('image/')) {
       alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
-      e.target.value = '';
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       alert('ছবির সাইজ 5MB এর বেশি হওয়া উচিত নয়!');
-      e.target.value = '';
       return;
     }
     const reader = new FileReader();
@@ -6098,7 +6098,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       alert('ছবি পড়তে সমস্যা হয়েছে!');
     };
     reader.readAsDataURL(file);
-    e.target.value = '';
   };
 
   const sections = [
@@ -6323,18 +6322,26 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   </div>
                 ) : (
                   <div style={{display:'flex',alignItems:'center',gap:12}}>
-                    <label style={{
-                      display:'flex',alignItems:'center',justifyContent:'center',gap:12,
-                      padding:'24px',border:`2px dashed ${T.gray300}`,borderRadius:12,cursor:'pointer',
-                      background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600,maxWidth:500,
-                      position:'relative',overflow:'hidden',flex:1
-                    }} onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
-                       onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
+                    <button 
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{
+                        display:'flex',alignItems:'center',justifyContent:'center',gap:12,
+                        padding:'24px',border:`2px dashed ${T.gray300}`,borderRadius:12,
+                        background:T.gray50,transition:'all 0.2s',fontSize:14,color:T.gray600,maxWidth:500,
+                        cursor:'pointer',width:'100%'
+                      }}
+                      onMouseOver={e=>{e.currentTarget.style.borderColor=T.teal;e.currentTarget.style.background=T.tealLight}}
+                      onMouseLeave={e=>{e.currentTarget.style.borderColor=T.gray300;e.currentTarget.style.background=T.gray50}}>
                       <span style={{fontSize:28}}>📁</span>
                       <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
-                      <input type="file" accept="image/*" onChange={handleImageUpload} 
-                        style={{position:'absolute',top:0,left:0,width:'100%',height:'100%',opacity:0,cursor:'pointer'}}/>
-                    </label>
+                    </button>
+                    <input 
+                      ref={fileInputRef}
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleImageUpload} 
+                      style={{display:'none'}}
+                    />
                   </div>
                 )}
               </div>
