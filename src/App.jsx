@@ -6278,6 +6278,10 @@ function ReportsScreen({sales, customers, purchases, settings}) {
                   const showAddress = s.purchaseShowAddress !== false;
                   const showSupplier = s.purchaseShowSupplier !== false;
                   const showPhone = s.purchaseShowPhone !== false;
+                  const showVat = s.purchaseShowVat !== false;
+                  const subtotal = grandTotal;
+                  const vatAmount = showVat ? subtotal * 0.15 : 0;
+                  const totalWithVat = subtotal + vatAmount;
                   let html = `<!DOCTYPE html>
 <html>
 <head>
@@ -6321,7 +6325,9 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                   });
                   html += `</tbody>
 </table>
-<div class="total row"><span>সর্বমোট:</span><span>৳${grandTotal.toFixed(2)}</span></div>
+<div class="row"><span>সাবটোটাল:</span><span>৳${subtotal.toFixed(2)}</span></div>
+${showVat ? '<div class="row"><span>ভ্যাট (১৫%):</span><span>৳' + vatAmount.toFixed(2) + '</span></div>' : ''}
+<div class="total row"><span>সর্বমোট:</span><span>৳${totalWithVat.toFixed(2)}</span></div>
 <div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
@@ -6555,6 +6561,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     purchaseShowAddress: settings?.purchaseShowAddress !== false,
     purchaseShowSupplier: settings?.purchaseShowSupplier !== false,
     purchaseShowPhone: settings?.purchaseShowPhone !== false,
+    purchaseShowVat: settings?.purchaseShowVat !== false,
     purchaseFontSize: settings?.purchaseFontSize || 11,
     purchaseIcon: settings?.purchaseIcon || '',
   });
@@ -7604,12 +7611,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
                 <div style={{ padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '2px solid #e2e8f0', marginBottom: 16 }}>
                   <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                     {[
                       { key: 'purchaseShowLogo', label: 'লোগো/আইকন' },
                       { key: 'purchaseShowAddress', label: 'ঠিকানা' },
                       { key: 'purchaseShowSupplier', label: 'সাপ্লায়ার তথ্য' },
                       { key: 'purchaseShowPhone', label: 'ফোন নম্বর' },
+                      { key: 'purchaseShowVat', label: 'ভ্যাট ১৫%' },
                     ].map(item => (
                       <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                         <input
@@ -7684,7 +7692,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       </table>
                       <div style={{ borderTop: '1px dashed #000', marginTop: 6, paddingTop: 6 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${(form.purchaseFontSize||11)-1}px` }}><span>সাবটোটাল:</span><span>৳900</span></div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}><span>সর্বমোট:</span><span>৳900</span></div>
+                        {form.purchaseShowVat!==false&&<div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${(form.purchaseFontSize||11)-1}px` }}><span>ভ্যাট (১৫%):</span><span>৳135</span></div>}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}><span>সর্বমোট:</span><span>৳1035</span></div>
                       </div>
                       <div style={{ textAlign: 'center', borderTop: '1px dashed #000', marginTop: 8, paddingTop: 6, fontSize: `${(form.purchaseFontSize||11)-2}px` }}>{form.purchaseFooter||'ধন্যবাদ'}<br/>২ আগস্ট, ২০২৬</div>
                     </div>
