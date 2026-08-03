@@ -1539,7 +1539,7 @@ ${r.sale.discount > 0 ? `<div class="row"><span>ছাড়:</span><span>-৳${
 <div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toFixed(2)}</span></div>
 ${r.sale.change > 0 ? `<div class="row"><span>ফেরত:</span><span>৳${r.sale.change.toFixed(2)}</span></div>` : ''}
 ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${r.sale.due.toFixed(2)}</span></div>` : ''}
-${showQr ? '<div style="text-align:center;margin-top:8px;">📱 QR কোড</div>' : ''}
+${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:50px;height:50px;margin:0 auto;background:repeating-linear-gradient(0deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(90deg,#000 0px,#000 2px,#fff 2px,#fff 4px);background-size:4px 4px;"></div><div style="font-size:8px;margin-top:4px;">QR কোড</div></div>' : ''}
 <div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
@@ -7579,17 +7579,24 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         <div style={{
                           width: 60,
                           height: 60,
-                          background: '#000',
                           margin: '0 auto 4px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: '#fff',
-                          fontSize: '8px',
-                          borderRadius: 4
-                        }}>
-                          QR
-                        </div>
+                          backgroundImage: `repeating-linear-gradient(
+                            0deg,
+                            #000 0px,
+                            #000 3px,
+                            #fff 3px,
+                            #fff 6px
+                          ),
+                          repeating-linear-gradient(
+                            90deg,
+                            #000 0px,
+                            #000 3px,
+                            #fff 3px,
+                            #fff 6px
+                          )`,
+                          backgroundSize: '6px 6px',
+                          borderRadius: 2
+                        }}></div>
                         <div style={{ color: '#000', fontWeight: 600 }}>
                           QR কোড
                         </div>
