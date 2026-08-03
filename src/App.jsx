@@ -4617,11 +4617,11 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
                 onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
             </div>
 
-            {/* Unit & Stock */}
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
+            {/* 3 Column Grid: Unit/Stock/MinStock + Price + Profit */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:16}}>
               <div>
                 <label style={label}>📥 একক</label>
-                <select value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} style={{...input,appearance:'none',cursor:'pointer',backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 12px center',paddingRight:36}}
+                <select value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} style={{...input,appearance:'none',cursor:'pointer',backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 8px center',paddingRight:28,fontSize:12}}
                   onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                   onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})}>
                   <option value="পিস">পিস</option>
@@ -4642,10 +4642,13 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
                   onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                   onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
               </div>
-            </div>
-
-            {/* Prices */}
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
+              <div>
+                <label style={label}>⚠️ মিন স্টক</label>
+                <input type="number" value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} placeholder="5" 
+                  style={input} 
+                  onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
+              </div>
               <div>
                 <label style={label}>💰 ক্রয়মূল্য</label>
                 <input type="number" value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} placeholder="0" 
@@ -4660,19 +4663,20 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
                   onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                   onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
               </div>
-            </div>
-
-            {/* Min Stock */}
-            <div style={{marginBottom:20}}>
-              <label style={label}>⚠️ মিন স্টক</label>
-              <input type="number" value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} placeholder="5" 
-                style={input} 
-                onFocus={(e) => Object.assign(e.target.style, inputFocus)}
-                onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
+              <div>
+                <label style={label}>📊 লাভ</label>
+                <div style={{padding:'7px 10px',background:T.greenLight,borderRadius:6,fontWeight:700,color:T.green,fontSize:13,border:`1px solid ${T.gray200}`}}>
+                  {form.buyP > 0 && form.sellP > 0 ? (
+                    <>{(((+form.sellP) - (+form.buyP)).toFixed(0))} ({(((+form.sellP - +form.buyP) / +form.buyP) * 100).toFixed(0)}%)</>
+                  ) : (
+                    <span style={{color:T.gray400,fontWeight:400}}>--</span>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Add Button */}
-            <button onClick={addItem} style={{...btn('primary'),width:'100%',padding:'14px',fontSize:14,borderRadius:10}}>
+            <button onClick={addItem} style={{...btn('primary'),width:'100%',padding:'12px',fontSize:14,borderRadius:10}}>
               ➕ পণ্য তালিকায় যোগ করুন
             </button>
           </div>
