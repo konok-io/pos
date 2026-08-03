@@ -5968,6 +5968,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
     const periodLabel = period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to;
     const totalSellingPrice = fs.reduce((s,sale)=>s+sale.total/1.15,0);
     const totalVatOnTotal = fs.reduce((s,sale)=>s+sale.total*0.15,0);
+    const totalVatOnSelling = fs.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0);
     
     let html = `
     <!DOCTYPE html>
@@ -6048,6 +6049,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
     const periodLabel = period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to;
     const totalSellingPrice = fs.reduce((s,sale)=>s+sale.total/1.15,0);
     const totalVatOnTotal = fs.reduce((s,sale)=>s+sale.total*0.15,0);
+    const totalVatOnSelling = fs.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0);
     
     let html = `
     <!DOCTYPE html>
@@ -6104,6 +6106,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
             <td style="text-align:right;color:${s.due>0?'#c62828':'#999'};">৳${s.due.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:#00897b;">৳${(s.total/1.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:#c62828;">৳${(s.total*0.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#ff6f00;">৳${((s.total/1.15)*0.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>`;
     });
     
@@ -6117,6 +6120,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
             <td style="text-align:right;">৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalSellingPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalVatOnTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalVatOnSelling.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>
         </tfoot>
       </table>
@@ -6241,13 +6245,13 @@ function ReportsScreen({sales, customers, purchases, settings}) {
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  {['তারিখ','বিল নং','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ','বিক্রয় মূল্য','মোটের ভ্যাট'].map(h=>(
+                  {['তারিখ','বিল নং','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ','বিক্রয় মূল্য','মোটের ভ্যাট','বিক্রয়ের ভ্যাট'].map(h=>(
                     <th key={h} style={{padding:'8px 10px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray400,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {fs.length===0 ? <tr><td colSpan={11} style={{padding:30,textAlign:'center',color:T.gray400}}>নির্বাচিত সময়ে কোনো বিক্রয় নেই</td></tr>
+                {fs.length===0 ? <tr><td colSpan={12} style={{padding:30,textAlign:'center',color:T.gray400}}>নির্বাচিত সময়ে কোনো বিক্রয় নেই</td></tr>
                 : [...fs].reverse().map((s,i)=>(
                   <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                     <td style={{padding:'9px 10px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
@@ -6270,6 +6274,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
                   <td style={{padding:'10px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalProfit)}</td>
                   <td style={{padding:'10px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(fs.reduce((s,sale)=>s+sale.total/1.15,0))}</td>
                   <td style={{padding:'10px',fontWeight:700,fontSize:13,color:'#c62828'}}>{fmt(fs.reduce((s,sale)=>s+sale.total*0.15,0))}</td>
+                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:'#ff6f00'}}>{fmt(fs.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0))}</td>
                 </tr>
               </tfoot>
             </table>
