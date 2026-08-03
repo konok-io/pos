@@ -1539,7 +1539,7 @@ ${r.sale.discount > 0 ? `<div class="row"><span>ছাড়:</span><span>-৳${
 <div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toFixed(2)}</span></div>
 ${r.sale.change > 0 ? `<div class="row"><span>ফেরত:</span><span>৳${r.sale.change.toFixed(2)}</span></div>` : ''}
 ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${r.sale.due.toFixed(2)}</span></div>` : ''}
-${showQr && s.zatkaEnabled ? '<div style="text-align:center;margin-top:8px;">📱 ZATCA QR</div>' : ''}
+${showQr ? '<div style="text-align:center;margin-top:8px;">📱 QR কোড</div>' : ''}
 <div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
@@ -7579,7 +7579,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         <div style={{
                           width: 60,
                           height: 60,
-                          background: form.zatkaEnabled ? '#000' : '#ccc',
+                          background: '#000',
                           margin: '0 auto 4px',
                           display: 'flex',
                           alignItems: 'center',
@@ -7588,10 +7588,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           fontSize: '8px',
                           borderRadius: 4
                         }}>
-                          {form.zatkaEnabled ? 'QR' : '📱'}
+                          QR
                         </div>
-                        <div style={{ color: form.zatkaEnabled ? '#000' : '#999' }}>
-                          {form.zatkaEnabled ? 'ZATCA QR' : 'QR কোড (সক্রিয় করুন)'}
+                        <div style={{ color: '#000', fontWeight: 600 }}>
+                          QR কোড
                         </div>
                       </div>
                     )}
