@@ -1413,6 +1413,17 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   };
 
   const printReceipt = (r) => {
+    const s = r.settings || {};
+    const headerText = s.receiptHeader || '🧾 বিক্রয় রিসিট';
+    const footerText = s.receiptFooter || 'ধন্যবাদ';
+    const fontSize = s.receiptFontSize || 11;
+    const showLogo = s.receiptShowLogo !== false;
+    const showAddress = s.receiptShowAddress !== false;
+    const showPhone = s.receiptShowPhone !== false;
+    const showCustomer = s.receiptShowCustomer !== false;
+    const showVat = s.receiptShowVat !== false;
+    const showQr = s.receiptShowQr !== false;
+
     const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -1437,7 +1448,7 @@ body {
   width: 80mm;
   margin: 0;
   padding: 2mm;
-  font-size: 11px;
+  font-size: ${fontSize}px;
   color: #000;
   background: #fff;
   -webkit-font-smoothing: antialiased;
@@ -1459,7 +1470,7 @@ body {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 10px;
+  font-size: ${fontSize - 1}px;
 }
 th {
   border-bottom: 1px dashed #000;
@@ -1487,17 +1498,21 @@ td:nth-child(4) {
   margin-top: 10px;
   border-top: 1px dashed #000;
   padding-top: 5px;
-  font-size: 9px;
+  font-size: ${fontSize - 2}px;
 }
 </style>
 </head>
 <body>
 <div class="center border">
-  <div style="font-size:14px;font-weight:bold;">🧾 বিক্রয় রিসিট</div>
+  ${showLogo ? '<div style="font-size:14px;font-weight:bold;">' + headerText + '</div>' : '<div style="font-weight:bold;">' + headerText.replace(/[^\w\s]/g, '') + '</div>'}
+  ${showAddress && s.name ? '<div>' + s.name + '</div>' : ''}
+  ${showAddress && s.address ? '<div>' + s.address + '</div>' : ''}
+  ${showPhone && s.phone ? '<div>' + s.phone + '</div>' : ''}
+  ${showPhone && s.taxId ? '<div>VAT: ' + s.taxId + '</div>' : ''}
   <div>#${r.sale.id.slice(-8).toUpperCase()}</div>
   <div>${new Date(r.sale.date).toLocaleDateString('bn-BD')}</div>
-  <div>গ্রাহক: ${r.sale.custName}</div>
-  ${r.sale.phone ? '<div>ফোন: ' + r.sale.phone + '</div>' : ''}
+  ${showCustomer ? '<div>গ্রাহক: ' + r.sale.custName + '</div>' : ''}
+  ${showCustomer && r.sale.phone ? '<div>ফোন: ' + r.sale.phone + '</div>' : ''}
 </div>
 <table>
   <thead>
@@ -1518,13 +1533,14 @@ td:nth-child(4) {
   </tbody>
 </table>
 <div class="total row"><span>সাবটোটাল:</span><span>৳${(r.sale.subtotal || r.sale.total).toFixed(2)}</span></div>
-${r.sale.vatAmount > 0 ? `<div class="row"><span>ভ্যাট (${r.sale.vatPercent}%):</span><span>৳${r.sale.vatAmount.toFixed(2)}</span></div>` : ''}
+${showVat && r.sale.vatAmount > 0 ? `<div class="row"><span>ভ্যাট (${r.sale.vatPercent}%):</span><span>৳${r.sale.vatAmount.toFixed(2)}</span></div>` : ''}
 ${r.sale.discount > 0 ? `<div class="row"><span>ছাড়:</span><span>-৳${r.sale.discount.toFixed(2)}</span></div>` : ''}
 <div class="total row"><span>মোট:</span><span>৳${r.sale.total.toFixed(2)}</span></div>
 <div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toFixed(2)}</span></div>
 ${r.sale.change > 0 ? `<div class="row"><span>ফেরত:</span><span>৳${r.sale.change.toFixed(2)}</span></div>` : ''}
 ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${r.sale.due.toFixed(2)}</span></div>` : ''}
-<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
+${showQr && s.zatkaEnabled ? '<div style="text-align:center;margin-top:8px;">📱 ZATCA QR</div>' : ''}
+<div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
 
@@ -6509,7 +6525,16 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     zatcaClientSecret: settings?.zatcaClientSecret || '',
     vatEnabled: settings?.vatEnabled !== false,
     vatPercent: settings?.vatPercent || 15,
-    bannerImage: settings?.bannerImage || ''
+    bannerImage: settings?.bannerImage || '',
+    receiptHeader: settings?.receiptHeader || '🧾 বিক্রয় রিসিট',
+    receiptFooter: settings?.receiptFooter || 'ধন্যবাদ',
+    receiptShowLogo: settings?.receiptShowLogo !== false,
+    receiptShowAddress: settings?.receiptShowAddress !== false,
+    receiptShowPhone: settings?.receiptShowPhone !== false,
+    receiptShowCustomer: settings?.receiptShowCustomer !== false,
+    receiptShowVat: settings?.receiptShowVat !== false,
+    receiptShowQr: settings?.receiptShowQr !== false,
+    receiptFontSize: settings?.receiptFontSize || 11,
   });
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -7327,9 +7352,118 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               }}>🎨</div>
               <div>
                 <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডিজাইন সেটিংস</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>হোম পেজ ব্যানার ও প্রদর্শন</p>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>রিসিট টেমপ্লেট ও হোম পেজ ব্যানার</p>
               </div>
             </div>
+
+            {/* Receipt Template Settings */}
+            <div style={{ marginBottom: 32 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: '#1e293b' }}>🧾 থার্মাল রিসিট টেমপ্লেট</h4>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>৮০মিমি থার্মাল প্রিন্টারের জন্য কাস্টমাইজ করুন</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    হেডার টাইটেল
+                  </label>
+                  <input
+                    value={form.receiptHeader || ''}
+                    onChange={e => setForm(p => ({...p, receiptHeader: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      fontSize: 14,
+                      border: '2px solid #e2e8f0',
+                      borderRadius: 8,
+                      outline: 'none',
+                      color: '#1e293b',
+                      background: '#f8fafc'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#0F766E'}
+                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    placeholder="🧾 বিক্রয় রিসিট"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    ফুটার টেক্সট
+                  </label>
+                  <input
+                    value={form.receiptFooter || ''}
+                    onChange={e => setForm(p => ({...p, receiptFooter: e.target.value}))}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      fontSize: 14,
+                      border: '2px solid #e2e8f0',
+                      borderRadius: 8,
+                      outline: 'none',
+                      color: '#1e293b',
+                      background: '#f8fafc'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#0F766E'}
+                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    placeholder="ধন্যবাদ"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    ফন্ট সাইজ
+                  </label>
+                  <select
+                    value={form.receiptFontSize || 11}
+                    onChange={e => setForm(p => ({...p, receiptFontSize: parseInt(e.target.value)}))}
+                    style={{
+                      width: '100%',
+                      padding: '12px 14px',
+                      fontSize: 14,
+                      border: '2px solid #e2e8f0',
+                      borderRadius: 8,
+                      outline: 'none',
+                      color: '#1e293b',
+                      background: '#f8fafc'
+                    }}
+                    onFocus={e => e.target.style.borderColor = '#0F766E'}
+                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  >
+                    <option value={9}>ছোট (৯px)</option>
+                    <option value={10}>মাঝারি ছোট (১০px)</option>
+                    <option value={11}>মাঝারি (১১px)</option>
+                    <option value={12}>বড় (১২px)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '2px solid #e2e8f0' }}>
+                <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                  {[
+                    { key: 'receiptShowLogo', label: 'লোগো/আইকন' },
+                    { key: 'receiptShowAddress', label: 'ঠিকানা' },
+                    { key: 'receiptShowPhone', label: 'ফোন নম্বর' },
+                    { key: 'receiptShowCustomer', label: 'গ্রাহক তথ্য' },
+                    { key: 'receiptShowVat', label: 'ভ্যাট তথ্য' },
+                    { key: 'receiptShowQr', label: 'QR কোড' },
+                  ].map(item => (
+                    <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={form[item.key] !== false}
+                        onChange={e => setForm(p => ({...p, [item.key]: e.target.checked}))}
+                        style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#0F766E' }}
+                      />
+                      <span style={{ fontSize: 13, color: '#475569' }}>{item.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '0 0 24px' }} />
 
             <label style={{ display: 'block', marginBottom: 12, fontSize: 14, fontWeight: 600, color: '#475569' }}>
               হোম পেজ ব্যানার ছবি
