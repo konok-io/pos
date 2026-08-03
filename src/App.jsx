@@ -4689,7 +4689,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
         </div>
 
         {/* Right: Purchase List */}
-        <div style={{flex:1,padding:16,overflow:'auto',display:'flex',flexDirection:'column',gap:12}}>
+        <div style={{width:280,padding:12,overflow:'auto',display:'flex',flexDirection:'column',gap:8,background:T.gray50}}>
           <h3 style={{margin:0,fontSize:14,fontWeight:700}}>📋 পণ্য তালিকা ({purchaseItems.length})</h3>
           
           {purchaseItems.length === 0 ? (
@@ -4699,7 +4699,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
             </div>
           ) : (
             purchaseItems.map((item,i) => (
-              <div key={item.id} style={{...card,padding:12,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+              <div key={item.id} style={{...card,padding:10,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                 <div style={{flex:1}}>
                   <div style={{fontWeight:600,fontSize:14,marginBottom:4}}>{item.name}</div>
                   <div style={{fontSize:12,color:T.gray500}}>
