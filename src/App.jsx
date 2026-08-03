@@ -306,6 +306,17 @@ function DynamicMenu({tab, setTab, tabs}) {
       }}>
         <span style={{fontSize: 15}}>{t.icon}</span>
         <span>{t.label}</span>
+        {t.shortcut && (
+          <span style={{
+            fontSize: 9,
+            fontWeight: 700,
+            padding: '1px 4px',
+            borderRadius: 3,
+            background: isActive ? 'rgba(255,255,255,0.2)' : T.gray200,
+            color: isActive ? T.white : T.gray500,
+            marginLeft: 2,
+          }}>{t.shortcut}</span>
+        )}
       </button>
     );
   };
@@ -751,6 +762,36 @@ function MainApp({ currentUser, onLogout }) {
     document.documentElement.style.padding = '0';
   }, []);
 
+  // Keyboard shortcuts for menu navigation (F1-F11)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't trigger if user is typing in an input field
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      const keyMap = {
+        'F1': 'pos',
+        'F2': 'products',
+        'F3': 'newproduct',
+        'F4': 'barcode',
+        'F5': 'suppliers',
+        'F6': 'customers',
+        'F7': 'inventory',
+        'F8': 'lowstock',
+        'F9': 'income',
+        'F10': 'reports',
+        'F11': 'settings',
+      };
+      
+      if (keyMap[e.key]) {
+        e.preventDefault();
+        setTab(keyMap[e.key]);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Initialize time and tab from localStorage on mount
   useEffect(() => {
     // Initialize tab from localStorage
@@ -1019,17 +1060,17 @@ function MainApp({ currentUser, onLogout }) {
   );
 
   const tabs = [
-    {id:'pos',icon:'🛒',label:'বিক্রয়'},
-    {id:'products',icon:'📦',label:'সকল পণ্য'},
-    {id:'newproduct',icon:'➕',label:'নতুন পণ্য'},
-    {id:'barcode',icon:'📊',label:'বারকোড'},
-    {id:'suppliers',icon:'🏢',label:'ম্যানেজমেন্ট'},
-    {id:'customers',icon:'👥',label:'কাস্টমার'},
-    {id:'inventory',icon:'🏭',label:'স্টক'},
-    {id:'lowstock',icon:'⚠️',label:'স্টক কম'},
-    {id:'income',icon:'💰',label:'আয়/ব্যয়'},
-    {id:'reports',icon:'📊',label:'রিপোর্ট'},
-    {id:'settings',icon:'⚙️',label:'সেটিংস'},
+    {id:'pos',icon:'🛒',label:'বিক্রয়',shortcut:'F1'},
+    {id:'products',icon:'📦',label:'সকল পণ্য',shortcut:'F2'},
+    {id:'newproduct',icon:'➕',label:'নতুন পণ্য',shortcut:'F3'},
+    {id:'barcode',icon:'📊',label:'বারকোড',shortcut:'F4'},
+    {id:'suppliers',icon:'🏢',label:'ম্যানেজমেন্ট',shortcut:'F5'},
+    {id:'customers',icon:'👥',label:'কাস্টমার',shortcut:'F6'},
+    {id:'inventory',icon:'🏭',label:'স্টক',shortcut:'F7'},
+    {id:'lowstock',icon:'⚠️',label:'স্টক কম',shortcut:'F8'},
+    {id:'income',icon:'💰',label:'আয়/ব্যয়',shortcut:'F9'},
+    {id:'reports',icon:'📊',label:'রিপোর্ট',shortcut:'F10'},
+    {id:'settings',icon:'⚙️',label:'সেটিংস',shortcut:'F11'},
   ];
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd};
