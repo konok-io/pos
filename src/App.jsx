@@ -955,25 +955,8 @@ function MainApp({ currentUser, onLogout }) {
 
 /* ─────────────── APP WRAPPER ─────────────── */
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.auth)) || null; } catch { return null; }
-  });
-
-  const handleLogin = (userData) => {
-    localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(userData));
-    setCurrentUser(userData);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem(STORAGE_KEYS.auth);
-    setCurrentUser(null);
-  };
-
-  if (!currentUser) {
-    return <LoginPage onLogin={handleLogin} />;
-  }
-
-  return <MainApp currentUser={currentUser} onLogout={handleLogout} />;
+  const fakeUser = { email: 'admin@local', name: 'Admin', role: 'admin' };
+  return <MainApp currentUser={fakeUser} onLogout={() => {}} />;
 }
 
 /* ═══════════════════════════════════════════
