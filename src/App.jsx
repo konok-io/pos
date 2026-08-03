@@ -1863,8 +1863,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           {cart.length===0 ? (
             <div style={{textAlign:'center',padding:'30px 16px',background:T.white,margin:8,borderRadius:8,border:'1px solid #e5e7eb'}}>
               <div style={{fontSize:36,marginBottom:8}}>🛒</div>
-              <div style={{fontSize:13,fontWeight:600,color:T.gray500,marginBottom:3}}>কার্ট খালি</div>
-              <div style={{fontSize:11,color:T.gray400}}>বাম দিক থেকে পণ্য যোগ করুন</div>
+              <div style={{fontSize:14,fontWeight:600,color:T.gray500,marginBottom:4}}>কার্ট খালি</div>
+              <div style={{fontSize:13,color:T.gray400}}>বাম দিক থেকে পণ্য যোগ করুন</div>
             </div>
           ) : (
             <div style={{padding:'8px 16px'}}>
@@ -1877,12 +1877,12 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
                       <span style={{fontSize:12,fontWeight:700,color:T.teal,flexShrink:0}}>{fmt(item.sellP*item.qty)}</span>
                     </div>
                     <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:2}}>
-                      <span style={{fontSize:10,color:T.gray400}}>{item.qty} × {fmt(item.sellP)}</span>
+                      <span style={{fontSize:12,color:T.gray500}}>{item.qty} × {fmt(item.sellP)}</span>
                       <div style={{display:'flex',alignItems:'center',gap:4}}>
-                        <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:20,height:20,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>−</button>
-                        <span style={{fontSize:11,fontWeight:600,minWidth:16,textAlign:'center'}}>{item.qty}</span>
-                        <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:20,height:20,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>+</button>
-                        <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:20,height:20,border:'none',borderRadius:4,background:T.redLight,cursor:'pointer',fontSize:9,display:'flex',alignItems:'center',justifyContent:'center',color:T.red,marginLeft:4}}>✕</button>
+                        <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:22,height:22,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:12,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>−</button>
+                        <span style={{fontSize:12,fontWeight:600,minWidth:18,textAlign:'center'}}>{item.qty}</span>
+                        <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:22,height:22,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:12,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>+</button>
+                        <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:22,height:22,border:'none',borderRadius:4,background:T.redLight,cursor:'pointer',fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',color:T.red,marginLeft:4}}>✕</button>
                       </div>
                     </div>
                   </div>
@@ -1897,24 +1897,24 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           {/* Receipt-style Summary */}
           <div style={{border:'1px solid #e5e7eb',borderRadius:8,overflow:'hidden',marginBottom:8}}>
             {/* Header */}
-            <div style={{background:T.gray100,padding:'6px 10px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db'}}>
-              <span style={{fontSize:10,color:T.gray600,fontWeight:600}}>সাবটোটাল ({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
-              <span style={{fontSize:11,fontWeight:600,color:T.gray700}}>{fmt(subtotal)}</span>
+            <div style={{background:T.gray100,padding:'8px 12px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db'}}>
+              <span style={{fontSize:13,color:T.gray600,fontWeight:600}}>সাবটোটাল ({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
+              <span style={{fontSize:13,fontWeight:600,color:T.gray700}}>{fmt(subtotal)}</span>
             </div>
             
             {/* Discount Row */}
             {(parseFloat(discount)||0) > 0 && (
-              <div style={{padding:'5px 10px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db',background:T.greenLight}}>
-                <span style={{fontSize:10,color:T.green}}>ছাড়</span>
-                <span style={{fontSize:10,fontWeight:600,color:T.green}}>−{fmt(parseFloat(discount)||0)}</span>
+              <div style={{padding:'6px 12px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db',background:T.greenLight}}>
+                <span style={{fontSize:13,color:T.green}}>ছাড়</span>
+                <span style={{fontSize:13,fontWeight:600,color:T.green}}>−{fmt(parseFloat(discount)||0)}</span>
               </div>
             )}
             
             {/* VAT Row */}
             {vatAmount > 0 && (
-              <div style={{padding:'5px 10px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db',background:T.amberLight}}>
-                <span style={{fontSize:10,color:T.amber}}>ভ্যাট ({vatPercent}%)</span>
-                <span style={{fontSize:10,fontWeight:600,color:T.amber}}>+{fmt(vatAmount)}</span>
+              <div style={{padding:'6px 12px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db',background:T.amberLight}}>
+                <span style={{fontSize:13,color:T.amber}}>ভ্যাট ({vatPercent}%)</span>
+                <span style={{fontSize:13,fontWeight:600,color:T.amber}}>+{fmt(vatAmount)}</span>
               </div>
             )}
             
