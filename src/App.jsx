@@ -6059,7 +6059,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
-  const [form, setForm] = useState(settings);
+  const [form, setForm] = useState({...settings, bannerImage: settings?.bannerImage || ''});
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
   const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
@@ -6077,8 +6077,12 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   };
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    console.log('handleImageUpload called', e.target.files);
+    const file = e.target.files?.[0];
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
     console.log('File selected:', file.name, file.size, file.type);
     if (!file.type.startsWith('image/')) {
       alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
@@ -6091,7 +6095,11 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     const reader = new FileReader();
     reader.onload = (event) => {
       console.log('Image loaded, length:', event.target.result?.length);
-      setForm(p => ({...p, bannerImage: event.target.result}));
+      const imageData = event.target.result;
+      setForm(prev => {
+        console.log('Setting form with image, prev:', !!prev.bannerImage);
+        return {...prev, bannerImage: imageData};
+      });
     };
     reader.onerror = () => {
       console.error('FileReader error');
