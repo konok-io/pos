@@ -559,23 +559,11 @@ function LoginScreen({ onLogin, settings }) {
 /* ─────────────── MAIN APP ─────────────── */
 const DEFAULT_SETTINGS = {name:'আমার দোকান',address:'',phone:'',vatEnabled:true,vatPercent:15};
 
-export default function App() {
-  // Initialize auth state FIRST
-  const [currentUser, setCurrentUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.auth)) || null; } catch { return null; }
-  });
+function LoginPage({ onLogin }) {
+  return <LoginScreen onLogin={onLogin} settings={DEFAULT_SETTINGS} />;
+}
 
-  // If not logged in, show login screen (no hooks called after this)
-  if (!currentUser) {
-    const handleLogin = (userData) => {
-      localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(userData));
-      setCurrentUser(userData);
-    };
-    return <LoginScreen onLogin={handleLogin} settings={DEFAULT_SETTINGS} />;
-  }
-
-  // User is logged in - initialize all state
-  const [showLogin, setShowLogin] = useState(false);
+function MainApp({ currentUser, onLogout }) {
   const [tab, setTab] = useState(() => localStorage.getItem('pos_current_tab') || 'pos');
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -588,12 +576,6 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem(STORAGE_KEYS.auth);
-    setCurrentUser(null);
-  };
 
   // CSS Reset
   useEffect(() => {
@@ -877,15 +859,13 @@ export default function App() {
 
   // Auto-logout after 15 minutes of inactivity
   useEffect(() => {
-    if (!currentUser) return;
-
     const INACTIVITY_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
     let inactivityTimer;
 
     const resetTimer = () => {
       clearTimeout(inactivityTimer);
       inactivityTimer = setTimeout(() => {
-        handleLogout();
+        onLogout();
       }, INACTIVITY_TIME);
     };
 
@@ -905,7 +885,7 @@ export default function App() {
         document.removeEventListener(event, resetTimer);
       });
     };
-  }, [currentUser]);
+  }, []);
 
   return (
     <>
@@ -939,7 +919,7 @@ export default function App() {
             </button>
             
             {/* Logout Button */}
-            <button onClick={handleLogout} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="লগআউট">
+            <button onClick={onLogout} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="লগআউট">
               <span style={{fontSize:16}}>↩️</span>
             </button>
 
@@ -968,6 +948,29 @@ export default function App() {
     </div>
     </>
   );
+}
+
+/* ─────────────── APP WRAPPER ─────────────── */
+export default function App() {
+  const [currentUser, setCurrentUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.auth)) || null; } catch { return null; }
+  });
+
+  const handleLogin = (userData) => {
+    localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(userData));
+    setCurrentUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(STORAGE_KEYS.auth);
+    setCurrentUser(null);
+  };
+
+  if (!currentUser) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
+
+  return <MainApp currentUser={currentUser} onLogout={handleLogout} />;
 }
 
 /* ═══════════════════════════════════════════
