@@ -1366,7 +1366,9 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
     const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
     const vatText = vatAmount > 0 ? `\nভ্যাট (${vatPercent}%): ৳${vatAmount.toFixed(0)}` : '';
-    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${dueCreditText}`;
+    const paidText = paidAmt > 0 ? `\nপরিশোধ: ৳${paidAmt.toFixed(0)}` : '';
+    const changeText = change > 0 ? `\nফেরত: ৳${change.toFixed(0)}` : '';
+    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${paidText}${changeText}${dueCreditText}`;
 
     if (!window.confirm(confirmMsg)) return;
 
