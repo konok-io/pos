@@ -6415,6 +6415,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
+  // Initialize form with default values first
   const [form, setForm] = useState({
     name: '',
     address: '',
@@ -6429,31 +6430,45 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({ email: '', password: '', name: '', role: 'admin' });
-  const [initialized, setInitialized] = useState(false);
 
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
-  // Initialize form with settings on mount only
+  // Load settings into form when settings become available
   useEffect(() => {
-    if (!initialized) {
+    if (settings && settings.name !== undefined) {
       setForm({
-        name: settings?.name || '',
-        address: settings?.address || '',
-        phone: settings?.phone || '',
-        vatEnabled: settings?.vatEnabled !== false,
-        vatPercent: settings?.vatPercent || 15,
-        bannerImage: settings?.bannerImage || ''
+        name: settings.name || '',
+        address: settings.address || '',
+        phone: settings.phone || '',
+        vatEnabled: settings.vatEnabled !== false,
+        vatPercent: settings.vatPercent || 15,
+        bannerImage: settings.bannerImage || ''
       });
-      setInitialized(true);
     }
-  }, []);
+  }, [settings]);
+
+  // Handler functions
+  const handleNameChange = (e) => setForm(f => ({...f, name: e.target.value}));
+  const handlePhoneChange = (e) => setForm(f => ({...f, phone: e.target.value}));
+  const handleAddressChange = (e) => setForm(f => ({...f, address: e.target.value}));
+  const handleVatToggle = () => setForm(f => ({...f, vatEnabled: !f.vatEnabled}));
+  const handleVatPercentChange = (e) => setForm(f => ({...f, vatPercent: parseFloat(e.target.value) || 0}));
+  const handleBannerChange = (data) => setForm(f => ({...f, bannerImage: data}));
 
   const save = async () => {
-    // Merge form with existing settings to preserve any fields not in form
-    const updatedSettings = { ...settings, ...form };
-    await upd.settings(updatedSettings);
-    setSaved(true); setTimeout(()=>setSaved(false),2000);
+    // Create complete settings object
+    const completeSettings = {
+      name: form.name,
+      address: form.address,
+      phone: form.phone,
+      vatEnabled: form.vatEnabled,
+      vatPercent: form.vatPercent,
+      bannerImage: form.bannerImage
+    };
+    await upd.settings(completeSettings);
+    setSaved(true); 
+    setTimeout(()=>setSaved(false), 2000);
   };
 
   const sections = [
@@ -6633,8 +6648,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <div>
                   <label style={{...label,marginBottom:8}}>🏪 ব্যবসার নাম *</label>
                   <input 
-                    value={form.name||''} 
-                    onChange={e=>setForm(p=>({...p,name:e.target.value}))} 
+                    type="text"
+                    value={form.name} 
+                    onChange={handleNameChange} 
                     style={{...input,padding:'12px 14px',fontSize:14}}
                     placeholder="আপনার ব্যবসার নাম লিখুন"
                   />
@@ -6642,8 +6658,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <div>
                   <label style={{...label,marginBottom:8}}>📞 ফোন নম্বর</label>
                   <input 
-                    value={form.phone||''} 
-                    onChange={e=>setForm(p=>({...p,phone:e.target.value}))} 
+                    type="tel"
+                    value={form.phone} 
+                    onChange={handlePhoneChange} 
                     style={{...input,padding:'12px 14px',fontSize:14}}
                     placeholder="01XXXXXXXXX"
                   />
@@ -6651,8 +6668,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <div style={{gridColumn:'1 / -1'}}>
                   <label style={{...label,marginBottom:8}}>📍 ঠিকানা</label>
                   <input 
-                    value={form.address||''} 
-                    onChange={e=>setForm(p=>({...p,address:e.target.value}))} 
+                    type="text"
+                    value={form.address} 
+                    onChange={handleAddressChange} 
                     style={{...input,padding:'12px 14px',fontSize:14}}
                     placeholder="আপনার ব্যবসার ঠিকানা লিখুন"
                   />
@@ -6670,7 +6688,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 
                 <BannerImageUpload 
                   value={form.bannerImage} 
-                  onChange={(data) => setForm(p => ({...p, bannerImage: data}))} 
+                  onChange={handleBannerChange} 
                 />
               </div>
             </SectionCard>
@@ -6681,7 +6699,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
             <SectionCard title="ট্যাক্স সেটিংস" icon="💰">
               <FormRow labelText="ভ্যাট সক্রিয়">
                 <div style={{display:'flex',alignItems:'center',gap:12}}>
-                  <ToggleButton active={form.vatEnabled} onClick={()=>setForm(p=>({...p,vatEnabled:!p.vatEnabled}))}>
+                  <ToggleButton active={form.vatEnabled} onClick={handleVatToggle}>
                     {form.vatEnabled ? '✅ চালু' : '❌ বন্ধ'}
                   </ToggleButton>
                 </div>
@@ -6691,8 +6709,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <FormRow labelText="ডিফল্ট ভ্যাট %">
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     <input 
-                      value={form.vatPercent||15} 
-                      onChange={e=>setForm(p=>({...p,vatPercent:parseFloat(e.target.value)||0}))} 
+                      value={form.vatPercent} 
+                      onChange={handleVatPercentChange} 
                       type="number" min="0" max="100" 
                       style={{...input,width:100,padding:'10px 14px',fontSize:14}}
                     />
