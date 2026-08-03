@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef, useMemo, memo } from "react";
 
 /* ─────────────── GLOBAL CSS RESET ─────────────── */
 const GlobalStyle = () => {
