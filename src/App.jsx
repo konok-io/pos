@@ -726,6 +726,30 @@ function LoginPage({ onLogin }) {
   return <LoginScreen onLogin={onLogin} settings={DEFAULT_SETTINGS} />;
 }
 
+// Separate component for time display - prevents re-rendering entire MainApp
+function TimeDisplay() {
+  const [currentTime, setCurrentTime] = useState(null);
+  
+  useEffect(() => {
+    setCurrentTime(new Date());
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+  
+  return (
+    <div style={{textAlign:'right',paddingLeft:14}}>
+      <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>
+        {currentTime ? currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '--:--:--'}
+      </div>
+      <div style={{fontSize:11,color:T.gray400}}>
+        {currentTime ? currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : '------'}
+      </div>
+    </div>
+  );
+}
+
 function MainApp({ currentUser, onLogout }) {
   const logoutRef = useRef(onLogout);
   logoutRef.current = onLogout;
@@ -742,7 +766,6 @@ function MainApp({ currentUser, onLogout }) {
   const [purchases, setPurchases] = useState([]);
   const [productHistory, setProductHistory] = useState([]);
   const [ready, setReady] = useState(false);
-  const [currentTime, setCurrentTime] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // CSS Reset
@@ -760,15 +783,6 @@ function MainApp({ currentUser, onLogout }) {
     if (savedTab) {
       setTab(savedTab);
     }
-    
-    // Initialize current time
-    setCurrentTime(new Date());
-    
-    // Update time every second
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(interval);
   }, []);
 
   // Save tab to localStorage when it changes
@@ -1116,11 +1130,8 @@ function MainApp({ currentUser, onLogout }) {
               <span style={{fontSize:16}}>↩️</span>
             </button>
 
-            {/* Date & Time - Rightmost */}
-            <div style={{textAlign:'right',paddingLeft:14}}>
-              <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{currentTime ? currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '--:--:--'}</div>
-              <div style={{fontSize:11,color:T.gray400}}>{currentTime ? currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : '------'}</div>
-            </div>
+            {/* Date & Time - Rightmost (Separate component to prevent re-renders) */}
+            <TimeDisplay />
           </div>
         </div>
       </div>
