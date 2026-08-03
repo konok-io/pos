@@ -1212,7 +1212,6 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState(settings.vatPercent || 15);
   const [paid, setPaid] = useState('');
-  const [receipt, setReceipt] = useState(null);
   const [showAddCust, setShowAddCust] = useState(false);
   const [newCustName, setNewCustName] = useState('');
   const [newCustPhone, setNewCustPhone] = useState('');
@@ -1396,8 +1395,10 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     upd.customers(newCusts);
     upd.sales(newSales);
 
-    setReceipt({sale, settings});
+    // Auto print receipt and return to sales page
+    printReceipt({sale, settings});
     setCart([]); setDiscount(''); setPaid(''); setSelCust(null); setCustQ('');
+    setTimeout(() => searchRef.current?.focus(), 100);
   };
 
   const printReceipt = (r) => {
@@ -1531,26 +1532,6 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
       }, 100);
     };
   };
-
-  if (receipt) return (
-    <div style={{display:'flex',flexDirection:'column',height:'100%',alignItems:'center',justifyContent:'center',gap:20,background:T.greenLight}} onKeyDown={e=>{if(e.key==='Enter'){printReceipt(receipt);setTimeout(()=>{setReceipt(null);searchRef.current?.focus();},500);}}} tabIndex={0}>
-      <div style={{fontSize:72}}>✅</div>
-      <div style={{fontSize:24,fontWeight:800,color:T.green}}>বিক্রয় সম্পন্ন!</div>
-      <div style={{...card,width:340,textAlign:'center',padding:24}}>
-        <div style={{fontSize:12,color:T.gray400,marginBottom:6}}>বিল নং: #{receipt.sale.id.slice(-8).toUpperCase()}</div>
-        <div style={{fontSize:32,fontWeight:800,color:T.teal,marginBottom:4}}>{fmt(receipt.sale.total)}</div>
-        <div style={{display:'flex',justifyContent:'center',gap:20,fontSize:13,color:T.gray600,marginBottom:4}}>
-          <span>পরিশোধ: {fmt(receipt.sale.paid)}</span>
-          {receipt.sale.change>0 && <span style={{color:T.green}}>ফেরত: {fmt(receipt.sale.change)}</span>}
-          {receipt.sale.due>0 && <span style={{color:T.red}}>বাকি: {fmt(receipt.sale.due)}</span>}
-        </div>
-        <div style={{fontSize:13,color:T.gray400,marginBottom:20}}>কাস্টমার: {receipt.sale.custName}</div>
-        <div style={{display:'flex',gap:10,justifyContent:'center'}}>
-          <button autoFocus style={btn('primary')} onClick={()=>{printReceipt(receipt);setTimeout(()=>{setReceipt(null);searchRef.current?.focus();},500);}}>✅ বন্ধ করুন</button>
-        </div>
-      </div>
-    </div>
-  );
 
   // Add Customer Popup
   if (showAddCust) return (
