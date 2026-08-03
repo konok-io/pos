@@ -298,7 +298,7 @@ function LoginScreen({ onLogin, settings }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#F8FAFC',
+      background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -306,156 +306,70 @@ function LoginScreen({ onLogin, settings }) {
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Background App Preview - 50% opacity */}
+      {/* Background Pattern */}
       <div style={{
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        opacity: 0.5,
-        background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        {/* POS Interface Preview */}
-        <div style={{
-          width: '90%',
-          maxWidth: 800,
-          background: T.white,
-          borderRadius: 16,
-          boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
-          overflow: 'hidden',
-          transform: 'scale(0.85)',
-        }}>
-          {/* Mini Header */}
-          <div style={{
-            background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-            padding: '12px 20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-          }}>
-            <div style={{
-              width: 32, height: 32,
-              background: 'rgba(255,255,255,0.2)',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 16,
-            }}>🏪</div>
-            <span style={{color: T.white, fontWeight: 700, fontSize: 14}}>{businessName}</span>
-            <span style={{color: 'rgba(255,255,255,0.7)', fontSize: 11, marginLeft: 'auto'}}>POS ম্যানেজমেন্ট সিস্টেম</span>
-          </div>
-          {/* Mini Content */}
-          <div style={{padding: '20px', display: 'flex', gap: 16}}>
-            {/* Sidebar */}
-            <div style={{width: 60, display: 'flex', flexDirection: 'column', gap: 8}}>
-              {['💰', '📦', '🛒', '📊', '👥', '⚙️'].map((icon, i) => (
-                <div key={i} style={{
-                  height: 40, background: i === 0 ? '#F0FDFA' : '#F8FAFC',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 16,
-                  color: i === 0 ? '#0F766E' : '#94A3B8',
-                }}>{icon}</div>
-              ))}
-            </div>
-            {/* Main Content */}
-            <div style={{flex: 1, display: 'flex', flexDirection: 'column', gap: 12}}>
-              {/* Stats Row */}
-              <div style={{display: 'flex', gap: 12}}>
-                {[
-                  {label: 'আজকের বিক্রয়', value: '৳১২,৫০০', color: '#0F766E'},
-                  {label: 'মোট পণ্য', value: '১৫০', color: '#0D9488'},
-                  {label: 'গ্রাহক', value: '৪২', color: '#F59E0B'},
-                ].map((stat, i) => (
-                  <div key={i} style={{
-                    flex: 1, padding: '12px 16px',
-                    background: '#F8FAFC',
-                    borderRadius: 10,
-                    border: '1px solid #E2E8F0',
-                  }}>
-                    <div style={{fontSize: 10, color: '#94A3B8', marginBottom: 4}}>{stat.label}</div>
-                    <div style={{fontSize: 16, fontWeight: 700, color: stat.color}}>{stat.value}</div>
-                  </div>
-                ))}
-              </div>
-              {/* Products Table */}
-              <div style={{
-                background: '#F8FAFC',
-                borderRadius: 10,
-                border: '1px solid #E2E8F0',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  padding: '10px 14px',
-                  background: '#F0FDFA',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: '#0F766E',
-                  borderBottom: '1px solid #E2E8F0',
-                }}>📦 সাম্প্রতিক পণ্যসমূহ</div>
-                {[
-                  {name: 'চাল', company: 'মদন ফুড', stock: '৫০', price: '৳৬৫'},
-                  {name: 'আটা', company: 'ফুডওয়ে', stock: '৩০', price: '৳৪৫'},
-                  {name: 'তেল', company: 'প্রাইম অয়েল', stock: '১০০', price: '৳১৮০'},
-                ].map((item, i) => (
-                  <div key={i} style={{
-                    padding: '10px 14px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    borderBottom: i < 2 ? '1px solid #E2E8F0' : 'none',
-                    fontSize: 12,
-                  }}>
-                    <div>
-                      <div style={{fontWeight: 600, color: '#1E293B'}}>{item.name}</div>
-                      <div style={{fontSize: 10, color: '#94A3B8'}}>{item.company}</div>
-                    </div>
-                    <div style={{textAlign: 'right'}}>
-                      <div style={{fontWeight: 600, color: '#0F766E'}}>{item.price}</div>
-                      <div style={{fontSize: 10, color: '#94A3B8'}}>স্টক: {item.stock}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        opacity: 0.1,
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+      }} />
+
+      {/* Floating Elements */}
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        left: '5%',
+        width: 120,
+        height: 120,
+        background: 'rgba(255,255,255,0.1)',
+        borderRadius: '50%',
+        filter: 'blur(40px)',
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '15%',
+        right: '10%',
+        width: 200,
+        height: 200,
+        background: 'rgba(255,255,255,0.08)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
+      }} />
 
       {/* Login Card */}
       <div style={{
-        background: T.white,
-        borderRadius: 16,
-        padding: '48px 40px',
+        background: 'rgba(255,255,255,0.95)',
+        backdropFilter: 'blur(20px)',
+        borderRadius: 24,
+        padding: '48px 44px',
         width: '100%',
-        maxWidth: 400,
-        boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
-        border: '1px solid #E2E8F0',
+        maxWidth: 420,
+        boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+        border: '1px solid rgba(255,255,255,0.2)',
+        position: 'relative',
+        zIndex: 10,
       }}>
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
           {/* Logo Icon */}
           <div style={{
-            width: 56, height: 56,
+            width: 72, height: 72,
             background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-            borderRadius: 14,
+            borderRadius: 20,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 28,
+            fontSize: 36,
             margin: '0 auto 20px',
-            boxShadow: '0 4px 12px rgba(15,118,110,0.25)',
+            boxShadow: '0 8px 24px rgba(15,118,110,0.4)',
           }}>🏪</div>
           
           <h1 style={{ 
-            margin: '0 0 8px', 
-            fontSize: 22, 
+            margin: '0 0 6px', 
+            fontSize: 24, 
             fontWeight: 700, 
             color: '#1E293B',
             letterSpacing: '-0.5px'
@@ -465,13 +379,13 @@ function LoginScreen({ onLogin, settings }) {
           
           {(businessAddress || businessPhone) && (
             <div style={{ 
-              marginBottom: 12,
+              marginBottom: 14,
               fontSize: 13, 
               color: '#64748B',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 12,
+              gap: 10,
               flexWrap: 'wrap'
             }}>
               {businessAddress && <span>{businessAddress}</span>}
@@ -483,17 +397,17 @@ function LoginScreen({ onLogin, settings }) {
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 6,
-            padding: '6px 14px',
-            background: '#F0FDFA',
-            borderRadius: 20,
-            border: '1px solid #CCFBF1',
-            marginTop: 4,
+            gap: 8,
+            padding: '8px 18px',
+            background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+            borderRadius: 25,
+            marginTop: 6,
+            boxShadow: '0 4px 12px rgba(15,118,110,0.3)',
           }}>
-            <span style={{ fontSize: 14 }}>💼</span>
+            <span style={{ fontSize: 16 }}>💼</span>
             <span style={{ 
-              fontSize: 12, 
-              color: '#0F766E',
+              fontSize: 13, 
+              color: '#FFFFFF',
               fontWeight: 600,
               letterSpacing: '0.3px'
             }}>
@@ -506,13 +420,13 @@ function LoginScreen({ onLogin, settings }) {
         <div style={{
           height: 1,
           background: 'linear-gradient(90deg, transparent, #E2E8F0, transparent)',
-          marginBottom: 28,
+          marginBottom: 32,
         }} />
 
         {/* Login Form */}
         <form onSubmit={handleLogin}>
           {/* Email Field */}
-          <div style={{ marginBottom: 18 }}>
+          <div style={{ marginBottom: 20 }}>
             <label style={{ 
               display: 'block',
               marginBottom: 8,
@@ -531,23 +445,29 @@ function LoginScreen({ onLogin, settings }) {
               required
               style={{
                 width: '100%',
-                padding: '12px 14px',
-                fontSize: 14,
-                border: '1.5px solid #E2E8F0',
-                borderRadius: 10,
+                padding: '14px 16px',
+                fontSize: 15,
+                border: '2px solid #E2E8F0',
+                borderRadius: 12,
                 outline: 'none',
-                transition: 'border-color 0.2s',
+                transition: 'all 0.2s',
                 boxSizing: 'border-box',
                 color: '#1E293B',
                 background: '#F8FAFC',
               }}
-              onFocus={(e) => e.target.style.borderColor = '#0F766E'}
-              onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#0F766E';
+                e.target.style.boxShadow = '0 0 0 4px rgba(15,118,110,0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E2E8F0';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
           {/* Password Field */}
-          <div style={{ marginBottom: 24 }}>
+          <div style={{ marginBottom: 28 }}>
             <label style={{ 
               display: 'block',
               marginBottom: 8,
@@ -566,30 +486,36 @@ function LoginScreen({ onLogin, settings }) {
               required
               style={{
                 width: '100%',
-                padding: '12px 14px',
-                fontSize: 14,
-                border: '1.5px solid #E2E8F0',
-                borderRadius: 10,
+                padding: '14px 16px',
+                fontSize: 15,
+                border: '2px solid #E2E8F0',
+                borderRadius: 12,
                 outline: 'none',
-                transition: 'border-color 0.2s',
+                transition: 'all 0.2s',
                 boxSizing: 'border-box',
                 color: '#1E293B',
                 background: '#F8FAFC',
               }}
-              onFocus={(e) => e.target.style.borderColor = '#0F766E'}
-              onBlur={(e) => e.target.style.borderColor = '#E2E8F0'}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#0F766E';
+                e.target.style.boxShadow = '0 0 0 4px rgba(15,118,110,0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#E2E8F0';
+                e.target.style.boxShadow = 'none';
+              }}
             />
           </div>
 
           {/* Error Message */}
           {error && (
             <div style={{
-              padding: '12px 14px',
+              padding: '14px 16px',
               background: '#FEF2F2',
-              borderRadius: 10,
-              marginBottom: 20,
+              borderRadius: 12,
+              marginBottom: 24,
               color: '#DC2626',
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 500,
               border: '1px solid #FECACA',
             }}>
@@ -603,19 +529,19 @@ function LoginScreen({ onLogin, settings }) {
             disabled={loading}
             style={{
               width: '100%',
-              padding: '13px',
+              padding: '15px',
               background: loading ? '#94A3B8' : 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-              color: T.white,
+              color: '#FFFFFF',
               border: 'none',
-              borderRadius: 10,
-              fontSize: 15,
+              borderRadius: 12,
+              fontSize: 16,
               fontWeight: 600,
               cursor: loading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
-              boxShadow: loading ? 'none' : '0 4px 12px rgba(15,118,110,0.3)',
+              transition: 'all 0.3s',
+              boxShadow: loading ? 'none' : '0 8px 20px rgba(15,118,110,0.4)',
               letterSpacing: '0.3px',
             }}
-            onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-1px)')}
+            onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-2px)')}
             onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
           >
             {loading ? '⏳ লোড হচ্ছে...' : '🔓 লগইন করুন'}
@@ -623,10 +549,10 @@ function LoginScreen({ onLogin, settings }) {
         </form>
 
         {/* Footer */}
-        <div style={{ marginTop: 32, textAlign: 'center' }}>
+        <div style={{ marginTop: 36, textAlign: 'center' }}>
           <p style={{ 
             margin: 0, 
-            fontSize: 11, 
+            fontSize: 12, 
             color: '#94A3B8',
             letterSpacing: '0.2px'
           }}>
