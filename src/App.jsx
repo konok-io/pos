@@ -6249,7 +6249,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  {['তারিখ','বিল নং','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ','বিক্রয় মূল্য','মোটের ভ্যাট','বিক্রয়ের ভ্যাট','পার্থক্য'].map(h=>(
+                  {['তারিখ','বিল নং','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ','বিক্রয় মূল্য','মোট মূল্যের ভ্যাট','বিক্রয় মূল্যের ভ্যাট','পার্থক্য'].map(h=>(
                     <th key={h} style={{padding:'8px 10px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray400,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                   ))}
                 </tr>
