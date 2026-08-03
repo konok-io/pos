@@ -2659,7 +2659,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
               </div>
 
               {/* Profit Percentage Display */}
-              {form.buyP > 0 && form.sellP > 0 && (
+              {(+form.buyP > 0 || form.buyP !== '') && (+form.sellP > 0 || form.sellP !== '') && (
                 <div style={{marginBottom:12,padding:'8px 12px',background:T.greenLight,borderRadius:8,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                   <span style={{fontSize:13,color:T.gray600}}>📊 লাভ:</span>
                   <span style={{fontSize:16,fontWeight:700,color:T.green}}>
