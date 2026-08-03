@@ -427,6 +427,19 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
 
+  // Handle login from LoginScreen - must be before early return
+  const handleLogin = (userData) => {
+    setCurrentUser(userData);
+    setShowLogin(false);
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem(STORAGE_KEYS.auth);
+    setCurrentUser(null);
+    setShowLogin(true);
+  };
+
   // Show login screen if not authenticated - must be before all useEffects
   if (showLogin || !currentUser) {
     return <LoginScreen onLogin={handleLogin} settings={settings} />;
@@ -703,18 +716,6 @@ export default function App() {
     }
   };
 
-  // Handle login from LoginScreen
-  const handleLogin = (userData) => {
-    setCurrentUser(userData);
-    setShowLogin(false);
-  };
-
-  // Handle logout
-  const handleLogout = () => {
-    localStorage.removeItem(STORAGE_KEYS.auth);
-    setCurrentUser(null);
-    setShowLogin(true);
-  };
 
   // Auto-logout after 15 minutes of inactivity
   useEffect(() => {
