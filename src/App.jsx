@@ -1531,6 +1531,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         </div>
         
         {/* Filter row */}
+        {/* Stock buttons row */}
         <div style={{padding:'6px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
           {/* স্টক আছে button */}
           <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
@@ -1564,9 +1565,12 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             padding:'6px 12px',
             fontSize:12,
           }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
-          
+        </div>
+        
+        {/* Dropdowns row */}
+        <div style={{padding:'6px 14px',background:T.white,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
           {/* Category dropdown */}
-          <div style={{position:'relative',minWidth:120}} data-cat-dropdown>
+          <div style={{position:'relative',minWidth:140}} data-cat-dropdown>
             <input 
               value={selCat === 'স্টক আছে' || selCat === 'স্টক শেষ' || selCat === 'স্টক কম' ? catSearch : selCat} 
               onChange={e=>{setSelCat('স্টক আছে');setCatSearch(e.target.value);setShowCatDrop(true);}} 
@@ -1600,7 +1604,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             )}
           </div>
           {/* Company dropdown */}
-          <div style={{position:'relative',minWidth:120}} data-comp-dropdown>
+          <div style={{position:'relative',minWidth:140}} data-comp-dropdown>
             <input 
               value={selComp === 'সব কোম্পানি' ? compSearch : selComp} 
               onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
