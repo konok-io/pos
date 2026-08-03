@@ -6535,6 +6535,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     receiptShowVat: settings?.receiptShowVat !== false,
     receiptShowQr: settings?.receiptShowQr !== false,
     receiptFontSize: settings?.receiptFontSize || 11,
+    receiptLogo: settings?.receiptLogo || '',
   });
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -7410,6 +7411,28 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   </div>
                   <div>
                     <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                      লোগো ইএমওআই
+                    </label>
+                    <input
+                      value={form.receiptLogo || ''}
+                      onChange={e => setForm(p => ({...p, receiptLogo: e.target.value}))}
+                      style={{
+                        width: '100%',
+                        padding: '12px 14px',
+                        fontSize: 14,
+                        border: '2px solid #e2e8f0',
+                        borderRadius: 8,
+                        outline: 'none',
+                        color: '#1e293b',
+                        background: '#f8fafc'
+                      }}
+                      onFocus={e => e.target.style.borderColor = '#0F766E'}
+                      onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                      placeholder="🖼️"
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
                       ফন্ট সাইজ
                     </label>
                     <select
@@ -7442,7 +7465,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     {[
                       { key: 'receiptShowLogo', label: 'লোগো/আইকন' },
                       { key: 'receiptShowAddress', label: 'ঠিকানা' },
-                      { key: 'receiptShowPhone', label: 'ফোন নম্বর' },
+                      { key: 'receiptShowPhone', label: 'ফোন নম্বর ও ভ্যাট' },
                       { key: 'receiptShowCustomer', label: 'গ্রাহক তথ্য' },
                       { key: 'receiptShowVat', label: 'ভ্যাট তথ্য' },
                       { key: 'receiptShowQr', label: 'QR কোড' },
@@ -7459,66 +7482,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     ))}
                   </div>
                 </div>
-
-                <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '24px 0' }} />
-
-                <label style={{ display: 'block', marginBottom: 12, fontSize: 14, fontWeight: 600, color: '#475569' }}>
-                  হোম পেজ ব্যানার ছবি
-                </label>
-            <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>
-              বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।
-            </p>
-
-            {form.bannerImage && (
-              <div style={{
-                marginBottom: 20,
-                position: 'relative',
-                borderRadius: 14,
-                overflow: 'hidden',
-                maxWidth: 500
-              }}>
-                <img src={form.bannerImage} alt="Banner" style={{ width: '100%', maxHeight: 220, objectFit: 'cover', display: 'block' }} />
-                <button
-                  onClick={() => setForm(p => ({...p, bannerImage: ''}))}
-                  style={{
-                    position: 'absolute',
-                    top: 12, right: 12,
-                    padding: '10px 16px',
-                    background: 'rgba(0,0,0,0.8)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 8,
-                    cursor: 'pointer',
-                    fontSize: 13,
-                    fontWeight: 600
-                  }}
-                >
-                  ✕ মুছুন
-                </button>
-              </div>
-            )}
-
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 14,
-              padding: '40px',
-              border: '2px dashed #cbd5e1',
-              borderRadius: 14,
-              cursor: 'pointer',
-              background: '#f8fafc',
-              transition: 'all 0.2s',
-              fontSize: 14,
-              color: '#64748b'
-            }}
-            onMouseOver={e => { e.currentTarget.style.borderColor = '#0F766E'; e.currentTarget.style.background = '#f0fdfa'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.background = '#f8fafc'; }}
-            >
-              <span style={{ fontSize: 36 }}>📁</span>
-              <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
-              <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
-            </label>
               </div>
 
               {/* Right Column - Receipt Preview */}
@@ -7546,7 +7509,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 8, marginBottom: 8 }}>
                       {form.receiptShowLogo !== false && (
                         <div style={{ fontWeight: 'bold', fontSize: `${form.receiptFontSize + 3}px` }}>
-                          {form.receiptHeader || '🧾 বিক্রয় রিসিট'}
+                          {form.receiptLogo || form.receiptHeader || '🧾 বিক্রয় রিসিট'}
                         </div>
                       )}
                       {form.receiptShowAddress !== false && form.name && (
@@ -7673,6 +7636,64 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               </div>
 
             </div>
+
+            {/* Home Page Banner Section - Below the 2-column grid */}
+            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '32px 0 24px' }} />
+            <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>🏠 হোম পেজ ব্যানার ছবি</h4>
+            <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>
+              বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।
+            </p>
+
+            {form.bannerImage && (
+              <div style={{
+                marginBottom: 20,
+                position: 'relative',
+                borderRadius: 14,
+                overflow: 'hidden',
+                maxWidth: 500
+              }}>
+                <img src={form.bannerImage} alt="Banner" style={{ width: '100%', maxHeight: 220, objectFit: 'cover', display: 'block' }} />
+                <button
+                  onClick={() => setForm(p => ({...p, bannerImage: ''}))}
+                  style={{
+                    position: 'absolute',
+                    top: 12, right: 12,
+                    padding: '10px 16px',
+                    background: 'rgba(0,0,0,0.8)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    fontWeight: 600
+                  }}
+                >
+                  ✕ মুছুন
+                </button>
+              </div>
+            )}
+
+            <label style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 14,
+              padding: '40px',
+              border: '2px dashed #cbd5e1',
+              borderRadius: 14,
+              cursor: 'pointer',
+              background: '#f8fafc',
+              transition: 'all 0.2s',
+              fontSize: 14,
+              color: '#64748b'
+            }}
+            onMouseOver={e => { e.currentTarget.style.borderColor = '#0F766E'; e.currentTarget.style.background = '#f0fdfa'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.background = '#f8fafc'; }}
+            >
+              <span style={{ fontSize: 36 }}>📁</span>
+              <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
+              <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+            </label>
           </div>
         )}
 
