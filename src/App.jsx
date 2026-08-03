@@ -2629,45 +2629,44 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 </div>
               </div>
 
-              {/* Inline Fields: Unit, Stock, Prices, Min Stock */}
-              <div style={{display:'flex',gap:8,marginBottom:8,flexWrap:'wrap'}}>
-                <div style={{flex:'1 1 100px',minWidth:80}}>
+              {/* Inline Fields: 3 columns layout */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8,marginBottom:8}}>
+                <div>
                   <label style={label}>📥 একক</label>
                   <input value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} placeholder="পিস..."
                     style={{...input,fontSize:12,padding:'6px 8px'}} />
                 </div>
-                <div style={{flex:'1 1 80px',minWidth:70}}>
+                <div>
                   <label style={label}>📥 স্টক</label>
                   <input value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} type="number" placeholder="০"
                     style={{...input,fontSize:12,padding:'6px 8px'}} />
                 </div>
-                <div style={{flex:'1 1 90px',minWidth:80}}>
-                  <label style={label}>💰 ক্রয়মূল্য</label>
-                  <input value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} type="number" placeholder="০"
-                    style={{...input,fontSize:12,padding:'6px 8px'}} />
-                </div>
-                <div style={{flex:'1 1 90px',minWidth:80}}>
-                  <label style={label}>💵 বিক্রয়মূল্য</label>
-                  <input value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} type="number" placeholder="০"
-                    style={{...input,fontSize:12,padding:'6px 8px'}} />
-                </div>
-                <div style={{flex:'1 1 80px',minWidth:70}}>
+                <div>
                   <label style={label}>⚠️ মিন স্টক</label>
                   <input value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} type="number" placeholder="৫"
                     style={{...input,fontSize:12,padding:'6px 8px'}} />
                 </div>
-              </div>
-
-              {/* Profit Percentage Display */}
-              {(+form.buyP > 0 || form.buyP !== '') && (+form.sellP > 0 || form.sellP !== '') && (
-                <div style={{marginBottom:12,padding:'8px 12px',background:T.greenLight,borderRadius:8,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                  <span style={{fontSize:13,color:T.gray600}}>📊 লাভ:</span>
-                  <span style={{fontSize:16,fontWeight:700,color:T.green}}>
-                    ৳{((+form.sellP || 0) - (+form.buyP || 0)).toFixed(2)} 
-                    ({(((+form.sellP || 0) - (+form.buyP || 0)) / (+form.buyP || 1) * 100).toFixed(1)}%)
-                  </span>
+                <div>
+                  <label style={label}>💰 ক্রয়মূল্য</label>
+                  <input value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} type="number" placeholder="০"
+                    style={{...input,fontSize:12,padding:'6px 8px'}} />
                 </div>
-              )}
+                <div>
+                  <label style={label}>💵 বিক্রয়মূল্য</label>
+                  <input value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} type="number" placeholder="০"
+                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                </div>
+                <div>
+                  <label style={label}>📊 লাভ</label>
+                  <div style={{padding:'6px 8px',background:T.greenLight,borderRadius:6,fontWeight:700,color:T.green,fontSize:13}}>
+                    {form.buyP > 0 && form.sellP > 0 ? (
+                      <>{(((+form.sellP) - (+form.buyP)).toFixed(2))} ({(((+form.sellP - +form.buyP) / +form.buyP * 100).toFixed(1))}%)</>
+                    ) : (
+                      <span style={{color:T.gray400}}>--</span>
+                    )}
+                  </div>
+                </div>
+              </div>
 
               <button onClick={addToPurchase} style={{...btn('primary'),width:'100%',padding:'10px'}}>
                 ➕ পণ্য তালিকায় যোগ করুন
@@ -2676,7 +2675,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           </div>
 
           {/* Right: Purchase Items List */}
-          <div style={{width:360,display:'flex',flexDirection:'column',background:T.gray50,overflow:'hidden'}}>
+          <div style={{width:280,display:'flex',flexDirection:'column',background:T.gray50,overflow:'hidden'}}>
             <div style={{padding:12,background:T.white,borderBottom:`1px solid ${T.gray200}`,fontWeight:700}}>
               📋 পণ্য তালিকা ({purchaseItems.length})
             </div>
