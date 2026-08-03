@@ -2004,7 +2004,7 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
     setLoading(true);
     const timer = setTimeout(() => setLoading(false), 300);
     return () => clearTimeout(timer);
-  }, [products, selCat]);
+  }, [products]);
 
   // Handle edit product price
   const handleEditProduct = () => {
