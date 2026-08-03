@@ -6486,10 +6486,10 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 }
 
 /* ═══════════════════════════════════════════
-   SETTINGS SCREEN
+/* ═══════════════════════════════════════════
+   SETTINGS SCREEN - NEW PROFESSIONAL DESIGN
 ═══════════════════════════════════════════ */
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
-  // Initialize form directly from settings (only on mount)
   const [form, setForm] = useState({
     name: settings?.name || '',
     address: settings?.address || '',
@@ -6501,7 +6501,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     bannerImage: settings?.bannerImage || ''
   });
   const [saved, setSaved] = useState(false);
-  const [activeSection, setActiveSection] = useState('business');
+  const [activeTab, setActiveTab] = useState(0);
   const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -6510,52 +6510,19 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
-  // Simple handlers
-  const handleNameChange = (e) => {
-    setForm(prev => ({...prev, name: e.target.value}));
-  };
-  const handlePhoneChange = (e) => {
-    setForm(prev => ({...prev, phone: e.target.value}));
-  };
-  const handleAddressChange = (e) => {
-    setForm(prev => ({...prev, address: e.target.value}));
-  };
-  const handleFieldChange = (field, value) => {
-    setForm(prev => ({...prev, [field]: value}));
-  };
-  const handleVatToggle = () => {
-    setForm(prev => ({...prev, vatEnabled: !prev.vatEnabled}));
-  };
-  const handleVatPercentChange = (e) => {
-    setForm(prev => ({...prev, vatPercent: parseFloat(e.target.value) || 0}));
-  };
-  const handleBannerChange = (data) => {
-    setForm(prev => ({...prev, bannerImage: data}));
-  };
-
   const save = async () => {
-    // Create complete settings object
-    const completeSettings = {
-      name: form.name,
-      address: form.address,
-      phone: form.phone,
-      email: form.email,
-      taxId: form.taxId,
-      vatEnabled: form.vatEnabled,
-      vatPercent: form.vatPercent,
-      bannerImage: form.bannerImage
-    };
-    await upd.settings(completeSettings);
-    setSaved(true); 
-    setTimeout(() => setSaved(false), 2000);
+    await upd.settings(form);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
   };
 
-  const sections = [
-    { id: 'business', icon: '🏪', label: 'ব্যবসা' },
-    { id: 'tax', icon: '💰', label: 'ট্যাক্স' },
-    { id: 'reports', icon: '📊', label: 'রিপোর্ট' },
-    { id: 'users', icon: '👥', label: 'ইউজার' },
-    { id: 'data', icon: '💾', label: 'ডেটা' },
+  const tabs = [
+    { icon: '🏪', label: 'ব্যবসা' },
+    { icon: '💰', label: 'ট্যাক্স' },
+    { icon: '🖼️', label: 'ডিসপ্লে' },
+    { icon: '📊', label: 'রিপোর্ট' },
+    { icon: '👥', label: 'ইউজার' },
+    { icon: '💾', label: 'ডেটা' },
   ];
 
   const openUserModal = (user = null) => {
@@ -6595,602 +6562,1095 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     }
   };
 
-  const ToggleButton = ({active, onClick, children}) => (
-    <button onClick={onClick} style={{
-      padding: '8px 20px',
-      borderRadius: 8,
-      fontWeight: 600,
-      fontSize: 13,
-      cursor: 'pointer',
-      border: 'none',
-      transition: 'all 0.2s',
-      background: active ? T.green : T.gray200,
-      color: active ? T.white : T.gray600,
-    }}>
-      {children}
-    </button>
-  );
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('ছবির সাইজ 5MB এর বেশি হওয়া উচিত নয়!');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setForm(p => ({...p, bannerImage: event.target.result}));
+    };
+    reader.readAsDataURL(file);
+  };
 
-  const SectionCard = ({title, icon, children}) => (
-    <div style={{
-      background: T.white,
-      borderRadius: 12,
-      padding: 24,
-      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-      border: `1px solid ${T.gray200}`,
-    }}>
-      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:20,paddingBottom:16,borderBottom:`2px solid ${T.gray100}`}}>
-        <span style={{fontSize:24}}>{icon}</span>
-        <h3 style={{margin:0,fontSize:17,fontWeight:700,color:T.gray900}}>{title}</h3>
-      </div>
-      {children}
-    </div>
-  );
-
-  const FormRow = ({labelText, children}) => (
-    <div style={{display:'flex',alignItems:'center',gap:16,marginBottom:16}}>
-      <label style={{...label,margin:0,minWidth:160,fontSize:14,fontWeight:600}}>{labelText}</label>
-      <div style={{flex:1}}>{children}</div>
-    </div>
-  );
+  const stats = [
+    { label: 'মোট পণ্য', value: products.length, icon: '📦', color: '#0F766E' },
+    { label: 'স্টক শেষ', value: products.filter(p => p.stock <= 0).length, icon: '⚠️', color: '#DC2626' },
+    { label: 'কম স্টক', value: products.filter(p => p.stock > 0 && p.stock <= p.minStock).length, icon: '📉', color: '#F59E0B' },
+    { label: 'স্টক মূল্য', value: fmt(products.reduce((s, p) => s + p.sellP * p.stock, 0)), icon: '💰', color: '#059669' },
+  ];
 
   return (
-    <div style={{height:'100%',overflow:'auto',padding:24,width:'100%',background:T.gray50}}>
+    <div style={{ 
+      height: '100%', 
+      overflow: 'auto', 
+      background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
+      width: '100%'
+    }}>
       {/* Header */}
-      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:24}}>
-        <div>
-          <h1 style={{margin:0,fontSize:24,fontWeight:800,color:T.gray900}}>⚙️ সেটিংস</h1>
-          <p style={{margin:'4px 0 0',fontSize:14,color:T.gray500}}>আপনার POS ম্যানেজমেন্ট সিস্টেম কনফিগার করুন</p>
-        </div>
-        <button onClick={save} style={{
-          padding:'12px 28px',
-          background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-          color:T.white,
-          border:'none',
-          borderRadius:10,
-          fontSize:14,
-          fontWeight:600,
-          cursor:'pointer',
-          boxShadow:'0 4px 12px rgba(15,118,110,0.3)',
-          display:'flex',
-          alignItems:'center',
-          gap:8,
-        }}>
-          💾 সেটিংস সংরক্ষণ
-        </button>
-      </div>
-
-      {saved && (
+      <div style={{
+        background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
+        padding: '32px 32px 48px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Background Pattern */}
         <div style={{
-          padding:'12px 20px',
-          background:T.greenLight,
-          border:`1px solid ${T.green}`,
-          borderRadius:10,
-          marginBottom:20,
-          display:'flex',
-          alignItems:'center',
-          gap:10,
-          color:T.green,
-          fontWeight:600,
-        }}>
-          ✅ সেটিংস সফলভাবে সংরক্ষিত হয়েছে!
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          opacity: 0.1,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }} />
+        
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
+              ⚙️ সেটিংস
+            </h1>
+            <p style={{ margin: '8px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
+              আপনার POS সিস্টেম কনফিগার করুন
+            </p>
+          </div>
+          
+          {/* Save Button */}
+          <button onClick={save} style={{
+            padding: '14px 28px',
+            background: saved ? '#059669' : 'rgba(255,255,255,0.95)',
+            color: saved ? '#fff' : '#0F766E',
+            border: 'none',
+            borderRadius: 12,
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+            boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+            transition: 'all 0.3s ease',
+            transform: saved ? 'scale(1.05)' : 'scale(1)',
+          }}>
+            {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ করুন'}
+          </button>
         </div>
-      )}
 
-      <div style={{display:'grid',gridTemplateColumns:'220px 1fr',gap:24,minHeight:'calc(100vh - 200px)'}}>
-        {/* Sidebar Navigation */}
+        {/* Stats Cards */}
         <div style={{
-          background:T.white,
-          borderRadius:12,
-          padding:16,
-          boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
-          border:`1px solid ${T.gray200}`,
-          height:'fit-content',
-          position:'sticky',
-          top:0,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 16,
+          marginTop: 24,
+          position: 'relative',
+          zIndex: 1
         }}>
-          {sections.map(s => (
-            <button
-              key={s.id}
-              onClick={() => setActiveSection(s.id)}
-              style={{
-                width:'100%',
-                padding:'14px 16px',
-                border:'none',
-                borderRadius:10,
-                cursor:'pointer',
-                display:'flex',
-                alignItems:'center',
-                gap:12,
-                marginBottom:6,
-                transition:'all 0.2s',
-                background: activeSection === s.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
-                color: activeSection === s.id ? T.white : T.gray600,
-                fontWeight: activeSection === s.id ? 600 : 500,
-                fontSize:14,
-                textAlign:'left',
-              }}
-            >
-              <span style={{fontSize:18}}>{s.icon}</span>
-              <span>{s.label}</span>
-            </button>
+          {stats.map((stat, i) => (
+            <div key={i} style={{
+              background: 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: 12,
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              border: '1px solid rgba(255,255,255,0.2)',
+            }}>
+              <div style={{
+                width: 44, height: 44,
+                background: 'rgba(255,255,255,0.2)',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 22
+              }}>
+                {stat.icon}
+              </div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: '#fff' }}>{stat.value}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)', marginTop: 2 }}>{stat.label}</div>
+              </div>
+            </div>
           ))}
         </div>
+      </div>
 
-        {/* Content Area */}
-        <div style={{display:'flex',flexDirection:'column',gap:24}}>
-          {/* Business Info */}
-          {activeSection === 'business' && (
-            <SectionCard title="ব্যবসার তথ্য" icon="🏪">
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
-                <div>
-                  <label style={{...label,marginBottom:8}}>🏪 ব্যবসার নাম *</label>
-                  <input 
-                    type="text"
-                    value={form.name} 
-                    onChange={handleNameChange} 
-                    style={{...input,padding:'12px 14px',fontSize:14}}
-                    placeholder="আপনার ব্যবসার নাম লিখুন"
-                  />
-                </div>
-                <div>
-                  <label style={{...label,marginBottom:8}}>📞 মোবাইল নম্বর</label>
-                  <input 
-                    type="tel"
-                    value={form.phone} 
-                    onChange={handlePhoneChange} 
-                    style={{...input,padding:'12px 14px',fontSize:14}}
-                    placeholder="মোবাইল নম্বর লিখুন"
-                  />
-                </div>
-                <div style={{gridColumn:'1 / -1'}}>
-                  <label style={{...label,marginBottom:8}}>📍 ঠিকানা</label>
-                  <input 
-                    type="text"
-                    value={form.address} 
-                    onChange={handleAddressChange} 
-                    style={{...input,padding:'12px 14px',fontSize:14}}
-                    placeholder="আপনার ব্যবসার ঠিকানা লিখুন"
-                  />
-                </div>
-                <div>
-                  <label style={{...label,marginBottom:8}}>📧 ইমেইল</label>
-                  <input 
-                    type="email"
-                    value={form.email || ''} 
-                    onChange={e => handleFieldChange('email', e.target.value)} 
-                    style={{...input,padding:'12px 14px',fontSize:14}}
-                    placeholder="ইমেইল লিখুন"
-                  />
-                </div>
-                <div>
-                  <label style={{...label,marginBottom:8}}>🔢 ট্যাক্স নম্বর</label>
-                  <input 
-                    type="text"
-                    value={form.taxId || ''} 
-                    onChange={e => handleFieldChange('taxId', e.target.value)} 
-                    style={{...input,padding:'12px 14px',fontSize:14}}
-                    placeholder="ট্যাক্স/ভ্যাট নম্বর"
-                  />
-                </div>
+      {/* Tab Navigation */}
+      <div style={{
+        display: 'flex',
+        gap: 8,
+        padding: '20px 32px',
+        background: '#fff',
+        borderBottom: '1px solid #e2e8f0',
+        overflowX: 'auto',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+      }}>
+        {tabs.map((tab, i) => (
+          <button
+            key={i}
+            onClick={() => setActiveTab(i)}
+            style={{
+              padding: '12px 24px',
+              border: 'none',
+              borderRadius: 10,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              fontSize: 14,
+              fontWeight: 600,
+              transition: 'all 0.2s ease',
+              background: activeTab === i ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+              color: activeTab === i ? '#fff' : '#64748b',
+              whiteSpace: 'nowrap',
+              boxShadow: activeTab === i ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
+            }}
+          >
+            <span style={{ fontSize: 18 }}>{tab.icon}</span>
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: 32, maxWidth: 1200 }}>
+        {/* Business Tab */}
+        {activeTab === 0 && (
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            padding: 32,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
+              <div style={{
+                width: 48, height: 48,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24,
+                color: '#fff'
+              }}>🏪</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ব্যবসার তথ্য</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>আপনার ব্যবসার মূল তথ্য</p>
               </div>
-            </SectionCard>
-          )}
+            </div>
 
-          {/* Tax Settings */}
-          {activeSection === 'tax' && (
-            <SectionCard title="ট্যাক্স সেটিংস" icon="💰">
-              <FormRow labelText="ভ্যাট সক্রিয়">
-                <div style={{display:'flex',alignItems:'center',gap:12}}>
-                  <ToggleButton active={form.vatEnabled} onClick={handleVatToggle}>
-                    {form.vatEnabled ? '✅ চালু' : '❌ বন্ধ'}
-                  </ToggleButton>
-                </div>
-              </FormRow>
-              
-              {form.vatEnabled && (
-                <FormRow labelText="ডিফল্ট ভ্যাট %">
-                  <div style={{display:'flex',alignItems:'center',gap:8}}>
-                    <input 
-                      value={form.vatPercent} 
-                      onChange={handleVatPercentChange} 
-                      type="number" min="0" max="100" 
-                      style={{...input,width:100,padding:'10px 14px',fontSize:14}}
-                    />
-                    <span style={{fontSize:14,color:T.gray600}}>%</span>
-                  </div>
-                </FormRow>
-              )}
-              
-              <div style={{marginTop:20,padding:16,background:T.tealLight,borderRadius:10,border:`1px solid ${T.tealMid}`}}>
-                <p style={{margin:0,fontSize:13,color:T.tealDark,lineHeight:1.6}}>
-                  💡 টিপ: ভ্যাট চালু থাকলে সকল বিক্রয় রসিদে ভ্যাট যোগ হবে।
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  🏪 ব্যবসার নাম *
+                </label>
+                <input
+                  value={form.name}
+                  onChange={e => setForm(p => ({...p, name: e.target.value}))}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  placeholder="আপনার ব্যবসার নাম লিখুন"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  📞 মোবাইল নম্বর
+                </label>
+                <input
+                  value={form.phone}
+                  onChange={e => setForm(p => ({...p, phone: e.target.value}))}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  placeholder="01XXXXXXXXX"
+                />
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  📍 ঠিকানা
+                </label>
+                <input
+                  value={form.address}
+                  onChange={e => setForm(p => ({...p, address: e.target.value}))}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  placeholder="আপনার ব্যবসার ঠিকানা লিখুন"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  📧 ইমেইল
+                </label>
+                <input
+                  value={form.email || ''}
+                  onChange={e => setForm(p => ({...p, email: e.target.value}))}
+                  type="email"
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  placeholder="email@example.com"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  🔢 ট্যাক্স/ভ্যাট নম্বর
+                </label>
+                <input
+                  value={form.taxId || ''}
+                  onChange={e => setForm(p => ({...p, taxId: e.target.value}))}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    transition: 'all 0.2s',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  placeholder="ট্যাক্স/ভ্যাট নম্বর"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tax Tab */}
+        {activeTab === 1 && (
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            padding: 32,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
+              <div style={{
+                width: 48, height: 48,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24,
+                color: '#fff'
+              }}>💰</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ট্যাক্স সেটিংস</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ভ্যাট ও ট্যাক্স কনফিগারেশন</p>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '24px 28px',
+              background: form.vatEnabled ? '#ecfdf5' : '#fef2f2',
+              borderRadius: 14,
+              border: `2px solid ${form.vatEnabled ? '#059669' : '#ef4444'}`,
+              marginBottom: 24
+            }}>
+              <div>
+                <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>
+                  ভ্যাট সক্রিয় {form.vatEnabled ? '✅' : '❌'}
+                </h4>
+                <p style={{ margin: '6px 0 0', fontSize: 13, color: '#64748b' }}>
+                  {form.vatEnabled ? 'সকল বিক্রয়ে ভ্যাট যোগ হবে' : 'ভ্যাট গণনা বন্ধ আছে'}
                 </p>
               </div>
-            </SectionCard>
-          )}
+              <button
+                onClick={() => setForm(p => ({...p, vatEnabled: !p.vatEnabled}))}
+                style={{
+                  padding: '14px 32px',
+                  background: form.vatEnabled ? '#059669' : '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {form.vatEnabled ? '✅ চালু আছে' : '❌ বন্ধ আছে'}
+              </button>
+            </div>
 
-          {/* Reports Settings */}
-          {activeSection === 'reports' && (
-            <SectionCard title="রিপোর্ট সেটিংস" icon="📊">
-              <div style={{display:'grid',gridTemplateColumns:'repeat(2, 1fr)',gap:16}}>
-                {[
-                  {l:'📦 পণ্য স্টক রিপোর্ট',v:'products'},
-                  {l:'📈 বিক্রয় রিপোর্ট',v:'sales'},
-                  {l:'💰 আয়-ব্যয় রিপোর্ট',v:'income'},
-                  {l:'👥 কাস্টমার রিপোর্ট',v:'customers'},
-                ].map(r=>(
-                  <div key={r.v} style={{
-                    padding:20,
-                    background:T.gray50,
-                    borderRadius:10,
-                    border:`1px solid ${T.gray200}`,
-                    display:'flex',
-                    alignItems:'center',
-                    justifyContent:'space-between'
-                  }}>
-                    <span style={{fontSize:15,fontWeight:600,color:T.gray700}}>{r.l}</span>
-                    <span style={{
-                      padding:'4px 12px',
-                      background:T.green,
-                      color:T.white,
-                      borderRadius:6,
-                      fontSize:12,
-                      fontWeight:600
-                    }}>সক্রিয়</span>
-                  </div>
-                ))}
+            {form.vatEnabled && (
+              <div style={{
+                padding: '24px 28px',
+                background: '#f0fdf4',
+                borderRadius: 14,
+                border: '2px solid #86efac'
+              }}>
+                <label style={{ display: 'block', marginBottom: 12, fontSize: 14, fontWeight: 600, color: '#166534' }}>
+                  ডিফল্ট ভ্যাট শতাংশ
+                </label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <input
+                    value={form.vatPercent}
+                    onChange={e => setForm(p => ({...p, vatPercent: parseFloat(e.target.value) || 0}))}
+                    type="number"
+                    min="0"
+                    max="100"
+                    style={{
+                      width: 120,
+                      padding: '14px 16px',
+                      fontSize: 18,
+                      fontWeight: 700,
+                      border: '2px solid #86efac',
+                      borderRadius: 10,
+                      outline: 'none',
+                      textAlign: 'center',
+                      color: '#166534',
+                      background: '#fff'
+                    }}
+                  />
+                  <span style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>%</span>
+                </div>
               </div>
-            </SectionCard>
-          )}
+            )}
 
-          {/* Users Management */}
-          {activeSection === 'users' && (
-            isSuperAdmin ? (
-              <SectionCard title="ইউজার ম্যানেজমেন্ট" icon="👥">
-                <div style={{marginBottom:20,display:'flex',justifyContent:'flex-end'}}>
-                  <button onClick={() => openUserModal()} style={{
-                    padding:'10px 20px',
-                    background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                    color:T.white,
-                    border:'none',
-                    borderRadius:10,
-                    fontSize:14,
-                    fontWeight:600,
-                    cursor:'pointer',
-                    display:'flex',
-                    alignItems:'center',
-                    gap:8,
-                  }}>
-                    ➕ নতুন ইউজার
-                  </button>
-                </div>
-                
-                <div style={{marginBottom:20,padding:16,background:T.tealLight,borderRadius:10,border:`1px solid ${T.tealMid}`}}>
-                  <p style={{margin:0,fontSize:13,color:T.tealDark,lineHeight:1.6}}>
-                    👑 সুপার এডমিন (admin@konok.io) সবসময় সক্রিয় থাকে এবং মুছে যায় না।
-                  </p>
-                </div>
+            <div style={{
+              marginTop: 24,
+              padding: '20px 24px',
+              background: '#f0fdfa',
+              borderRadius: 12,
+              border: '1px solid #99f6e4'
+            }}>
+              <p style={{ margin: 0, fontSize: 13, color: '#115e59', lineHeight: 1.7 }}>
+                💡 টিপ: ভ্যাট চালু থাকলে সকল বিক্রয় রসিদে স্বয়ংক্রিয়ভাবে ভ্যাট যোগ হবে।
+              </p>
+            </div>
+          </div>
+        )}
 
-                {/* User List */}
-                <div style={{display:'flex',flexDirection:'column',gap:12}}>
-                  {/* Super Admin */}
+        {/* Display Tab */}
+        {activeTab === 2 && (
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            padding: 32,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
+              <div style={{
+                width: 48, height: 48,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24,
+                color: '#fff'
+              }}>🖼️</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডিসপ্লে সেটিংস</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>হোম পেজ ব্যানার ও প্রদর্শন</p>
+              </div>
+            </div>
+
+            <label style={{ display: 'block', marginBottom: 12, fontSize: 14, fontWeight: 600, color: '#475569' }}>
+              হোম পেজ ব্যানার ছবি
+            </label>
+            <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>
+              বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।
+            </p>
+
+            {form.bannerImage && (
+              <div style={{
+                marginBottom: 20,
+                position: 'relative',
+                borderRadius: 14,
+                overflow: 'hidden',
+                maxWidth: 500
+              }}>
+                <img src={form.bannerImage} alt="Banner" style={{ width: '100%', maxHeight: 220, objectFit: 'cover', display: 'block' }} />
+                <button
+                  onClick={() => setForm(p => ({...p, bannerImage: ''}))}
+                  style={{
+                    position: 'absolute',
+                    top: 12, right: 12,
+                    padding: '10px 16px',
+                    background: 'rgba(0,0,0,0.8)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    fontSize: 13,
+                    fontWeight: 600
+                  }}
+                >
+                  ✕ মুছুন
+                </button>
+              </div>
+            )}
+
+            <label style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 14,
+              padding: '40px',
+              border: '2px dashed #cbd5e1',
+              borderRadius: 14,
+              cursor: 'pointer',
+              background: '#f8fafc',
+              transition: 'all 0.2s',
+              fontSize: 14,
+              color: '#64748b'
+            }}
+            onMouseOver={e => { e.currentTarget.style.borderColor = '#0F766E'; e.currentTarget.style.background = '#f0fdfa'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#cbd5e1'; e.currentTarget.style.background = '#f8fafc'; }}
+            >
+              <span style={{ fontSize: 36 }}>📁</span>
+              <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
+              <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+            </label>
+          </div>
+        )}
+
+        {/* Reports Tab */}
+        {activeTab === 3 && (
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            padding: 32,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+            border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
+              <div style={{
+                width: 48, height: 48,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 24,
+                color: '#fff'
+              }}>📊</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>রিপোর্ট সেটিংস</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>বিভিন্ন রিপোর্টের সেটিংস</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+              {[
+                { l: '📦 পণ্য স্টক রিপোর্ট', d: 'সকল পণ্যের স্টক তথ্য' },
+                { l: '📈 বিক্রয় রিপোর্ট', d: 'বিক্রয় সম্পর্কিত সব তথ্য' },
+                { l: '💰 আয়-ব্যয় রিপোর্ট', d: 'আয় ও ব্যয়ের হিসাব' },
+                { l: '👥 কাস্টমার রিপোর্ট', d: 'কাস্টমার তথ্য ও লেনদেন' },
+              ].map((r, i) => (
+                <div key={i} style={{
+                  padding: 24,
+                  background: '#f8fafc',
+                  borderRadius: 14,
+                  border: '2px solid #e2e8f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  transition: 'all 0.2s'
+                }}>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>{r.l}</div>
+                    <div style={{ fontSize: 13, color: '#64748b' }}>{r.d}</div>
+                  </div>
                   <div style={{
-                    padding:16,
-                    background:T.tealLight,
-                    borderRadius:10,
-                    border:`2px solid ${T.teal}`,
-                    display:'flex',
-                    alignItems:'center',
-                    justifyContent:'space-between'
-                  }}>
-                    <div style={{display:'flex',alignItems:'center',gap:12}}>
-                      <div style={{
-                        width:40,height:40,
-                        background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                        borderRadius:10,
-                        display:'flex',
-                        alignItems:'center',
-                        justifyContent:'center',
-                        fontSize:22,
-                        color:T.white
-                      }}>👑</div>
-                      <div>
-                        <div style={{fontSize:14,fontWeight:700,color:T.gray900}}>Super Admin</div>
-                        <div style={{fontSize:12,color:T.gray500}}>admin@konok.io</div>
-                      </div>
-                    </div>
-                    <div style={{
-                      width:40,height:40,
-                      background:T.teal,
-                      borderRadius:10,
-                      display:'flex',
-                      alignItems:'center',
-                      justifyContent:'center',
-                      fontSize:20
-                    }}>👑</div>
+                    padding: '8px 16px',
+                    background: '#059669',
+                    color: '#fff',
+                    borderRadius: 8,
+                    fontSize: 12,
+                    fontWeight: 700
+                  }}>সক্রিয়</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 4 && (
+          isSuperAdmin ? (
+            <div style={{
+              background: '#fff',
+              borderRadius: 16,
+              padding: 32,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+              border: '1px solid #e2e8f0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{
+                    width: 48, height: 48,
+                    background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 24,
+                    color: '#fff'
+                  }}>👥</div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ইউজার ম্যানেজমেন্ট</h3>
+                    <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>সিস্টেম ইউজার যোগ ও পরিচালনা</p>
                   </div>
+                </div>
+                <button
+                  onClick={() => openUserModal()}
+                  style={{
+                    padding: '14px 24px',
+                    background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 10,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    boxShadow: '0 4px 12px rgba(15,118,110,0.3)'
+                  }}
+                >
+                  ➕ নতুন ইউজার
+                </button>
+              </div>
 
-                  {/* Other Users */}
-                  {users.map(u => (
-                    <div key={u.id} style={{
-                      padding:16,
-                      background:T.gray50,
-                      borderRadius:10,
-                      border:`1px solid ${T.gray200}`,
-                      display:'flex',
-                      alignItems:'center',
-                      justifyContent:'space-between'
+              <div style={{
+                padding: '16px 20px',
+                background: '#f0fdfa',
+                borderRadius: 12,
+                border: '1px solid #99f6e4',
+                marginBottom: 24
+              }}>
+                <p style={{ margin: 0, fontSize: 13, color: '#115e59', lineHeight: 1.6 }}>
+                  👑 সুপার এডমিন (admin@konok.io) সবসময় সক্রিয় থাকে এবং মুছে যায় না।
+                </p>
+              </div>
+
+              {/* Super Admin */}
+              <div style={{
+                padding: 20,
+                background: '#f0fdfa',
+                borderRadius: 14,
+                border: '2px solid #0F766E',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: 16
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{
+                    width: 48, height: 48,
+                    background: '#0F766E',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22,
+                    color: '#fff'
+                  }}>👑</div>
+                  <div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#1e293b' }}>Super Admin</div>
+                    <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>admin@konok.io</div>
+                  </div>
+                </div>
+                <div style={{
+                  padding: '8px 16px',
+                  background: '#0F766E',
+                  color: '#fff',
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 700
+                }}>👑 সুপার</div>
+              </div>
+
+              {/* Users */}
+              {users.map(u => (
+                <div key={u.id} style={{
+                  padding: 20,
+                  background: '#f8fafc',
+                  borderRadius: 14,
+                  border: '1px solid #e2e8f0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: 12
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{
+                      width: 48, height: 48,
+                      background: '#115E59',
+                      borderRadius: 12,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 20,
+                      color: '#fff',
+                      fontWeight: 700
+                    }}>{u.name?.charAt(0).toUpperCase()}</div>
+                    <div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{u.name}</div>
+                      <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>{u.email}</div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{
+                      padding: '6px 14px',
+                      background: u.role === 'admin' ? '#64748b' : '#f59e0b',
+                      color: '#fff',
+                      borderRadius: 8,
+                      fontSize: 11,
+                      fontWeight: 700
                     }}>
-                      <div style={{display:'flex',alignItems:'center',gap:12}}>
-                        <div style={{
-                          width:40,height:40,
-                          background:T.teal,
-                          borderRadius:10,
-                          display:'flex',
-                          alignItems:'center',
-                          justifyContent:'center',
-                          fontSize:18,
-                          color:T.white
-                        }}>{u.name?.charAt(0).toUpperCase()}</div>
-                        <div>
-                          <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>{u.name}</div>
-                          <div style={{fontSize:12,color:T.gray500}}>{u.email}</div>
-                        </div>
-                      </div>
-                      <div style={{display:'flex',alignItems:'center',gap:8}}>
-                        <span style={{
-                          padding:'4px 12px',
-                          background: u.role === 'super_admin' ? T.teal : u.role === 'admin' ? T.gray600 : T.orange,
-                          color: T.white,
-                          borderRadius:6,
-                          fontSize:11,
-                          fontWeight:600
-                        }}>
-                          {u.role === 'super_admin' ? '👑 সুপার' : u.role === 'admin' ? '🛡️ এডমিন' : '🛒 অপারেটর'}
-                        </span>
-                        <button onClick={() => openUserModal(u)} style={{
-                          padding:'6px 12px',
-                          background:T.white,
-                          border:`1px solid ${T.gray200}`,
-                          borderRadius:8,
-                          cursor:'pointer',
-                          fontSize:13,
-                        }}>✏️</button>
-                        <button onClick={() => deleteUser(u.id)} style={{
-                          padding:'6px 12px',
-                          background:T.redLight,
-                          border:`1px solid ${T.red}30`,
-                          borderRadius:8,
-                          cursor:'pointer',
-                          fontSize:13,
-                        }}>🗑️</button>
-                      </div>
+                      {u.role === 'admin' ? '🛡️ এডমিন' : '🛒 অপারেটর'}
                     </div>
-                  ))}
-                  
-                  {users.length === 0 && (
-                    <div style={{textAlign:'center',padding:40,color:T.gray400}}>
-                      <div style={{fontSize:40,marginBottom:12}}>👥</div>
-                      <div>কোনো ইউজার নেই</div>
-                    </div>
-                  )}
+                    <button
+                      onClick={() => openUserModal(u)}
+                      style={{
+                        padding: '8px 14px',
+                        background: '#fff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: 8,
+                        cursor: 'pointer',
+                        fontSize: 14
+                      }}
+                    >✏️</button>
+                    <button
+                      onClick={() => deleteUser(u.id)}
+                      style={{
+                        padding: '8px 14px',
+                        background: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        borderRadius: 8,
+                        cursor: 'pointer',
+                        fontSize: 14
+                      }}
+                    >🗑️</button>
+                  </div>
                 </div>
-              </SectionCard>
-            ) : (
-              <SectionCard title="ইউজার ম্যানেজমেন্ট" icon="👥">
-                <div style={{textAlign:'center',padding:40}}>
-                  <div style={{fontSize:60,marginBottom:16}}>🔒</div>
-                  <h3 style={{margin:'0 0 12px',color:T.gray700}}>এক্সেস সীমাবদ্ধ</h3>
-                  <p style={{margin:0,color:T.gray500}}>শুধুমাত্র সুপার এডমিন এই পেজ দেখতে পারবেন।</p>
-                </div>
-              </SectionCard>
-            )
-          )}
+              ))}
 
-          {/* Data Management */}
-          {activeSection === 'data' && (
-            <>
-              {/* Stats Dashboard */}
-              <div style={{display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:16}}>
-                {[
-                  {l:'📦 মোট পণ্য',v:`${products.length}`,c:T.teal,icon:'📦'},
-                  {l:'⚠️ স্টক শেষ',v:`${products.filter(p=>p.stock<=0).length}`,c:T.red,icon:'⚠️'},
-                  {l:'📉 কম স্টক',v:`${products.filter(p=>p.stock>0&&p.stock<=p.minStock).length}`,c:T.amber,icon:'📉'},
-                  {l:'💰 স্টক মূল্য',v:fmt(products.reduce((s,p)=>s+p.sellP*p.stock,0)),c:T.green,icon:'💰'},
-                ].map(s=>(
-                  <div key={s.l} style={{
-                    background:T.white,
-                    borderRadius:12,
-                    padding:20,
-                    boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
-                    border:`1px solid ${T.gray200}`,
-                    textAlign:'center'
+              {users.length === 0 && (
+                <div style={{ textAlign: 'center', padding: 48, color: '#94a3b8' }}>
+                  <div style={{ fontSize: 48, marginBottom: 12 }}>👥</div>
+                  <div style={{ fontSize: 15 }}>কোনো ইউজার নেই</div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{
+              background: '#fff',
+              borderRadius: 16,
+              padding: 64,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+              border: '1px solid #e2e8f0',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: 72, marginBottom: 20 }}>🔒</div>
+              <h3 style={{ margin: '0 0 12px', fontSize: 20, fontWeight: 700, color: '#374151' }}>এক্সেস সীমাবদ্ধ</h3>
+              <p style={{ margin: 0, fontSize: 14, color: '#6b7280' }}>শুধুমাত্র সুপার এডমিন এই পেজ দেখতে পারবেন।</p>
+            </div>
+          )
+        )}
+
+        {/* Data Tab */}
+        {activeTab === 5 && (
+          <div>
+            <div style={{
+              background: '#fff',
+              borderRadius: 16,
+              padding: 32,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+              border: '1px solid #e2e8f0',
+              marginBottom: 24
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+                <div style={{
+                  width: 48, height: 48,
+                  background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 24,
+                  color: '#fff'
+                }}>📊</div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডেটা স্ট্যাটাস</h3>
+                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>আপনার সিস্টেমের ডেটা সারাংশ</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+                {stats.map((stat, i) => (
+                  <div key={i} style={{
+                    background: '#f8fafc',
+                    borderRadius: 14,
+                    padding: 24,
+                    textAlign: 'center',
+                    border: '1px solid #e2e8f0'
                   }}>
-                    <div style={{fontSize:28,marginBottom:8}}>{s.icon}</div>
-                    <div style={{fontSize:24,fontWeight:800,color:s.c}}>{s.v}</div>
-                    <div style={{fontSize:12,color:T.gray500,marginTop:4}}>{s.l}</div>
+                    <div style={{ fontSize: 36, marginBottom: 10 }}>{stat.icon}</div>
+                    <div style={{ fontSize: 28, fontWeight: 800, color: stat.color }}>{stat.value}</div>
+                    <div style={{ fontSize: 13, color: '#64748b', marginTop: 6 }}>{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{
+              background: '#fff',
+              borderRadius: 16,
+              padding: 32,
+              boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+              border: '1px solid #e2e8f0'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+                <div style={{
+                  width: 48, height: 48,
+                  background: '#dc2626',
+                  borderRadius: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 24,
+                  color: '#fff'
+                }}>⚠️</div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডেটা রিসেট</h3>
+                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ডেটা মুছে ফেলার জন্য সতর্ক ব্যবহার করুন</p>
+                </div>
+              </div>
+
+              <div style={{
+                padding: '16px 20px',
+                background: '#fef2f2',
+                borderRadius: 12,
+                border: '1px solid #fecaca',
+                marginBottom: 24
+              }}>
+                <p style={{ margin: 0, fontSize: 13, color: '#dc2626', lineHeight: 1.6 }}>
+                  ⚠️ সতর্কতা: নিচের অপশনগুলো ব্যবহারে ডেটা স্থায়ীভাবে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+                {[
+                  { l: '📦 পণ্য ডেটা', c: products.length, btn: 'সব পণ্য মুছে ফেলুন', fn: () => { if(confirm('সব পণ্য মুছে ফেলবেন?')) { upd.products([]); alert('পণ্য মুছা হয়েছে।'); } } },
+                  { l: '🏢 কোম্পানি ডেটা', c: suppliers.length, btn: 'সব কোম্পানি মুছে ফেলুন', fn: () => { if(confirm('সব কোম্পানি মুছে ফেলবেন?')) { upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); } } },
+                  { l: '📂 ক্যাটাগরি ডেটা', c: categories.length, btn: 'সব ক্যাটাগরি মুছে ফেলুন', fn: () => { if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { upd.categories([]); alert('ক্যাটাগরি মুছা হয়েছে।'); } } },
+                  { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { upd.sales([]); alert('বিক্রয় মুছা হয়েছে।'); } } },
+                ].map((d, i) => (
+                  <div key={i} style={{
+                    padding: 24,
+                    background: '#fef2f2',
+                    borderRadius: 14,
+                    border: '1px solid #fecaca'
+                  }}>
+                    <h4 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{d.l}</h4>
+                    <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b' }}>মোট {d.c}টি আইটেম</p>
+                    <button
+                      onClick={d.fn}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        background: '#dc2626',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: 10,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🗑️ {d.btn}
+                    </button>
                   </div>
                 ))}
               </div>
 
-              {/* Data Reset Options */}
-              <SectionCard title="ডেটা রিসেট" icon="⚠️">
-                <div style={{marginBottom:20,padding:16,background:T.redLight,borderRadius:10,border:`1px solid ${T.red+'30'}`}}>
-                  <p style={{margin:0,fontSize:13,color:T.red,lineHeight:1.6}}>
-                    ⚠️ সতর্কতা: নিচের অপশনগুলো ব্যবহারে ডেটা স্থায়ীভাবে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।
-                  </p>
-                </div>
-                
-                <div style={{display:'grid',gridTemplateColumns:'repeat(2, 1fr)',gap:16}}>
-                  <div style={{padding:20,background:T.gray50,borderRadius:10,border:`1px solid ${T.gray200}`}}>
-                    <h4 style={{margin:'0 0 12px',fontSize:15,fontWeight:700,color:T.gray800}}>📦 পণ্য ডেটা</h4>
-                    <p style={{margin:'0 0 14px',fontSize:13,color:T.gray500}}>মোট {products.length}টি পণ্য</p>
-                    <button style={btn('danger')} onClick={async()=>{
-                      if(confirm('সব পণ্য মুছে ফেলবেন?')) { await upd.products([]); alert('পণ্য মুছা হয়েছে।'); }
-                    }}>🗑️ রিসেট করুন</button>
-                  </div>
-                  
-                  <div style={{padding:20,background:T.gray50,borderRadius:10,border:`1px solid ${T.gray200}`}}>
-                    <h4 style={{margin:'0 0 12px',fontSize:15,fontWeight:700,color:T.gray800}}>🏢 কোম্পানি ডেটা</h4>
-                    <p style={{margin:'0 0 14px',fontSize:13,color:T.gray500}}>মোট {suppliers.length}টি কোম্পানি</p>
-                    <button style={btn('danger')} onClick={async()=>{
-                      if(confirm('সব কোম্পানি মুছে ফেলবেন?')) { await upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); }
-                    }}>🗑️ রিসেট করুন</button>
-                  </div>
-                  
-                  <div style={{padding:20,background:T.gray50,borderRadius:10,border:`1px solid ${T.gray200}`}}>
-                    <h4 style={{margin:'0 0 12px',fontSize:15,fontWeight:700,color:T.gray800}}>📂 ক্যাটাগরি ডেটা</h4>
-                    <p style={{margin:'0 0 14px',fontSize:13,color:T.gray500}}>মোট {categories.length}টি ক্যাটাগরি</p>
-                    <button style={btn('danger')} onClick={async()=>{
-                      if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { await upd.categories([]); alert('ক্যাটাগরি মুছা হয়েছে।'); }
-                    }}>🗑️ রিসেট করুন</button>
-                  </div>
-                  
-                  <div style={{padding:20,background:T.gray50,borderRadius:10,border:`1px solid ${T.gray200}`}}>
-                    <h4 style={{margin:'0 0 12px',fontSize:15,fontWeight:700,color:T.gray800}}>🛒 বিক্রয় ডেটা</h4>
-                    <p style={{margin:'0 0 14px',fontSize:13,color:T.gray500}}>মোট {sales.length}টি লেনদেন</p>
-                    <button style={btn('danger')} onClick={async()=>{
-                      if(confirm('সব বিক্রয় ইতিহাস মুছে ফেলবেন?')) { await upd.sales([]); alert('বিক্রয় ইতিহাস মুছা হয়েছে।'); }
-                    }}>🗑️ রিসেট করুন</button>
-                  </div>
-                </div>
-
-                <div style={{marginTop:24,padding:20,background:T.redLight,borderRadius:10,border:`2px solid ${T.red+'40'}`}}>
-                  <h4 style={{margin:'0 0 12px',fontSize:16,fontWeight:700,color:T.red}}>💥 সম্পূর্ণ রিসেট</h4>
-                  <p style={{margin:'0 0 16px',fontSize:13,color:T.gray600}}>সমস্ত ডেটা মুছে ফেলুন। এটি পূর্বাবস্থায় ফেরানো যাবে না।</p>
-                  <button style={{...btn('danger'),padding:'12px 24px'}} onClick={async()=>{
+              <div style={{
+                marginTop: 24,
+                padding: 24,
+                background: '#fef2f2',
+                borderRadius: 14,
+                border: '2px solid #ef4444'
+              }}>
+                <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 700, color: '#dc2626' }}>💥 সম্পূর্ণ রিসেট</h4>
+                <p style={{ margin: '0 0 16px', fontSize: 13, color: '#6b7280' }}>সমস্ত ডেটা মুছে ফেলুন। এটি পূর্বাবস্থায় ফেরানো যাবে না।</p>
+                <button
+                  onClick={() => {
                     if(confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
                       localStorage.clear();
                       db.set('pos_reset_done', true);
-                      alert('সব ডেটা মুছে ফেলা হয়েছে।');
+                      alert('সব ডেটা মুছা হয়েছে।');
                       window.location.reload();
                     }
-                  }}>💥 সব ডেটা মুছুন</button>
-                </div>
-              </SectionCard>
-            </>
-          )}
-        </div>
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '14px 24px',
+                    background: '#991b1b',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 10,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  💥 সব ডেটা মুছুন
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* User Modal */}
       {showUserModal && (
         <div style={{
-          position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',
-          display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000,padding:20
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: 20,
+          backdropFilter: 'blur(4px)'
         }}>
           <div style={{
-            background:T.white,borderRadius:16,padding:32,width:'100%',maxWidth:420,
-            boxShadow:'0 25px 50px rgba(0,0,0,0.25)'
+            background: '#fff',
+            borderRadius: 20,
+            padding: 36,
+            width: '100%',
+            maxWidth: 460,
+            boxShadow: '0 25px 50px rgba(0,0,0,0.25)'
           }}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
-              <h3 style={{margin:0,fontSize:18,fontWeight:700,color:T.gray900}}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
+              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>
                 {editingUser ? '✏️ ইউজার এডিট করুন' : '➕ নতুন ইউজার যোগ করুন'}
               </h3>
-              <button onClick={() => setShowUserModal(false)} style={{
-                padding:'8px 12px',background:T.gray100,border:'none',borderRadius:8,cursor:'pointer',fontSize:16
-              }}>✕</button>
+              <button
+                onClick={() => setShowUserModal(false)}
+                style={{
+                  padding: '10px 14px',
+                  background: '#f1f5f9',
+                  border: 'none',
+                  borderRadius: 10,
+                  cursor: 'pointer',
+                  fontSize: 18,
+                  color: '#64748b'
+                }}
+              >✕</button>
             </div>
 
-            <div style={{display:'flex',flexDirection:'column',gap:16}}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div>
-                <label style={{...label,marginBottom:8}}>👤 নাম</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  👤 নাম
+                </label>
                 <input
                   type="text"
                   value={userForm.name}
                   onChange={e => setUserForm(p => ({...p, name: e.target.value}))}
-                  style={{...input,padding:'12px 14px',fontSize:14}}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
                   placeholder="ইউজারের নাম"
                 />
               </div>
               <div>
-                <label style={{...label,marginBottom:8}}>📧 ইমেইল</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  📧 ইমেইল
+                </label>
                 <input
                   type="email"
                   value={userForm.email}
                   onChange={e => setUserForm(p => ({...p, email: e.target.value}))}
-                  style={{...input,padding:'12px 14px',fontSize:14}}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
                   placeholder="email@example.com"
                 />
               </div>
               <div>
-                <label style={{...label,marginBottom:8}}>🔐 পাসওয়ার্ড</label>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  🔐 পাসওয়ার্ড
+                </label>
                 <input
                   type="text"
                   value={userForm.password}
                   onChange={e => setUserForm(p => ({...p, password: e.target.value}))}
-                  style={{...input,padding:'12px 14px',fontSize:14}}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    fontSize: 15,
+                    border: '2px solid #e2e8f0',
+                    borderRadius: 10,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    color: '#1e293b',
+                    background: '#f8fafc'
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#0F766E'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
                   placeholder="পাসওয়ার্ড"
                 />
               </div>
               <div>
-                <label style={{...label,marginBottom:8}}>🎭 রোল</label>
-                <div style={{display:'flex',gap:8}}>
-                  <button
-                    type="button"
-                    onClick={() => setUserForm(p => ({...p, role: 'operator'}))}
-                    style={{
-                      flex:1,padding:'10px 12px',
-                      background: userForm.role === 'operator' ? T.teal : T.gray100,
-                      color: userForm.role === 'operator' ? T.white : T.gray600,
-                      border:'none',borderRadius:10,
-                      fontSize:12,fontWeight:600,cursor:'pointer',
-                      transition:'all 0.2s',
-                      display:'flex',alignItems:'center',justifyContent:'center',gap:6
-                    }}
-                  >
-                    🛒 সেলস অপারেটর
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUserForm(p => ({...p, role: 'admin'}))}
-                    style={{
-                      flex:1,padding:'10px 12px',
-                      background: userForm.role === 'admin' ? T.teal : T.gray100,
-                      color: userForm.role === 'admin' ? T.white : T.gray600,
-                      border:'none',borderRadius:10,
-                      fontSize:12,fontWeight:600,cursor:'pointer',
-                      transition:'all 0.2s',
-                      display:'flex',alignItems:'center',justifyContent:'center',gap:6
-                    }}
-                  >
-                    🛡️ এডমিন
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setUserForm(p => ({...p, role: 'super_admin'}))}
-                    style={{
-                      flex:1,padding:'10px 12px',
-                      background: userForm.role === 'super_admin' ? T.teal : T.gray100,
-                      color: userForm.role === 'super_admin' ? T.white : T.gray600,
-                      border:'none',borderRadius:10,
-                      fontSize:12,fontWeight:600,cursor:'pointer',
-                      transition:'all 0.2s',
-                      display:'flex',alignItems:'center',justifyContent:'center',gap:6
-                    }}
-                  >
-                    👑 সুপার এডমিন
-                  </button>
+                <label style={{ display: 'block', marginBottom: 10, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  🎭 রোল নির্বাচন করুন
+                </label>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  {[
+                    { v: 'operator', l: '🛒 অপারেটর' },
+                    { v: 'admin', l: '🛡️ এডমিন' },
+                    { v: 'super_admin', l: '👑 সুপার' },
+                  ].map(r => (
+                    <button
+                      key={r.v}
+                      type="button"
+                      onClick={() => setUserForm(p => ({...p, role: r.v}))}
+                      style={{
+                        flex: 1,
+                        padding: '12px 8px',
+                        background: userForm.role === r.v ? '#0F766E' : '#f1f5f9',
+                        color: userForm.role === r.v ? '#fff' : '#64748b',
+                        border: 'none',
+                        borderRadius: 10,
+                        fontSize: 11,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {r.l}
+                    </button>
+                  ))}
                 </div>
-                <p style={{margin:'8px 0 0',fontSize:11,color:T.gray500,lineHeight:1.5}}>
+                <p style={{ margin: '10px 0 0', fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
                   সুপার = সব এক্সেস | এডমিন = সব (ইউজার ছাড়া) | অপারেটর = শুধু বিক্রয়
                 </p>
               </div>
             </div>
 
-            <div style={{display:'flex',gap:12,marginTop:24}}>
-              <button onClick={() => setShowUserModal(false)} style={{
-                flex:1,padding:'12px',background:T.gray100,border:'none',borderRadius:10,
-                fontSize:14,fontWeight:600,cursor:'pointer',color:T.gray600
-              }}>বাতিল</button>
-              <button onClick={saveUser} style={{
-                flex:1,padding:'12px',
-                background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                border:'none',borderRadius:10,
-                fontSize:14,fontWeight:600,cursor:'pointer',color:T.white,
-                boxShadow:'0 4px 12px rgba(15,118,110,0.3)'
-              }}>
+            <div style={{ display: 'flex', gap: 14, marginTop: 28 }}>
+              <button
+                onClick={() => setShowUserModal(false)}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  background: '#f1f5f9',
+                  border: 'none',
+                  borderRadius: 12,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  color: '#64748b'
+                }}
+              >বাতিল</button>
+              <button
+                onClick={saveUser}
+                style={{
+                  flex: 1,
+                  padding: '14px',
+                  background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                  border: 'none',
+                  borderRadius: 12,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  color: '#fff',
+                  boxShadow: '0 4px 12px rgba(15,118,110,0.3)'
+                }}
+              >
                 💾 সংরক্ষণ
               </button>
             </div>
