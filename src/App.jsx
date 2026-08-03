@@ -2610,7 +2610,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           📋 পণ্য তালিকা
         </button>
         <button onClick={()=>setProductTab('history')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:productTab==='history'?700:400,color:productTab==='history'?T.teal:T.gray500,borderBottom:productTab==='history'?`2px solid ${T.teal}`:'none',fontSize:13}}>
-          📜 হিস্ট্রি ({productHistory.length})
+          📜 হিস্ট্রি ({productHistory.filter(h => h.type === 'price_buy' || h.type === 'price_sell').length})
         </button>
       </div>
 
@@ -2618,48 +2618,50 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
       {productTab === 'history' && (
         <div style={{flex:1,overflow:'auto',padding:12}}>
           <div style={{...card,overflow:'hidden'}}>
-            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📜 পণ্য পরিবর্তনের ইতিহাস</div>
-            {productHistory.length === 0 ? (
-              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পরিবর্তন নেই</div>
-            ) : (
-              <table style={{width:'100%',borderCollapse:'collapse'}}>
-                <thead>
-                  <tr style={{background:T.tealLight}}>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তনের ধরন</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন মান</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন মান</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[...productHistory].reverse().map((h,i)=>(
-                    <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
-                        {new Date(h.timestamp).toLocaleString('bn-BD')}
-                      </td>
-                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
-                      <td style={{padding:'10px 12px',fontSize:12}}>
-                        {h.type === 'price_buy' && <span style={{background:T.orangeLight,color:T.orange,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>ক্রয়মূল্য</span>}
-                        {h.type === 'price_sell' && <span style={{background:T.tealLight,color:T.teal,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>বিক্রয়মূল্য</span>}
-                        {h.type === 'stock' && <span style={{background:T.amberLight,color:T.amber,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>স্টক</span>}
-                      </td>
-                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
-                        {h.type === 'stock' ? h.oldValue : fmt(h.oldValue)}
-                      </td>
-                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
-                        {h.type === 'stock' ? h.newValue : fmt(h.newValue)}
-                      </td>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
-                        <div style={{fontWeight:600}}>{h.user}</div>
-                        {h.userEmail && <div style={{fontSize:11,color:T.gray400}}>{h.userEmail}</div>}
-                      </td>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📜 পণ্যের দাম পরিবর্তনের ইতিহাস</div>
+            {(() => {
+              const priceHistory = productHistory.filter(h => h.type === 'price_buy' || h.type === 'price_sell');
+              return priceHistory.length === 0 ? (
+                <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো দাম পরিবর্তন নেই</div>
+              ) : (
+                <table style={{width:'100%',borderCollapse:'collapse'}}>
+                  <thead>
+                    <tr style={{background:T.tealLight}}>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তনের ধরন</th>
+                      <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন দাম</th>
+                      <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন দাম</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  </thead>
+                  <tbody>
+                    {[...priceHistory].reverse().map((h,i)=>(
+                      <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                          {new Date(h.timestamp).toLocaleString('bn-BD')}
+                        </td>
+                        <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
+                        <td style={{padding:'10px 12px',fontSize:12}}>
+                          {h.type === 'price_buy' && <span style={{background:T.orangeLight,color:T.orange,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>ক্রয়মূল্য</span>}
+                          {h.type === 'price_sell' && <span style={{background:T.tealLight,color:T.teal,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>বিক্রয়মূল্য</span>}
+                        </td>
+                        <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
+                          {fmt(h.oldValue)}
+                        </td>
+                        <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
+                          {fmt(h.newValue)}
+                        </td>
+                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                          <div style={{fontWeight:600}}>{h.user}</div>
+                          {h.userEmail && <div style={{fontSize:11,color:T.gray400}}>{h.userEmail}</div>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              );
+            })()}
           </div>
         </div>
       )}
