@@ -4770,7 +4770,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   const [adjNote, setAdjNote] = useState('');
   const [loading, setLoading] = useState(true);
   const [invTab, setInvTab] = useState('list'); // list, history
-  const [stockFilter, setStockFilter] = useState('all'); // all, low, proper
+  const [stockFilter, setStockFilter] = useState('all'); // all, low, proper, out
 
   // Loading effect
   useEffect(() => {
@@ -4785,6 +4785,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
     .filter(p=>{
       if (stockFilter === 'low') return p.stock > 0 && p.stock <= p.minStock;
       if (stockFilter === 'proper') return p.stock > p.minStock;
+      if (stockFilter === 'out') return p.stock <= 0;
       return true;
     })
     .sort((a, b) => {
@@ -4885,6 +4886,16 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
       {invTab === 'list' && (
       <>
       <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
+        <button onClick={()=>{setStockFilter('all');setSearch('');}} style={{
+          ...btn(stockFilter==='all'?'primary':'ghost'),
+          background:stockFilter==='all'?T.teal:T.gray100,
+          color:stockFilter==='all'?T.white:T.gray600,
+          border:'none',
+          padding:'8px 14px',
+          fontSize:12,
+        }}>
+          📋 সকল স্টক ({realProducts.length})
+        </button>
         <button onClick={()=>{setStockFilter(stockFilter==='low'?'all':'low');setSearch('');}} style={{
           ...btn(stockFilter==='low'?'primary':'ghost'),
           background:stockFilter==='low'?T.orange:T.gray100,
@@ -4909,6 +4920,16 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
         </div>
+        <button onClick={()=>{setStockFilter(stockFilter==='out'?'all':'out');setSearch('');}} style={{
+          ...btn(stockFilter==='out'?'primary':'ghost'),
+          background:stockFilter==='out'?T.red:T.gray100,
+          color:stockFilter==='out'?T.white:T.gray600,
+          border:'none',
+          padding:'8px 14px',
+          fontSize:12,
+        }}>
+          🚨 স্টক শেষ ({outOfStock.length})
+        </button>
         <button style={btn('ghost')} onClick={()=>{
           const printFiltered = filtered.length > 0 ? filtered : realProducts;
           const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
