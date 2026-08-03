@@ -726,6 +726,36 @@ function MainApp({ currentUser, onLogout }) {
     setReady(true);
   }, []);
 
+  // Auto-logout after 15 minutes of inactivity
+  useEffect(() => {
+    const INACTIVITY_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
+    let inactivityTimer;
+
+    const resetTimer = () => {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(() => {
+        logoutRef.current();
+      }, INACTIVITY_TIME);
+    };
+
+    // Track user activity
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+    events.forEach(event => {
+      document.addEventListener(event, resetTimer, { passive: true });
+    });
+
+    // Start the timer
+    resetTimer();
+
+    // Cleanup
+    return () => {
+      clearTimeout(inactivityTimer);
+      events.forEach(event => {
+        document.removeEventListener(event, resetTimer);
+      });
+    };
+  }, []);
+
   // Track product history when products are updated
   const trackProductHistory = (oldProducts, newProducts, user) => {
     const changes = [];
@@ -868,37 +898,6 @@ function MainApp({ currentUser, onLogout }) {
       document.exitFullscreen();
     }
   };
-
-
-  // Auto-logout after 15 minutes of inactivity
-  useEffect(() => {
-    const INACTIVITY_TIME = 15 * 60 * 1000; // 15 minutes in milliseconds
-    let inactivityTimer;
-
-    const resetTimer = () => {
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => {
-        logoutRef.current();
-      }, INACTIVITY_TIME);
-    };
-
-    // Track user activity
-    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
-    events.forEach(event => {
-      document.addEventListener(event, resetTimer, { passive: true });
-    });
-
-    // Start the timer
-    resetTimer();
-
-    // Cleanup
-    return () => {
-      clearTimeout(inactivityTimer);
-      events.forEach(event => {
-        document.removeEventListener(event, resetTimer);
-      });
-    };
-  }, []);
 
   return (
     <>
