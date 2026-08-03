@@ -732,6 +732,8 @@ function MainApp({ currentUser, onLogout }) {
   
   const [tab, setTab] = useState('pos');
   const [products, setProducts] = useState([]);
+  const productsRef = useRef(products);
+  productsRef.current = products;
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
@@ -997,7 +999,7 @@ function MainApp({ currentUser, onLogout }) {
 
   const upd = useMemo(() => ({
     products: v => { 
-      trackProductHistory(products, v, currentUser); 
+      trackProductHistory(productsRef.current, v, currentUser); 
       setProducts(v); 
       db.set(STORAGE_KEYS.products, v); 
       return Promise.resolve(); 
@@ -1008,7 +1010,7 @@ function MainApp({ currentUser, onLogout }) {
     suppliers: v => { setSuppliers(v); db.set(STORAGE_KEYS.suppliers, v); return Promise.resolve(); },
     categories: v => { setCategories(v); db.set(STORAGE_KEYS.categories, v); return Promise.resolve(); },
     purchases: v => { setPurchases(v); db.set(STORAGE_KEYS.purchases, v); return Promise.resolve(); },
-  }), [products, currentUser]);
+  }), []);
 
   if (!ready) return (
     <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'#0F766E',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:20}}>
@@ -6478,8 +6480,8 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
 const SettingsScreen = memo(function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
-  // Initialize form with useRef for initial values, useState for current values
-  const formRef = useRef({
+  // Initialize form with current settings
+  const [form, setForm] = useState({
     name: settings?.name || '',
     address: settings?.address || '',
     phone: settings?.phone || '',
@@ -6489,7 +6491,6 @@ const SettingsScreen = memo(function SettingsScreen({settings, products, supplie
     vatPercent: settings?.vatPercent || 15,
     bannerImage: settings?.bannerImage || ''
   });
-  const [form, setForm] = useState(formRef.current);
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
   const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
