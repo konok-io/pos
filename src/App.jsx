@@ -1034,9 +1034,7 @@ function MainApp({ currentUser, onLogout }) {
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
-  const props = useMemo(() => ({
-    products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd
-  }), [products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd]);
+  const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd};
 
   // Refresh data from localStorage without reloading page
   const handleHardRefresh = () => {
