@@ -4770,7 +4770,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   const [adjNote, setAdjNote] = useState('');
   const [loading, setLoading] = useState(true);
   const [invTab, setInvTab] = useState('list'); // list, history
-  const [showLowStock, setShowLowStock] = useState(false);
+  const [stockFilter, setStockFilter] = useState('all'); // all, low, proper
 
   // Loading effect
   useEffect(() => {
@@ -4782,7 +4782,11 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   const realProducts = products.filter(p=>!p.name?.includes('(ক্যাটাগরি)'));
   const filtered = realProducts
     .filter(p=>!search||p.name.toLowerCase().includes(search.toLowerCase()))
-    .filter(p=>!showLowStock || (p.stock > 0 && p.stock <= p.minStock))
+    .filter(p=>{
+      if (stockFilter === 'low') return p.stock > 0 && p.stock <= p.minStock;
+      if (stockFilter === 'proper') return p.stock > p.minStock;
+      return true;
+    })
     .sort((a, b) => {
       // Out of stock first (stock <= 0)
       if (a.stock <= 0 && b.stock > 0) return -1;
@@ -4797,6 +4801,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
     });
   const lowStock = realProducts.filter(p=>p.stock>0&&p.stock<=p.minStock);
   const outOfStock = realProducts.filter(p=>p.stock<=0);
+  const properStock = realProducts.filter(p=>p.stock>p.minStock);
   const totalValue = realProducts.reduce((s,p)=>s+p.sellP*p.stock,0);
   
   // Filter only stock change history (exclude price changes)
@@ -4884,15 +4889,25 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
           <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:32}}/>
         </div>
-        <button onClick={()=>{setShowLowStock(!showLowStock);setSearch('');}} style={{
-          ...btn(showLowStock?'primary':'ghost'),
-          background:showLowStock?T.orange:T.gray100,
-          color:showLowStock?T.white:T.gray600,
+        <button onClick={()=>{setStockFilter(stockFilter==='low'?'all':'low');setSearch('');}} style={{
+          ...btn(stockFilter==='low'?'primary':'ghost'),
+          background:stockFilter==='low'?T.orange:T.gray100,
+          color:stockFilter==='low'?T.white:T.gray600,
           border:'none',
           padding:'8px 14px',
           fontSize:12,
         }}>
-          ⚠️ স্টক কম আছে ({lowStock.length})
+          ⚠️ স্টক কম ({lowStock.length})
+        </button>
+        <button onClick={()=>{setStockFilter(stockFilter==='proper'?'all':'proper');setSearch('');}} style={{
+          ...btn(stockFilter==='proper'?'primary':'ghost'),
+          background:stockFilter==='proper'?T.green:T.gray100,
+          color:stockFilter==='proper'?T.white:T.gray600,
+          border:'none',
+          padding:'8px 14px',
+          fontSize:12,
+        }}>
+          ✅ স্টক ঠিক আছে ({properStock.length})
         </button>
         <button style={btn('ghost')} onClick={()=>{
           const printFiltered = filtered.length > 0 ? filtered : realProducts;
