@@ -6637,38 +6637,42 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
       {/* Tab Navigation */}
       <div style={{
-        display: 'flex',
-        gap: 0,
-        padding: '0 32px',
-        background: '#fff',
-        borderBottom: '1px solid #e2e8f0',
-        overflowX: 'auto'
+        background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
+        padding: '0 32px'
       }}>
-        {tabs.map((tab, i) => (
-          <button
-            key={i}
-            onClick={() => setActiveTab(i)}
-            style={{
-              padding: '16px 24px',
-              border: 'none',
-              borderBottom: activeTab === i ? '2px solid #0F766E' : '2px solid transparent',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              fontSize: 14,
-              fontWeight: activeTab === i ? 600 : 500,
-              transition: 'all 0.2s ease',
-              background: 'transparent',
-              color: activeTab === i ? '#0F766E' : '#64748b',
-              whiteSpace: 'nowrap',
-              marginBottom: -1,
-            }}
-          >
-            <span style={{ fontSize: 16 }}>{tab.icon}</span>
-            <span>{tab.label}</span>
-          </button>
-        ))}
+        <div style={{
+          display: 'flex',
+          gap: 0,
+          maxWidth: 1200,
+          margin: '0 auto',
+          overflowX: 'auto'
+        }}>
+          {tabs.map((tab, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveTab(i)}
+              style={{
+                padding: '16px 24px',
+                border: 'none',
+                borderBottom: activeTab === i ? '3px solid #fff' : '3px solid transparent',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 14,
+                fontWeight: activeTab === i ? 600 : 500,
+                transition: 'all 0.2s ease',
+                background: 'transparent',
+                color: activeTab === i ? '#fff' : 'rgba(255,255,255,0.7)',
+                whiteSpace: 'nowrap',
+                marginBottom: -1,
+              }}
+            >
+              <span style={{ fontSize: 16 }}>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Content */}
