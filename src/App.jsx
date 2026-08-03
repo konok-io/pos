@@ -6638,34 +6638,37 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       {/* Tab Navigation */}
       <div style={{
         background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
-        padding: '0 32px'
+        padding: '0 32px 16px',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
+        {/* Background Pattern */}
         <div style={{
-          display: 'flex',
-          gap: 0,
-          maxWidth: 1200,
-          margin: '0 auto',
-          overflowX: 'auto'
-        }}>
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          opacity: 0.1,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }} />
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'center', gap: 8, overflowX: 'auto' }}>
           {tabs.map((tab, i) => (
             <button
               key={i}
               onClick={() => setActiveTab(i)}
               style={{
-                padding: '16px 24px',
+                padding: '12px 24px',
                 border: 'none',
-                borderBottom: activeTab === i ? '3px solid #fff' : '3px solid transparent',
+                borderRadius: 10,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
                 fontSize: 14,
-                fontWeight: activeTab === i ? 600 : 500,
+                fontWeight: 600,
                 transition: 'all 0.2s ease',
-                background: 'transparent',
-                color: activeTab === i ? '#fff' : 'rgba(255,255,255,0.7)',
+                background: activeTab === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
+                color: activeTab === i ? '#0F766E' : '#fff',
                 whiteSpace: 'nowrap',
-                marginBottom: -1,
+                boxShadow: activeTab === i ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
               }}
             >
               <span style={{ fontSize: 16 }}>{tab.icon}</span>
