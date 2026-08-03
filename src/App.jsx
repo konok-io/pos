@@ -7281,48 +7281,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               borderRadius: 16,
               padding: 32,
               boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-              border: '1px solid #e2e8f0',
-              marginBottom: 24
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
-                <div style={{
-                  width: 48, height: 48,
-                  background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                  borderRadius: 12,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 24,
-                  color: '#fff'
-                }}>📊</div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডেটা স্ট্যাটাস</h3>
-                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>আপনার সিস্টেমের ডেটা সারাংশ</p>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
-                {stats.map((stat, i) => (
-                  <div key={i} style={{
-                    background: '#f8fafc',
-                    borderRadius: 14,
-                    padding: 24,
-                    textAlign: 'center',
-                    border: '1px solid #e2e8f0'
-                  }}>
-                    <div style={{ fontSize: 36, marginBottom: 10 }}>{stat.icon}</div>
-                    <div style={{ fontSize: 28, fontWeight: 800, color: stat.color }}>{stat.value}</div>
-                    <div style={{ fontSize: 13, color: '#64748b', marginTop: 6 }}>{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={{
-              background: '#fff',
-              borderRadius: 16,
-              padding: 32,
-              boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
               border: '1px solid #e2e8f0'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
