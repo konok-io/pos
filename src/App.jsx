@@ -7574,22 +7574,25 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     </div>
 
                     {/* QR Code */}
-                    {form.receiptShowQr !== false && form.zatkaEnabled && (
+                    {form.receiptShowQr !== false && (
                       <div style={{ textAlign: 'center', marginTop: 12, fontSize: `${form.receiptFontSize - 1}px` }}>
                         <div style={{
                           width: 60,
                           height: 60,
-                          background: '#000',
+                          background: form.zatkaEnabled ? '#000' : '#ccc',
                           margin: '0 auto 4px',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           color: '#fff',
-                          fontSize: '8px'
+                          fontSize: '8px',
+                          borderRadius: 4
                         }}>
-                          QR
+                          {form.zatkaEnabled ? 'QR' : '📱'}
                         </div>
-                        <div>📱 ZATCA</div>
+                        <div style={{ color: form.zatkaEnabled ? '#000' : '#999' }}>
+                          {form.zatkaEnabled ? 'ZATCA QR' : 'QR কোড (সক্রিয় করুন)'}
+                        </div>
                       </div>
                     )}
 
