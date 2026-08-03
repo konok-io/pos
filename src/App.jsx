@@ -4681,6 +4681,37 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
               </div>
             </div>
 
+            {/* 3 Column Grid: VAT */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginBottom:12}}>
+              <div>
+                <label style={label}>🧾 VAT %</label>
+                <input type="number" value="15" placeholder="15" 
+                  style={{...input,background:T.orangeLight,borderColor:T.orange}} 
+                  onFocus={(e) => Object.assign(e.target.style, inputFocus)}
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
+              </div>
+              <div>
+                <label style={label}>💰 VAT পরিমাণ</label>
+                <div style={{padding:'7px 10px',background:T.orangeLight,borderRadius:6,fontWeight:700,color:T.orange,fontSize:13,border:`1px solid ${T.gray200}`}}>
+                  {form.sellP > 0 ? (
+                    <>{((+form.sellP * 0.15).toFixed(2))}</>
+                  ) : (
+                    <span style={{color:T.gray400,fontWeight:400}}>--</span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label style={label}>💵 মোট বিক্রয়মূল্য</label>
+                <div style={{padding:'7px 10px',background:T.tealLight,borderRadius:6,fontWeight:700,color:T.teal,fontSize:13,border:`1px solid ${T.gray200}`}}>
+                  {form.sellP > 0 ? (
+                    <>{((+form.sellP * 1.15).toFixed(2))}</>
+                  ) : (
+                    <span style={{color:T.gray400,fontWeight:400}}>--</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Add Button */}
             <button onClick={addItem} style={{...btn('primary'),width:'100%',padding:'12px',fontSize:14,borderRadius:10}}>
               ➕ পণ্য তালিকায় যোগ করুন
