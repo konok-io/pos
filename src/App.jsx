@@ -887,7 +887,7 @@ function MainApp({ currentUser, onLogout }) {
           });
         }
         
-        // Check for stock changes
+        // Check for stock changes (increase or decrease)
         if (oldP.stock !== newP.stock) {
           changes.push({
             id: genId(),
@@ -895,6 +895,21 @@ function MainApp({ currentUser, onLogout }) {
             productName: newP.name,
             type: 'stock',
             oldValue: oldP.stock,
+            newValue: newP.stock,
+            user: user?.name || 'Unknown',
+            userEmail: user?.email || '',
+            timestamp: now(),
+          });
+        }
+      } else {
+        // New product being added - track initial stock if > 0
+        if (newP.stock > 0) {
+          changes.push({
+            id: genId(),
+            productId: newP.id,
+            productName: newP.name,
+            type: 'stock',
+            oldValue: 0,
             newValue: newP.stock,
             user: user?.name || 'Unknown',
             userEmail: user?.email || '',
