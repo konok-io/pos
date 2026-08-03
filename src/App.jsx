@@ -325,9 +325,16 @@ function LoginScreen({ onLogin, settings }) {
             margin: '0 auto 16px',
             boxShadow: '0 8px 20px rgba(15,118,110,0.4)',
           }}>🏪</div>
-          <h1 style={{ margin: '0 0 8px', fontSize: 24, fontWeight: 800, color: T.gray900 }}>
+          <h1 style={{ margin: '0 0 4px', fontSize: 24, fontWeight: 800, color: T.gray900 }}>
             {businessName}
           </h1>
+          {(businessAddress || businessPhone) && (
+            <p style={{ margin: '0 0 8px', fontSize: 12, color: T.gray500 }}>
+              {businessAddress && <span>{businessAddress}</span>}
+              {businessAddress && businessPhone && <span> | </span>}
+              {businessPhone && <span>📞 {businessPhone}</span>}
+            </p>
+          )}
           <p style={{ margin: 0, fontSize: 14, color: T.gray500 }}>
             লগইন করে এগিয়ে যান
           </p>
@@ -398,8 +405,6 @@ function LoginScreen({ onLogin, settings }) {
         <div style={{ marginTop: 24, textAlign: 'center' }}>
           <p style={{ margin: 0, fontSize: 12, color: T.gray400 }}>
             © {currentYear} {businessName}
-            {businessAddress && <> | {businessAddress}</>}
-            {businessPhone && <> | 📞 {businessPhone}</>}
           </p>
         </div>
       </div>
