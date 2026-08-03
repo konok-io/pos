@@ -1603,13 +1603,13 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
           {/* Category dropdown */}
           <div style={{position:'relative',minWidth:120}} data-cat-dropdown>
             <input 
-              value={selCat === 'স্টক আছে' || selCat === 'স্টক শেষ' ? catSearch : selCat} 
+              value={selCat === 'স্টক আছে' || selCat === 'স্টক শেষ' || selCat === 'স্টক কম' ? catSearch : selCat} 
               onChange={e=>{setSelCat('স্টক আছে');setCatSearch(e.target.value);setShowCatDrop(true);}} 
               onFocus={()=>setShowCatDrop(true)}
               placeholder="ক্যাটাগরি..."
               style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
             />
-            {selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && (
+            {selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && (
               <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
                 position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
                 background:'none',border:'none',cursor:'pointer',padding:4,
