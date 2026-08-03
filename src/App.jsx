@@ -335,7 +335,16 @@ function LoginScreen({ onLogin, settings }) {
               {businessPhone && <span>📞 {businessPhone}</span>}
             </p>
           )}
-          <p style={{ margin: 0, fontSize: 14, color: T.gray500 }}>
+          <p style={{ 
+            margin: '8px 0 0', 
+            fontSize: 13, 
+            color: T.teal,
+            fontWeight: 600,
+            padding: '8px 16px',
+            background: T.tealLight,
+            borderRadius: 8,
+            display: 'inline-block'
+          }}>
             লগইন করে এগিয়ে যান
           </p>
         </div>
