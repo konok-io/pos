@@ -1034,7 +1034,9 @@ function MainApp({ currentUser, onLogout }) {
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
-  const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd};
+  const props = useMemo(() => ({
+    products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd
+  }), [products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd]);
 
   // Refresh data from localStorage without reloading page
   const handleHardRefresh = () => {
@@ -1137,7 +1139,7 @@ function MainApp({ currentUser, onLogout }) {
         {tab==='lowstock'  && <LowStockScreen {...props} />}
         {tab==='income'    && <IncomeScreen {...props} />}
         {tab==='reports'   && <ReportsScreen {...props} />}
-        {tab==='settings'  && <SettingsScreen key="settings" {...props} />}
+        {tab==='settings'  && <SettingsScreen {...props} />}
       </div>
     </div>
     </>
