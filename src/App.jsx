@@ -6479,9 +6479,9 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
-function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
-  // Initialize form with current settings
-  const [form, setForm] = useState({
+const SettingsScreen = memo(function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
+  // Initialize form with current settings - use useState with function to avoid re-initialization
+  const [form, setForm] = useState(() => ({
     name: settings?.name || '',
     address: settings?.address || '',
     phone: settings?.phone || '',
@@ -6490,16 +6490,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     vatEnabled: settings?.vatEnabled !== false,
     vatPercent: settings?.vatPercent || 15,
     bannerImage: settings?.bannerImage || ''
-  });
+  }));
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
-  
-  // DEBUG: Log re-renders to find the issue
-  const renderCount = useRef(0);
-  renderCount.current++;
-  useEffect(() => {
-    console.log('Settings re-render #' + renderCount.current, {settings: settings?.name, products: products?.length, upd: !!upd});
-  });
   const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -7197,4 +7190,4 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       )}
     </div>
   );
-}
+});
