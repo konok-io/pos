@@ -1972,9 +1972,10 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             <button ref={checkoutRef} onClick={checkout} 
               disabled={!cart.length || (due > 0 && !selCust)}
               style={{
-                padding:'8px 10px',borderRadius:8,border:'none',
+                padding:'12px 16px',borderRadius:10,border:'none',
                 background: cart.length && !(due > 0 && !selCust) ? T.orange : '#e5e7eb',
-                color:T.white,fontWeight:700,fontSize:13,cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
+                color:T.white,fontWeight:700,fontSize:15,cursor: cart.length && !(due > 0 && !selCust) ? 'pointer' : 'not-allowed',
+                boxShadow: cart.length && !(due > 0 && !selCust) ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
               }}>
               ✓ বিক্রয় সম্পন্ন
             </button>
