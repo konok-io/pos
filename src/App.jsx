@@ -6638,38 +6638,34 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       {/* Tab Navigation */}
       <div style={{
         display: 'flex',
-        gap: 8,
-        padding: '20px 32px',
+        gap: 0,
+        padding: '0 32px',
         background: '#fff',
         borderBottom: '1px solid #e2e8f0',
-        overflowX: 'auto',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+        overflowX: 'auto'
       }}>
         {tabs.map((tab, i) => (
           <button
             key={i}
             onClick={() => setActiveTab(i)}
             style={{
-              padding: '12px 24px',
+              padding: '16px 24px',
               border: 'none',
-              borderRadius: 10,
+              borderBottom: activeTab === i ? '2px solid #0F766E' : '2px solid transparent',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: 10,
+              gap: 8,
               fontSize: 14,
-              fontWeight: 600,
+              fontWeight: activeTab === i ? 600 : 500,
               transition: 'all 0.2s ease',
-              background: activeTab === i ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
-              color: activeTab === i ? '#fff' : '#64748b',
+              background: 'transparent',
+              color: activeTab === i ? '#0F766E' : '#64748b',
               whiteSpace: 'nowrap',
-              boxShadow: activeTab === i ? '0 4px 12px rgba(15,118,110,0.3)' : 'none',
+              marginBottom: -1,
             }}
           >
-            <span style={{ fontSize: 18 }}>{tab.icon}</span>
+            <span style={{ fontSize: 16 }}>{tab.icon}</span>
             <span>{tab.label}</span>
           </button>
         ))}
