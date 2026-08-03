@@ -15,17 +15,19 @@ const now = () => new Date().toISOString();
 /* ─────────────── BANNER IMAGE UPLOAD ─────────────── */
 function BannerImageUpload({ value, onChange }) {
   const [preview, setPreview] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef(null);
 
   // Sync preview with value prop
   useEffect(() => {
     if (value) {
       setPreview(value);
+    } else {
+      setPreview('');
     }
   }, [value]);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
+  const processFile = (file) => {
     if (!file) return;
     
     if (!file.type.startsWith('image/')) {
@@ -40,9 +42,7 @@ function BannerImageUpload({ value, onChange }) {
     const reader = new FileReader();
     reader.onload = (event) => {
       const data = event.target.result;
-      // Update preview immediately
       setPreview(data);
-      // Also update parent state immediately
       if (onChange && typeof onChange === 'function') {
         onChange(data);
       }
@@ -54,6 +54,19 @@ function BannerImageUpload({ value, onChange }) {
     reader.readAsDataURL(file);
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
+  const handleClick = () => {
+    if (inputRef.current) {
+      inputRef.current.click();
+    }
+  };
+
   const handleRemove = () => {
     setPreview('');
     if (onChange && typeof onChange === 'function') {
@@ -61,6 +74,25 @@ function BannerImageUpload({ value, onChange }) {
     }
     if (inputRef.current) {
       inputRef.current.value = '';
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
     }
   };
 
@@ -92,15 +124,25 @@ function BannerImageUpload({ value, onChange }) {
         id="banner-upload"
         style={{ display: 'none' }}
       />
-      <label htmlFor="banner-upload" style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-        padding: '24px', border: '2px dashed #d1d5db', borderRadius: 12,
-        background: '#f9fafb', cursor: 'pointer', fontSize: 14, color: '#6b7280', maxWidth: 500,
-        transition: 'all 0.2s'
-      }}>
+      <div
+        onClick={handleClick}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+          padding: '24px', border: `2px dashed ${isDragging ? '#0F766E' : '#d1d5db'}`,
+          borderRadius: 12, background: isDragging ? '#F0FDFA' : '#f9fafb',
+          cursor: 'pointer', fontSize: 14, color: '#6b7280', maxWidth: 500,
+          transition: 'all 0.2s'
+        }}
+      >
         <span style={{ fontSize: 28 }}>📁</span>
         <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
-      </label>
+      </div>
+      <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>
+        অথবা ছবিটি এখানে টেনে আনুন
+      </p>
     </div>
   );
 }
@@ -6435,6 +6477,18 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
+
+  // Sync form with settings when settings change externally
+  useEffect(() => {
+    setForm({
+      name: settings?.name || '',
+      address: settings?.address || '',
+      phone: settings?.phone || '',
+      vatEnabled: settings?.vatEnabled !== false,
+      vatPercent: settings?.vatPercent || 15,
+      bannerImage: settings?.bannerImage || ''
+    });
+  }, [settings]);
 
   // Simple handlers
   const handleNameChange = (e) => {
