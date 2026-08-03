@@ -7461,6 +7461,146 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   ))}
                 </div>
               </div>
+
+              {/* Live Receipt Preview */}
+              <div style={{ marginTop: 24 }}>
+                <h5 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#1e293b' }}>👁️ লাইভ প্রিভিউ</h5>
+                <div style={{
+                  background: '#f1f5f9',
+                  borderRadius: 12,
+                  padding: 20,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'flex-start',
+                  gap: 20
+                }}>
+                  <div style={{
+                    background: '#fff',
+                    padding: `${form.receiptFontSize}px`,
+                    width: 280,
+                    minHeight: 400,
+                    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                    fontSize: `${form.receiptFontSize}px`,
+                    fontFamily: "'Tiro Bangla', 'Courier New', monospace",
+                    color: '#000'
+                  }}>
+                    {/* Header */}
+                    <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 8, marginBottom: 8 }}>
+                      {form.receiptShowLogo !== false && (
+                        <div style={{ fontWeight: 'bold', fontSize: `${form.receiptFontSize + 3}px` }}>
+                          {form.receiptHeader || '🧾 বিক্রয় রিসিট'}
+                        </div>
+                      )}
+                      {form.receiptShowAddress !== false && form.name && (
+                        <div style={{ fontSize: `${form.receiptFontSize - 1}px` }}>{form.name}</div>
+                      )}
+                      {form.receiptShowAddress !== false && form.address && (
+                        <div style={{ fontSize: `${form.receiptFontSize - 2}px` }}>{form.address}</div>
+                      )}
+                      {form.receiptShowPhone !== false && form.phone && (
+                        <div style={{ fontSize: `${form.receiptFontSize - 2}px` }}>{form.phone}</div>
+                      )}
+                      {form.receiptShowPhone !== false && form.taxId && (
+                        <div style={{ fontSize: `${form.receiptFontSize - 2}px` }}>VAT: {form.taxId}</div>
+                      )}
+                      <div style={{ fontSize: `${form.receiptFontSize - 1}px`, marginTop: 4 }}>#ABC12345</div>
+                      <div style={{ fontSize: `${form.receiptFontSize - 2}px` }}>২ আগস্ট, ২০২৬</div>
+                    </div>
+
+                    {/* Customer */}
+                    {form.receiptShowCustomer !== false && (
+                      <div style={{ marginBottom: 8, fontSize: `${form.receiptFontSize - 1}px` }}>
+                        <div>গ্রাহক: মোঃ রহিম উদ্দিন</div>
+                        <div>ফোন: ০১৭XXXXXXXX</div>
+                      </div>
+                    )}
+
+                    {/* Items Table */}
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: `${form.receiptFontSize - 1}px` }}>
+                      <thead>
+                        <tr style={{ borderBottom: '1px dashed #000' }}>
+                          <th style={{ textAlign: 'left', padding: '4px 0' }}>পণ্য</th>
+                          <th style={{ textAlign: 'center', padding: '4px 0' }}>পরি</th>
+                          <th style={{ textAlign: 'right', padding: '4px 0' }}>দাম</th>
+                          <th style={{ textAlign: 'right', padding: '4px 0' }}>মোট</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td style={{ padding: '4px 0' }}>
+                            পণ্য নাম ১<br/>
+                            <span style={{ fontSize: `${form.receiptFontSize - 3}px`, color: '#666' }}>কোম্পানি</span>
+                          </td>
+                          <td style={{ textAlign: 'center', padding: '4px 0' }}>2</td>
+                          <td style={{ textAlign: 'right', padding: '4px 0' }}>৳50</td>
+                          <td style={{ textAlign: 'right', padding: '4px 0' }}>৳100</td>
+                        </tr>
+                        <tr>
+                          <td style={{ padding: '4px 0' }}>
+                            পণ্য নাম ২<br/>
+                            <span style={{ fontSize: `${form.receiptFontSize - 3}px`, color: '#666' }}>কোম্পানি</span>
+                          </td>
+                          <td style={{ textAlign: 'center', padding: '4px 0' }}>1</td>
+                          <td style={{ textAlign: 'right', padding: '4px 0' }}>৳75</td>
+                          <td style={{ textAlign: 'right', padding: '4px 0' }}>৳75</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    {/* Totals */}
+                    <div style={{ borderTop: '1px dashed #000', marginTop: 8, paddingTop: 8 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${form.receiptFontSize - 1}px` }}>
+                        <span>সাবটোটাল:</span>
+                        <span>৳175</span>
+                      </div>
+                      {form.receiptShowVat !== false && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${form.receiptFontSize - 1}px` }}>
+                          <span>ভ্যাট (১৫%):</span>
+                          <span>৳26.25</span>
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}>
+                        <span>মোট:</span>
+                        <span>৳201.25</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${form.receiptFontSize - 1}px` }}>
+                        <span>পরিশোধ:</span>
+                        <span>৳210</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${form.receiptFontSize - 1}px` }}>
+                        <span>ফেরত:</span>
+                        <span>৳8.75</span>
+                      </div>
+                    </div>
+
+                    {/* QR Code */}
+                    {form.receiptShowQr !== false && form.zatkaEnabled && (
+                      <div style={{ textAlign: 'center', marginTop: 12, fontSize: `${form.receiptFontSize - 1}px` }}>
+                        <div style={{
+                          width: 60,
+                          height: 60,
+                          background: '#000',
+                          margin: '0 auto 4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#fff',
+                          fontSize: '8px'
+                        }}>
+                          QR
+                        </div>
+                        <div>📱 ZATCA</div>
+                      </div>
+                    )}
+
+                    {/* Footer */}
+                    <div style={{ textAlign: 'center', borderTop: '1px dashed #000', marginTop: 12, paddingTop: 8, fontSize: `${form.receiptFontSize - 2}px` }}>
+                      {form.receiptFooter || 'ধন্যবাদ'}<br/>
+                      ২ আগস্ট, ২০২৬
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '0 0 24px' }} />
