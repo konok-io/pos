@@ -5964,6 +5964,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
   const printPurchases = () => {
     const purchases = filterPurchases();
     const total = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0);
+    const totalVat = purchases.reduce((s,p) => {const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;}, 0);
     const periodLabel = period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to;
     
     let html = `
@@ -6002,6 +6003,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
             <th>সরবরাহকারী</th>
             <th style="text-align:center;">পণ্য</th>
             <th style="text-align:right;">মোট খরচ</th>
+            <th style="text-align:right;">ভ্যাট</th>
           </tr>
         </thead>
         <tbody>`;
@@ -6013,7 +6015,8 @@ function ReportsScreen({sales, customers, purchases, settings}) {
             <td style="font-family:monospace;color:#00897b;font-weight:600;">${p.id}</td>
             <td>${p.supplier}</td>
             <td style="text-align:center;">${p.totalItems}টি</td>
-            <td style="text-align:right;font-weight:600;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0)).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:600;">৳${p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#c62828;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0) * 0.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>`;
     });
     
@@ -6023,6 +6026,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
           <tr class="total-row">
             <td colspan="4" style="text-align:right;">মোট পারচেজ এমাউন্ট:</td>
             <td style="text-align:right;">৳${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>
         </tfoot>
       </table>
@@ -6186,27 +6190,32 @@ function ReportsScreen({sales, customers, purchases, settings}) {
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ'].map(h=>(
+                  {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট'].map(h=>(
                     <th key={h} style={{padding:'8px 10px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray400,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {filteredPurchases.length===0 ? <tr><td colSpan={5} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</td></tr>
-                : [...filteredPurchases].reverse().map((p,i)=>(
+                {filteredPurchases.length===0 ? <tr><td colSpan={6} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</td></tr>
+                : [...filteredPurchases].reverse().map((p,i)=>{
+                    const total = p.items.reduce((s,i)=>s+(i.stock||0)*(i.buyP||0),0);
+                    const vat = total * 0.15;
+                    return (
                   <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewPurchase(p)}>
                     <td style={{padding:'9px 10px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
                     <td style={{padding:'9px 10px',fontSize:12,fontFamily:'monospace',color:T.teal,fontWeight:600}}>{p.id}</td>
                     <td style={{padding:'9px 10px',fontSize:12}}>{p.supplier}</td>
                     <td style={{padding:'9px 10px',fontSize:12,color:T.gray400}}>{p.totalItems}টি</td>
-                    <td style={{padding:'9px 10px',fontWeight:600,fontSize:13,color:T.green}}>{fmt(p.items.reduce((s,i)=>s+(i.stock||0)*(i.buyP||0),0))}</td>
+                    <td style={{padding:'9px 10px',fontWeight:600,fontSize:13,color:T.green}}>{fmt(total)}</td>
+                    <td style={{padding:'9px 10px',fontSize:12,color:T.red}}>{fmt(vat)}</td>
                   </tr>
-                ))}
+                )})}
               </tbody>
               <tfoot>
                 <tr style={{background:T.tealLight}}>
                   <td colSpan={4} style={{padding:'10px',fontWeight:700,fontSize:13}}>মোট পারচেজ এমাউন্ট:</td>
                   <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0),0))}</td>
+                  <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.red}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;},0))}</td>
                 </tr>
               </tfoot>
             </table>
