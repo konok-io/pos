@@ -1565,41 +1565,6 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
             fontSize:12,
           }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
           
-          {/* Company dropdown */}
-          <div style={{position:'relative',minWidth:120}} data-comp-dropdown>
-            <input 
-              value={selComp === 'সব কোম্পানি' ? compSearch : selComp} 
-              onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
-              onFocus={()=>setShowCompDrop(true)}
-              placeholder="কোম্পানি..."
-              style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
-            />
-            {selComp !== 'সব কোম্পানি' && (
-              <button onClick={()=>{setSelComp('সব কোম্পানি');setCompSearch('');}} style={{
-                position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
-                background:'none',border:'none',cursor:'pointer',padding:4,
-                color:T.gray400,fontSize:11,lineHeight:1
-              }}>✕</button>
-            )}
-            {showCompDrop && (
-              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
-                {filteredComps.length === 0 ? (
-                  <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো কোম্পানি পাওয়া যায়নি</div>
-                ) : filteredComps.map(c=>(
-                  <div key={c} onClick={()=>{setSelComp(c);setCompSearch('');setShowCompDrop(false);}} style={{
-                    padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
-                    background:selComp===c?T.tealLight:'transparent',
-                    borderBottom:`1px solid ${T.gray100}`,
-                    fontSize:12,
-                  }}>
-                    <span style={{color:selComp===c?T.teal:T.gray900}}>{c}</span>
-                    <span style={{color:T.gray400,fontSize:11}}>{compCounts[c] || 0}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          
           {/* Category dropdown */}
           <div style={{position:'relative',minWidth:120}} data-cat-dropdown>
             <input 
@@ -1629,6 +1594,40 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
                   }}>
                     <span style={{color:selCat===c?T.teal:T.gray900}}>{c}</span>
                     <span style={{color:T.gray400,fontSize:11}}>{catCounts[c] || 0}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Company dropdown */}
+          <div style={{position:'relative',minWidth:120}} data-comp-dropdown>
+            <input 
+              value={selComp === 'সব কোম্পানি' ? compSearch : selComp} 
+              onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
+              onFocus={()=>setShowCompDrop(true)}
+              placeholder="কোম্পানি..."
+              style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
+            />
+            {selComp !== 'সব কোম্পানি' && (
+              <button onClick={()=>{setSelComp('সব কোম্পানি');setCompSearch('');}} style={{
+                position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
+                background:'none',border:'none',cursor:'pointer',padding:4,
+                color:T.gray400,fontSize:11,lineHeight:1
+              }}>✕</button>
+            )}
+            {showCompDrop && (
+              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
+                {filteredComps.length === 0 ? (
+                  <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো কোম্পানি পাওয়া যায়নি</div>
+                ) : filteredComps.map(c=>(
+                  <div key={c} onClick={()=>{setSelComp(c);setCompSearch('');setShowCompDrop(false);}} style={{
+                    padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
+                    background:selComp===c?T.tealLight:'transparent',
+                    borderBottom:`1px solid ${T.gray100}`,
+                    fontSize:12,
+                  }}>
+                    <span style={{color:selComp===c?T.teal:T.gray900}}>{c}</span>
+                    <span style={{color:T.gray400,fontSize:11}}>{compCounts[c] || 0}</span>
                   </div>
                 ))}
               </div>
