@@ -964,8 +964,31 @@ function MainApp({ currentUser, onLogout }) {
 
 /* ─────────────── APP WRAPPER ─────────────── */
 export default function App() {
-  const fakeUser = { email: 'admin@local', name: 'Admin', role: 'admin' };
-  return <MainApp currentUser={fakeUser} onLogout={() => {}} />;
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const auth = db.get(STORAGE_KEYS.auth);
+    return !!auth;
+  });
+  const [currentUser, setCurrentUser] = useState(() => {
+    return db.get(STORAGE_KEYS.auth) || null;
+  });
+
+  const handleLogin = (user) => {
+    setCurrentUser(user);
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    db.set(STORAGE_KEYS.auth, null);
+    localStorage.removeItem(STORAGE_KEYS.auth);
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+  };
+
+  if (!isLoggedIn) {
+    return <LoginScreen onLogin={handleLogin} settings={DEFAULT_SETTINGS} />;
+  }
+
+  return <MainApp currentUser={currentUser} onLogout={handleLogout} />;
 }
 
 /* ═══════════════════════════════════════════
