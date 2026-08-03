@@ -1603,8 +1603,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         {/* Filter row */}
         {/* Combined row with stock summary left and dropdowns right */}
         <div style={{padding:'6px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap',justifyContent:'space-between'}}>
-          {/* Left: Stock summary (display only) */}
-          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+          {/* Left: Stock summary (display only) with dividers */}
+          <div style={{display:'flex',gap:0,flexWrap:'wrap',alignItems:'center'}}>
             {/* স্টক আছে summary */}
             <div style={{
               borderRadius:7, whiteSpace:'nowrap',
@@ -1613,8 +1613,11 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               border:'none',
               padding:'6px 12px',
               fontSize:12,
-              fontWeight:500,
-            }}>📦 স্টক আছে <span>({allCount})</span></div>
+              fontWeight:600,
+            }}>📦 স্টক আছে <span style={{fontWeight:700,marginLeft:4}}>({allCount})</span></div>
+            
+            {/* Divider */}
+            <div style={{width:1,height:20,background:T.gray300,margin:'0 8px'}}></div>
             
             {/* স্টক কম summary */}
             <div style={{
@@ -1624,8 +1627,11 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               border:'none',
               padding:'6px 12px',
               fontSize:12,
-              fontWeight:500,
-            }}>⚠️ স্টক কম <span>({lowStockCount})</span></div>
+              fontWeight:600,
+            }}>⚠️ স্টক কম <span style={{fontWeight:700,marginLeft:4}}>({lowStockCount})</span></div>
+            
+            {/* Divider */}
+            <div style={{width:1,height:20,background:T.gray300,margin:'0 8px'}}></div>
             
             {/* স্টক শেষ summary */}
             <div style={{
@@ -1635,8 +1641,8 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
               border:'none',
               padding:'6px 12px',
               fontSize:12,
-              fontWeight:500,
-            }}>⚠️ স্টক শেষ <span>({outOfStockCount})</span></div>
+              fontWeight:600,
+            }}>⚠️ স্টক শেষ <span style={{fontWeight:700,marginLeft:4}}>({outOfStockCount})</span></div>
           </div>
           
           {/* Right: Dropdowns */}
