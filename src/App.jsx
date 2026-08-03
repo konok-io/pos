@@ -2,12 +2,6 @@ import { useState, useEffect, useRef } from "react";
 
 /* ─────────────── GLOBAL CSS RESET ─────────────── */
 const GlobalStyle = () => {
-  useEffect(() => {
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    document.documentElement.style.margin = '0';
-    document.documentElement.style.padding = '0';
-  }, []);
   return null;
 };
 
@@ -599,6 +593,14 @@ export default function App() {
   if (showLogin || !currentUser) {
     return <LoginScreen onLogin={handleLogin} settings={settings} />;
   }
+
+  // CSS Reset
+  useEffect(() => {
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.documentElement.style.margin = '0';
+    document.documentElement.style.padding = '0';
+  }, []);
 
   // Update time every second
   useEffect(() => {
