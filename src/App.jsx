@@ -1126,7 +1126,7 @@ function MainApp({ currentUser, onLogout }) {
       {/* Content */}
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
         {tab==='pos'       && <POSScreen {...props} />}
-        {tab==='products'  && <ProductsScreen {...props} selCat={selCat} />}
+        {tab==='products'  && <ProductsScreen {...props} />}
         {tab==='newproduct' && <NewProductScreen {...props} />}
         {tab==='barcode'   && <BarcodeScreen {...props} />}
         {tab==='suppliers' && <SuppliersScreen {...props} />}
@@ -1980,7 +1980,7 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
 /* ═══════════════════════════════════════════
    PRODUCTS SCREEN
 ═══════════════════════════════════════════ */
-function ProductsScreen({products, suppliers, categories, purchases, productHistory, upd, selCat}) {
+function ProductsScreen({products, suppliers, categories, purchases, productHistory, upd}) {
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState([]);
@@ -2002,12 +2002,10 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
 
   const overlay = {position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100};
 
-  // Loading effect
+  // Initialize loading state once on mount
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 300);
-    return () => clearTimeout(timer);
-  }, [products]);
+    setLoading(false);
+  }, []);
 
   // Handle edit product price
   const handleEditProduct = () => {
