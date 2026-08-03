@@ -4896,16 +4896,6 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
         }}>
           📋 সকল স্টক ({realProducts.length})
         </button>
-        <button onClick={()=>{setStockFilter(stockFilter==='low'?'all':'low');setSearch('');}} style={{
-          ...btn(stockFilter==='low'?'primary':'ghost'),
-          background:stockFilter==='low'?T.orange:T.gray100,
-          color:stockFilter==='low'?T.white:T.gray600,
-          border:'none',
-          padding:'8px 14px',
-          fontSize:12,
-        }}>
-          ⚠️ স্টক কম ({lowStock.length})
-        </button>
         <button onClick={()=>{setStockFilter(stockFilter==='proper'?'all':'proper');setSearch('');}} style={{
           ...btn(stockFilter==='proper'?'primary':'ghost'),
           background:stockFilter==='proper'?T.green:T.gray100,
@@ -4915,6 +4905,16 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           fontSize:12,
         }}>
           ✅ স্টক ঠিক আছে ({properStock.length})
+        </button>
+        <button onClick={()=>{setStockFilter(stockFilter==='low'?'all':'low');setSearch('');}} style={{
+          ...btn(stockFilter==='low'?'primary':'ghost'),
+          background:stockFilter==='low'?T.orange:T.gray100,
+          color:stockFilter==='low'?T.white:T.gray600,
+          border:'none',
+          padding:'8px 14px',
+          fontSize:12,
+        }}>
+          ⚠️ স্টক কম ({lowStock.length})
         </button>
         <div style={{position:'relative',flex:'1 1 200px'}}>
           <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
