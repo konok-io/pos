@@ -1531,111 +1531,114 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         </div>
         
         {/* Filter row */}
-        {/* Stock buttons row */}
-        <div style={{padding:'6px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
-          {/* স্টক আছে button */}
-          <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
-            ...btn(selCat==='স্টক আছে'?'primary':'ghost','sm'),
-            borderRadius:7, whiteSpace:'nowrap',
-            background:selCat==='স্টক আছে'?T.teal:T.gray100,
-            color:selCat==='স্টক আছে'?T.white:T.gray600,
-            border:'none',
-            padding:'6px 12px',
-            fontSize:12,
-          }}>📦 স্টক আছে {allCount > 0 && <span style={{opacity:0.7}}>({allCount})</span>}</button>
-          
-          {/* স্টক কম button */}
-          <button onClick={()=>{setSelCat('স্টক কম');setCatSearch('');}} style={{
-            ...btn(selCat==='স্টক কম'?'primary':'ghost','sm'),
-            borderRadius:7, whiteSpace:'nowrap',
-            background:selCat==='স্টক কম'?T.orange:T.orangeLight,
-            color:selCat==='স্টক কম'?T.white:T.orange,
-            border:'none',
-            padding:'6px 12px',
-            fontSize:12,
-          }}>⚠️ স্টক কম {lowStockCount > 0 && <span style={{opacity:0.7}}>({lowStockCount})</span>}</button>
-          
-          {/* স্টক শেষ button */}
-          <button onClick={()=>{setSelCat('স্টক শেষ');setCatSearch('');}} style={{
-            ...btn(selCat==='স্টক শেষ'?'primary':'ghost','sm'),
-            borderRadius:7, whiteSpace:'nowrap',
-            background:selCat==='স্টক শেষ'?T.red:T.redLight,
-            color:selCat==='স্টক শেষ'?T.white:T.red,
-            border:'none',
-            padding:'6px 12px',
-            fontSize:12,
-          }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
-        </div>
-        
-        {/* Dropdowns row */}
-        <div style={{padding:'6px 14px',background:T.white,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap'}}>
-          {/* Category dropdown */}
-          <div style={{position:'relative',minWidth:140}} data-cat-dropdown>
-            <input 
-              value={selCat === 'স্টক আছে' || selCat === 'স্টক শেষ' || selCat === 'স্টক কম' ? catSearch : selCat} 
-              onChange={e=>{setSelCat('স্টক আছে');setCatSearch(e.target.value);setShowCatDrop(true);}} 
-              onFocus={()=>setShowCatDrop(true)}
-              placeholder="ক্যাটাগরি..."
-              style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
-            />
-            {selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && (
-              <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
-                position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
-                background:'none',border:'none',cursor:'pointer',padding:4,
-                color:T.gray400,fontSize:11,lineHeight:1
-              }}>✕</button>
-            )}
-            {showCatDrop && (
-              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
-                {filteredCats.length === 0 ? (
-                  <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো ক্যাটাগরি পাওয়া যায়নি</div>
-                ) : filteredCats.map(c=>(
-                  <div key={c} onClick={()=>{setSelCat(c);setCatSearch('');setShowCatDrop(false);}} style={{
-                    padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
-                    background:selCat===c?T.tealLight:'transparent',
-                    borderBottom:`1px solid ${T.gray100}`,
-                    fontSize:12,
-                  }}>
-                    <span style={{color:selCat===c?T.teal:T.gray900}}>{c}</span>
-                    <span style={{color:T.gray400,fontSize:11}}>{catCounts[c] || 0}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* Combined row with stock buttons left and dropdowns right */}
+        <div style={{padding:'6px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap',justifyContent:'space-between'}}>
+          {/* Left: Stock buttons */}
+          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+            {/* স্টক আছে button */}
+            <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
+              ...btn(selCat==='স্টক আছে'?'primary':'ghost','sm'),
+              borderRadius:7, whiteSpace:'nowrap',
+              background:selCat==='স্টক আছে'?T.teal:T.gray100,
+              color:selCat==='স্টক আছে'?T.white:T.gray600,
+              border:'none',
+              padding:'6px 12px',
+              fontSize:12,
+            }}>📦 স্টক আছে {allCount > 0 && <span style={{opacity:0.7}}>({allCount})</span>}</button>
+            
+            {/* স্টক কম button */}
+            <button onClick={()=>{setSelCat('স্টক কম');setCatSearch('');}} style={{
+              ...btn(selCat==='স্টক কম'?'primary':'ghost','sm'),
+              borderRadius:7, whiteSpace:'nowrap',
+              background:selCat==='স্টক কম'?T.orange:T.orangeLight,
+              color:selCat==='স্টক কম'?T.white:T.orange,
+              border:'none',
+              padding:'6px 12px',
+              fontSize:12,
+            }}>⚠️ স্টক কম {lowStockCount > 0 && <span style={{opacity:0.7}}>({lowStockCount})</span>}</button>
+            
+            {/* স্টক শেষ button */}
+            <button onClick={()=>{setSelCat('স্টক শেষ');setCatSearch('');}} style={{
+              ...btn(selCat==='স্টক শেষ'?'primary':'ghost','sm'),
+              borderRadius:7, whiteSpace:'nowrap',
+              background:selCat==='স্টক শেষ'?T.red:T.redLight,
+              color:selCat==='স্টক শেষ'?T.white:T.red,
+              border:'none',
+              padding:'6px 12px',
+              fontSize:12,
+            }}>⚠️ স্টক শেষ {outOfStockCount > 0 && <span style={{opacity:0.7}}>({outOfStockCount})</span>}</button>
           </div>
-          {/* Company dropdown */}
-          <div style={{position:'relative',minWidth:140}} data-comp-dropdown>
-            <input 
-              value={selComp === 'সব কোম্পানি' ? compSearch : selComp} 
-              onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
-              onFocus={()=>setShowCompDrop(true)}
-              placeholder="কোম্পানি..."
-              style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
-            />
-            {selComp !== 'সব কোম্পানি' && (
-              <button onClick={()=>{setSelComp('সব কোম্পানি');setCompSearch('');}} style={{
-                position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
-                background:'none',border:'none',cursor:'pointer',padding:4,
-                color:T.gray400,fontSize:11,lineHeight:1
-              }}>✕</button>
-            )}
-            {showCompDrop && (
-              <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
-                {filteredComps.length === 0 ? (
-                  <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো কোম্পানি পাওয়া যায়নি</div>
-                ) : filteredComps.map(c=>(
-                  <div key={c} onClick={()=>{setSelComp(c);setCompSearch('');setShowCompDrop(false);}} style={{
-                    padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
-                    background:selComp===c?T.tealLight:'transparent',
-                    borderBottom:`1px solid ${T.gray100}`,
-                    fontSize:12,
-                  }}>
-                    <span style={{color:selComp===c?T.teal:T.gray900}}>{c}</span>
-                    <span style={{color:T.gray400,fontSize:11}}>{compCounts[c] || 0}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+          
+          {/* Right: Dropdowns */}
+          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+            {/* Category dropdown */}
+            <div style={{position:'relative',minWidth:130}} data-cat-dropdown>
+              <input 
+                value={selCat === 'স্টক আছে' || selCat === 'স্টক শেষ' || selCat === 'স্টক কম' ? catSearch : selCat} 
+                onChange={e=>{setSelCat('স্টক আছে');setCatSearch(e.target.value);setShowCatDrop(true);}} 
+                onFocus={()=>setShowCatDrop(true)}
+                placeholder="ক্যাটাগরি..."
+                style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
+              />
+              {selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && (
+                <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
+                  position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
+                  background:'none',border:'none',cursor:'pointer',padding:4,
+                  color:T.gray400,fontSize:11,lineHeight:1
+                }}>✕</button>
+              )}
+              {showCatDrop && (
+                <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
+                  {filteredCats.length === 0 ? (
+                    <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো ক্যাটাগরি পাওয়া যায়নি</div>
+                  ) : filteredCats.map(c=>(
+                    <div key={c} onClick={()=>{setSelCat(c);setCatSearch('');setShowCatDrop(false);}} style={{
+                      padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
+                      background:selCat===c?T.tealLight:'transparent',
+                      borderBottom:`1px solid ${T.gray100}`,
+                      fontSize:12,
+                    }}>
+                      <span style={{color:selCat===c?T.teal:T.gray900}}>{c}</span>
+                      <span style={{color:T.gray400,fontSize:11}}>{catCounts[c] || 0}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Company dropdown */}
+            <div style={{position:'relative',minWidth:130}} data-comp-dropdown>
+              <input 
+                value={selComp === 'সব কোম্পানি' ? compSearch : selComp} 
+                onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
+                onFocus={()=>setShowCompDrop(true)}
+                placeholder="কোম্পানি..."
+                style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
+              />
+              {selComp !== 'সব কোম্পানি' && (
+                <button onClick={()=>{setSelComp('সব কোম্পানি');setCompSearch('');}} style={{
+                  position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
+                  background:'none',border:'none',cursor:'pointer',padding:4,
+                  color:T.gray400,fontSize:11,lineHeight:1
+                }}>✕</button>
+              )}
+              {showCompDrop && (
+                <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
+                  {filteredComps.length === 0 ? (
+                    <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো কোম্পানি পাওয়া যায়নি</div>
+                  ) : filteredComps.map(c=>(
+                    <div key={c} onClick={()=>{setSelComp(c);setCompSearch('');setShowCompDrop(false);}} style={{
+                      padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
+                      background:selComp===c?T.tealLight:'transparent',
+                      borderBottom:`1px solid ${T.gray100}`,
+                      fontSize:12,
+                    }}>
+                      <span style={{color:selComp===c?T.teal:T.gray900}}>{c}</span>
+                      <span style={{color:T.gray400,fontSize:11}}>{compCounts[c] || 0}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
