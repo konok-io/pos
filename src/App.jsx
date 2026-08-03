@@ -6481,7 +6481,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
-const SettingsScreen = memo(function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
+function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
   // Initialize form with current settings
   const [form, setForm] = useState({
     name: settings?.name || '',
@@ -7192,4 +7192,4 @@ const SettingsScreen = memo(function SettingsScreen({settings, products, supplie
       )}
     </div>
   );
-});
+}
