@@ -14,23 +14,19 @@ const now = () => new Date().toISOString();
 
 /* ─────────────── BANNER IMAGE UPLOAD ─────────────── */
 function BannerImageUpload({ value, onChange }) {
-  const [preview, setPreview] = useState(value || '');
+  const [preview, setPreview] = useState('');
   const inputRef = useRef(null);
 
+  // Sync preview with value prop
   useEffect(() => {
-    console.log('BannerImageUpload - value changed:', value ? 'yes' : 'no');
-    setPreview(value || '');
+    if (value) {
+      setPreview(value);
+    }
   }, [value]);
 
   const handleFileChange = (e) => {
-    console.log('handleFileChange called, files:', e.target.files);
     const file = e.target.files?.[0];
-    if (!file) {
-      console.log('No file selected');
-      return;
-    }
-    
-    console.log('File:', file.name, file.type, file.size);
+    if (!file) return;
     
     if (!file.type.startsWith('image/')) {
       alert('শুধুমাত্র ছবি ফাইল আপলোড করুন!');
@@ -43,11 +39,13 @@ function BannerImageUpload({ value, onChange }) {
     
     const reader = new FileReader();
     reader.onload = (event) => {
-      console.log('FileReader onload, result length:', event.target.result?.length);
       const data = event.target.result;
+      // Update preview immediately
       setPreview(data);
-      onChange(data);
-      console.log('onChange called with data');
+      // Also update parent state immediately
+      if (onChange && typeof onChange === 'function') {
+        onChange(data);
+      }
     };
     reader.onerror = () => {
       console.error('FileReader error');
@@ -57,9 +55,10 @@ function BannerImageUpload({ value, onChange }) {
   };
 
   const handleRemove = () => {
-    console.log('handleRemove called');
     setPreview('');
-    onChange('');
+    if (onChange && typeof onChange === 'function') {
+      onChange('');
+    }
     if (inputRef.current) {
       inputRef.current.value = '';
     }
@@ -6397,11 +6396,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
+  // Sync form with settings when settings prop changes
+  useEffect(() => {
+    setForm({...settings, bannerImage: settings?.bannerImage || ''});
+  }, [settings]);
+
   const save = async () => {
-    console.log('Saving form with bannerImage:', form.bannerImage ? 'yes (length: ' + form.bannerImage.length + ')' : 'no');
-    console.log('Full form:', JSON.stringify({...form, bannerImage: form.bannerImage ? '[IMAGE_DATA]' : ''}));
     await upd.settings(form);
-    console.log('Settings saved successfully');
     setSaved(true); setTimeout(()=>setSaved(false),2000);
   };
 
