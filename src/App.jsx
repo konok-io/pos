@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, memo } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 
 /* ─────────────── GLOBAL CSS RESET ─────────────── */
 const GlobalStyle = () => {
@@ -6478,8 +6478,8 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
 const SettingsScreen = memo(function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
-  // Initialize form directly from settings (only on mount)
-  const [form, setForm] = useState({
+  // Initialize form with useRef for initial values, useState for current values
+  const formRef = useRef({
     name: settings?.name || '',
     address: settings?.address || '',
     phone: settings?.phone || '',
@@ -6489,6 +6489,7 @@ const SettingsScreen = memo(function SettingsScreen({settings, products, supplie
     vatPercent: settings?.vatPercent || 15,
     bannerImage: settings?.bannerImage || ''
   });
+  const [form, setForm] = useState(formRef.current);
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
   const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
