@@ -4421,7 +4421,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
 
   // Download demo CSV
   const downloadDemoCSV = () => {
-    const csv = 'পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,80,10';
+    const csv = 'পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,VAT%,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,15,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,15,80,10\nসুজি চিপস,S001,সুজি,স্ন্যাকস,003,পিস,20,25,15,200,20\nপারফেক্ট সাবান,P001,পারফেক্ট,সৌন্দর্য,004,পিস,35,45,15,150,15';
     const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -4524,27 +4524,19 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
         {/* Left: Form */}
         <div style={{flex:1,padding:16,overflow:'auto',borderRight:`1px solid ${T.gray200}`,background:T.white}}>
           
-          {/* CSV Import */}
-          <div style={{...card,padding:16,marginBottom:16,background:T.tealLight,border:`1px dashed ${T.teal}`}}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-              <h3 style={{margin:0,fontSize:14,color:T.teal}}>📥 CSV আমদানি করুন</h3>
-            </div>
-            <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-              <input type="file" accept=".csv" onChange={handleCsvImport} id="newProductCsvInput" style={{display:'none'}} />
-              <label htmlFor="newProductCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:13,padding:'10px 20px'}}>
-                📁 CSV আপলোড করুন
-              </label>
-              <button onClick={downloadDemoCSV} style={{...btn('ghost'),fontSize:13,padding:'10px 20px'}}>
-                📥 ডেমো CSV
-              </button>
-            </div>
-            <div style={{fontSize:11,color:T.gray600,marginTop:8}}>
-              💡 CSV ফাইলে কোম্পানি ও ক্যাটাগরি ডাটাবেজে থাকতে হবে
-            </div>
+          {/* CSV Import - Minimal Design */}
+          <div style={{marginBottom:16,display:'flex',alignItems:'center',gap:12,flexWrap:'wrap'}}>
+            <input type="file" accept=".csv" onChange={handleCsvImport} id="newProductCsvInput" style={{display:'none'}} />
+            <label htmlFor="newProductCsvInput" style={{...btn('primary'),cursor:'pointer',padding:'8px 16px',display:'flex',alignItems:'center',gap:6}}>
+              <span>📁</span> CSV আপলোড
+            </label>
+            <button onClick={downloadDemoCSV} style={{...btn('outline'),padding:'8px 16px',display:'flex',alignItems:'center',gap:6}}>
+              <span>📥</span> ডেমো CSV
+            </button>
             {csvData.length > 0 && (
-              <div style={{marginTop:8,fontSize:12,color:T.teal,fontWeight:600}}>
-                ✓ {csvData.length}টি পণ্য CSV থেকে যোগ হয়েছে
-              </div>
+              <span style={{fontSize:12,color:T.teal,fontWeight:600,background:T.tealLight,padding:'6px 12px',borderRadius:20}}>
+                ✓ {csvData.length}টি পণ্য যোগ হয়েছে
+              </span>
             )}
           </div>
           
