@@ -560,13 +560,27 @@ function LoginScreen({ onLogin, settings }) {
 const DEFAULT_SETTINGS = {name:'আমার দোকান',address:'',phone:'',vatEnabled:true,vatPercent:15};
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(() => db.get(STORAGE_KEYS.auth));
-  const [showLogin, setShowLogin] = useState(() => !db.get(STORAGE_KEYS.auth));
+  // Initialize auth state FIRST
+  const [currentUser, setCurrentUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.auth)) || null; } catch { return null; }
+  });
+
+  // If not logged in, show login screen (no hooks called after this)
+  if (!currentUser) {
+    const handleLogin = (userData) => {
+      localStorage.setItem(STORAGE_KEYS.auth, JSON.stringify(userData));
+      setCurrentUser(userData);
+    };
+    return <LoginScreen onLogin={handleLogin} settings={DEFAULT_SETTINGS} />;
+  }
+
+  // User is logged in - initialize all state
+  const [showLogin, setShowLogin] = useState(false);
   const [tab, setTab] = useState(() => localStorage.getItem('pos_current_tab') || 'pos');
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
-  const [settings, setSettings] = useState(() => DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [purchases, setPurchases] = useState([]);
@@ -575,23 +589,11 @@ export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Handle login from LoginScreen - must be before early return
-  const handleLogin = (userData) => {
-    setCurrentUser(userData);
-    setShowLogin(false);
-  };
-
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem(STORAGE_KEYS.auth);
     setCurrentUser(null);
-    setShowLogin(true);
   };
-
-  // Show login screen if not authenticated - must be before all useEffects
-  if (showLogin || !currentUser) {
-    return <LoginScreen onLogin={handleLogin} settings={settings} />;
-  }
 
   // CSS Reset
   useEffect(() => {
