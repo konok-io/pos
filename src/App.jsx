@@ -995,7 +995,7 @@ function MainApp({ currentUser, onLogout }) {
     }
   };
 
-  const upd = {
+  const upd = useMemo(() => ({
     products: v => { 
       trackProductHistory(products, v, currentUser); 
       setProducts(v); 
@@ -1008,7 +1008,7 @@ function MainApp({ currentUser, onLogout }) {
     suppliers: v => { setSuppliers(v); db.set(STORAGE_KEYS.suppliers, v); return Promise.resolve(); },
     categories: v => { setCategories(v); db.set(STORAGE_KEYS.categories, v); return Promise.resolve(); },
     purchases: v => { setPurchases(v); db.set(STORAGE_KEYS.purchases, v); return Promise.resolve(); },
-  };
+  }), [products, currentUser]);
 
   if (!ready) return (
     <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'#0F766E',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:20}}>
