@@ -6412,7 +6412,14 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
    SETTINGS SCREEN
 ═══════════════════════════════════════════ */
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, upd}) {
-  const [form, setForm] = useState({...settings, bannerImage: settings?.bannerImage || ''});
+  const [form, setForm] = useState({
+    name: settings?.name || '',
+    address: settings?.address || '',
+    phone: settings?.phone || '',
+    vatEnabled: settings?.vatEnabled !== false,
+    vatPercent: settings?.vatPercent || 15,
+    bannerImage: settings?.bannerImage || ''
+  });
   const [saved, setSaved] = useState(false);
   const [activeSection, setActiveSection] = useState('business');
   const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
@@ -6422,11 +6429,6 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
-
-  // Sync form with settings when settings prop changes
-  useEffect(() => {
-    setForm({...settings, bannerImage: settings?.bannerImage || ''});
-  }, [settings]);
 
   const save = async () => {
     await upd.settings(form);
