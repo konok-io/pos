@@ -264,7 +264,6 @@ function LoginScreen({ onLogin, settings }) {
   const currentYear = new Date().getFullYear();
   const businessName = settings?.name || 'আপনার দোকান';
   const businessAddress = settings?.address || '';
-  const businessPhone = settings?.phone || '';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -377,7 +376,7 @@ function LoginScreen({ onLogin, settings }) {
             {businessName}
           </h1>
           
-          {(businessAddress || businessPhone) && (
+          {businessAddress && (
             <div style={{ 
               marginBottom: 14,
               fontSize: 13, 
@@ -388,8 +387,7 @@ function LoginScreen({ onLogin, settings }) {
               gap: 10,
               flexWrap: 'wrap'
             }}>
-              {businessAddress && <span>{businessAddress}</span>}
-              {businessPhone && <span>📞</span>}
+              {businessAddress}
             </div>
           )}
           
