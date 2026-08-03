@@ -4000,7 +4000,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
   // View single category
   if (viewCategory) {
-    const catProducts = products.filter(p => p.cat === viewCategory.name);
+    const catProducts = products.filter(p => p.cat === viewCategory.name && p.name);
     
     return (
       <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
