@@ -7317,6 +7317,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   { l: '💰 পণ্যের ক্রয়-বিক্রয় দাম পূর্ণ-নির্ধারণ', c: productHistory.filter(h => h.type === 'price_buy' || h.type === 'price_sell').length, btn: 'সব দাম হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('সব দাম হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory(productHistory.filter(h => h.type !== 'price_buy' && h.type !== 'price_sell')); alert('দাম হিস্ট্রি মুছা হয়েছে।'); } } },
                   { l: '📊 স্টক কমানো-বাড়ানো ডেটা', c: productHistory.filter(h => h.type === 'stock').length, btn: 'স্টক হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('স্টক হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory(productHistory.filter(h => h.type !== 'stock')); alert('স্টক হিস্ট্রি মুছা হয়েছে।'); } } },
                   { l: '👥 কাস্টমার ডেটা', c: customers.length, btn: 'সব কাস্টমার মুছে ফেলুন', fn: () => { if(confirm('সব কাস্টমার মুছে ফেলবেন?')) { upd.customers([]); alert('কাস্টমার মুছা হয়েছে।'); } } },
+                  { l: '🛒 পারচেজ হিস্ট্রি', c: purchases.length, btn: 'সব পারচেজ হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('সব পারচেজ হিস্ট্রি মুছে ফেলবেন?')) { upd.purchases([]); alert('পারচেজ হিস্ট্রি মুছা হয়েছে।'); } } },
                 ].map((d, i) => (
                   <div key={i} style={{
                     padding: 24,
