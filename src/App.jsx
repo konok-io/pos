@@ -1604,44 +1604,41 @@ ${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাক�
         {/* Combined row with stock summary left and dropdowns right */}
         <div style={{padding:'6px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:6,alignItems:'center',flexWrap:'wrap',justifyContent:'space-between'}}>
           {/* Left: Stock summary (display only) with dividers */}
-          <div style={{display:'flex',gap:0,flexWrap:'wrap',alignItems:'center'}}>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
             {/* স্টক আছে summary */}
             <div style={{
-              borderRadius:7, whiteSpace:'nowrap',
+              borderRadius:8, whiteSpace:'nowrap',
               background:T.tealLight,
               color:T.teal,
-              border:'none',
-              padding:'6px 12px',
+              border:`1.5px solid ${T.teal}30`,
+              padding:'6px 14px',
               fontSize:12,
               fontWeight:600,
+              boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
             }}>📦 স্টক আছে <span style={{fontWeight:700,marginLeft:4}}>({allCount})</span></div>
-            
-            {/* Divider */}
-            <div style={{width:1,height:20,background:T.gray300,margin:'0 8px'}}></div>
             
             {/* স্টক কম summary */}
             <div style={{
-              borderRadius:7, whiteSpace:'nowrap',
+              borderRadius:8, whiteSpace:'nowrap',
               background:T.orangeLight,
               color:T.orange,
-              border:'none',
-              padding:'6px 12px',
+              border:`1.5px solid ${T.orange}30`,
+              padding:'6px 14px',
               fontSize:12,
               fontWeight:600,
+              boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
             }}>⚠️ স্টক কম <span style={{fontWeight:700,marginLeft:4}}>({lowStockCount})</span></div>
-            
-            {/* Divider */}
-            <div style={{width:1,height:20,background:T.gray300,margin:'0 8px'}}></div>
             
             {/* স্টক শেষ summary */}
             <div style={{
-              borderRadius:7, whiteSpace:'nowrap',
+              borderRadius:8, whiteSpace:'nowrap',
               background:T.redLight,
               color:T.red,
-              border:'none',
-              padding:'6px 12px',
+              border:`1.5px solid ${T.red}30`,
+              padding:'6px 14px',
               fontSize:12,
               fontWeight:600,
+              boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
             }}>⚠️ স্টক শেষ <span style={{fontWeight:700,marginLeft:4}}>({outOfStockCount})</span></div>
           </div>
           
