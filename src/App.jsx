@@ -4245,17 +4245,17 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                         <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{i+1}</td>
                         <td style={{padding:'10px 12px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat.name}</td>
                         <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
-                        <td style={{padding:'10px 12px',whiteSpace:'nowrap',textAlign:'center'}}>
-                          <button onClick={()=>setViewCategory(cat)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
+                        <td style={{padding:'10px 12px',display:'flex',gap:6,justifyContent:'center'}}>
+                          <button onClick={()=>setViewCategory(cat)} style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14}}>👁️</button>
                           {products.filter(p=>p.cat===cat.name).length === 0 ? (
-                            <button onClick={e=>{e.stopPropagation();setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('primary'),padding:'4px 6px'}}>✏️</button>
+                            <button onClick={e=>{e.stopPropagation();setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('primary','sm'),padding:'5px 8px',fontSize:14}}>✏️</button>
                           ) : (
-                            <button disabled style={{...btn('ghost'),padding:'4px 6px',opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে এডিট করা যাবে না">✏️</button>
+                            <button disabled style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14,opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে এডিট করা যাবে না">✏️</button>
                           )}
                           {products.filter(p=>p.cat===cat.name).length === 0 ? (
-                            <button onClick={e=>{e.stopPropagation();if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
+                            <button onClick={e=>{e.stopPropagation();if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger','sm'),padding:'5px 8px',fontSize:14}}>🗑️</button>
                           ) : (
-                            <button disabled style={{...btn('ghost'),padding:'4px 6px',opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে মুছা যাবে না">🗑️</button>
+                            <button disabled style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14,opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে মুছা যাবে না">🗑️</button>
                           )}
                         </td>
                       </tr>
