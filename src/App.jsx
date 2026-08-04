@@ -3795,7 +3795,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [showCatDrop, setShowCatDrop] = useState(false);
   const [showCsvSection, setShowCsvSection] = useState(false);
   const [csvImportResult, setCsvImportResult] = useState(null);
-  const [newSupplier, setNewSupplier] = useState({name:'',phone:'',email:'',address:'',company:'',crNumber:'',vatNumber:''});
+  const [newSupplier, setNewSupplier] = useState({name:'',phone:'',email:'',address:'',company:'',crNumber:'',vatNumber:'',code:''});
   
   // Handle Add New Supplier
   const handleAddSupplier = async () => {
@@ -3810,6 +3810,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         email: newSupplier.email || '',
         address: newSupplier.address || '',
         crNumber: newSupplier.crNumber || '',
+        code: newSupplier.code || '',
         vatNumber: newSupplier.vatNumber || '',
         company: newSupplier.company || newSupplier.name.trim()
       });
@@ -4508,7 +4509,14 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               {/* Right: Add New Supplier - Larger */}
               <div style={{...card,padding:16}}>
                 <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal,textAlign:'center'}}>➕ নতুন সরবরাহকারী</h3>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:8}}>
+                  <input 
+                    type="text" 
+                    placeholder="🔢 আইডি (খালি=অটো)" 
+                    value={newSupplier.code || ''} 
+                    onChange={e=>setNewSupplier({...newSupplier,code:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
                   <input 
                     type="text" 
                     placeholder="🏢 নাম *" 
