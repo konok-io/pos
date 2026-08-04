@@ -6757,6 +6757,10 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
                   const showPhone = s.purchaseShowPhone !== false;
                   const showVat = s.purchaseShowVat !== false;
                   const vatAmount = showVat ? grandTotal * 0.15 : 0;
+                  
+                  // Get supplier info
+                  const supplierInfo = suppliers.find(sup=>(sup.name||'').toLowerCase()===(viewPurchase.supplier||'').toLowerCase());
+                  
                   let html = `<!DOCTYPE html>
 <html>
 <head>
@@ -6768,45 +6772,49 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
 html { width: 80mm; }
 body { font-family:'Tiro Bangla','Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:${fontSize}px; color:#000; background:#fff; }
 .center { text-align:center; }
-.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
+.border { border-bottom:1px dashed #000; padding-bottom:6px; margin-bottom:6px; }
 .row { display:flex; justify-content:space-between; margin:2px 0; }
 table { width:100%; border-collapse:collapse; font-size:${fontSize-1}px; }
-th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
+th { text-align:left; padding:3px 0; border-bottom:1px dashed #000; }
 td { padding:3px 0; }
 td:nth-child(2) { text-align:center; }
 td:nth-child(3), td:nth-child(4) { text-align:right; }
 .total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
-.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:${fontSize-2}px; }
+.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:6px; font-size:${fontSize-2}px; }
 </style>
 </head>
 <body>
 <div class="center border">
-  ${showLogo ? '<div style="font-size:14px;font-weight:bold;">' + headerText + '</div>' : '<div style="font-weight:bold;">' + headerText.replace(/[^\w\s]/g, '') + '</div>'}
-  ${showAddress && s.name ? '<div>' + s.name + '</div>' : ''}
-  ${showAddress && s.address ? '<div>' + s.address + '</div>' : ''}
-  ${showAddress && s.phone ? '<div>' + s.phone + '</div>' : ''}
-  ${showAddress && s.taxId ? '<div style="font-weight:bold;">Seller VAT: ' + s.taxId + '</div>' : ''}
-  <div>Invoice ID: ${viewPurchase.id.replace(/\D/g,'').slice(-8)}</div>
-  <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-  ${showSupplier ? '<div>সরবরাহকারী: ' + viewPurchase.supplier + '</div>' : ''}
-  ${showPhone && viewPurchase.phone ? '<div>ফোন: ' + viewPurchase.phone + '</div>' : ''}
-  ${showSupplier && suppliers.find(s=>(s.name||'').toLowerCase()===(viewPurchase.supplier||'').toLowerCase())?.vatNumber ? '<div style="font-weight:bold;">Supplier VAT: ' + suppliers.find(s=>(s.name||'').toLowerCase()===(viewPurchase.supplier||'').toLowerCase())?.vatNumber + '</div>' : ''}
+  ${showLogo !== false ? '<div style="font-size:' + (fontSize + 3) + 'px;font-weight:bold;">' + (headerText) + '</div>' : ''}
+  ${showAddress !== false && s.name ? '<div style="font-size:' + (fontSize - 1) + 'px;">' + s.name + '</div>' : ''}
+  ${showAddress !== false && s.address ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.address + '</div>' : ''}
+  ${showPhone !== false && s.phone ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.phone + '</div>' : ''}
+  ${showPhone !== false && s.taxId ? '<div style="font-weight:bold;font-size:' + (fontSize - 2) + 'px;">Seller VAT: ' + s.taxId + '</div>' : ''}
+  <div style="font-size:${fontSize - 1}px;margin-top:4px;">Invoice ID: ${viewPurchase.id.replace(/\D/g,'').slice(-8)}</div>
+  <div style="font-size:${fontSize - 2}px;">${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+</div>
+${showSupplier !== false ? '<div style="margin-bottom:6px;font-size:' + (fontSize - 1) + 'px;">' : '<div style="margin-bottom:6px;">'}
+  ${showSupplier !== false ? '<div>সরবরাহকারী: ' + viewPurchase.supplier + '</div>' : ''}
+  ${showPhone !== false && viewPurchase.phone ? '<div>ফোন: ' + viewPurchase.phone + '</div>' : ''}
+  ${showSupplier !== false && supplierInfo?.crNumber ? '<div style="font-weight:bold;font-size:' + (fontSize - 1) + 'px;margin-top:2px;">CR: ' + supplierInfo.crNumber + '</div>' : ''}
+  ${showSupplier !== false && supplierInfo?.vatNumber ? '<div style="font-weight:bold;font-size:' + (fontSize - 1) + 'px;margin-top:2px;">VAT: ' + supplierInfo.vatNumber + '</div>' : ''}
+  ${showSupplier !== false && supplierInfo?.address ? '<div style="font-size:' + (fontSize - 2) + 'px;margin-top:2px;">ঠিকানা: ' + supplierInfo.address + '</div>' : ''}
 </div>
 <div style="border-top:1px dotted #000;margin:4px 0;"></div>
 <table>
-  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <thead><tr><th>পণ্য</th><th style="text-align:center;">পরি</th><th style="text-align:right;">দাম</th><th style="text-align:right;">মোট</th></tr></thead>
   <tbody>`;
                   viewPurchase.items.forEach(item => {
                     const qty = item.stock||0;
                     const price = item.buyP||0;
-                    html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company || ''}</span></td><td>${qty} ${item.unit||'পিস'}</td><td>৳${price.toFixed(2)}</td><td>৳${(qty*price).toFixed(2)}</td></tr>`;
+                    html += '<tr><td>' + item.name + (item.company ? '<br><span style="font-size:' + (fontSize - 3) + 'px;color:#666;">' + item.company + '</span>' : '') + '</td><td style="text-align:center;">' + qty + ' ' + (item.unit||'পিস') + '</td><td style="text-align:right;">৳' + price.toFixed(2) + '</td><td style="text-align:right;">৳' + (qty*price).toFixed(2) + '</td></tr>';
                   });
                   html += `</tbody>
 </table>
 <div style="border-top:1px dashed #000;margin-top:6px;padding-top:6px;">
-<div class="row"><span>মূল্য:</span><span>৳${grandTotal.toFixed(2)}</span></div>
-${showVat ? '<div class="row"><span>ভ্যাট (১৫%):</span><span>৳' + vatAmount.toFixed(2) + '</span></div>' : ''}
-${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4px;" class="total row"><span>মোট:</span><span>৳' + (grandTotal + vatAmount).toFixed(2) + '</span></div>' : ''}
+<div class="row"><span>মূল্য:</span><span>৳${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+${showVat !== false ? '<div class="row"><span>ভ্যাট (১৫%):</span><span>৳' + vatAmount.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4px;" class="total row"><span>মোট (ভ্যাট সহ):</span><span>৳' + (grandTotal + vatAmount).toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
 </div>
 <div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
@@ -6826,13 +6834,13 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
                 <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'10px 16px',borderRadius:8}}>✕</button>
               </div>
             </div>
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
+            <table style={{width:'100%',borderCollapse:'collapse',tableLayout:'fixed'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  <th style={{padding:10,textAlign:'left',fontSize:12,color:T.gray600}}>পণ্যের নাম</th>
-                  <th style={{padding:10,textAlign:'center',fontSize:12,color:T.gray600}}>পরিমাণ</th>
-                  <th style={{padding:10,textAlign:'right',fontSize:12,color:T.gray600}}>দাম</th>
-                  <th style={{padding:10,textAlign:'right',fontSize:12,color:T.gray600}}>মোট</th>
+                  <th style={{padding:'10px 12px',textAlign:'left',fontSize:12,color:T.gray600,width:'40%'}}>পণ্যের নাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'center',fontSize:12,color:T.gray600,width:'20%'}}>পরিমাণ</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>দাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>মোট</th>
                 </tr></thead>
               <tbody>
                 {viewPurchase.items.map((item,i) => {
@@ -6841,21 +6849,21 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
                   const total = qty * price;
                   return (
                     <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
-                      <td style={{padding:12,fontSize:13}}>
+                      <td style={{padding:'10px 12px',fontSize:13,verticalAlign:'top'}}>
                         <div style={{fontWeight:600}}>{item.name}</div>
-                        <div style={{fontSize:11,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
+                        {item.company && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{item.company}</div>}
                       </td>
-                      <td style={{padding:12,textAlign:'center',fontWeight:600}}>{qty} {item.unit || 'পিস'}</td>
-                      <td style={{padding:12,textAlign:'right',fontSize:13}}>{fmt(price)}</td>
-                      <td style={{padding:12,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(total)}</td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,fontSize:13,verticalAlign:'middle'}}>{qty} {item.unit || 'পিস'}</td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontSize:13,verticalAlign:'middle'}}>{fmt(price)}</td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green,fontSize:13,verticalAlign:'middle'}}>{fmt(total)}</td>
                     </tr>
                   );
                 })}
               </tbody>
               <tfoot>
                 <tr style={{background:T.tealLight}}>
-                  <td colSpan={3} style={{padding:12,fontWeight:700,fontSize:14}}>সর্বমোট</td>
-                  <td style={{padding:12,textAlign:'right',fontWeight:800,fontSize:18,color:T.teal}}>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:700,fontSize:14,textAlign:'right'}}>সর্বমোট:</td>
+                  <td style={{padding:'12px',textAlign:'right',fontWeight:800,fontSize:18,color:T.teal}}>
                     {fmt(viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0))}
                   </td>
                 </tr>
@@ -6881,51 +6889,51 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
                 <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'10px 16px',borderRadius:8}}>✕</button>
               </div>
             </div>
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
+            <table style={{width:'100%',borderCollapse:'collapse',tableLayout:'fixed'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  <th style={{padding:10,textAlign:'left',fontSize:12,color:T.gray600}}>পণ্যের নাম</th>
-                  <th style={{padding:10,textAlign:'center',fontSize:12,color:T.gray600}}>পরিমাণ</th>
-                  <th style={{padding:10,textAlign:'right',fontSize:12,color:T.gray600}}>দাম</th>
-                  <th style={{padding:10,textAlign:'right',fontSize:12,color:T.gray600}}>মোট</th>
+                  <th style={{padding:'10px 12px',textAlign:'left',fontSize:12,color:T.gray600,width:'40%'}}>পণ্যের নাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'center',fontSize:12,color:T.gray600,width:'20%'}}>পরিমাণ</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>দাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>মোট</th>
                 </tr>
               </thead>
               <tbody>
                 {(viewSale.items||[]).map((item,i) => (
                   <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
-                    <td style={{padding:12,fontSize:13}}>
+                    <td style={{padding:'10px 12px',fontSize:13,verticalAlign:'top'}}>
                       <div style={{fontWeight:600}}>{item.name}</div>
-                      <div style={{fontSize:11,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
+                      {item.company && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{item.company}</div>}
                     </td>
-                    <td style={{padding:12,textAlign:'center',fontWeight:600}}>{item.qty} {item.unit || 'পিস'}</td>
-                    <td style={{padding:12,textAlign:'right',fontSize:13}}>{fmt(item.sellP)}</td>
-                    <td style={{padding:12,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(item.qty * item.sellP)}</td>
+                    <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,fontSize:13,verticalAlign:'middle'}}>{item.qty} {item.unit || 'পিস'}</td>
+                    <td style={{padding:'10px 12px',textAlign:'right',fontSize:13,verticalAlign:'middle'}}>{fmt(item.sellP)}</td>
+                    <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green,fontSize:13,verticalAlign:'middle'}}>{fmt(item.qty * item.sellP)}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr style={{background:T.gray100}}>
-                  <td colSpan={3} style={{padding:12,fontWeight:600,fontSize:13}}>সাবটোটাল</td>
-                  <td style={{padding:12,textAlign:'right',fontWeight:700,fontSize:14}}>{fmt(viewSale.total)}</td>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:600,fontSize:13,textAlign:'right'}}>সাবটোটাল</td>
+                  <td style={{padding:'12px',textAlign:'right',fontWeight:700,fontSize:14}}>{fmt(viewSale.total)}</td>
                 </tr>
                 {viewSale.vatEnabled && viewSale.vat > 0 && (
                   <tr style={{background:T.gray100}}>
-                    <td colSpan={3} style={{padding:12,fontSize:13,color:T.gray600}}>ভ্যাট ({viewSale.vatRate}%)</td>
-                    <td style={{padding:12,textAlign:'right',fontSize:13,color:T.gray600}}>{fmt(viewSale.vat)}</td>
+                    <td colSpan={3} style={{padding:'12px',fontSize:13,color:T.gray600,textAlign:'right'}}>ভ্যাট ({viewSale.vatRate}%)</td>
+                    <td style={{padding:'12px',textAlign:'right',fontSize:13,color:T.gray600}}>{fmt(viewSale.vat)}</td>
                   </tr>
                 )}
                 <tr style={{background:T.greenLight}}>
-                  <td colSpan={3} style={{padding:12,fontWeight:700,fontSize:14,color:T.green}}>মোট</td>
-                  <td style={{padding:12,textAlign:'right',fontWeight:800,fontSize:18,color:T.green}}>{fmt(viewSale.total + (viewSale.vat||0))}</td>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.green,textAlign:'right'}}>মোট</td>
+                  <td style={{padding:'12px',textAlign:'right',fontWeight:800,fontSize:18,color:T.green}}>{fmt(viewSale.total + (viewSale.vat||0))}</td>
                 </tr>
                 <tr style={{background:T.greenLight}}>
-                  <td colSpan={3} style={{padding:12,fontWeight:600,fontSize:13,color:T.green}}>পরিশোধ হয়েছে</td>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:600,fontSize:13,color:T.green,textAlign:'right'}}>পরিশোধ হয়েছে</td>
                   <td style={{padding:12,textAlign:'right',fontWeight:700,fontSize:14,color:T.green}}>{fmt(viewSale.paid)}</td>
                 </tr>
                 {viewSale.due > 0 && (
                   <tr style={{background:T.redLight}}>
-                    <td colSpan={3} style={{padding:12,fontWeight:700,fontSize:14,color:T.red}}>বাকি</td>
-                    <td style={{padding:12,textAlign:'right',fontWeight:800,fontSize:14,color:T.red}}>{fmt(viewSale.due)}</td>
+                    <td colSpan={3} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.red,textAlign:'right'}}>বাকি</td>
+                    <td style={{padding:'12px',textAlign:'right',fontWeight:800,fontSize:14,color:T.red}}>{fmt(viewSale.due)}</td>
                   </tr>
                 )}
               </tfoot>
