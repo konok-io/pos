@@ -167,11 +167,25 @@ const STORAGE_KEYS = {
 
 /* ─────────────── INDEXEDDB STORAGE (Persistent) ─────────────── */
 const DB_NAME = 'POS_Database';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented to trigger upgrade
 const STORE_NAME = 'pos_data';
+const DB_VERSION_KEY = 'pos_db_version';
+const CURRENT_DB_VERSION = 2;
+const DATA_VERSION_KEY = 'pos_data_version';
+
+// Generate a unique ID for this installation
+const INSTALLATION_ID = 'pos_install_' + Date.now();
 
 let idb = null;
 let idbInitPromise = null;
+let cachedVersion = null;
+
+// Reset cached version when IndexedDB is deleted
+function resetIDBCache() {
+  idb = null;
+  idbInitPromise = null;
+  cachedVersion = null;
+}
 
 function initIndexedDB() {
   if (idbInitPromise) return idbInitPromise;
@@ -181,6 +195,7 @@ function initIndexedDB() {
     
     request.onerror = () => {
       console.error('IndexedDB error:', request.error);
+      resetIDBCache();
       reject(request.error);
     };
     
@@ -239,17 +254,91 @@ const db = {
     });
   },
   
+  // Check if storage was cleared - compare localStorage and IndexedDB versions
+  async checkStorage() {
+    try {
+      // Reset cache to ensure we get fresh connection
+      resetIDBCache();
+      
+      // Initialize IndexedDB fresh
+      await initIndexedDB();
+      
+      // Get the data version from IndexedDB
+      const indexedDBVersion = await new Promise((resolve) => {
+        try {
+          const tx = idb.transaction(STORE_NAME, 'readonly');
+          const store = tx.objectStore(STORE_NAME);
+          const request = store.get(DATA_VERSION_KEY);
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => resolve(null);
+        } catch { resolve(null); }
+      });
+      
+      // Get the stored localStorage version
+      const localStorageVersion = localStorage.getItem(DATA_VERSION_KEY);
+      
+      // If versions don't match, storage was cleared
+      const idbVersionValue = indexedDBVersion?.value || 'none';
+      const lsVersionValue = localStorageVersion || 'none';
+      
+      if (idbVersionValue !== lsVersionValue) {
+        cachedVersion = false;
+        return false; // Versions don't match, data exists
+      }
+      
+      // Both are null/none - this is a fresh install or cleared storage
+      if (!idbVersionValue || idbVersionValue === 'none') {
+        cachedVersion = true;
+        return true; // Fresh/cleared
+      }
+      
+      // Check if this is a new installation
+      const installId = await this.get('pos_install_id');
+      const lsInstallId = localStorage.getItem('pos_install_id');
+      
+      if (!installId && !lsInstallId) {
+        // New installation
+        cachedVersion = true;
+        return true;
+      }
+      
+      if (installId !== lsInstallId) {
+        // Installation IDs don't match - storage was cleared
+        cachedVersion = true;
+        return true;
+      }
+      
+      cachedVersion = false;
+      return false;
+    } catch (e) {
+      console.error('Storage check error:', e);
+      cachedVersion = true;
+      return true;
+    }
+  },
+  
+  // Initialize version markers for fresh install
+  async initVersion() {
+    const installId = INSTALLATION_ID;
+    const versionValue = Date.now().toString();
+    
+    await this.set(DATA_VERSION_KEY, { value: versionValue, timestamp: Date.now() });
+    await this.set('pos_install_id', installId);
+    
+    localStorage.setItem(DATA_VERSION_KEY, versionValue);
+    localStorage.setItem('pos_install_id', installId);
+  },
+  
   // Clear all data including localStorage
   async clearAll() {
     await this.clear();
-    // Clear all localStorage items used by this app
     Object.values(STORAGE_KEYS).forEach(key => {
       localStorage.removeItem(key);
     });
-    // Clear other app-specific localStorage items
     const localStorageKeys = [
       'pos_cart', 'pos_selCust', 'pos_current_tab', 'pos_suppliers_tab',
-      'pos_expenses', 'pos_incomes', 'pos_want_fullscreen'
+      'pos_expenses', 'pos_incomes', 'pos_want_fullscreen',
+      DATA_VERSION_KEY, 'pos_install_id'
     ];
     localStorageKeys.forEach(key => {
       localStorage.removeItem(key);
@@ -903,8 +992,13 @@ function MainApp({ currentUser, onLogout }) {
   useEffect(() => {
     // Async function to load data from IndexedDB
     async function loadData() {
-      // Always start with empty data - no DEMO data
-      // If user clears browser storage, app starts fresh with no data
+      // Check if storage was cleared (user deleted IndexedDB from browser DevTools)
+      const wasCleared = await db.checkStorage();
+      
+      // If storage was cleared, reinitialize the version marker
+      if (wasCleared) {
+        await db.initVersion();
+      }
       
       // Load from IndexedDB
       const savedProducts = await db.get(STORAGE_KEYS.products);
