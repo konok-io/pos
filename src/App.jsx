@@ -4135,7 +4135,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             ) : (
               <button disabled style={{...btn('danger'),opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে মুছা যাবে না">🗑️ মুছুন</button>
             )}
-            <button style={{...btn('primary'),padding:'6px 12px'}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>${viewCategory.name} - ক্যাটাগরি</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4;margin:15mm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#00897b;color:white;font-weight:700;font-size:12px}.footer{margin-top:20px;text-align:center;color:#999;font-size:11px}</style></head><body><h2 style="text-align:center;color:#00897b;margin-bottom:20px;border-bottom:2px solid #00897b;padding-bottom:10px">📂 ${viewCategory.name}</h2><p style="margin-bottom:10px">🏢 সরবরাহকারী: ${viewCategory.company || '-'}</p><p style="margin-bottom:10px">মোট পণ্য: ${catProducts.length}টি | মোট স্টক: ${catProducts.reduce((s,p)=>s+(p.stock||0),0)}টি | মোট মূল্য: ৳${totalValue.toLocaleString('en-US',{minimumFractionDigits:2})}</p><table><thead><tr><th style="text-align:center">আইডি</th><th>পণ্যের নাম</th><th style="text-align:center">স্টক</th><th style="text-align:right">ক্রয়</th><th style="text-align:right">বিক্রয়</th></tr></thead><tbody>${catProducts.map(p=>`<tr><td style="text-align:center">${p.id}</td><td>${p.name}</td><td style="text-align:center">${p.stock} ${p.unit}</td><td style="text-align:right">৳${(p.buyP||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td><td style="text-align:right">৳${(p.sellP||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>`).join('')}</tbody></table><p class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
+            <button style={{...btn('primary'),padding:'6px 12px'}} onClick={()=>{const totalBuyValue=catProducts.reduce((s,p)=>s+(p.stock||0)*(p.buyP||0),0);const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>${viewCategory.name} - ক্যাটাগরি</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4;margin:15mm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#00897b;color:white;font-weight:700;font-size:12px}.info-table td{padding:10px;font-size:13px}.info-table td:first-child{font-weight:700;color:#555;width:140px;background:#f8faf9}.total-row td{background:#e0f7f0;font-weight:700;font-size:14px}.footer{margin-top:20px;text-align:center;color:#999;font-size:11px}</style></head><body><h2 style="text-align:center;color:#00897b;margin-bottom:20px;border-bottom:2px solid #00897b;padding-bottom:10px">📂 ${viewCategory.name}</h2><table class="info-table"><tbody><tr><td>ক্যাটাগরি</td><td>${viewCategory.name}</td></tr><tr><td>মোট পণ্য</td><td>${catProducts.length}টি</td></tr><tr><td>মোট স্টক</td><td>${catProducts.reduce((s,p)=>s+(p.stock||0),0)}টি</td></tr><tr><td>মোট ক্রয়মূল্য</td><td>৳${totalBuyValue.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr><tr><td>মোট বিক্রয়মূল্য</td><td>৳${totalValue.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr></tbody></table><br/><table><thead><tr><th style="text-align:center">আইডি</th><th>পণ্যের নাম</th><th style="text-align:center">স্টক</th><th style="text-align:right">ক্রয়</th><th style="text-align:right">বিক্রয়</th></tr></thead><tbody>${catProducts.map(p=>`<tr><td style="text-align:center">${p.id}</td><td>${p.name}</td><td style="text-align:center">${p.stock} ${p.unit}</td><td style="text-align:right">৳${(p.buyP||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td><td style="text-align:right">৳${(p.sellP||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>`).join('')}</tbody><tfoot><tr class="total-row"><td colspan="2">মোট</td><td style="text-align:center">${catProducts.reduce((s,p)=>s+(p.stock||0),0)}</td><td style="text-align:right">৳${totalBuyValue.toLocaleString('en-US',{minimumFractionDigits:2})}</td><td style="text-align:right">৳${totalValue.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr></tfoot></table><p class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
           </div>
         </div>
 
@@ -4220,43 +4220,49 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
         {/* CATEGORIES TAB */}
         {activeTab === 'categories' && (
-          <div style={{...card,marginBottom:16,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 180px)'}}>
-            <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
-              <thead>
-                <tr style={{background:T.tealLight}}>
-                  {['ক্রম','ক্যাটাগরির নাম','পণ্য সংখ্যা','একশন'].map((h,i)=>(
-                    <th key={i} style={{padding:'10px 12px',textAlign:i===3?'center':'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-            </table>
-            <div style={{flex:1,overflow:'auto'}}>
+          <div>
+            <div style={{...card,marginBottom:12,padding:12,display:'flex',justifyContent:'space-between',alignItems:'center',background:T.white,borderRadius:10}}>
+              <span style={{fontSize:13,color:T.gray600}}>মোট: {categories.filter(c => !search || (c.name||'').toLowerCase().includes(search.toLowerCase())).length}টি ক্যাটাগরি</span>
+              <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>ক্যাটাগরি লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4 landscape;margin:12.7mm}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:22px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#e0f7f0;font-weight:700;color:#00897b}.total{background:#e0f7f0;font-weight:700}</style></head><body><div class="header"><h1>📂 ক্যাটাগরি লিস্ট</h1></div><table><thead><tr><th style="width:10%">ক্রম</th><th style="width:60%">ক্যাটাগরির নাম</th><th style="width:30%">পণ্য সংখ্যা</th></tr></thead><tbody>${categories.map((c,i)=>`<tr><td>${i+1}</td><td>${c.name}</td><td style="text-align:center">${products.filter(p=>p.cat===c.name).length}টি</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="2">মোট ক্যাটাগরি: ${categories.length}টি</td><td>পণ্য: ${products.filter(p=>p.cat&&p.name).length}টি</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
+            </div>
+            <div style={{...card,marginBottom:16,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 240px)'}}>
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
-                <tbody>
-                  {categories.length === 0 ? (
-                    <tr><td colSpan={4} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ক্যাটাগরি পাওয়া যায়নি</td></tr>
-                  ) : categories.filter(c => !search || (c.name||'').toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
-                    <tr key={cat.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{i+1}</td>
-                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat.name}</td>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
-                      <td style={{padding:'10px 12px',whiteSpace:'nowrap',textAlign:'center'}}>
-                        <button onClick={()=>setViewCategory(cat)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
-                        {products.filter(p=>p.cat===cat.name).length === 0 ? (
-                          <button onClick={e=>{e.stopPropagation();setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('primary'),padding:'4px 6px'}}>✏️</button>
-                        ) : (
-                          <button disabled style={{...btn('ghost'),padding:'4px 6px',opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে এডিট করা যাবে না">✏️</button>
-                        )}
-                        {products.filter(p=>p.cat===cat.name).length === 0 ? (
-                          <button onClick={e=>{e.stopPropagation();if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
-                        ) : (
-                          <button disabled style={{...btn('ghost'),padding:'4px 6px',opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে মুছা যাবে না">🗑️</button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                <thead>
+                  <tr style={{background:T.tealLight}}>
+                    {['ক্রম','ক্যাটাগরির নাম','পণ্য সংখ্যা','একশন'].map((h,i)=>(
+                      <th key={i} style={{padding:'10px 12px',textAlign:i===3?'center':'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
               </table>
+              <div style={{flex:1,overflow:'auto'}}>
+                <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
+                  <tbody>
+                    {categories.length === 0 ? (
+                      <tr><td colSpan={4} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ক্যাটাগরি পাওয়া যায়নি</td></tr>
+                    ) : categories.filter(c => !search || (c.name||'').toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
+                      <tr key={cat.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                        <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{i+1}</td>
+                        <td style={{padding:'10px 12px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat.name}</td>
+                        <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
+                        <td style={{padding:'10px 12px',whiteSpace:'nowrap',textAlign:'center'}}>
+                          <button onClick={()=>setViewCategory(cat)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
+                          {products.filter(p=>p.cat===cat.name).length === 0 ? (
+                            <button onClick={e=>{e.stopPropagation();setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('primary'),padding:'4px 6px'}}>✏️</button>
+                          ) : (
+                            <button disabled style={{...btn('ghost'),padding:'4px 6px',opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে এডিট করা যাবে না">✏️</button>
+                          )}
+                          {products.filter(p=>p.cat===cat.name).length === 0 ? (
+                            <button onClick={e=>{e.stopPropagation();if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
+                          ) : (
+                            <button disabled style={{...btn('ghost'),padding:'4px 6px',opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে মুছা যাবে না">🗑️</button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
