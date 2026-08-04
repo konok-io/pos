@@ -4051,8 +4051,8 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ হিস্ট্রি</button>
             {!viewSupplier.isAuto && (
               <>
-                <button style={btn()} onClick={()=>{setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️ সম্পাদনা</button>
-                <button style={btn('danger')} onClick={()=>del(viewSupplier.id)}>🗑️ মুছুন</button>
+                <button style={btn()} onClick={()=>{setViewSupplier(null);setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️ সম্পাদনা</button>
+                <button style={btn('danger')} onClick={()=>{setViewSupplier(null);del(viewSupplier.id);}}>🗑️ মুছুন</button>
               </>
             )}
           </div>
