@@ -4484,22 +4484,22 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             {/* Top Section: CSV Import + Add Supplier Form */}
             <div style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
               {/* Left: CSV Import - Smaller */}
-              <div style={{...card,padding:16}}>
-                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
+              <div style={{...card,padding:20,display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',textAlign:'center'}}>
+                <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
                 <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
-                <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:10}}>
-                  <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:11,padding:'6px 12px'}}>
-                    📁 CSV
+                <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12,justifyContent:'center'}}>
+                  <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:12,padding:'8px 16px'}}>
+                    📁 CSV ফাইল
                   </label>
-                  <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:11,padding:'6px 12px'}}>
+                  <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:12,padding:'8px 16px'}}>
                     📥 ডেমো
                   </button>
                 </div>
-                <div style={{fontSize:10,color:T.gray500}}>
+                <div style={{fontSize:11,color:T.gray500}}>
                   কোম্পানি/ক্যাটাগরি ডুপ্লিকেট হবে না
                 </div>
                 {csvImportResult && (
-                  <div style={{marginTop:8,padding:6,background:T.tealLight,borderRadius:6,fontSize:10}}>
+                  <div style={{marginTop:10,padding:8,background:T.tealLight,borderRadius:6,fontSize:11}}>
                     ✅ আমদানি সফল
                   </div>
                 )}
