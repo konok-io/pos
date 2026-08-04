@@ -4482,33 +4482,33 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         {activeTab === 'companies' && (
           <div>
             {/* Top Section: CSV Import + Add Supplier Form */}
-            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
-              {/* Left: CSV Import */}
-              <div style={{...card,padding:20}}>
-                <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
+            <div style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
+              {/* Left: CSV Import - Smaller */}
+              <div style={{...card,padding:16}}>
+                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
                 <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
-                <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12}}>
-                  <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:12,padding:'8px 14px'}}>
-                    📁 CSV ফাইল
+                <div style={{display:'flex',gap:6,flexWrap:'wrap',marginBottom:10}}>
+                  <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:11,padding:'6px 12px'}}>
+                    📁 CSV
                   </label>
-                  <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:12,padding:'8px 14px'}}>
+                  <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:11,padding:'6px 12px'}}>
                     📥 ডেমো
                   </button>
                 </div>
-                <div style={{fontSize:11,color:T.gray500}}>
-                  কোম্পানি ও ক্যাটাগরি ডুপ্লিকেট হবে না
+                <div style={{fontSize:10,color:T.gray500}}>
+                  কোম্পানি/ক্যাটাগরি ডুপ্লিকেট হবে না
                 </div>
                 {csvImportResult && (
-                  <div style={{marginTop:10,padding:8,background:T.tealLight,borderRadius:6,fontSize:11}}>
-                    ✅ আমদানি: সরবরাহকারী {csvImportResult.companies}টি, ক্যাটাগরি {csvImportResult.categories}টি
+                  <div style={{marginTop:8,padding:6,background:T.tealLight,borderRadius:6,fontSize:10}}>
+                    ✅ আমদানি সফল
                   </div>
                 )}
               </div>
               
-              {/* Right: Add New Supplier */}
-              <div style={{...card,padding:20}}>
-                <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>➕ নতুন সরবরাহকারী</h3>
-                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+              {/* Right: Add New Supplier - Larger */}
+              <div style={{...card,padding:16}}>
+                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal}}>➕ নতুন সরবরাহকারী</h3>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
                   <input 
                     type="text" 
                     placeholder="🏢 নাম *" 
@@ -4521,6 +4521,13 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                     placeholder="📱 ফোন" 
                     value={newSupplier.phone} 
                     onChange={e=>setNewSupplier({...newSupplier,phone:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="📧 ইমেইল" 
+                    value={newSupplier.email} 
+                    onChange={e=>setNewSupplier({...newSupplier,email:e.target.value})}
                     style={{...input,padding:'8px 10px',fontSize:12}}
                   />
                   <input 
@@ -4540,13 +4547,6 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                   />
                   <input 
                     type="text" 
-                    placeholder="📧 ইমেইল" 
-                    value={newSupplier.email} 
-                    onChange={e=>setNewSupplier({...newSupplier,email:e.target.value})}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
-                  />
-                  <input 
-                    type="text" 
                     placeholder="📍 ঠিকানা" 
                     value={newSupplier.address} 
                     onChange={e=>setNewSupplier({...newSupplier,address:e.target.value})}
@@ -4555,7 +4555,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 </div>
                 <button 
                   onClick={handleAddSupplier}
-                  style={{...btn('primary'),padding:'8px 16px',fontSize:12,marginTop:10,width:'100%'}}
+                  style={{...btn('primary'),padding:'8px 16px',fontSize:12,marginTop:8,width:'100%'}}
                 >
                   ✅ যুক্ত করুন
                 </button>
