@@ -566,7 +566,7 @@ function LoginScreen({ onLogin, settings }) {
               fontWeight: 600,
               letterSpacing: '0.3px'
             }}>
-              POS ম্যানেজমেন্ট সিস্টেম
+              POS সরবরাহকারী সিস্টেম
             </span>
           </div>
         </div>
@@ -1037,7 +1037,7 @@ function MainApp({ currentUser, onLogout }) {
     {id:'products',icon:'📦',label:'সকল পণ্য'},
     {id:'newproduct',icon:'➕',label:'নতুন পণ্য'},
     {id:'barcode',icon:'📊',label:'বারকোড'},
-    {id:'suppliers',icon:'🏢',label:'ম্যানেজমেন্ট'},
+    {id:'suppliers',icon:'🏢',label:'সরবরাহকারী'},
     {id:'customers',icon:'👥',label:'কাস্টমার'},
     {id:'inventory',icon:'🏭',label:'স্টক'},
     {id:'lowstock',icon:'⚠️',label:'স্টক কম'},
@@ -1104,7 +1104,7 @@ function MainApp({ currentUser, onLogout }) {
             <div style={{width:44,height:44,background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,boxShadow:'0 4px 12px rgba(15,118,110,0.3)'}}>🏪</div>
             <div>
               <div style={{fontWeight:800,fontSize:17,color:T.gray900,lineHeight:1.2}}>{settings.name}</div>
-              <div style={{fontSize:11,color:T.gray400}}>POS ম্যানেজমেন্ট সিস্টেম</div>
+              <div style={{fontSize:11,color:T.gray400}}>POS সরবরাহকারী সিস্টেম</div>
             </div>
           </div>
           
@@ -1262,7 +1262,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   }, []);
 
   const [selCat, setSelCat] = useState('স্টক আছে');
-  const [selComp, setSelComp] = useState('সব কোম্পানি');
+  const [selComp, setSelComp] = useState('সব সরবরাহকারী');
   const [catSearch, setCatSearch] = useState('');
   const [showCatDrop, setShowCatDrop] = useState(false);
   const [compSearch, setCompSearch] = useState('');
@@ -1310,7 +1310,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     if (isCategory) return false;
     
     // Company filter
-    const matchComp = selComp === 'সব কোম্পানি' || p.company === selComp;
+    const matchComp = selComp === 'সব সরবরাহকারী' || p.company === selComp;
     // Product name filter
     const matchName = !search || (p.name||'').toLowerCase().includes(search.toLowerCase()) || (p.barcode||'').includes(search);
     
@@ -1697,14 +1697,14 @@ ${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:48p
             {/* Company dropdown */}
             <div style={{position:'relative',minWidth:130}} data-comp-dropdown>
               <input 
-                value={selComp === 'সব কোম্পানি' ? compSearch : selComp} 
-                onChange={e=>{setSelComp('সব কোম্পানি');setCompSearch(e.target.value);setShowCompDrop(true);}} 
+                value={selComp === 'সব সরবরাহকারী' ? compSearch : selComp} 
+                onChange={e=>{setSelComp('সব সরবরাহকারী');setCompSearch(e.target.value);setShowCompDrop(true);}} 
                 onFocus={()=>setShowCompDrop(true)}
                 placeholder="কোম্পানি..."
                 style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
               />
-              {selComp !== 'সব কোম্পানি' && (
-                <button onClick={()=>{setSelComp('সব কোম্পানি');setCompSearch('');}} style={{
+              {selComp !== 'সব সরবরাহকারী' && (
+                <button onClick={()=>{setSelComp('সব সরবরাহকারী');setCompSearch('');}} style={{
                   position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
                   background:'none',border:'none',cursor:'pointer',padding:4,
                   color:T.gray400,fontSize:11,lineHeight:1
@@ -1713,7 +1713,7 @@ ${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:48p
               {showCompDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
                   {filteredComps.length === 0 ? (
-                    <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো কোম্পানি পাওয়া যায়নি</div>
+                    <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো সরবরাহকারী পাওয়া যায়নি</div>
                   ) : filteredComps.map(c=>(
                     <div key={c} onClick={()=>{setSelComp(c);setCompSearch('');setShowCompDrop(false);}} style={{
                       padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
@@ -1733,15 +1733,15 @@ ${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:48p
 
         {/* Product grid - Show products when company or category is selected */}
         <div style={{flex:1,overflow:'auto',padding:16,background:T.gray50}}>
-          {selComp !== 'সব কোম্পানি' || (selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম') ? (
+          {selComp !== 'সব সরবরাহকারী' || (selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম') ? (
             <div>
               <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                 <span style={{fontSize:13,fontWeight:600,color:T.gray600}}>
-                  {selComp !== 'সব কোম্পানি' && `🏢 ${selComp} (${filtered.length}টি পণ্য)`}
-                  {selComp === 'সব কোম্পানি' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && `📁 ${selCat} (${filtered.length}টি পণ্য)`}
-                  {selComp !== 'সব কোম্পানি' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && ' - ' + selCat}
+                  {selComp !== 'সব সরবরাহকারী' && `🏢 ${selComp} (${filtered.length}টি পণ্য)`}
+                  {selComp === 'সব সরবরাহকারী' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && `📁 ${selCat} (${filtered.length}টি পণ্য)`}
+                  {selComp !== 'সব সরবরাহকারী' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && ' - ' + selCat}
                 </span>
-                <button onClick={()=>{setSelComp('সব কোম্পানি');setSelCat('স্টক আছে');setCompSearch('');setCatSearch('');}} style={{fontSize:11,padding:'4px 10px',border:'none',borderRadius:5,background:T.gray200,cursor:'pointer',color:T.gray600}}>✕ মুছুন</button>
+                <button onClick={()=>{setSelComp('সব সরবরাহকারী');setSelCat('স্টক আছে');setCompSearch('');setCatSearch('');}} style={{fontSize:11,padding:'4px 10px',border:'none',borderRadius:5,background:T.gray200,cursor:'pointer',color:T.gray600}}>✕ মুছুন</button>
               </div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:10}}>
                 {filtered.map(p => (
@@ -1810,7 +1810,7 @@ ${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:48p
               </svg>
               <div style={{padding:'16px',textAlign:'center'}}>
                 <div style={{fontSize:15,color:T.gray500,fontWeight:600}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
-                <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা কোম্পানি/ক্যাটাগরি সিলেক্ট করুন</div>
+                <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা সরবরাহকারী/ক্যাটাগরি সিলেক্ট করুন</div>
               </div>
             </div>
           )}
@@ -2086,13 +2086,13 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
         });
         
         // Get company code, company name and category from CSV
-        const csvCompanyCode = (row['কোম্পানি কোড'] || row['company code'] || '').trim();
+        const csvCompanyCode = (row['সরবরাহকারী কোড'] || row['company code'] || '').trim();
         const csvCompany = (row['কোম্পানি'] || row['company'] || supplierQ || '').trim();
         const csvCategory = (row['ক্যাটাগরি'] || row['category'] || '').trim();
         
         // Validate company by name
         if (csvCompany && !existingCompanies.includes(csvCompany.toLowerCase())) {
-          errors.push(`পণ্য ${i}: "${csvCompany}" কোম্পানি ডাটাবেজে নেই`);
+          errors.push(`পণ্য ${i}: "${csvCompany}" সরবরাহকারী ডাটাবেজে নেই`);
           continue;
         }
         
@@ -2551,7 +2551,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     📁 পণ্যের CSV আপলোড করুন
                   </label>
                   <button onClick={() => {
-                    const csv = 'পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,VAT%,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,15,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,15,80,10\nসুজি চিপস,S001,সুজি,স্ন্যাকস,003,পিস,20,25,15,200,20\nপারফেক্ট সাবান,P001,পারফেক্ট,সৌন্দর্য,004,পিস,35,45,15,150,15';
+                    const csv = 'পণ্যের নাম,সরবরাহকারী কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,VAT%,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,15,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,15,80,10\nসুজি চিপস,S001,সুজি,স্ন্যাকস,003,পিস,20,25,15,200,20\nপারফেক্ট সাবান,P001,পারফেক্ট,সৌন্দর্য,004,পিস,35,45,15,150,15';
                     const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -2564,7 +2564,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                   </button>
                 </div>
                 <div style={{fontSize:11,color:T.gray600}}>
-                  💡 CSV ফাইলে কোম্পানি কোড, কোম্পানির নাম ও ক্যাটাগরি অবশ্যই ডাটাবেজে থাকতে হবে
+                  💡 CSV ফাইলে সরবরাহকারী কোড, সরবরাহকারীর নাম ও ক্যাটাগরি অবশ্যই ডাটাবেজে থাকতে হবে
                 </div>
               </div>
               {csvData.length > 0 && (
@@ -2579,14 +2579,14 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
               
               {/* Supplier/Company */}
               <div style={{marginBottom:12, position:'relative'}}>
-                <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
+                <label style={label}>🏢 সরবরাহকারী *</label>
                 <div style={{display:'flex',gap:4}}>
                   <input 
                     value={supplierQ} 
                     onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));setShowCompanyList(true);}}
                     onClick={()=>setShowCompanyList(true)}
                     onBlur={()=>setTimeout(()=>setShowCompanyList(false),200)}
-                    placeholder="কোম্পানির নাম লিখুন..."
+                    placeholder="সরবরাহকারীর নাম লিখুন..."
                     style={{...input,fontSize:13,flex:1}} />
                   <button type="button" onClick={()=>setShowCompanyList(!showCompanyList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
                 </div>
@@ -2875,7 +2875,7 @@ tr:nth-child(even) { background:#fafafa; }
 .footer { margin-top:15px; text-align:center; color:#999; font-size:10px; }
 </style></head><body>
 <div class="header"><h1>📦 পণ্যের তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')} | ${printFiltered.length}টি পণ্য</p></div>
-<table><thead><tr><th>কোম্পানি কোড</th><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>ক্রয়মূল্য</th><th>বিক্রয়মূল্য</th><th>লাভ</th><th>VAT (১৫%)</th><th>মোট (VAT সহ)</th><th>স্টক</th><th>একক</th></tr></thead><tbody>
+<table><thead><tr><th>সরবরাহকারী কোড</th><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>ক্রয়মূল্য</th><th>বিক্রয়মূল্য</th><th>লাভ</th><th>VAT (১৫%)</th><th>মোট (VAT সহ)</th><th>স্টক</th><th>একক</th></tr></thead><tbody>
 ${printFiltered.map(p => {
   const profit = p.sellP - p.buyP;
   const profitPct = p.buyP > 0 ? Math.round((profit / p.buyP) * 100) : 0;
@@ -2912,7 +2912,7 @@ ${printFiltered.map(p => {
           <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
             <thead>
               <tr style={{background:T.tealLight}}>
-                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','VAT (১৫%)','মোট (VAT সহ)','স্টক','একক','একশন'].map((h,i)=>(
+                {['সরবরাহকারী কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','VAT (১৫%)','মোট (VAT সহ)','স্টক','একক','একশন'].map((h,i)=>(
                   <th key={i} style={{padding:'10px 12px',textAlign:i===11?'center':'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                 ))}
               </tr>
@@ -3473,7 +3473,7 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                   <div style={{fontSize:12,color:T.gray500}}>
                     বারকোড: <span style={{fontFamily:'monospace',color:T.teal}}>{item.barcode || item.id}</span>
                   </div>
-                  <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | কোম্পানি: {item.company || '-'}</div>
+                  <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | সরবরাহকারী: {item.company || '-'}</div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:6}}>
                   <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
@@ -3592,7 +3592,7 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
                   <div style={{fontSize:12,color:T.gray500}}>
                     বারকোড: <span style={{fontFamily:'monospace',color:T.teal}}>{item.barcode}</span>
                   </div>
-                  <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | কোম্পানি: {item.company || '-'}</div>
+                  <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | সরবরাহকারী: {item.company || '-'}</div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:6}}>
                   <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
@@ -3708,14 +3708,14 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   );
 
   const saveCompany = async () => {
-    if (!form.name?.trim()) { alert('কোম্পানির নাম দিন'); return; }
+    if (!form.name?.trim()) { alert('সরবরাহকারীর নাম দিন'); return; }
     
     // Check for duplicate company name (exclude current company when editing)
     const currentId = modal?.mode === 'edit' ? modal.id : null;
     const exists = suppliers.some(s => 
       s.id !== currentId && (s.name||'').toLowerCase().trim() === (form.name||'').toLowerCase().trim()
     );
-    if (exists) { alert('❌ এই কোম্পানির নাম ইতিমধ্যে আছে!'); return; }
+    if (exists) { alert('❌ এই সরবরাহকারীর নাম ইতিমধ্যে আছে!'); return; }
     
     // Use custom code if provided, otherwise generate auto code
     let newCode = form.code?.trim();
@@ -3736,11 +3736,11 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       const newS = { id: genId(), code: newCode, name: form.name.trim(), phone: form.phone||'', address: form.address||'', vatNumber: form.vatNumber||'', crNumber: form.crNumber||'' };
       await upd.suppliers([...suppliers, newS]);
       setForm({name:'',phone:'',address:'',vatNumber:'',crNumber:'',isAuto:false});
-      alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
+      alert(`✅ কোম্পানি যোগ করা হয়েছে!\nসরবরাহকারী কোড: ${newCode}`);
     } else if (modal.mode === 'add') {
       await upd.suppliers([...suppliers, { ...form, id: genId(), code: newCode }]);
       setForm({name:'',phone:'',address:'',vatNumber:'',crNumber:'',isAuto:false,code:''});
-      alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
+      alert(`✅ কোম্পানি যোগ করা হয়েছে!\nসরবরাহকারী কোড: ${newCode}`);
     } else {
       await upd.suppliers(suppliers.map(s => s.id === modal.id ? {...form, id: modal.id} : s));
       setModal(null);
@@ -3748,7 +3748,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   };
 
   const saveProduct = async () => {
-    if (!productForm.company) { alert('কোম্পানি সিলেক্ট করুন'); return; }
+    if (!productForm.company) { alert('সরবরাহকারী সিলেক্ট করুন'); return; }
     if (!productForm.cat) { alert('ক্যাটাগরি সিলেক্ট করুন'); return; }
     if (!productForm.name?.trim()) { alert('পণ্যের নাম দিন'); return; }
     
@@ -3884,7 +3884,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           const rowNum = i + 2;
           
           // Get company info
-          const csvCompanyCode = (row['কোম্পানি কোড'] || row['company code'] || '').trim();
+          const csvCompanyCode = (row['সরবরাহকারী কোড'] || row['company code'] || '').trim();
           const csvCompany = (row['কোম্পানি'] || row['company'] || '').trim();
           const csvCategory = (row['ক্যাটাগরি'] || row['category'] || '').trim();
           
@@ -3901,7 +3901,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               
               // Check for duplicate code
               if (csvCompanyCode && newCompanies.some(s => s.code === csvCompanyCode)) {
-                errors.push(`সারি ${rowNum}: কোম্পানি কোড "${csvCompanyCode}" ইতিমধ্যে আছে`);
+                errors.push(`সারি ${rowNum}: সরবরাহকারী কোড "${csvCompanyCode}" ইতিমধ্যে আছে`);
               } else {
                 const newComp = {
                   id: genId(),
@@ -3947,7 +3947,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         setCsvImportResult(result);
         
         let msg = `✅ আমদানি সম্পন্ন!\n\n`;
-        msg += `🏢 নতুন কোম্পানি: ${result.companies}টি\n`;
+        msg += `🏢 নতুন সরবরাহকারী: ${result.companies}টি\n`;
         msg += `📂 নতুন ক্যাটাগরি: ${result.categories}টি\n`;
         if (errors.length > 0) {
           msg += `\n⚠️ সমস্যা: ${errors.length}টি\n`;
@@ -3966,7 +3966,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
   // Download demo CSV
   const downloadSuppliersCSV = () => {
-    const csv = `পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক
+    const csv = `পণ্যের নাম,সরবরাহকারী কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক
 মিনিকেট চাল 5kg,C-00001,মিনিকেট,খাদ্যপণ্য,001,বস্তা,2500,2800,50,10
 মিনিকেট চাল 10kg,C-00001,মিনিকেট,খাদ্যপণ্য,002,বস্তা,4800,5200,30,5
 সুজি চিপস,C-00002,সুজান,স্ন্যাকস,003,পিস,20,25,200,50
@@ -4192,7 +4192,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           <div style={{position:'relative'}}>
             <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
             <input value={search} onChange={e=>setSearch(e.target.value)} 
-              placeholder={activeTab==='companies'?'কোম্পানি খুঁজুন...':'ক্যাটাগরি খুঁজুন...'}
+              placeholder={activeTab==='companies'?'সরবরাহকারী খুঁজুন...':'ক্যাটাগরি খুঁজুন...'}
               style={{...input,paddingLeft:32,padding:'6px 12px',fontSize:12}}/>
           </div>
           <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>setModal({mode:'add'})}>
@@ -4254,19 +4254,19 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             <div style={{fontSize:13,color:T.gray600,lineHeight:1.8}}>
               <div style={{fontWeight:600,marginBottom:8}}>CSV কলাম (Header):</div>
               <code style={{background:T.gray50,padding:'8px 12px',borderRadius:8,display:'block',marginBottom:12}}>
-                পণ্যের নাম, কোম্পানি কোড, কোম্পানি, ক্যাটাগরি, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিনস্টক
+                পণ্যের নাম, সরবরাহকারী কোড, কোম্পানি, ক্যাটাগরি, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিনস্টক
               </code>
               <div style={{marginTop:12}}>
                 <div style={{fontWeight:600,marginBottom:8}}>নিয়মাবলী:</div>
                 <div>✅ কোম্পানি ও ক্যাটাগরি ডুপ্লিকেট হবে না</div>
-                <div>✅ কোম্পানি কোড খালি রাখলে অটো তৈরি হবে</div>
+                <div>✅ সরবরাহকারী কোড খালি রাখলে অটো তৈরি হবে</div>
                 <div>📝 পণ্য যুক্ত করতে পারচেজ (ক্রয়) মেনু ব্যবহার করুন</div>
               </div>
             </div>
             {csvImportResult && (
               <div style={{marginTop:16,padding:16,background:T.tealLight,borderRadius:8}}>
                 <div style={{fontWeight:600,color:T.teal,marginBottom:8}}>✅ সর্বশেষ আমদানি ফলাফল:</div>
-                <div>🏢 নতুন কোম্পানি: {csvImportResult.companies}টি</div>
+                <div>🏢 নতুন সরবরাহকারী: {csvImportResult.companies}টি</div>
                 <div>📂 নতুন ক্যাটাগরি: {csvImportResult.categories}টি</div>
                 {csvImportResult.errors > 0 && (
                   <div style={{color:T.red,marginTop:8}}>⚠️ ত্রুটি: {csvImportResult.errors}টি</div>
@@ -4283,7 +4283,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
-                    {['ক্রম','কোম্পানির নাম','ঠিকানা','CR নম্বর','VAT নম্বর','পণ্য','একশন'].map((h,i)=>(
+                    {['ক্রম','সরবরাহকারীর নাম','ঠিকানা','CR নম্বর','VAT নম্বর','পণ্য','একশন'].map((h,i)=>(
                       <th key={i} style={{padding:'10px 8px',textAlign:i===6?'center':'left',fontSize:10,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
@@ -4293,7 +4293,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                   <tbody>
                     {filtered.length === 0 ? (
-                      <tr><td colSpan={7} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
+                      <tr><td colSpan={7} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো সরবরাহকারী পাওয়া যায়নি</td></tr>
                     ) : filtered.map((s,i)=>(
                       <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                         <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{i+1}</td>
@@ -4328,8 +4328,8 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <>
                 <h3 style={{margin:'0 0 16px'}}>{modal.mode === 'add' ? '🏢 নতুন কোম্পানি যোগ করুন' : '✏️ কোম্পানি সম্পাদনা করুন'}</h3>
                 <div style={{marginBottom:12}}>
-                  <label style={label}>🏢 কোম্পানির নাম *</label>
-                  <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="কোম্পানির নাম" style={input} autoFocus />
+                  <label style={label}>🏢 সরবরাহকারীর নাম *</label>
+                  <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="সরবরাহকারীর নাম" style={input} autoFocus />
                 </div>
                 <div style={{marginBottom:12}}>
                   <label style={label}>🏢 CR নম্বর <span style={{fontSize:10,color:T.gray500}}>(কমার্শিয়াল রেজিস্ট্রেশন)</span></label>
@@ -4487,7 +4487,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
         const csvCategory = (row['ক্যাটাগরি'] || row['category'] || '').trim();
         
         if (csvCompany && !existingCompanies.includes(csvCompany.toLowerCase())) {
-          errors.push(`পণ্য ${i}: "${csvCompany}" কোম্পানি ডাটাবেজে নেই`);
+          errors.push(`পণ্য ${i}: "${csvCompany}" সরবরাহকারী ডাটাবেজে নেই`);
           continue;
         }
         
@@ -4528,7 +4528,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
 
   // Download demo CSV
   const downloadDemoCSV = () => {
-    const csv = 'পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,VAT%,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,15,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,15,80,10\nসুজি চিপস,S001,সুজি,স্ন্যাকস,003,পিস,20,25,15,200,20\nপারফেক্ট সাবান,P001,পারফেক্ট,সৌন্দর্য,004,পিস,35,45,15,150,15';
+    const csv = 'পণ্যের নাম,সরবরাহকারী কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,VAT%,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,15,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,15,80,10\nসুজি চিপস,S001,সুজি,স্ন্যাকস,003,পিস,20,25,15,200,20\nপারফেক্ট সাবান,P001,পারফেক্ট,সৌন্দর্য,004,পিস,35,45,15,150,15';
     const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -4539,7 +4539,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
   // Add item to purchase list
   const addItem = () => {
     if (!form.name?.trim()) { alert('পণ্যের নাম দিন'); return; }
-    if (!form.company?.trim()) { alert('কোম্পানির নাম দিন'); return; }
+    if (!form.company?.trim()) { alert('সরবরাহকারীর নাম দিন'); return; }
     
     const item = {
       id: genId(),
@@ -4659,13 +4659,13 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
               {/* Company */}
               <div style={{position:'relative'}}>
-                <label style={label}>🏢 সরবরাহকারী/কোম্পানি *</label>
+                <label style={label}>🏢 সরবরাহকারী *</label>
                 <div style={{display:'flex',gap:4}}>
                   <input 
                     value={supplierQ} 
                     onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));setShowCompanyList(true);}}
                     onFocus={()=>setShowCompanyList(true)}
-                    placeholder="কোম্পানির নাম..."
+                    placeholder="সরবরাহকারীর নাম..."
                     style={{...input,flex:1,fontSize:13}} 
                     onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                     onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
@@ -5306,7 +5306,7 @@ tr:nth-child(even) { background:#fafafa; }
   <div class="summary-item red">স্টক শেষ: ${outOfStock.length}টি</div>
   <div class="summary-item blue">মোট মূল্য: ৳${totalValue.toLocaleString()}</div>
 </div>
-<table><thead><tr><th>কোম্পানি কোড</th><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>স্টক</th><th>একক</th><th>মিন স্টক</th><th>বিক্রয়মূল্য</th><th>স্টক মূল্য</th><th>অবস্থা</th></tr></thead><tbody>
+<table><thead><tr><th>সরবরাহকারী কোড</th><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>স্টক</th><th>একক</th><th>মিন স্টক</th><th>বিক্রয়মূল্য</th><th>স্টক মূল্য</th><th>অবস্থা</th></tr></thead><tbody>
 ${printFiltered.map(p => {
   const st = p.stock<=0?'শেষ':p.stock<=p.minStock?'কম':'পর্যাপ্ত';
   const stColor = p.stock<=0?'#c62828':p.stock<=p.minStock?'#ef6c00':'#2e7d32';
@@ -5351,7 +5351,7 @@ ${printFiltered.map(p => {
           <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
             <thead>
               <tr style={{background:T.tealLight}}>
-                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
+                {['সরবরাহকারী কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
                   <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>{h}</th>
                 ))}
               </tr>
@@ -5467,7 +5467,7 @@ function LowStockScreen({products, upd}) {
           <input 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
-            placeholder="পণ্য বা কোম্পানি খুঁজুন..." 
+            placeholder="পণ্য বা সরবরাহকারী খুঁজুন..." 
             style={{...input, paddingLeft: 32, height: 36, fontSize: 13}}
           />
         </div>
@@ -7959,7 +7959,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
             <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '0 0 24px' }} />
             <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>🏠 হোম পেজ ব্যানার ছবি</h4>
             <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>
-              বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। কোম্পানি/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।
+              বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। সরবরাহকারী/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।
             </p>
 
             {form.bannerImage && (
@@ -8304,7 +8304,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                 {[
                   { l: '📦 পণ্য ডেটা', c: products.length, btn: 'সব পণ্য মুছে ফেলুন', fn: () => { if(confirm('সব পণ্য মুছে ফেলবেন?')) { upd.products([]); alert('পণ্য মুছা হয়েছে।'); } } },
-                  { l: '🏢 কোম্পানি ডেটা', c: suppliers.length, btn: 'সব কোম্পানি মুছে ফেলুন', fn: () => { if(confirm('সব কোম্পানি মুছে ফেলবেন?')) { upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); } } },
+                  { l: '🏢 কোম্পানি ডেটা', c: suppliers.length, btn: 'সব সরবরাহকারী মুছে ফেলুন', fn: () => { if(confirm('সব সরবরাহকারী মুছে ফেলবেন?')) { upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); } } },
                   { l: '📂 ক্যাটাগরি ডেটা', c: categories.length, btn: 'সব ক্যাটাগরি মুছে ফেলুন', fn: () => { if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { upd.categories([]); alert('ক্যাটাগরি মুছা হয়েছে।'); } } },
                   { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { upd.sales([]); alert('বিক্রয় মুছা হয়েছে।'); } } },
                   { l: '💰 পণ্যের ক্রয়-বিক্রয় দাম পূর্ণ-নির্ধারণ', c: productHistory.filter(h => h.type === 'price_buy' || h.type === 'price_sell').length, btn: 'সব দাম হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('সব দাম হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory(productHistory.filter(h => h.type !== 'price_buy' && h.type !== 'price_sell')); alert('দাম হিস্ট্রি মুছা হয়েছে।'); } } },
