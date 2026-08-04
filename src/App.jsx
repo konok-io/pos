@@ -6410,10 +6410,12 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   ${showAddress && s.name ? '<div>' + s.name + '</div>' : ''}
   ${showAddress && s.address ? '<div>' + s.address + '</div>' : ''}
   ${showAddress && s.phone ? '<div>' + s.phone + '</div>' : ''}
+  ${showAddress && s.taxId ? '<div style="font-weight:bold;">Seller VAT: ' + s.taxId + '</div>' : ''}
   <div>Invoice ID: ${viewPurchase.id.replace(/\D/g,'').slice(-8)}</div>
   <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
   ${showSupplier ? '<div>সরবরাহকারী: ' + viewPurchase.supplier + '</div>' : ''}
   ${showPhone && viewPurchase.phone ? '<div>ফোন: ' + viewPurchase.phone + '</div>' : ''}
+  ${showSupplier && suppliers.find(s=>(s.name||'').toLowerCase()===(viewPurchase.supplier||'').toLowerCase())?.vatNumber ? '<div style="font-weight:bold;">Supplier VAT: ' + suppliers.find(s=>(s.name||'').toLowerCase()===(viewPurchase.supplier||'').toLowerCase())?.vatNumber + '</div>' : ''}
 </div>
 <table>
   <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
@@ -7784,6 +7786,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         {form.purchaseShowAddress!==false&&form.name&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-1}px` }}>{form.name}</div>}
                         {form.purchaseShowAddress!==false&&form.address&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>{form.address}</div>}
                         {form.purchaseShowPhone!==false&&form.phone&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>{form.phone}</div>}
+                        {form.purchaseShowPhone!==false&&form.taxId&&<div style={{ fontWeight: 'bold', fontSize: `${(form.purchaseFontSize||11)-2}px` }}>Seller VAT: {form.taxId}</div>}
                         <div style={{ fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 4 }}>Invoice ID: 12345678</div>
                         <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>২ আগস্ট, ২০২৬</div>
                       </div>
