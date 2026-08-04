@@ -2608,34 +2608,6 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 )}
               </div>
 
-              {/* Supplier CR, VAT, Address - Editable Fields */}
-              <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom:12}}>
-                <div>
-                  <label style={label}>🏢 CR নম্বর</label>
-                  <input 
-                    value={form.supplierCrNumber||''} 
-                    onChange={e=>setForm(f=>({...f,supplierCrNumber:e.target.value}))}
-                    placeholder="CR নম্বর"
-                    style={input} />
-                </div>
-                <div>
-                  <label style={label}>🧾 VAT নম্বর</label>
-                  <input 
-                    value={form.supplierVatNumber||''} 
-                    onChange={e=>setForm(f=>({...f,supplierVatNumber:e.target.value}))}
-                    placeholder="VAT নম্বর"
-                    style={input} />
-                </div>
-                <div style={{gridColumn:'1/-1'}}>
-                  <label style={label}>📍 ঠিকানা</label>
-                  <input 
-                    value={form.supplierAddress||''} 
-                    onChange={e=>setForm(f=>({...f,supplierAddress:e.target.value}))}
-                    placeholder="ঠিকানা"
-                    style={input} />
-                </div>
-              </div>
-
               {/* Category */}
               <div style={{marginBottom:12, position:'relative'}}>
                 <label style={label}>📂 ক্যাটাগরি</label>
@@ -4702,11 +4674,39 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
                 {showCompanyList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:180,overflow:'auto',marginTop:2}}>
                     {filteredCompanies.map((c,i)=>(
-                      <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowCompanyList(false);}}
+                      <div key={i} onClick={()=>{const sup=suppliers.find(s=>(s.name||'').toLowerCase().trim()===c.toLowerCase());setSupplierQ(c);setForm(f=>({...f,company:c,supplierCrNumber:sup?.crNumber||'',supplierVatNumber:sup?.vatNumber||'',supplierAddress:sup?.address||''}));setShowCompanyList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:12}}>{c}</div>
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Supplier CR, VAT, Address */}
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
+                <div>
+                  <label style={label}>🏢 CR নম্বর</label>
+                  <input 
+                    value={form.supplierCrNumber||''} 
+                    onChange={e=>setForm(f=>({...f,supplierCrNumber:e.target.value}))}
+                    placeholder="CR নম্বর"
+                    style={input} />
+                </div>
+                <div>
+                  <label style={label}>🧾 VAT নম্বর</label>
+                  <input 
+                    value={form.supplierVatNumber||''} 
+                    onChange={e=>setForm(f=>({...f,supplierVatNumber:e.target.value}))}
+                    placeholder="VAT নম্বর"
+                    style={input} />
+                </div>
+                <div style={{gridColumn:'1/-1'}}>
+                  <label style={label}>📍 ঠিকানা</label>
+                  <input 
+                    value={form.supplierAddress||''} 
+                    onChange={e=>setForm(f=>({...f,supplierAddress:e.target.value}))}
+                    placeholder="ঠিকানা"
+                    style={input} />
+                </div>
               </div>
 
               {/* Category */}
