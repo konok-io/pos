@@ -2335,7 +2335,10 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
   // Delete product
   const del = async (id) => {
     if (!confirm('এই পণ্যটি মুছে ফেলবেন?')) return;
+    const product = products.find(p=>p.id===id);
+    // Delete product and its stock history
     await upd.products(products.filter(p=>p.id!==id));
+    await upd.productHistory(productHistory.filter(h=>h.productId!==id));
   };
 
   // Purchase history view
