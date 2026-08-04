@@ -977,6 +977,7 @@ function MainApp({ currentUser, onLogout }) {
             productId: newP.id,
             productName: newP.name,
             type: 'stock',
+            source: 'auto', // automatic from purchase/sale
             oldValue: oldP.stock,
             newValue: newP.stock,
             user: user?.name || 'Unknown',
@@ -992,6 +993,7 @@ function MainApp({ currentUser, onLogout }) {
             productId: newP.id,
             productName: newP.name,
             type: 'stock',
+            source: 'auto', // automatic from purchase
             oldValue: 0,
             newValue: newP.stock,
             user: user?.name || 'Unknown',
@@ -5242,13 +5244,35 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   const totalValue = realProducts.reduce((s,p)=>s+p.sellP*p.stock,0);
   
   // Filter only stock change history (exclude price changes)
-  const stockHistory = productHistory.filter(h => h.type === 'stock');
+  // Filter only manual stock change history
+  const manualStockHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'manual');
 
   const adjust = async () => {
     const qty = parseInt(adjQty)||0;
     if(qty<=0) { alert('পরিমাণ দিন'); return; }
     const newS = adjType==='add' ? modal.stock+qty : Math.max(0,modal.stock-qty);
+    const oldS = modal.stock;
+    const change = newS - oldS;
+    
+    // Update product stock
     await upd.products(products.map(p=>p.id===modal.id?{...p,stock:newS}:p));
+    
+    // Save manual stock change directly to history with source='manual'
+    const newHistoryEntry = {
+      id: Date.now().toString(),
+      productId: modal.id,
+      productName: modal.name,
+      type: 'stock',
+      source: 'manual', // manual adjustment
+      oldValue: oldS,
+      newValue: newS,
+      change: change,
+      user: 'You',
+      userEmail: '',
+      timestamp: new Date().toISOString(),
+    };
+    await upd.productHistory([...productHistory, newHistoryEntry]);
+    
     setModal(null); setAdjQty(''); setAdjNote('');
   };
 
@@ -5280,7 +5304,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           fontWeight:600,
           fontSize:13,
         }}>
-          📜 স্টক কমানো বাড়ানোর হিস্ট্রি ({stockHistory.length})
+          📜 স্টক কমানো বাড়ানোর হিস্ট্রি ({manualStockHistory.length})
         </button>
       </div>
 
@@ -5288,9 +5312,9 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
       {invTab === 'history' && (
         <div style={{flex:1,overflow:'auto',padding:12}}>
           <div style={{...card,overflow:'hidden'}}>
-            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📜 স্টক পরিবর্তনের ইতিহাস</div>
-            {stockHistory.length === 0 ? (
-              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো স্টক পরিবর্তন নেই</div>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📜 ম্যানুয়াল স্টক পরিবর্তনের ইতিহাস (শুধু স্টক মেনু থেকে)</div>
+            {manualStockHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ম্যানুয়াল স্টক পরিবর্তন নেই</div>
             ) : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
@@ -5304,7 +5328,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...stockHistory].reverse().map((h,i)=>(
+                  {[...manualStockHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
