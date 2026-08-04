@@ -1999,7 +1999,7 @@ ${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:48p
 /* ═══════════════════════════════════════════
    PRODUCTS SCREEN
 ═══════════════════════════════════════════ */
-function ProductsScreen({products, suppliers, categories, purchases, productHistory, upd}) {
+function ProductsScreen({products, suppliers, categories, purchases, productHistory, upd, settings}) {
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState([]);
