@@ -761,6 +761,19 @@ function MainApp({ currentUser, onLogout }) {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  // Listen for menu actions (from Electron menu bar)
+  useEffect(() => {
+    // Check if running in Electron
+    if (window.electronAPI) {
+      // Listen for tab switch from menu
+      window.electronAPI.onMenuAction((action, data) => {
+        if (action === 'switch-tab' && data) {
+          setTab(data);
+        }
+      });
+    }
+  }, []);
+
   // Auto-enter fullscreen on page load if it was requested before reload
   useEffect(() => {
     const wantFullscreen = localStorage.getItem('pos_want_fullscreen');
