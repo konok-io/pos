@@ -4748,10 +4748,37 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
               {/* Barcode */}
               <div>
                 <label style={label}>🔢 বারকোড</label>
-                <input value={barcodeVal} onChange={e=>{setBarcodeVal(e.target.value);setForm(f=>({...f,barcode:e.target.value}))}} placeholder="বারকোড..." 
+                <input value={barcodeVal} onChange={e=>{setBarcodeVal(e.target.value);setForm(f=>({...f,barcode:e.target.value}))}} placeholder="বারকোড লিখে Enter চাপুন..." 
                   style={{...input,fontSize:13}} 
                   onFocus={(e) => Object.assign(e.target.style, inputFocus)}
-                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
+                  onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && barcodeVal) {
+                      const found = products.find(p => p.barcode === barcodeVal);
+                      if (found) {
+                        const sup = suppliers.find(s => (s.name||'').toLowerCase().trim() === (found.company||'').toLowerCase().trim());
+                        setSupplierQ(found.company||'');
+                        setForm(f => ({
+                          ...f,
+                          name: found.name||'',
+                          barcode: found.barcode||'',
+                          company: found.company||'',
+                          cat: found.cat||'',
+                          unit: found.unit||'পিস',
+                          buyP: found.buyP||'',
+                          sellP: found.sellP||'',
+                          stock: '',
+                          minStock: found.minStock||'5',
+                          supplierCrNumber: sup?.crNumber||'',
+                          supplierVatNumber: sup?.vatNumber||'',
+                          supplierAddress: sup?.address||''
+                        }));
+                        setShowCategoryList(false);
+                      } else {
+                        alert('❌ এই বারকোডে কোনো পণ্য পাওয়া যায়নি!');
+                      }
+                    }
+                  }} />
               </div>
             </div>
 
