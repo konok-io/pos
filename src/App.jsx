@@ -6150,10 +6150,10 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
   );
 
 const filteredSales = filterSales().filter(s => !salesSearch || s.id.toLowerCase().includes(salesSearch.toLowerCase()) || (s.custName||'').toLowerCase().includes(salesSearch.toLowerCase()));
-  const totalSales = fs.reduce((s,i)=>s+i.total,0);
-  const totalPaid  = fs.reduce((s,i)=>s+i.paid,0);
-  const totalDue   = fs.reduce((s,i)=>s+i.due,0);
-  const totalProfit= fs.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.profit||0),0),0);
+  const totalSales =  filteredSales.reduce((s,i)=>s+i.total,0);
+  const totalPaid  =  filteredSales.reduce((s,i)=>s+i.paid,0);
+  const totalDue   =  filteredSales.reduce((s,i)=>s+i.due,0);
+  const totalProfit=  filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.profit||0),0),0);
   const allCredit  = customers.reduce((s,c)=>s+(c.credit||0),0);
   const profitPct  = totalSales>0 ? (totalProfit/totalSales*100).toFixed(1) : 0;
 
@@ -6256,7 +6256,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
 
   const exportSalesCSV = () => {
     const rows = [['তারিখ','ইনভয়েস আইডি','কাস্টমার','মোট','পরিশোধ','বাকি','লাভ'],
-      ...fs.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id,s.custName,s.total,s.paid,s.due,
+      ... filteredSales.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id,s.custName,s.total,s.paid,s.due,
         (s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toFixed(2)])];
     const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
     const a = document.createElement('a');
@@ -6464,7 +6464,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
     {l:'লাভের হার',v:`${profitPct}%`,icon:'🎯',c:T.green,bg:T.greenLight},
     {l:'পরিশোধ হয়েছে',v:fmt(totalPaid),icon:'✅',c:T.green,bg:T.greenLight},
     {l:'বাকি বিক্রয়',v:fmt(totalDue),icon:'⏳',c:T.amber,bg:T.amberLight},
-    {l:'বিলের সংখ্যা',v:fs.length,icon:'🧾',c:T.teal,bg:T.tealLight},
+    {l:'বিলের সংখ্যা',v:filteredSales.length,icon:'🧾',c:T.teal,bg:T.tealLight},
     {l:'সব কাস্টমার বাকি',v:fmt(allCredit),icon:'💳',c:T.red,bg:T.redLight},
   ];
 
@@ -6628,7 +6628,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 ['লাভের হার', `${profitPct}%`],
                 ['পরিশোধ হয়েছে', totalPaid],
                 ['বাকি বিক্রয়', totalDue],
-                ['বিলের সংখ্যা', fs.length],
+                ['বিলের সংখ্যা', filteredSales.length],
                 ['সব কাস্টমার বাকি', allCredit],
               ];
               const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
@@ -6733,7 +6733,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                   </tr>
                 </thead>
                 <tbody>
-                  {fs.length===0 ? (
+                  {filteredSales.length===0 ? (
                     <tr><td colSpan={8} style={{padding:40,textAlign:'center',color:T.gray400}}>
                       <div style={{fontSize:48,marginBottom:12}}>📭</div>
                       নির্বাচিত সময়ে কোনো বিক্রয় নেই
