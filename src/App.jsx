@@ -4244,8 +4244,8 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
-                    {['কোম্পানি কোড','কোম্পানির নাম','ফোন','ঠিকানা','পণ্য সংখ্যা'].map((h,i)=>(
-                      <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                    {['কোম্পানি কোড','কোম্পানির নাম','ফোন','CR নম্বর','VAT নম্বর','পণ্য'].map((h,i)=>(
+                      <th key={i} style={{padding:'10px 8px',textAlign:'left',fontSize:10,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -4254,14 +4254,15 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                   <tbody>
                     {filtered.length === 0 ? (
-                      <tr><td colSpan={5} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
+                      <tr><td colSpan={6} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
                     ) : filtered.map((s,i)=>(
                       <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewSupplier(s)}>
-                        <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{s.code||'-'}</td>
-                        <td style={{padding:'10px 12px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.name}</td>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.phone||'-'}</td>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.address||'-'}</td>
-                        <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{getProductsCount(s.name)}</td>
+                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{s.code||'-'}</td>
+                        <td style={{padding:'10px 8px',fontWeight:600,fontSize:12,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.name}</td>
+                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.phone||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.crNumber||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.vatNumber||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal,textAlign:'center'}}>{getProductsCount(s.name)}</td>
                       </tr>
                     ))}
                   </tbody>
