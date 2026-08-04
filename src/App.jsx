@@ -6285,7 +6285,8 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
   const printPurchases = () => {
     const periodLabel = getPeriodLabel();
     const purchases = filterPurchases();
-    const total = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0);
+    const totalPurchase = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0);
+    const totalItems = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0), 0), 0);
     const totalVat = purchases.reduce((s,p) => {const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;}, 0);
     const grandTotal = total + totalVat;
     
@@ -6294,7 +6295,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
     <html>
     <head>
       <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
-      <title>বিক্রয় ইতিহাস</title>
+      <title>পারচেজ হিস্ট্রি</title>
       <style>
         @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
@@ -6337,7 +6338,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <td>${new Date(p.date).toLocaleDateString('bn-BD')}</td>
             <td style="font-family:monospace;color:#00897b;font-weight:600;">${p.id}</td>
             <td>${p.supplier}</td>
-            <td style="text-align:center;">${p.totalItems}টি</td>
+            <td style="text-align:center;">${p.items.reduce((a,i)=>a+(i.stock||0),0)}টি</td>
             <td style="text-align:right;font-weight:600;">৳${p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:#c62828;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0) * 0.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;font-weight:700;color:#00897b;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0) * 1.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
@@ -6346,14 +6347,12 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
     
     html += `
         </tbody>
-          <tr class="total-row">
-            <td colspan="4" style="text-align:right;">মোট পারচেজ এমাউন্ট:</td>
-            <td style="text-align:right;">৳${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;">৳${totalVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;font-weight:bold;color:#00897b;">৳${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-          </tr>
         <tfoot>
           <tr class="total-row">
+            <td colspan="2" style="text-align:right;">মোট:</td>
+            <td style="text-align:center;">${purchases.length}টি বিল</td>
+            <td style="text-align:center;">${totalItems}টি</td>
+            <td style="text-align:right;">৳${totalPurchase.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;font-weight:bold;color:#00897b;">৳${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>
@@ -6382,7 +6381,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
     <html>
     <head>
       <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
-      <title>বিক্রয় ইতিহাস</title>
+      <title>পারচেজ হিস্ট্রি</title>
       <style>
         @page { size: A4 landscape; margin: 12.7mm; }
         * { margin:0; padding:0; box-sizing:border-box; }
