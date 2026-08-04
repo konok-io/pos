@@ -3825,10 +3825,6 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       setCatForm({name:''});
     }
   };
-    await upd.categories([...categories, newCat]);
-    alert(`✅ ক্যাটাগরি যোগ করা হয়েছে!\nক্যাটাগরি: ${catForm.name.trim()}`);
-    setCatForm({name:''});
-  };
 
   const del = async (id) => {
     if (!confirm('এই কোম্পানি মুছে ফেলবেন?')) return;
