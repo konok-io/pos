@@ -5242,13 +5242,33 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-      {/* Sub-tabs: List / History */}
-      <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
-        <button onClick={()=>setInvTab('list')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:invTab==='list'?700:400,color:invTab==='list'?T.teal:T.gray500,borderBottom:invTab==='list'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+      {/* Sub-tabs: List / History - Centered with borders */}
+      <div style={{display:'flex',gap:8,alignItems:'center',background:T.white,padding:'10px 12px',flexWrap:'wrap',justifyContent:'center'}}>
+        <button onClick={()=>setInvTab('list')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${invTab==='list'?T.teal:T.gray200}`,
+          background:invTab==='list'?T.teal:T.gray100,
+          color:invTab==='list'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
           📦 স্টক তালিকা
         </button>
-        <button onClick={()=>setInvTab('history')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:invTab==='history'?700:400,color:invTab==='history'?T.teal:T.gray500,borderBottom:invTab==='history'?`2px solid ${T.teal}`:'none',fontSize:13}}>
-          📜 হিস্ট্রি ({stockHistory.length})
+        <button onClick={()=>setInvTab('history')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${invTab==='history'?T.teal:T.gray200}`,
+          background:invTab==='history'?T.teal:T.gray100,
+          color:invTab==='history'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
+          📜 স্টক কমানো বাড়ানোর হিস্ট্রি ({stockHistory.length})
         </button>
       </div>
 
