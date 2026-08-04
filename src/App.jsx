@@ -3795,7 +3795,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [showCatDrop, setShowCatDrop] = useState(false);
   const [showCsvSection, setShowCsvSection] = useState(false);
   const [csvImportResult, setCsvImportResult] = useState(null);
-  const [newSupplier, setNewSupplier] = useState({name:'',phone:'',email:'',address:'',company:''});
+  const [newSupplier, setNewSupplier] = useState({name:'',phone:'',email:'',address:'',company:'',crNumber:'',vatNumber:''});
   
   // Handle Add New Supplier
   const handleAddSupplier = async () => {
@@ -3809,12 +3809,13 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         phone: newSupplier.phone || '',
         email: newSupplier.email || '',
         address: newSupplier.address || '',
-        vatNumber: '',
+        crNumber: newSupplier.crNumber || '',
+        vatNumber: newSupplier.vatNumber || '',
         company: newSupplier.company || newSupplier.name.trim()
       });
       if (result.success) {
         alert('✅ সরবরাহকারী যুক্ত হয়েছে!');
-        setNewSupplier({name:'',phone:'',email:'',address:'',company:''});
+        setNewSupplier({name:'',phone:'',email:'',address:'',company:'',crNumber:'',vatNumber:''});
         // Refresh data
         const data = await loadAllData();
         if (data.suppliers) {
@@ -4521,6 +4522,21 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                     value={newSupplier.phone} 
                     onChange={e=>setNewSupplier({...newSupplier,phone:e.target.value})}
                     style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="🧾 CR নম্বর" 
+                    value={newSupplier.crNumber || ''} 
+                    onChange={e=>setNewSupplier({...newSupplier,crNumber:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="🧾 VAT নম্বর" 
+                    value={newSupplier.vatNumber || ''} 
+                    onChange={e=>setNewSupplier({...newSupplier,vatNumber:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    maxLength={15}
                   />
                   <input 
                     type="text" 
