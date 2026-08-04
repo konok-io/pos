@@ -3997,22 +3997,14 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
           <button style={btn()} onClick={()=>setViewSupplier(null)}>← ফিরে যান</button>
           <span style={{fontWeight:700,fontSize:15}}>🏢 {viewSupplier.name}</span>
-          {viewSupplier.code && <span style={{fontSize:12,color:T.teal,fontWeight:600,marginLeft:8}}>{viewSupplier.code}</span>}
+          <span style={{fontSize:12,color:T.gray500,marginLeft:8}}>CR: {viewSupplier.crNumber || '-'}</span>
         </div>
         <div style={{flex:1,overflow:'auto',padding:12}}>
-          {/* CR Number Banner */}
-          {viewSupplier.crNumber && (
-            <div style={{padding:'12px 16px',background:'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',borderRadius:10,marginBottom:12,color:T.white}}>
-              <div style={{fontSize:12,fontWeight:600,opacity:0.9}}>🏢 CR নম্বর</div>
-              <div style={{fontSize:18,fontWeight:800,marginTop:4,letterSpacing:'1px'}}>{viewSupplier.crNumber}</div>
-            </div>
-          )}
-          {/* VAT Number Banner - Important for Input Tax Credit */}
+          {/* VAT Banner */}
           {viewSupplier.vatNumber && (
             <div style={{padding:'12px 16px',background:'linear-gradient(135deg, #059669 0%, #047857 100%)',borderRadius:10,marginBottom:16,color:T.white}}>
-              <div style={{fontSize:12,fontWeight:600,opacity:0.9}}>🧾 সরবরাহকারীর VAT নম্বর</div>
-              <div style={{fontSize:18,fontWeight:800,marginTop:4,letterSpacing:'1px'}}>{viewSupplier.vatNumber}</div>
-              <div style={{fontSize:11,opacity:0.8,marginTop:4}}>ZATCA ইনপুট VAT ক্রেডিটের জন্য প্রয়োজন</div>
+              <div style={{fontSize:12,fontWeight:600,opacity:0.9}}>🧾 VAT নম্বর (ZATCA ক্রেডিটের জন্য)</div>
+              <div style={{fontSize:20,fontWeight:800,marginTop:4,letterSpacing:'1px'}}>{viewSupplier.vatNumber}</div>
             </div>
           )}
           {/* Stats */}
@@ -4030,17 +4022,6 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <div style={{fontSize:12,color:T.gray500}}>মোট একক</div>
             </div>
           </div>
-          
-          {/* Actions */}
-          <div style={{display:'flex',gap:8,marginBottom:16}}>
-            <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ হিস্ট্রি</button>
-            {!viewSupplier.isAuto && (
-              <>
-                <button style={btn()} onClick={()=>{setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️ সম্পাদনা</button>
-                <button style={btn('danger')} onClick={()=>del(viewSupplier.id)}>🗑️ মুছুন</button>
-              </>
-            )}
-          </div>
 
           {/* Products List */}
           <div style={{...card,padding:0}}>
@@ -4049,14 +4030,6 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <div style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পণ্য নেই</div>
             ) : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
-                <thead>
-                  <tr style={{background:T.tealLight}}>
-                    <th style={{padding:'8px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্য</th>
-                    <th style={{padding:'8px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>স্টক</th>
-                    <th style={{padding:'8px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>ক্রয়মূল্য</th>
-                    <th style={{padding:'8px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>বিক্রয়মূল্য</th>
-                  </tr>
-                </thead>
                 <tbody>
                   {supProducts.map(p => (
                     <tr key={p.id} style={{borderBottom:`1px solid ${T.gray100}`}}>
@@ -4236,15 +4209,10 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       {/* COMPANIES TAB */}
         {activeTab === 'companies' && (
           <div style={{...card,marginBottom:16,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 180px)'}}>
-              {/* Header with Action Buttons */}
-              <div style={{padding:'12px 16px',borderBottom:`1px solid ${T.gray200}`,background:T.gray50,display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
-                <button onClick={()=>{setForm({});setModal({mode:'add'});}} style={{...btn('primary'),fontSize:13,padding:'8px 16px'}}>➕ নতুন কোম্পানি</button>
-                <div style={{marginLeft:'auto',fontSize:12,color:T.gray500}}>{filtered.length}টি কোম্পানি</div>
-              </div>
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
-                    {['কোম্পানি কোড','কোম্পানির নাম','ফোন','CR নম্বর','VAT নম্বর','পণ্য'].map((h,i)=>(
+                    {['ক্রম','কোম্পানির নাম','CR নম্বর','VAT নম্বর','পণ্য',''].map((h,i)=>(
                       <th key={i} style={{padding:'10px 8px',textAlign:'left',fontSize:10,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
@@ -4256,13 +4224,21 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                     {filtered.length === 0 ? (
                       <tr><td colSpan={6} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
                     ) : filtered.map((s,i)=>(
-                      <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewSupplier(s)}>
-                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{s.code||'-'}</td>
+                      <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{i+1}</td>
                         <td style={{padding:'10px 8px',fontWeight:600,fontSize:12,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.name}</td>
-                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.phone||'-'}</td>
                         <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.crNumber||'-'}</td>
                         <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.vatNumber||'-'}</td>
                         <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal,textAlign:'center'}}>{getProductsCount(s.name)}</td>
+                        <td style={{padding:'10px 8px',whiteSpace:'nowrap'}}>
+                          <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
+                          {!s.isAuto && (
+                            <>
+                              <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
+                              <button onClick={()=>del(s.id)} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
+                            </>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
