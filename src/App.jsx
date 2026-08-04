@@ -6255,8 +6255,10 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
   };
 
   const exportSalesCSV = () => {
-    const rows = [['তারিখ','ইনভয়েস আইডি','কাস্টমার','মোট','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'],
-      ... filteredSales.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id,s.custName,s.total,s.paid,s.due,
+    const rows = [['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','ক্রয়মূল্য','বিক্রয়মূল্য','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'],
+      ... filteredSales.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id,s.custName,(s.items||[]).length,
+        (s.items||[]).reduce((a,i)=>a+(i.qty||0)*(i.buyP||0),0).toFixed(2),
+        s.total,s.paid,s.due,
         (s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toFixed(2),
         ((s.items||[]).reduce((a,i)=>a+(i.qty||0)*(i.buyP||0),0)*0.15).toFixed(2),
         (s.total*15/115).toFixed(2),
@@ -6410,7 +6412,8 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <th>বিল নং</th>
             <th>কাস্টমার</th>
             <th style="text-align:center;">পণ্য</th>
-            <th style="text-align:right;">মোট</th>
+            <th style="text-align:right;">ক্রয়মূল্য</th>
+            <th style="text-align:right;">বিক্রয়মূল্য</th>
             <th style="text-align:right;">পরিশোধ</th>
             <th style="text-align:right;">বাকি</th>
             <th style="text-align:right;">লাভ</th>
@@ -6422,7 +6425,8 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         <tbody>`;
     
     filteredSales.forEach(s => {
-      const purchaseVat = (s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15;
+      const purchasePrice = (s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0);
+      const purchaseVat = purchasePrice*0.15;
       const salesVat = s.total*15/115;
       const remainingVat = salesVat - purchaseVat;
       html += `
@@ -6431,7 +6435,8 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <td style="font-family:monospace;color:#00897b;font-weight:600;">#${s.id.slice(-6).toUpperCase()}</td>
             <td>${s.custName}</td>
             <td style="text-align:center;">${(s.items||[]).length}টি</td>
-            <td style="text-align:right;font-weight:600;">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:600;color:#666;">৳${purchasePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:600;color:#00897b;">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:#2e7d32;">৳${s.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:${s.due>0?'#c62828':'#999'};">৳${s.due.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:#2e7d32;">৳${(s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
@@ -6446,6 +6451,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         <tfoot>
           <tr class="total-row">
             <td colspan="4" style="text-align:right;">মোট:</td>
+            <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0),0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
@@ -6736,14 +6742,14 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.gray50}}>
-                    {['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'].map(h=>(
+                    {['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','ক্রয়মূল্য','বিক্রয়মূল্য','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'].map(h=>(
                       <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredSales.length===0 ? (
-                    <tr><td colSpan={11} style={{padding:40,textAlign:'center',color:T.gray400}}>
+                    <tr><td colSpan={12} style={{padding:40,textAlign:'center',color:T.gray400}}>
                       <div style={{fontSize:48,marginBottom:12}}>📭</div>
                       নির্বাচিত সময়ে কোনো বিক্রয় নেই
                     </td></tr>
@@ -6753,7 +6759,8 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                       <td style={{padding:'12px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600,fontFamily:'monospace'}} onClick={()=>setViewSale(s)}>{s.id}</td>
                       <td style={{padding:'12px',fontSize:12}}>{s.custName}</td>
                       <td style={{padding:'12px',fontSize:12,color:T.gray400}}>{(s.items||[]).length}টি</td>
-                      <td style={{padding:'12px',fontWeight:600,fontSize:13}}>{fmt(s.total)}</td>
+                      <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.gray600}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0))}</td>
+                      <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.teal}}>{fmt(s.total)}</td>
                       <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt(s.paid)}</td>
                       <td style={{padding:'12px',fontWeight:s.due>0?700:400,color:s.due>0?T.red:T.gray400}}>{fmt(s.due)}</td>
                       <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.profit||0),0))}</td>
@@ -6765,7 +6772,8 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 </tbody>
                 <tfoot>
                   <tr style={{background:T.tealLight}}>
-                    <td colSpan={4} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট:</td>
+                    <td colSpan={5} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট:</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{fmt(filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0),0))}</td>
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(totalSales)}</td>
                     <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalPaid)}</td>
                     <td style={{padding:'12px',fontWeight:700,fontSize:13,color:totalDue>0?T.red:T.gray400}}>{fmt(totalDue)}</td>
