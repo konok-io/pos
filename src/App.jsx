@@ -4103,54 +4103,62 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   if (viewCategory) {
     const catProducts = products.filter(p => p.cat === viewCategory.name && p.name);
     const totalValue = catProducts.reduce((s,p) => s + (p.stock || 0) * (p.sellP || 0), 0);
-    
-    return (
-      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-        <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
-          <button style={btn()} onClick={()=>setViewCategory(null)}>← ফিরে যান</button>
-          <span style={{fontWeight:700,fontSize:15}}>📂 {viewCategory.name}</span>
-          <span style={{fontSize:12,color:T.gray500,marginLeft:8}}>({viewCategory.company})</span>
-        </div>
-        <div style={{flex:1,overflow:'auto',padding:12}}>
-          {/* Stats */}
-          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:16}}>
-            <div style={{...card,padding:16,textAlign:'center'}}>
-              <div style={{fontSize:24,fontWeight:800,color:T.teal}}>{catProducts.length}</div>
-              <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
-            </div>
-            <div style={{...card,padding:16,textAlign:'center'}}>
-              <div style={{fontSize:24,fontWeight:800,color:T.orange}}>{catProducts.reduce((s,p)=>s+p.stock,0)}</div>
-              <div style={{fontSize:12,color:T.gray500}}>মোট স্টক</div>
-            </div>
-            <div style={{...card,padding:16,textAlign:'center'}}>
-              <div style={{fontSize:24,fontWeight:800,color:T.green}}>{fmt(totalValue)}</div>
-              <div style={{fontSize:12,color:T.gray500}}>মোট মূল্য</div>
-            </div>
-          </div>
 
-          {/* Actions */}
-          <div style={{display:'flex',gap:8,marginBottom:16}}>
-            <button style={btn('primary')} onClick={()=>{setViewCategory(null);setCatForm({name:viewCategory.name});setModal({mode:'editCat',catName:viewCategory.name,catId:viewCategory.id});}}>✏️ সম্পাদনা</button>
+    return (
+      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden',background:T.gray50}}>
+        {/* Header */}
+        <div style={{padding:'16px 20px',display:'flex',gap:12,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+          <button style={btn()} onClick={()=>setViewCategory(null)}>← ফিরে যান</button>
+          <div style={{display:'flex',flexDirection:'column'}}>
+            <span style={{fontWeight:700,fontSize:18,color:T.teal}}>📂 {viewCategory.name}</span>
+            {viewCategory.company && (
+              <span style={{fontSize:12,color:T.gray500,marginTop:4}}>🏢 {viewCategory.company}</span>
+            )}
+          </div>
+          <div style={{marginLeft:'auto',display:'flex',gap:8}}>
+            <button style={btn()} onClick={()=>{setViewCategory(null);setCatForm({name:viewCategory.name});setModal({mode:'editCat',catName:viewCategory.name,catId:viewCategory.id});}}>✏️ সম্পাদনা</button>
             <button style={btn('danger')} onClick={()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){setViewCategory(null);upd.categories(categories.filter(c=>c.id!==viewCategory.id));}}}>🗑️ মুছুন</button>
           </div>
+        </div>
 
-          {/* Products List */}
+        {/* Content */}
+        <div style={{flex:1,overflow:'auto',padding:20}}>
+          {/* Stats Row */}
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:16}}>
+            <div style={{...card,padding:20,textAlign:'center'}}>
+              <div style={{fontSize:32,fontWeight:800,color:T.teal}}>{catProducts.length}</div>
+              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>পণ্য</div>
+            </div>
+            <div style={{...card,padding:20,textAlign:'center'}}>
+              <div style={{fontSize:32,fontWeight:800,color:T.orange}}>{catProducts.reduce((s,p)=>s+p.stock,0)}</div>
+              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>স্টক</div>
+            </div>
+            <div style={{...card,padding:20,textAlign:'center'}}>
+              <div style={{fontSize:32,fontWeight:800,color:T.green}}>{fmt(totalValue)}</div>
+              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>মূল্য</div>
+            </div>
+          </div>
+
+          {/* Products Table */}
           <div style={{...card,padding:0}}>
-            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📦 পণ্য তালিকা</div>
+            <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontWeight:700,fontSize:14}}>📦 পণ্য</span>
+              <span style={{fontSize:12,color:T.gray400}}>{catProducts.length}টি</span>
+            </div>
             {catProducts.length === 0 ? (
-              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পণ্য নেই</div>
+              <div style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পণ্য নেই</div>
             ) : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <tbody>
-                  {catProducts.map(p => (
-                    <tr key={p.id} style={{borderBottom:`1px solid ${T.gray100}`}}>
-                      <td style={{padding:'8px 12px'}}>
-                        <div style={{fontWeight:600,fontSize:13}}>{p.name}</div>
-                        <div style={{fontSize:11,color:T.gray400}}>{p.barcode}</div>
+                  {catProducts.map((p,i) => (
+                    <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA'}}>
+                      <td style={{padding:'12px 16px'}}>
+                        <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
+                        <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{p.barcode}</div>
                       </td>
-                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:600}}>{p.stock} {p.unit}</td>
-                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:600,color:T.orange}}>{fmt(p.buyP)}</td>
-                      <td style={{padding:'8px 12px',textAlign:'right',fontWeight:700,color:T.teal}}>{fmt(p.sellP)}</td>
+                      <td style={{padding:'12px 16px',textAlign:'center',color:T.gray600,fontSize:13}}>{p.stock} {p.unit}</td>
+                      <td style={{padding:'12px 16px',textAlign:'right',fontWeight:600,color:T.gray600}}>{fmt(p.buyP)}</td>
+                      <td style={{padding:'12px 16px',textAlign:'right',fontWeight:700,color:T.teal,fontSize:14}}>{fmt(p.sellP)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -4161,6 +4169,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       </div>
     );
   }
+
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
