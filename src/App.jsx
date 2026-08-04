@@ -566,7 +566,7 @@ function LoginScreen({ onLogin, settings }) {
               fontWeight: 600,
               letterSpacing: '0.3px'
             }}>
-              POS সরবরাহকারী সিস্টেম
+              POS ম্যানেজমেন্ট সিস্টেম
             </span>
           </div>
         </div>
@@ -1104,7 +1104,7 @@ function MainApp({ currentUser, onLogout }) {
             <div style={{width:44,height:44,background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,boxShadow:'0 4px 12px rgba(15,118,110,0.3)'}}>🏪</div>
             <div>
               <div style={{fontWeight:800,fontSize:17,color:T.gray900,lineHeight:1.2}}>{settings.name}</div>
-              <div style={{fontSize:11,color:T.gray400}}>POS সরবরাহকারী সিস্টেম</div>
+              <div style={{fontSize:11,color:T.gray400}}>POS ম্যানেজমেন্ট সিস্টেম</div>
             </div>
           </div>
           
