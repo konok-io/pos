@@ -6281,6 +6281,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
     const purchases = filterPurchases();
     const total = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0);
     const totalVat = purchases.reduce((s,p) => {const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;}, 0);
+    const grandTotal = total + totalVat;
     
     let html = `
     <!DOCTYPE html>
@@ -6319,6 +6320,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <th style="text-align:center;">পণ্য</th>
             <th style="text-align:right;">মোট খরচ</th>
             <th style="text-align:right;">ভ্যাট</th>
+            <th style="text-align:right;">সর্বমোট</th>
           </tr>
         </thead>
         <tbody>`;
@@ -6332,16 +6334,22 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <td style="text-align:center;">${p.totalItems}টি</td>
             <td style="text-align:right;font-weight:600;">৳${p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:#c62828;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0) * 0.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:700;color:#00897b;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0) * 1.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>`;
     });
     
     html += `
         </tbody>
-        <tfoot>
           <tr class="total-row">
             <td colspan="4" style="text-align:right;">মোট পারচেজ এমাউন্ট:</td>
             <td style="text-align:right;">৳${total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:bold;color:#00897b;">৳${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>
+        <tfoot>
+          <tr class="total-row">
+            <td style="text-align:right;">৳${totalVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:bold;color:#00897b;">৳${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>
         </tfoot>
       </table>
