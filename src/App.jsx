@@ -161,19 +161,87 @@ const STORAGE_KEYS = {
   productHistory: 'pos_product_history',
 };
 
-/* ─────────────── STORAGE ─────────────── */
+/* ─────────────── INDEXEDDB STORAGE (Persistent) ─────────────── */
+const DB_NAME = 'POS_Database';
+const DB_VERSION = 1;
+const STORE_NAME = 'pos_data';
+
+let idb = null;
+let idbInitPromise = null;
+
+function initIndexedDB() {
+  if (idbInitPromise) return idbInitPromise;
+  
+  idbInitPromise = new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    
+    request.onerror = () => {
+      console.error('IndexedDB error:', request.error);
+      reject(request.error);
+    };
+    
+    request.onsuccess = () => {
+      idb = request.result;
+      resolve(idb);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME);
+      }
+    };
+  });
+  
+  return idbInitPromise;
+}
+
 const db = {
-  get(k) {
+  async get(k) {
+    await initIndexedDB();
+    return new Promise((resolve) => {
+      try {
+        const tx = idb.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const request = store.get(k);
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => resolve(null);
+      } catch { resolve(null); }
+    });
+  },
+  
+  async set(k, v) {
+    await initIndexedDB();
+    return new Promise((resolve) => {
+      try {
+        const tx = idb.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.put(v, k);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => resolve();
+      } catch { resolve(); }
+    });
+  },
+  
+  async clear() {
+    await initIndexedDB();
+    return new Promise((resolve) => {
+      try {
+        const tx = idb.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.clear();
+        tx.oncomplete = () => resolve();
+      } catch { resolve(); }
+    });
+  },
+  
+  // Sync method - saves to both IndexedDB and localStorage (for backup)
+  async sync(k, v) {
+    await this.set(k, v);
+    // Also save to localStorage as backup (won't be cleared by normal cache clear)
     try {
-      const v = localStorage.getItem(k);
-      return v ? JSON.parse(v) : null;
-    } catch { return null; }
-  },
-  set(k, v) {
-    try { localStorage.setItem(k, JSON.stringify(v)); } catch(e) { console.error(e); }
-  },
-  clear() {
-    Object.values(STORAGE_KEYS).forEach(k => localStorage.removeItem(k));
+      localStorage.setItem(k, JSON.stringify(v));
+    } catch {}
   }
 };
 
@@ -431,7 +499,7 @@ function LoginScreen({ onLogin, settings }) {
     await new Promise(r => setTimeout(r, 500));
 
     // Check credentials
-    const users = db.get(STORAGE_KEYS.users) || [];
+    const users = await db.get(STORAGE_KEYS.users) || [];
     const allUsers = [DEFAULT_SUPER_ADMIN, ...users];
     
     const user = allUsers.find(u => u.email === email && u.password === password);
@@ -443,7 +511,7 @@ function LoginScreen({ onLogin, settings }) {
         role: user.role,
         loginTime: new Date().toISOString(),
       };
-      db.set(STORAGE_KEYS.auth, authData);
+      await db.set(STORAGE_KEYS.auth, authData);
       onLogin(authData);
     } else {
       setError('❌ ইমেইল বা পাসওয়ার্ড ভুল!');
@@ -829,78 +897,83 @@ function MainApp({ currentUser, onLogout }) {
   }, []);
 
   useEffect(() => {
-    // Check if reset was done - flag stays forever to prevent DEMO loading
-    const wasReset = db.get('pos_reset_done');
-    
-    // Load from localStorage
-    const savedProducts = db.get(STORAGE_KEYS.products);
-    const savedCustomers = db.get(STORAGE_KEYS.customers);
-    const savedSales = db.get(STORAGE_KEYS.sales);
-    const savedSettings = db.get(STORAGE_KEYS.settings);
-    const savedSuppliers = db.get(STORAGE_KEYS.suppliers) || [];
-    const savedPurchases = db.get(STORAGE_KEYS.purchases) || [];
-    const savedCategories = db.get(STORAGE_KEYS.categories) || [];
-    const savedProductHistory = db.get(STORAGE_KEYS.productHistory) || [];
+    // Async function to load data from IndexedDB
+    async function loadData() {
+      // Check if reset was done - flag stays forever to prevent DEMO loading
+      const wasReset = await db.get('pos_reset_done');
+      
+      // Load from IndexedDB
+      const savedProducts = await db.get(STORAGE_KEYS.products);
+      const savedCustomers = await db.get(STORAGE_KEYS.customers);
+      const savedSales = await db.get(STORAGE_KEYS.sales);
+      const savedSettings = await db.get(STORAGE_KEYS.settings);
+      const savedSuppliers = await db.get(STORAGE_KEYS.suppliers) || [];
+      const savedPurchases = await db.get(STORAGE_KEYS.purchases) || [];
+      const savedCategories = await db.get(STORAGE_KEYS.categories) || [];
+      const savedProductHistory = await db.get(STORAGE_KEYS.productHistory) || [];
 
-    // If reset was done, always use empty data (never load DEMO)
-    if (wasReset) {
-      setProducts(savedProducts || []);
-      setCustomers(savedCustomers || []);
-      setCategories(savedCategories);
-      setSuppliers(savedSuppliers);
+      // If reset was done, always use empty data (never load DEMO)
+      if (wasReset) {
+        setProducts(savedProducts || []);
+        setCustomers(savedCustomers || []);
+        setCategories(savedCategories);
+        setSuppliers(savedSuppliers);
+        setSales(savedSales || []);
+        setPurchases(savedPurchases);
+        setProductHistory(savedProductHistory);
+        setSettings(savedSettings ? {...{...DEFAULT_SETTINGS}, ...savedSettings} : {...DEFAULT_SETTINGS});
+        setReady(true);
+        return;
+      }
+
+      // If no data exists and not reset, load DEMO data
+      if (!savedProducts || savedProducts.length === 0) {
+        setProducts(DEMO.products);
+        await db.set(STORAGE_KEYS.products, DEMO.products);
+      } else {
+        setProducts(savedProducts);
+      }
+
+      if (!savedCustomers || savedCustomers.length === 0) {
+        setCustomers(DEMO.customers);
+        await db.set(STORAGE_KEYS.customers, DEMO.customers);
+      } else {
+        setCustomers(savedCustomers);
+      }
+
       setSales(savedSales || []);
+      setSuppliers(savedSuppliers);
       setPurchases(savedPurchases);
       setProductHistory(savedProductHistory);
-      setSettings(savedSettings ? {...{...DEFAULT_SETTINGS}, ...savedSettings} : {...DEFAULT_SETTINGS});
-      setReady(true);
-      return;
-    }
 
-    // If no data exists and not reset, load DEMO data
-    if (!savedProducts || savedProducts.length === 0) {
-      setProducts(DEMO.products);
-      db.set(STORAGE_KEYS.products, DEMO.products);
-    } else {
-      setProducts(savedProducts);
-    }
-
-    if (!savedCustomers || savedCustomers.length === 0) {
-      setCustomers(DEMO.customers);
-      db.set(STORAGE_KEYS.customers, DEMO.customers);
-    } else {
-      setCustomers(savedCustomers);
-    }
-
-    setSales(savedSales || []);
-    setSuppliers(savedSuppliers);
-    setPurchases(savedPurchases);
-    setProductHistory(savedProductHistory);
-
-    // Migrate old category products to new categories state
-    if (savedCategories && savedCategories.length > 0) {
-      setCategories(savedCategories);
-    } else if (savedProducts) {
-      const oldCategories = savedProducts
-        .filter(p => p.name?.includes('(ক্যাটাগরি)'))
-        .map(p => ({ id: p.id, name: p.cat, company: p.company }));
-      if (oldCategories.length > 0) {
-        setCategories(oldCategories);
-        db.set(STORAGE_KEYS.categories, oldCategories);
-        // Remove old category products from products
-        const realProducts = savedProducts.filter(p => !p.name?.includes('(ক্যাটাগরি)'));
-        setProducts(realProducts);
-        db.set(STORAGE_KEYS.products, realProducts);
+      // Migrate old category products to new categories state
+      if (savedCategories && savedCategories.length > 0) {
+        setCategories(savedCategories);
+      } else if (savedProducts) {
+        const oldCategories = savedProducts
+          .filter(p => p.name?.includes('(ক্যাটাগরি)'))
+          .map(p => ({ id: p.id, name: p.cat, company: p.company }));
+        if (oldCategories.length > 0) {
+          setCategories(oldCategories);
+          await db.set(STORAGE_KEYS.categories, oldCategories);
+          // Remove old category products from products
+          const realProducts = savedProducts.filter(p => !p.name?.includes('(ক্যাটাগরি)'));
+          setProducts(realProducts);
+          await db.set(STORAGE_KEYS.products, realProducts);
+        } else {
+          setCategories([]);
+        }
       } else {
         setCategories([]);
       }
-    } else {
-      setCategories([]);
+
+      const defaultSettings = {...DEFAULT_SETTINGS};
+      setSettings(savedSettings ? {...defaultSettings, ...savedSettings} : defaultSettings);
+
+      setReady(true);
     }
-
-    const defaultSettings = {...DEFAULT_SETTINGS};
-    setSettings(savedSettings ? {...defaultSettings, ...savedSettings} : defaultSettings);
-
-    setReady(true);
+    
+    loadData();
   }, []);
 
   // Auto-logout after 15 minutes of inactivity
@@ -1007,24 +1080,23 @@ function MainApp({ currentUser, onLogout }) {
     if (changes.length > 0) {
       const newHistory = [...productHistory, ...changes];
       setProductHistory(newHistory);
-      db.set(STORAGE_KEYS.productHistory, newHistory);
+      await db.set(STORAGE_KEYS.productHistory, newHistory);
     }
   };
 
   const upd = {
-    products: v => { 
+    products: async v => { 
       trackProductHistory(products, v, currentUser); 
       setProducts(v); 
-      db.set(STORAGE_KEYS.products, v); 
-      return Promise.resolve(); 
+      await db.set(STORAGE_KEYS.products, v); 
     },
-    customers: v => { setCustomers(v); db.set(STORAGE_KEYS.customers, v); return Promise.resolve(); },
-    sales: v => { setSales(v); db.set(STORAGE_KEYS.sales, v); return Promise.resolve(); },
-    settings: v => { setSettings(v); db.set(STORAGE_KEYS.settings, v); return Promise.resolve(); },
-    suppliers: v => { setSuppliers(v); db.set(STORAGE_KEYS.suppliers, v); return Promise.resolve(); },
-    categories: v => { setCategories(v); db.set(STORAGE_KEYS.categories, v); return Promise.resolve(); },
-    purchases: v => { setPurchases(v); db.set(STORAGE_KEYS.purchases, v); return Promise.resolve(); },
-    productHistory: v => { setProductHistory(v); db.set(STORAGE_KEYS.productHistory, v); return Promise.resolve(); },
+    customers: async v => { setCustomers(v); await db.set(STORAGE_KEYS.customers, v); },
+    sales: async v => { setSales(v); await db.set(STORAGE_KEYS.sales, v); },
+    settings: async v => { setSettings(v); await db.set(STORAGE_KEYS.settings, v); },
+    suppliers: async v => { setSuppliers(v); await db.set(STORAGE_KEYS.suppliers, v); },
+    categories: async v => { setCategories(v); await db.set(STORAGE_KEYS.categories, v); },
+    purchases: async v => { setPurchases(v); await db.set(STORAGE_KEYS.purchases, v); },
+    productHistory: async v => { setProductHistory(v); await db.set(STORAGE_KEYS.productHistory, v); },
   };
 
   if (!ready) return (
@@ -1051,17 +1123,17 @@ function MainApp({ currentUser, onLogout }) {
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd, currentUser};
 
-  // Refresh data from localStorage without reloading page
-  const handleHardRefresh = () => {
-    const wasReset = db.get('pos_reset_done');
+  // Refresh data from IndexedDB without reloading page
+  const handleHardRefresh = async () => {
+    const wasReset = await db.get('pos_reset_done');
     
-    const savedProducts = db.get(STORAGE_KEYS.products);
-    const savedCustomers = db.get(STORAGE_KEYS.customers);
-    const savedSales = db.get(STORAGE_KEYS.sales);
-    const savedSettings = db.get(STORAGE_KEYS.settings);
-    const savedSuppliers = db.get(STORAGE_KEYS.suppliers) || [];
-    const savedPurchases = db.get(STORAGE_KEYS.purchases) || [];
-    const savedCategories = db.get(STORAGE_KEYS.categories) || [];
+    const savedProducts = await db.get(STORAGE_KEYS.products);
+    const savedCustomers = await db.get(STORAGE_KEYS.customers);
+    const savedSales = await db.get(STORAGE_KEYS.sales);
+    const savedSettings = await db.get(STORAGE_KEYS.settings);
+    const savedSuppliers = await db.get(STORAGE_KEYS.suppliers) || [];
+    const savedPurchases = await db.get(STORAGE_KEYS.purchases) || [];
+    const savedCategories = await db.get(STORAGE_KEYS.categories) || [];
 
     if (wasReset) {
       setProducts([...savedProducts] || []);
@@ -1158,25 +1230,44 @@ function MainApp({ currentUser, onLogout }) {
 
 /* ─────────────── APP WRAPPER ─────────────── */
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    const auth = db.get(STORAGE_KEYS.auth);
-    return !!auth;
-  });
-  const [currentUser, setCurrentUser] = useState(() => {
-    return db.get(STORAGE_KEYS.auth) || null;
-  });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function checkAuth() {
+      const auth = await db.get(STORAGE_KEYS.auth);
+      setCurrentUser(auth);
+      setIsLoggedIn(!!auth);
+      setIsLoading(false);
+    }
+    checkAuth();
+  }, []);
 
   const handleLogin = (user) => {
     setCurrentUser(user);
     setIsLoggedIn(true);
   };
 
-  const handleLogout = () => {
-    db.set(STORAGE_KEYS.auth, null);
+  const handleLogout = async () => {
+    await db.set(STORAGE_KEYS.auth, null);
     localStorage.removeItem(STORAGE_KEYS.auth);
     setCurrentUser(null);
     setIsLoggedIn(false);
   };
+
+  if (isLoading) {
+    return (
+      <div style={{
+        position:'fixed',top:0,left:0,right:0,bottom:0,
+        background:'#0F766E',display:'flex',alignItems:'center',
+        justifyContent:'center',flexDirection:'column',gap:20
+      }}>
+        <div style={{fontSize:64}}>🏪</div>
+        <div style={{color:'white',fontSize:24,fontWeight:700}}>লোড হচ্ছে...</div>
+      </div>
+    );
+  }
 
   if (!isLoggedIn) {
     return <LoginScreen onLogin={handleLogin} settings={DEFAULT_SETTINGS} />;
@@ -7594,10 +7685,19 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   });
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [users, setUsers] = useState(() => db.get(STORAGE_KEYS.users) || []);
+  const [users, setUsers] = useState([]);
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({ email: '', password: '', name: '', role: 'admin' });
+
+  // Load users from IndexedDB
+  useEffect(() => {
+    async function loadUsers() {
+      const savedUsers = await db.get(STORAGE_KEYS.users);
+      setUsers(savedUsers || []);
+    }
+    loadUsers();
+  }, []);
 
   const currentUser = db.get(STORAGE_KEYS.auth);
   const isSuperAdmin = currentUser?.role === 'super_admin';
@@ -7627,7 +7727,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     setShowUserModal(true);
   };
 
-  const saveUser = () => {
+  const saveUser = async () => {
     if (!userForm.email || !userForm.password || !userForm.name) {
       alert('সব তথ্য পূরণ করুন!');
       return;
@@ -7635,21 +7735,21 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     if (editingUser) {
       const updated = users.map(u => u.id === editingUser.id ? { ...u, ...userForm } : u);
       setUsers(updated);
-      db.set(STORAGE_KEYS.users, updated);
+      await db.set(STORAGE_KEYS.users, updated);
     } else {
       const newUser = { ...userForm, id: genId() };
       const updated = [...users, newUser];
       setUsers(updated);
-      db.set(STORAGE_KEYS.users, updated);
+      await db.set(STORAGE_KEYS.users, updated);
     }
     setShowUserModal(false);
   };
 
-  const deleteUser = (id) => {
+  const deleteUser = async (id) => {
     if (confirm('এই ইউজার মুছে ফেলতে চান?')) {
       const updated = users.filter(u => u.id !== id);
       setUsers(updated);
-      db.set(STORAGE_KEYS.users, updated);
+      await db.set(STORAGE_KEYS.users, updated);
     }
   };
 
@@ -9096,7 +9196,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   { l: '📊 স্টক কমানো-বাড়ানো ডেটা', c: productHistory.filter(h => h.type === 'stock').length, btn: 'স্টক হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('স্টক হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory(productHistory.filter(h => h.type !== 'stock')); alert('স্টক হিস্ট্রি মুছা হয়েছে।'); } } },
                   { l: '👥 কাস্টমার ডেটা', c: customers.length, btn: 'সব কাস্টমার মুছে ফেলুন', fn: () => { if(confirm('সব কাস্টমার মুছে ফেলবেন?')) { upd.customers([]); alert('কাস্টমার মুছা হয়েছে।'); } } },
                   { l: '🛒 পারচেজ হিস্ট্রি', c: purchases.length, btn: 'সব পারচেজ হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('সব পারচেজ হিস্ট্রি মুছে ফেলবেন?')) { upd.purchases([]); alert('পারচেজ হিস্ট্রি মুছা হয়েছে।'); } } },
-                  { l: '👤 সকল ইউজার (সুপার এডমিন ছাড়া)', c: users.length, btn: 'সব ইউজার মুছে ফেলুন', fn: () => { if(confirm('সুপার এডমিন ছাড়া সব ইউজার মুছে ফেলবেন?')) { setUsers([]); db.set('pos_users', []); alert('সব ইউজার মুছা হয়েছে।'); } } },
+                  { l: '👤 সকল ইউজার (সুপার এডমিন ছাড়া)', c: users.length, btn: 'সব ইউজার মুছে ফেলুন', fn: async () => { if(confirm('সুপার এডমিন ছাড়া সব ইউজার মুছে ফেলবেন?')) { setUsers([]); await db.set(STORAGE_KEYS.users, []); alert('সব ইউজার মুছা হয়েছে।'); } } },
                 ].map((d, i) => (
                   <div key={i} style={{
                     padding: 24,
@@ -9136,10 +9236,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 700, color: '#dc2626' }}>💥 সম্পূর্ণ রিসেট</h4>
                 <p style={{ margin: '0 0 16px', fontSize: 13, color: '#6b7280' }}>সমস্ত ডেটা মুছে ফেলুন। এটি পূর্বাবস্থায় ফেরানো যাবে না।</p>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if(confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                      localStorage.clear();
-                      db.set('pos_reset_done', true);
+                      await db.clear();
+                      await db.set('pos_reset_done', true);
                       alert('সব ডেটা মুছা হয়েছে।');
                       window.location.reload();
                     }
