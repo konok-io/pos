@@ -4138,7 +4138,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
               <thead>
                 <tr style={{background:T.tealLight}}>
-                  {['ক্রম','ক্যাটাগরির নাম','পণ্য সংখ্যা',''].map((h,i)=>(
+                  {['ক্রম','ক্যাটাগরির নাম','পণ্য সংখ্যা','একশন'].map((h,i)=>(
                     <th key={i} style={{padding:'10px 12px',textAlign:i===3?'center':'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                   ))}
                 </tr>
@@ -4212,7 +4212,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
-                    {['ক্রম','কোম্পানির নাম','CR নম্বর','VAT নম্বর','পণ্য',''].map((h,i)=>(
+                    {['ক্রম','কোম্পানির নাম','CR নম্বর','VAT নম্বর','পণ্য','একশন'].map((h,i)=>(
                       <th key={i} style={{padding:'10px 8px',textAlign:i===5?'center':'left',fontSize:10,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
