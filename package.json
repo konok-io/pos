@@ -2,12 +2,12 @@
   "name": "pos",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "electron:build:win": "npm run build && electron-builder --win"
   },
   "dependencies": {
     "jsbarcode": "^3.12.3",
@@ -19,10 +19,28 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
     "eslint": "^10.8.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
     "vite": "^8.2.0"
-  }
+  },
+ "build": {
+  "appId": "com.pos.system",
+  "productName": "POS সিস্টেম",
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "public/**/*",
+    "package.json"
+  ]
+},
+  "author": "POS Team",
+  "description": "POS সিস্টেম - বিক্রয়, স্টক ও হিসাব ব্যবস্থা",
+  "main": "electron/main.js"
 }
