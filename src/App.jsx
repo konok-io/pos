@@ -5535,7 +5535,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                       <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
                       <td style={{padding:'10px 12px',textAlign:'center',fontSize:12}}>
                         <span style={{background:T.redLight,color:T.red,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>
-                          {h.newValue - h.oldValue}
+                          -{h.oldValue - h.newValue}
                         </span>
                       </td>
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
