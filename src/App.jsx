@@ -2267,15 +2267,19 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
     const savedCount = purchaseItems.length;
     const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
     
-    // Get supplier VAT number
+    // Get supplier info
     const supplierObj = suppliers.find(s => s.name === form.company);
     const supplierVatNumber = supplierObj?.vatNumber || '';
+    const supplierCrNumber = supplierObj?.crNumber || '';
+    const supplierAddress = supplierObj?.address || '';
     
     const purchase = {
       id: purchaseId,
       date: now(),
       supplier: form.company || 'সাধারণ',
       supplierVatNumber: supplierVatNumber,
+      supplierCrNumber: supplierCrNumber,
+      supplierAddress: supplierAddress,
       items: purchaseItems,
       totalItems: purchaseItems.length,
       totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
@@ -2379,8 +2383,14 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
                     <div style={{fontWeight:800,fontSize:18,color:T.teal}}>{viewPurchase.id}</div>
                     <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
                     <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
+                    {viewPurchase.supplierCrNumber && (
+                      <div style={{fontSize:11,marginTop:4,fontWeight:600,color:T.teal}}>🏢 CR: {viewPurchase.supplierCrNumber}</div>
+                    )}
                     {viewPurchase.supplierVatNumber && (
-                      <div style={{fontSize:12,marginTop:4,fontWeight:600,color:T.orange}}>🧾 সরবরাহকারী VAT: {viewPurchase.supplierVatNumber}</div>
+                      <div style={{fontSize:11,marginTop:2,fontWeight:600,color:T.green}}>🧾 VAT: {viewPurchase.supplierVatNumber}</div>
+                    )}
+                    {viewPurchase.supplierAddress && (
+                      <div style={{fontSize:11,marginTop:2,color:T.gray600}}>📍 {viewPurchase.supplierAddress}</div>
                     )}
                   </div>
                   <div style={{display:'flex',gap:8,alignItems:'flex-start'}}>
@@ -2389,9 +2399,9 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
                       const vatRate = settings?.vatPercent || 15;
                       const vatAmount = grandTotal * vatRate / 100;
                       const totalWithVat = grandTotal + vatAmount;
-                      const supplierObj = suppliers.find(s => s.name === viewPurchase.supplier);
-                      const supplierCrDisplay = supplierObj?.crNumber ? `<div style="margin-top:3px;"><strong>সরবরাহকারী CR: ${supplierObj.crNumber}</strong></div>` : '';
-                      const supplierVatDisplay = viewPurchase.supplierVatNumber ? `<div style="margin-top:3px;"><strong>সরবরাহকারী VAT: ${viewPurchase.supplierVatNumber}</strong></div>` : '';
+                      const supplierCrDisplay = viewPurchase.supplierCrNumber ? `<div>সরবরাহকারী CR: ${viewPurchase.supplierCrNumber}</div>` : '';
+                      const supplierVatDisplay = viewPurchase.supplierVatNumber ? `<div>সরবরাহকারী VAT: ${viewPurchase.supplierVatNumber}</div>` : '';
+                      const supplierAddressDisplay = viewPurchase.supplierAddress ? `<div>ঠিকানা: ${viewPurchase.supplierAddress}</div>` : '';
                       let html = `<!DOCTYPE html>
 <html>
 <head>
@@ -2423,6 +2433,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   <div>সরবরাহকারী: ${viewPurchase.supplier}</div>
   ${supplierCrDisplay}
   ${supplierVatDisplay}
+  ${supplierAddressDisplay}
   ${settings?.taxId ? '<div style="margin-top:3px;"><strong>ক্রেতার VAT: ' + settings.taxId + '</strong></div>' : ''}
 </div>
 <table>
@@ -2570,7 +2581,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 {showCompanyList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                     {uniqueCompanies.filter(c=>c && c.toLowerCase().includes((supplierQ||'').toLowerCase())).map((c,i)=>(
-                      <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowCompanyList(false);}}
+                      <div key={i} onClick={()=>{const s=suppliers.find(sup=>sup.name===c);setSupplierQ(c);setForm(f=>({...f,company:c,supplierCrNumber:s?.crNumber||'',supplierVatNumber:s?.vatNumber||'',supplierAddress:s?.address||''}));setShowCompanyList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                         {c}
                       </div>
@@ -2584,6 +2595,30 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                   </div>
                 )}
               </div>
+
+              {/* Supplier Info Display */}
+              {form.company && (
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom:12,padding:12,background:T.gray50,borderRadius:8,border:`1px solid ${T.gray200}`}}>
+                  {form.supplierCrNumber && (
+                    <div>
+                      <div style={{fontSize:10,color:T.gray500,marginBottom:2}}>🏢 CR নম্বর</div>
+                      <div style={{fontSize:12,fontWeight:600,color:T.teal}}>{form.supplierCrNumber}</div>
+                    </div>
+                  )}
+                  {form.supplierVatNumber && (
+                    <div>
+                      <div style={{fontSize:10,color:T.gray500,marginBottom:2}}>🧾 VAT নম্বর</div>
+                      <div style={{fontSize:12,fontWeight:600,color:T.green}}>{form.supplierVatNumber}</div>
+                    </div>
+                  )}
+                  {form.supplierAddress && (
+                    <div style={{gridColumn:'1/-1'}}>
+                      <div style={{fontSize:10,color:T.gray500,marginBottom:2}}>📍 ঠিকানা</div>
+                      <div style={{fontSize:12,fontWeight:600}}>{form.supplierAddress}</div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Category */}
               <div style={{marginBottom:12, position:'relative'}}>
