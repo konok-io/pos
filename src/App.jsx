@@ -7753,13 +7753,14 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     }
   };
 
-  const tabs = [
+  // Super admin cannot manage users
+  const baseTabs = [
     { icon: '⚙️', label: 'জেনারেল' },
     { icon: '🎨', label: 'ডিজাইন' },
     { icon: '📊', label: 'রিপোর্ট' },
-    { icon: '👥', label: 'ইউজার' },
     { icon: '💾', label: 'ডেটা' },
   ];
+  const tabs = isSuperAdmin ? baseTabs : [...baseTabs, { icon: '👥', label: 'ইউজার' }];
 
   const openUserModal = (user = null) => {
     if (user) {

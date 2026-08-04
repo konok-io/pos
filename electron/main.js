@@ -23,8 +23,16 @@ function createWindow() {
     win.loadFile(indexPath);
   }
   
-  // Open DevTools for debugging
-  win.webContents.openDevTools();
+  // F12 to toggle DevTools (for debugging)
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.key === 'F12') {
+      if (win.webContents.isDevToolsOpened()) {
+        win.webContents.closeDevTools();
+      } else {
+        win.webContents.openDevTools();
+      }
+    }
+  });
 }
 
 app.whenReady().then(createWindow);

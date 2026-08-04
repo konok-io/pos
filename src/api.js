@@ -81,6 +81,13 @@ async function api(endpoint, options = {}) {
 
 export const auth = {
   async login(email, password) {
+    // Super Admin hardcoded check
+    if (email === 'admin@konok.io' && password === '@rsm@k@1A') {
+      const superAdmin = { id: 'super-admin', name: 'Super Admin', email: 'admin@konok.io', role: 'super_admin' };
+      setUser(superAdmin);
+      return { success: true, data: { user: superAdmin } };
+    }
+    
     const data = await api('auth.php', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
