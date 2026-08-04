@@ -1138,7 +1138,7 @@ function MainApp({ currentUser, onLogout }) {
 
       {/* Content */}
       <div style={{flex:1,overflow:'hidden',width:'100%'}}>
-        {tab==='pos'       && <POSScreen {...props} />}
+        {tab==='pos'       && <POSScreen {...props} productHistory={productHistory} />}
         {tab==='products'  && <ProductsScreen {...props} />}
         {tab==='newproduct' && <NewProductScreen {...props} />}
         {tab==='barcode'   && <BarcodeScreen {...props} />}
@@ -1187,7 +1187,7 @@ export default function App() {
 /* ═══════════════════════════════════════════
    POS SCREEN
 ═══════════════════════════════════════════ */
-function POSScreen({products, customers, sales, settings, categories, upd}) {
+function POSScreen({products, customers, sales, settings, categories, upd, productHistory}) {
   // Initialize cart from localStorage in useEffect to avoid hydration issues
   const [cart, setCart] = useState([]);
   const [selCust, setSelCust] = useState(null);
@@ -1403,10 +1403,33 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     }
 
     const newSales = [...sales, sale];
+    
+    // Track sale stock changes (source='sale')
+    const saleHistoryEntries = cart.map(item => {
+      const product = products.find(p => p.id === item.id);
+      return {
+        id: genId(),
+        productId: item.id,
+        productName: item.name,
+        type: 'stock',
+        source: 'sale',
+        oldValue: product?.stock || 0,
+        newValue: Math.max(0, (product?.stock || 0) - item.qty),
+        saleId: sale.id,
+        user: 'You',
+        userEmail: '',
+        timestamp: now(),
+      };
+    });
 
     upd.products(newProds);
     upd.customers(newCusts);
     upd.sales(newSales);
+    
+    // Add sale history entries
+    if (saleHistoryEntries.length > 0) {
+      upd.productHistory([...productHistory, ...saleHistoryEntries]);
+    }
 
     // Auto print receipt and return to sales page
     printReceipt({sale, settings});
@@ -2314,6 +2337,27 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
       newSupplierArr = [...suppliers, newSupplier];
     }
 
+    // Track purchase stock changes (source='purchase')
+    const purchaseHistoryEntries = [];
+    purchaseItems.forEach(item => {
+      const existingProduct = products.find(p => p.name === item.name && p.company === form.company);
+      if (existingProduct) {
+        purchaseHistoryEntries.push({
+          id: genId(),
+          productId: existingProduct.id,
+          productName: item.name,
+          type: 'stock',
+          source: 'purchase',
+          oldValue: existingProduct.stock || 0,
+          newValue: (existingProduct.stock || 0) + (item.stock || 0),
+          purchaseId: purchaseId,
+          user: currentUser?.name || 'Unknown',
+          userEmail: currentUser?.email || '',
+          timestamp: now(),
+        });
+      }
+    });
+
     // Build promises array
     const promises = [];
     if (newSupplierArr) {
@@ -2321,6 +2365,11 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
     }
     promises.push(upd.products([...updatedProducts, ...newProductsToAdd]));
     promises.push(upd.purchases([...purchases, purchase]));
+    
+    // Add purchase history entries
+    if (purchaseHistoryEntries.length > 0) {
+      promises.push(upd.productHistory([...productHistory, ...purchaseHistoryEntries]));
+    }
 
     // Execute all updates
     await Promise.all(promises);
@@ -5244,14 +5293,10 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   const totalValue = realProducts.reduce((s,p)=>s+p.sellP*p.stock,0);
   
   // Filter only stock change history (exclude price changes)
-  // Filter manual stock history
-  const manualStockHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'manual');
-  
-  // Filter stock increase history (manual)
-  const stockIncreaseHistory = manualStockHistory.filter(h => h.newValue > h.oldValue);
-  
-  // Filter stock decrease history (manual)
-  const stockDecreaseHistory = manualStockHistory.filter(h => h.newValue < h.oldValue);
+  // Filter stock history by source
+  const purchaseHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'purchase');
+  const saleHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'sale');
+  const manualHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'manual');
 
   const adjust = async () => {
     const qty = parseInt(adjQty)||0;
@@ -5310,7 +5355,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           fontWeight:600,
           fontSize:13,
         }}>
-          ⬆️ স্টক বাড়ানো ({stockIncreaseHistory.length})
+          ⬆️ স্টক বাড়ানো ({purchaseHistory.length})
         </button>
         <button onClick={()=>setInvTab('decrease')} style={{
           padding:'8px 14px',
@@ -5323,7 +5368,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           fontWeight:600,
           fontSize:13,
         }}>
-          ⬇️ স্টক কমানো ({stockDecreaseHistory.length})
+          ⬇️ স্টক কমানো ({saleHistory.length})
         </button>
         <button onClick={()=>setInvTab('manual')} style={{
           padding:'8px 14px',
@@ -5336,17 +5381,17 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           fontWeight:600,
           fontSize:13,
         }}>
-          🔧 ম্যানুয়াল স্টক পরিবর্তন
+          🔧 ম্যানুয়াল স্টক পরিবর্তন ({manualHistory.length})
         </button>
       </div>
 
-      {/* Stock Increase Tab Content */}
+      {/* Stock Increase Tab Content - Purchases */}
       {invTab === 'increase' && (
         <div style={{flex:1,overflow:'auto',padding:12}}>
           <div style={{...card,overflow:'hidden'}}>
-            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>⬆️ স্টক বাড়ানোর ইতিহাস (শুধু ম্যানুয়াল)</div>
-            {stockIncreaseHistory.length === 0 ? (
-              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো স্টক বাড়ানো হয়নি</div>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>⬆️ পারচেজ থেকে স্টক বাড়ানো</div>
+            {purchaseHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</div>
             ) : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
@@ -5359,7 +5404,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...stockIncreaseHistory].reverse().map((h,i)=>(
+                  {[...purchaseHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
@@ -5385,13 +5430,13 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
         </div>
       )}
 
-      {/* Stock Decrease Tab Content */}
+      {/* Stock Decrease Tab Content - Sales */}
       {invTab === 'decrease' && (
         <div style={{flex:1,overflow:'auto',padding:12}}>
           <div style={{...card,overflow:'hidden'}}>
-            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>⬇️ স্টক কমানোর ইতিহাস (শুধু ম্যানুয়াল)</div>
-            {stockDecreaseHistory.length === 0 ? (
-              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো স্টক কমানো হয়নি</div>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>⬇️ বিক্রয় থেকে স্টক কমানো</div>
+            {saleHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো বিক্রয় নেই</div>
             ) : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
@@ -5404,7 +5449,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...stockDecreaseHistory].reverse().map((h,i)=>(
+                  {[...saleHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
@@ -5434,8 +5479,8 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
       {invTab === 'manual' && (
         <div style={{flex:1,overflow:'auto',padding:12}}>
           <div style={{...card,overflow:'hidden'}}>
-            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>🔧 ম্যানুয়াল স্টক পরিবর্তনের ইতিহাস</div>
-            {manualStockHistory.length === 0 ? (
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>🔧 ম্যানুয়াল স্টক পরিবর্তন (স্টক মেনু থেকে)</div>
+            {manualHistory.length === 0 ? (
               <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ম্যানুয়াল স্টক পরিবর্তন নেই</div>
             ) : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
@@ -5450,7 +5495,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...manualStockHistory].reverse().map((h,i)=>(
+                  {[...manualHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
