@@ -4030,7 +4030,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             )}
           </div>
           <div style={{marginLeft:'auto',display:'flex',gap:8}}>
-            <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ</button>
+            <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ হিস্ট্রি</button>
             {!viewSupplier.isAuto && (
               <>
                 <button style={btn()} onClick={()=>{setViewSupplier(null);setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️</button>
@@ -4043,16 +4043,6 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
         {/* Content */}
         <div style={{flex:1,overflow:'auto',padding:20}}>
-          {/* Info Row */}
-          <div style={{...card,padding:16,marginBottom:16}}>
-            <div style={{display:'flex',gap:24}}>
-              {viewSupplier.phone && <div><span style={{fontSize:11,color:T.gray400}}>ফোন</span><div style={{fontWeight:600,fontSize:14,marginTop:2}}>{viewSupplier.phone}</div></div>}
-              {viewSupplier.crNumber && <div><span style={{fontSize:11,color:T.gray400}}>CR নম্বর</span><div style={{fontWeight:600,fontSize:14,marginTop:2}}>{viewSupplier.crNumber}</div></div>}
-              {viewSupplier.vatNumber && <div><span style={{fontSize:11,color:T.gray400}}>VAT নম্বর</span><div style={{fontWeight:600,fontSize:14,marginTop:2,color:T.teal}}>{viewSupplier.vatNumber}</div></div>}
-              {viewSupplier.address && <div style={{flex:1}}><span style={{fontSize:11,color:T.gray400}}>ঠিকানা</span><div style={{fontWeight:500,fontSize:13,marginTop:2,color:T.gray600}}>{viewSupplier.address}</div></div>}
-            </div>
-          </div>
-
           {/* Stats Row */}
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:16}}>
             <div style={{...card,padding:20,textAlign:'center'}}>
