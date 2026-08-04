@@ -3742,8 +3742,11 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const saveCompany = async () => {
     if (!form.name?.trim()) { alert('কোম্পানির নাম দিন'); return; }
     
-    // Check for duplicate company name
-    const exists = suppliers.some(s => (s.name||'').toLowerCase().trim() === (form.name||'').toLowerCase().trim());
+    // Check for duplicate company name (exclude current company when editing)
+    const currentId = modal?.mode === 'edit' ? modal.id : null;
+    const exists = suppliers.some(s => 
+      s.id !== currentId && (s.name||'').toLowerCase().trim() === (form.name||'').toLowerCase().trim()
+    );
     if (exists) { alert('❌ এই কোম্পানির নাম ইতিমধ্যে আছে!'); return; }
     
     // Use custom code if provided, otherwise generate auto code
@@ -3755,8 +3758,8 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       }, 0);
       newCode = `C-${String(maxCode + 1).padStart(5, '0')}`;
     } else {
-      // Check for duplicate code
-      const codeExists = suppliers.some(s => s.code === newCode);
+      // Check for duplicate code (exclude current company when editing)
+      const codeExists = suppliers.some(s => s.id !== currentId && s.code === newCode);
       if (codeExists) { alert('❌ এই কোম্পানি আইডি ইতিমধ্যে আছে!'); return; }
     }
     
