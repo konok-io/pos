@@ -2454,7 +2454,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                       viewPurchase.items.forEach(item => {
                         const qty = item.stock||0;
                         const price = item.buyP||0;
-                        html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${qty} ${item.unit||'পিস'}</td><td>৳${price.toFixed(2)}</td><td>৳${(qty*price).toFixed(2)}</td></tr>`;
+                        html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company||''}</span></td><td style="text-align:center;">${qty} ${item.unit||'পিস'}</td><td style="text-align:right;">৳${price.toFixed(2)}</td><td style="text-align:right;">৳${(qty*price).toFixed(2)}</td></tr>`;
                       });
                       html += `</tbody>
 </table>
@@ -6676,10 +6676,10 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </div>
 <div style="border-top:1px dotted #000;margin:4px 0;"></div>
 <table>
-  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <thead><tr style="border-bottom:1px dashed #000;"><th style="text-align:left;padding:3px 0;">পণ্য</th><th style="text-align:center;padding:3px 0;">পরিমাণ</th><th style="text-align:right;padding:3px 0;">দাম</th><th style="text-align:right;padding:3px 0;">মোট</th></tr></thead>
   <tbody>`;
                   (viewSale.items||[]).forEach(item => {
-                    html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company}</span></td><td>${item.qty} ${item.unit||'পিস'}</td><td>৳${item.sellP.toFixed(2)}</td><td>৳${(item.qty*item.sellP).toFixed(2)}</td></tr>`;
+                    html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company||''}</span></td><td style="text-align:center;">${item.qty} ${item.unit||'পিস'}</td><td style="text-align:right;">৳${item.sellP.toFixed(2)}</td><td style="text-align:right;">৳${(item.qty*item.sellP).toFixed(2)}</td></tr>`;
                   });
                   html += `</tbody>
 </table>
