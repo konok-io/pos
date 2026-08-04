@@ -3997,9 +3997,32 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
           <button style={btn()} onClick={()=>setViewSupplier(null)}>← ফিরে যান</button>
           <span style={{fontWeight:700,fontSize:15}}>🏢 {viewSupplier.name}</span>
-          <span style={{fontSize:12,color:T.gray500,marginLeft:8}}>CR: {viewSupplier.crNumber || '-'}</span>
         </div>
         <div style={{flex:1,overflow:'auto',padding:12}}>
+          {/* Contact Info Card */}
+          <div style={{...card,padding:16,marginBottom:16}}>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:16}}>
+              {viewSupplier.phone && (
+                <div>
+                  <div style={{fontSize:11,color:T.gray500,marginBottom:2}}>📞 ফোন</div>
+                  <div style={{fontWeight:600,fontSize:14}}>{viewSupplier.phone}</div>
+                </div>
+              )}
+              {viewSupplier.crNumber && (
+                <div>
+                  <div style={{fontSize:11,color:T.gray500,marginBottom:2}}>🏢 CR নম্বর</div>
+                  <div style={{fontWeight:600,fontSize:14}}>{viewSupplier.crNumber}</div>
+                </div>
+              )}
+              {viewSupplier.address && (
+                <div style={{gridColumn:'1/-1'}}>
+                  <div style={{fontSize:11,color:T.gray500,marginBottom:2}}>📍 ঠিকানা</div>
+                  <div style={{fontWeight:600,fontSize:14}}>{viewSupplier.address}</div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* VAT Banner */}
           {viewSupplier.vatNumber && (
             <div style={{padding:'12px 16px',background:'linear-gradient(135deg, #059669 0%, #047857 100%)',borderRadius:10,marginBottom:16,color:T.white}}>
@@ -4021,6 +4044,17 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <div style={{fontSize:24,fontWeight:800,color:T.orange}}>{supPurchases.reduce((s,p)=>s+p.totalStock,0)}</div>
               <div style={{fontSize:12,color:T.gray500}}>মোট একক</div>
             </div>
+          </div>
+
+          {/* Actions */}
+          <div style={{display:'flex',gap:8,marginBottom:16}}>
+            <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ হিস্ট্রি</button>
+            {!viewSupplier.isAuto && (
+              <>
+                <button style={btn()} onClick={()=>{setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️ সম্পাদনা</button>
+                <button style={btn('danger')} onClick={()=>del(viewSupplier.id)}>🗑️ মুছুন</button>
+              </>
+            )}
           </div>
 
           {/* Products List */}
