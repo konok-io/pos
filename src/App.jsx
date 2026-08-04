@@ -2865,7 +2865,7 @@ ${printFiltered.map(p => {
           <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
             <thead>
               <tr style={{background:T.tealLight}}>
-                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','VAT (১৫%)','মোট (VAT সহ)','স্টক','একক','একশন'].map((h,i)=>(
+                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','একশন','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','VAT (১৫%)','মোট (VAT সহ)','স্টক','একক'].map((h,i)=>(
                   <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                 ))}
               </tr>
@@ -2889,6 +2889,11 @@ ${printFiltered.map(p => {
                     </td>
                     <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
                     <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
+                    <td style={{padding:'10px 12px',display:'flex',gap:4}}>
+                      <button style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setViewProduct(p)} title="দেখুন">👁️</button>
+                      <button style={{...btn('primary','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setEditProduct({...p})} title="সম্পাদনা">✏️</button>
+                      <button style={{...btn('danger','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>del(p.id)} title="মুছুন">🗑️</button>
+                    </td>
                     <td style={{padding:'10px 12px',fontSize:13}}>{fmt(p.buyP)}</td>
                     <td style={{padding:'10px 12px',fontWeight:700,fontSize:14}}>{fmt(p.sellP)}</td>
                     <td style={{padding:'10px 12px'}}>
@@ -2907,11 +2912,6 @@ ${printFiltered.map(p => {
                       {isLowStock && <span style={{fontSize:10,color:T.red,marginLeft:4}}>⚠️ কম</span>}
                     </td>
                     <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
-                    <td style={{padding:'10px 12px',display:'flex',gap:6}}>
-                      <button style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setViewProduct(p)} title="দেখুন">👁️</button>
-                      <button style={{...btn('primary','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setEditProduct({...p})} title="সম্পাদনা">✏️</button>
-                      <button style={{...btn('danger','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>del(p.id)} title="মুছুন">🗑️</button>
-                    </td>
                   </tr>
                 );
               })}
