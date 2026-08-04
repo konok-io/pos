@@ -4192,14 +4192,44 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
       {/* Sub tabs - Only Companies, Categories, and CSV Import */}
-      <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
-        <button onClick={()=>setActiveTab('companies')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='companies'?700:400,color:activeTab==='companies'?T.teal:T.gray500,borderBottom:activeTab==='companies'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+      <div style={{display:'flex',gap:8,alignItems:'center',background:T.white,padding:'10px 12px',flexWrap:'wrap'}}>
+        <button onClick={()=>setActiveTab('companies')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${activeTab==='companies'?T.teal:T.gray200}`,
+          background:activeTab==='companies'?T.teal:T.gray100,
+          color:activeTab==='companies'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
           🏢 সরবরাহকারী ({allSuppliers.length})
         </button>
-        <button onClick={()=>setActiveTab('categories')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='categories'?700:400,color:activeTab==='categories'?T.teal:T.gray500,borderBottom:activeTab==='categories'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+        <button onClick={()=>setActiveTab('categories')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${activeTab==='categories'?T.teal:T.gray200}`,
+          background:activeTab==='categories'?T.teal:T.gray100,
+          color:activeTab==='categories'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
           📂 ক্যাটাগরি ({categories.length})
         </button>
-        <button onClick={()=>setActiveTab('csv')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='csv'?700:400,color:activeTab==='csv'?T.teal:T.gray500,borderBottom:activeTab==='csv'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+        <button onClick={()=>setActiveTab('csv')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${activeTab==='csv'?T.teal:T.gray200}`,
+          background:activeTab==='csv'?T.teal:T.gray100,
+          color:activeTab==='csv'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
           📥 CSV আমদানি
         </button>
         {/* Search and Add button - right aligned */}
