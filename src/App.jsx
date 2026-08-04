@@ -4410,19 +4410,6 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         }}>
           📂 ক্যাটাগরি ({categories.length})
         </button>
-        <button onClick={()=>setActiveTab('csv')} style={{
-          padding:'8px 14px',
-          borderRadius:7,
-          whiteSpace:'nowrap',
-          border:`1px solid ${activeTab==='csv'?T.teal:T.gray200}`,
-          background:activeTab==='csv'?T.teal:T.gray100,
-          color:activeTab==='csv'?T.white:T.gray600,
-          cursor:'pointer',
-          fontWeight:600,
-          fontSize:13,
-        }}>
-          📥 সিএসবি ইম্পোর্ট
-        </button>
         {/* Search and Add button - right aligned */}
         <div style={{marginLeft:'auto',display:'flex',gap:8,alignItems:'center',paddingRight:12}}>
           <div style={{position:'relative'}}>
@@ -4488,99 +4475,85 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           </div>
         )}
 
-        {/* CSV IMPORT TAB */}
-        {activeTab === 'csv' && (
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
-            {/* Left: CSV Import */}
-            <div style={{...card,padding:24}}>
-              <h3 style={{margin:'0 0 16px',fontSize:16,color:T.teal}}>📥 সিএসবি ইম্পোর্ট করুন</h3>
-              <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
-              <div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:16}}>
-                <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:13,padding:'10px 16px'}}>
-                  📁 CSV ফাইল নির্বাচন করুন
-                </label>
-                <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:13,padding:'10px 16px'}}>
-                  📥 ডেমো CSV ডাউনলোড
-                </button>
-              </div>
-              <div style={{fontSize:12,color:T.gray600,lineHeight:1.7}}>
-                <div style={{fontWeight:600,marginBottom:6}}>CSV কলাম:</div>
-                <code style={{background:T.gray50,padding:'8px 10px',borderRadius:6,display:'block',marginBottom:12,fontSize:11}}>
-                  পণ্যের নাম, সরবরাহকারী, কোম্পানি, ক্যাটাগরি, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিনস্টক
-                </code>
-                <div>✅ কোম্পানি ও ক্যাটাগরি ডুপ্লিকেট হবে না</div>
-                <div>✅ সরবরাহকারী কোড খালি রাখলে অটো তৈরি</div>
-              </div>
-              {csvImportResult && (
-                <div style={{marginTop:16,padding:12,background:T.tealLight,borderRadius:8}}>
-                  <div style={{fontWeight:600,color:T.teal,marginBottom:6,fontSize:13}}>✅ আমদানি ফলাফল:</div>
-                  <div style={{fontSize:12}}>🏢 সরবরাহকারী: {csvImportResult.companies}টি</div>
-                  <div style={{fontSize:12}}>📂 ক্যাটাগরি: {csvImportResult.categories}টি</div>
-                  {csvImportResult.errors > 0 && <div style={{color:T.red,marginTop:4}}>⚠️ ত্রুটি: {csvImportResult.errors}টি</div>}
-                </div>
-              )}
-            </div>
-            
-            {/* Right: Add New Supplier */}
-            <div style={{...card,padding:24}}>
-              <h3 style={{margin:'0 0 16px',fontSize:16,color:T.teal}}>➕ নতুন সরবরাহকারী যুক্ত করুন</h3>
-              <div style={{display:'flex',flexDirection:'column',gap:10}}>
-                <input 
-                  type="text" 
-                  placeholder="🏢 সরবরাহকারীর নাম *" 
-                  value={newSupplier.name} 
-                  onChange={e=>setNewSupplier({...newSupplier,name:e.target.value})}
-                  style={{...input,padding:'10px 12px'}}
-                />
-                <input 
-                  type="text" 
-                  placeholder="📱 ফোন নম্বর" 
-                  value={newSupplier.phone} 
-                  onChange={e=>setNewSupplier({...newSupplier,phone:e.target.value})}
-                  style={{...input,padding:'10px 12px'}}
-                />
-                <input 
-                  type="text" 
-                  placeholder="📧 ইমেইল" 
-                  value={newSupplier.email} 
-                  onChange={e=>setNewSupplier({...newSupplier,email:e.target.value})}
-                  style={{...input,padding:'10px 12px'}}
-                />
-                <input 
-                  type="text" 
-                  placeholder="📍 ঠিকানা" 
-                  value={newSupplier.address} 
-                  onChange={e=>setNewSupplier({...newSupplier,address:e.target.value})}
-                  style={{...input,padding:'10px 12px'}}
-                />
-                <input 
-                  type="text" 
-                  placeholder="🏢 কোম্পানির নাম" 
-                  value={newSupplier.company} 
-                  onChange={e=>setNewSupplier({...newSupplier,company:e.target.value})}
-                  style={{...input,padding:'10px 12px'}}
-                />
-                <button 
-                  onClick={handleAddSupplier}
-                  style={{...btn('primary'),padding:'10px 20px',fontSize:14}}
-                >
-                  ✅ সরবরাহকারী যুক্ত করুন
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* COMPANIES TAB */}
+      {/* COMPANIES TAB - ALL IN ONE */}
         {activeTab === 'companies' && (
-          <div style={{...card,marginBottom:16,padding:12,display:'flex',justifyContent:'space-between',alignItems:'center',background:T.white,borderRadius:10}}>
-            <span style={{fontSize:13,color:T.gray600}}>মোট: {filtered.length}টি সরবরাহকারী</span>
-            <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>সরবরাহকারী লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4 landscape;margin:12.7mm}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:22px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#e0f7f0;font-weight:700;color:#00897b}.total{background:#e0f7f0;font-weight:700}</style></head><body><div class="header"><h1>🏢 সরবরাহকারী লিস্ট</h1></div><table><thead><tr><th style="width:5%">ক্রম</th><th style="width:25%">সরবরাহকারীর নাম</th><th style="width:25%">ঠিকানা</th><th style="width:12%">ফোন</th><th style="width:12%">CR নম্বর</th><th style="width:14%">VAT নম্বর</th><th style="width:7%">পণ্য</th></tr></thead><tbody>${filtered.map((s,i)=>`<tr><td style="width:5%">${i+1}</td><td style="width:25%">${s.name}</td><td style="width:25%">${s.address||'-'}</td><td style="width:12%">${s.phone||'-'}</td><td style="width:12%">${s.crNumber||'-'}</td><td style="width:14%">${s.vatNumber||'-'}</td><td style="width:7%;text-align:center">${getProductsCount(s.name)}</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="6">মোট সরবরাহকারী: ${filtered.length}টি</td><td>পণ্য: ${filtered.reduce((s,sup)=>s+getProductsCount(sup.name),0)}টি</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
-          </div>
-        )}
-        {activeTab === 'companies' && (
-          <div style={{...card,marginBottom:16,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 180px)'}}>
+          <div>
+            {/* Top Section: CSV Import + Add Supplier Form */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
+              {/* Left: CSV Import */}
+              <div style={{...card,padding:20}}>
+                <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
+                <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
+                <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12}}>
+                  <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:12,padding:'8px 14px'}}>
+                    📁 CSV ফাইল
+                  </label>
+                  <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:12,padding:'8px 14px'}}>
+                    📥 ডেমো
+                  </button>
+                </div>
+                <div style={{fontSize:11,color:T.gray500}}>
+                  কোম্পানি ও ক্যাটাগরি ডুপ্লিকেট হবে না
+                </div>
+                {csvImportResult && (
+                  <div style={{marginTop:10,padding:8,background:T.tealLight,borderRadius:6,fontSize:11}}>
+                    ✅ আমদানি: সরবরাহকারী {csvImportResult.companies}টি, ক্যাটাগরি {csvImportResult.categories}টি
+                  </div>
+                )}
+              </div>
+              
+              {/* Right: Add New Supplier */}
+              <div style={{...card,padding:20}}>
+                <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>➕ নতুন সরবরাহকারী</h3>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                  <input 
+                    type="text" 
+                    placeholder="🏢 নাম *" 
+                    value={newSupplier.name} 
+                    onChange={e=>setNewSupplier({...newSupplier,name:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="📱 ফোন" 
+                    value={newSupplier.phone} 
+                    onChange={e=>setNewSupplier({...newSupplier,phone:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="📧 ইমেইল" 
+                    value={newSupplier.email} 
+                    onChange={e=>setNewSupplier({...newSupplier,email:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="📍 ঠিকানা" 
+                    value={newSupplier.address} 
+                    onChange={e=>setNewSupplier({...newSupplier,address:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                </div>
+                <button 
+                  onClick={handleAddSupplier}
+                  style={{...btn('primary'),padding:'8px 16px',fontSize:12,marginTop:10,width:'100%'}}
+                >
+                  ✅ যুক্ত করুন
+                </button>
+              </div>
+            </div>
+
+            {/* Middle: Stats + Print */}
+            <div style={{...card,marginBottom:12,padding:12,display:'flex',justifyContent:'space-between',alignItems:'center',background:T.white,borderRadius:10}}>
+              <span style={{fontSize:13,color:T.gray600}}>🏢 মোট: {filtered.length}টি সরবরাহকারী</span>
+              <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>সরবরাহকারী লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4 landscape;margin:12.7mm}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:22px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#e0f7f0;font-weight:700;color:#00897b}.total{background:#e0f7f0;font-weight:700}</style></head><body><div class="header"><h1>🏢 সরবরাহকারী লিস্ট</h1></div><table><thead><tr><th style="width:5%">ক্রম</th><th style="width:25%">সরবরাহকারীর নাম</th><th style="width:25%">ঠিকানা</th><th style="width:12%">ফোন</th><th style="width:12%">CR নম্বর</th><th style="width:14%">VAT নম্বর</th><th style="width:7%">পণ্য</th></tr></thead><tbody>${filtered.map((s,i)=>`<tr><td style="width:5%">${i+1}</td><td style="width:25%">${s.name}</td><td style="width:25%">${s.address||'-'}</td><td style="width:12%">${s.phone||'-'}</td><td style="width:12%">${s.crNumber||'-'}</td><td style="width:14%">${s.vatNumber||'-'}</td><td style="width:7%;text-align:center">${getProductsCount(s.name)}</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="6">মোট সরবরাহকারী: ${filtered.length}টি</td><td>পণ্য: ${filtered.reduce((s,sup)=>s+getProductsCount(sup.name),0)}টি</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
+            </div>
+
+            {/* Bottom: Suppliers List Table */}
+            <div style={{...card,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 420px)'}}>
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
@@ -4618,6 +4591,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 </table>
               </div>
             </div>
+          </div>
         )}
 
       {/* Modal */}
