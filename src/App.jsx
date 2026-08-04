@@ -6905,7 +6905,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         <tfoot>
           <tr class="total-row">
             <td colspan="2" style="text-align:right;">মোট:</td>
-            <td style="text-align:center;">${purchases.length}টি বিল</td>
+            <td style="text-align:left;">${purchases.length}টি বিল</td>
             <td style="text-align:center;">${totalItems}টি</td>
             <td style="text-align:right;">৳${totalPurchase.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
@@ -7005,7 +7005,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         <tfoot>
           <tr class="total-row">
             <td colspan="2" style="text-align:right;">মোট:</td>
-            <td style="text-align:center;">${filteredSales.length}টি বিল</td>
+            <td style="text-align:left;">${filteredSales.length}টি বিল</td>
             <td style="text-align:center;">${filteredSales.reduce((c,i)=>c+(i.items||[]).reduce((a,it)=>a+(it.qty||0),0),0)}টি</td>
             <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0),0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
