@@ -4994,7 +4994,7 @@ function CustomersScreen({customers, sales, upd}) {
             : [...custSales].reverse().map((s,i)=>(
               <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                 <td style={{padding:'10px 12px',fontSize:13}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
-                <td style={{padding:'10px 12px',fontSize:12,fontFamily:'monospace',color:T.teal}}>#{s.id.slice(-8).toUpperCase()}</td>
+                <td style={{padding:'10px 12px',fontSize:12,fontFamily:'monospace',color:T.teal}}>#{s.id.toUpperCase()}</td>
                 <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{(s.items||[]).length}টি পণ্য</td>
                 <td style={{padding:'10px 12px',fontWeight:600}}>{fmt(s.total)}</td>
                 <td style={{padding:'10px 12px',color:T.green,fontWeight:600}}>{fmt(s.paid)}</td>
@@ -6167,8 +6167,8 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
   };
 
   const exportSalesCSV = () => {
-    const rows = [['তারিখ','বিল নং','কাস্টমার','মোট','পরিশোধ','বাকি','লাভ'],
-      ...fs.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id.slice(-8),s.custName,s.total,s.paid,s.due,
+    const rows = [['তারিখ','ইনভয়েস আইডি','কাস্টমার','মোট','পরিশোধ','বাকি','লাভ'],
+      ...fs.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id,s.custName,s.total,s.paid,s.due,
         (s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toFixed(2)])];
     const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
     const a = document.createElement('a');
@@ -6617,7 +6617,7 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.gray50}}>
-                    {['তারিখ','বিল নং','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ'].map(h=>(
+                    {['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ'].map(h=>(
                       <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
@@ -6631,7 +6631,7 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
                   ) : [...fs].reverse().map((s,i)=>(
                     <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                       <td style={{padding:'12px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
-                      <td style={{padding:'12px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600}} onClick={()=>setViewSale(s)}>#{s.id.slice(-6).toUpperCase()}</td>
+                      <td style={{padding:'12px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600,fontFamily:'monospace'}} onClick={()=>setViewSale(s)}>{s.id}</td>
                       <td style={{padding:'12px',fontSize:12}}>{s.custName}</td>
                       <td style={{padding:'12px',fontSize:12,color:T.gray400}}>{(s.items||[]).length}টি</td>
                       <td style={{padding:'12px',fontWeight:600,fontSize:13}}>{fmt(s.total)}</td>
