@@ -1007,7 +1007,7 @@ function MainApp({ currentUser, onLogout }) {
   }, []);
 
   // Track product history when products are updated
-  const trackProductHistory = (oldProducts, newProducts, user) => {
+  const trackProductHistory = async (oldProducts, newProducts, user) => {
     const changes = [];
     
     newProducts.forEach(newP => {
@@ -1086,7 +1086,7 @@ function MainApp({ currentUser, onLogout }) {
 
   const upd = {
     products: async v => { 
-      trackProductHistory(products, v, currentUser); 
+      await trackProductHistory(products, v, currentUser); 
       setProducts(v); 
       await db.set(STORAGE_KEYS.products, v); 
     },
