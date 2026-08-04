@@ -4125,8 +4125,16 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             )}
           </div>
           <div style={{marginLeft:'auto',display:'flex',gap:8}}>
-            <button style={btn()} onClick={()=>{setViewCategory(null);setCatForm({name:viewCategory.name});setModal({mode:'editCat',catName:viewCategory.name,catId:viewCategory.id});}}>✏️ সম্পাদনা</button>
-            <button style={btn('danger')} onClick={()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){setViewCategory(null);upd.categories(categories.filter(c=>c.id!==viewCategory.id));}}}>🗑️ মুছুন</button>
+            {catProducts.length === 0 ? (
+              <button style={btn()} onClick={()=>{setViewCategory(null);setCatForm({name:viewCategory.name});setModal({mode:'editCat',catName:viewCategory.name,catId:viewCategory.id});}}>✏️ সম্পাদনা</button>
+            ) : (
+              <button disabled style={{...btn(),opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে এডিট করা যাবে না">✏️ সম্পাদনা</button>
+            )}
+            {catProducts.length === 0 ? (
+              <button style={btn('danger')} onClick={()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){setViewCategory(null);upd.categories(categories.filter(c=>c.id!==viewCategory.id));}}}>🗑️ মুছুন</button>
+            ) : (
+              <button disabled style={{...btn('danger'),opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে মুছা যাবে না">🗑️ মুছুন</button>
+            )}
             <button style={{...btn('primary'),padding:'6px 12px'}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>${viewCategory.name} - ক্যাটাগরি</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4;margin:15mm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#00897b;color:white;font-weight:700;font-size:12px}.footer{margin-top:20px;text-align:center;color:#999;font-size:11px}</style></head><body><h2 style="text-align:center;color:#00897b;margin-bottom:20px;border-bottom:2px solid #00897b;padding-bottom:10px">📂 ${viewCategory.name}</h2><p style="margin-bottom:10px">🏢 সরবরাহকারী: ${viewCategory.company || '-'}</p><p style="margin-bottom:10px">মোট পণ্য: ${catProducts.length}টি | মোট স্টক: ${catProducts.reduce((s,p)=>s+(p.stock||0),0)}টি | মোট মূল্য: ৳${totalValue.toLocaleString('en-US',{minimumFractionDigits:2})}</p><table><thead><tr><th style="text-align:center">আইডি</th><th>পণ্যের নাম</th><th style="text-align:center">স্টক</th><th style="text-align:right">ক্রয়</th><th style="text-align:right">বিক্রয়</th></tr></thead><tbody>${catProducts.map(p=>`<tr><td style="text-align:center">${p.id}</td><td>${p.name}</td><td style="text-align:center">${p.stock} ${p.unit}</td><td style="text-align:right">৳${(p.buyP||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td><td style="text-align:right">৳${(p.sellP||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>`).join('')}</tbody></table><p class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
           </div>
         </div>
@@ -4234,8 +4242,16 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                       <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
                       <td style={{padding:'10px 12px',whiteSpace:'nowrap',textAlign:'center'}}>
                         <button onClick={()=>setViewCategory(cat)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
-                        <button onClick={e=>{e.stopPropagation();setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('primary'),padding:'4px 6px'}}>✏️</button>
-                        <button onClick={e=>{e.stopPropagation();if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
+                        {products.filter(p=>p.cat===cat.name).length === 0 ? (
+                          <button onClick={e=>{e.stopPropagation();setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('primary'),padding:'4px 6px'}}>✏️</button>
+                        ) : (
+                          <button disabled style={{...btn('ghost'),padding:'4px 6px',opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে এডিট করা যাবে না">✏️</button>
+                        )}
+                        {products.filter(p=>p.cat===cat.name).length === 0 ? (
+                          <button onClick={e=>{e.stopPropagation();if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
+                        ) : (
+                          <button disabled style={{...btn('ghost'),padding:'4px 6px',opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে মুছা যাবে না">🗑️</button>
+                        )}
                       </td>
                     </tr>
                   ))}
