@@ -1521,11 +1521,11 @@ td:nth-child(4) {
 </div>
 <table>
   <thead>
-    <tr>
-      <th>পণ্য</th>
-      <th>পরিমাণ</th>
-      <th>দাম</th>
-      <th>মোট</th>
+    <tr style="border-bottom:1px dashed #000;">
+      <th style="text-align:left;padding:3px 0;">পণ্য</th>
+      <th style="text-align:center;padding:3px 0;">পরিমাণ</th>
+      <th style="text-align:right;padding:3px 0;">দাম</th>
+      <th style="text-align:right;padding:3px 0;">মোট</th>
     </tr>
   </thead>
   <tbody>
@@ -2449,7 +2449,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </div>
 <div style="border-top:1px dotted #000;margin:4px 0;"></div>
 <table>
-  <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
+  <thead><tr style="border-bottom:1px dashed #000;"><th style="text-align:left;padding:3px 0;">পণ্য</th><th style="text-align:center;padding:3px 0;">পরিমাণ</th><th style="text-align:right;padding:3px 0;">দাম</th><th style="text-align:right;padding:3px 0;">মোট</th></tr></thead>
   <tbody>`;
                       viewPurchase.items.forEach(item => {
                         const qty = item.stock||0;
