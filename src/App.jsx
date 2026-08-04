@@ -2465,12 +2465,13 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </body>
 </html>`;
                       try {
-                        const win = window.open('', '_blank', 'width=400,height=600');
+                        const win = window.open('', '_blank', 'width=350,height=600,left=100,top=100');
                         if (win) {
                           win.document.open();
                           win.document.write(html);
                           win.document.close();
-                          win.onload = function() { setTimeout(() => win.print(), 500); };
+                          // Show print dialog
+                          win.onload = function() { win.print(); };
                         } else {
                           alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
                         }
@@ -6574,12 +6575,13 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
 </body>
 </html>`;
                   try {
-                    const win = window.open('', '_blank', 'width=400,height=600');
+                    const win = window.open('', '_blank', 'width=350,height=600,left=100,top=100');
                     if (win) {
                       win.document.open();
                       win.document.write(html);
                       win.document.close();
-                      win.onload = function() { setTimeout(() => win.print(), 500); };
+                      // Show print dialog
+                      win.onload = function() { win.print(); };
                     } else {
                       alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
                     }
