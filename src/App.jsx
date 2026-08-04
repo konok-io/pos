@@ -5244,8 +5244,14 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   const totalValue = realProducts.reduce((s,p)=>s+p.sellP*p.stock,0);
   
   // Filter only stock change history (exclude price changes)
-  // Filter only manual stock change history
+  // Filter manual stock history
   const manualStockHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'manual');
+  
+  // Filter stock increase history (manual)
+  const stockIncreaseHistory = manualStockHistory.filter(h => h.newValue > h.oldValue);
+  
+  // Filter stock decrease history (manual)
+  const stockDecreaseHistory = manualStockHistory.filter(h => h.newValue < h.oldValue);
 
   const adjust = async () => {
     const qty = parseInt(adjQty)||0;
@@ -5278,7 +5284,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-      {/* Sub-tabs: List / History - Centered with borders */}
+      {/* Sub-tabs: 4 tabs - Centered with borders */}
       <div style={{display:'flex',gap:8,alignItems:'center',background:T.white,padding:'10px 12px',flexWrap:'wrap',justifyContent:'center'}}>
         <button onClick={()=>setInvTab('list')} style={{
           padding:'8px 14px',
@@ -5293,26 +5299,142 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
         }}>
           📦 স্টক তালিকা
         </button>
-        <button onClick={()=>setInvTab('history')} style={{
+        <button onClick={()=>setInvTab('increase')} style={{
           padding:'8px 14px',
           borderRadius:7,
           whiteSpace:'nowrap',
-          border:`1px solid ${invTab==='history'?T.teal:T.gray200}`,
-          background:invTab==='history'?T.teal:T.gray100,
-          color:invTab==='history'?T.white:T.gray600,
+          border:`1px solid ${invTab==='increase'?T.teal:T.gray200}`,
+          background:invTab==='increase'?T.teal:T.gray100,
+          color:invTab==='increase'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
           fontSize:13,
         }}>
-          📜 স্টক কমানো বাড়ানোর হিস্ট্রি ({manualStockHistory.length})
+          ⬆️ স্টক বাড়ানো ({stockIncreaseHistory.length})
+        </button>
+        <button onClick={()=>setInvTab('decrease')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${invTab==='decrease'?T.teal:T.gray200}`,
+          background:invTab==='decrease'?T.teal:T.gray100,
+          color:invTab==='decrease'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
+          ⬇️ স্টক কমানো ({stockDecreaseHistory.length})
+        </button>
+        <button onClick={()=>setInvTab('manual')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${invTab==='manual'?T.teal:T.gray200}`,
+          background:invTab==='manual'?T.teal:T.gray100,
+          color:invTab==='manual'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
+          🔧 ম্যানুয়াল স্টক পরিবর্তন
         </button>
       </div>
 
-      {/* History Tab Content */}
-      {invTab === 'history' && (
+      {/* Stock Increase Tab Content */}
+      {invTab === 'increase' && (
         <div style={{flex:1,overflow:'auto',padding:12}}>
           <div style={{...card,overflow:'hidden'}}>
-            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>📜 ম্যানুয়াল স্টক পরিবর্তনের ইতিহাস (শুধু স্টক মেনু থেকে)</div>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>⬆️ স্টক বাড়ানোর ইতিহাস (শুধু ম্যানুয়াল)</div>
+            {stockIncreaseHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো স্টক বাড়ানো হয়নি</div>
+            ) : (
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.tealLight}}>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>বেশি হয়েছে</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...stockIncreaseHistory].reverse().map((h,i)=>(
+                    <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        {new Date(h.timestamp).toLocaleString('bn-BD')}
+                      </td>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:12}}>
+                        <span style={{background:T.greenLight,color:T.green,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>
+                          +{h.newValue - h.oldValue}
+                        </span>
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
+                        {h.oldValue}
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
+                        {h.newValue}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Stock Decrease Tab Content */}
+      {invTab === 'decrease' && (
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          <div style={{...card,overflow:'hidden'}}>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>⬇️ স্টক কমানোর ইতিহাস (শুধু ম্যানুয়াল)</div>
+            {stockDecreaseHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো স্টক কমানো হয়নি</div>
+            ) : (
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.tealLight}}>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>কম হয়েছে</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...stockDecreaseHistory].reverse().map((h,i)=>(
+                    <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        {new Date(h.timestamp).toLocaleString('bn-BD')}
+                      </td>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:12}}>
+                        <span style={{background:T.redLight,color:T.red,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>
+                          {h.newValue - h.oldValue}
+                        </span>
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
+                        {h.oldValue}
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
+                        {h.newValue}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Manual Stock Adjustment Tab Content */}
+      {invTab === 'manual' && (
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          <div style={{...card,overflow:'hidden'}}>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>🔧 ম্যানুয়াল স্টক পরিবর্তনের ইতিহাস</div>
             {manualStockHistory.length === 0 ? (
               <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ম্যানুয়াল স্টক পরিবর্তন নেই</div>
             ) : (
@@ -5321,7 +5443,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                   <tr style={{background:T.tealLight}}>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তন</th>
+                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তন</th>
                     <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
                     <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
@@ -5334,7 +5456,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
                       </td>
                       <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
-                      <td style={{padding:'10px 12px',fontSize:12}}>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:12}}>
                         <span style={{
                           background: h.newValue > h.oldValue ? T.greenLight : T.redLight,
                           color: h.newValue > h.oldValue ? T.green : T.red,
@@ -5351,7 +5473,6 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                       </td>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         <div style={{fontWeight:600}}>{h.user}</div>
-                        {h.userEmail && <div style={{fontSize:11,color:T.gray400}}>{h.userEmail}</div>}
                       </td>
                     </tr>
                   ))}
