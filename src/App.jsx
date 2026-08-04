@@ -7773,9 +7773,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     { icon: '⚙️', label: 'জেনারেল' },
     { icon: '🎨', label: 'ডিজাইন' },
     { icon: '📊', label: 'রিপোর্ট' },
-    { icon: '💾', label: 'ডেটা' },
+    { icon: '💾', label: 'ইউজার' },
   ];
-  const tabs = isSuperAdmin ? [...baseTabs, { icon: '👥', label: 'ইউজার' }] : [...baseTabs, { icon: '👥', label: 'ইউজার' }];
+  const tabs = isSuperAdmin ? [...baseTabs, { icon: '🔄', label: 'ডেটা রিসেট' }] : [...baseTabs, { icon: '🔄', label: 'ডেটা রিসেট' }];
 
   const openUserModal = (user = null) => {
     if (user) {
