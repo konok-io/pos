@@ -7888,8 +7888,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       </div>
                       {form.purchaseShowSupplier!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.purchaseFontSize||11)-1}px` }}>
                         <div>সরবরাহকারী: এবিসি ট্রেডার্স</div>
-                        <div style={{ fontWeight: 'bold', color: '#0284C7', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>CR: 1234567890</div>
-                        <div style={{ fontWeight: 'bold', color: '#EA580C', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>VAT: 123456789012345</div>
+                        <div style={{ fontWeight: 'bold', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>CR: 1234567890</div>
+                        <div style={{ fontWeight: 'bold', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>VAT: 123456789012345</div>
                         <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px`, marginTop: 2 }}>ঠিকানা: সরবরাহকারীর ঠিকানা</div>
                       </div>}
                       <div style={{ borderTop: '1px dotted #000', margin: '4px 0' }}></div>
