@@ -1414,7 +1414,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
 
   	  const printReceipt = (r) => {
     const s = r.settings || {};
-    const headerText = s.receiptHeader || '🧾 বিক্রয় রিসিট';
+    const headerText = s.receiptLogo || s.receiptHeader || '🧾 বিক্রয় রিসিট';
     const footerText = s.receiptFooter || 'ধন্যবাদ';
     const fontSize = s.receiptFontSize || 11;
     const showLogo = s.receiptShowLogo !== false;
@@ -1455,16 +1455,14 @@ body {
   font-size: ${fontSize}px;
   color: #000;
   background: #fff;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 .center {
   text-align: center;
 }
 .border {
   border-bottom: 1px dashed #000;
-  padding-bottom: 5px;
-  margin-bottom: 5px;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
 }
 .row {
   display: flex;
@@ -1501,50 +1499,50 @@ td:nth-child(4) {
   text-align: center;
   margin-top: 10px;
   border-top: 1px dashed #000;
-  padding-top: 5px;
+  padding-top: 6px;
   font-size: ${fontSize - 2}px;
 }
 </style>
 </head>
 <body>
 <div class="center border">
-  ${showLogo ? '<div style="font-size:14px;font-weight:bold;">' + headerText + '</div>' : '<div style="font-weight:bold;">' + headerText.replace(/[^\w\s]/g, '') + '</div>'}
-  ${showAddress && s.name ? '<div>' + s.name + '</div>' : ''}
-  ${showAddress && s.address ? '<div>' + s.address + '</div>' : ''}
-  ${showPhone && s.phone ? '<div>' + s.phone + '</div>' : ''}
-  ${showPhone && s.taxId ? '<div style="font-weight:bold;">VAT নং: ' + s.taxId + '</div>' : ''}
-  ${showPhone && s.taxId ? '<div style="font-weight:bold;">✚ সরলীকৃত কর চালান</div>' : ''}
-  	  <div>Invoice ID: ${r.sale.id.replace(/\D/g,'').slice(-8)}</div>
-  <div>${dateStr} | ${timeStr}</div>
-  ${showCustomer ? '<div>গ্রাহক: ' + r.sale.custName + '</div>' : ''}
-  ${showCustomer && r.sale.phone ? '<div>ফোন: ' + r.sale.phone + '</div>' : ''}
+  ${showLogo !== false ? '<div style="font-size:' + (fontSize + 3) + 'px;font-weight:bold;">' + headerText + '</div>' : ''}
+  ${showAddress !== false && s.name ? '<div style="font-size:' + (fontSize - 1) + 'px;">' + s.name + '</div>' : ''}
+  ${showAddress !== false && s.address ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.address + '</div>' : ''}
+  ${showPhone !== false && s.phone ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.phone + '</div>' : ''}
+  ${showPhone !== false && s.taxId ? '<div style="font-weight:bold;font-size:' + (fontSize - 2) + 'px;">VAT নং: ' + s.taxId + '</div>' : ''}
+  ${showPhone !== false && s.taxId ? '<div style="font-weight:bold;font-size:' + (fontSize - 2) + 'px;">✚ সরলীকৃত কর চালান</div>' : ''}
+  <div style="font-size:${fontSize - 1}px;margin-top:4px;">Invoice ID: ${r.sale.id.replace(/\D/g,'').slice(-8)}</div>
+  <div style="font-size:${fontSize - 2}px;">${dateStr} | ${timeStr}</div>
 </div>
+${showCustomer !== false ? '<div style="margin-bottom:6px;font-size:' + (fontSize - 1) + 'px;">' : '<div style="margin-bottom:6px;">'}
+  ${showCustomer !== false ? '<div>গ্রাহক: ' + r.sale.custName + '</div>' : ''}
+  ${showPhone !== false && r.sale.phone ? '<div>ফোন: ' + r.sale.phone + '</div>' : ''}
+</div>
+<div style="border-top:1px dotted #000;margin:4px 0;"></div>
 <table>
   <thead>
-    <tr style="border-bottom:1px dashed #000;">
+    <tr>
       <th style="text-align:left;padding:3px 0;">পণ্য</th>
-      <th style="text-align:center;padding:3px 0;">পরিমাণ</th>
+      <th style="text-align:center;padding:3px 0;">পরি</th>
       <th style="text-align:right;padding:3px 0;">দাম</th>
       <th style="text-align:right;padding:3px 0;">মোট</th>
     </tr>
   </thead>
   <tbody>
-    ${r.sale.items.map(i => `<tr>
-      <td>${i.name}<br><span style="font-size:9px;color:#666;">${i.company || ''}</span></td>
-      <td>${i.qty} ${i.unit || 'পিস'}</td>
-      <td>৳${i.sellP.toFixed(2)}</td>
-      <td>৳${i.total.toFixed(2)}</td>
-    </tr>`).join('')}
+    ${r.sale.items.map(i => '<tr><td>' + i.name + (i.company ? '<br><span style="font-size:' + (fontSize - 3) + 'px;color:#666;">' + i.company + '</span>' : '') + '</td><td style="text-align:center;">' + i.qty + ' ' + (i.unit || 'পিস') + '</td><td style="text-align:right;">৳' + i.sellP.toFixed(2) + '</td><td style="text-align:right;">৳' + (i.qty * i.sellP).toFixed(2) + '</td></tr>').join('')}
   </tbody>
 </table>
-<div class="total row"><span>সাবটোটাল:</span><span>৳${(r.sale.subtotal || r.sale.total).toFixed(2)}</span></div>
-${showVat && r.sale.vatAmount > 0 ? `<div class="row"><span>ভ্যাট (${r.sale.vatPercent}%):</span><span>৳${r.sale.vatAmount.toFixed(2)}</span></div>` : ''}
-${r.sale.discount > 0 ? `<div class="row"><span>ছাড়:</span><span>-৳${r.sale.discount.toFixed(2)}</span></div>` : ''}
-<div class="total row"><span>মোট:</span><span>৳${r.sale.total.toFixed(2)}</span></div>
-<div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toFixed(2)}</span></div>
-${r.sale.change > 0 ? `<div class="row"><span>ফেরত:</span><span>৳${r.sale.change.toFixed(2)}</span></div>` : ''}
-${r.sale.due > 0 ? `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${r.sale.due.toFixed(2)}</span></div>` : ''}
-${showQr ? '<div style="text-align:center;margin-top:8px;"><div style="width:48px;height:48px;margin:0 auto 4px;padding:2px;border:2px solid #000;"><div style="width:100%;height:100%;background:repeating-linear-gradient(0deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(90deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px),repeating-linear-gradient(-45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px);background-size:4px 4px,4px 4px,8px 8px,8px 8px;background-position:0 0,0 0,2px 2px,-2px 2px;"></div></div><div style="font-size:7px;color:#000;font-weight:bold;">🧾 ZATCA QR</div><div style="font-size:6px;color:#666;">ডেমো</div></div>' : ''}
+<div style="border-top:1px dashed #000;margin-top:6px;padding-top:6px;">
+<div class="row"><span>সাবটোটাল:</span><span>৳${(r.sale.subtotal || r.sale.total).toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+${showVat !== false && r.sale.vatAmount > 0 ? '<div class="row"><span>ভ্যাট (' + (r.sale.vatPercent || 15) + '%):</span><span>৳' + r.sale.vatAmount.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+${r.sale.discount > 0 ? '<div class="row"><span>ছাড়:</span><span>-৳' + r.sale.discount.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+<div class="total row"><span>মোট:</span><span>৳${r.sale.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+<div class="row"><span>পরিশোধ:</span><span>৳${r.sale.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+${r.sale.change > 0 ? '<div class="row"><span>ফেরত:</span><span>৳' + r.sale.change.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+${r.sale.due > 0 ? '<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳' + r.sale.due.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+</div>
+${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style="width:48px;height:48px;margin:0 auto 4px;padding:2px;border:2px solid #000;"><div style="width:100%;height:100%;background:repeating-linear-gradient(0deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(90deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px),repeating-linear-gradient(-45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px);background-size:4px 4px,4px 4px,8px 8px,8px 8px;background-position:0 0,0 0,2px 2px,-2px 2px;"></div></div><div style="font-size:7px;color:#000;font-weight:bold;">🧾 ZATCA QR</div></div>' : ''}
 <div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
