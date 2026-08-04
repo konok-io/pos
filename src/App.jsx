@@ -6116,13 +6116,20 @@ ${filteredExpenses.length > 0 ? `
 /* ═══════════════════════════════════════════
    REPORTS SCREEN
 ═══════════════════════════════════════════ */
-function ReportsScreen({sales, customers, purchases, settings}) {
+function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
+  const [activeTab, setActiveTab] = useState('summary');
   const [period, setPeriod] = useState('today');
   const [from, setFrom] = useState(today());
   const [to, setTo] = useState(today());
   const [viewPurchase, setViewPurchase] = useState(null);
   const [viewSale, setViewSale] = useState(null);
   const [purchaseSearch, setPurchaseSearch] = useState('');
+
+  const tabs = [
+    { id: 'summary', label: '📊 সামারি', icon: '📊' },
+    { id: 'sales', label: '🧾 বিক্রয় হিস্ট্রি', icon: '🧾' },
+    { id: 'purchases', label: '📦 পারচেজ হিস্ট্রি', icon: '📦' },
+  ];
 
   const filterByPeriod = (items, dateField = 'date') => {
     const n = new Date();
@@ -6136,13 +6143,8 @@ function ReportsScreen({sales, customers, purchases, settings}) {
     });
   };
 
-  const filterSales = () => {
-    return filterByPeriod(sales);
-  };
-
-  const filterPurchases = () => {
-    return filterByPeriod(purchases);
-  };
+  const filterSales = () => filterByPeriod(sales);
+  const filterPurchases = () => filterByPeriod(purchases);
 
   const filteredPurchases = filterPurchases().filter(p => 
     !purchaseSearch || 
@@ -6158,7 +6160,15 @@ function ReportsScreen({sales, customers, purchases, settings}) {
   const allCredit  = customers.reduce((s,c)=>s+(c.credit||0),0);
   const profitPct  = totalSales>0 ? (totalProfit/totalSales*100).toFixed(1) : 0;
 
-  const exportCSV = () => {
+  const getPeriodLabel = () => {
+    if (period === 'today') return 'আজ';
+    if (period === 'week') return 'এই সপ্তাহ';
+    if (period === 'month') return 'এই মাস';
+    if (period === 'all') return 'সব সময়';
+    return `${from} থেকে ${to}`;
+  };
+
+  const exportSalesCSV = () => {
     const rows = [['তারিখ','বিল নং','কাস্টমার','মোট','পরিশোধ','বাকি','লাভ'],
       ...fs.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id.slice(-8),s.custName,s.total,s.paid,s.due,
         (s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toFixed(2)])];
@@ -6168,15 +6178,24 @@ function ReportsScreen({sales, customers, purchases, settings}) {
     a.download='sales-report.csv'; a.click();
   };
 
+  const exportPurchasesCSV = () => {
+    const rows = [['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট','সর্বমোট'],
+      ...filteredPurchases.map(p=>{
+        const total = p.items.reduce((s,i)=>s+(i.stock||0)*(i.buyP||0),0);
+        const vat = total * 0.15;
+        return [new Date(p.date).toLocaleDateString('en-GB'),p.id,p.supplier,p.totalItems,total,vat,total+vat];
+      })];
+    const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+    a.download='purchase-report.csv'; a.click();
+  };
+
   const printPurchases = () => {
+    const periodLabel = getPeriodLabel();
     const purchases = filterPurchases();
     const total = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0);
     const totalVat = purchases.reduce((s,p) => {const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;}, 0);
-    const periodLabel = period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to;
-    const totalSellingPrice = fs.reduce((s,sale)=>s+sale.total/1.15,0);
-    const totalVatOnTotal = fs.reduce((s,sale)=>s+sale.total*0.15,0);
-    const totalVatOnSelling = fs.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0);
-    const totalVatDiff = fs.reduce((s,sale)=>{const t=sale.total*0.15;const v=(sale.total/1.15)*0.15;return s+(t-v);},0);
     
     let html = `
     <!DOCTYPE html>
@@ -6245,7 +6264,6 @@ function ReportsScreen({sales, customers, purchases, settings}) {
     </body>
     </html>`;
     
-    // Large paper print - window.open for preview and printer selection
     const win = window.open('', '', 'width=1000,height=600');
     win.document.open();
     win.document.write(html);
@@ -6254,7 +6272,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
   };
 
   const printSales = () => {
-    const periodLabel = period === 'today' ? 'আজ' : period === 'week' ? 'এই সপ্তাহ' : period === 'month' ? 'এই মাস' : period === 'all' ? 'সব সময়' : from + ' থেকে ' + to;
+    const periodLabel = getPeriodLabel();
     const totalSellingPrice = fs.reduce((s,sale)=>s+sale.total/1.15,0);
     const totalVatOnTotal = fs.reduce((s,sale)=>s+sale.total*0.15,0);
     const totalVatOnSelling = fs.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0);
@@ -6357,157 +6375,376 @@ function ReportsScreen({sales, customers, purchases, settings}) {
   ];
 
   return (
-    <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-      <div style={{padding:'10px 12px',display:'flex',gap:6,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
-        {[{v:'today',l:'আজ'},{v:'week',l:'এই সপ্তাহ'},{v:'month',l:'এই মাস'},{v:'all',l:'সব সময়'},{v:'custom',l:'নির্দিষ্ট তারিখ'}].map(p=>(
-          <button key={p.v} onClick={()=>setPeriod(p.v)} style={{
-            ...btn(period===p.v?'primary':'ghost','sm'),
-            background:period===p.v?T.teal:T.gray100, color:period===p.v?T.white:T.gray600, border:'none',
-          }}>{p.l}</button>
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden',background:T.gray50}}>
+      {/* Tab Menu */}
+      <div style={{
+        background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+        padding:'12px 16px 0',
+        display:'flex',
+        gap:0,
+        boxShadow:'0 2px 8px rgba(0,0,0,0.15)'
+      }}>
+        {tabs.map((tab, index) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              padding:'12px 20px',
+              background: activeTab === tab.id ? T.white : 'transparent',
+              color: activeTab === tab.id ? T.teal : 'rgba(255,255,255,0.8)',
+              border: 'none',
+              borderTopLeftRadius: activeTab === tab.id ? '12px' : '0',
+              borderTopRightRadius: activeTab === tab.id ? '12px' : '0',
+              fontSize:'14px',
+              fontWeight: activeTab === tab.id ? '700' : '600',
+              cursor:'pointer',
+              transition:'all 0.2s ease',
+              display:'flex',
+              alignItems:'center',
+              gap:'8px',
+              marginBottom: activeTab === tab.id ? '-1px' : '0',
+              borderBottom: activeTab === tab.id ? '3px solid ' + T.teal : '3px solid transparent',
+              boxShadow: activeTab === tab.id ? '0 -2px 10px rgba(0,0,0,0.1)' : 'none',
+            }}
+          >
+            <span style={{fontSize:'18px'}}>{tab.icon}</span>
+            <span>{tab.label.replace(/^[^\s]+\s/, '')}</span>
+          </button>
         ))}
-        {period==='custom' && <>
-          <input type="date" value={from} onChange={e=>setFrom(e.target.value)} style={{...input,width:140,fontSize:13}}/>
-          <span style={{color:T.gray400,fontSize:13}}>থেকে</span>
-          <input type="date" value={to}   onChange={e=>setTo(e.target.value)}   style={{...input,width:140,fontSize:13}}/>
-        </>}
-        <button style={btn('ghost','sm')} onClick={exportCSV}>📤 CSV রপ্তানি</button>
       </div>
 
-      <div style={{flex:1,overflow:'auto',padding:12}}>
-        {/* Stat cards */}
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(170px,1fr))',gap:10,marginBottom:14}}>
-          {statCards.map(s=>(
-            <div key={s.l} style={{...card,textAlign:'center',background:s.bg,border:'none'}}>
-              <div style={{fontSize:26,marginBottom:4}}>{s.icon}</div>
-              <div style={{fontSize:22,fontWeight:800,color:s.c}}>{s.v}</div>
-              <div style={{fontSize:12,color:T.gray600,marginTop:2,fontWeight:500}}>{s.l}</div>
-            </div>
-          ))}
+      {/* Period Filters */}
+      <div style={{
+        padding:'12px 16px',
+        display:'flex',
+        gap:'10px',
+        alignItems:'center',
+        background:T.white,
+        borderBottom:`1px solid ${T.gray200}`,
+        flexWrap:'wrap'
+      }}>
+        <span style={{fontSize:'13px',fontWeight:'600',color:T.gray600,marginRight:'4px'}}>📅 সময়কাল:</span>
+        {[
+          {v:'today',l:'আজ',icon:'📆'},
+          {v:'week',l:'এই সপ্তাহ',icon:'📅'},
+          {v:'month',l:'এই মাস',icon:'🗓️'},
+          {v:'all',l:'সব সময়',icon:'♾️'},
+        ].map(p=>(
+          <button key={p.v} onClick={()=>setPeriod(p.v)} style={{
+            padding:'8px 14px',
+            background: period === p.v ? T.teal : T.gray100,
+            color: period === p.v ? T.white : T.gray600,
+            border: 'none',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display:'flex',
+            alignItems:'center',
+            gap:'6px',
+            transition:'all 0.2s',
+            boxShadow: period === p.v ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
+          }}>
+            <span>{p.icon}</span>
+            <span>{p.l}</span>
+          </button>
+        ))}
+        
+        {/* Date Range */}
+        <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'4px'}}>
+          <button 
+            onClick={()=>setPeriod(period === 'custom' ? 'today' : 'custom')} 
+            style={{
+              padding:'8px 14px',
+              background: period === 'custom' ? T.teal : T.gray100,
+              color: period === 'custom' ? T.white : T.gray600,
+              border: 'none',
+              borderRadius: '20px',
+              fontSize: '13px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display:'flex',
+              alignItems:'center',
+              gap:'6px',
+              transition:'all 0.2s',
+            }}
+          >
+            📅 নির্দিষ্ট তারিখ
+          </button>
+          {period === 'custom' && (
+            <>
+              <input 
+                type="date" 
+                value={from} 
+                onChange={e=>setFrom(e.target.value)} 
+                style={{
+                  ...input,
+                  width:140,
+                  fontSize:12,
+                  padding:'6px 10px',
+                  borderRadius:7,
+                  border:`1px solid ${T.gray200}`,
+                }}
+              />
+              <span style={{color:T.gray400,fontSize:12}}>থেকে</span>
+              <input 
+                type="date" 
+                value={to} 
+                onChange={e=>setTo(e.target.value)} 
+                style={{
+                  ...input,
+                  width:140,
+                  fontSize:12,
+                  padding:'6px 10px',
+                  borderRadius:7,
+                  border:`1px solid ${T.gray200}`,
+                }}
+              />
+            </>
+          )}
         </div>
 
-        {/* P&L */}
-        <div style={{...card,marginBottom:14}}>
-          <h3 style={{margin:'0 0 12px',fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>লাভ-ক্ষতির হিসাব</h3>
-          {[
-            {l:'মোট বিক্রয় আয়',v:totalSales,c:T.gray900},
-            {l:'পণ্যের ক্রয়মূল্য (COGS)',v:-(totalSales-totalProfit),c:T.red},
-            {l:'মোট লাভ',v:totalProfit,c:T.green,bold:true,line:true},
-            {l:'লাভের হার',v:`${profitPct}%`,c:T.teal,bold:true,str:true},
-          ].map((r,i)=>(
-            <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'9px 0',borderTop:r.line?`2px solid ${T.gray200}`:'none',marginTop:r.line?4:0}}>
-              <span style={{color:T.gray600,fontSize:14}}>{r.l}</span>
-              <span style={{fontWeight:r.bold?800:600,fontSize:r.bold?16:14,color:r.c}}>{r.str?r.v:fmt(r.v)}</span>
-            </div>
-          ))}
-        </div>
+        {/* CSV Export */}
+        <button 
+          style={{
+            padding:'8px 16px',
+            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+            color: T.white,
+            border: 'none',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display:'flex',
+            alignItems:'center',
+            gap:'6px',
+            marginLeft:'auto',
+            transition:'all 0.2s',
+            boxShadow:'0 2px 8px rgba(5,150,105,0.3)',
+          }}
+          onClick={() => {
+            if (activeTab === 'sales') exportSalesCSV();
+            else if (activeTab === 'purchases') exportPurchasesCSV();
+            else {
+              const rows = [['রিপোর্ট সামারি'],
+                [`${getPeriodLabel()}`],
+                [],
+                ['মোট বিক্রয়', totalSales],
+                ['মোট লাভ', totalProfit],
+                ['লাভের হার', `${profitPct}%`],
+                ['পরিশোধ হয়েছে', totalPaid],
+                ['বাকি বিক্রয়', totalDue],
+                ['বিলের সংখ্যা', fs.length],
+                ['সব কাস্টমার বাকি', allCredit],
+              ];
+              const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+              a.download='summary-report.csv'; a.click();
+            }
+          }}
+        >
+          📤 CSV এক্সপোর্ট
+        </button>
+      </div>
 
-        {/* Purchase History */}
-        <div style={{...card,marginBottom:14}}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-            <h3 style={{margin:0,fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>📦 পারচেজ হিস্ট্রি ({filterPurchases().length}টি)</h3>
-            <div style={{display:'flex',gap:8,alignItems:'center'}}>
-              <input value={purchaseSearch} onChange={e=>setPurchaseSearch(e.target.value)} placeholder="খুঁজুন..." style={{...input,padding:'6px 10px',fontSize:12,width:150}}/>
-              <button onClick={printPurchases} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
+      {/* Content Area */}
+      <div style={{flex:1,overflow:'auto',padding:16}}>
+        {/* Summary Tab */}
+        {activeTab === 'summary' && (
+          <div>
+            {/* Stat cards */}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(170px,1fr))',gap:12,marginBottom:16}}>
+              {statCards.map(s=>(
+                <div key={s.l} style={{
+                  ...card,
+                  textAlign:'center',
+                  background:s.bg,
+                  border:'none',
+                  padding:20,
+                  borderRadius:12,
+                  boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+                }}>
+                  <div style={{fontSize:28,marginBottom:8}}>{s.icon}</div>
+                  <div style={{fontSize:22,fontWeight:800,color:s.c}}>{s.v}</div>
+                  <div style={{fontSize:12,color:T.gray600,marginTop:4,fontWeight:500}}>{s.l}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* P&L */}
+            <div style={{...card,padding:20,borderRadius:12}}>
+              <h3 style={{margin:'0 0 16px',fontSize:16,fontWeight:700,color:T.gray700,display:'flex',alignItems:'center',gap:8}}>
+                📊 লাভ-ক্ষতির হিসাব
+              </h3>
+              {[
+                {l:'মোট বিক্রয় আয়',v:totalSales,c:T.gray900},
+                {l:'পণ্যের ক্রয়মূল্য (COGS)',v:-(totalSales-totalProfit),c:T.red},
+                {l:'মোট লাভ',v:totalProfit,c:T.green,bold:true,line:true},
+                {l:'লাভের হার',v:`${profitPct}%`,c:T.teal,bold:true,str:true},
+              ].map((r,i)=>(
+                <div key={i} style={{
+                  display:'flex',
+                  justifyContent:'space-between',
+                  padding:'12px 0',
+                  borderTop:r.line?`2px solid ${T.gray200}`:'none',
+                  marginTop:r.line?8:0
+                }}>
+                  <span style={{color:T.gray600,fontSize:14}}>{r.l}</span>
+                  <span style={{fontWeight:r.bold?800:600,fontSize:r.bold?16:14,color:r.c}}>{r.str?r.v:fmt(r.v)}</span>
+                </div>
+              ))}
             </div>
           </div>
-          <div style={{overflow:'auto'}}>
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
-              <thead>
-                <tr style={{background:T.gray50}}>
-                  {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট','সর্বমোট'].map(h=>(
-                    <th key={h} style={{padding:'8px 10px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray400,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
+        )}
+
+        {/* Sales History Tab */}
+        {activeTab === 'sales' && (
+          <div style={card}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+              <h3 style={{margin:0,fontSize:16,fontWeight:700,color:T.gray700,display:'flex',alignItems:'center',gap:8}}>
+                🧾 বিক্রয় ইতিহাস ({fs.length}টি বিল)
+              </h3>
+              <button onClick={printSales} style={{
+                ...btn('ghost'),
+                padding:'8px 14px',
+                fontSize:13,
+                borderRadius:8,
+                display:'flex',
+                alignItems:'center',
+                gap:6,
+              }}>🖨️ প্রিন্ট</button>
+            </div>
+            <div style={{overflow:'auto'}}>
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.gray50}}>
+                    {['তারিখ','বিল নং','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ'].map(h=>(
+                      <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {fs.length===0 ? (
+                    <tr><td colSpan={8} style={{padding:40,textAlign:'center',color:T.gray400}}>
+                      <div style={{fontSize:48,marginBottom:12}}>📭</div>
+                      নির্বাচিত সময়ে কোনো বিক্রয় নেই
+                    </td></tr>
+                  ) : [...fs].reverse().map((s,i)=>(
+                    <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'12px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
+                      <td style={{padding:'12px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600}} onClick={()=>setViewSale(s)}>#{s.id.slice(-6).toUpperCase()}</td>
+                      <td style={{padding:'12px',fontSize:12}}>{s.custName}</td>
+                      <td style={{padding:'12px',fontSize:12,color:T.gray400}}>{(s.items||[]).length}টি</td>
+                      <td style={{padding:'12px',fontWeight:600,fontSize:13}}>{fmt(s.total)}</td>
+                      <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt(s.paid)}</td>
+                      <td style={{padding:'12px',fontWeight:s.due>0?700:400,color:s.due>0?T.red:T.gray400}}>{fmt(s.due)}</td>
+                      <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.profit||0),0))}</td>
+                    </tr>
                   ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPurchases.length===0 ? <tr><td colSpan={7} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</td></tr>
-                : [...filteredPurchases].reverse().map((p,i)=>{
+                </tbody>
+                <tfoot>
+                  <tr style={{background:T.tealLight}}>
+                    <td colSpan={4} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট:</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(totalSales)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalPaid)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:totalDue>0?T.red:T.gray400}}>{fmt(totalDue)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalProfit)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Purchase History Tab */}
+        {activeTab === 'purchases' && (
+          <div style={card}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+              <h3 style={{margin:0,fontSize:16,fontWeight:700,color:T.gray700,display:'flex',alignItems:'center',gap:8}}>
+                📦 পারচেজ হিস্ট্রি ({filterPurchases().length}টি)
+              </h3>
+              <div style={{display:'flex',gap:10,alignItems:'center'}}>
+                <input 
+                  value={purchaseSearch} 
+                  onChange={e=>setPurchaseSearch(e.target.value)} 
+                  placeholder="🔍 খুঁজুন..." 
+                  style={{
+                    ...input,
+                    padding:'8px 12px',
+                    fontSize:12,
+                    width:180,
+                    borderRadius:8,
+                  }}
+                />
+                <button onClick={printPurchases} style={{
+                  ...btn('ghost'),
+                  padding:'8px 14px',
+                  fontSize:13,
+                  borderRadius:8,
+                  display:'flex',
+                  alignItems:'center',
+                  gap:6,
+                }}>🖨️ প্রিন্ট</button>
+              </div>
+            </div>
+            <div style={{overflow:'auto'}}>
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.gray50}}>
+                    {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট','সর্বমোট'].map(h=>(
+                      <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPurchases.length===0 ? (
+                    <tr><td colSpan={7} style={{padding:40,textAlign:'center',color:T.gray400}}>
+                      <div style={{fontSize:48,marginBottom:12}}>📭</div>
+                      কোনো পারচেজ নেই
+                    </td></tr>
+                  ) : [...filteredPurchases].reverse().map((p,i)=>{
                     const total = p.items.reduce((s,i)=>s+(i.stock||0)*(i.buyP||0),0);
                     const vat = total * 0.15;
                     const grandTotal = total + vat;
                     return (
-                  <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewPurchase(p)}>
-                    <td style={{padding:'9px 10px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
-                    <td style={{padding:'9px 10px',fontSize:12,fontFamily:'monospace',color:T.teal,fontWeight:600}}>{p.id}</td>
-                    <td style={{padding:'9px 10px',fontSize:12}}>{p.supplier}</td>
-                    <td style={{padding:'9px 10px',fontSize:12,color:T.gray400}}>{p.totalItems}টি</td>
-                    <td style={{padding:'9px 10px',fontWeight:600,fontSize:13,color:T.green}}>{fmt(total)}</td>
-                    <td style={{padding:'9px 10px',fontSize:12,color:T.red}}>{fmt(vat)}</td>
-                    <td style={{padding:'9px 10px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(grandTotal)}</td>
+                      <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewPurchase(p)}>
+                        <td style={{padding:'12px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
+                        <td style={{padding:'12px',fontSize:12,fontFamily:'monospace',color:T.teal,fontWeight:600}}>{p.id}</td>
+                        <td style={{padding:'12px',fontSize:12}}>{p.supplier}</td>
+                        <td style={{padding:'12px',fontSize:12,color:T.gray400}}>{p.totalItems}টি</td>
+                        <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.green}}>{fmt(total)}</td>
+                        <td style={{padding:'12px',fontSize:12,color:T.red}}>{fmt(vat)}</td>
+                        <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(grandTotal)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr style={{background:T.tealLight}}>
+                    <td colSpan={4} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট পারচেজ এমাউন্ট:</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0),0))}</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.red}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;},0))}</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t+t*0.15;},0))}</td>
                   </tr>
-                )})}
-              </tbody>
-              <tfoot>
-                <tr style={{background:T.tealLight}}>
-                  <td colSpan={4} style={{padding:'10px',fontWeight:700,fontSize:13}}>মোট পারচেজ এমাউন্ট:</td>
-                  <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0),0))}</td>
-                  <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.red}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;},0))}</td>
-                  <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t+t*0.15;},0))}</td>
-                </tr>
-              </tfoot>
-            </table>
+                </tfoot>
+              </table>
+            </div>
           </div>
-        </div>
-
-        {/* Sales history */}
-        <div style={card}>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-            <h3 style={{margin:0,fontSize:14,fontWeight:700,color:T.gray600,textTransform:'uppercase',letterSpacing:'0.5px'}}>বিক্রয় ইতিহাস ({fs.length}টি বিল)</h3>
-            <button onClick={printSales} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
-          </div>
-          <div style={{overflow:'auto'}}>
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
-              <thead>
-                <tr style={{background:T.gray50}}>
-                  {['তারিখ','বিল নং','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ','বিক্রয় মূল্য','মোট মূল্যের ভ্যাট','বিক্রয় মূল্যের ভ্যাট','পার্থক্য'].map(h=>(
-                    <th key={h} style={{padding:'8px 10px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray400,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {fs.length===0 ? <tr><td colSpan={13} style={{padding:30,textAlign:'center',color:T.gray400}}>নির্বাচিত সময়ে কোনো বিক্রয় নেই</td></tr>
-                : [...fs].reverse().map((s,i)=>(
-                  <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                    <td style={{padding:'9px 10px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
-                    <td style={{padding:'9px 10px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600}} onClick={()=>setViewSale(s)}>#{s.id.slice(-6).toUpperCase()}</td>
-                    <td style={{padding:'9px 10px',fontSize:12}}>{s.custName}</td>
-                    <td style={{padding:'9px 10px',fontSize:12,color:T.gray400}}>{(s.items||[]).length}টি</td>
-                    <td style={{padding:'9px 10px',fontWeight:600,fontSize:13}}>{fmt(s.total)}</td>
-                    <td style={{padding:'9px 10px',color:T.green,fontSize:13}}>{fmt(s.paid)}</td>
-                    <td style={{padding:'9px 10px',fontWeight:s.due>0?700:400,color:s.due>0?T.red:T.gray400}}>{fmt(s.due)}</td>
-                    <td style={{padding:'9px 10px',color:T.green,fontSize:13}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.profit||0),0))}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr style={{background:T.greenLight}}>
-                  <td colSpan={4} style={{padding:'10px',fontWeight:700,fontSize:13,color:T.green}}>মোট:</td>
-                  <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.green}}>{fmt(totalSales)}</td>
-                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalPaid)}</td>
-                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:totalDue>0?T.red:T.gray400}}>{fmt(totalDue)}</td>
-                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalProfit)}</td>
-                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(fs.reduce((s,sale)=>s+sale.total/1.15,0))}</td>
-                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:'#c62828'}}>{fmt(fs.reduce((s,sale)=>s+sale.total*0.15,0))}</td>
-                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:'#ff6f00'}}>{fmt(fs.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0))}</td>
-                  <td style={{padding:'10px',fontWeight:700,fontSize:13,color:'#c62828'}}>{fmt(fs.reduce((s,sale)=>{const t=sale.total*0.15;const v=(sale.total/1.15)*0.15;return s+(t-v);},0))}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Purchase Detail Modal */}
       {viewPurchase && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setViewPurchase(null)}>
-          <div style={{background:T.white,borderRadius:12,padding:20,width:500,maxHeight:'80vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:16,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
+          <div style={{background:T.white,borderRadius:16,padding:24,width:520,maxHeight:'85vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
               <div>
-                <div style={{fontWeight:800,fontSize:18,color:T.teal}}>{viewPurchase.id}</div>
-                <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-                <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
+                <div style={{fontWeight:800,fontSize:20,color:T.teal}}>{viewPurchase.id}</div>
+                <div style={{fontSize:12,color:T.gray500,marginTop:6}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:13,marginTop:6}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
               </div>
-              <div style={{display:'flex',gap:8}}>
+              <div style={{display:'flex',gap:10}}>
                 <button onClick={()=>{
                   const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
                   const s = settings || {};
@@ -6580,25 +6817,23 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
                       win.document.open();
                       win.document.write(html);
                       win.document.close();
-                      // Show print dialog
                       win.onload = function() { win.print(); };
                     } else {
                       alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
                     }
                   } catch(e) { alert('প্রিন্ট করতে সমস্যা হয়েছে!'); }
-                }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
-                <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+                }} style={{...btn('primary'),padding:'10px 16px',borderRadius:8}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'10px 16px',borderRadius:8}}>✕</button>
               </div>
             </div>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  <th style={{padding:8,textAlign:'left',fontSize:11,color:T.gray600}}>পণ্যের নাম</th>
-                  <th style={{padding:8,textAlign:'center',fontSize:11,color:T.gray600}}>পরিমাণ</th>
-                  <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>দাম</th>
-                  <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>মোট</th>
-                </tr>
-              </thead>
+                  <th style={{padding:10,textAlign:'left',fontSize:12,color:T.gray600}}>পণ্যের নাম</th>
+                  <th style={{padding:10,textAlign:'center',fontSize:12,color:T.gray600}}>পরিমাণ</th>
+                  <th style={{padding:10,textAlign:'right',fontSize:12,color:T.gray600}}>দাম</th>
+                  <th style={{padding:10,textAlign:'right',fontSize:12,color:T.gray600}}>মোট</th>
+                </tr></thead>
               <tbody>
                 {viewPurchase.items.map((item,i) => {
                   const qty = item.stock || 0;
@@ -6606,21 +6841,21 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
                   const total = qty * price;
                   return (
                     <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
-                      <td style={{padding:10,fontSize:13}}>
+                      <td style={{padding:12,fontSize:13}}>
                         <div style={{fontWeight:600}}>{item.name}</div>
                         <div style={{fontSize:11,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
                       </td>
-                      <td style={{padding:10,textAlign:'center',fontWeight:600}}>{qty} {item.unit || 'পিস'}</td>
-                      <td style={{padding:10,textAlign:'right',fontSize:13}}>{fmt(price)}</td>
-                      <td style={{padding:10,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(total)}</td>
+                      <td style={{padding:12,textAlign:'center',fontWeight:600}}>{qty} {item.unit || 'পিস'}</td>
+                      <td style={{padding:12,textAlign:'right',fontSize:13}}>{fmt(price)}</td>
+                      <td style={{padding:12,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(total)}</td>
                     </tr>
                   );
                 })}
               </tbody>
               <tfoot>
                 <tr style={{background:T.tealLight}}>
-                  <td colSpan={3} style={{padding:10,fontWeight:700,fontSize:13}}>সর্বমোট</td>
-                  <td style={{padding:10,textAlign:'right',fontWeight:800,fontSize:16,color:T.teal}}>
+                  <td colSpan={3} style={{padding:12,fontWeight:700,fontSize:14}}>সর্বমোট</td>
+                  <td style={{padding:12,textAlign:'right',fontWeight:800,fontSize:18,color:T.teal}}>
                     {fmt(viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0))}
                   </td>
                 </tr>
@@ -6633,64 +6868,64 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
       {/* Sale Detail Modal */}
       {viewSale && (
         <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setViewSale(null)}>
-          <div style={{background:T.white,borderRadius:12,padding:20,width:500,maxHeight:'80vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:16,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
+          <div style={{background:T.white,borderRadius:16,padding:24,width:520,maxHeight:'85vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
               <div>
-                <div style={{fontWeight:800,fontSize:18,color:T.teal}}>#{viewSale.id.slice(-6).toUpperCase()}</div>
-                <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
-                <div style={{fontSize:13,marginTop:4}}>👤 কাস্টমার: {viewSale.custName}</div>
-                {viewSale.phone && <div style={{fontSize:12,color:T.gray500,marginTop:2}}>📱 {viewSale.phone}</div>}
+                <div style={{fontWeight:800,fontSize:20,color:T.teal}}>#{viewSale.id.slice(-6).toUpperCase()}</div>
+                <div style={{fontSize:12,color:T.gray500,marginTop:6}}>📅 {new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:13,marginTop:6}}>👤 কাস্টমার: {viewSale.custName}</div>
+                {viewSale.phone && <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📱 {viewSale.phone}</div>}
               </div>
-              <div style={{display:'flex',gap:8}}>
-                <button onClick={()=>printReceipt({sale: viewSale, settings})} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
-                <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
+              <div style={{display:'flex',gap:10}}>
+                <button onClick={()=>printReceipt({sale: viewSale, settings})} style={{...btn('primary'),padding:'10px 16px',borderRadius:8}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'10px 16px',borderRadius:8}}>✕</button>
               </div>
             </div>
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  <th style={{padding:8,textAlign:'left',fontSize:11,color:T.gray600}}>পণ্যের নাম</th>
-                  <th style={{padding:8,textAlign:'center',fontSize:11,color:T.gray600}}>পরিমাণ</th>
-                  <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>দাম</th>
-                  <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>মোট</th>
+                  <th style={{padding:10,textAlign:'left',fontSize:12,color:T.gray600}}>পণ্যের নাম</th>
+                  <th style={{padding:10,textAlign:'center',fontSize:12,color:T.gray600}}>পরিমাণ</th>
+                  <th style={{padding:10,textAlign:'right',fontSize:12,color:T.gray600}}>দাম</th>
+                  <th style={{padding:10,textAlign:'right',fontSize:12,color:T.gray600}}>মোট</th>
                 </tr>
               </thead>
               <tbody>
                 {(viewSale.items||[]).map((item,i) => (
                   <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
-                    <td style={{padding:10,fontSize:13}}>
+                    <td style={{padding:12,fontSize:13}}>
                       <div style={{fontWeight:600}}>{item.name}</div>
                       <div style={{fontSize:11,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
                     </td>
-                    <td style={{padding:10,textAlign:'center',fontWeight:600}}>{item.qty} {item.unit || 'পিস'}</td>
-                    <td style={{padding:10,textAlign:'right',fontSize:13}}>{fmt(item.sellP)}</td>
-                    <td style={{padding:10,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(item.qty * item.sellP)}</td>
+                    <td style={{padding:12,textAlign:'center',fontWeight:600}}>{item.qty} {item.unit || 'পিস'}</td>
+                    <td style={{padding:12,textAlign:'right',fontSize:13}}>{fmt(item.sellP)}</td>
+                    <td style={{padding:12,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(item.qty * item.sellP)}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr style={{background:T.gray100}}>
-                  <td colSpan={3} style={{padding:10,fontWeight:600,fontSize:13}}>সাবটোটাল</td>
-                  <td style={{padding:10,textAlign:'right',fontWeight:700,fontSize:14}}>{fmt(viewSale.total)}</td>
+                  <td colSpan={3} style={{padding:12,fontWeight:600,fontSize:13}}>সাবটোটাল</td>
+                  <td style={{padding:12,textAlign:'right',fontWeight:700,fontSize:14}}>{fmt(viewSale.total)}</td>
                 </tr>
                 {viewSale.vatEnabled && viewSale.vat > 0 && (
                   <tr style={{background:T.gray100}}>
-                    <td colSpan={3} style={{padding:10,fontSize:13,color:T.gray600}}>ভ্যাট ({viewSale.vatRate}%)</td>
-                    <td style={{padding:10,textAlign:'right',fontSize:13,color:T.gray600}}>{fmt(viewSale.vat)}</td>
+                    <td colSpan={3} style={{padding:12,fontSize:13,color:T.gray600}}>ভ্যাট ({viewSale.vatRate}%)</td>
+                    <td style={{padding:12,textAlign:'right',fontSize:13,color:T.gray600}}>{fmt(viewSale.vat)}</td>
                   </tr>
                 )}
                 <tr style={{background:T.greenLight}}>
-                  <td colSpan={3} style={{padding:10,fontWeight:700,fontSize:13,color:T.green}}>মোট</td>
-                  <td style={{padding:10,textAlign:'right',fontWeight:800,fontSize:16,color:T.green}}>{fmt(viewSale.total + (viewSale.vat||0))}</td>
+                  <td colSpan={3} style={{padding:12,fontWeight:700,fontSize:14,color:T.green}}>মোট</td>
+                  <td style={{padding:12,textAlign:'right',fontWeight:800,fontSize:18,color:T.green}}>{fmt(viewSale.total + (viewSale.vat||0))}</td>
                 </tr>
                 <tr style={{background:T.greenLight}}>
-                  <td colSpan={3} style={{padding:10,fontWeight:600,fontSize:13,color:T.green}}>পরিশোধ হয়েছে</td>
-                  <td style={{padding:10,textAlign:'right',fontWeight:700,fontSize:14,color:T.green}}>{fmt(viewSale.paid)}</td>
+                  <td colSpan={3} style={{padding:12,fontWeight:600,fontSize:13,color:T.green}}>পরিশোধ হয়েছে</td>
+                  <td style={{padding:12,textAlign:'right',fontWeight:700,fontSize:14,color:T.green}}>{fmt(viewSale.paid)}</td>
                 </tr>
                 {viewSale.due > 0 && (
                   <tr style={{background:T.redLight}}>
-                    <td colSpan={3} style={{padding:10,fontWeight:700,fontSize:13,color:T.red}}>বাকি</td>
-                    <td style={{padding:10,textAlign:'right',fontWeight:800,fontSize:14,color:T.red}}>{fmt(viewSale.due)}</td>
+                    <td colSpan={3} style={{padding:12,fontWeight:700,fontSize:14,color:T.red}}>বাকি</td>
+                    <td style={{padding:12,textAlign:'right',fontWeight:800,fontSize:14,color:T.red}}>{fmt(viewSale.due)}</td>
                   </tr>
                 )}
               </tfoot>
