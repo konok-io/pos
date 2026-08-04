@@ -6414,16 +6414,17 @@ function ReportsScreen({sales, customers, purchases, settings}) {
             <table style={{width:'100%',borderCollapse:'collapse'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট'].map(h=>(
+                  {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট','সর্বমোট'].map(h=>(
                     <th key={h} style={{padding:'8px 10px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray400,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {filteredPurchases.length===0 ? <tr><td colSpan={6} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</td></tr>
+                {filteredPurchases.length===0 ? <tr><td colSpan={7} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পারচেজ নেই</td></tr>
                 : [...filteredPurchases].reverse().map((p,i)=>{
                     const total = p.items.reduce((s,i)=>s+(i.stock||0)*(i.buyP||0),0);
                     const vat = total * 0.15;
+                    const grandTotal = total + vat;
                     return (
                   <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewPurchase(p)}>
                     <td style={{padding:'9px 10px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
@@ -6432,6 +6433,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
                     <td style={{padding:'9px 10px',fontSize:12,color:T.gray400}}>{p.totalItems}টি</td>
                     <td style={{padding:'9px 10px',fontWeight:600,fontSize:13,color:T.green}}>{fmt(total)}</td>
                     <td style={{padding:'9px 10px',fontSize:12,color:T.red}}>{fmt(vat)}</td>
+                    <td style={{padding:'9px 10px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(grandTotal)}</td>
                   </tr>
                 )})}
               </tbody>
@@ -6440,6 +6442,7 @@ function ReportsScreen({sales, customers, purchases, settings}) {
                   <td colSpan={4} style={{padding:'10px',fontWeight:700,fontSize:13}}>মোট পারচেজ এমাউন্ট:</td>
                   <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0),0))}</td>
                   <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.red}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;},0))}</td>
+                  <td style={{padding:'10px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t+t*0.15;},0))}</td>
                 </tr>
               </tfoot>
             </table>
