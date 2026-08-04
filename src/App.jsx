@@ -159,6 +159,10 @@ const STORAGE_KEYS = {
   users: 'pos_users',
   auth: 'pos_auth',
   productHistory: 'pos_product_history',
+  cart: 'pos_cart',
+  selCust: 'pos_selCust',
+  expenses: 'pos_expenses',
+  incomes: 'pos_incomes',
 };
 
 /* ─────────────── INDEXEDDB STORAGE (Persistent) ─────────────── */
@@ -235,13 +239,21 @@ const db = {
     });
   },
   
-  // Sync method - saves to both IndexedDB and localStorage (for backup)
-  async sync(k, v) {
-    await this.set(k, v);
-    // Also save to localStorage as backup (won't be cleared by normal cache clear)
-    try {
-      localStorage.setItem(k, JSON.stringify(v));
-    } catch {}
+  // Clear all data including localStorage
+  async clearAll() {
+    await this.clear();
+    // Clear all localStorage items used by this app
+    Object.values(STORAGE_KEYS).forEach(key => {
+      localStorage.removeItem(key);
+    });
+    // Clear other app-specific localStorage items
+    const localStorageKeys = [
+      'pos_cart', 'pos_selCust', 'pos_current_tab', 'pos_suppliers_tab',
+      'pos_expenses', 'pos_incomes', 'pos_want_fullscreen'
+    ];
+    localStorageKeys.forEach(key => {
+      localStorage.removeItem(key);
+    });
   }
 };
 
@@ -251,14 +263,6 @@ const DEFAULT_SUPER_ADMIN = {
   password: '@rsm@k@1A',
   role: 'super_admin',
   name: 'Super Admin',
-};
-
-/* ─────────────── DEMO DATA ─────────────── */
-const DEMO = {
-  products: [],
-  customers: [],
-  suppliers: [],
-  categories: [],
 };
 
 /* ─────────────── DESIGN TOKENS ─────────────── */
@@ -899,8 +903,8 @@ function MainApp({ currentUser, onLogout }) {
   useEffect(() => {
     // Async function to load data from IndexedDB
     async function loadData() {
-      // Check if reset was done - flag stays forever to prevent DEMO loading
-      const wasReset = await db.get('pos_reset_done');
+      // Always start with empty data - no DEMO data
+      // If user clears browser storage, app starts fresh with no data
       
       // Load from IndexedDB
       const savedProducts = await db.get(STORAGE_KEYS.products);
@@ -912,64 +916,15 @@ function MainApp({ currentUser, onLogout }) {
       const savedCategories = await db.get(STORAGE_KEYS.categories) || [];
       const savedProductHistory = await db.get(STORAGE_KEYS.productHistory) || [];
 
-      // If reset was done, always use empty data (never load DEMO)
-      if (wasReset) {
-        setProducts(savedProducts || []);
-        setCustomers(savedCustomers || []);
-        setCategories(savedCategories);
-        setSuppliers(savedSuppliers);
-        setSales(savedSales || []);
-        setPurchases(savedPurchases);
-        setProductHistory(savedProductHistory);
-        setSettings(savedSettings ? {...{...DEFAULT_SETTINGS}, ...savedSettings} : {...DEFAULT_SETTINGS});
-        setReady(true);
-        return;
-      }
-
-      // If no data exists and not reset, load DEMO data
-      if (!savedProducts || savedProducts.length === 0) {
-        setProducts(DEMO.products);
-        await db.set(STORAGE_KEYS.products, DEMO.products);
-      } else {
-        setProducts(savedProducts);
-      }
-
-      if (!savedCustomers || savedCustomers.length === 0) {
-        setCustomers(DEMO.customers);
-        await db.set(STORAGE_KEYS.customers, DEMO.customers);
-      } else {
-        setCustomers(savedCustomers);
-      }
-
-      setSales(savedSales || []);
+      // Always use empty data when no data exists - no DEMO loading
+      setProducts(savedProducts || []);
+      setCustomers(savedCustomers || []);
+      setCategories(savedCategories);
       setSuppliers(savedSuppliers);
+      setSales(savedSales || []);
       setPurchases(savedPurchases);
       setProductHistory(savedProductHistory);
-
-      // Migrate old category products to new categories state
-      if (savedCategories && savedCategories.length > 0) {
-        setCategories(savedCategories);
-      } else if (savedProducts) {
-        const oldCategories = savedProducts
-          .filter(p => p.name?.includes('(ক্যাটাগরি)'))
-          .map(p => ({ id: p.id, name: p.cat, company: p.company }));
-        if (oldCategories.length > 0) {
-          setCategories(oldCategories);
-          await db.set(STORAGE_KEYS.categories, oldCategories);
-          // Remove old category products from products
-          const realProducts = savedProducts.filter(p => !p.name?.includes('(ক্যাটাগরি)'));
-          setProducts(realProducts);
-          await db.set(STORAGE_KEYS.products, realProducts);
-        } else {
-          setCategories([]);
-        }
-      } else {
-        setCategories([]);
-      }
-
-      const defaultSettings = {...DEFAULT_SETTINGS};
-      setSettings(savedSettings ? {...defaultSettings, ...savedSettings} : defaultSettings);
-
+      setSettings(savedSettings ? {...{...DEFAULT_SETTINGS}, ...savedSettings} : {...DEFAULT_SETTINGS});
       setReady(true);
     }
     
@@ -1125,8 +1080,6 @@ function MainApp({ currentUser, onLogout }) {
 
   // Refresh data from IndexedDB without reloading page
   const handleHardRefresh = async () => {
-    const wasReset = await db.get('pos_reset_done');
-    
     const savedProducts = await db.get(STORAGE_KEYS.products);
     const savedCustomers = await db.get(STORAGE_KEYS.customers);
     const savedSales = await db.get(STORAGE_KEYS.sales);
@@ -1135,23 +1088,14 @@ function MainApp({ currentUser, onLogout }) {
     const savedPurchases = await db.get(STORAGE_KEYS.purchases) || [];
     const savedCategories = await db.get(STORAGE_KEYS.categories) || [];
 
-    if (wasReset) {
-      setProducts([...savedProducts] || []);
-      setCustomers([...savedCustomers] || []);
-      setCategories([...savedCategories]);
-      setSuppliers([...savedSuppliers]);
-      setSales([...savedSales] || []);
-      setPurchases([...savedPurchases]);
-      setSettings({...savedSettings} || {...DEFAULT_SETTINGS});
-    } else {
-      setProducts([...savedProducts] || [...DEMO.products]);
-      setCustomers([...savedCustomers] || [...DEMO.customers]);
-      setSales([...savedSales] || []);
-      setSuppliers([...savedSuppliers]);
-      setPurchases([...savedPurchases]);
-      setCategories([...savedCategories]);
-      setSettings({...savedSettings} || {...DEFAULT_SETTINGS});
-    }
+    // Always use empty data when no data exists
+    setProducts(savedProducts || []);
+    setCustomers(savedCustomers || []);
+    setCategories(savedCategories);
+    setSuppliers(savedSuppliers);
+    setSales(savedSales || []);
+    setPurchases(savedPurchases);
+    setSettings(savedSettings ? {...DEFAULT_SETTINGS, ...savedSettings} : {...DEFAULT_SETTINGS});
   };
 
   // Fullscreen toggle function
@@ -1280,35 +1224,37 @@ export default function App() {
    POS SCREEN
 ═══════════════════════════════════════════ */
 function POSScreen({products, customers, sales, settings, categories, upd, productHistory, currentUser}) {
-  // Initialize cart from localStorage in useEffect to avoid hydration issues
+  // Initialize cart from IndexedDB in useEffect to avoid hydration issues
   const [cart, setCart] = useState([]);
   const [selCust, setSelCust] = useState(null);
   const [custQ, setCustQ] = useState('');
   
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem('pos_cart');
-      if (savedCart) {
-        setCart(JSON.parse(savedCart));
+    async function loadCartData() {
+      try {
+        const savedCart = await db.get(STORAGE_KEYS.cart);
+        if (savedCart) {
+          setCart(savedCart);
+        }
+        const savedCust = await db.get(STORAGE_KEYS.selCust);
+        if (savedCust) {
+          setSelCust(savedCust);
+          setCustQ(savedCust ? savedCust.name : '');
+        }
+      } catch (e) {
+        console.error('Failed to load cart data:', e);
       }
-      const savedCust = localStorage.getItem('pos_selCust');
-      if (savedCust) {
-        const c = JSON.parse(savedCust);
-        setSelCust(c);
-        setCustQ(c ? c.name : '');
-      }
-    } catch (e) {
-      console.error('Failed to load from localStorage:', e);
     }
+    loadCartData();
   }, []);
   
-  // Save cart to localStorage whenever it changes
+  // Save cart to IndexedDB whenever it changes
   useEffect(() => {
-    localStorage.setItem('pos_cart', JSON.stringify(cart));
+    db.set(STORAGE_KEYS.cart, cart);
   }, [cart]);
   
   useEffect(() => {
-    localStorage.setItem('pos_selCust', JSON.stringify(selCust));
+    db.set(STORAGE_KEYS.selCust, selCust);
   }, [selCust]);
   
   const [search, setSearch] = useState('');
@@ -6109,8 +6055,19 @@ function IncomeScreen({sales, purchases, upd}) {
   const [expenseForm, setExpenseForm] = useState({title:'',amount:'',note:''});
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [incomeForm, setIncomeForm] = useState({title:'',amount:'',note:''});
-  const [expenses, setExpenses] = useState(() => JSON.parse(localStorage.getItem('pos_expenses') || '[]'));
-  const [incomes, setIncomes] = useState(() => JSON.parse(localStorage.getItem('pos_incomes') || '[]'));
+  const [expenses, setExpenses] = useState([]);
+  const [incomes, setIncomes] = useState([]);
+  
+  // Load expenses and incomes from IndexedDB
+  useEffect(() => {
+    async function loadData() {
+      const savedExpenses = await db.get(STORAGE_KEYS.expenses);
+      const savedIncomes = await db.get(STORAGE_KEYS.incomes);
+      setExpenses(savedExpenses || []);
+      setIncomes(savedIncomes || []);
+    }
+    loadData();
+  }, []);
 
   const card = {background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`,boxShadow:'0 2px 8px rgba(0,0,0,0.04)'};
   const input = {width:'100%',padding:'10px 12px',border:`1.5px solid ${T.gray200}`,borderRadius:8,fontSize:13,outline:'none',boxSizing:'border-box',background:T.gray50,color:T.gray800};
@@ -6186,7 +6143,7 @@ function IncomeScreen({sales, purchases, upd}) {
   const totalExpense = totalPurchaseExpense + totalManualExpense;
   const netProfit = totalIncome - totalExpense;
 
-  // Save expense to localStorage
+  // Save expense to IndexedDB
   const saveExpense = async () => {
     if (!expenseForm.title?.trim()) { alert('ব্যয়ের বিবরণ দিন'); return; }
     if (!expenseForm.amount || expenseForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
@@ -6201,7 +6158,7 @@ function IncomeScreen({sales, purchases, upd}) {
     
     const updatedExpenses = [...expenses, newExpense];
     setExpenses(updatedExpenses);
-    localStorage.setItem('pos_expenses', JSON.stringify(updatedExpenses));
+    await db.set(STORAGE_KEYS.expenses, updatedExpenses);
     
     setExpenseForm({title:'',amount:'',note:''});
     setShowExpenseForm(false);
@@ -6209,15 +6166,15 @@ function IncomeScreen({sales, purchases, upd}) {
   };
 
   // Delete expense
-  const deleteExpense = (id) => {
+  const deleteExpense = async (id) => {
     if (!confirm('এই ব্যয় মুছে ফেলবেন?')) return;
     const updatedExpenses = expenses.filter(e => e.id !== id);
     setExpenses(updatedExpenses);
-    localStorage.setItem('pos_expenses', JSON.stringify(updatedExpenses));
+    await db.set(STORAGE_KEYS.expenses, updatedExpenses);
   };
 
-  // Save income
-  const saveIncome = () => {
+  // Save income to IndexedDB
+  const saveIncome = async () => {
     if (!incomeForm.title?.trim()) { alert('আয়ের বিবরণ দিন'); return; }
     if (!incomeForm.amount || incomeForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
     
@@ -6231,7 +6188,7 @@ function IncomeScreen({sales, purchases, upd}) {
     
     const updatedIncomes = [...incomes, newIncome];
     setIncomes(updatedIncomes);
-    localStorage.setItem('pos_incomes', JSON.stringify(updatedIncomes));
+    await db.set(STORAGE_KEYS.incomes, updatedIncomes);
     
     setIncomeForm({title:'',amount:'',note:''});
     setShowIncomeForm(false);
@@ -6239,11 +6196,11 @@ function IncomeScreen({sales, purchases, upd}) {
   };
 
   // Delete income
-  const deleteIncome = (id) => {
+  const deleteIncome = async (id) => {
     if (!confirm('এই আয় মুছে ফেলবেন?')) return;
     const updatedIncomes = incomes.filter(i => i.id !== id);
     setIncomes(updatedIncomes);
-    localStorage.setItem('pos_incomes', JSON.stringify(updatedIncomes));
+    await db.set(STORAGE_KEYS.incomes, updatedIncomes);
   };
 
   const periods = [
@@ -9238,8 +9195,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <button
                   onClick={async () => {
                     if(confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                      await db.clear();
-                      await db.set('pos_reset_done', true);
+                      await db.clearAll();
                       alert('সব ডেটা মুছা হয়েছে।');
                       window.location.reload();
                     }
