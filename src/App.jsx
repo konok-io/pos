@@ -2464,11 +2464,17 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
-                      const win = window.open('', '', 'width=400,height=600');
-                      win.document.open();
-                      win.document.write(html);
-                      win.document.close();
-                      win.onload = function() { setTimeout(() => win.print(), 100); };
+                      try {
+                        const win = window.open('', '_blank', 'width=400,height=600');
+                        if (win) {
+                          win.document.open();
+                          win.document.write(html);
+                          win.document.close();
+                          win.onload = function() { setTimeout(() => win.print(), 500); };
+                        } else {
+                          alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
+                        }
+                      } catch(e) { alert('প্রিন্ট করতে সমস্যা হয়েছে!'); }
                     }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
                     <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px',fontSize:12}}>✕</button>
                   </div>
@@ -6567,18 +6573,17 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
 <div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
-                  const iframe = document.createElement('iframe');
-                  iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-                  document.body.appendChild(iframe);
-                  iframe.contentWindow.document.open();
-                  iframe.contentWindow.document.write(html);
-                  iframe.contentWindow.document.close();
-                  iframe.contentWindow.onload = function() {
-                    setTimeout(() => {
-                      iframe.contentWindow.print();
-                      document.body.removeChild(iframe);
-                    }, 100);
-                  };
+                  try {
+                    const win = window.open('', '_blank', 'width=400,height=600');
+                    if (win) {
+                      win.document.open();
+                      win.document.write(html);
+                      win.document.close();
+                      win.onload = function() { setTimeout(() => win.print(), 500); };
+                    } else {
+                      alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
+                    }
+                  } catch(e) { alert('প্রিন্ট করতে সমস্যা হয়েছে!'); }
                 }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
               </div>
