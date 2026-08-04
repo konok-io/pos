@@ -1547,20 +1547,18 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
 </body>
 </html>`;
 
-    // Create iframe for silent printing (no new tab)
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-    document.body.appendChild(iframe);
-    const iframeDoc = iframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write(html);
-    iframeDoc.close();
-    iframe.contentWindow.onload = function() {
-      setTimeout(() => {
-        iframe.contentWindow.print();
-        document.body.removeChild(iframe);
-      }, 100);
-    };
+    // Open new window for print preview
+    try {
+      const win = window.open('', '_blank', 'width=350,height=600,left=100,top=100');
+      if (win) {
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+        win.onload = function() { win.print(); };
+      } else {
+        alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
+      }
+    } catch(e) { alert('প্রিন্ট করতে সমস্যা হয়েছে!'); }
   };
 
   // Add Customer Popup
