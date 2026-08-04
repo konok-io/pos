@@ -5490,17 +5490,21 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পারচেজ আইডি</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
                     <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>বেশি হয়েছে</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...purchaseHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>
+                        {h.purchaseId || '-'}
+                      </td>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
                       </td>
@@ -5539,17 +5543,21 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ইনভয়েস</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
                     <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>কম হয়েছে</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন</th>
                     <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...saleHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>
+                        {h.saleId || '-'}
+                      </td>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
                       </td>
