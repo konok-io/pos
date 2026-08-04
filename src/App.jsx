@@ -7884,11 +7884,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       </div>
                       {form.purchaseShowSupplier!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.purchaseFontSize||11)-1}px` }}>
                         <div>সরবরাহকারী: এবিসি ট্রেডার্স</div>
-                        <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>ফোন: ০১৮XXXXXXXX</div>
                         <div style={{ fontWeight: 'bold', color: '#0284C7', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>CR: 1234567890</div>
                         <div style={{ fontWeight: 'bold', color: '#EA580C', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>VAT: 123456789012345</div>
+                        <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px`, marginTop: 2 }}>ঠিকানা: সরবরাহকারীর ঠিকানা</div>
                       </div>}
-                      {form.purchaseShowStoreVat!==false&&form.taxId&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px`, fontWeight: 'bold', marginBottom: 4 }}>ক্রেতার VAT: {form.taxId}</div>}
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: `${(form.purchaseFontSize||11)-1}px` }}>
                         <thead><tr style={{ borderBottom: '1px dashed #000' }}><th style={{ textAlign: 'left', padding: '3px 0' }}>পণ্য</th><th style={{ textAlign: 'center', padding: '3px 0' }}>পরি</th><th style={{ textAlign: 'right', padding: '3px 0' }}>দাম</th><th style={{ textAlign: 'right', padding: '3px 0' }}>মোট</th></tr></thead>
                         <tbody>
