@@ -4139,7 +4139,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <thead>
                 <tr style={{background:T.tealLight}}>
                   {['ক্রম','ক্যাটাগরির নাম','পণ্য সংখ্যা',''].map((h,i)=>(
-                    <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                    <th key={i} style={{padding:'10px 12px',textAlign:i===3?'center':'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -4154,7 +4154,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                       <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{i+1}</td>
                       <td style={{padding:'10px 12px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat.name}</td>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
-                      <td style={{padding:'10px 12px',whiteSpace:'nowrap'}}>
+                      <td style={{padding:'10px 12px',whiteSpace:'nowrap',textAlign:'center'}}>
                         <button onClick={()=>setViewCategory(cat)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
                         <button onClick={()=>{setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
                         <button onClick={async ()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){await upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
@@ -4213,7 +4213,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 <thead>
                   <tr style={{background:T.tealLight}}>
                     {['ক্রম','কোম্পানির নাম','CR নম্বর','VAT নম্বর','পণ্য',''].map((h,i)=>(
-                      <th key={i} style={{padding:'10px 8px',textAlign:'left',fontSize:10,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                      <th key={i} style={{padding:'10px 8px',textAlign:i===5?'center':'left',fontSize:10,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -4229,8 +4229,8 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                         <td style={{padding:'10px 8px',fontWeight:600,fontSize:12,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.name}</td>
                         <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.crNumber||'-'}</td>
                         <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.vatNumber||'-'}</td>
-                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal,textAlign:'center'}}>{getProductsCount(s.name)}</td>
-                        <td style={{padding:'10px 8px',whiteSpace:'nowrap'}}>
+                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{getProductsCount(s.name)}</td>
+                        <td style={{padding:'10px 8px',whiteSpace:'nowrap',textAlign:'center'}}>
                           <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
                           {!s.isAuto && (
                             <>
