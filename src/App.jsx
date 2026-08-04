@@ -4088,6 +4088,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   // View single category
   if (viewCategory) {
     const catProducts = products.filter(p => p.cat === viewCategory.name && p.name);
+    const totalValue = catProducts.reduce((s,p) => s + (p.stock || 0) * (p.sellP || 0), 0);
     
     return (
       <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
@@ -4098,7 +4099,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         </div>
         <div style={{flex:1,overflow:'auto',padding:12}}>
           {/* Stats */}
-          <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:12,marginBottom:16}}>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:16}}>
             <div style={{...card,padding:16,textAlign:'center'}}>
               <div style={{fontSize:24,fontWeight:800,color:T.teal}}>{catProducts.length}</div>
               <div style={{fontSize:12,color:T.gray500}}>মোট পণ্য</div>
@@ -4107,6 +4108,16 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               <div style={{fontSize:24,fontWeight:800,color:T.orange}}>{catProducts.reduce((s,p)=>s+p.stock,0)}</div>
               <div style={{fontSize:12,color:T.gray500}}>মোট স্টক</div>
             </div>
+            <div style={{...card,padding:16,textAlign:'center'}}>
+              <div style={{fontSize:24,fontWeight:800,color:T.green}}>{fmt(totalValue)}</div>
+              <div style={{fontSize:12,color:T.gray500}}>মোট মূল্য</div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div style={{display:'flex',gap:8,marginBottom:16}}>
+            <button style={btn('primary')} onClick={()=>{setViewCategory(null);setCatForm({name:viewCategory.name});setModal({mode:'editCat',catName:viewCategory.name,catId:viewCategory.id});}}>✏️ সম্পাদনা</button>
+            <button style={btn('danger')} onClick={()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){setViewCategory(null);upd.categories(categories.filter(c=>c.id!==viewCategory.id));}}}>🗑️ মুছুন</button>
           </div>
 
           {/* Products List */}
