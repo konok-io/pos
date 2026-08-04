@@ -2334,9 +2334,21 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
 
   // Delete product
   const del = async (id) => {
-    if (!confirm('এই পণ্যটি মুছে ফেলবেন?')) return;
     const product = products.find(p=>p.id===id);
-    // Delete product and its stock history
+    const relatedPurchases = purchases.filter(p=>p.items?.some(i=>i.productId===id));
+    
+    if (relatedPurchases.length > 0) {
+      const msg = `⚠️ এই পণ্যটি ${relatedPurchases.length}টি পারচেজে আছে।\n\nপারচেজ ডেটা ও স্টক হিস্ট্রি সহ সম্পূর্ণ মুছে ফেলতে "ঠিক আছে" দিন।\nশুধু পণ্য মুছতে "বাতিল" করুন।`;
+      if (!confirm(msg)) return;
+      
+      // Delete related purchases
+      const purchaseIds = relatedPurchases.map(p=>p.id);
+      await upd.purchases(purchases.filter(p=>!purchaseIds.includes(p.id)));
+    } else {
+      if (!confirm('এই পণ্যটি মুছে ফেলবেন?')) return;
+    }
+    
+    // Delete product, its stock history, and price history
     await upd.products(products.filter(p=>p.id!==id));
     await upd.productHistory(productHistory.filter(h=>h.productId!==id));
   };
