@@ -4190,7 +4190,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                       <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
                       <td style={{padding:'10px 12px',whiteSpace:'nowrap',textAlign:'center'}}>
                         <button onClick={()=>setViewCategory(cat)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
-                        <button onClick={()=>{setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
+                        <button onClick={()=>{setCatForm({name:cat.name});setModal({mode:'editCat',catName:cat.name,catId:cat.id});}} style={{...btn('primary'),padding:'4px 6px'}}>✏️</button>
                         <button onClick={async ()=>{if(confirm('এই ক্যাটাগরি মুছে ফেলবেন?')){await upd.categories(categories.filter(c=>c.id!==cat.id));}}} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
                       </td>
                     </tr>
@@ -4269,7 +4269,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                           <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
                           {!s.isAuto && (
                             <>
-                              <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
+                              <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('primary'),padding:'4px 6px'}}>✏️</button>
                               <button onClick={()=>del(s.id)} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
                             </>
                           )}
@@ -4956,7 +4956,7 @@ function CustomersScreen({customers, sales, upd}) {
               </div>
               <div style={{display:'flex',gap:6}} onClick={e=>e.stopPropagation()}>
                 <button style={{...btn('ghost','sm'),flex:1,justifyContent:'center'}} onClick={e=>{e.stopPropagation();setViewId(c.id);}}>📋 ইতিহাস</button>
-                <button style={btn('ghost','sm')} onClick={e=>{e.stopPropagation();setForm({...c});setModal({mode:'edit',id:c.id});}}>✏️</button>
+                <button style={btn('primary','sm')} onClick={e=>{e.stopPropagation();setForm({...c});setModal({mode:'edit',id:c.id});}}>✏️</button>
                 <button style={btn('danger','sm')} onClick={e=>{e.stopPropagation();del(c.id);}}>🗑️</button>
               </div>
             </div>
