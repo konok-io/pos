@@ -4023,10 +4023,15 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           <button style={btn()} onClick={()=>setViewSupplier(null)}>← ফিরে যান</button>
           <div style={{display:'flex',flexDirection:'column'}}>
             <span style={{fontWeight:700,fontSize:18,color:T.teal}}>🏢 {viewSupplier.name}</span>
-            {(viewSupplier.phone || viewSupplier.vatNumber) && (
-              <span style={{fontSize:12,color:T.gray500,marginTop:2}}>
-                {viewSupplier.phone && `📞 ${viewSupplier.phone}`}{viewSupplier.phone && viewSupplier.vatNumber && ' | '}{viewSupplier.vatNumber && `VAT: ${viewSupplier.vatNumber}`}
-              </span>
+            <span style={{fontSize:12,color:T.gray500,marginTop:4}}>
+              {viewSupplier.phone && `📞 ${viewSupplier.phone}`}
+              {viewSupplier.phone && viewSupplier.crNumber && ' | '}
+              {viewSupplier.crNumber && `CR: ${viewSupplier.crNumber}`}
+              {((viewSupplier.phone || viewSupplier.crNumber) && viewSupplier.vatNumber) && ' | '}
+              {viewSupplier.vatNumber && `VAT: ${viewSupplier.vatNumber}`}
+            </span>
+            {viewSupplier.address && (
+              <span style={{fontSize:12,color:T.gray400,marginTop:4}}>📍 {viewSupplier.address}</span>
             )}
           </div>
           <div style={{marginLeft:'auto',display:'flex',gap:8}}>
