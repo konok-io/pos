@@ -6288,7 +6288,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
     const totalPurchase = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0);
     const totalItems = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0), 0), 0);
     const totalVat = purchases.reduce((s,p) => {const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;}, 0);
-    const grandTotal = total + totalVat;
+    const grandTotal = totalPurchase + totalVat;
     
     let html = `
     <!DOCTYPE html>
