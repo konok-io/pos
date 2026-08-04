@@ -1049,7 +1049,7 @@ function MainApp({ currentUser, onLogout }) {
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
-  const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd};
+  const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd, currentUser};
 
   // Refresh data from localStorage without reloading page
   const handleHardRefresh = () => {
@@ -1188,7 +1188,7 @@ export default function App() {
 /* ═══════════════════════════════════════════
    POS SCREEN
 ═══════════════════════════════════════════ */
-function POSScreen({products, customers, sales, settings, categories, upd, productHistory}) {
+function POSScreen({products, customers, sales, settings, categories, upd, productHistory, currentUser}) {
   // Initialize cart from localStorage in useEffect to avoid hydration issues
   const [cart, setCart] = useState([]);
   const [selCust, setSelCust] = useState(null);
@@ -1417,8 +1417,8 @@ function POSScreen({products, customers, sales, settings, categories, upd, produ
         oldValue: product?.stock || 0,
         newValue: Math.max(0, (product?.stock || 0) - item.qty),
         saleId: sale.id,
-        user: 'You',
-        userEmail: '',
+        user: currentUser?.name || 'Unknown',
+        userEmail: currentUser?.email || '',
         timestamp: now(),
       };
     });
@@ -2343,6 +2343,7 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
     purchaseItems.forEach(item => {
       const existingProduct = products.find(p => p.name === item.name && p.company === form.company);
       if (existingProduct) {
+        // Update existing product - track stock increase
         purchaseHistoryEntries.push({
           id: genId(),
           productId: existingProduct.id,
@@ -2351,6 +2352,21 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
           source: 'purchase',
           oldValue: existingProduct.stock || 0,
           newValue: (existingProduct.stock || 0) + (item.stock || 0),
+          purchaseId: purchaseId,
+          user: currentUser?.name || 'Unknown',
+          userEmail: currentUser?.email || '',
+          timestamp: now(),
+        });
+      } else {
+        // New product being added - track initial stock
+        purchaseHistoryEntries.push({
+          id: genId(),
+          productId: item.id,
+          productName: item.name,
+          type: 'stock',
+          source: 'purchase',
+          oldValue: 0,
+          newValue: item.stock || 0,
           purchaseId: purchaseId,
           user: currentUser?.name || 'Unknown',
           userEmail: currentUser?.email || '',
@@ -4618,7 +4634,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 /* ═══════════════════════════════════════════
    NEW PRODUCT SCREEN
 ═══════════════════════════════════════════ */
-function NewProductScreen({products, suppliers, categories, purchases, upd}) {
+function NewProductScreen({products, suppliers, categories, purchases, upd, currentUser}) {
   const [purchaseItems, setPurchaseItems] = useState([]);
   const [supplierQ, setSupplierQ] = useState('');
   const [showCompanyList, setShowCompanyList] = useState(false);
@@ -5479,6 +5495,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                     <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>বেশি হয়েছে</th>
                     <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
                     <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -5498,6 +5515,9 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                       </td>
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
                         {h.newValue}
+                      </td>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <div style={{fontWeight:600}}>{h.user}</div>
                       </td>
                     </tr>
                   ))}
@@ -5524,6 +5544,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                     <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>কম হয়েছে</th>
                     <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
                     <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -5543,6 +5564,9 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                       </td>
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
                         {h.newValue}
+                      </td>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <div style={{fontWeight:600}}>{h.user}</div>
                       </td>
                     </tr>
                   ))}
