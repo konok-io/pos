@@ -7764,7 +7764,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       <div style={{ borderTop: '1px dashed #000', marginTop: 6, paddingTop: 6 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${(form.purchaseFontSize||11)-1}px` }}><span>মূল্য:</span><span>৳900</span></div>
                         {form.purchaseShowVat!==false&&<div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${(form.purchaseFontSize||11)-1}px` }}><span>ভ্যাট (১৫%):</span><span>৳135</span></div>}
-                        {form.purchaseShowVat!==false&&<div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: `${(form.purchaseFontSize||11)}px` }}><span>মোট:</span><span>৳1,035</span></div>}
+                        {form.purchaseShowVat!==false&&<div style={{ borderTop: '1px solid #000', marginTop: 4, paddingTop: 4, display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: `${(form.purchaseFontSize||11)}px` }}><span>মোট:</span><span>৳1,035</span></div>}
                       </div>
                       <div style={{ textAlign: 'center', borderTop: '1px dashed #000', marginTop: 8, paddingTop: 6, fontSize: `${(form.purchaseFontSize||11)-2}px` }}>{form.purchaseFooter||'ধন্যবাদ'}<br/>২ আগস্ট, ২০২৬</div>
                     </div>
