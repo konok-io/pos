@@ -7758,10 +7758,14 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const save = async () => {
     try {
-      await settings.update(form);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-      alert('✅ সেটিংস সংরক্ষিত হয়েছে!');
+      const result = await upd.settings.update(form);
+      if (result.success) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+        alert('✅ সেটিংস সংরক্ষিত হয়েছে!');
+      } else {
+        alert('❌ সেটিংস সংরক্ষণ ব্যর্থ হয়েছে!');
+      }
     } catch (error) {
       console.error('Failed to save settings:', error);
       alert('❌ সেটিংস সংরক্ষণ ব্যর্থ হয়েছে!');
