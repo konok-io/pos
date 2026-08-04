@@ -6450,7 +6450,9 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         </tbody>
         <tfoot>
           <tr class="total-row">
-            <td colspan="4" style="text-align:right;">মোট:</td>
+            <td colspan="2" style="text-align:right;">মোট:</td>
+            <td style="text-align:right;">${filteredSales.length}টি বিল</td>
+            <td style="text-align:right;">${filteredSales.reduce((c,i)=>c+(i.items||[]).reduce((a,it)=>a+(it.qty||0),0),0)}টি</td>
             <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0),0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
