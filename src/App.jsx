@@ -1514,7 +1514,7 @@ td:nth-child(4) {
   ${showPhone && s.phone ? '<div>' + s.phone + '</div>' : ''}
   ${showPhone && s.taxId ? '<div style="font-weight:bold;">VAT নং: ' + s.taxId + '</div>' : ''}
   ${showPhone && s.taxId ? '<div style="font-weight:bold;">✚ সরলীকৃত কর চালান</div>' : ''}
-  	  <div>${r.sale.id.slice(-8).toUpperCase()}</div>
+  	  <div>${r.sale.id.replace(/\D/g,'').slice(-8)}</div>
   <div>${dateStr} | ${timeStr}</div>
   ${showCustomer ? '<div>গ্রাহক: ' + r.sale.custName + '</div>' : ''}
   ${showCustomer && r.sale.phone ? '<div>ফোন: ' + r.sale.phone + '</div>' : ''}
@@ -6387,7 +6387,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   ${showAddress && s.name ? '<div>' + s.name + '</div>' : ''}
   ${showAddress && s.address ? '<div>' + s.address + '</div>' : ''}
   ${showAddress && s.phone ? '<div>' + s.phone + '</div>' : ''}
-  <div>${viewPurchase.id.slice(-8).toUpperCase()}</div>
+  <div>${viewPurchase.id.replace(/\D/g,'').slice(-8)}</div>
   <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
   ${showSupplier ? '<div>সরবরাহকারী: ' + viewPurchase.supplier + '</div>' : ''}
   ${showPhone && viewPurchase.phone ? '<div>ফোন: ' + viewPurchase.phone + '</div>' : ''}
@@ -7727,7 +7727,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         {form.receiptShowPhone!==false&&form.phone&&<div style={{ fontSize: `${(form.receiptFontSize||11)-2}px` }}>{form.phone}</div>}
                         {form.receiptShowPhone!==false&&form.taxId&&<div style={{ fontWeight: 'bold', fontSize: `${(form.receiptFontSize||11)-2}px` }}>VAT নং: {form.taxId}</div>}
                         {form.receiptShowPhone!==false&&form.taxId&&<div style={{ fontWeight: 'bold', fontSize: `${(form.receiptFontSize||11)-2}px` }}>✚ সরলীকৃত কর চালান</div>}
-                        <div style={{ fontSize: `${(form.receiptFontSize||11)-1}px`, marginTop: 4 }}>ABC12345</div>
+                        <div style={{ fontSize: `${(form.receiptFontSize||11)-1}px`, marginTop: 4 }}>12345678</div>
                         <div style={{ fontSize: `${(form.receiptFontSize||11)-2}px` }}>২ আগস্ট, ২০২৬ | ১০:৩০ AM</div>
                       </div>
                       {form.receiptShowCustomer!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.receiptFontSize||11)-1}px` }}>গ্রাহক: মোঃ রহিম উদ্দিন<br/>ফোন: ০১৭XXXXXXXX</div>}
@@ -7759,7 +7759,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         {form.purchaseShowAddress!==false&&form.name&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-1}px` }}>{form.name}</div>}
                         {form.purchaseShowAddress!==false&&form.address&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>{form.address}</div>}
                         {form.purchaseShowPhone!==false&&form.phone&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>{form.phone}</div>}
-                        <div style={{ fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 4 }}>ABC12345</div>
+                        <div style={{ fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 4 }}>12345678</div>
                         <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>২ আগস্ট, ২০২৬</div>
                       </div>
                       {form.purchaseShowSupplier!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.purchaseFontSize||11)-1}px` }}>সরবরাহকারী: এবিসি ট্রেডার্স<br/>ফোন: ০১৮XXXXXXXX</div>}
