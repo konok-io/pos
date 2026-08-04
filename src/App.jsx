@@ -6164,6 +6164,95 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
     return `${from} থেকে ${to}`;
   };
 
+  // Print Sale Receipt for ReportsScreen
+  const printSaleReceipt = (sale) => {
+    const s = settings || {};
+    const headerText = s.receiptLogo || s.receiptHeader || '🧾 বিক্রয় রিসিট';
+    const footerText = s.receiptFooter || 'ধন্যবাদ';
+    const fontSize = s.receiptFontSize || 11;
+    const showLogo = s.receiptShowLogo !== false;
+    const showAddress = s.receiptShowAddress !== false;
+    const showPhone = s.receiptShowPhone !== false;
+    const showCustomer = s.receiptShowCustomer !== false;
+    const showVat = s.receiptShowVat !== false;
+    const showQr = s.receiptShowQr !== false;
+    
+    const saleDate = new Date(sale.date);
+    const dateStr = saleDate.toLocaleDateString('bn-BD');
+    const timeStr = saleDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
+<title>বিক্রয় রিসিট</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { width: 80mm; }
+body { font-family: 'Tiro Bangla', 'Courier New', monospace; width: 80mm; margin: 0; padding: 2mm; font-size: ${fontSize}px; color: #000; background: #fff; }
+.center { text-align: center; }
+.border { border-bottom: 1px dashed #000; padding-bottom: 6px; margin-bottom: 6px; }
+.row { display: flex; justify-content: space-between; margin: 2px 0; }
+table { width: 100%; border-collapse: collapse; font-size: ${fontSize - 1}px; }
+th { border-bottom: 1px dashed #000; padding: 3px 0; text-align: left; }
+td { padding: 3px 0; }
+td:nth-child(2) { text-align: center; }
+td:nth-child(3), td:nth-child(4) { text-align: right; }
+.total { border-top: 1px dashed #000; margin-top: 5px; padding-top: 5px; font-weight: bold; }
+.footer { text-align: center; margin-top: 10px; border-top: 1px dashed #000; padding-top: 6px; font-size: ${fontSize - 2}px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  ${showLogo !== false ? '<div style="font-size:' + (fontSize + 3) + 'px;font-weight:bold;">' + headerText + '</div>' : ''}
+  ${showAddress !== false && s.name ? '<div style="font-size:' + (fontSize - 1) + 'px;">' + s.name + '</div>' : ''}
+  ${showAddress !== false && s.address ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.address + '</div>' : ''}
+  ${showPhone !== false && s.phone ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.phone + '</div>' : ''}
+  ${showPhone !== false && s.taxId ? '<div style="font-weight:bold;font-size:' + (fontSize - 2) + 'px;">VAT নং: ' + s.taxId + '</div>' : ''}
+  ${showPhone !== false && s.taxId ? '<div style="font-weight:bold;font-size:' + (fontSize - 2) + 'px;">✚ সরলীকৃত কর চালান</div>' : ''}
+  <div style="font-size:${fontSize - 1}px;margin-top:4px;">Invoice ID: ${sale.id.replace(/\D/g,'').slice(-8)}</div>
+  <div style="font-size:${fontSize - 2}px;">${dateStr} | ${timeStr}</div>
+</div>
+${showCustomer !== false ? '<div style="margin-bottom:6px;font-size:' + (fontSize - 1) + 'px;">' : '<div style="margin-bottom:6px;">'}
+  ${showCustomer !== false ? '<div>গ্রাহক: ' + sale.custName + '</div>' : ''}
+  ${showPhone !== false && sale.phone ? '<div>ফোন: ' + sale.phone + '</div>' : ''}
+</div>
+<div style="border-top:1px dotted #000;margin:4px 0;"></div>
+<table>
+  <thead><tr><th style="text-align:left;padding:3px 0;">পণ্য</th><th style="text-align:center;padding:3px 0;">পরি</th><th style="text-align:right;padding:3px 0;">দাম</th><th style="text-align:right;padding:3px 0;">মোট</th></tr></thead>
+  <tbody>
+    ${(sale.items||[]).map(i => '<tr><td>' + i.name + (i.company ? '<br><span style="font-size:' + (fontSize - 3) + 'px;color:#666;">' + i.company + '</span>' : '') + '</td><td style="text-align:center;">' + i.qty + ' ' + (i.unit || 'পিস') + '</td><td style="text-align:right;">৳' + i.sellP.toFixed(2) + '</td><td style="text-align:right;">৳' + (i.qty * i.sellP).toFixed(2) + '</td></tr>').join('')}
+  </tbody>
+</table>
+<div style="border-top:1px dashed #000;margin-top:6px;padding-top:6px;">
+<div class="row"><span>সাবটোটাল:</span><span>৳${(sale.subtotal || sale.total).toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+${showVat !== false && sale.vatAmount > 0 ? '<div class="row"><span>ভ্যাট (' + (sale.vatPercent || 15) + '%):</span><span>৳' + sale.vatAmount.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+${sale.discount > 0 ? '<div class="row"><span>ছাড়:</span><span>-৳' + sale.discount.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+<div class="total row"><span>মোট:</span><span>৳${sale.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+<div class="row"><span>পরিশোধ:</span><span>৳${sale.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+${sale.change > 0 ? '<div class="row"><span>ফেরত:</span><span>৳' + sale.change.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+${sale.due > 0 ? '<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳' + sale.due.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+</div>
+${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style="width:48px;height:48px;margin:0 auto 4px;padding:2px;border:2px solid #000;"><div style="width:100%;height:100%;background:repeating-linear-gradient(0deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(90deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px),repeating-linear-gradient(-45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px);background-size:4px 4px,4px 4px,8px 8px,8px 8px;background-position:0 0,0 0,2px 2px,-2px 2px;"></div></div><div style="font-size:7px;color:#000;font-weight:bold;">🧾 ZATCA QR</div></div>' : ''}
+<div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
+</body>
+</html>`;
+
+    try {
+      const win = window.open('', '_blank', 'width=350,height=600,left=100,top=100');
+      if (win) {
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+        win.onload = function() { win.print(); };
+      } else {
+        alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
+      }
+    } catch(e) { alert('প্রিন্ট করতে সমস্যা হয়েছে!'); }
+  };
+
   const exportSalesCSV = () => {
     const rows = [['তারিখ','ইনভয়েস আইডি','কাস্টমার','মোট','পরিশোধ','বাকি','লাভ'],
       ...fs.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id,s.custName,s.total,s.paid,s.due,
@@ -6881,7 +6970,7 @@ ${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;pad
                 {viewSale.phone && <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📱 {viewSale.phone}</div>}
               </div>
               <div style={{display:'flex',gap:10}}>
-                <button onClick={()=>printReceipt({sale: viewSale, settings})} style={{...btn('primary'),padding:'10px 16px',borderRadius:8}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>printSaleReceipt(viewSale)} style={{...btn('primary'),padding:'10px 16px',borderRadius:8}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'10px 16px',borderRadius:8}}>✕</button>
               </div>
             </div>
