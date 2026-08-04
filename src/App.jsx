@@ -2504,7 +2504,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     📁 পণ্যের CSV আপলোড করুন
                   </label>
                   <button onClick={() => {
-                    const csv = 'পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,80,10\nসুজি চিপস,S001,সুজি,স্ন্যাকস,003,পিস,20,25,200,20\nপারফেক্ট সাবান,P001,পারফেক্ট,সৌন্দর্য,004,পিস,35,45,150,15';
+                    const csv = 'পণ্যের নাম,কোম্পানি কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,VAT%,স্টক,মিনস্টক\nমিনিকেট চাল,M001,মিনিকেট,খাদ্যপণ্য,001,কেজি,55,65,15,100,10\nব্রিলিয়ান্ট চাল,B001,ব্রিলিয়ান্ট,খাদ্যপণ্য,002,কেজি,52,62,15,80,10\nসুজি চিপস,S001,সুজি,স্ন্যাকস,003,পিস,20,25,15,200,20\nপারফেক্ট সাবান,P001,পারফেক্ট,সৌন্দর্য,004,পিস,35,45,15,150,15';
                     const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -2828,12 +2828,15 @@ tr:nth-child(even) { background:#fafafa; }
 .footer { margin-top:15px; text-align:center; color:#999; font-size:10px; }
 </style></head><body>
 <div class="header"><h1>📦 পণ্যের তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')} | ${printFiltered.length}টি পণ্য</p></div>
-<table><thead><tr><th>কোম্পানি কোড</th><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>ক্রয়মূল্য</th><th>বিক্রয়মূল্য</th><th>লাভ</th><th>স্টক</th><th>একক</th></tr></thead><tbody>
+<table><thead><tr><th>কোম্পানি কোড</th><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>ক্রয়মূল্য</th><th>বিক্রয়মূল্য</th><th>লাভ</th><th>VAT (১৫%)</th><th>মোট (VAT সহ)</th><th>স্টক</th><th>একক</th></tr></thead><tbody>
 ${printFiltered.map(p => {
   const profit = p.sellP - p.buyP;
   const profitPct = p.buyP > 0 ? Math.round((profit / p.buyP) * 100) : 0;
   const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'-';
-  return `<tr><td>${supCode}</td><td>${p.name}</td><td>${p.company||'-'}</td><td>${p.cat||'-'}</td><td>৳${p.buyP.toLocaleString()}</td><td>৳${p.sellP.toLocaleString()}</td><td>৳${profit.toLocaleString()} (${profitPct}%)</td><td>${p.stock}</td><td>${p.unit}</td></tr>`;
+  const vatRate = p.vatPercent || 15;
+  const vatAmount = Math.round(p.sellP * vatRate / 100);
+  const totalWithVat = p.sellP + vatAmount;
+  return `<tr><td>${supCode}</td><td>${p.name}</td><td>${p.company||'-'}</td><td>${p.cat||'-'}</td><td>৳${p.buyP.toLocaleString()}</td><td>৳${p.sellP.toLocaleString()}</td><td>৳${profit.toLocaleString()} (${profitPct}%)</td><td>${vatRate}%</td><td>৳${totalWithVat.toLocaleString()}</td><td>${p.stock}</td><td>${p.unit}</td></tr>`;
 }).join('')}
 </tbody></table>
 <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</div>
@@ -2862,18 +2865,21 @@ ${printFiltered.map(p => {
           <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
             <thead>
               <tr style={{background:T.tealLight}}>
-                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','স্টক','একক',''].map((h,i)=>(
+                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','VAT (১৫%)','মোট (VAT সহ)','স্টক','একক',''].map((h,i)=>(
                   <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtered.length===0 ? (
-                <tr><td colSpan={10} style={{padding:40,textAlign:'center',color:T.gray400}}>পণ্য পাওয়া যায়নি</td></tr>
+                <tr><td colSpan={12} style={{padding:40,textAlign:'center',color:T.gray400}}>পণ্য পাওয়া যায়নি</td></tr>
               ) : filtered.map((p,i)=>{
                 const profitPct = p.buyP>0 ? Math.round((p.sellP-p.buyP)/p.buyP*100) : 0;
                 const isLowStock = p.stock <= p.minStock;
                 const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'';
+                const vatRate = p.vatPercent || settings?.vatPercent || 15;
+                const vatAmount = Math.round(p.sellP * vatRate / 100);
+                const totalWithVat = p.sellP + vatAmount;
                 return (
                   <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                     <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
@@ -2889,6 +2895,12 @@ ${printFiltered.map(p => {
                       <span style={{fontSize:12,fontWeight:600,color:profitPct>0?T.green:T.red}}>
                         {fmt(p.sellP-p.buyP)} ({profitPct}%)
                       </span>
+                    </td>
+                    <td style={{padding:'10px 12px',fontSize:12,color:T.amber,fontWeight:600}}>
+                      {vatRate}%
+                    </td>
+                    <td style={{padding:'10px 12px',fontWeight:700,fontSize:14,color:T.teal}}>
+                      {fmt(totalWithVat)}
                     </td>
                     <td style={{padding:'10px 12px'}}>
                       <span style={{fontWeight:700,fontSize:15,color:isLowStock?T.red:T.gray900}}>{fmtN(p.stock)}</span>
