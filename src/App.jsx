@@ -2597,7 +2597,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     {supplierQ && !uniqueCompanies.some(c=>c && c.toLowerCase()===(supplierQ||'').toLowerCase()) && (
                       <div onClick={()=>{upd.suppliers([...suppliers,{id:genId(),name:supplierQ,phone:'',address:'',vatNumber:'',crNumber:''}]);setForm(f=>({...f,company:supplierQ,supplierCrNumber:'',supplierVatNumber:'',supplierAddress:''}));setShowCompanyList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
-                        + নতুন কোম্পানি যুক্ত করুন: "{supplierQ}"
+                        + নতুন সরবরাহকারী যুক্ত করুন: "{supplierQ}"
                       </div>
                     )}
                   </div>
@@ -4175,7 +4175,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       {/* Sub tabs - Only Companies, Categories, and CSV Import */}
       <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
         <button onClick={()=>setActiveTab('companies')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='companies'?700:400,color:activeTab==='companies'?T.teal:T.gray500,borderBottom:activeTab==='companies'?`2px solid ${T.teal}`:'none',fontSize:13}}>
-          🏢 কোম্পানি ({allSuppliers.length})
+          🏢 সরবরাহকারী ({allSuppliers.length})
         </button>
         <button onClick={()=>setActiveTab('categories')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:activeTab==='categories'?700:400,color:activeTab==='categories'?T.teal:T.gray500,borderBottom:activeTab==='categories'?`2px solid ${T.teal}`:'none',fontSize:13}}>
           📂 ক্যাটাগরি ({categories.length})
@@ -4192,7 +4192,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               style={{...input,paddingLeft:32,padding:'6px 12px',fontSize:12}}/>
           </div>
           <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>setModal({mode:'add'})}>
-            {activeTab==='companies'?'🏢 নতুন কোম্পানি':'📂 ক্যাটাগরি যোগ করুন'}
+            {activeTab==='companies'?'🏢 নতুন সরবরাহকারী':'📂 ক্যাটাগরি যোগ করুন'}
           </button>
         </div>
       </div>
@@ -4322,7 +4322,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
             {/* Company Form */}
             {(modal.mode === 'add' || modal.mode === 'edit') && activeTab === 'companies' && (
               <>
-                <h3 style={{margin:'0 0 16px'}}>{modal.mode === 'add' ? '🏢 নতুন কোম্পানি যোগ করুন' : '✏️ কোম্পানি সম্পাদনা করুন'}</h3>
+                <h3 style={{margin:'0 0 16px'}}>{modal.mode === 'add' ? '🏢 নতুন সরবরাহকারী যোগ করুন' : '✏️ সরবরাহকারী সম্পাদনা করুন'}</h3>
                 <div style={{marginBottom:12}}>
                   <label style={label}>🏢 সরবরাহকারীর নাম *</label>
                   <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="সরবরাহকারীর নাম" style={input} autoFocus />
@@ -4355,7 +4355,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 </div>
                 {modal.mode === 'add' && (
                   <div style={{marginTop:12,fontSize:11,color:T.gray500,textAlign:'center'}}>
-                    💡 সংরক্ষণের পর আবার নতুন কোম্পানি যোগ করতে পারবেন
+                    💡 সংরক্ষণের পর আবার নতুন সরবরাহকারী যোগ করতে পারবেন
                   </div>
                 )}
               </>
