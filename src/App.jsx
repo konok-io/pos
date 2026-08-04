@@ -6856,7 +6856,9 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 </tbody>
                 <tfoot>
                   <tr style={{background:T.tealLight}}>
-                    <td colSpan={4} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট পারচেজ এমাউন্ট:</td>
+                    <td colSpan={2} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট:</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{filteredPurchases.length}টি বিল</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0),0),0)}টি</td>
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0),0))}</td>
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.red}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;},0))}</td>
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t+t*0.15;},0))}</td>
