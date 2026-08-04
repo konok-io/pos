@@ -4562,7 +4562,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                   />
                   <button 
                     onClick={handleAddSupplier}
-                    style={{...btn('primary'),padding:'8px 10px',fontSize:12,height:'38px'}}
+                    style={{...btn('primary'),padding:'8px 10px',fontSize:12,height:'38px',display:'flex',alignItems:'center',justifyContent:'center'}}
                   >
                     ✅ যুক্ত করুন
                   </button>
