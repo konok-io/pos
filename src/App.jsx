@@ -2617,7 +2617,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
             {/* CSV Import Section */}
             <div style={{...card,padding:16,marginBottom:16,background:T.tealLight,border:`1px dashed ${T.teal}`}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
-                <h3 style={{margin:0,fontSize:14,color:T.teal}}>📥 CSV আমদানি করুন</h3>
+                <h3 style={{margin:0,fontSize:14,color:T.teal}}>📥 সিএসবি ইম্পোর্ট করুন</h3>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:8,alignItems:'flex-start'}}>
                 <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
@@ -4388,7 +4388,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           fontWeight:600,
           fontSize:13,
         }}>
-          📥 CSV আমদানি
+          📥 সিএসবি ইম্পোর্ট
         </button>
         {/* Search and Add button - right aligned */}
         <div style={{marginLeft:'auto',display:'flex',gap:8,alignItems:'center',paddingRight:12}}>
@@ -4458,7 +4458,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         {/* CSV IMPORT TAB */}
         {activeTab === 'csv' && (
           <div style={{...card,padding:24}}>
-            <h3 style={{margin:'0 0 16px',fontSize:16}}>📥 CSV আমদানি করুন</h3>
+            <h3 style={{margin:'0 0 16px',fontSize:16}}>📥 সিএসবি ইম্পোর্ট করুন</h3>
             <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
             <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:16}}>
               <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:14,padding:'10px 20px'}}>
