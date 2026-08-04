@@ -1357,7 +1357,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
   const afterDiscount = Math.max(0, subtotal-disc);
   const vatEnabled = settings.vatEnabled !== false;
   const vatRate = vatPercent || 0;
-  const vatAmount = vatEnabled ? Math.round(afterDiscount * vatRate / 100) : 0;
+  const vatAmount = vatEnabled ? parseFloat((afterDiscount * vatRate / 100).toFixed(2)) : 0;
   const total = afterDiscount + vatAmount;
   const paidAmt = paid === '' ? 0 : (parseFloat(paid) || 0);
   const due = total - paidAmt;
@@ -2834,8 +2834,8 @@ ${printFiltered.map(p => {
   const profitPct = p.buyP > 0 ? Math.round((profit / p.buyP) * 100) : 0;
   const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'-';
   const vatRate = p.vatPercent || 15;
-  const vatAmount = Math.round(p.sellP * vatRate / 100);
-  const totalWithVat = p.sellP + vatAmount;
+  const vatAmount = parseFloat((p.sellP * vatRate / 100).toFixed(2));
+  const totalWithVat = parseFloat((p.sellP + vatAmount).toFixed(2));
   return `<tr><td>${supCode}</td><td>${p.name}</td><td>${p.company||'-'}</td><td>${p.cat||'-'}</td><td>৳${p.buyP.toLocaleString()}</td><td>৳${p.sellP.toLocaleString()}</td><td>৳${profit.toLocaleString()} (${profitPct}%)</td><td>${vatRate}%</td><td>৳${totalWithVat.toLocaleString()}</td><td>${p.stock}</td><td>${p.unit}</td></tr>`;
 }).join('')}
 </tbody></table>
@@ -2878,8 +2878,8 @@ ${printFiltered.map(p => {
                 const isLowStock = p.stock <= p.minStock;
                 const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'';
                 const vatRate = p.vatPercent || settings?.vatPercent || 15;
-                const vatAmount = Math.round(p.sellP * vatRate / 100);
-                const totalWithVat = p.sellP + vatAmount;
+                const vatAmount = parseFloat((p.sellP * vatRate / 100).toFixed(2));
+                const totalWithVat = parseFloat((p.sellP + vatAmount).toFixed(2));
                 return (
                   <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                     <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
