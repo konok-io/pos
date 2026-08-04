@@ -4420,7 +4420,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               style={{...input,paddingLeft:32,padding:'6px 12px',fontSize:12}}/>
           </div>
           <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>setModal({mode:'add'})}>
-            {activeTab==='companies'?'🏢 নতুন সরবরাহকারী':'📂 ক্যাটাগরি যোগ করুন'}
+            {activeTab==='companies'?'🏢 সরবরাহকারী যোগ করুন':'📂 ক্যাটাগরি যোগ করুন'}
           </button>
         </div>
       </div>
