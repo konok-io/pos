@@ -6772,7 +6772,8 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 </tbody>
                 <tfoot>
                   <tr style={{background:T.tealLight}}>
-                    <td colSpan={4} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট:</td>
+                    <td colSpan={3} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট:</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{filteredSales.reduce((c,i)=>c+(i.items||[]).reduce((a,it)=>a+(it.qty||0),0),0)}টি</td>
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{fmt(filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0),0))}</td>
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(totalSales)}</td>
                     <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalPaid)}</td>
