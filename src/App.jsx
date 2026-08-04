@@ -2389,6 +2389,8 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
                       const vatRate = settings?.vatPercent || 15;
                       const vatAmount = grandTotal * vatRate / 100;
                       const totalWithVat = grandTotal + vatAmount;
+                      const supplierObj = suppliers.find(s => s.name === viewPurchase.supplier);
+                      const supplierCrDisplay = supplierObj?.crNumber ? `<div style="margin-top:3px;"><strong>সরবরাহকারী CR: ${supplierObj.crNumber}</strong></div>` : '';
                       const supplierVatDisplay = viewPurchase.supplierVatNumber ? `<div style="margin-top:3px;"><strong>সরবরাহকারী VAT: ${viewPurchase.supplierVatNumber}</strong></div>` : '';
                       let html = `<!DOCTYPE html>
 <html>
@@ -2419,6 +2421,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   <div>${viewPurchase.id}</div>
   <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
   <div>সরবরাহকারী: ${viewPurchase.supplier}</div>
+  ${supplierCrDisplay}
   ${supplierVatDisplay}
   ${settings?.taxId ? '<div style="margin-top:3px;"><strong>ক্রেতার VAT: ' + settings.taxId + '</strong></div>' : ''}
 </div>
@@ -3704,13 +3707,13 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     
     if (form.isAuto) {
       // Convert auto to real supplier
-      const newS = { id: genId(), code: newCode, name: form.name.trim(), phone: form.phone||'', address: form.address||'', vatNumber: form.vatNumber||'' };
+      const newS = { id: genId(), code: newCode, name: form.name.trim(), phone: form.phone||'', address: form.address||'', vatNumber: form.vatNumber||'', crNumber: form.crNumber||'' };
       await upd.suppliers([...suppliers, newS]);
-      setForm({name:'',phone:'',address:'',vatNumber:'',isAuto:false});
+      setForm({name:'',phone:'',address:'',vatNumber:'',crNumber:'',isAuto:false});
       alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
     } else if (modal.mode === 'add') {
       await upd.suppliers([...suppliers, { ...form, id: genId(), code: newCode }]);
-      setForm({name:'',phone:'',address:'',vatNumber:'',isAuto:false,code:''});
+      setForm({name:'',phone:'',address:'',vatNumber:'',crNumber:'',isAuto:false,code:''});
       alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
     } else {
       await upd.suppliers(suppliers.map(s => s.id === modal.id ? {...form, id: modal.id} : s));
@@ -3997,6 +4000,13 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           {viewSupplier.code && <span style={{fontSize:12,color:T.teal,fontWeight:600,marginLeft:8}}>{viewSupplier.code}</span>}
         </div>
         <div style={{flex:1,overflow:'auto',padding:12}}>
+          {/* CR Number Banner */}
+          {viewSupplier.crNumber && (
+            <div style={{padding:'12px 16px',background:'linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%)',borderRadius:10,marginBottom:12,color:T.white}}>
+              <div style={{fontSize:12,fontWeight:600,opacity:0.9}}>🏢 CR নম্বর</div>
+              <div style={{fontSize:18,fontWeight:800,marginTop:4,letterSpacing:'1px'}}>{viewSupplier.crNumber}</div>
+            </div>
+          )}
           {/* VAT Number Banner - Important for Input Tax Credit */}
           {viewSupplier.vatNumber && (
             <div style={{padding:'12px 16px',background:'linear-gradient(135deg, #059669 0%, #047857 100%)',borderRadius:10,marginBottom:16,color:T.white}}>
@@ -4272,6 +4282,10 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 <div style={{marginBottom:12}}>
                   <label style={label}>🏢 কোম্পানির নাম *</label>
                   <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="কোম্পানির নাম" style={input} autoFocus />
+                </div>
+                <div style={{marginBottom:12}}>
+                  <label style={label}>🏢 CR নম্বর <span style={{fontSize:10,color:T.gray500}}>(কমার্শিয়াল রেজিস্ট্রেশন)</span></label>
+                  <input value={form.crNumber||''} onChange={e=>setForm(f=>({...f,crNumber:e.target.value}))} placeholder="CR নম্বর" style={input} />
                 </div>
                 {modal.mode === 'add' && (
                   <div style={{marginBottom:12}}>
@@ -7800,6 +7814,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       {form.purchaseShowSupplier!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.purchaseFontSize||11)-1}px` }}>
                         <div>সরবরাহকারী: এবিসি ট্রেডার্স</div>
                         <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>ফোন: ০১৮XXXXXXXX</div>
+                        <div style={{ fontWeight: 'bold', color: '#0284C7', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>CR: 1234567890</div>
                         <div style={{ fontWeight: 'bold', color: '#EA580C', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>VAT: 123456789012345</div>
                       </div>}
                       {form.purchaseShowStoreVat!==false&&form.taxId&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px`, fontWeight: 'bold', marginBottom: 4 }}>ক্রেতার VAT: {form.taxId}</div>}
