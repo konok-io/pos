@@ -2447,6 +2447,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   ${supplierVatDisplay}
   ${supplierAddressDisplay}
 </div>
+<div style="border-top:1px dotted #000;margin:4px 0;"></div>
 <table>
   <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
   <tbody>`;
@@ -6509,6 +6510,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   ${showPhone && viewPurchase.phone ? '<div>ফোন: ' + viewPurchase.phone + '</div>' : ''}
   ${showSupplier && suppliers.find(s=>(s.name||'').toLowerCase()===(viewPurchase.supplier||'').toLowerCase())?.vatNumber ? '<div style="font-weight:bold;">Supplier VAT: ' + suppliers.find(s=>(s.name||'').toLowerCase()===(viewPurchase.supplier||'').toLowerCase())?.vatNumber + '</div>' : ''}
 </div>
+<div style="border-top:1px dotted #000;margin:4px 0;"></div>
 <table>
   <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
   <tbody>`;
@@ -6627,6 +6629,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   <div>Customer: ${viewSale.custName}</div>
   ${viewSale.phone ? '<div>Phone: '+viewSale.phone+'</div>' : ''}
 </div>
+<div style="border-top:1px dotted #000;margin:4px 0;"></div>
 <table>
   <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
   <tbody>`;
@@ -7850,6 +7853,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         <div style={{ fontSize: `${(form.receiptFontSize||11)-2}px` }}>২ আগস্ট, ২০২৬ | ১০:৩০ AM</div>
                       </div>
                       {form.receiptShowCustomer!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.receiptFontSize||11)-1}px` }}>গ্রাহক: মোঃ রহিম উদ্দিন<br/>ফোন: ০১৭XXXXXXXX</div>}
+                      <div style={{ borderTop: '1px dotted #000', margin: '4px 0' }}></div>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: `${(form.receiptFontSize||11)-1}px` }}>
                         <thead><tr style={{ borderBottom: '1px dashed #000' }}><th style={{ textAlign: 'left', padding: '3px 0' }}>পণ্য</th><th style={{ textAlign: 'center', padding: '3px 0' }}>পরি</th><th style={{ textAlign: 'right', padding: '3px 0' }}>দাম</th><th style={{ textAlign: 'right', padding: '3px 0' }}>মোট</th></tr></thead>
                         <tbody>
@@ -7888,6 +7892,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         <div style={{ fontWeight: 'bold', color: '#EA580C', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>VAT: 123456789012345</div>
                         <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px`, marginTop: 2 }}>ঠিকানা: সরবরাহকারীর ঠিকানা</div>
                       </div>}
+                      <div style={{ borderTop: '1px dotted #000', margin: '4px 0' }}></div>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: `${(form.purchaseFontSize||11)-1}px` }}>
                         <thead><tr style={{ borderBottom: '1px dashed #000' }}><th style={{ textAlign: 'left', padding: '3px 0' }}>পণ্য</th><th style={{ textAlign: 'center', padding: '3px 0' }}>পরি</th><th style={{ textAlign: 'right', padding: '3px 0' }}>দাম</th><th style={{ textAlign: 'right', padding: '3px 0' }}>মোট</th></tr></thead>
                         <tbody>
