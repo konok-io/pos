@@ -1369,16 +1369,16 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
 
     // Due sale confirmation
     if (due > 0 && selCust) {
-      if (!confirm(`⚠️ আপনি কি সত্যিই বাকিতে বিক্রয় করতে চান?\nবাকি: ৳${due.toFixed(0)}\nগ্রাহক: ${selCust.name}\nএই বাকি ${selCust.name} এর হিসাবে যোগ হবে।`)) return;
+      if (!confirm(`⚠️ আপনি কি সত্যিই বাকিতে বিক্রয় করতে চান?\nবাকি: ৳${due.toFixed(2)}\nগ্রাহক: ${selCust.name}\nএই বাকি ${selCust.name} এর হিসাবে যোগ হবে।`)) return;
     }
 
     // Confirmation dialog
-    const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(0)}` : '';
+    const dueText = due > 0 ? `\nবাকি: ৳${due.toFixed(2)}` : '';
     const dueCreditText = (selCust && due > 0) ? `\nবাকি ${selCust.name} এর হিসাবে যোগ হবে।` : '';
-    const vatText = vatAmount > 0 ? `\nভ্যাট (${vatPercent}%): ৳${vatAmount.toFixed(0)}` : '';
-    const paidText = paidAmt > 0 ? `\nপরিশোধ: ৳${paidAmt.toFixed(0)}` : '';
-    const changeText = change > 0 ? `\nফেরত: ৳${change.toFixed(0)}` : '';
-    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(0)}${vatText}${dueText}${paidText}${changeText}${dueCreditText}`;
+    const vatText = vatAmount > 0 ? `\nভ্যাট (${vatPercent}%): ৳${vatAmount.toFixed(2)}` : '';
+    const paidText = paidAmt > 0 ? `\nপরিশোধ: ৳${paidAmt.toFixed(2)}` : '';
+    const changeText = change > 0 ? `\nফেরত: ৳${change.toFixed(2)}` : '';
+    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(2)}${vatText}${dueText}${paidText}${changeText}${dueCreditText}`;
 
     if (!window.confirm(confirmMsg)) return;
 
