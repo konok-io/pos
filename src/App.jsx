@@ -4017,85 +4017,82 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     const totalPurchase = supPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0)*1.15,0);
     
     return (
-      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-        <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
+      <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden',background:T.gray50}}>
+        {/* Header */}
+        <div style={{padding:'16px 20px',display:'flex',gap:12,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
           <button style={btn()} onClick={()=>setViewSupplier(null)}>← ফিরে যান</button>
-          <span style={{fontWeight:700,fontSize:15}}>🏢 {viewSupplier.name}</span>
-          <button style={{...btn('primary'),marginLeft:'auto',padding:'6px 12px',fontSize:12}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>${viewSupplier.name} - সরবরাহকারী</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4;margin:15mm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#00897b;color:white;font-weight:700;font-size:12px}.info-table td{padding:10px;font-size:13px}.info-table td:first-child{font-weight:700;color:#555;width:140px;background:#f8faf9}.total-row td{background:#e0f7f0;font-weight:700;font-size:14px}.footer{margin-top:20px;text-align:center;color:#999;font-size:11px}</style></head><body><h2 style="text-align:center;color:#00897b;margin-bottom:20px;border-bottom:2px solid #00897b;padding-bottom:10px">🏢 ${viewSupplier.name}</h2><table class="info-table"><tbody><tr><td>ফোন</td><td>${viewSupplier.phone || '-'}</td></tr><tr><td>CR নম্বর</td><td>${viewSupplier.crNumber || '-'}</td></tr><tr><td>VAT নম্বর</td><td>${viewSupplier.vatNumber || '-'}</td></tr><tr><td>ঠিকানা</td><td>${viewSupplier.address || '-'}</td></tr></tbody></table><br/><table><thead><tr><th>মোট পণ্য</th><th>পারচেজ সংখ্যা</th><th>মোট একক</th><th>মোট এমাউন্ট (VAT সহ)</th></tr></thead><tbody><tr><td style="text-align:center;font-weight:700">${supProducts.length}টি</td><td style="text-align:center;font-weight:700">${supPurchases.length}টি</td><td style="text-align:center;font-weight:700">${supPurchases.reduce((s,p)=>s+p.totalStock,0)}টি</td><td style="text-align:right;font-weight:700">৳${totalPurchase.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr></tbody></table><p class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
-        </div>
-        <div style={{flex:1,overflow:'auto',padding:20}}>
-          {/* Quick Stats */}
-          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:16}}>
-            <div style={{...card,padding:16,textAlign:'center',borderTop:`3px solid ${T.teal}`}}>
-              <div style={{fontSize:28,fontWeight:800,color:T.teal}}>{supProducts.length}</div>
-              <div style={{fontSize:12,color:T.gray500,marginTop:4}}>পণ্য</div>
-            </div>
-            <div style={{...card,padding:16,textAlign:'center',borderTop:`3px solid ${T.green}`}}>
-              <div style={{fontSize:28,fontWeight:800,color:T.green}}>{supPurchases.length}</div>
-              <div style={{fontSize:12,color:T.gray500,marginTop:4}}>পারচেজ</div>
-            </div>
-            <div style={{...card,padding:16,textAlign:'center',borderTop:`3px solid ${T.orange}`}}>
-              <div style={{fontSize:28,fontWeight:800,color:T.orange}}>{supPurchases.reduce((s,p)=>s+p.totalStock,0)}</div>
-              <div style={{fontSize:12,color:T.gray500,marginTop:4}}>একক</div>
-            </div>
-            <div style={{...card,padding:16,textAlign:'center',borderTop:`3px solid #059669`}}>
-              <div style={{fontSize:28,fontWeight:800,color:'#059669'}}>{fmt(totalPurchase)}</div>
-              <div style={{fontSize:12,color:T.gray500,marginTop:4}}>মোট (VAT)</div>
-            </div>
-          </div>
-
-          {/* Details Grid */}
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:16}}>
-            <div style={{...card,padding:16}}>
-              <div style={{fontSize:13,fontWeight:700,color:T.teal,marginBottom:12,borderBottom:`1px solid ${T.gray200}`,paddingBottom:8}}>📋 যোগাযোগ</div>
-              {viewSupplier.phone && <div style={{marginBottom:8}}><span style={{color:T.gray500,fontSize:12}}>ফোন: </span><span style={{fontWeight:600}}>{viewSupplier.phone}</span></div>}
-              {viewSupplier.crNumber && <div style={{marginBottom:8}}><span style={{color:T.gray500,fontSize:12}}>CR: </span><span style={{fontWeight:600}}>{viewSupplier.crNumber}</span></div>}
-              {viewSupplier.vatNumber && <div><span style={{color:T.gray500,fontSize:12}}>VAT: </span><span style={{fontWeight:600,color:'#059669'}}>{viewSupplier.vatNumber}</span></div>}
-            </div>
-            {viewSupplier.address && (
-              <div style={{...card,padding:16}}>
-                <div style={{fontSize:13,fontWeight:700,color:T.teal,marginBottom:8,borderBottom:`1px solid ${T.gray200}`,paddingBottom:8}}>📍 ঠিকানা</div>
-                <div style={{fontSize:13,color:T.gray600}}>{viewSupplier.address}</div>
-              </div>
+          <div style={{display:'flex',flexDirection:'column'}}>
+            <span style={{fontWeight:700,fontSize:18,color:T.teal}}>🏢 {viewSupplier.name}</span>
+            {(viewSupplier.phone || viewSupplier.vatNumber) && (
+              <span style={{fontSize:12,color:T.gray500,marginTop:2}}>
+                {viewSupplier.phone && `📞 ${viewSupplier.phone}`}{viewSupplier.phone && viewSupplier.vatNumber && ' | '}{viewSupplier.vatNumber && `VAT: ${viewSupplier.vatNumber}`}
+              </span>
             )}
           </div>
-
-          {/* Actions */}
-          <div style={{display:'flex',gap:8,marginBottom:16}}>
-            <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ হিস্ট্রি</button>
+          <div style={{marginLeft:'auto',display:'flex',gap:8}}>
+            <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ</button>
             {!viewSupplier.isAuto && (
               <>
-                <button style={btn()} onClick={()=>{setViewSupplier(null);setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️ সম্পাদনা</button>
-                <button style={btn('danger')} onClick={()=>{setViewSupplier(null);del(viewSupplier.id);}}>🗑️ মুছুন</button>
+                <button style={btn()} onClick={()=>{setViewSupplier(null);setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️</button>
+                <button style={btn('danger')} onClick={()=>{setViewSupplier(null);del(viewSupplier.id);}}>🗑️</button>
               </>
             )}
+            <button style={{...btn('primary'),padding:'6px 12px'}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>${viewSupplier.name} - সরবরাহকারী</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4;margin:15mm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#00897b;color:white;font-weight:700;font-size:12px}.info-table td{padding:10px;font-size:13px}.info-table td:first-child{font-weight:700;color:#555;width:140px;background:#f8faf9}.total-row td{background:#e0f7f0;font-weight:700;font-size:14px}.footer{margin-top:20px;text-align:center;color:#999;font-size:11px}</style></head><body><h2 style="text-align:center;color:#00897b;margin-bottom:20px;border-bottom:2px solid #00897b;padding-bottom:10px">🏢 ${viewSupplier.name}</h2><table class="info-table"><tbody><tr><td>ফোন</td><td>${viewSupplier.phone || '-'}</td></tr><tr><td>CR নম্বর</td><td>${viewSupplier.crNumber || '-'}</td></tr><tr><td>VAT নম্বর</td><td>${viewSupplier.vatNumber || '-'}</td></tr><tr><td>ঠিকানা</td><td>${viewSupplier.address || '-'}</td></tr></tbody></table><br/><table><thead><tr><th>মোট পণ্য</th><th>পারচেজ সংখ্যা</th><th>মোট একক</th><th>মোট এমাউন্ট (VAT সহ)</th></tr></thead><tbody><tr><td style="text-align:center;font-weight:700">${supProducts.length}টি</td><td style="text-align:center;font-weight:700">${supPurchases.length}টি</td><td style="text-align:center;font-weight:700">${supPurchases.reduce((s,p)=>s+p.totalStock,0)}টি</td><td style="text-align:right;font-weight:700">৳${totalPurchase.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr></tbody></table><p class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div style={{flex:1,overflow:'auto',padding:20}}>
+          {/* Info Row */}
+          <div style={{...card,padding:16,marginBottom:16}}>
+            <div style={{display:'flex',gap:24}}>
+              {viewSupplier.phone && <div><span style={{fontSize:11,color:T.gray400}}>ফোন</span><div style={{fontWeight:600,fontSize:14,marginTop:2}}>{viewSupplier.phone}</div></div>}
+              {viewSupplier.crNumber && <div><span style={{fontSize:11,color:T.gray400}}>CR নম্বর</span><div style={{fontWeight:600,fontSize:14,marginTop:2}}>{viewSupplier.crNumber}</div></div>}
+              {viewSupplier.vatNumber && <div><span style={{fontSize:11,color:T.gray400}}>VAT নম্বর</span><div style={{fontWeight:600,fontSize:14,marginTop:2,color:T.teal}}>{viewSupplier.vatNumber}</div></div>}
+              {viewSupplier.address && <div style={{flex:1}}><span style={{fontSize:11,color:T.gray400}}>ঠিকানা</span><div style={{fontWeight:500,fontSize:13,marginTop:2,color:T.gray600}}>{viewSupplier.address}</div></div>}
+            </div>
           </div>
 
-          {/* Products */}
+          {/* Stats Row */}
+          <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:16}}>
+            <div style={{...card,padding:20,textAlign:'center'}}>
+              <div style={{fontSize:32,fontWeight:800,color:T.teal}}>{supProducts.length}</div>
+              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>পণ্য</div>
+            </div>
+            <div style={{...card,padding:20,textAlign:'center'}}>
+              <div style={{fontSize:32,fontWeight:800,color:T.green}}>{supPurchases.length}</div>
+              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>পারচেজ</div>
+            </div>
+            <div style={{...card,padding:20,textAlign:'center'}}>
+              <div style={{fontSize:32,fontWeight:800,color:T.orange}}>{supPurchases.reduce((s,p)=>s+p.totalStock,0)}</div>
+              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>একক</div>
+            </div>
+            <div style={{...card,padding:20,textAlign:'center'}}>
+              <div style={{fontSize:32,fontWeight:800,color:T.teal}}>{fmt(totalPurchase)}</div>
+              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>মোট (VAT)</div>
+            </div>
+          </div>
+
+          {/* Products Table */}
           <div style={{...card,padding:0}}>
-            <div style={{padding:'12px 16px',borderBottom:`1px solid ${T.gray200}`,fontWeight:700,fontSize:13,background:T.gray50}}>📦 পণ্য তালিকা ({supProducts.length}টি)</div>
+            <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <span style={{fontWeight:700,fontSize:14}}>📦 পণ্য</span>
+              <span style={{fontSize:12,color:T.gray400}}>{supProducts.length}টি</span>
+            </div>
             {supProducts.length === 0 ? (
               <div style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পণ্য নেই</div>
             ) : (
               <table style={{width:'100%',borderCollapse:'collapse'}}>
-                <thead>
-                  <tr style={{background:T.gray50}}>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500}}>পণ্য</th>
-                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.gray500}}>স্টক</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.gray500}}>ক্রয়</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.gray500}}>বিক্রয়</th>
-                  </tr>
-                </thead>
                 <tbody>
-                  {supProducts.map(p => (
-                    <tr key={p.id} style={{borderBottom:`1px solid ${T.gray100}`}}>
-                      <td style={{padding:'10px 12px'}}>
-                        <div style={{fontWeight:600,fontSize:13}}>{p.name}</div>
-                        <div style={{fontSize:11,color:T.gray400}}>{p.barcode}</div>
+                  {supProducts.map((p,i) => (
+                    <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA'}}>
+                      <td style={{padding:'12px 16px'}}>
+                        <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
+                        <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{p.barcode}</div>
                       </td>
-                      <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600}}>{p.stock} {p.unit}</td>
-                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.orange}}>{fmt(p.buyP)}</td>
-                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.teal}}>{fmt(p.sellP)}</td>
+                      <td style={{padding:'12px 16px',textAlign:'center',color:T.gray600,fontSize:13}}>{p.stock} {p.unit}</td>
+                      <td style={{padding:'12px 16px',textAlign:'right',fontWeight:600,color:T.gray600}}>{fmt(p.buyP)}</td>
+                      <td style={{padding:'12px 16px',textAlign:'right',fontWeight:700,color:T.teal,fontSize:14}}>{fmt(p.sellP)}</td>
                     </tr>
                   ))}
                 </tbody>
