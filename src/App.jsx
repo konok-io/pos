@@ -147,204 +147,14 @@ function BannerImageUpload({ value, onChange }) {
   );
 }
 
-/* ─────────────── STORAGE KEYS ─────────────── */
-const STORAGE_KEYS = {
-  products: 'pos_products',
-  customers: 'pos_customers',
-  sales: 'pos_sales',
-  settings: 'pos_settings',
-  suppliers: 'pos_suppliers',
-  categories: 'pos_categories',
-  purchases: 'pos_purchases',
-  users: 'pos_users',
-  auth: 'pos_auth',
-  productHistory: 'pos_product_history',
-  cart: 'pos_cart',
-  selCust: 'pos_selCust',
-  expenses: 'pos_expenses',
-  incomes: 'pos_incomes',
-};
-
-/* ─────────────── INDEXEDDB STORAGE (Persistent) ─────────────── */
-const DB_NAME = 'POS_Database';
-const DB_VERSION = 2; // Incremented to trigger upgrade
-const STORE_NAME = 'pos_data';
-const DB_VERSION_KEY = 'pos_db_version';
-const CURRENT_DB_VERSION = 2;
-const DATA_VERSION_KEY = 'pos_data_version';
-
-// Generate a unique ID for this installation
-const INSTALLATION_ID = 'pos_install_' + Date.now();
-
-let idb = null;
-let idbInitPromise = null;
-let cachedVersion = null;
-
-// Reset cached version when IndexedDB is deleted
-function resetIDBCache() {
-  idb = null;
-  idbInitPromise = null;
-  cachedVersion = null;
-}
-
-function initIndexedDB() {
-  if (idbInitPromise) return idbInitPromise;
-  
-  idbInitPromise = new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-    
-    request.onerror = () => {
-      console.error('IndexedDB error:', request.error);
-      resetIDBCache();
-      reject(request.error);
-    };
-    
-    request.onsuccess = () => {
-      idb = request.result;
-      resolve(idb);
-    };
-    
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME);
-      }
-    };
-  });
-  
-  return idbInitPromise;
-}
-
-const db = {
-  async get(k) {
-    await initIndexedDB();
-    return new Promise((resolve) => {
-      try {
-        const tx = idb.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const request = store.get(k);
-        request.onsuccess = () => resolve(request.result || null);
-        request.onerror = () => resolve(null);
-      } catch { resolve(null); }
-    });
-  },
-  
-  async set(k, v) {
-    await initIndexedDB();
-    return new Promise((resolve) => {
-      try {
-        const tx = idb.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        store.put(v, k);
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => resolve();
-      } catch { resolve(); }
-    });
-  },
-  
-  async clear() {
-    await initIndexedDB();
-    return new Promise((resolve) => {
-      try {
-        const tx = idb.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        store.clear();
-        tx.oncomplete = () => resolve();
-      } catch { resolve(); }
-    });
-  },
-  
-  // Check if storage was cleared - compare localStorage and IndexedDB versions
-  async checkStorage() {
-    try {
-      // Reset cache to ensure we get fresh connection
-      resetIDBCache();
-      
-      // Initialize IndexedDB fresh
-      await initIndexedDB();
-      
-      // Get the data version from IndexedDB
-      const indexedDBVersion = await new Promise((resolve) => {
-        try {
-          const tx = idb.transaction(STORE_NAME, 'readonly');
-          const store = tx.objectStore(STORE_NAME);
-          const request = store.get(DATA_VERSION_KEY);
-          request.onsuccess = () => resolve(request.result);
-          request.onerror = () => resolve(null);
-        } catch { resolve(null); }
-      });
-      
-      // Get the stored localStorage version
-      const localStorageVersion = localStorage.getItem(DATA_VERSION_KEY);
-      
-      // If versions don't match, storage was cleared
-      const idbVersionValue = indexedDBVersion?.value || 'none';
-      const lsVersionValue = localStorageVersion || 'none';
-      
-      if (idbVersionValue !== lsVersionValue) {
-        cachedVersion = false;
-        return false; // Versions don't match, data exists
-      }
-      
-      // Both are null/none - this is a fresh install or cleared storage
-      if (!idbVersionValue || idbVersionValue === 'none') {
-        cachedVersion = true;
-        return true; // Fresh/cleared
-      }
-      
-      // Check if this is a new installation
-      const installId = await this.get('pos_install_id');
-      const lsInstallId = localStorage.getItem('pos_install_id');
-      
-      if (!installId && !lsInstallId) {
-        // New installation
-        cachedVersion = true;
-        return true;
-      }
-      
-      if (installId !== lsInstallId) {
-        // Installation IDs don't match - storage was cleared
-        cachedVersion = true;
-        return true;
-      }
-      
-      cachedVersion = false;
-      return false;
-    } catch (e) {
-      console.error('Storage check error:', e);
-      cachedVersion = true;
-      return true;
-    }
-  },
-  
-  // Initialize version markers for fresh install
-  async initVersion() {
-    const installId = INSTALLATION_ID;
-    const versionValue = Date.now().toString();
-    
-    await this.set(DATA_VERSION_KEY, { value: versionValue, timestamp: Date.now() });
-    await this.set('pos_install_id', installId);
-    
-    localStorage.setItem(DATA_VERSION_KEY, versionValue);
-    localStorage.setItem('pos_install_id', installId);
-  },
-  
-  // Clear all data including localStorage
-  async clearAll() {
-    await this.clear();
-    Object.values(STORAGE_KEYS).forEach(key => {
-      localStorage.removeItem(key);
-    });
-    const localStorageKeys = [
-      'pos_cart', 'pos_selCust', 'pos_current_tab', 'pos_suppliers_tab',
-      'pos_expenses', 'pos_incomes', 'pos_want_fullscreen',
-      DATA_VERSION_KEY, 'pos_install_id'
-    ];
-    localStorageKeys.forEach(key => {
-      localStorage.removeItem(key);
-    });
-  }
-};
+/* ─────────────── API SERVICE (MySQL Backend) ─────────────── */
+// All business data is stored in MySQL via PHP API
+// Only auth token and UI preferences are stored in localStorage
+import { 
+  auth, products, customers, sales, suppliers, categories, 
+  expenses, incomes, settings, users, loadAllData,
+  getToken, setToken, getUser, setUser, clearAuth
+} from './api.js';
 
 /* ─────────────── DEFAULT SUPER ADMIN ─────────────── */
 const DEFAULT_SUPER_ADMIN = {
@@ -588,26 +398,17 @@ function LoginScreen({ onLogin, settings }) {
     setError('');
     setLoading(true);
 
-    // Simulate network delay
-    await new Promise(r => setTimeout(r, 500));
-
-    // Check credentials
-    const users = await db.get(STORAGE_KEYS.users) || [];
-    const allUsers = [DEFAULT_SUPER_ADMIN, ...users];
-    
-    const user = allUsers.find(u => u.email === email && u.password === password);
-    
-    if (user) {
-      const authData = {
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        loginTime: new Date().toISOString(),
-      };
-      await db.set(STORAGE_KEYS.auth, authData);
-      onLogin(authData);
-    } else {
-      setError('❌ ইমেইল বা পাসওয়ার্ড ভুল!');
+    try {
+      const result = await auth.login(email, password);
+      
+      if (result.success && result.data.user) {
+        onLogin(result.data.user);
+      } else {
+        setError(result.error || '❌ লগইন ব্যর্থ হয়েছে!');
+      }
+    } catch (err) {
+      setError('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+      console.error('Login error:', err);
     }
     setLoading(false);
   };
@@ -990,40 +791,49 @@ function MainApp({ currentUser, onLogout }) {
   }, []);
 
   useEffect(() => {
-    // Async function to load data from IndexedDB
+    // Async function to load data from MySQL API
     async function loadData() {
-      // Check if storage was cleared (user deleted IndexedDB from browser DevTools)
-      const wasCleared = await db.checkStorage();
-      
-      // If storage was cleared, reinitialize the version marker
-      if (wasCleared) {
-        await db.initVersion();
+      try {
+        // Load all data from MySQL via API
+        const data = await loadAllData();
+        
+        setProducts(data.products || []);
+        setCustomers(data.customers || []);
+        setCategories(data.categories || []);
+        setSuppliers(data.suppliers || []);
+        setSales(data.sales || []);
+        setSettings(data.settings ? {...DEFAULT_SETTINGS, ...data.settings} : {...DEFAULT_SETTINGS});
+        setReady(true);
+      } catch (error) {
+        console.error('Failed to load data from server:', error);
+        // Still set ready to show UI, but with empty data
+        setProducts([]);
+        setCustomers([]);
+        setCategories([]);
+        setSuppliers([]);
+        setSales([]);
+        setSettings(DEFAULT_SETTINGS);
+        setReady(true);
       }
-      
-      // Load from IndexedDB
-      const savedProducts = await db.get(STORAGE_KEYS.products);
-      const savedCustomers = await db.get(STORAGE_KEYS.customers);
-      const savedSales = await db.get(STORAGE_KEYS.sales);
-      const savedSettings = await db.get(STORAGE_KEYS.settings);
-      const savedSuppliers = await db.get(STORAGE_KEYS.suppliers) || [];
-      const savedPurchases = await db.get(STORAGE_KEYS.purchases) || [];
-      const savedCategories = await db.get(STORAGE_KEYS.categories) || [];
-      const savedProductHistory = await db.get(STORAGE_KEYS.productHistory) || [];
-
-      // Always use empty data when no data exists - no DEMO loading
-      setProducts(savedProducts || []);
-      setCustomers(savedCustomers || []);
-      setCategories(savedCategories);
-      setSuppliers(savedSuppliers);
-      setSales(savedSales || []);
-      setPurchases(savedPurchases);
-      setProductHistory(savedProductHistory);
-      setSettings(savedSettings ? {...{...DEFAULT_SETTINGS}, ...savedSettings} : {...DEFAULT_SETTINGS});
-      setReady(true);
     }
     
     loadData();
   }, []);
+
+  // Refresh data from server
+  const refreshData = async () => {
+    try {
+      const data = await loadAllData();
+      setProducts(data.products || []);
+      setCustomers(data.customers || []);
+      setCategories(data.categories || []);
+      setSuppliers(data.suppliers || []);
+      setSales(data.sales || []);
+      setSettings(data.settings ? {...DEFAULT_SETTINGS, ...data.settings} : {...DEFAULT_SETTINGS});
+    } catch (error) {
+      console.error('Failed to refresh data:', error);
+    }
+  };
 
   // Auto-logout after 15 minutes of inactivity
   useEffect(() => {
@@ -1055,97 +865,176 @@ function MainApp({ currentUser, onLogout }) {
     };
   }, []);
 
-  // Track product history when products are updated
-  const trackProductHistory = async (oldProducts, newProducts, user) => {
-    const changes = [];
-    
-    newProducts.forEach(newP => {
-      const oldP = oldProducts.find(p => p.id === newP.id);
-      
-      if (oldP) {
-        // Check for price changes
-        if (oldP.buyP !== newP.buyP) {
-          changes.push({
-            id: genId(),
-            productId: newP.id,
-            productName: newP.name,
-            type: 'price_buy',
-            oldValue: oldP.buyP,
-            newValue: newP.buyP,
-            user: user?.name || 'Unknown',
-            userEmail: user?.email || '',
-            timestamp: now(),
-          });
-        }
-        
-        if (oldP.sellP !== newP.sellP) {
-          changes.push({
-            id: genId(),
-            productId: newP.id,
-            productName: newP.name,
-            type: 'price_sell',
-            oldValue: oldP.sellP,
-            newValue: newP.sellP,
-            user: user?.name || 'Unknown',
-            userEmail: user?.email || '',
-            timestamp: now(),
-          });
-        }
-        
-        // Check for stock changes (increase or decrease)
-        if (oldP.stock !== newP.stock) {
-          changes.push({
-            id: genId(),
-            productId: newP.id,
-            productName: newP.name,
-            type: 'stock',
-            source: 'auto', // automatic from purchase/sale
-            oldValue: oldP.stock,
-            newValue: newP.stock,
-            user: user?.name || 'Unknown',
-            userEmail: user?.email || '',
-            timestamp: now(),
-          });
-        }
-      } else {
-        // New product being added - track initial stock if > 0
-        if (newP.stock > 0) {
-          changes.push({
-            id: genId(),
-            productId: newP.id,
-            productName: newP.name,
-            type: 'stock',
-            source: 'auto', // automatic from purchase
-            oldValue: 0,
-            newValue: newP.stock,
-            user: user?.name || 'Unknown',
-            userEmail: user?.email || '',
-            timestamp: now(),
-          });
-        }
-      }
-    });
-    
-    if (changes.length > 0) {
-      const newHistory = [...productHistory, ...changes];
-      setProductHistory(newHistory);
-      await db.set(STORAGE_KEYS.productHistory, newHistory);
-    }
-  };
-
+  // Product operations - API-based
   const upd = {
-    products: async v => { 
-      await trackProductHistory(products, v, currentUser); 
-      setProducts(v); 
-      await db.set(STORAGE_KEYS.products, v); 
+    // Products
+    products: {
+      add: async (product) => {
+        const result = await products.create(product);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      update: async (product) => {
+        const result = await products.update(product);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      delete: async (id) => {
+        const result = await products.delete(id);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      refresh: refreshData,
     },
-    customers: async v => { setCustomers(v); await db.set(STORAGE_KEYS.customers, v); },
-    sales: async v => { setSales(v); await db.set(STORAGE_KEYS.sales, v); },
-    settings: async v => { setSettings(v); await db.set(STORAGE_KEYS.settings, v); },
-    suppliers: async v => { setSuppliers(v); await db.set(STORAGE_KEYS.suppliers, v); },
-    categories: async v => { setCategories(v); await db.set(STORAGE_KEYS.categories, v); },
-    purchases: async v => { setPurchases(v); await db.set(STORAGE_KEYS.purchases, v); },
-    productHistory: async v => { setProductHistory(v); await db.set(STORAGE_KEYS.productHistory, v); },
+    // Customers
+    customers: {
+      add: async (customer) => {
+        const result = await customers.create(customer);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      update: async (customer) => {
+        const result = await customers.update(customer);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      delete: async (id) => {
+        const result = await customers.delete(id);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      refresh: refreshData,
+    },
+    // Sales
+    sales: {
+      add: async (sale) => {
+        const result = await sales.create(sale);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      delete: async (id) => {
+        const result = await sales.delete(id);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      refresh: refreshData,
+    },
+    // Suppliers
+    suppliers: {
+      add: async (supplier) => {
+        const result = await suppliers.create(supplier);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      update: async (supplier) => {
+        const result = await suppliers.update(supplier);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      delete: async (id) => {
+        const result = await suppliers.delete(id);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      refresh: refreshData,
+    },
+    // Categories
+    categories: {
+      add: async (category) => {
+        const result = await categories.create(category);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      update: async (category) => {
+        const result = await categories.update(category);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      delete: async (id) => {
+        const result = await categories.delete(id);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      refresh: refreshData,
+    },
+    // Purchases
+    purchases: {
+      add: async (purchase) => {
+        const result = await purchases.create(purchase);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      delete: async (id) => {
+        const result = await purchases.delete(id);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      refresh: refreshData,
+    },
+    // Settings
+    settings: {
+      update: async (settingsData) => {
+        const result = await settings.update(settingsData);
+        if (result.success) {
+          await refreshData();
+        }
+        return result;
+      },
+      refresh: refreshData,
+    },
+    // Users
+    users: {
+      add: async (user) => {
+        return await users.create(user);
+      },
+      update: async (user) => {
+        return await users.update(user);
+      },
+      delete: async (id) => {
+        return await users.delete(id);
+      },
+      refresh: async () => {
+        try {
+          const userList = await users.getAll();
+          return userList;
+        } catch (error) {
+          console.error('Failed to refresh users:', error);
+          return [];
+        }
+      },
+    },
   };
 
   if (!ready) return (
@@ -1170,26 +1059,11 @@ function MainApp({ currentUser, onLogout }) {
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
-  const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd, currentUser};
+  const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd, currentUser, refreshData};
 
-  // Refresh data from IndexedDB without reloading page
+  // Refresh data from MySQL API without reloading page
   const handleHardRefresh = async () => {
-    const savedProducts = await db.get(STORAGE_KEYS.products);
-    const savedCustomers = await db.get(STORAGE_KEYS.customers);
-    const savedSales = await db.get(STORAGE_KEYS.sales);
-    const savedSettings = await db.get(STORAGE_KEYS.settings);
-    const savedSuppliers = await db.get(STORAGE_KEYS.suppliers) || [];
-    const savedPurchases = await db.get(STORAGE_KEYS.purchases) || [];
-    const savedCategories = await db.get(STORAGE_KEYS.categories) || [];
-
-    // Always use empty data when no data exists
-    setProducts(savedProducts || []);
-    setCustomers(savedCustomers || []);
-    setCategories(savedCategories);
-    setSuppliers(savedSuppliers);
-    setSales(savedSales || []);
-    setPurchases(savedPurchases);
-    setSettings(savedSettings ? {...DEFAULT_SETTINGS, ...savedSettings} : {...DEFAULT_SETTINGS});
+    await refreshData();
   };
 
   // Fullscreen toggle function
@@ -1274,9 +1148,13 @@ export default function App() {
 
   useEffect(() => {
     async function checkAuth() {
-      const auth = await db.get(STORAGE_KEYS.auth);
-      setCurrentUser(auth);
-      setIsLoggedIn(!!auth);
+      // Check if user is logged in from localStorage token
+      const user = getUser();
+      const token = getToken();
+      if (user && token) {
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+      }
       setIsLoading(false);
     }
     checkAuth();
@@ -1288,8 +1166,7 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await db.set(STORAGE_KEYS.auth, null);
-    localStorage.removeItem(STORAGE_KEYS.auth);
+    await auth.logout();
     setCurrentUser(null);
     setIsLoggedIn(false);
   };
@@ -1317,39 +1194,11 @@ export default function App() {
 /* ═══════════════════════════════════════════
    POS SCREEN
 ═══════════════════════════════════════════ */
-function POSScreen({products, customers, sales, settings, categories, upd, productHistory, currentUser}) {
+function POSScreen({products, customers, sales, settings, categories, upd, productHistory, currentUser, refreshData}) {
   // Initialize cart from IndexedDB in useEffect to avoid hydration issues
   const [cart, setCart] = useState([]);
   const [selCust, setSelCust] = useState(null);
   const [custQ, setCustQ] = useState('');
-  
-  useEffect(() => {
-    async function loadCartData() {
-      try {
-        const savedCart = await db.get(STORAGE_KEYS.cart);
-        if (savedCart) {
-          setCart(savedCart);
-        }
-        const savedCust = await db.get(STORAGE_KEYS.selCust);
-        if (savedCust) {
-          setSelCust(savedCust);
-          setCustQ(savedCust ? savedCust.name : '');
-        }
-      } catch (e) {
-        console.error('Failed to load cart data:', e);
-      }
-    }
-    loadCartData();
-  }, []);
-  
-  // Save cart to IndexedDB whenever it changes
-  useEffect(() => {
-    db.set(STORAGE_KEYS.cart, cart);
-  }, [cart]);
-  
-  useEffect(() => {
-    db.set(STORAGE_KEYS.selCust, selCust);
-  }, [selCust]);
   
   const [search, setSearch] = useState('');
   const searchRef = useRef();
@@ -6137,7 +5986,7 @@ function LowStockScreen({products, upd}) {
 /* ═══════════════════════════════════════════
    INCOME SCREEN
 ═══════════════════════════════════════════ */
-function IncomeScreen({sales, purchases, upd}) {
+function IncomeScreen({sales, purchases, upd, refreshData}) {
   const [period, setPeriod] = useState('month');
   const [from, setFrom] = useState(() => {
     const d = new Date();
@@ -6152,13 +6001,19 @@ function IncomeScreen({sales, purchases, upd}) {
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
   
-  // Load expenses and incomes from IndexedDB
+  // Load expenses and incomes from MySQL API
   useEffect(() => {
     async function loadData() {
-      const savedExpenses = await db.get(STORAGE_KEYS.expenses);
-      const savedIncomes = await db.get(STORAGE_KEYS.incomes);
-      setExpenses(savedExpenses || []);
-      setIncomes(savedIncomes || []);
+      try {
+        const [expensesData, incomesData] = await Promise.all([
+          expenses.getAll(),
+          incomes.getAll(),
+        ]);
+        setExpenses(expensesData || []);
+        setIncomes(incomesData || []);
+      } catch (error) {
+        console.error('Failed to load expenses/incomes:', error);
+      }
     }
     loadData();
   }, []);
@@ -6242,59 +6097,91 @@ function IncomeScreen({sales, purchases, upd}) {
     if (!expenseForm.title?.trim()) { alert('ব্যয়ের বিবরণ দিন'); return; }
     if (!expenseForm.amount || expenseForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
     
-    const newExpense = {
-      id: genId(),
-      date: new Date().toISOString(),
-      title: expenseForm.title.trim(),
-      amount: parseFloat(expenseForm.amount),
-      note: expenseForm.note || ''
-    };
-    
-    const updatedExpenses = [...expenses, newExpense];
-    setExpenses(updatedExpenses);
-    await db.set(STORAGE_KEYS.expenses, updatedExpenses);
-    
-    setExpenseForm({title:'',amount:'',note:''});
-    setShowExpenseForm(false);
-    alert('✅ ব্যয় সংরক্ষিত হয়েছে!');
+    try {
+      const result = await expenses.create({
+        title: expenseForm.title.trim(),
+        amount: parseFloat(expenseForm.amount),
+        note: expenseForm.note || ''
+      });
+      
+      if (result.success) {
+        // Reload expenses from API
+        const expensesData = await expenses.getAll();
+        setExpenses(expensesData || []);
+        
+        setExpenseForm({title:'',amount:'',note:''});
+        setShowExpenseForm(false);
+        alert('✅ ব্যয় সংরক্ষিত হয়েছে!');
+      } else {
+        alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to save expense:', error);
+      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+    }
   };
 
   // Delete expense
   const deleteExpense = async (id) => {
     if (!confirm('এই ব্যয় মুছে ফেলবেন?')) return;
-    const updatedExpenses = expenses.filter(e => e.id !== id);
-    setExpenses(updatedExpenses);
-    await db.set(STORAGE_KEYS.expenses, updatedExpenses);
+    try {
+      const result = await expenses.delete(id);
+      if (result.success) {
+        const expensesData = await expenses.getAll();
+        setExpenses(expensesData || []);
+      } else {
+        alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to delete expense:', error);
+      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+    }
   };
 
-  // Save income to IndexedDB
+  // Save income to MySQL
   const saveIncome = async () => {
     if (!incomeForm.title?.trim()) { alert('আয়ের বিবরণ দিন'); return; }
     if (!incomeForm.amount || incomeForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
     
-    const newIncome = {
-      id: genId(),
-      date: new Date().toISOString(),
-      title: incomeForm.title.trim(),
-      amount: parseFloat(incomeForm.amount),
-      note: incomeForm.note || ''
-    };
-    
-    const updatedIncomes = [...incomes, newIncome];
-    setIncomes(updatedIncomes);
-    await db.set(STORAGE_KEYS.incomes, updatedIncomes);
-    
-    setIncomeForm({title:'',amount:'',note:''});
-    setShowIncomeForm(false);
-    alert('✅ আয় সংরক্ষিত হয়েছে!');
+    try {
+      const result = await incomes.create({
+        title: incomeForm.title.trim(),
+        amount: parseFloat(incomeForm.amount),
+        note: incomeForm.note || ''
+      });
+      
+      if (result.success) {
+        // Reload incomes from API
+        const incomesData = await incomes.getAll();
+        setIncomes(incomesData || []);
+        
+        setIncomeForm({title:'',amount:'',note:''});
+        setShowIncomeForm(false);
+        alert('✅ আয় সংরক্ষিত হয়েছে!');
+      } else {
+        alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to save income:', error);
+      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+    }
   };
 
   // Delete income
   const deleteIncome = async (id) => {
     if (!confirm('এই আয় মুছে ফেলবেন?')) return;
-    const updatedIncomes = incomes.filter(i => i.id !== id);
-    setIncomes(updatedIncomes);
-    await db.set(STORAGE_KEYS.incomes, updatedIncomes);
+    try {
+      const result = await incomes.delete(id);
+      if (result.success) {
+        const incomesData = await incomes.getAll();
+        setIncomes(incomesData || []);
+      } else {
+        alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Failed to delete income:', error);
+      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+    }
   };
 
   const periods = [
@@ -7741,22 +7628,32 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({ email: '', password: '', name: '', role: 'admin' });
 
-  // Load users from IndexedDB
+  // Load users from MySQL API
   useEffect(() => {
     async function loadUsers() {
-      const savedUsers = await db.get(STORAGE_KEYS.users);
-      setUsers(savedUsers || []);
+      try {
+        const userList = await users.getAll();
+        setUsers(userList || []);
+      } catch (error) {
+        console.error('Failed to load users:', error);
+      }
     }
     loadUsers();
   }, []);
 
-  const currentUser = db.get(STORAGE_KEYS.auth);
+  const currentUser = getUser();
   const isSuperAdmin = currentUser?.role === 'super_admin';
 
   const save = async () => {
-    await upd.settings(form);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    try {
+      await settings.update(form);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+      alert('✅ সেটিংস সংরক্ষিত হয়েছে!');
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      alert('❌ সেটিংস সংরক্ষণ ব্যর্থ হয়েছে!');
+    }
   };
 
   const tabs = [
@@ -7783,24 +7680,41 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
       alert('সব তথ্য পূরণ করুন!');
       return;
     }
-    if (editingUser) {
-      const updated = users.map(u => u.id === editingUser.id ? { ...u, ...userForm } : u);
-      setUsers(updated);
-      await db.set(STORAGE_KEYS.users, updated);
-    } else {
-      const newUser = { ...userForm, id: genId() };
-      const updated = [...users, newUser];
-      setUsers(updated);
-      await db.set(STORAGE_KEYS.users, updated);
+    try {
+      if (editingUser) {
+        const result = await users.update({ ...editingUser, ...userForm });
+        if (result.success) {
+          const userList = await users.getAll();
+          setUsers(userList || []);
+        }
+      } else {
+        const result = await users.create(userForm);
+        if (result.success) {
+          const userList = await users.getAll();
+          setUsers(userList || []);
+        }
+      }
+      setShowUserModal(false);
+      alert('✅ ইউজার সংরক্ষিত হয়েছে!');
+    } catch (error) {
+      console.error('Failed to save user:', error);
+      alert('❌ ইউজার সংরক্ষণ ব্যর্থ হয়েছে!');
     }
-    setShowUserModal(false);
   };
 
   const deleteUser = async (id) => {
     if (confirm('এই ইউজার মুছে ফেলতে চান?')) {
-      const updated = users.filter(u => u.id !== id);
-      setUsers(updated);
-      await db.set(STORAGE_KEYS.users, updated);
+      try {
+        const result = await users.delete(id);
+        if (result.success) {
+          const userList = await users.getAll();
+          setUsers(userList || []);
+          alert('✅ ইউজার মুছা হয়েছে!');
+        }
+      } catch (error) {
+        console.error('Failed to delete user:', error);
+        alert('❌ ইউজার মুছে ফেলতে ব্যর্থ!');
+      }
     }
   };
 
@@ -9239,15 +9153,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                 {[
-                  { l: '📦 পণ্য ডেটা', c: products.length, btn: 'সব পণ্য মুছে ফেলুন', fn: () => { if(confirm('সব পণ্য মুছে ফেলবেন?')) { upd.products([]); alert('পণ্য মুছা হয়েছে।'); } } },
-                  { l: '🏢 কোম্পানি ডেটা', c: suppliers.length, btn: 'সব সরবরাহকারী মুছে ফেলুন', fn: () => { if(confirm('সব সরবরাহকারী মুছে ফেলবেন?')) { upd.suppliers([]); alert('কোম্পানি মুছা হয়েছে।'); } } },
-                  { l: '📂 ক্যাটাগরি ডেটা', c: categories.length, btn: 'সব ক্যাটাগরি মুছে ফেলুন', fn: () => { if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { upd.categories([]); alert('ক্যাটাগরি মুছা হয়েছে।'); } } },
-                  { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { upd.sales([]); alert('বিক্রয় মুছা হয়েছে।'); } } },
-                  { l: '💰 পণ্যের ক্রয়-বিক্রয় দাম পূর্ণ-নির্ধারণ', c: productHistory.filter(h => h.type === 'price_buy' || h.type === 'price_sell').length, btn: 'সব দাম হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('সব দাম হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory(productHistory.filter(h => h.type !== 'price_buy' && h.type !== 'price_sell')); alert('দাম হিস্ট্রি মুছা হয়েছে।'); } } },
-                  { l: '📊 স্টক কমানো-বাড়ানো ডেটা', c: productHistory.filter(h => h.type === 'stock').length, btn: 'স্টক হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('স্টক হিস্ট্রি মুছে ফেলবেন?')) { upd.productHistory(productHistory.filter(h => h.type !== 'stock')); alert('স্টক হিস্ট্রি মুছা হয়েছে।'); } } },
-                  { l: '👥 কাস্টমার ডেটা', c: customers.length, btn: 'সব কাস্টমার মুছে ফেলুন', fn: () => { if(confirm('সব কাস্টমার মুছে ফেলবেন?')) { upd.customers([]); alert('কাস্টমার মুছা হয়েছে।'); } } },
-                  { l: '🛒 পারচেজ হিস্ট্রি', c: purchases.length, btn: 'সব পারচেজ হিস্ট্রি মুছে ফেলুন', fn: () => { if(confirm('সব পারচেজ হিস্ট্রি মুছে ফেলবেন?')) { upd.purchases([]); alert('পারচেজ হিস্ট্রি মুছা হয়েছে।'); } } },
-                  { l: '👤 সকল ইউজার (সুপার এডমিন ছাড়া)', c: users.length, btn: 'সব ইউজার মুছে ফেলুন', fn: async () => { if(confirm('সুপার এডমিন ছাড়া সব ইউজার মুছে ফেলবেন?')) { setUsers([]); await db.set(STORAGE_KEYS.users, []); alert('সব ইউজার মুছা হয়েছে।'); } } },
+                  { l: '📦 পণ্য ডেটা', c: products.length, btn: 'সব পণ্য মুছে ফেলুন', fn: async () => { if(confirm('সব পণ্য মুছে ফেলবেন?')) { for(const p of products) { await products.delete(p.id); } await refreshData(); alert('পণ্য মুছা হয়েছে।'); } } },
+                  { l: '🏢 কোম্পানি ডেটা', c: suppliers.length, btn: 'সব সরবরাহকারী মুছে ফেলুন', fn: async () => { if(confirm('সব সরবরাহকারী মুছে ফেলবেন?')) { for(const s of suppliers) { await suppliers.delete(s.id); } await refreshData(); alert('কোম্পানি মুছা হয়েছে।'); } } },
+                  { l: '📂 ক্যাটাগরি ডেটা', c: categories.length, btn: 'সব ক্যাটাগরি মুছে ফেলুন', fn: async () => { if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { for(const c of categories) { await categories.delete(c.id); } await refreshData(); alert('ক্যাটাগরি মুছা হয়েছে।'); } } },
+                  { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: async () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { for(const s of sales) { await sales.delete(s.id); } await refreshData(); alert('বিক্রয় মুছা হয়েছে।'); } } },
+                  { l: '👥 কাস্টমার ডেটা', c: customers.length, btn: 'সব কাস্টমার মুছে ফেলুন', fn: async () => { if(confirm('সব কাস্টমার মুছে ফেলবেন?')) { for(const c of customers) { await customers.delete(c.id); } await refreshData(); alert('কাস্টমার মুছা হয়েছে।'); } } },
+                  { l: '🛒 পারচেজ হিস্ট্রি', c: purchases.length, btn: 'সব পারচেজ হিস্ট্রি মুছে ফেলুন', fn: async () => { if(confirm('সব পারচেজ হিস্ট্রি মুছে ফেলবেন?')) { for(const p of purchases) { await purchases.delete(p.id); } await refreshData(); alert('পারচেজ হিস্ট্রি মুছা হয়েছে।'); } } },
+                  { l: '👤 সকল ইউজার (সুপার এডমিন ছাড়া)', c: users.length, btn: 'সব ইউজার মুছে ফেলুন', fn: async () => { if(confirm('সুপার এডমিন ছাড়া সব ইউজার মুছে ফেলবেন?')) { for(const u of users) { await users.delete(u.id); } const userList = await users.getAll(); setUsers(userList); alert('সব ইউজার মুছা হয়েছে।'); } } },
                 ].map((d, i) => (
                   <div key={i} style={{
                     padding: 24,
@@ -9289,7 +9201,16 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <button
                   onClick={async () => {
                     if(confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                      await db.clearAll();
+                      // Delete all data from MySQL
+                      for(const p of products) { await products.delete(p.id); }
+                      for(const c of customers) { await customers.delete(c.id); }
+                      for(const s of suppliers) { await suppliers.delete(s.id); }
+                      for(const cat of categories) { await categories.delete(cat.id); }
+                      for(const s of sales) { await sales.delete(s.id); }
+                      for(const p of purchases) { await purchases.delete(p.id); }
+                      for(const u of users) { await users.delete(u.id); }
+                      // Clear local storage
+                      clearAuth();
                       alert('সব ডেটা মুছা হয়েছে।');
                       window.location.reload();
                     }

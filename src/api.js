@@ -1,30 +1,44 @@
 /**
- * API Service
- * POS System - Connects to PHP Backend
+ * API Service - POS System
+ * All business data is stored in MySQL via PHP API
+ * ONLY auth token and UI preferences are stored in localStorage
  */
 
-// API Base URL - Change this to your server URL
+// API Base URL
 const API_BASE = '/api';
 
-/**
- * Get stored token
- */
-const getToken = () => localStorage.getItem('pos_token');
+// ============================================================================
+// AUTH STORAGE (Only auth-related data allowed in localStorage)
+// ============================================================================
 
-/**
- * Set auth token
- */
-const setToken = (token) => {
-  if (token) {
-    localStorage.setItem('pos_token', token);
-  } else {
-    localStorage.removeItem('pos_token');
-  }
+const AUTH_TOKEN_KEY = 'pos_auth_token';
+const AUTH_USER_KEY = 'pos_auth_user';
+
+export const getToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
+export const setToken = (token) => {
+  if (token) localStorage.setItem(AUTH_TOKEN_KEY, token);
+  else localStorage.removeItem(AUTH_TOKEN_KEY);
 };
 
-/**
- * API request wrapper
- */
+export const getUser = () => {
+  const user = localStorage.getItem(AUTH_USER_KEY);
+  return user ? JSON.parse(user) : null;
+};
+
+export const setUser = (user) => {
+  if (user) localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  else localStorage.removeItem(AUTH_USER_KEY);
+};
+
+export const clearAuth = () => {
+  setToken(null);
+  setUser(null);
+};
+
+// ============================================================================
+// API REQUEST WRAPPER
+// ============================================================================
+
 async function api(endpoint, options = {}) {
   const url = `${API_BASE}/${endpoint}`;
   const token = getToken();
@@ -48,8 +62,7 @@ async function api(endpoint, options = {}) {
     
     if (!response.ok) {
       if (response.status === 401) {
-        // Token expired or invalid
-        setToken(null);
+        clearAuth();
         window.location.reload();
       }
       throw new Error(data.error || 'Request failed');
@@ -62,9 +75,10 @@ async function api(endpoint, options = {}) {
   }
 }
 
-/**
- * Auth API
- */
+// ============================================================================
+// AUTH API
+// ============================================================================
+
 export const auth = {
   async login(email, password) {
     const data = await api('auth.php', {
@@ -74,7 +88,7 @@ export const auth = {
     
     if (data.success && data.data.token) {
       setToken(data.data.token);
-      localStorage.setItem('pos_user', JSON.stringify(data.data.user));
+      setUser(data.data.user);
     }
     
     return data;
@@ -86,32 +100,25 @@ export const auth = {
     } catch (e) {
       // Ignore errors
     }
-    setToken(null);
-    localStorage.removeItem('pos_user');
+    clearAuth();
   },
   
   async check() {
     try {
-      const data = await api('auth.php');
-      return data;
+      return await api('auth.php');
     } catch {
       return { success: false };
     }
   },
   
-  getUser() {
-    const user = localStorage.getItem('pos_user');
-    return user ? JSON.parse(user) : null;
-  },
-  
-  isAuthenticated() {
-    return !!getToken();
-  },
+  getUser,
+  isAuthenticated: () => !!getToken(),
 };
 
-/**
- * Products API
- */
+// ============================================================================
+// PRODUCTS API
+// ============================================================================
+
 export const products = {
   async getAll(search = '', category = '') {
     const params = new URLSearchParams();
@@ -123,27 +130,28 @@ export const products = {
   },
   
   async create(product) {
-    return api('products.php', {
+    return await api('products.php', {
       method: 'POST',
       body: JSON.stringify(product),
     });
   },
   
   async update(product) {
-    return api('products.php', {
+    return await api('products.php', {
       method: 'PUT',
       body: JSON.stringify(product),
     });
   },
   
   async delete(id) {
-    return api(`products.php?id=${id}`, { method: 'DELETE' });
+    return await api(`products.php?id=${id}`, { method: 'DELETE' });
   },
 };
 
-/**
- * Customers API
- */
+// ============================================================================
+// CUSTOMERS API
+// ============================================================================
+
 export const customers = {
   async getAll(search = '') {
     const query = search ? `?search=${encodeURIComponent(search)}` : '';
@@ -152,27 +160,28 @@ export const customers = {
   },
   
   async create(customer) {
-    return api('customers.php', {
+    return await api('customers.php', {
       method: 'POST',
       body: JSON.stringify(customer),
     });
   },
   
   async update(customer) {
-    return api('customers.php', {
+    return await api('customers.php', {
       method: 'PUT',
       body: JSON.stringify(customer),
     });
   },
   
   async delete(id) {
-    return api(`customers.php?id=${id}`, { method: 'DELETE' });
+    return await api(`customers.php?id=${id}`, { method: 'DELETE' });
   },
 };
 
-/**
- * Sales API
- */
+// ============================================================================
+// SALES API
+// ============================================================================
+
 export const sales = {
   async getAll(date = '', from = '', to = '') {
     const params = new URLSearchParams();
@@ -185,20 +194,21 @@ export const sales = {
   },
   
   async create(sale) {
-    return api('sales.php', {
+    return await api('sales.php', {
       method: 'POST',
       body: JSON.stringify(sale),
     });
   },
   
   async delete(id) {
-    return api(`sales.php?id=${id}`, { method: 'DELETE' });
+    return await api(`sales.php?id=${id}`, { method: 'DELETE' });
   },
 };
 
-/**
- * Purchases API
- */
+// ============================================================================
+// PURCHASES API
+// ============================================================================
+
 export const purchases = {
   async getAll(from = '', to = '') {
     const params = new URLSearchParams();
@@ -210,20 +220,21 @@ export const purchases = {
   },
   
   async create(purchase) {
-    return api('purchases.php', {
+    return await api('purchases.php', {
       method: 'POST',
       body: JSON.stringify(purchase),
     });
   },
   
   async delete(id) {
-    return api(`purchases.php?id=${id}`, { method: 'DELETE' });
+    return await api(`purchases.php?id=${id}`, { method: 'DELETE' });
   },
 };
 
-/**
- * Suppliers API
- */
+// ============================================================================
+// SUPPLIERS API
+// ============================================================================
+
 export const suppliers = {
   async getAll(search = '') {
     const query = search ? `?search=${encodeURIComponent(search)}` : '';
@@ -232,27 +243,28 @@ export const suppliers = {
   },
   
   async create(supplier) {
-    return api('suppliers.php', {
+    return await api('suppliers.php', {
       method: 'POST',
       body: JSON.stringify(supplier),
     });
   },
   
   async update(supplier) {
-    return api('suppliers.php', {
+    return await api('suppliers.php', {
       method: 'PUT',
       body: JSON.stringify(supplier),
     });
   },
   
   async delete(id) {
-    return api(`suppliers.php?id=${id}`, { method: 'DELETE' });
+    return await api(`suppliers.php?id=${id}`, { method: 'DELETE' });
   },
 };
 
-/**
- * Categories API
- */
+// ============================================================================
+// CATEGORIES API
+// ============================================================================
+
 export const categories = {
   async getAll() {
     const data = await api('categories.php');
@@ -260,29 +272,30 @@ export const categories = {
   },
   
   async create(category) {
-    return api('categories.php', {
+    return await api('categories.php', {
       method: 'POST',
       body: JSON.stringify(category),
     });
   },
   
   async update(category) {
-    return api('categories.php', {
+    return await api('categories.php', {
       method: 'PUT',
       body: JSON.stringify(category),
     });
   },
   
   async delete(id) {
-    return api(`categories.php?id=${id}`, { method: 'DELETE' });
+    return await api(`categories.php?id=${id}`, { method: 'DELETE' });
   },
 };
 
-/**
- * Expenses API
- */
+// ============================================================================
+// EXPENSES API
+// ============================================================================
+
 export const expenses = {
-  async getExpenses(from = '', to = '') {
+  async getAll(from = '', to = '') {
     const params = new URLSearchParams({ type: 'expenses' });
     if (from) params.append('from', from);
     if (to) params.append('to', to);
@@ -291,22 +304,23 @@ export const expenses = {
   },
   
   async create(expense) {
-    return api('expenses.php?type=expenses', {
+    return await api('expenses.php?type=expenses', {
       method: 'POST',
       body: JSON.stringify(expense),
     });
   },
   
   async delete(id) {
-    return api(`expenses.php?type=expenses&id=${id}`, { method: 'DELETE' });
+    return await api(`expenses.php?type=expenses&id=${id}`, { method: 'DELETE' });
   },
 };
 
-/**
- * Incomes API
- */
+// ============================================================================
+// INCOMES API
+// ============================================================================
+
 export const incomes = {
-  async getIncomes(from = '', to = '') {
+  async getAll(from = '', to = '') {
     const params = new URLSearchParams({ type: 'incomes' });
     if (from) params.append('from', from);
     if (to) params.append('to', to);
@@ -315,20 +329,21 @@ export const incomes = {
   },
   
   async create(income) {
-    return api('expenses.php?type=incomes', {
+    return await api('expenses.php?type=incomes', {
       method: 'POST',
       body: JSON.stringify(income),
     });
   },
   
   async delete(id) {
-    return api(`expenses.php?type=incomes&id=${id}`, { method: 'DELETE' });
+    return await api(`expenses.php?type=incomes&id=${id}`, { method: 'DELETE' });
   },
 };
 
-/**
- * Settings API
- */
+// ============================================================================
+// SETTINGS API
+// ============================================================================
+
 export const settings = {
   async get() {
     const data = await api('settings.php');
@@ -336,16 +351,17 @@ export const settings = {
   },
   
   async update(settingsData) {
-    return api('settings.php', {
+    return await api('settings.php', {
       method: 'POST',
       body: JSON.stringify(settingsData),
     });
   },
 };
 
-/**
- * Users API
- */
+// ============================================================================
+// USERS API
+// ============================================================================
+
 export const users = {
   async getAll() {
     const data = await api('users.php');
@@ -353,23 +369,53 @@ export const users = {
   },
   
   async create(user) {
-    return api('users.php', {
+    return await api('users.php', {
       method: 'POST',
       body: JSON.stringify(user),
     });
   },
   
   async update(user) {
-    return api('users.php', {
+    return await api('users.php', {
       method: 'PUT',
       body: JSON.stringify(user),
     });
   },
   
   async delete(id) {
-    return api(`users.php?id=${id}`, { method: 'DELETE' });
+    return await api(`users.php?id=${id}`, { method: 'DELETE' });
   },
 };
 
-// Export API base for direct access
-export { API_BASE, api, getToken, setToken };
+// ============================================================================
+// DATA LOADER - Load all initial data from MySQL
+// ============================================================================
+
+export async function loadAllData() {
+  try {
+    const [productsData, customersData, salesData, settingsData, suppliersData, categoriesData] = await Promise.all([
+      products.getAll(),
+      customers.getAll(),
+      sales.getAll(),
+      settings.get(),
+      suppliers.getAll(),
+      categories.getAll(),
+    ]);
+    
+    return {
+      products: productsData,
+      customers: customersData,
+      sales: salesData,
+      settings: settingsData,
+      suppliers: suppliersData,
+      categories: categoriesData,
+    };
+  } catch (error) {
+    console.error('Failed to load data:', error);
+    throw error;
+  }
+}
+
+// Export for direct access
+export { API_BASE };
+
