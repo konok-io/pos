@@ -6402,8 +6402,11 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                   });
                   html += `</tbody>
 </table>
+<div style="border-top:1px dashed #000;margin-top:6px;padding-top:6px;">
 <div class="row"><span>মূল্য:</span><span>৳${grandTotal.toFixed(2)}</span></div>
 ${showVat ? '<div class="row"><span>ভ্যাট (১৫%):</span><span>৳' + vatAmount.toFixed(2) + '</span></div>' : ''}
+${showVat ? '<div style="border-top:1px solid #000;margin-top:4px;padding-top:4px;" class="total row"><span>মোট:</span><span>৳' + (grandTotal + vatAmount).toFixed(2) + '</span></div>' : ''}
+</div>
 <div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
