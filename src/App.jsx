@@ -4035,7 +4035,10 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           <div style={{display:'flex',gap:8,marginBottom:16}}>
             <button style={btn('primary')} onClick={()=>setShowPurchaseHistory(viewSupplier)}>📋 পারচেজ হিস্ট্রি</button>
             {!viewSupplier.isAuto && (
-              <button style={btn()} onClick={()=>{setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️ সম্পাদনা</button>
+              <>
+                <button style={btn()} onClick={()=>{setForm({...viewSupplier});setModal({mode:'edit',id:viewSupplier.id});}}>✏️ সম্পাদনা</button>
+                <button style={btn('danger')} onClick={()=>del(viewSupplier.id)}>🗑️ মুছুন</button>
+              </>
             )}
           </div>
 
@@ -4233,10 +4236,15 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       {/* COMPANIES TAB */}
         {activeTab === 'companies' && (
           <div style={{...card,marginBottom:16,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 180px)'}}>
+              {/* Header with Action Buttons */}
+              <div style={{padding:'12px 16px',borderBottom:`1px solid ${T.gray200}`,background:T.gray50,display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
+                <button onClick={()=>{setForm({});setModal({mode:'add'});}} style={{...btn('primary'),fontSize:13,padding:'8px 16px'}}>➕ নতুন কোম্পানি</button>
+                <div style={{marginLeft:'auto',fontSize:12,color:T.gray500}}>{filtered.length}টি কোম্পানি</div>
+              </div>
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
-                    {['কোম্পানি কোড','কোম্পানির নাম','ফোন','ঠিকানা','পণ্য সংখ্যা',''].map((h,i)=>(
+                    {['কোম্পানি কোড','কোম্পানির নাম','ফোন','ঠিকানা','পণ্য সংখ্যা'].map((h,i)=>(
                       <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
@@ -4246,23 +4254,14 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                   <tbody>
                     {filtered.length === 0 ? (
-                      <tr><td colSpan={6} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
+                      <tr><td colSpan={5} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো কোম্পানি পাওয়া যায়নি</td></tr>
                     ) : filtered.map((s,i)=>(
-                      <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewSupplier(s)}>
                         <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{s.code||'-'}</td>
                         <td style={{padding:'10px 12px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.name}</td>
                         <td style={{padding:'10px 12px',fontSize:12,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.phone||'-'}</td>
                         <td style={{padding:'10px 12px',fontSize:12,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.address||'-'}</td>
                         <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{getProductsCount(s.name)}</td>
-                        <td style={{padding:'10px 12px',whiteSpace:'nowrap'}}>
-                          <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
-                          {!s.isAuto && (
-                            <>
-                              <button onClick={()=>{setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('ghost'),padding:'4px 6px'}}>✏️</button>
-                              <button onClick={()=>del(s.id)} style={{...btn('danger'),padding:'4px 6px'}}>🗑️</button>
-                            </>
-                          )}
-                        </td>
                       </tr>
                     ))}
                   </tbody>
