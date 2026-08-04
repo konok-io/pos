@@ -2464,18 +2464,11 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
-                      const iframe = document.createElement('iframe');
-                      iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-                      document.body.appendChild(iframe);
-                      iframe.contentWindow.document.open();
-                      iframe.contentWindow.document.write(html);
-                      iframe.contentWindow.document.close();
-                      iframe.contentWindow.onload = function() {
-                        setTimeout(() => {
-                          iframe.contentWindow.print();
-                          document.body.removeChild(iframe);
-                        }, 100);
-                      };
+                      const win = window.open('', '', 'width=400,height=600');
+                      win.document.open();
+                      win.document.write(html);
+                      win.document.close();
+                      win.onload = function() { setTimeout(() => win.print(), 100); };
                     }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
                     <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px',fontSize:12}}>✕</button>
                   </div>
@@ -6642,68 +6635,7 @@ ${showVat ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4
                 {viewSale.phone && <div style={{fontSize:12,color:T.gray500,marginTop:2}}>📱 {viewSale.phone}</div>}
               </div>
               <div style={{display:'flex',gap:8}}>
-                <button onClick={()=>{
-                  const total = viewSale.total + (viewSale.vat||0);
-                  let html = `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Sale Receipt</title>
-<style>
-@page { size: 80mm auto; margin: 0; }
-* { margin:0; padding:0; box-sizing:border-box; }
-html { width: 80mm; }
-body { font-family:'Tiro Bangla','Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:11px; color:#000; background:#fff; }
-.center { text-align:center; }
-.border { border-bottom:1px dashed #000; padding-bottom:5px; margin-bottom:5px; }
-.row { display:flex; justify-content:space-between; margin:2px 0; }
-table { width:100%; border-collapse:collapse; font-size:10px; }
-th { border-bottom:1px dashed #000; padding:3px 0; text-align:left; }
-td { padding:3px 0; }
-td:nth-child(2) { text-align:center; }
-td:nth-child(3), td:nth-child(4) { text-align:right; }
-.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
-.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:5px; font-size:9px; }
-</style>
-</head>
-<body>
-<div class="center border">
-  <div style="font-size:14px;font-weight:bold;">🧾 Sale Receipt</div>
-  <div>#${viewSale.id.slice(-6).toUpperCase()}</div>
-  <div>${new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
-  <div>Customer: ${viewSale.custName}</div>
-  ${viewSale.phone ? '<div>Phone: '+viewSale.phone+'</div>' : ''}
-</div>
-<div style="border-top:1px dotted #000;margin:4px 0;"></div>
-<table>
-  <thead><tr style="border-bottom:1px dashed #000;"><th style="text-align:left;padding:3px 0;">পণ্য</th><th style="text-align:center;padding:3px 0;">পরিমাণ</th><th style="text-align:right;padding:3px 0;">দাম</th><th style="text-align:right;padding:3px 0;">মোট</th></tr></thead>
-  <tbody>`;
-                  (viewSale.items||[]).forEach(item => {
-                    html += `<tr><td>${item.name}<br><span style="font-size:9px;color:#666;">${item.company||''}</span></td><td style="text-align:center;">${item.qty} ${item.unit||'পিস'}</td><td style="text-align:right;">৳${item.sellP.toFixed(2)}</td><td style="text-align:right;">৳${(item.qty*item.sellP).toFixed(2)}</td></tr>`;
-                  });
-                  html += `</tbody>
-</table>
-<div class="total row"><span>সাবটোটাল:</span><span>৳${viewSale.total.toFixed(2)}</span></div>`;
-                  if(viewSale.vat > 0) html += `<div class="row"><span>VAT (${viewSale.vatRate}%):</span><span>৳${viewSale.vat.toFixed(2)}</span></div>`;
-                  html += `<div class="total row"><span>মোট:</span><span>৳${total.toFixed(2)}</span></div>
-<div class="row"><span>পরিশোধ:</span><span>৳${viewSale.paid.toFixed(2)}</span></div>`;
-                  if(viewSale.due > 0) html += `<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳${viewSale.due.toFixed(2)}</span></div>`;
-                  html += `<div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
-</body>
-</html>`;
-                  const iframe = document.createElement('iframe');
-                  iframe.style.cssText = 'position:absolute;width:0;height:0;border:none;top:-9999px;left:-9999px;';
-                  document.body.appendChild(iframe);
-                  iframe.contentWindow.document.open();
-                  iframe.contentWindow.document.write(html);
-                  iframe.contentWindow.document.close();
-                  iframe.contentWindow.onload = function() {
-                    setTimeout(() => {
-                      iframe.contentWindow.print();
-                      document.body.removeChild(iframe);
-                    }, 100);
-                  };
-                }} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>printReceipt({sale: viewSale, settings})} style={{...btn('primary'),padding:'6px 12px'}}>🖨️ প্রিন্ট</button>
                 <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'6px 12px'}}>✕</button>
               </div>
             </div>
