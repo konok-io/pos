@@ -2438,9 +2438,11 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </div>
 <div class="center border">
   <div style="font-size:14px;font-weight:bold;">📦 পারচেজ ইনভয়েস</div>
-  <div>${viewPurchase.id}</div>
+  <div>Invoice ID: ${viewPurchase.id}</div>
   <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-  <div>সরবরাহকারী: ${viewPurchase.supplier}</div>
+</div>
+<div class="center border">
+  <div style="font-weight:bold;">সরবরাহকারী: ${viewPurchase.supplier}</div>
   ${supplierCrDisplay}
   ${supplierVatDisplay}
   ${supplierAddressDisplay}
