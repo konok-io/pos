@@ -5373,7 +5373,7 @@ function CustomersScreen({customers, sales, upd}) {
 /* ═══════════════════════════════════════════
    INVENTORY SCREEN
 ═══════════════════════════════════════════ */
-function InventoryScreen({products, suppliers, productHistory, upd}) {
+function InventoryScreen({products, suppliers, productHistory, upd, currentUser}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
   const [adjQty, setAdjQty] = useState('');
@@ -5452,8 +5452,8 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
       oldValue: oldS,
       newValue: newS,
       change: change,
-      user: 'You',
-      userEmail: '',
+      user: currentUser?.name || 'Unknown',
+      userEmail: currentUser?.email || '',
       timestamp: new Date().toISOString(),
     };
     await upd.productHistory([...productHistory, newHistoryEntry]);
