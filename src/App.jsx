@@ -3113,7 +3113,11 @@ ${printFiltered.map(p => {
                     <td style={{padding:'10px 12px',display:'flex',gap:6,justifyContent:'center'}}>
                       <button style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setViewProduct(p)} title="দেখুন">👁️</button>
                       <button style={{...btn('primary','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setEditProduct({...p})} title="সম্পাদনা">✏️</button>
-                      <button style={{...btn('danger','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>del(p.id)} title="মুছুন">🗑️</button>
+                      {p.stock <= 0 ? (
+                        <button style={{...btn('danger','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>del(p.id)} title="মুছুন">🗑️</button>
+                      ) : (
+                        <button disabled style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14,opacity:0.4,cursor:'not-allowed'}} title="স্টক থাকলে মুছা যাবে না">🔒</button>
+                      )}
                     </td>
                   </tr>
                 );
