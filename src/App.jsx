@@ -7725,21 +7725,23 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({ email: '', password: '', name: '', role: 'admin' });
 
+  const currentUser = getUser();
+  const isSuperAdmin = currentUser?.role === 'super_admin';
+  
   // Load users from MySQL API
   useEffect(() => {
     async function loadUsers() {
       try {
         const userList = await users.getAll();
-        setUsers(userList || []);
+        // If not super admin, filter out super_admin from the list
+        const filteredList = isSuperAdmin ? (userList || []) : (userList || []).filter(u => u.role !== 'super_admin');
+        setUsers(filteredList);
       } catch (error) {
         console.error('Failed to load users:', error);
       }
     }
     loadUsers();
-  }, []);
-
-  const currentUser = getUser();
-  const isSuperAdmin = currentUser?.role === 'super_admin';
+  }, [isSuperAdmin]);
 
   const save = async () => {
     try {
@@ -7753,14 +7755,14 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     }
   };
 
-  // Super admin cannot manage users
+  // Super admin can see all tabs
   const baseTabs = [
     { icon: '⚙️', label: 'জেনারেল' },
     { icon: '🎨', label: 'ডিজাইন' },
     { icon: '📊', label: 'রিপোর্ট' },
     { icon: '💾', label: 'ডেটা' },
   ];
-  const tabs = isSuperAdmin ? baseTabs : [...baseTabs, { icon: '👥', label: 'ইউজার' }];
+  const tabs = isSuperAdmin ? [...baseTabs, { icon: '👥', label: 'ইউজার' }] : [...baseTabs, { icon: '👥', label: 'ইউজার' }];
 
   const openUserModal = (user = null) => {
     if (user) {
