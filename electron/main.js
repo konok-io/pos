@@ -64,6 +64,7 @@ function createMenu() {
     {
       label: 'File',
       submenu: [
+        { label: 'Hard Refresh', accelerator: 'CmdOrCtrl+Shift+R', click: () => mainWindow?.webContents.reloadIgnoringCache() },
         { label: 'Refresh App', accelerator: 'CmdOrCtrl+R', click: () => mainWindow?.reload() },
         { type: 'separator' },
         { label: 'Export Data', click: () => mainWindow?.webContents.send('menu-action', 'export') },
@@ -111,7 +112,8 @@ function createMenu() {
     {
       label: 'View',
       submenu: [
-        { role: 'reload', label: 'Reload' },
+        { label: 'Hard Refresh', accelerator: 'CmdOrCtrl+Shift+R', click: () => mainWindow?.webContents.reloadIgnoringCache() },
+        { role: 'reload', label: 'Refresh' },
         { role: 'forceReload', label: 'Force Reload' },
         { type: 'separator' },
         { role: 'resetZoom', label: 'Reset Zoom' },
