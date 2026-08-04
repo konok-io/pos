@@ -2599,7 +2599,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                       </div>
                     ))}
                     {supplierQ && !uniqueCompanies.some(c=>c && c.toLowerCase()===(supplierQ||'').toLowerCase()) && (
-                      <div onClick={()=>{setForm(f=>({...f,company:supplierQ}));setShowCompanyList(false);}}
+                      <div onClick={()=>{upd.suppliers([...suppliers,{id:genId(),name:supplierQ,phone:'',address:'',vatNumber:'',crNumber:''}]);setForm(f=>({...f,company:supplierQ}));setShowCompanyList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',background:T.tealLight,color:T.teal,fontWeight:600,borderTop:`1px solid ${T.gray200}`}}>
                         + নতুন কোম্পানি যুক্ত করুন: "{supplierQ}"
                       </div>
@@ -2610,7 +2610,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 
               {/* Supplier Info Display */}
               {(() => {
-                const sup = suppliers.find(s => s.name === form.company);
+                const sup = suppliers.find(s => (s.name||'').toLowerCase().trim() === (form.company||'').toLowerCase().trim());
                 if (!sup) return null;
                 const crNum = sup.crNumber;
                 const vatNum = sup.vatNumber;
