@@ -1161,10 +1161,10 @@ export default function App() {
 
   useEffect(() => {
     async function checkAuth() {
-      // Check if user is logged in from localStorage token
+      // Check if user is logged in from localStorage (user OR token)
       const user = getUser();
       const token = getToken();
-      if (user && token) {
+      if (user || token) {
         setCurrentUser(user);
         setIsLoggedIn(true);
       }
