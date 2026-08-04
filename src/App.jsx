@@ -151,7 +151,7 @@ function BannerImageUpload({ value, onChange }) {
 // All business data is stored in MySQL via PHP API
 // Only auth token and UI preferences are stored in localStorage
 import { 
-  auth, products, customers, sales, suppliers, categories, 
+  auth, products, customers, sales, suppliers as suppliersApi, categories as categoriesApi, 
   expenses, incomes, settings, users, loadAllData,
   getToken, setToken, getUser, setUser, clearAuth
 } from './api.js';
@@ -938,21 +938,21 @@ function MainApp({ currentUser, onLogout }) {
     // Suppliers
     suppliers: {
       add: async (supplier) => {
-        const result = await suppliers.create(supplier);
+        const result = await suppliersApi.create(supplier);
         if (result.success) {
           await refreshData();
         }
         return result;
       },
       update: async (supplier) => {
-        const result = await suppliers.update(supplier);
+        const result = await suppliersApi.update(supplier);
         if (result.success) {
           await refreshData();
         }
         return result;
       },
       delete: async (id) => {
-        const result = await suppliers.delete(id);
+        const result = await suppliersApi.delete(id);
         if (result.success) {
           await refreshData();
         }
@@ -963,21 +963,21 @@ function MainApp({ currentUser, onLogout }) {
     // Categories
     categories: {
       add: async (category) => {
-        const result = await categories.create(category);
+        const result = await categoriesApi.create(category);
         if (result.success) {
           await refreshData();
         }
         return result;
       },
       update: async (category) => {
-        const result = await categories.update(category);
+        const result = await categoriesApi.update(category);
         if (result.success) {
           await refreshData();
         }
         return result;
       },
       delete: async (id) => {
-        const result = await categories.delete(id);
+        const result = await categoriesApi.delete(id);
         if (result.success) {
           await refreshData();
         }
@@ -3804,7 +3804,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       return;
     }
     try {
-      const result = await suppliers.create({
+      const result = await suppliersApi.create({
         name: newSupplier.name.trim(),
         phone: newSupplier.phone || '',
         email: newSupplier.email || '',
@@ -4131,13 +4131,34 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         }
         
         // Save changes - only companies and categories
-        await upd.suppliers(newCompanies);
-        await upd.categories(newCategories);
+        const companiesAdded = newCompanies.length - suppliers.length;
+        const categoriesAdded = newCategories.length - categories.length;
+        
+        // Add each new company via API
+        for (let i = suppliers.length; i < newCompanies.length; i++) {
+          try {
+            await suppliersApi.create(newCompanies[i]);
+          } catch (e) {
+            errors.push(`সরবরাহকারী যুক্ত করতে ব্যর্থ: ${newCompanies[i].name}`);
+          }
+        }
+        
+        // Add each new category via API
+        for (let i = categories.length; i < newCategories.length; i++) {
+          try {
+            await categoriesApi.create(newCategories[i]);
+          } catch (e) {
+            errors.push(`ক্যাটাগরি যুক্ত করতে ব্যর্থ: ${newCategories[i].name}`);
+          }
+        }
+        
+        // Refresh data
+        await refreshData();
         
         // Show result
         const result = {
-          companies: newCompanies.length - suppliers.length,
-          categories: newCategories.length - categories.length,
+          companies: companiesAdded,
+          categories: categoriesAdded,
           products: 0,
           errors: errors.length,
           errorList: errors
@@ -9230,7 +9251,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                 {[
                   { l: '📦 পণ্য ডেটা', c: products.length, btn: 'সব পণ্য মুছে ফেলুন', fn: async () => { if(confirm('সব পণ্য মুছে ফেলবেন?')) { for(const p of products) { await products.delete(p.id); } await refreshData(); alert('পণ্য মুছা হয়েছে।'); } } },
-                  { l: '🏢 কোম্পানি ডেটা', c: suppliers.length, btn: 'সব সরবরাহকারী মুছে ফেলুন', fn: async () => { if(confirm('সব সরবরাহকারী মুছে ফেলবেন?')) { for(const s of suppliers) { await suppliers.delete(s.id); } await refreshData(); alert('কোম্পানি মুছা হয়েছে।'); } } },
+                  { l: '🏢 কোম্পানি ডেটা', c: suppliers.length, btn: 'সব সরবরাহকারী মুছে ফেলুন', fn: async () => { if(confirm('সব সরবরাহকারী মুছে ফেলবেন?')) { for(const s of suppliers) { await suppliersApi.delete(s.id); } await refreshData(); alert('কোম্পানি মুছা হয়েছে।'); } } },
                   { l: '📂 ক্যাটাগরি ডেটা', c: categories.length, btn: 'সব ক্যাটাগরি মুছে ফেলুন', fn: async () => { if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { for(const c of categories) { await categories.delete(c.id); } await refreshData(); alert('ক্যাটাগরি মুছা হয়েছে।'); } } },
                   { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: async () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { for(const s of sales) { await sales.delete(s.id); } await refreshData(); alert('বিক্রয় মুছা হয়েছে।'); } } },
                   { l: '👥 কাস্টমার ডেটা', c: customers.length, btn: 'সব কাস্টমার মুছে ফেলুন', fn: async () => { if(confirm('সব কাস্টমার মুছে ফেলবেন?')) { for(const c of customers) { await customers.delete(c.id); } await refreshData(); alert('কাস্টমার মুছা হয়েছে।'); } } },
@@ -9280,8 +9301,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       // Delete all data from MySQL
                       for(const p of products) { await products.delete(p.id); }
                       for(const c of customers) { await customers.delete(c.id); }
-                      for(const s of suppliers) { await suppliers.delete(s.id); }
-                      for(const cat of categories) { await categories.delete(cat.id); }
+                      for(const s of suppliers) { await suppliersApi.delete(s.id); }
+                      for(const cat of categories) { await categoriesApi.delete(cat.id); }
                       for(const s of sales) { await sales.delete(s.id); }
                       for(const p of purchases) { await purchases.delete(p.id); }
                       for(const u of users) { await users.delete(u.id); }
