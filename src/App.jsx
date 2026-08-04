@@ -2399,9 +2399,27 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
       if (!confirm('এই পণ্যটি মুছে ফেলবেন?')) return;
     }
     
-    // Delete product, its stock history, and price history
-    await upd.products(products.filter(p=>p.id!==id));
-    await upd.productHistory(productHistory.filter(h=>h.productId!==id));
+    // Save product deletion to history BEFORE deleting
+    const deletionEntry = {
+      id: genId(),
+      productId: product?.id,
+      productName: product?.name,
+      productCompany: product?.company || '',
+      productCat: product?.cat || '',
+      stockAtDeletion: product?.stock || 0,
+      type: 'product_delete',
+      source: 'product_delete',
+      user: currentUser?.name || 'Unknown',
+      userEmail: currentUser?.email || '',
+      timestamp: now(),
+    };
+    
+    // Delete product
+    const updatedProducts = products.filter(p=>p.id!==id);
+    await upd.products(updatedProducts);
+    
+    // Delete stock/price history for this product BUT keep deletion entry
+    await upd.productHistory([...productHistory.filter(h=>h.productId!==id), deletionEntry]);
   };
 
   // Purchase history view
@@ -5297,6 +5315,7 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
   const purchaseHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'purchase');
   const saleHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'sale');
   const manualHistory = productHistory.filter(h => h.type === 'stock' && h.source === 'manual');
+  const deleteHistory = productHistory.filter(h => h.type === 'product_delete');
 
   const adjust = async () => {
     const qty = parseInt(adjQty)||0;
@@ -5382,6 +5401,19 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
           fontSize:13,
         }}>
           🔧 ম্যানুয়াল স্টক পরিবর্তন ({manualHistory.length})
+        </button>
+        <button onClick={()=>setInvTab('deleted')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${invTab==='deleted'?T.teal:T.gray200}`,
+          background:invTab==='deleted'?T.teal:T.gray100,
+          color:invTab==='deleted'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
+          🗑️ পণ্য ডিলিট ({deleteHistory.length})
         </button>
       </div>
 
@@ -5516,6 +5548,45 @@ function InventoryScreen({products, suppliers, productHistory, upd}) {
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
                         {h.newValue}
                       </td>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <div style={{fontWeight:600}}>{h.user}</div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Product Delete Tab Content */}
+      {invTab === 'deleted' && (
+        <div style={{flex:1,overflow:'auto',padding:12}}>
+          <div style={{...card,overflow:'hidden'}}>
+            <div style={{padding:12,borderBottom:`1px solid ${T.gray200}`,fontWeight:700,background:T.gray50}}>🗑️ পণ্য ডিলিটের তালিকা</div>
+            {deleteHistory.length === 0 ? (
+              <div style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পণ্য ডিলিট করা হয়নি</div>
+            ) : (
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.redLight}}>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.red}}>তারিখ ও সময়</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.red}}>পণ্যের নাম</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.red}}>কোম্পানি</th>
+                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.red}}>ডিলিটের সময় স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.red}}>ব্যবহারকারী</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...deleteHistory].reverse().map((h,i)=>(
+                    <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        {new Date(h.timestamp).toLocaleString('bn-BD')}
+                      </td>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13,color:T.red}}>{h.productName}</td>
+                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{h.productCompany || '-'}</td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,color:T.orange}}>{h.stockAtDeletion || 0}</td>
                       <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
                         <div style={{fontWeight:600}}>{h.user}</div>
                       </td>
