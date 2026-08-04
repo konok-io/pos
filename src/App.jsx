@@ -4632,7 +4632,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 /* ═══════════════════════════════════════════
    NEW PRODUCT SCREEN
 ═══════════════════════════════════════════ */
-function NewProductScreen({products, suppliers, categories, purchases, upd, currentUser}) {
+function NewProductScreen({products, suppliers, categories, purchases, upd, currentUser, productHistory}) {
   const [purchaseItems, setPurchaseItems] = useState([]);
   const [supplierQ, setSupplierQ] = useState('');
   const [showCompanyList, setShowCompanyList] = useState(false);
