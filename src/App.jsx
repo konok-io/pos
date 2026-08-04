@@ -4457,23 +4457,23 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
 
         {/* CSV IMPORT TAB */}
         {activeTab === 'csv' && (
-          <div style={{...card,padding:24}}>
-            <h3 style={{margin:'0 0 16px',fontSize:16}}>📥 সিএসবি ইম্পোর্ট করুন</h3>
+          <div style={{...card,padding:32,textAlign:'center',maxWidth:600,margin:'0 auto'}}>
+            <h3 style={{margin:'0 0 20px',fontSize:18}}>📥 সিএসবি ইম্পোর্ট করুন</h3>
             <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
-            <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:16}}>
-              <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:14,padding:'10px 20px'}}>
+            <div style={{display:'flex',gap:12,justifyContent:'center',flexWrap:'wrap',marginBottom:24}}>
+              <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:14,padding:'12px 24px'}}>
                 📁 CSV ফাইল নির্বাচন করুন
               </label>
-              <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:14,padding:'10px 20px'}}>
+              <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:14,padding:'12px 24px'}}>
                 📥 ডেমো CSV ডাউনলোড
               </button>
             </div>
-            <div style={{fontSize:13,color:T.gray600,lineHeight:1.8}}>
+            <div style={{fontSize:13,color:T.gray600,lineHeight:1.8,textAlign:'left'}}>
               <div style={{fontWeight:600,marginBottom:8}}>CSV কলাম (Header):</div>
-              <code style={{background:T.gray50,padding:'8px 12px',borderRadius:8,display:'block',marginBottom:12}}>
+              <code style={{background:T.gray50,padding:'10px 14px',borderRadius:8,display:'block',marginBottom:16}}>
                 পণ্যের নাম, সরবরাহকারী কোড, কোম্পানি, ক্যাটাগরি, বারকোড, একক, ক্রয়মূল্য, বিক্রয়মূল্য, স্টক, মিনস্টক
               </code>
-              <div style={{marginTop:12}}>
+              <div style={{marginTop:16}}>
                 <div style={{fontWeight:600,marginBottom:8}}>নিয়মাবলী:</div>
                 <div>✅ কোম্পানি ও ক্যাটাগরি ডুপ্লিকেট হবে না</div>
                 <div>✅ সরবরাহকারী কোড খালি রাখলে অটো তৈরি হবে</div>
@@ -4481,7 +4481,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               </div>
             </div>
             {csvImportResult && (
-              <div style={{marginTop:16,padding:16,background:T.tealLight,borderRadius:8}}>
+              <div style={{marginTop:20,padding:16,background:T.tealLight,borderRadius:8,textAlign:'left'}}>
                 <div style={{fontWeight:600,color:T.teal,marginBottom:8}}>✅ সর্বশেষ আমদানি ফলাফল:</div>
                 <div>🏢 নতুন সরবরাহকারী: {csvImportResult.companies}টি</div>
                 <div>📂 নতুন ক্যাটাগরি: {csvImportResult.categories}টি</div>
