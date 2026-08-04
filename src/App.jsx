@@ -2267,10 +2267,15 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
     const savedCount = purchaseItems.length;
     const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
     
+    // Get supplier VAT number
+    const supplierObj = suppliers.find(s => s.name === form.company);
+    const supplierVatNumber = supplierObj?.vatNumber || '';
+    
     const purchase = {
       id: purchaseId,
       date: now(),
       supplier: form.company || 'সাধারণ',
+      supplierVatNumber: supplierVatNumber,
       items: purchaseItems,
       totalItems: purchaseItems.length,
       totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
@@ -2303,7 +2308,7 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
     // Prepare new supplier if needed
     let newSupplierArr = null;
     if (form.company && !suppliers.find(s => s.name === form.company)) {
-      const newSupplier = { id: genId(), name: form.company, phone: '', address: '' };
+      const newSupplier = { id: genId(), name: form.company, phone: '', address: '', vatNumber: '' };
       newSupplierArr = [...suppliers, newSupplier];
     }
 
@@ -2374,16 +2379,23 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
                     <div style={{fontWeight:800,fontSize:18,color:T.teal}}>{viewPurchase.id}</div>
                     <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
                     <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
+                    {viewPurchase.supplierVatNumber && (
+                      <div style={{fontSize:12,marginTop:4,fontWeight:600,color:T.orange}}>🧾 সরবরাহকারী VAT: {viewPurchase.supplierVatNumber}</div>
+                    )}
                   </div>
                   <div style={{display:'flex',gap:8,alignItems:'flex-start'}}>
                     <button onClick={()=>{
                       const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
+                      const vatRate = settings?.vatPercent || 15;
+                      const vatAmount = grandTotal * vatRate / 100;
+                      const totalWithVat = grandTotal + vatAmount;
+                      const supplierVatDisplay = viewPurchase.supplierVatNumber ? `<div style="margin-top:3px;"><strong>সরবরাহকারী VAT: ${viewPurchase.supplierVatNumber}</strong></div>` : '';
                       let html = `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
-<title>পারচেজ হিস্ট্রি</title>
+<title>পারচেজ ইনভয়েস</title>
 <style>
 @page { size: 80mm auto; margin: 0; }
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -2403,10 +2415,12 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </head>
 <body>
 <div class="center border">
-  <div style="font-size:14px;font-weight:bold;">📦 পারচেজ হিস্ট্রি</div>
+  <div style="font-size:14px;font-weight:bold;">📦 পারচেজ ইনভয়েস</div>
   <div>${viewPurchase.id}</div>
   <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
   <div>সরবরাহকারী: ${viewPurchase.supplier}</div>
+  ${supplierVatDisplay}
+  ${settings?.taxId ? '<div style="margin-top:3px;"><strong>ক্রেতার VAT: ' + settings.taxId + '</strong></div>' : ''}
 </div>
 <table>
   <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
@@ -2419,6 +2433,8 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                       html += `</tbody>
 </table>
 <div class="total row"><span>সর্বমোট:</span><span>৳${grandTotal.toFixed(2)}</span></div>
+<div class="row"><span>ভ্যাট (${vatRate}%):</span><span>৳${vatAmount.toFixed(2)}</span></div>
+<div class="total row"><span>মোট (ভ্যাট সহ):</span><span>৳${totalWithVat.toFixed(2)}</span></div>
 <div class="footer">ধন্যবাদ<br>${new Date().toLocaleDateString('bn-BD')}</div>
 </body>
 </html>`;
@@ -3688,13 +3704,13 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     
     if (form.isAuto) {
       // Convert auto to real supplier
-      const newS = { id: genId(), code: newCode, name: form.name.trim(), phone: form.phone||'', address: form.address||'' };
+      const newS = { id: genId(), code: newCode, name: form.name.trim(), phone: form.phone||'', address: form.address||'', vatNumber: form.vatNumber||'' };
       await upd.suppliers([...suppliers, newS]);
-      setForm({name:'',phone:'',address:'',isAuto:false});
+      setForm({name:'',phone:'',address:'',vatNumber:'',isAuto:false});
       alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
     } else if (modal.mode === 'add') {
-      await upd.suppliers([...suppliers, {...form, id: genId(), code: newCode}]);
-      setForm({name:'',phone:'',address:'',isAuto:false,code:''});
+      await upd.suppliers([...suppliers, { ...form, id: genId(), code: newCode }]);
+      setForm({name:'',phone:'',address:'',vatNumber:'',isAuto:false,code:''});
       alert(`✅ কোম্পানি যোগ করা হয়েছে!\nকোম্পানি কোড: ${newCode}`);
     } else {
       await upd.suppliers(suppliers.map(s => s.id === modal.id ? {...form, id: modal.id} : s));
@@ -3981,6 +3997,14 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           {viewSupplier.code && <span style={{fontSize:12,color:T.teal,fontWeight:600,marginLeft:8}}>{viewSupplier.code}</span>}
         </div>
         <div style={{flex:1,overflow:'auto',padding:12}}>
+          {/* VAT Number Banner - Important for Input Tax Credit */}
+          {viewSupplier.vatNumber && (
+            <div style={{padding:'12px 16px',background:'linear-gradient(135deg, #059669 0%, #047857 100%)',borderRadius:10,marginBottom:16,color:T.white}}>
+              <div style={{fontSize:12,fontWeight:600,opacity:0.9}}>🧾 সরবরাহকারীর VAT নম্বর</div>
+              <div style={{fontSize:18,fontWeight:800,marginTop:4,letterSpacing:'1px'}}>{viewSupplier.vatNumber}</div>
+              <div style={{fontSize:11,opacity:0.8,marginTop:4}}>ZATCA ইনপুট VAT ক্রেডিটের জন্য প্রয়োজন</div>
+            </div>
+          )}
           {/* Stats */}
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:16}}>
             <div style={{...card,padding:16,textAlign:'center'}}>
@@ -4259,6 +4283,10 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                   <label style={label}>📱 ফোন নম্বর</label>
                   <input value={form.phone||''} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} placeholder="মোবাইল নম্বর" style={input} />
                 </div>
+                <div style={{marginBottom:12}}>
+                  <label style={label}>🧾 সরবরাহকারীর VAT নম্বর (১৫ ডিজিট) <span style={{fontSize:10,color:T.gray500}}>ZATCA ক্রেডিটের জন্য জরুরি</span></label>
+                  <input value={form.vatNumber||''} onChange={e=>setForm(f=>({...f,vatNumber:e.target.value}))} placeholder="১৫ ডিজিটের VAT নম্বর" style={input} maxLength={15} />
+                </div>
                 <div style={{marginBottom:16}}>
                   <label style={label}>📍 ঠিকানা</label>
                   <input value={form.address||''} onChange={e=>setForm(f=>({...f,address:e.target.value}))} placeholder="ঠিকানা" style={input} />
@@ -4480,10 +4508,15 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
     const savedCount = purchaseItems.length;
     const purchaseId = `PO-${Date.now().toString().slice(-8)}`;
     
+    // Get supplier VAT number
+    const supplierObj = suppliers.find(s => s.name === form.company);
+    const supplierVatNumber = supplierObj?.vatNumber || '';
+    
     const purchase = {
       id: purchaseId,
       date: new Date().toISOString(),
       supplier: form.company || 'সাধারণ',
+      supplierVatNumber: supplierVatNumber,
       items: purchaseItems,
       totalItems: purchaseItems.length,
       totalStock: purchaseItems.reduce((s,i) => s + i.stock, 0)
@@ -4511,7 +4544,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
     
     let newSupplierArr = null;
     if (form.company && !suppliers.find(s => s.name === form.company)) {
-      const newSupplier = { id: genId(), name: form.company, phone: '', address: '' };
+      const newSupplier = { id: genId(), name: form.company, phone: '', address: '', vatNumber: '' };
       newSupplierArr = [...suppliers, newSupplier];
     }
 
@@ -6641,6 +6674,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     purchaseShowSupplier: settings?.purchaseShowSupplier !== false,
     purchaseShowPhone: settings?.purchaseShowPhone !== false,
     purchaseShowVat: settings?.purchaseShowVat !== false,
+    purchaseShowStoreVat: settings?.purchaseShowStoreVat !== false,
     purchaseFontSize: settings?.purchaseFontSize || 11,
     purchaseIcon: settings?.purchaseIcon || '',
   });
@@ -6949,7 +6983,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  🔢 ভ্যাট নম্বর (TIN) *
+                  🔢 আপনার VAT নম্বর (TIN) <span style={{fontSize:11,color:T.gray500}}>পারচেজ ইনভয়েসে দেখানো হবে</span>
                 </label>
                 <input
                   value={form.taxId || ''}
@@ -6968,7 +7002,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   }}
                   onFocus={e => e.target.style.borderColor = '#0F766E'}
                   onBlur={e => e.target.style.borderColor = '#e2e8f0'}
-                  placeholder="310xxxxxx"
+                  placeholder="১৫ ডিজিটের VAT নম্বর (ZATCA)"
                 />
               </div>
               <div>
@@ -7697,6 +7731,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       { key: 'purchaseShowSupplier', label: 'সাপ্লায়ার তথ্য' },
                       { key: 'purchaseShowPhone', label: 'ফোন নম্বর' },
                       { key: 'purchaseShowVat', label: 'ভ্যাট ১৫%' },
+                      { key: 'purchaseShowStoreVat', label: 'দোকানের VAT' },
                     ].map(item => (
                       <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
                         <input
@@ -7762,7 +7797,12 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         <div style={{ fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 4 }}>Invoice ID: 12345678</div>
                         <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>২ আগস্ট, ২০২৬</div>
                       </div>
-                      {form.purchaseShowSupplier!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.purchaseFontSize||11)-1}px` }}>সরবরাহকারী: এবিসি ট্রেডার্স<br/>ফোন: ০১৮XXXXXXXX</div>}
+                      {form.purchaseShowSupplier!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.purchaseFontSize||11)-1}px` }}>
+                        <div>সরবরাহকারী: এবিসি ট্রেডার্স</div>
+                        <div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px` }}>ফোন: ০১৮XXXXXXXX</div>
+                        <div style={{ fontWeight: 'bold', color: '#EA580C', fontSize: `${(form.purchaseFontSize||11)-1}px`, marginTop: 2 }}>VAT: 123456789012345</div>
+                      </div>}
+                      {form.purchaseShowStoreVat!==false&&form.taxId&&<div style={{ fontSize: `${(form.purchaseFontSize||11)-2}px`, fontWeight: 'bold', marginBottom: 4 }}>ক্রেতার VAT: {form.taxId}</div>}
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: `${(form.purchaseFontSize||11)-1}px` }}>
                         <thead><tr style={{ borderBottom: '1px dashed #000' }}><th style={{ textAlign: 'left', padding: '3px 0' }}>পণ্য</th><th style={{ textAlign: 'center', padding: '3px 0' }}>পরি</th><th style={{ textAlign: 'right', padding: '3px 0' }}>দাম</th><th style={{ textAlign: 'right', padding: '3px 0' }}>মোট</th></tr></thead>
                         <tbody>
@@ -7773,7 +7813,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       <div style={{ borderTop: '1px dashed #000', marginTop: 6, paddingTop: 6 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${(form.purchaseFontSize||11)-1}px` }}><span>মূল্য:</span><span>৳900</span></div>
                         {form.purchaseShowVat!==false&&<div style={{ display: 'flex', justifyContent: 'space-between', fontSize: `${(form.purchaseFontSize||11)-1}px` }}><span>ভ্যাট (১৫%):</span><span>৳135</span></div>}
-                        {form.purchaseShowVat!==false&&<div style={{ borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4, display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: `${(form.purchaseFontSize||11)}px` }}><span>মোট:</span><span>৳1,035</span></div>}
+                        {form.purchaseShowVat!==false&&<div style={{ borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4, display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: `${(form.purchaseFontSize||11)}px` }}><span>মোট (ভ্যাট সহ):</span><span>৳1,035</span></div>}
                       </div>
                       <div style={{ textAlign: 'center', borderTop: '1px dashed #000', marginTop: 8, paddingTop: 6, fontSize: `${(form.purchaseFontSize||11)-2}px` }}>{form.purchaseFooter||'ধন্যবাদ'}<br/>২ আগস্ট, ২০২৬</div>
                     </div>
