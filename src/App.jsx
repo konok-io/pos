@@ -1024,6 +1024,7 @@ function MainApp({ currentUser, onLogout }) {
     suppliers: v => { setSuppliers(v); db.set(STORAGE_KEYS.suppliers, v); return Promise.resolve(); },
     categories: v => { setCategories(v); db.set(STORAGE_KEYS.categories, v); return Promise.resolve(); },
     purchases: v => { setPurchases(v); db.set(STORAGE_KEYS.purchases, v); return Promise.resolve(); },
+    productHistory: v => { setProductHistory(v); db.set(STORAGE_KEYS.productHistory, v); return Promise.resolve(); },
   };
 
   if (!ready) return (
