@@ -2583,7 +2583,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 <div style={{display:'flex',gap:4}}>
                   <input 
                     value={supplierQ} 
-                    onChange={e=>{const val=e.target.value;const sup=suppliers.find(s=>s.name===val);setSupplierQ(val);setForm(f=>({...f,company:val,supplierCrNumber:sup?.crNumber||'',supplierVatNumber:sup?.vatNumber||'',supplierAddress:sup?.address||''}));setShowCompanyList(true);}}
+                    onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));setShowCompanyList(true);}}
                     onClick={()=>setShowCompanyList(true)}
                     onBlur={()=>setTimeout(()=>setShowCompanyList(false),200)}
                     placeholder="কোম্পানির নাম লিখুন..."
@@ -2593,7 +2593,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 {showCompanyList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                     {uniqueCompanies.filter(c=>c && c.toLowerCase().includes((supplierQ||'').toLowerCase())).map((c,i)=>(
-                      <div key={i} onClick={()=>{const s=suppliers.find(sup=>sup.name===c);setSupplierQ(c);setForm(f=>({...f,company:c,supplierCrNumber:s?.crNumber||'',supplierVatNumber:s?.vatNumber||'',supplierAddress:s?.address||''}));setShowCompanyList(false);}}
+                      <div key={i} onClick={()=>{setSupplierQ(c);setForm(f=>({...f,company:c}));setShowCompanyList(false);}}
                         style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
                         {c}
                       </div>
@@ -2609,12 +2609,14 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
               </div>
 
               {/* Supplier Info Display */}
-              {form.company && (() => {
+              {(() => {
                 const sup = suppliers.find(s => s.name === form.company);
-                const crNum = form.supplierCrNumber || sup?.crNumber;
-                const vatNum = form.supplierVatNumber || sup?.vatNumber;
-                const addr = form.supplierAddress || sup?.address;
-                return (crNum || vatNum || addr) && (
+                if (!sup) return null;
+                const crNum = sup.crNumber;
+                const vatNum = sup.vatNumber;
+                const addr = sup.address;
+                if (!crNum && !vatNum && !addr) return null;
+                return (
                   <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginBottom:12,padding:12,background:T.gray50,borderRadius:8,border:`1px solid ${T.gray200}`}}>
                     {crNum && (
                       <div>
