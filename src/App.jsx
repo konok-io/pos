@@ -6255,9 +6255,12 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
   };
 
   const exportSalesCSV = () => {
-    const rows = [['তারিখ','ইনভয়েস আইডি','কাস্টমার','মোট','পরিশোধ','বাকি','লাভ'],
+    const rows = [['তারিখ','ইনভয়েস আইডি','কাস্টমার','মোট','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'],
       ... filteredSales.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id,s.custName,s.total,s.paid,s.due,
-        (s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toFixed(2)])];
+        (s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toFixed(2),
+        ((s.items||[]).reduce((a,i)=>a+(i.qty||0)*(i.buyP||0),0)*0.15).toFixed(2),
+        (s.total*15/115).toFixed(2),
+        ((s.total*15/115)-(s.items||[]).reduce((a,i)=>a+(i.qty||0)*(i.buyP||0),0)*0.15).toFixed(2)])];
     const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
@@ -6410,12 +6413,18 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <th style="text-align:right;">মোট</th>
             <th style="text-align:right;">পরিশোধ</th>
             <th style="text-align:right;">বাকি</th>
-            <th style="text-align:right;">ভ্যাট</th>
+            <th style="text-align:right;">লাভ</th>
+            <th style="text-align:right;">ক্রয় ভ্যাট</th>
+            <th style="text-align:right;">বিক্রয় ভ্যাট</th>
+            <th style="text-align:right;">অবশিষ্ট ভ্যাট</th>
           </tr>
         </thead>
         <tbody>`;
     
     filteredSales.forEach(s => {
+      const purchaseVat = (s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15;
+      const salesVat = s.total*15/115;
+      const remainingVat = salesVat - purchaseVat;
       html += `
           <tr>
             <td>${new Date(s.date).toLocaleDateString('bn-BD')}</td>
@@ -6425,10 +6434,10 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <td style="text-align:right;font-weight:600;">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:#2e7d32;">৳${s.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;color:${s.due>0?'#c62828':'#999'};">৳${s.due.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;color:#00897b;">৳${(s.total/1.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;color:#c62828;">৳${(s.total*0.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;color:#ff6f00;">৳${((s.total/1.15)*0.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;font-weight:600;color:${((s.total*0.15)-((s.total/1.15)*0.15))>0?'#c62828':'#2e7d32'};">৳${((s.total*0.15)-((s.total/1.15)*0.15)).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#2e7d32;">৳${(s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#c62828;">৳${purchaseVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#00897b;">৳${salesVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:600;color:${remainingVat>0?'#ff6f00':'#2e7d32'};">৳${remainingVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>`;
     });
     
@@ -6440,10 +6449,10 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <td style="text-align:right;">৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
             <td style="text-align:right;">৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;">৳${totalSellingPrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;">৳${totalVatOnTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;">৳${totalVatOnSelling.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-            <td style="text-align:right;">৳${totalVatDiff.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+i.total*15/115,0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+(i.total*15/115)-(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           </tr>
         </tfoot>
       </table>
@@ -6727,14 +6736,14 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.gray50}}>
-                    {['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ'].map(h=>(
+                    {['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','মোট','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'].map(h=>(
                       <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {filteredSales.length===0 ? (
-                    <tr><td colSpan={8} style={{padding:40,textAlign:'center',color:T.gray400}}>
+                    <tr><td colSpan={11} style={{padding:40,textAlign:'center',color:T.gray400}}>
                       <div style={{fontSize:48,marginBottom:12}}>📭</div>
                       নির্বাচিত সময়ে কোনো বিক্রয় নেই
                     </td></tr>
@@ -6748,6 +6757,9 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                       <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt(s.paid)}</td>
                       <td style={{padding:'12px',fontWeight:s.due>0?700:400,color:s.due>0?T.red:T.gray400}}>{fmt(s.due)}</td>
                       <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.profit||0),0))}</td>
+                      <td style={{padding:'12px',fontSize:13,color:T.red}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15)}</td>
+                      <td style={{padding:'12px',fontSize:13,color:T.teal}}>{fmt(s.total*15/115)}</td>
+                      <td style={{padding:'12px',fontSize:13,fontWeight:600,color:T.amber}}>{fmt((s.total*15/115)-(s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -6758,6 +6770,9 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                     <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalPaid)}</td>
                     <td style={{padding:'12px',fontWeight:700,fontSize:13,color:totalDue>0?T.red:T.gray400}}>{fmt(totalDue)}</td>
                     <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalProfit)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.red}}>{fmt(filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0))}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(filteredSales.reduce((s,i)=>s+i.total*15/115,0))}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.amber}}>{fmt(filteredSales.reduce((s,i)=>s+(i.total*15/115)-(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0))}</td>
                   </tr>
                 </tfoot>
               </table>
