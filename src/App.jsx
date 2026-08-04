@@ -6397,7 +6397,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
     </head>
     <body>
       <div class="header">
-        <h1>🧾 বিক্রয় ইতিহাস</h1>
+        <h1>🧾 বিক্রি হিস্ট্রি</h1>
         <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
       </div>
       <table>
@@ -6697,7 +6697,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           <div style={card}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
               <h3 style={{margin:0,fontSize:16,fontWeight:700,color:T.gray700,display:'flex',alignItems:'center',gap:8}}>
-                🧾 বিক্রয় ইতিহাস ({filteredSales.length}টি বিল)
+                🧾 বিক্রি হিস্ট্রি ({filteredSales.length}টি বিল)
               </h3>
               <div style={{display:'flex',gap:10,alignItems:'center'}}>
                 <input
