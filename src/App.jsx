@@ -2401,7 +2401,11 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
                       const totalWithVat = grandTotal + vatAmount;
                       const supplierCrDisplay = viewPurchase.supplierCrNumber ? `<div>সরবরাহকারী CR: ${viewPurchase.supplierCrNumber}</div>` : '';
                       const supplierVatDisplay = viewPurchase.supplierVatNumber ? `<div>সরবরাহকারী VAT: ${viewPurchase.supplierVatNumber}</div>` : '';
-                      const supplierAddressDisplay = viewPurchase.supplierAddress ? `<div>ঠিকানা: ${viewPurchase.supplierAddress}</div>` : '';
+                      const supplierAddressDisplay = viewPurchase.supplierAddress ? `<div>সরবরাহকারী ঠিকানা: ${viewPurchase.supplierAddress}</div>` : '';
+                      const sellerNameDisplay = settings?.businessName ? `<div style="font-weight:bold;">${settings.businessName}</div>` : '';
+                      const sellerCrDisplay = settings?.crNumber ? `<div>CR: ${settings.crNumber}</div>` : '';
+                      const sellerVatDisplay = settings?.taxId ? `<div>VAT: ${settings.taxId}</div>` : '';
+                      const sellerAddressDisplay = settings?.address ? `<div>${settings.address}</div>` : '';
                       let html = `<!DOCTYPE html>
 <html>
 <head>
@@ -2427,6 +2431,12 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 </head>
 <body>
 <div class="center border">
+  ${sellerNameDisplay}
+  ${sellerCrDisplay}
+  ${sellerVatDisplay}
+  ${sellerAddressDisplay}
+</div>
+<div class="center border">
   <div style="font-size:14px;font-weight:bold;">📦 পারচেজ ইনভয়েস</div>
   <div>${viewPurchase.id}</div>
   <div>${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
@@ -2434,7 +2444,6 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
   ${supplierCrDisplay}
   ${supplierVatDisplay}
   ${supplierAddressDisplay}
-  ${settings?.taxId ? '<div style="margin-top:3px;"><strong>ক্রেতার VAT: ' + settings.taxId + '</strong></div>' : ''}
 </div>
 <table>
   <thead><tr><th>পণ্য</th><th>পরিমাণ</th><th>দাম</th><th>মোট</th></tr></thead>
