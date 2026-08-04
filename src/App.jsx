@@ -2865,7 +2865,7 @@ ${printFiltered.map(p => {
           <table style={{width:'100%',borderCollapse:'collapse',background:T.white,borderRadius:10,overflow:'hidden',boxShadow:'0 1px 4px rgba(0,0,0,0.08)',border:`1px solid ${T.gray200}`}}>
             <thead>
               <tr style={{background:T.tealLight}}>
-                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','VAT (১৫%)','মোট (VAT সহ)','স্টক','একক',''].map((h,i)=>(
+                {['কোম্পানি কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','VAT (১৫%)','মোট (VAT সহ)','স্টক','একক','একশন'].map((h,i)=>(
                   <th key={i} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                 ))}
               </tr>
