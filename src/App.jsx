@@ -6119,6 +6119,7 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
   const [to, setTo] = useState(today());
   const [viewPurchase, setViewPurchase] = useState(null);
   const [viewSale, setViewSale] = useState(null);
+  const [salesSearch, setSalesSearch] = useState('');
   const [purchaseSearch, setPurchaseSearch] = useState('');
 
   const tabs = [
@@ -6148,7 +6149,7 @@ function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
     (p.supplier||'').toLowerCase().includes(purchaseSearch.toLowerCase())
   );
 
-  const fs = filterSales();
+const filteredSales = filterSales().filter(s => !salesSearch || s.id.toLowerCase().includes(salesSearch.toLowerCase()) || (s.custName||'').toLowerCase().includes(salesSearch.toLowerCase()));
   const totalSales = fs.reduce((s,i)=>s+i.total,0);
   const totalPaid  = fs.reduce((s,i)=>s+i.paid,0);
   const totalDue   = fs.reduce((s,i)=>s+i.due,0);
@@ -6366,10 +6367,10 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
 
   const printSales = () => {
     const periodLabel = getPeriodLabel();
-    const totalSellingPrice = fs.reduce((s,sale)=>s+sale.total/1.15,0);
-    const totalVatOnTotal = fs.reduce((s,sale)=>s+sale.total*0.15,0);
-    const totalVatOnSelling = fs.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0);
-    const totalVatDiff = fs.reduce((s,sale)=>{const t=sale.total*0.15;const v=(sale.total/1.15)*0.15;return s+(t-v);},0);
+    const totalSellingPrice = filteredSales.reduce((s,sale)=>s+sale.total/1.15,0);
+    const totalVatOnTotal = filteredSales.reduce((s,sale)=>s+sale.total*0.15,0);
+    const totalVatOnSelling = filteredSales.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0);
+    const totalVatDiff = filteredSales.reduce((s,sale)=>{const t=sale.total*0.15;const v=(sale.total/1.15)*0.15;return s+(t-v);},0);
     
     let html = `
     <!DOCTYPE html>
@@ -6414,7 +6415,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         </thead>
         <tbody>`;
     
-    fs.forEach(s => {
+    filteredSales.forEach(s => {
       html += `
           <tr>
             <td>${new Date(s.date).toLocaleDateString('bn-BD')}</td>
@@ -6446,7 +6447,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           </tr>
         </tfoot>
       </table>
-      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${fs.length}টি বিক্রয়</div>
+      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${filteredSales.length}টি বিক্রয়</div>
     </body>
     </html>`;
     
@@ -6696,17 +6697,31 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           <div style={card}>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
               <h3 style={{margin:0,fontSize:16,fontWeight:700,color:T.gray700,display:'flex',alignItems:'center',gap:8}}>
-                🧾 বিক্রয় ইতিহাস ({fs.length}টি বিল)
+                🧾 বিক্রয় ইতিহাস ({filteredSales.length}টি বিল)
               </h3>
-              <button onClick={printSales} style={{
-                ...btn('ghost'),
-                padding:'8px 14px',
-                fontSize:13,
-                borderRadius:8,
-                display:'flex',
-                alignItems:'center',
-                gap:6,
-              }}>🖨️ প্রিন্ট</button>
+              <div style={{display:'flex',gap:10,alignItems:'center'}}>
+                <input
+                  value={salesSearch}
+                  onChange={e=>setSalesSearch(e.target.value)}
+                  placeholder="🔍 খুঁজুন..."
+                  style={{
+                    ...input,
+                    padding:'8px 12px',
+                    fontSize:12,
+                    width:180,
+                    borderRadius:8,
+                  }}
+                />
+                <button onClick={printSales} style={{
+                  ...btn('ghost'),
+                  padding:'8px 14px',
+                  fontSize:13,
+                  borderRadius:8,
+                  display:'flex',
+                  alignItems:'center',
+                  gap:6,
+                }}>🖨️ প্রিন্ট</button>
+              </div>
             </div>
             <div style={{overflow:'auto'}}>
               <table style={{width:'100%',borderCollapse:'collapse'}}>
@@ -6723,7 +6738,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                       <div style={{fontSize:48,marginBottom:12}}>📭</div>
                       নির্বাচিত সময়ে কোনো বিক্রয় নেই
                     </td></tr>
-                  ) : [...fs].reverse().map((s,i)=>(
+                  ) : [...filteredSales].reverse().map((s,i)=>(
                     <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
                       <td style={{padding:'12px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
                       <td style={{padding:'12px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600,fontFamily:'monospace'}} onClick={()=>setViewSale(s)}>{s.id}</td>
