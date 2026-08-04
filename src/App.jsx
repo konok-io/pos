@@ -4507,7 +4507,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
               
               {/* Right: Add New Supplier - Larger */}
               <div style={{...card,padding:16}}>
-                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal}}>➕ নতুন সরবরাহকারী</h3>
+                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal,textAlign:'center'}}>➕ নতুন সরবরাহকারী</h3>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:8}}>
                   <input 
                     type="text" 
@@ -4555,7 +4555,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                 </div>
                 <button 
                   onClick={handleAddSupplier}
-                  style={{...btn('primary'),padding:'8px 16px',fontSize:12,marginTop:8,width:'100%'}}
+                  style={{...btn('primary'),padding:'8px 16px',fontSize:12,marginTop:8,width:'100%',textAlign:'center'}}
                 >
                   ✅ যুক্ত করুন
                 </button>
