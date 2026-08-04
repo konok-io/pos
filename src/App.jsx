@@ -4748,7 +4748,15 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
               {/* Barcode */}
               <div>
                 <label style={label}>🔢 বারকোড</label>
-                <input value={barcodeVal} onChange={e=>{setBarcodeVal(e.target.value);setForm(f=>({...f,barcode:e.target.value}))}} placeholder="বারকোড লিখে Enter চাপুন..." 
+                <input value={barcodeVal} onChange={e=>{
+                  const val = e.target.value;
+                  setBarcodeVal(val);
+                  setForm(f=>({...f,barcode:val}));
+                  if (!val) {
+                    setSupplierQ('');
+                    setForm(f=>({...f,name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5',supplierCrNumber:'',supplierVatNumber:'',supplierAddress:''}));
+                  }
+                }} placeholder="বারকোড লিখে Enter চাপুন..." 
                   style={{...input,fontSize:13}} 
                   onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                   onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})}
