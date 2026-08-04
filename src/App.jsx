@@ -2310,24 +2310,44 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
     // Check for existing products and update stock, or create new ones
     const updatedProducts = [...products];
     const newProductsToAdd = [];
+    const stockChanges = []; // Track all stock changes for history
     
     for (const item of purchaseItems) {
-      // Find existing product by company AND barcode
+      // Find existing product by company AND barcode (same logic for update and history)
       const existingIndex = updatedProducts.findIndex(
         p => p.company === item.company && p.barcode === item.barcode && p.barcode !== ''
       );
       
       if (existingIndex !== -1) {
         // Update existing product stock
+        const oldStock = updatedProducts[existingIndex].stock || 0;
+        const newStock = oldStock + (item.stock || 0);
         updatedProducts[existingIndex] = {
           ...updatedProducts[existingIndex],
-          stock: (updatedProducts[existingIndex].stock || 0) + (item.stock || 0),
+          stock: newStock,
           buyP: item.buyP || updatedProducts[existingIndex].buyP,
           sellP: item.sellP || updatedProducts[existingIndex].sellP
         };
+        // Track for history
+        stockChanges.push({
+          productId: updatedProducts[existingIndex].id,
+          productName: item.name,
+          oldValue: oldStock,
+          newValue: newStock,
+          isNew: false
+        });
       } else {
         // Create new product
-        newProductsToAdd.push({ ...item, id: genId() });
+        const newProductId = genId();
+        newProductsToAdd.push({ ...item, id: newProductId });
+        // Track for history - new product
+        stockChanges.push({
+          productId: newProductId,
+          productName: item.name,
+          oldValue: 0,
+          newValue: item.stock || 0,
+          isNew: true
+        });
       }
     }
     
@@ -2338,42 +2358,20 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
       newSupplierArr = [...suppliers, newSupplier];
     }
 
-    // Track purchase stock changes (source='purchase')
-    const purchaseHistoryEntries = [];
-    purchaseItems.forEach(item => {
-      const existingProduct = products.find(p => p.name === item.name && p.company === form.company);
-      if (existingProduct) {
-        // Update existing product - track stock increase
-        purchaseHistoryEntries.push({
-          id: genId(),
-          productId: existingProduct.id,
-          productName: item.name,
-          type: 'stock',
-          source: 'purchase',
-          oldValue: existingProduct.stock || 0,
-          newValue: (existingProduct.stock || 0) + (item.stock || 0),
-          purchaseId: purchaseId,
-          user: currentUser?.name || 'Unknown',
-          userEmail: currentUser?.email || '',
-          timestamp: now(),
-        });
-      } else {
-        // New product being added - track initial stock
-        purchaseHistoryEntries.push({
-          id: genId(),
-          productId: item.id,
-          productName: item.name,
-          type: 'stock',
-          source: 'purchase',
-          oldValue: 0,
-          newValue: item.stock || 0,
-          purchaseId: purchaseId,
-          user: currentUser?.name || 'Unknown',
-          userEmail: currentUser?.email || '',
-          timestamp: now(),
-        });
-      }
-    });
+    // Create purchase history entries from stockChanges
+    const purchaseHistoryEntries = stockChanges.map(change => ({
+      id: genId(),
+      productId: change.productId,
+      productName: change.productName,
+      type: 'stock',
+      source: 'purchase',
+      oldValue: change.oldValue,
+      newValue: change.newValue,
+      purchaseId: purchaseId,
+      user: currentUser?.name || 'Unknown',
+      userEmail: currentUser?.email || '',
+      timestamp: now(),
+    }));
 
     // Build promises array
     const promises = [];
@@ -4831,6 +4829,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
 
     const updatedProducts = [...products];
     const newProductsToAdd = [];
+    const stockChanges = []; // Track all stock changes for history
     
     for (const item of purchaseItems) {
       const existingIndex = updatedProducts.findIndex(
@@ -4838,14 +4837,35 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
       );
       
       if (existingIndex !== -1) {
+        // Update existing product stock
+        const oldStock = updatedProducts[existingIndex].stock || 0;
+        const newStock = oldStock + (item.stock || 0);
         updatedProducts[existingIndex] = {
           ...updatedProducts[existingIndex],
-          stock: (updatedProducts[existingIndex].stock || 0) + (item.stock || 0),
+          stock: newStock,
           buyP: item.buyP || updatedProducts[existingIndex].buyP,
           sellP: item.sellP || updatedProducts[existingIndex].sellP
         };
+        // Track for history
+        stockChanges.push({
+          productId: updatedProducts[existingIndex].id,
+          productName: item.name,
+          oldValue: oldStock,
+          newValue: newStock,
+          isNew: false
+        });
       } else {
-        newProductsToAdd.push({ ...item, id: genId() });
+        // Create new product
+        const newProductId = genId();
+        newProductsToAdd.push({ ...item, id: newProductId });
+        // Track for history - new product
+        stockChanges.push({
+          productId: newProductId,
+          productName: item.name,
+          oldValue: 0,
+          newValue: item.stock || 0,
+          isNew: true
+        });
       }
     }
     
@@ -4855,10 +4875,30 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
       newSupplierArr = [...suppliers, newSupplier];
     }
 
+    // Create purchase history entries
+    const purchaseHistoryEntries = stockChanges.map(change => ({
+      id: genId(),
+      productId: change.productId,
+      productName: change.productName,
+      type: 'stock',
+      source: 'purchase',
+      oldValue: change.oldValue,
+      newValue: change.newValue,
+      purchaseId: purchaseId,
+      user: currentUser?.name || 'Unknown',
+      userEmail: currentUser?.email || '',
+      timestamp: new Date().toISOString(),
+    }));
+
     const promises = [];
     if (newSupplierArr) promises.push(upd.suppliers(newSupplierArr));
     promises.push(upd.products([...updatedProducts, ...newProductsToAdd]));
     promises.push(upd.purchases([...purchases, purchase]));
+    
+    // Add purchase history entries
+    if (purchaseHistoryEntries.length > 0) {
+      promises.push(upd.productHistory([...productHistory, ...purchaseHistoryEntries]));
+    }
 
     await Promise.all(promises);
     alert(`✅ ${savedCount}টি পণ্য সংরক্ষিত হয়েছে!\nপারচেজ আইডি: ${purchaseId}`);
