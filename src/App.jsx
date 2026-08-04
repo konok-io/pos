@@ -1412,7 +1412,7 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     setTimeout(() => searchRef.current?.focus(), 100);
   };
 
-  const printReceipt = (r) => {
+  	  const printReceipt = (r) => {
     const s = r.settings || {};
     const headerText = s.receiptHeader || '🧾 বিক্রয় রিসিট';
     const footerText = s.receiptFooter || 'ধন্যবাদ';
@@ -1423,6 +1423,10 @@ function POSScreen({products, customers, sales, settings, categories, upd}) {
     const showCustomer = s.receiptShowCustomer !== false;
     const showVat = s.receiptShowVat !== false;
     const showQr = s.receiptShowQr !== false;
+    
+    const saleDate = new Date(r.sale.date);
+    const dateStr = saleDate.toLocaleDateString('bn-BD');
+    const timeStr = saleDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
 
     const html = `<!DOCTYPE html>
 <html>
@@ -1508,9 +1512,10 @@ td:nth-child(4) {
   ${showAddress && s.name ? '<div>' + s.name + '</div>' : ''}
   ${showAddress && s.address ? '<div>' + s.address + '</div>' : ''}
   ${showPhone && s.phone ? '<div>' + s.phone + '</div>' : ''}
-  ${showPhone && s.taxId ? '<div>VAT: ' + s.taxId + '</div>' : ''}
+  ${showPhone && s.taxId ? '<div style="font-weight:bold;">VAT নং: ' + s.taxId + '</div>' : ''}
+  ${showPhone && s.taxId ? '<div style="font-weight:bold;">✚ সরলীকৃত কর চালান</div>' : ''}
   <div>#${r.sale.id.slice(-8).toUpperCase()}</div>
-  <div>${new Date(r.sale.date).toLocaleDateString('bn-BD')}</div>
+  <div>${dateStr} | ${timeStr}</div>
   ${showCustomer ? '<div>গ্রাহক: ' + r.sale.custName + '</div>' : ''}
   ${showCustomer && r.sale.phone ? '<div>ফোন: ' + r.sale.phone + '</div>' : ''}
 </div>
@@ -7717,9 +7722,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         {form.receiptShowAddress!==false&&form.name&&<div style={{ fontSize: `${(form.receiptFontSize||11)-1}px` }}>{form.name}</div>}
                         {form.receiptShowAddress!==false&&form.address&&<div style={{ fontSize: `${(form.receiptFontSize||11)-2}px` }}>{form.address}</div>}
                         {form.receiptShowPhone!==false&&form.phone&&<div style={{ fontSize: `${(form.receiptFontSize||11)-2}px` }}>{form.phone}</div>}
-                        {form.receiptShowPhone!==false&&form.taxId&&<div style={{ fontSize: `${(form.receiptFontSize||11)-2}px` }}>VAT: {form.taxId}</div>}
+                        {form.receiptShowPhone!==false&&form.taxId&&<div style={{ fontWeight: 'bold', fontSize: `${(form.receiptFontSize||11)-2}px` }}>VAT নং: {form.taxId}</div>}
+                        {form.receiptShowPhone!==false&&form.taxId&&<div style={{ fontWeight: 'bold', fontSize: `${(form.receiptFontSize||11)-2}px` }}>✚ সরলীকৃত কর চালান</div>}
                         <div style={{ fontSize: `${(form.receiptFontSize||11)-1}px`, marginTop: 4 }}>#ABC12345</div>
-                        <div style={{ fontSize: `${(form.receiptFontSize||11)-2}px` }}>২ আগস্ট, ২০২৬</div>
+                        <div style={{ fontSize: `${(form.receiptFontSize||11)-2}px` }}>২ আগস্ট, ২০২৬ | ১০:৩০ AM</div>
                       </div>
                       {form.receiptShowCustomer!==false&&<div style={{ marginBottom: 6, fontSize: `${(form.receiptFontSize||11)-1}px` }}>গ্রাহক: মোঃ রহিম উদ্দিন<br/>ফোন: ০১৭XXXXXXXX</div>}
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: `${(form.receiptFontSize||11)-1}px` }}>
