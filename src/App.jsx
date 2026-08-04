@@ -4681,7 +4681,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
                 )}
               </div>
 
-              {/* Supplier CR, VAT, Address */}
+              {/* Supplier CR, VAT, Address - 2 columns */}
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:12}}>
                 <div>
                   <label style={label}>🏢 CR নম্বর</label>
@@ -4699,14 +4699,14 @@ function NewProductScreen({products, suppliers, categories, purchases, upd}) {
                     placeholder="VAT নম্বর"
                     style={input} />
                 </div>
-                <div style={{gridColumn:'1/-1'}}>
-                  <label style={label}>📍 ঠিকানা</label>
-                  <input 
-                    value={form.supplierAddress||''} 
-                    onChange={e=>setForm(f=>({...f,supplierAddress:e.target.value}))}
-                    placeholder="ঠিকানা"
-                    style={input} />
-                </div>
+              </div>
+              <div style={{marginBottom:12}}>
+                <label style={label}>📍 ঠিকানা</label>
+                <input 
+                  value={form.supplierAddress||''} 
+                  onChange={e=>setForm(f=>({...f,supplierAddress:e.target.value}))}
+                  placeholder="ঠিকানা"
+                  style={input} />
               </div>
 
               {/* Category */}
