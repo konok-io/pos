@@ -2765,13 +2765,33 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
 
   return (
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden'}}>
-      {/* Sub-tabs: List / History */}
-      <div style={{display:'flex',alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexShrink:0}}>
-        <button onClick={()=>{setProductTab('list');setStockFilter('স্টক আছে');}} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:productTab==='list'?700:400,color:productTab==='list'?T.teal:T.gray500,borderBottom:productTab==='list'?`2px solid ${T.teal}`:'none',fontSize:13}}>
+      {/* Sub-tabs: List / History - Centered with borders */}
+      <div style={{display:'flex',gap:8,alignItems:'center',background:T.white,padding:'10px 12px',flexWrap:'wrap',justifyContent:'center'}}>
+        <button onClick={()=>{setProductTab('list');setStockFilter('স্টক আছে');}} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${productTab==='list'?T.teal:T.gray200}`,
+          background:productTab==='list'?T.teal:T.gray100,
+          color:productTab==='list'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
           📋 পণ্য তালিকা
         </button>
-        <button onClick={()=>setProductTab('history')} style={{padding:'12px 20px',border:'none',background:'none',cursor:'pointer',fontWeight:productTab==='history'?700:400,color:productTab==='history'?T.teal:T.gray500,borderBottom:productTab==='history'?`2px solid ${T.teal}`:'none',fontSize:13}}>
-          📜 হিস্ট্রি ({productHistory.filter(h => h.type === 'price_buy' || h.type === 'price_sell').length})
+        <button onClick={()=>setProductTab('history')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${productTab==='history'?T.teal:T.gray200}`,
+          background:productTab==='history'?T.teal:T.gray100,
+          color:productTab==='history'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
+          📜 ক্রয় বিক্রয় দাম পরিবর্তনের হিস্ট্রি ({productHistory.filter(h => h.type === 'price_buy' || h.type === 'price_sell').length})
         </button>
       </div>
 
