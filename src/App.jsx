@@ -4560,13 +4560,13 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
                     onChange={e=>setNewSupplier({...newSupplier,address:e.target.value})}
                     style={{...input,padding:'8px 10px',fontSize:12}}
                   />
+                  <button 
+                    onClick={handleAddSupplier}
+                    style={{...btn('primary'),padding:'8px 10px',fontSize:12,height:'38px'}}
+                  >
+                    ✅ যুক্ত করুন
+                  </button>
                 </div>
-                <button 
-                  onClick={handleAddSupplier}
-                  style={{...btn('primary'),padding:'8px 16px',fontSize:12,marginTop:8,width:'100%',textAlign:'center'}}
-                >
-                  ✅ যুক্ত করুন
-                </button>
               </div>
             </div>
 
