@@ -6560,8 +6560,8 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
   const [expenseForm, setExpenseForm] = useState({title:'',amount:'',note:''});
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [incomeForm, setIncomeForm] = useState({title:'',amount:'',note:''});
-  const [expenses, setExpenses] = useState([]);
-  const [incomes, setIncomes] = useState([]);
+  const [expensesList, setExpensesList] = useState([]);
+  const [incomesList, setIncomesList] = useState([]);
   
   // Load expenses and incomes from SQLite API
   useEffect(() => {
@@ -6571,8 +6571,8 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
           expenses.getAll(),
           incomes.getAll(),
         ]);
-        setExpenses(expensesData || []);
-        setIncomes(incomesData || []);
+        setExpensesList(expensesData || []);
+        setIncomesList(incomesData || []);
       } catch (error) {
         console.error('Failed to load expenses/incomes:', error);
       }
@@ -6627,13 +6627,13 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
     });
 
     // Filter expenses
-    const filteredExpenses = expenses.filter(e => {
+    const filteredExpenses = expensesList.filter(e => {
       const d = new Date(e.date);
       return d >= startDate && d <= endDate;
     });
 
     // Filter incomes
-    const filteredIncomes = incomes.filter(i => {
+    const filteredIncomes = incomesList.filter(i => {
       const d = new Date(i.date);
       return d >= startDate && d <= endDate;
     });
@@ -6669,7 +6669,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       if (result.success) {
         // Reload expenses from API
         const expensesData = await expenses.getAll();
-        setExpenses(expensesData || []);
+        setExpensesList(expensesData || []);
         
         setExpenseForm({title:'',amount:'',note:''});
         setShowExpenseForm(false);
@@ -6690,7 +6690,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       const result = await expenses.delete(id);
       if (result.success) {
         const expensesData = await expenses.getAll();
-        setExpenses(expensesData || []);
+        setExpensesList(expensesData || []);
       } else {
         alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
       }
@@ -6715,7 +6715,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       if (result.success) {
         // Reload incomes from API
         const incomesData = await incomes.getAll();
-        setIncomes(incomesData || []);
+        setIncomesList(incomesData || []);
         
         setIncomeForm({title:'',amount:'',note:''});
         setShowIncomeForm(false);
@@ -6736,7 +6736,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       const result = await incomes.delete(id);
       if (result.success) {
         const incomesData = await incomes.getAll();
-        setIncomes(incomesData || []);
+        setIncomesList(incomesData || []);
       } else {
         alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
       }
