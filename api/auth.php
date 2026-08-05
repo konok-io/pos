@@ -16,21 +16,24 @@ function generateToken() {
     return bin2hex(random_bytes(32));
 }
 
-// Handle request
-$method = $_SERVER['REQUEST_METHOD'];
+// Only process requests if this file is accessed directly (not included)
+if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
+    // Handle request
+    $method = $_SERVER['REQUEST_METHOD'];
 
-switch ($method) {
-    case 'POST':
-        login();
-        break;
-    case 'DELETE':
-        logout();
-        break;
-    case 'GET':
-        checkAuth();
-        break;
-    default:
-        response(null, 'Method not allowed', 405);
+    switch ($method) {
+        case 'POST':
+            login();
+            break;
+        case 'DELETE':
+            logout();
+            break;
+        case 'GET':
+            checkAuth();
+            break;
+        default:
+            response(null, 'Method not allowed', 405);
+    }
 }
 
 /**
