@@ -164,17 +164,10 @@ class Database {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
-            -- Settings table
+            -- Settings table (key-value format)
             CREATE TABLE IF NOT EXISTS settings (
-                id INTEGER PRIMARY KEY CHECK (id = 1),
-                name TEXT DEFAULT 'POS সিস্টেম',
-                shop_name TEXT,
-                address TEXT,
-                phone TEXT,
-                vat_percent REAL DEFAULT 15,
-                receipt_header TEXT,
-                receipt_footer TEXT,
-                receipt_logo TEXT,
+                setting_key TEXT PRIMARY KEY,
+                setting_value TEXT,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -188,7 +181,10 @@ class Database {
             );
 
             -- Insert default settings if not exists
-            INSERT OR IGNORE INTO settings (id, name) VALUES (1, 'POS সিস্টেম');
+            INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('shop_name', 'POS সিস্টেম');
+            INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('address', '');
+            INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('phone', '');
+            INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('vat_percent', '15');
             
             -- Insert default super admin user if not exists
             INSERT OR IGNORE INTO users (id, name, email, password, role) 
