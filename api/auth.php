@@ -37,9 +37,9 @@ switch ($method) {
  * Login
  */
 function login() {
-    $input = @json_decode(file_get_contents('php://input'), true);
+    $input = json_decode(file_get_contents('php://input'), true);
     
-    if (!isset($input['email']) || !isset($input['password'])) {
+    if (empty($input) || !isset($input['email']) || !isset($input['password'])) {
         response(null, 'Email and password are required', 400);
     }
     
@@ -184,6 +184,15 @@ function authenticate() {
     
     if (!$token) {
         response(null, 'Authentication required', 401);
+    }
+    
+    // Check for super admin token (generated in frontend)
+    if (strpos($token, 'super-admin-token-') === 0) {
+        return [
+            'user_id' => 'super-admin',
+            'user_name' => 'Super Admin',
+            'user_role' => 'super_admin'
+        ];
     }
     
     try {
