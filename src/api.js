@@ -1,28 +1,44 @@
 /**
  * API Service - POS System
  * All business data is stored in SQLite database via PHP API
- * NO localStorage is used - all data comes from the database
+ * Auth token stored in sessionStorage (persists on reload, cleared on tab close)
+ * NO localStorage used for business data
  */
 
 // API Base URL
 const API_BASE = '/api';
 
 // ============================================================================
-// AUTH STORAGE (Session only - not persisted in localStorage)
+// AUTH STORAGE (sessionStorage - persists across page reloads, cleared on tab close)
 // ============================================================================
 
-let currentToken = null;
-let currentUser = null;
+const TOKEN_KEY = 'pos_auth_token';
+const USER_KEY = 'pos_auth_user';
 
-export const getToken = () => currentToken;
-export const setToken = (token) => { currentToken = token; };
+export const getToken = () => sessionStorage.getItem(TOKEN_KEY);
+export const setToken = (token) => { 
+  if (token) {
+    sessionStorage.setItem(TOKEN_KEY, token);
+  } else {
+    sessionStorage.removeItem(TOKEN_KEY);
+  }
+};
 
-export const getUser = () => currentUser;
-export const setUser = (user) => { currentUser = user; };
+export const getUser = () => {
+  const user = sessionStorage.getItem(USER_KEY);
+  return user ? JSON.parse(user) : null;
+};
+export const setUser = (user) => {
+  if (user) {
+    sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+  } else {
+    sessionStorage.removeItem(USER_KEY);
+  }
+};
 
 export const clearAuth = () => {
-  currentToken = null;
-  currentUser = null;
+  sessionStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(USER_KEY);
 };
 
 // ============================================================================
