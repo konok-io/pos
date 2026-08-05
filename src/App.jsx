@@ -4176,52 +4176,48 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           const row = rows[i];
           const rowNum = i + 2;
           
-          // Get company info
-          const csvCompanyCode = (row['সরবরাহকারী কোড'] || row['company code'] || '').trim();
-          const csvCompany = (row['কোম্পানি'] || row['company'] || '').trim();
-          const csvCategory = (row['ক্যাটাগরি'] || row['category'] || '').trim();
+          // Get supplier info with new columns
+          const csvCode = (row['কোম্পানি আইডি'] || row['company code'] || row['code'] || '').trim();
+          const csvName = (row['সরবরাহকারীর নাম'] || row['name'] || '').trim();
+          const csvCrNumber = (row['CR নম্বর'] || row['cr number'] || '').trim();
+          const csvVatNumber = (row['VAT নম্বর'] || row['vat number'] || '').trim();
+          const csvPhone = (row['ফোন'] || row['phone'] || '').trim();
+          const csvAddress = (row['ঠিকানা'] || row['address'] || '').trim();
           
-          // Validate and add company
-          if (csvCompany) {
-            const companyExists = newCompanies.some(s => (s.name||'').toLowerCase() === (csvCompany||'').toLowerCase());
-            if (!companyExists) {
-              // Generate company code
+          // Validate and add supplier
+          if (csvName) {
+            const supplierExists = newCompanies.some(s => (s.name||'').toLowerCase() === (csvName||'').toLowerCase());
+            if (!supplierExists) {
+              // Generate company code if not provided
               const maxCode = newCompanies.reduce((max, s) => {
                 const match = s.code?.match(/C-(\d+)/);
                 return match ? Math.max(max, parseInt(match[1])) : max;
               }, 0);
-              const newCode = csvCompanyCode || `C-${String(maxCode + 1).padStart(5, '0')}`;
+              const newCode = csvCode || `C-${String(maxCode + 1).padStart(5, '0')}`;
               
               // Check for duplicate code
-              if (csvCompanyCode && newCompanies.some(s => s.code === csvCompanyCode)) {
-                errors.push(`সারি ${rowNum}: সরবরাহকারী কোড "${csvCompanyCode}" ইতিমধ্যে আছে`);
+              if (csvCode && newCompanies.some(s => s.code === csvCode)) {
+                errors.push(`সারি ${rowNum}: কোম্পানি আইডি "${csvCode}" ইতিমধ্যে আছে`);
               } else {
-                const newComp = {
+                const newSupplier = {
                   id: genId(),
                   code: newCode,
-                  name: csvCompany,
-                  phone: '',
-                  address: ''
+                  name: csvName,
+                  crNumber: csvCrNumber,
+                  vatNumber: csvVatNumber,
+                  phone: csvPhone,
+                  address: csvAddress,
+                  email: '',
+                  company: csvName
                 };
-                newCompanies.push(newComp);
-                csvCompanies.add((csvCompany||'').toLowerCase());
+                newCompanies.push(newSupplier);
+                csvCompanies.add((csvName||'').toLowerCase());
               }
+            } else {
+              errors.push(`সারি ${rowNum}: সরবরাহকারী "${csvName}" ইতিমধ্যে আছে`);
             }
-          }
-          
-          // Validate and add category
-          if (csvCategory) {
-            const catExists = newCategories.some(c => (c.name||'').toLowerCase() === (csvCategory||'').toLowerCase());
-            if (!catExists) {
-              if (!csvCategories.has((csvCategory||'').toLowerCase())) {
-                const newCat = {
-                  id: genId(),
-                  name: csvCategory
-                };
-                newCategories.push(newCat);
-                csvCategories.add((csvCategory||'').toLowerCase());
-              }
-            }
+          } else {
+            errors.push(`সারি ${rowNum}: সরবরাহকারীর নাম খালি`);
           }
         }
         
@@ -4261,8 +4257,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         setCsvImportResult(result);
         
         let msg = `✅ আমদানি সম্পন্ন!\n\n`;
-        msg += `🏢 নতুন সরবরাহকারী: ${result.companies}টি\n`;
-        msg += `📂 নতুন ক্যাটাগরি: ${result.categories}টি\n`;
+        msg += `🏢 নতুন সরবরাহকারী: ${companiesAdded}টি\n`;
         if (errors.length > 0) {
           msg += `\n⚠️ সমস্যা: ${errors.length}টি\n`;
           msg += errors.slice(0, 5).join('\n');
@@ -4278,17 +4273,16 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     e.target.value = '';
   };
 
-  // Download demo CSV
+  // Download demo CSV for suppliers
   const downloadSuppliersCSV = () => {
-    const csv = `পণ্যের নাম,সরবরাহকারী কোড,কোম্পানি,ক্যাটাগরি,বারকোড,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক
-মিনিকেট চাল 5kg,C-00001,মিনিকেট,খাদ্যপণ্য,001,বস্তা,2500,2800,50,10
-মিনিকেট চাল 10kg,C-00001,মিনিকেট,খাদ্যপণ্য,002,বস্তা,4800,5200,30,5
-সুজি চিপস,C-00002,সুজান,স্ন্যাকস,003,পিস,20,25,200,50
-সুজি বিস্কুট,C-00002,সুজান,স্ন্যাকস,004,পিস,15,20,150,40`;
+    const csv = `কোম্পানি আইডি,সরবরাহকারীর নাম,CR নম্বর,VAT নম্বর,ফোন,ঠিকানা
+C-00001,মিনিকেট ফুডস,1234567890,312345678901234,0501234567,রিয়াদ,সৌদি আরব
+C-00002,সুজান বেভারেজ,9876543210,398765432109876,0509876543,জেদ্দাহ,সৌদি আরব
+C-00003,আল-মারওয়া ট্রেডিং,5678901234,456789012345678,0551234567,দাম্মাম,সৌদি আরব`;
     const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'সরবরাহকারী_পণ্য.csv';
+    a.download = 'সরবরাহকারী.csv';
     a.click();
   };
 
