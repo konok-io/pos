@@ -4032,6 +4032,88 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     }
   };
 
+  // Download Categories CSV
+  const downloadCategoriesCSV = () => {
+    const csv = `ক্যাটাগরি
+খাদ্যপণ্য
+স্ন্যাকস
+পানীয়
+মসলা
+সাজসজ্জা
+অন্যান্য`;
+    const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ক্যাটাগরি.csv';
+    a.click();
+  };
+
+  // CSV Import Handler for categories only
+  const handleCategoriesCsvImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target.result;
+        const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+        
+        if (lines.length < 2) {
+          alert('CSV ফাইলে কমপক্ষে হেডার ও একটি ডাটা থাকতে হবে');
+          return;
+        }
+        
+        // Parse CSV
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        
+        let newCategories = [...categories];
+        let addedCount = 0;
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = [];
+          let current = '';
+          let inQuotes = false;
+          for (const char of lines[i]) {
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              values.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          values.push(current.trim());
+          
+          const row = {};
+          headers.forEach((h, idx) => {
+            row[h] = values[idx] || '';
+          });
+          
+          const categoryName = row['ক্যাটাগরি'] || row['category'] || '';
+          
+          if (categoryName) {
+            // Check if category already exists (case insensitive)
+            const exists = newCategories.some(c => (c.name||'').toLowerCase().trim() === categoryName.toLowerCase());
+            if (!exists) {
+              newCategories.push({ id: genId(), name: categoryName });
+              addedCount++;
+            }
+          }
+        }
+        
+        await upd.categories(newCategories);
+        alert(`✅ ${addedCount}টি ক্যাটাগরি যোগ করা হয়েছে!`);
+        e.target.value = '';
+      } catch (error) {
+        console.error('CSV import error:', error);
+        alert('❌ CSV ইম্পোর্ট ব্যর্থ হয়েছে!');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const del = async (id) => {
     if (!confirm('এই কোম্পানি মুছে ফেলবেন?')) return;
     await upd.suppliers(suppliers.filter(s => s.id !== id));
@@ -4465,11 +4547,53 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         {/* CATEGORIES TAB */}
         {activeTab === 'categories' && (
           <div>
+            {/* Top Section: CSV Import + Add Category Form */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
+              {/* Left: CSV Import - Smaller */}
+              <div style={{...card,padding:20,display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',textAlign:'center'}}>
+                <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
+                <input type="file" accept=".csv" onChange={handleCategoriesCsvImport} id="categoriesCsvInput" style={{display:'none'}} />
+                <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12,justifyContent:'center'}}>
+                  <label htmlFor="categoriesCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:12,padding:'8px 16px'}}>
+                    📁 CSV ফাইল
+                  </label>
+                  <button onClick={downloadCategoriesCSV} style={{...btn(),fontSize:12,padding:'8px 16px'}}>
+                    📥 ডেমো
+                  </button>
+                </div>
+                <div style={{fontSize:11,color:T.gray500}}>
+                  ক্যাটাগরি ডুপ্লিকেট হবে না
+                </div>
+              </div>
+              
+              {/* Right: Add New Category - Larger */}
+              <div style={{...card,padding:16}}>
+                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal,textAlign:'center'}}>➕ নতুন ক্যাটাগরি</h3>
+                <div style={{display:'grid',gridTemplateColumns:'3fr 1fr',gap:8}}>
+                  <input 
+                    type="text" 
+                    placeholder="📂 ক্যাটাগরির নাম *" 
+                    value={catForm.name} 
+                    onChange={e=>setCatForm({name:e.target.value})}
+                    onKeyDown={e=>e.key==='Enter'&&saveCategory()}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <button 
+                    onClick={saveCategory}
+                    style={{...btn('primary'),padding:'8px 10px',fontSize:12,height:'38px',display:'flex',alignItems:'center',justifyContent:'center'}}
+                  >
+                    ✅ যুক্ত করুন
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Middle: Stats + Print */}
             <div style={{...card,marginBottom:12,padding:12,display:'flex',justifyContent:'space-between',alignItems:'center',background:T.white,borderRadius:10}}>
               <span style={{fontSize:13,color:T.gray600}}>মোট: {categories.filter(c => !search || (c.name||'').toLowerCase().includes(search.toLowerCase())).length}টি ক্যাটাগরি</span>
               <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>ক্যাটাগরি লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4;margin:15mm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px 12px}th{background:#e0f7f0;font-weight:700;color:#00897b}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:20px}.center{text-align:center}tr:nth-child(even){background:#f9f9f9}.total{background:#e0f7f0;font-weight:700}.total td{text-align:center}</style></head><body><div class="header"><h1>📂 ক্যাটাগরি লিস্ট</h1></div><table><thead><tr><th class="center" style="width:15%">ক্রম</th><th style="width:55%">ক্যাটাগরির নাম</th><th class="center" style="width:30%">পণ্য সংখ্যা</th></tr></thead><tbody>${categories.map((c,i)=>`<tr><td class="center">${i+1}</td><td>${c.name}</td><td class="center">${products.filter(p=>p.cat===c.name).length}টি</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="3">মোট ক্যাটাগরি: ${categories.length}টি | পণ্য: ${products.filter(p=>p.cat&&p.name).length}টি</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
             </div>
-            <div style={{...card,marginBottom:16,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 240px)'}}>
+            <div style={{...card,marginBottom:16,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 320px)'}}>
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
