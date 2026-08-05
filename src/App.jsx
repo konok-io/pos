@@ -1074,9 +1074,22 @@ function MainApp({ currentUser, onLogout }) {
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd, currentUser, refreshData};
 
-  // Refresh data from MySQL API without reloading page
-  const handleHardRefresh = async () => {
-    await refreshData();
+  // Hard refresh - clear all caches and reload page completely
+  const handleHardRefresh = () => {
+    // Clear all caches and local storage
+    if (window.caches) {
+      window.caches.keys().then(names => names.forEach(name => window.caches.delete(name)));
+    }
+    // Clear service workers if any
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+    }
+    // Clear localStorage and sessionStorage
+    localStorage.clear();
+    sessionStorage.clear();
+    // Hard reload bypassing cache
+    window.location.href = window.location.pathname + '?v=' + Date.now();
+    setTimeout(() => window.location.reload(true), 100);
   };
 
   // Fullscreen toggle function
@@ -1113,8 +1126,21 @@ function MainApp({ currentUser, onLogout }) {
           
           {/* Actions Section */}
           <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0,marginLeft:24}}>
-            {/* Refresh Button */}
-            <button onClick={handleHardRefresh} style={{width:34,height:34,borderRadius:8,border:'1px solid #e5e7eb',background:T.white,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,transition:'all 0.2s',color:T.gray500}} title="রিফ্রেশ">
+            {/* Refresh Button - Hard Refresh */}
+            <button 
+              onClick={handleHardRefresh} 
+              style={{
+                width:34,height:34,borderRadius:8,
+                border:'1px solid #e5e7eb',
+                background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                cursor:'pointer',
+                display:'flex',alignItems:'center',justifyContent:'center',
+                fontSize:14,transition:'all 0.2s',
+                color:T.white,
+                boxShadow:'0 2px 8px rgba(15,118,110,0.3)'
+              }} 
+              title="🔄 হার্ড রিফ্রেশ - সব সমস্যা সমাধান করে"
+            >
               🔄
             </button>
             
