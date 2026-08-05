@@ -151,7 +151,7 @@ function BannerImageUpload({ value, onChange }) {
 // All data is stored in SQLite via PHP API - NO localStorage used
 import { 
   auth, products, customers, sales, suppliers as suppliersApi, categories as categoriesApi, 
-  expenses, incomes, settings, users, loadAllData,
+  expenses, incomes, settings as settingsApi, users as usersApi, loadAllData,
   getToken, setToken, getUser, setUser, clearAuth
 } from './api.js';
 
@@ -983,7 +983,7 @@ function MainApp({ currentUser, onLogout }) {
     // Settings
     settings: {
       update: async (settingsData) => {
-        const result = await settings.update(settingsData);
+        const result = await settingsApi.update(settingsData);
         if (result.success) {
           await refreshData();
         }
@@ -994,17 +994,17 @@ function MainApp({ currentUser, onLogout }) {
     // Users
     users: {
       add: async (user) => {
-        return await users.create(user);
+        return await usersApi.create(user);
       },
       update: async (user) => {
-        return await users.update(user);
+        return await usersApi.update(user);
       },
       delete: async (id) => {
-        return await users.delete(id);
+        return await usersApi.delete(id);
       },
       refresh: async () => {
         try {
-          const userList = await users.getAll();
+          const userList = await usersApi.getAll();
           return userList;
         } catch (error) {
           console.error('Failed to refresh users:', error);
@@ -8199,7 +8199,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   useEffect(() => {
     async function loadUsers() {
       try {
-        const userList = await users.getAll();
+        const userList = await usersApi.getAll();
         // If not super admin, filter out super_admin from the list
         const filteredList = isSuperAdmin ? (userList || []) : (userList || []).filter(u => u.role !== 'super_admin');
         setUsers(filteredList);
@@ -8254,15 +8254,15 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
     }
     try {
       if (editingUser) {
-        const result = await users.update({ ...editingUser, ...userForm });
+        const result = await usersApi.update({ ...editingUser, ...userForm });
         if (result.success) {
-          const userList = await users.getAll();
+          const userList = await usersApi.getAll();
           setUsers(userList || []);
         }
       } else {
-        const result = await users.create(userForm);
+        const result = await usersApi.create(userForm);
         if (result.success) {
-          const userList = await users.getAll();
+          const userList = await usersApi.getAll();
           setUsers(userList || []);
         }
       }
@@ -8277,9 +8277,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const deleteUser = async (id) => {
     if (confirm('এই ইউজার মুছে ফেলতে চান?')) {
       try {
-        const result = await users.delete(id);
+        const result = await usersApi.delete(id);
         if (result.success) {
-          const userList = await users.getAll();
+          const userList = await usersApi.getAll();
           setUsers(userList || []);
           alert('✅ ইউজার মুছা হয়েছে!');
         }
@@ -9731,7 +9731,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: async () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { for(const s of sales) { await sales.delete(s.id); } await refreshData(); alert('বিক্রয় মুছা হয়েছে।'); } } },
                   { l: '👥 কাস্টমার ডেটা', c: customers.length, btn: 'সব কাস্টমার মুছে ফেলুন', fn: async () => { if(confirm('সব কাস্টমার মুছে ফেলবেন?')) { for(const c of customers) { await customers.delete(c.id); } await refreshData(); alert('কাস্টমার মুছা হয়েছে।'); } } },
                   { l: '🛒 পারচেজ হিস্ট্রি', c: purchases.length, btn: 'সব পারচেজ হিস্ট্রি মুছে ফেলুন', fn: async () => { if(confirm('সব পারচেজ হিস্ট্রি মুছে ফেলবেন?')) { for(const p of purchases) { await purchases.delete(p.id); } await refreshData(); alert('পারচেজ হিস্ট্রি মুছা হয়েছে।'); } } },
-                  { l: '👤 সকল ইউজার (সুপার এডমিন ছাড়া)', c: users.length, btn: 'সব ইউজার মুছে ফেলুন', fn: async () => { if(confirm('সুপার এডমিন ছাড়া সব ইউজার মুছে ফেলবেন?')) { for(const u of users) { await users.delete(u.id); } const userList = await users.getAll(); setUsers(userList); alert('সব ইউজার মুছা হয়েছে।'); } } },
+                  { l: '👤 সকল ইউজার (সুপার এডমিন ছাড়া)', c: users.length, btn: 'সব ইউজার মুছে ফেলুন', fn: async () => { if(confirm('সুপার এডমিন ছাড়া সব ইউজার মুছে ফেলবেন?')) { for(const u of users) { await usersApi.delete(u.id); } const userList = await usersApi.getAll(); setUsers(userList || []); alert('সব ইউজার মুছা হয়েছে।'); } } },
                 ].map((d, i) => (
                   <div key={i} style={{
                     padding: 24,
@@ -9780,7 +9780,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       for(const cat of categories) { await categoriesApi.delete(cat.id); }
                       for(const s of sales) { await sales.delete(s.id); }
                       for(const p of purchases) { await purchases.delete(p.id); }
-                      for(const u of users) { await users.delete(u.id); }
+                      for(const u of users) { await usersApi.delete(u.id); }
                       // Clear session storage
                       clearAuth();
                       alert('সব ডেটা মুছা হয়েছে।');
