@@ -54,7 +54,17 @@ function getSettings() {
                 if (json_last_error() === JSON_ERROR_NONE) {
                     $settings[$key] = $decoded;
                 } else {
-                    $settings[$key] = $value;
+                    // Handle boolean-like string values
+                    if ($value === 'true' || $value === '1') {
+                        $settings[$key] = true;
+                    } else if ($value === 'false' || $value === '0' || $value === '') {
+                        $settings[$key] = false;
+                    } else if (is_numeric($value)) {
+                        // Numeric values
+                        $settings[$key] = strpos($value, '.') !== false ? floatval($value) : intval($value);
+                    } else {
+                        $settings[$key] = $value;
+                    }
                 }
             }
         }
@@ -94,8 +104,10 @@ function updateSettings() {
                 continue;
             }
             
-            // Convert array/object to JSON string
-            if (is_array($value) || is_object($value)) {
+            // Convert to string for storage
+            if (is_bool($value)) {
+                $valueToSave = $value ? 'true' : 'false';
+            } else if (is_array($value) || is_object($value)) {
                 $valueToSave = json_encode($value, JSON_UNESCAPED_UNICODE);
             } else {
                 $valueToSave = (string)$value;
