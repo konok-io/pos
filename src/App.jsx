@@ -7166,6 +7166,7 @@ ${filteredExpenses.length > 0 ? `
   );
 }
 
+/* ═══════════════════════════════════════════
    REPORTS SCREEN
 ═══════════════════════════════════════════ */
 function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
@@ -8137,7 +8138,6 @@ ${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;pad
   );
 }
 
-/* ═══════════════════════════════════════════
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN - NEW PROFESSIONAL DESIGN
 ═══════════════════════════════════════════ */
