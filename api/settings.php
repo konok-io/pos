@@ -21,57 +21,6 @@ switch ($method) {
 }
 
 /**
- * Migrate settings table to correct schema
- */
-function migrateSettingsTable($db) {
-    // Get current columns
-    $columns = [];
-    $result = $db->query("PRAGMA table_info(settings)");
-    while ($row = $result->fetch()) {
-        $columns[$row['name']] = true;
-    }
-    
-    // If table already has correct schema, nothing to do
-    if (isset($columns['setting_key']) && isset($columns['setting_value'])) {
-        // Ensure updated_at column exists
-        if (!isset($columns['updated_at'])) {
-            try {
-                $db->exec("ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
-            } catch (Exception $e) {
-                // Column might already exist
-            }
-        }
-        return;
-    }
-    
-    // Migration needed - old schema with 'key' and 'value' columns
-    if (isset($columns['key']) && isset($columns['value'])) {
-        try {
-            // Try SQLite 3.25+ RENAME COLUMN (preferred method)
-            $db->exec("ALTER TABLE settings RENAME COLUMN key TO setting_key");
-            $db->exec("ALTER TABLE settings RENAME COLUMN value TO setting_value");
-        } catch (Exception $e) {
-            // Fallback: Recreate table with new schema
-            $db->exec("CREATE TABLE settings_new (
-                setting_key TEXT PRIMARY KEY,
-                setting_value TEXT,
-                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )");
-            $db->exec("INSERT INTO settings_new (setting_key, setting_value) SELECT key, value FROM settings");
-            $db->exec("DROP TABLE settings");
-            $db->exec("ALTER TABLE settings_new RENAME TO settings");
-        }
-        
-        // Ensure updated_at column exists
-        try {
-            $db->exec("ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
-        } catch (Exception $e) {
-            // Column might already exist
-        }
-    }
-}
-
-/**
  * Get all settings
  */
 function getSettings() {
@@ -84,9 +33,6 @@ function getSettings() {
             response(null, 'Settings table not found', 500);
             return;
         }
-        
-        // Migrate table if needed
-        migrateSettingsTable($db);
         
         $stmt = $db->query("SELECT setting_key, setting_value FROM settings");
         $rows = $stmt->fetchAll();
@@ -124,9 +70,6 @@ function updateSettings() {
 
     try {
         $db = getDB();
-        
-        // Migrate table if needed
-        migrateSettingsTable($db);
 
         foreach ($input as $key => $value) {
             // Validate key to prevent SQL injection

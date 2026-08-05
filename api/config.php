@@ -60,6 +60,9 @@ class Database {
             ];
             $this->connection = new PDO($dsn, null, null, $options);
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            
+            // Run migrations on existing database
+            $this->runMigrations();
         } catch (PDOException $e) {
             http_response_code(500);
             echo json_encode([
@@ -69,6 +72,55 @@ class Database {
                 'timestamp' => date('Y-m-d H:i:s')
             ], JSON_UNESCAPED_UNICODE);
             exit();
+        }
+    }
+
+    /**
+     * Run database migrations for schema updates
+     */
+    private function runMigrations() {
+        try {
+            // Migration: settings table column names
+            $result = $this->connection->query("PRAGMA table_info(settings)");
+            $columns = [];
+            while ($row = $result->fetch()) {
+                $columns[$row['name']] = true;
+            }
+            
+            // If table exists with old schema (key/value columns)
+            if (isset($columns['key']) && isset($columns['value']) && !isset($columns['setting_key'])) {
+                try {
+                    // Try RENAME COLUMN first (SQLite 3.25+)
+                    $this->connection->exec("ALTER TABLE settings RENAME COLUMN key TO setting_key");
+                    $this->connection->exec("ALTER TABLE settings RENAME COLUMN value TO setting_value");
+                } catch (Exception $e) {
+                    // Fallback: Recreate table
+                    $this->connection->exec("CREATE TABLE settings_new (
+                        setting_key TEXT PRIMARY KEY,
+                        setting_value TEXT,
+                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )");
+                    $this->connection->exec("INSERT INTO settings_new (setting_key, setting_value) SELECT key, value FROM settings");
+                    $this->connection->exec("DROP TABLE settings");
+                    $this->connection->exec("ALTER TABLE settings_new RENAME TO settings");
+                }
+            }
+            
+            // Ensure updated_at column exists
+            $result = $this->connection->query("PRAGMA table_info(settings)");
+            $columns = [];
+            while ($row = $result->fetch()) {
+                $columns[$row['name']] = true;
+            }
+            if (!isset($columns['updated_at'])) {
+                try {
+                    $this->connection->exec("ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+                } catch (Exception $e) {
+                    // Column might already exist
+                }
+            }
+        } catch (Exception $e) {
+            // Ignore migration errors - table might not exist yet
         }
     }
 
