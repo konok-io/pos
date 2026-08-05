@@ -34,16 +34,15 @@ function getSettings() {
             return;
         }
         
-        // Detect actual column names (handle different schema versions)
+        // Detect actual column names - auto-detect ANY two-column schema
         $columns = [];
+        $columnNames = [];
         $result = $db->query("PRAGMA table_info(settings)");
         while ($row = $result->fetch()) {
-            $columns[$row['name']] = true;
+            $colName = $row['name'];
+            $columns[$colName] = true;
+            $columnNames[] = $colName;
         }
-        
-        // Debug: Return detected columns for troubleshooting
-        // Remove this in production
-        // response(['debug_columns' => array_keys($columns)]);
         
         // Determine which columns to use - priority order
         $keyCol = null;
@@ -67,10 +66,14 @@ function getSettings() {
             $valueCol = 'data';
         }
         
+        // Fallback: If no recognized columns, use first two columns
+        if ((!$keyCol || !$valueCol) && count($columnNames) >= 2) {
+            $keyCol = $columnNames[0];
+            $valueCol = $columnNames[1];
+        }
+        
         if (!$keyCol || !$valueCol) {
-            // Debug info - list actual columns
-            $actualColumns = array_keys($columns);
-            response(null, 'Settings table schema error: columns=' . implode(',', $actualColumns), 500);
+            response(null, 'Settings table schema error: cannot determine columns. Found: ' . implode(',', $columnNames), 500);
             return;
         }
         
@@ -112,11 +115,14 @@ function updateSettings() {
     try {
         $db = getDB();
         
-        // Detect actual column names
+        // Detect actual column names - auto-detect ANY two-column schema
         $columns = [];
+        $columnNames = [];
         $result = $db->query("PRAGMA table_info(settings)");
         while ($row = $result->fetch()) {
-            $columns[$row['name']] = true;
+            $colName = $row['name'];
+            $columns[$colName] = true;
+            $columnNames[] = $colName;
         }
         
         // Determine which columns to use - priority order
@@ -141,8 +147,14 @@ function updateSettings() {
             $valueCol = 'data';
         }
         
+        // Fallback: If no recognized columns, use first two columns
+        if ((!$keyCol || !$valueCol) && count($columnNames) >= 2) {
+            $keyCol = $columnNames[0];
+            $valueCol = $columnNames[1];
+        }
+        
         if (!$keyCol || !$valueCol) {
-            response(null, 'Settings table schema error: missing columns', 500);
+            response(null, 'Settings table schema error: cannot determine columns. Found: ' . implode(',', $columnNames), 500);
             return;
         }
 
