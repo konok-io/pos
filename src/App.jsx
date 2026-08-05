@@ -1144,19 +1144,23 @@ export default function App() {
 
   useEffect(() => {
     async function checkAuth() {
-      // Check if user is logged in (from in-memory storage - no localStorage)
       const user = getUser();
       const token = getToken();
+      console.log('Auth Check - User:', user ? 'exists' : 'null', 'Token:', token ? 'exists' : 'null');
+      
       if (user && token) {
-        // Verify token is still valid with server
         try {
           const result = await auth.check();
+          console.log('Auth Check Result:', result);
           if (result.success) {
             setCurrentUser(user);
             setIsLoggedIn(true);
+          } else {
+            console.log('Auth check failed');
+            clearAuth();
           }
         } catch (e) {
-          // Token invalid, clear auth
+          console.log('Auth check error:', e);
           clearAuth();
         }
       }
