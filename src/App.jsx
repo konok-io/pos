@@ -1074,35 +1074,9 @@ function MainApp({ currentUser, onLogout }) {
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd, currentUser, refreshData};
 
-  // Hard refresh - clear caches and reload page but keep auth data
+  // Hard refresh - just reload page to fetch fresh data from server
   const handleHardRefresh = () => {
-    // Save auth data before clearing (using exact keys from api.js)
-    const savedUser = localStorage.getItem('pos_auth_user');
-    const savedToken = localStorage.getItem('pos_auth_token');
-    const savedWantFullscreen = localStorage.getItem('pos_want_fullscreen');
-    const savedProducts = localStorage.getItem('pos_products');
-    const savedCategories = localStorage.getItem('pos_categories');
-    
-    // Clear all caches
-    if (window.caches) {
-      window.caches.keys().then(names => names.forEach(name => window.caches.delete(name)));
-    }
-    // Clear service workers if any
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
-    }
-    // Clear localStorage and sessionStorage
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    // Restore auth and important data
-    if (savedUser) localStorage.setItem('pos_auth_user', savedUser);
-    if (savedToken) localStorage.setItem('pos_auth_token', savedToken);
-    if (savedWantFullscreen) localStorage.setItem('pos_want_fullscreen', savedWantFullscreen);
-    if (savedProducts) localStorage.setItem('pos_products', savedProducts);
-    if (savedCategories) localStorage.setItem('pos_categories', savedCategories);
-    
-    // Hard reload bypassing cache
+    // Hard reload bypassing browser cache - all data comes from PHP/MySQL server
     window.location.reload(true);
   };
 
