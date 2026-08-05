@@ -1,7 +1,7 @@
 <?php
 /**
  * Authentication API
- * POS System
+ * POS System - SQLite Backend
  */
 
 require_once 'config.php';
@@ -57,18 +57,18 @@ function login() {
             response(null, 'Invalid email or password', 401);
         }
         
-        // Create session
-        $sessionId = generateId();
+        // Create token
+        $tokenId = generateId();
         $token = generateToken();
         $expiresAt = date('Y-m-d H:i:s', strtotime('+24 hours'));
         
-        // Delete old sessions for this user
-        $stmt = $db->prepare("DELETE FROM sessions WHERE user_id = ?");
+        // Delete old tokens for this user
+        $stmt = $db->prepare("DELETE FROM auth_tokens WHERE user_id = ?");
         $stmt->execute([$user['id']]);
         
-        // Create new session
-        $stmt = $db->prepare("INSERT INTO sessions (id, user_id, token, expires_at) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$sessionId, $user['id'], $token, $expiresAt]);
+        // Create new token
+        $stmt = $db->prepare("INSERT INTO auth_tokens (id, user_id, token, expires_at) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$tokenId, $user['id'], $token, $expiresAt]);
         
         response([
             'user' => [
@@ -98,7 +98,7 @@ function logout() {
     
     try {
         $db = getDB();
-        $stmt = $db->prepare("DELETE FROM sessions WHERE token = ?");
+        $stmt = $db->prepare("DELETE FROM auth_tokens WHERE token = ?");
         $stmt->execute([$token]);
         
         response(['message' => 'Logged out successfully']);
@@ -121,10 +121,10 @@ function checkAuth() {
     try {
         $db = getDB();
         $stmt = $db->prepare("
-            SELECT s.*, u.name, u.email, u.role 
-            FROM sessions s 
-            JOIN users u ON s.user_id = u.id 
-            WHERE s.token = ? AND s.expires_at > NOW()
+            SELECT t.*, u.name, u.email, u.role 
+            FROM auth_tokens t 
+            JOIN users u ON t.user_id = u.id 
+            WHERE t.token = ? AND t.expires_at > datetime('now')
         ");
         $stmt->execute([$token]);
         $session = $stmt->fetch();
@@ -175,10 +175,10 @@ function authenticate() {
     try {
         $db = getDB();
         $stmt = $db->prepare("
-            SELECT s.*, u.name, u.email, u.role 
-            FROM sessions s 
-            JOIN users u ON s.user_id = u.id 
-            WHERE s.token = ? AND s.expires_at > NOW()
+            SELECT t.*, u.name, u.email, u.role 
+            FROM auth_tokens t 
+            JOIN users u ON t.user_id = u.id 
+            WHERE t.token = ? AND t.expires_at > datetime('now')
         ");
         $stmt->execute([$token]);
         $session = $stmt->fetch();
