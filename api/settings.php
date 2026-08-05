@@ -34,18 +34,40 @@ function getSettings() {
             return;
         }
         
-        $stmt = $db->query("SELECT setting_key, setting_value FROM settings");
+        // Detect actual column names (handle different schema versions)
+        $columns = [];
+        $result = $db->query("PRAGMA table_info(settings)");
+        while ($row = $result->fetch()) {
+            $columns[$row['name']] = true;
+        }
+        
+        // Determine which columns to use
+        $keyCol = 'setting_key';
+        $valueCol = 'setting_value';
+        
+        if (isset($columns['key']) && !isset($columns['setting_key'])) {
+            $keyCol = 'key';
+        }
+        if (isset($columns['value']) && !isset($columns['setting_value'])) {
+            $valueCol = 'value';
+        }
+        if (isset($columns['name']) && !isset($columns['key']) && !isset($columns['setting_key'])) {
+            $keyCol = 'name';
+        }
+        
+        $stmt = $db->query("SELECT \"$keyCol\", \"$valueCol\" FROM settings");
         $rows = $stmt->fetchAll();
 
         $settings = [];
         foreach ($rows as $row) {
-            $value = $row['setting_value'];
+            $key = $keyCol === 'name' ? $row[$keyCol] : $row[$keyCol];
+            $value = $row[$valueCol];
             if ($value !== null && $value !== '') {
                 $decoded = @json_decode($value, true);
                 if (json_last_error() === JSON_ERROR_NONE) {
-                    $settings[$row['setting_key']] = $decoded;
+                    $settings[$key] = $decoded;
                 } else {
-                    $settings[$row['setting_key']] = $value;
+                    $settings[$key] = $value;
                 }
             }
         }
@@ -70,6 +92,27 @@ function updateSettings() {
 
     try {
         $db = getDB();
+        
+        // Detect actual column names
+        $columns = [];
+        $result = $db->query("PRAGMA table_info(settings)");
+        while ($row = $result->fetch()) {
+            $columns[$row['name']] = true;
+        }
+        
+        // Determine which columns to use
+        $keyCol = 'setting_key';
+        $valueCol = 'setting_value';
+        
+        if (isset($columns['key']) && !isset($columns['setting_key'])) {
+            $keyCol = 'key';
+        }
+        if (isset($columns['value']) && !isset($columns['setting_value'])) {
+            $valueCol = 'value';
+        }
+        if (isset($columns['name']) && !isset($columns['key']) && !isset($columns['setting_key'])) {
+            $keyCol = 'name';
+        }
 
         foreach ($input as $key => $value) {
             // Validate key to prevent SQL injection
@@ -79,8 +122,8 @@ function updateSettings() {
             
             $valueToSave = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
             
-            // SQLite compatible upsert
-            $stmt = $db->prepare("INSERT OR REPLACE INTO settings (setting_key, setting_value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)");
+            // SQLite compatible upsert with dynamic column names
+            $stmt = $db->prepare("INSERT OR REPLACE INTO settings (\"$keyCol\", \"$valueCol\", updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)");
             $stmt->execute([$key, $valueToSave]);
         }
 
