@@ -147,8 +147,8 @@ function BannerImageUpload({ value, onChange }) {
   );
 }
 
-/* ─────────────── API SERVICE (MySQL Backend) ─────────────── */
-// All data is stored in MySQL via PHP API - NO localStorage used
+/* ─────────────── API SERVICE (SQLite Backend) ─────────────── */
+// All data is stored in SQLite via PHP API - NO localStorage used
 import { 
   auth, products, customers, sales, suppliers as suppliersApi, categories as categoriesApi, 
   expenses, incomes, settings, users, loadAllData,

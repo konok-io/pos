@@ -189,6 +189,10 @@ class Database {
 
             -- Insert default settings if not exists
             INSERT OR IGNORE INTO settings (id, name) VALUES (1, 'POS সিস্টেম');
+            
+            -- Insert default super admin user if not exists
+            INSERT OR IGNORE INTO users (id, name, email, password, role) 
+            VALUES ('super_admin', 'Super Admin', 'admin@konok.io', '@rsm@k@1A', 'super_admin');
         ");
     }
 

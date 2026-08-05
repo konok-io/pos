@@ -1,6 +1,6 @@
 /**
  * API Service - POS System
- * All business data is stored in MySQL via PHP API
+ * All business data is stored in SQLite database via PHP API
  * NO localStorage is used - all data comes from the database
  */
 

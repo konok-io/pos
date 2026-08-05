@@ -1,29 +1,21 @@
-# POS System Backend - PHP & MySQL
+# POS System Backend - PHP & SQLite
 
 ## Setup Instructions
 
 ### 1. Database Setup
 
-First, create the MySQL database and tables:
+**No setup required!** The SQLite database is automatically created on first run.
 
-```bash
-mysql -u root -p < api/database.sql
-```
-
-Or import via phpMyAdmin:
-1. Open phpMyAdmin
-2. Create a database named `pos_system`
-3. Import `api/database.sql`
+The database file `api/database.sqlite` will be created automatically with all tables.
 
 ### 2. Configuration
 
-Edit `api/config.php` to update your database credentials:
+No configuration needed! SQLite creates the database file automatically.
+
+To change the database location, edit `api/config.php`:
 
 ```php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'pos_system');
-define('DB_USER', 'your_username');
-define('DB_PASS', 'your_password');
+define('DB_PATH', __DIR__ . '/database.sqlite');
 ```
 
 ### 3. Default Login
