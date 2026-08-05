@@ -1047,9 +1047,16 @@ function MainApp({ currentUser, onLogout }) {
   const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd, currentUser, refreshData};
 
   // Hard refresh - just reload page to fetch fresh data from server
-  const handleHardRefresh = () => {
-    // Hard reload bypassing browser cache - all data comes from SQLite database
-    window.location.reload(true);
+  const handleHardRefresh = async () => {
+    // Refresh data from server without page reload - keeps sessionStorage intact
+    setIsLoading(true);
+    try {
+      await loadAllData();
+      console.log('Data refreshed successfully');
+    } catch (error) {
+      console.error('Refresh failed:', error);
+    }
+    setIsLoading(false);
   };
 
   // Fullscreen toggle function
