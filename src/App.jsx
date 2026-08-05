@@ -1200,7 +1200,7 @@ export default function App() {
    POS SCREEN
 ═══════════════════════════════════════════ */
 function POSScreen({products, customers, sales, settings, categories, upd, productHistory, currentUser, refreshData}) {
-  // Initialize cart from IndexedDB in useEffect to avoid hydration issues
+  // Cart is managed in component state (memory only)
   const [cart, setCart] = useState([]);
   const [selCust, setSelCust] = useState(null);
   const [custQ, setCustQ] = useState('');
@@ -6664,7 +6664,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
   const totalExpense = totalPurchaseExpense + totalManualExpense;
   const netProfit = totalIncome - totalExpense;
 
-  // Save expense to IndexedDB
+  // Save expense to MySQL database
   const saveExpense = async () => {
     if (!expenseForm.title?.trim()) { alert('ব্যয়ের বিবরণ দিন'); return; }
     if (!expenseForm.amount || expenseForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
