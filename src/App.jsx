@@ -1146,21 +1146,17 @@ export default function App() {
     async function checkAuth() {
       const user = getUser();
       const token = getToken();
-      console.log('Auth Check - User:', user ? 'exists' : 'null', 'Token:', token ? 'exists' : 'null');
       
       if (user && token) {
         try {
           const result = await auth.check();
-          console.log('Auth Check Result:', result);
           if (result.success) {
             setCurrentUser(user);
             setIsLoggedIn(true);
           } else {
-            console.log('Auth check failed');
             clearAuth();
           }
         } catch (e) {
-          console.log('Auth check error:', e);
           clearAuth();
         }
       }
