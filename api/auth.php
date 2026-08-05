@@ -37,7 +37,7 @@ switch ($method) {
  * Login
  */
 function login() {
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = @json_decode(file_get_contents('php://input'), true);
     
     if (!isset($input['email']) || !isset($input['password'])) {
         response(null, 'Email and password are required', 400);

@@ -64,7 +64,7 @@ function getCustomers() {
  */
 function createCustomer() {
     authenticate();
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
     
@@ -106,7 +106,7 @@ function createCustomer() {
  */
 function updateCustomer() {
     authenticate();
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = @json_decode(file_get_contents('php://input'), true);
     
     if (!isset($input['id'])) {
         response(null, 'Customer ID is required', 400);

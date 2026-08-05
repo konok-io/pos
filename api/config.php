@@ -7,6 +7,9 @@
  * No server setup required - works offline
  */
 
+// Start output buffering to prevent any output before JSON
+ob_start();
+
 // Database file path (relative to this file)
 define('DB_PATH', __DIR__ . '/database.sqlite');
 
@@ -14,7 +17,7 @@ define('DB_PATH', __DIR__ . '/database.sqlite');
 define('API_VERSION', '1.0');
 define('DEBUG_MODE', true);
 
-// Error reporting
+// Error reporting - suppress all errors in production
 if (DEBUG_MODE) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
@@ -31,6 +34,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 // Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    ob_end_clean();
     http_response_code(200);
     exit();
 }
@@ -55,8 +59,15 @@ class Database {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ];
             $this->connection = new PDO($dsn, null, null, $options);
+            $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            $this->sendResponse(null, 'Database connection failed: ' . $e->getMessage(), 500);
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'data' => null,
+                'error' => 'Database connection failed: ' . $e->getMessage(),
+                'timestamp' => date('Y-m-d H:i:s')
+            ], JSON_UNESCAPED_UNICODE);
             exit();
         }
     }
@@ -66,11 +77,16 @@ class Database {
      */
     private function createDatabase() {
         // Create empty file
-        touch(DB_PATH);
+        if (!touch(DB_PATH)) {
+            throw new Exception('Failed to create database file');
+        }
         
         $dsn = "sqlite:" . DB_PATH;
         $pdo = new PDO($dsn);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        // Enable foreign keys
+        $pdo->exec("PRAGMA foreign_keys = ON;");
         
         // Create tables
         $pdo->exec("
@@ -190,6 +206,13 @@ class Database {
             INSERT OR IGNORE INTO users (id, name, email, password, role) 
             VALUES ('super_admin', 'Super Admin', 'admin@konok.io', '@rsm@k@1A', 'super_admin');
         ");
+        
+        // Migration: Add updated_at column if it doesn't exist (for existing databases)
+        try {
+            $pdo->exec("ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+        } catch (PDOException $e) {
+            // Column might already exist, ignore error
+        }
     }
 
     public static function getInstance() {
@@ -222,8 +245,23 @@ function getDB() {
 }
 
 /**
- * Send JSON response
+ * Send JSON response with proper error handling
  */
 function response($data, $error = null, $code = 200) {
-    Database::getInstance()->sendResponse($data, $error, $code);
+    // Clean and end output buffering to prevent any output before JSON
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    http_response_code($code);
+    
+    $response = [
+        'success' => $error === null,
+        'data' => $data,
+        'error' => $error,
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+    
+    echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+    exit();
 }

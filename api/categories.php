@@ -47,7 +47,7 @@ function getCategories() {
  */
 function createCategory() {
     authenticate();
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
     
@@ -83,7 +83,7 @@ function createCategory() {
  */
 function updateCategory() {
     authenticate();
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = @json_decode(file_get_contents('php://input'), true);
     
     if (!isset($input['id'])) {
         response(null, 'Category ID is required', 400);

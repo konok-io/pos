@@ -58,7 +58,7 @@ function createUser() {
         response(null, 'Permission denied. Super Admin only.', 403);
     }
     
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = @json_decode(file_get_contents('php://input'), true);
     
     if (empty($input['email']) || empty($input['password']) || empty($input['name'])) {
         response(null, 'Name, email and password are required', 400);
@@ -113,7 +113,7 @@ function updateUser() {
         response(null, 'Permission denied. Super Admin only.', 403);
     }
     
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = @json_decode(file_get_contents('php://input'), true);
     
     if (!isset($input['id'])) {
         response(null, 'User ID is required', 400);
