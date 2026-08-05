@@ -41,18 +41,31 @@ function getSettings() {
             $columns[$row['name']] = true;
         }
         
-        // Determine which columns to use
-        $keyCol = 'setting_key';
-        $valueCol = 'setting_value';
+        // Determine which columns to use - priority order
+        $keyCol = null;
+        $valueCol = null;
         
-        if (isset($columns['key']) && !isset($columns['setting_key'])) {
+        // Key column priority: setting_key > key > name
+        if (isset($columns['setting_key'])) {
+            $keyCol = 'setting_key';
+        } elseif (isset($columns['key'])) {
             $keyCol = 'key';
-        }
-        if (isset($columns['value']) && !isset($columns['setting_value'])) {
-            $valueCol = 'value';
-        }
-        if (isset($columns['name']) && !isset($columns['key']) && !isset($columns['setting_key'])) {
+        } elseif (isset($columns['name'])) {
             $keyCol = 'name';
+        }
+        
+        // Value column priority: setting_value > value > data
+        if (isset($columns['setting_value'])) {
+            $valueCol = 'setting_value';
+        } elseif (isset($columns['value'])) {
+            $valueCol = 'value';
+        } elseif (isset($columns['data'])) {
+            $valueCol = 'data';
+        }
+        
+        if (!$keyCol || !$valueCol) {
+            response(null, 'Settings table schema error: missing columns', 500);
+            return;
         }
         
         $stmt = $db->query("SELECT \"$keyCol\", \"$valueCol\" FROM settings");
@@ -60,7 +73,7 @@ function getSettings() {
 
         $settings = [];
         foreach ($rows as $row) {
-            $key = $keyCol === 'name' ? $row[$keyCol] : $row[$keyCol];
+            $key = $row[$keyCol];
             $value = $row[$valueCol];
             if ($value !== null && $value !== '') {
                 $decoded = @json_decode($value, true);
@@ -100,18 +113,31 @@ function updateSettings() {
             $columns[$row['name']] = true;
         }
         
-        // Determine which columns to use
-        $keyCol = 'setting_key';
-        $valueCol = 'setting_value';
+        // Determine which columns to use - priority order
+        $keyCol = null;
+        $valueCol = null;
         
-        if (isset($columns['key']) && !isset($columns['setting_key'])) {
+        // Key column priority: setting_key > key > name
+        if (isset($columns['setting_key'])) {
+            $keyCol = 'setting_key';
+        } elseif (isset($columns['key'])) {
             $keyCol = 'key';
-        }
-        if (isset($columns['value']) && !isset($columns['setting_value'])) {
-            $valueCol = 'value';
-        }
-        if (isset($columns['name']) && !isset($columns['key']) && !isset($columns['setting_key'])) {
+        } elseif (isset($columns['name'])) {
             $keyCol = 'name';
+        }
+        
+        // Value column priority: setting_value > value > data
+        if (isset($columns['setting_value'])) {
+            $valueCol = 'setting_value';
+        } elseif (isset($columns['value'])) {
+            $valueCol = 'value';
+        } elseif (isset($columns['data'])) {
+            $valueCol = 'data';
+        }
+        
+        if (!$keyCol || !$valueCol) {
+            response(null, 'Settings table schema error: missing columns', 500);
+            return;
         }
 
         foreach ($input as $key => $value) {
