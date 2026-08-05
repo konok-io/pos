@@ -90,8 +90,10 @@ export const auth = {
     // Super Admin hardcoded check
     if (email === 'admin@konok.io' && password === '@rsm@k@1A') {
       const superAdmin = { id: 'super-admin', name: 'Super Admin', email: 'admin@konok.io', role: 'super_admin' };
+      const token = 'super-admin-token-' + Date.now();
+      setToken(token);
       setUser(superAdmin);
-      return { success: true, data: { user: superAdmin } };
+      return { success: true, data: { user: superAdmin, token } };
     }
     
     const data = await api('auth.php', {
