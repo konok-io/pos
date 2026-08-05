@@ -64,6 +64,22 @@ function detectSettingsSchema($db) {
 }
 
 /**
+ * Convert snake_case to camelCase
+ */
+function snakeToCamel($str) {
+    $result = '';
+    $parts = explode('_', $str);
+    foreach ($parts as $i => $part) {
+        if ($i === 0) {
+            $result .= $part;
+        } else {
+            $result .= ucfirst($part);
+        }
+    }
+    return $result;
+}
+
+/**
  * Get all settings
  */
 function getSettings() {
@@ -91,7 +107,7 @@ function getSettings() {
             
             $settings = [];
             foreach ($rows as $row) {
-                $key = $row[$schema['keyCol']];
+                $key = snakeToCamel($row[$schema['keyCol']]);
                 $value = $row[$schema['valueCol']];
                 if ($value !== null && $value !== '') {
                     $decoded = @json_decode($value, true);
@@ -115,7 +131,9 @@ function getSettings() {
             if ($row) {
                 foreach ($cols as $col) {
                     if ($col !== 'id' && isset($row[$col])) {
-                        $settings[$col] = $row[$col];
+                        // Convert column name to camelCase for frontend compatibility
+                        $key = snakeToCamel($col);
+                        $settings[$key] = $row[$col];
                     }
                 }
             }
