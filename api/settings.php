@@ -115,19 +115,29 @@ function updateSettings() {
     try {
         $db = getDB();
         
-        // Detect actual column names - auto-detect ANY two-column schema
+        // Get detailed column info
         $columns = [];
         $columnNames = [];
         $result = $db->query("PRAGMA table_info(settings)");
         while ($row = $result->fetch()) {
             $colName = $row['name'];
-            $columns[$colName] = true;
+            $columns[$colName] = [
+                'name' => $colName,
+                'type' => $row['type'],
+                'pk' => $row['pk'],
+                'notnull' => $row['notnull'],
+                'dflt_value' => $row['dflt_value']
+            ];
             $columnNames[] = $colName;
         }
         
         // Determine which columns to use - priority order
         $keyCol = null;
         $valueCol = null;
+        $hasUpdatedAt = false;
+        
+        // Check if updated_at column exists
+        $hasUpdatedAt = isset($columns['updated_at']);
         
         // Key column priority: setting_key > key > name
         if (isset($columns['setting_key'])) {
@@ -147,10 +157,21 @@ function updateSettings() {
             $valueCol = 'data';
         }
         
-        // Fallback: If no recognized columns, use first two columns
+        // Fallback: If no recognized columns, use first two non-pk columns
         if ((!$keyCol || !$valueCol) && count($columnNames) >= 2) {
-            $keyCol = $columnNames[0];
-            $valueCol = $columnNames[1];
+            $nonPkCols = [];
+            foreach ($columnNames as $col) {
+                if ($columns[$col]['pk'] == 0) {
+                    $nonPkCols[] = $col;
+                }
+            }
+            if (count($nonPkCols) >= 2) {
+                $keyCol = $nonPkCols[0];
+                $valueCol = $nonPkCols[1];
+            } elseif (count($nonPkCols) >= 1 && count($columnNames) >= 2) {
+                $keyCol = $nonPkCols[0];
+                $valueCol = $columnNames[1];
+            }
         }
         
         if (!$keyCol || !$valueCol) {
@@ -166,9 +187,14 @@ function updateSettings() {
             
             $valueToSave = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
             
-            // SQLite compatible upsert with dynamic column names
-            $stmt = $db->prepare("INSERT OR REPLACE INTO settings (\"$keyCol\", \"$valueCol\", updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)");
-            $stmt->execute([$key, $valueToSave]);
+            // Build query dynamically based on available columns
+            if ($hasUpdatedAt) {
+                $stmt = $db->prepare("INSERT OR REPLACE INTO settings (\"$keyCol\", \"$valueCol\", updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)");
+                $stmt->execute([$key, $valueToSave]);
+            } else {
+                $stmt = $db->prepare("INSERT OR REPLACE INTO settings (\"$keyCol\", \"$valueCol\") VALUES (?, ?)");
+                $stmt->execute([$key, $valueToSave]);
+            }
         }
 
         response(['message' => 'Settings updated successfully']);
