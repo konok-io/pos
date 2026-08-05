@@ -757,7 +757,7 @@ function MainApp({ currentUser, onLogout }) {
     }
   }, []);
 
-  // Auto-enter fullscreen on page load if it was requested before reload
+  // Auto-enter fullscreen on page load
   useEffect(() => {
     // Wait for page to fully load, then try fullscreen
     const tryFullscreen = () => {
@@ -772,7 +772,6 @@ function MainApp({ currentUser, onLogout }) {
       setTimeout(tryFullscreen, 300);
     } else {
       window.addEventListener('load', () => setTimeout(tryFullscreen, 300));
-      }
     }
   }, []);
 
