@@ -87,12 +87,16 @@ async function api(endpoint, options = {}) {
 
 export const auth = {
   async login(email, password) {
+    console.log('Login attempt:', email);
+    
     // Super Admin hardcoded check
     if (email === 'admin@konok.io' && password === '@rsm@k@1A') {
       const superAdmin = { id: 'super-admin', name: 'Super Admin', email: 'admin@konok.io', role: 'super_admin' };
       const token = 'super-admin-token-' + Date.now();
+      console.log('Super admin login, setting token:', token);
       setToken(token);
       setUser(superAdmin);
+      console.log('sessionStorage after login:', { token: getToken(), user: getUser() });
       return { success: true, data: { user: superAdmin, token } };
     }
     
@@ -102,8 +106,10 @@ export const auth = {
     });
     
     if (data.success && data.data.token) {
+      console.log('Regular login, setting token:', data.data.token);
       setToken(data.data.token);
       setUser(data.data.user);
+      console.log('sessionStorage after login:', { token: getToken(), user: getUser() });
     }
     
     return data;
