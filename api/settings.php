@@ -169,7 +169,8 @@ function updateSettings() {
         if ($schema['type'] === 'keyvalue') {
             // Key-value schema - update/insert each key
             foreach ($input as $key => $value) {
-                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key)) {
+                // Allow camelCase and snake_case keys (e.g., 'taxId', 'crNumber', 'email')
+                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key) && !preg_match('/^[a-zA-Z][a-zA-Z0-9]*$/', $key)) {
                     continue;
                 }
                 $valueToSave = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
