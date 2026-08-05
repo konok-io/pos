@@ -1046,17 +1046,10 @@ function MainApp({ currentUser, onLogout }) {
 
   const props = {products, customers, sales, settings, suppliers, categories, purchases, productHistory, upd, currentUser, refreshData};
 
-  // Hard refresh - just reload page to fetch fresh data from server
-  const handleHardRefresh = async () => {
-    // Refresh data from server without page reload - keeps sessionStorage intact
-    setIsLoading(true);
-    try {
-      await loadAllData();
-      console.log('Data refreshed successfully');
-    } catch (error) {
-      console.error('Refresh failed:', error);
-    }
-    setIsLoading(false);
+  // Hard refresh - reload page and fetch fresh data from server
+  const handleHardRefresh = () => {
+    // Full browser reload
+    window.location.reload();
   };
 
   // Fullscreen toggle function
