@@ -216,7 +216,7 @@ function Modal({onClose, title, children, width=460}) {
 }
 
 /* ─────────────── DYNAMIC MENU COMPONENT ─────────────── */
-function DynamicMenu({tab, setTab, tabs}) {
+function DynamicMenu({tab, onTabChange, tabs}) {
   const menuRef = useRef(null);
 
   const scrollMenu = (direction) => {
@@ -243,7 +243,7 @@ function DynamicMenu({tab, setTab, tabs}) {
   const renderMenuButton = (t) => {
     const isActive = tab === t.id;
     return (
-      <button key={t.id} onClick={() => setTab(t.id)} style={{
+      <button key={t.id} onClick={() => onTabChange(t.id)} style={{
         padding: '6px 10px',
         border: 'none',
         background: isActive 
@@ -715,7 +715,17 @@ function MainApp({ currentUser, onLogout }) {
   const logoutRef = useRef(onLogout);
   logoutRef.current = onLogout;
   
-  const [tab, setTab] = useState('pos');
+  const [tab, setTab] = useState(() => {
+    // Restore tab from localStorage
+    const savedTab = localStorage.getItem('pos_current_tab');
+    return savedTab || 'pos';
+  });
+
+  // Save tab to localStorage when it changes
+  const handleTabChange = (newTab) => {
+    localStorage.setItem('pos_current_tab', newTab);
+    setTab(newTab);
+  };
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [sales, setSales] = useState([]);
@@ -751,7 +761,7 @@ function MainApp({ currentUser, onLogout }) {
       // Listen for tab switch from menu
       window.electronAPI.onMenuAction((action, data) => {
         if (action === 'switch-tab' && data) {
-          setTab(data);
+          handleTabChange(data);
         }
       });
     }
@@ -1072,7 +1082,7 @@ function MainApp({ currentUser, onLogout }) {
           </div>
           
           {/* Dynamic Menu */}
-          <DynamicMenu tab={tab} setTab={setTab} tabs={tabs} />
+          <DynamicMenu tab={tab} onTabChange={handleTabChange} tabs={tabs} />
           
           {/* Actions Section */}
           <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0,marginLeft:24}}>
