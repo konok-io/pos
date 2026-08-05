@@ -37,7 +37,7 @@ switch ($method) {
 }
 
 /**
- * Get all expenses
+ * Get all expenses (stored in expenses table with type='expenses')
  */
 function getExpenses() {
     try {
@@ -46,7 +46,8 @@ function getExpenses() {
         $from = $_GET['from'] ?? '';
         $to = $_GET['to'] ?? '';
         
-        $sql = "SELECT * FROM expenses WHERE 1=1";
+        // Filter by type='expenses' or type is not set
+        $sql = "SELECT * FROM expenses WHERE (type = 'expenses' OR type IS NULL OR type = '')";
         $params = [];
         
         if ($from && $to) {
@@ -69,7 +70,7 @@ function getExpenses() {
 }
 
 /**
- * Create expense
+ * Create expense (stored in expenses table with type='expenses')
  */
 function createExpense() {
     $auth = authenticate();
@@ -81,8 +82,8 @@ function createExpense() {
         $db = getDB();
         
         $stmt = $db->prepare("
-            INSERT INTO expenses (id, title, amount, note, user_id, user_name)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO expenses (id, title, amount, note, type, user_id, user_name)
+            VALUES (?, ?, ?, ?, 'expenses', ?, ?)
         ");
         
         $stmt->execute([
@@ -102,7 +103,7 @@ function createExpense() {
 }
 
 /**
- * Delete expense
+ * Delete expense (stored in expenses table with type='expenses')
  */
 function deleteExpense() {
     $auth = authenticate();
@@ -119,7 +120,7 @@ function deleteExpense() {
     
     try {
         $db = getDB();
-        $stmt = $db->prepare("DELETE FROM expenses WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM expenses WHERE id = ? AND (type = 'expenses' OR type IS NULL OR type = '')");
         $stmt->execute([$id]);
         
         response(['message' => 'Expense deleted successfully']);
@@ -130,7 +131,7 @@ function deleteExpense() {
 }
 
 /**
- * Get all incomes
+ * Get all incomes (stored in expenses table with type='incomes')
  */
 function getIncomes() {
     try {
@@ -139,7 +140,8 @@ function getIncomes() {
         $from = $_GET['from'] ?? '';
         $to = $_GET['to'] ?? '';
         
-        $sql = "SELECT * FROM incomes WHERE 1=1";
+        // Use expenses table with type='incomes'
+        $sql = "SELECT * FROM expenses WHERE type = 'incomes'";
         $params = [];
         
         if ($from && $to) {
@@ -162,7 +164,7 @@ function getIncomes() {
 }
 
 /**
- * Create income
+ * Create income (stored in expenses table with type='incomes')
  */
 function createIncome() {
     $auth = authenticate();
@@ -174,8 +176,8 @@ function createIncome() {
         $db = getDB();
         
         $stmt = $db->prepare("
-            INSERT INTO incomes (id, title, amount, note, user_id, user_name)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO expenses (id, title, amount, note, type, user_id, user_name)
+            VALUES (?, ?, ?, ?, 'incomes', ?, ?)
         ");
         
         $stmt->execute([
@@ -195,7 +197,7 @@ function createIncome() {
 }
 
 /**
- * Delete income
+ * Delete income (stored in expenses table with type='incomes')
  */
 function deleteIncome() {
     $auth = authenticate();
@@ -212,7 +214,7 @@ function deleteIncome() {
     
     try {
         $db = getDB();
-        $stmt = $db->prepare("DELETE FROM incomes WHERE id = ?");
+        $stmt = $db->prepare("DELETE FROM expenses WHERE id = ? AND type = 'incomes'");
         $stmt->execute([$id]);
         
         response(['message' => 'Income deleted successfully']);
