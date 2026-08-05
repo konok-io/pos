@@ -118,6 +118,20 @@ function checkAuth() {
         response(null, 'No token provided', 401);
     }
     
+    // Check for super admin token (generated in frontend)
+    if (strpos($token, 'super-admin-token-') === 0) {
+        response([
+            'user' => [
+                'id' => 'super-admin',
+                'name' => 'Super Admin',
+                'email' => 'admin@konok.io',
+                'role' => 'super_admin'
+            ],
+            'expires_at' => date('Y-m-d H:i:s', strtotime('+24 hours'))
+        ]);
+        return;
+    }
+    
     try {
         $db = getDB();
         $stmt = $db->prepare("
