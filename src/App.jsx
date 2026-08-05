@@ -1076,10 +1076,12 @@ function MainApp({ currentUser, onLogout }) {
 
   // Hard refresh - clear caches and reload page but keep auth data
   const handleHardRefresh = () => {
-    // Save auth data before clearing
-    const savedUser = localStorage.getItem('pos_user');
-    const savedToken = localStorage.getItem('pos_token');
+    // Save auth data before clearing (using exact keys from api.js)
+    const savedUser = localStorage.getItem('pos_auth_user');
+    const savedToken = localStorage.getItem('pos_auth_token');
     const savedWantFullscreen = localStorage.getItem('pos_want_fullscreen');
+    const savedProducts = localStorage.getItem('pos_products');
+    const savedCategories = localStorage.getItem('pos_categories');
     
     // Clear all caches
     if (window.caches) {
@@ -1093,10 +1095,12 @@ function MainApp({ currentUser, onLogout }) {
     localStorage.clear();
     sessionStorage.clear();
     
-    // Restore auth data
-    if (savedUser) localStorage.setItem('pos_user', savedUser);
-    if (savedToken) localStorage.setItem('pos_token', savedToken);
+    // Restore auth and important data
+    if (savedUser) localStorage.setItem('pos_auth_user', savedUser);
+    if (savedToken) localStorage.setItem('pos_auth_token', savedToken);
     if (savedWantFullscreen) localStorage.setItem('pos_want_fullscreen', savedWantFullscreen);
+    if (savedProducts) localStorage.setItem('pos_products', savedProducts);
+    if (savedCategories) localStorage.setItem('pos_categories', savedCategories);
     
     // Hard reload bypassing cache
     window.location.reload(true);
