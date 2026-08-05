@@ -3824,11 +3824,8 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       if (result.success) {
         alert('✅ সরবরাহকারী যুক্ত হয়েছে!');
         setNewSupplier({name:'',phone:'',email:'',address:'',company:'',crNumber:'',vatNumber:''});
-        // Refresh data
-        const data = await loadAllData();
-        if (data.suppliers) {
-          setSuppliers(data.suppliers);
-        }
+        // Refresh data (upd.suppliers.add already calls refreshData, but we reload all)
+        await refreshData();
       } else {
         alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
       }
