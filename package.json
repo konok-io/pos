@@ -38,6 +38,7 @@
     "electron/**/*",
     "api/**/*",
     "public/**/*",
+    "router.php",
     "package.json"
   ]
 },
