@@ -31,15 +31,38 @@ function migrateSettingsTable($db) {
         $columns[$row['name']] = true;
     }
     
-    // If table exists but missing setting_key column, need migration
-    if (!isset($columns['setting_key']) && isset($columns['key'])) {
-        // Rename columns to match new schema
-        $db->exec("ALTER TABLE settings RENAME COLUMN key TO setting_key");
+    // If table already has correct schema, nothing to do
+    if (isset($columns['setting_key']) && isset($columns['setting_value'])) {
+        // Ensure updated_at column exists
+        if (!isset($columns['updated_at'])) {
+            try {
+                $db->exec("ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+            } catch (Exception $e) {
+                // Column might already exist
+            }
+        }
+        return;
     }
-    if (!isset($columns['setting_value']) && isset($columns['value'])) {
-        $db->exec("ALTER TABLE settings RENAME COLUMN value TO setting_value");
-    }
-    if (!isset($columns['updated_at'])) {
+    
+    // Migration needed - old schema with 'key' and 'value' columns
+    if (isset($columns['key']) && isset($columns['value'])) {
+        try {
+            // Try SQLite 3.25+ RENAME COLUMN (preferred method)
+            $db->exec("ALTER TABLE settings RENAME COLUMN key TO setting_key");
+            $db->exec("ALTER TABLE settings RENAME COLUMN value TO setting_value");
+        } catch (Exception $e) {
+            // Fallback: Recreate table with new schema
+            $db->exec("CREATE TABLE settings_new (
+                setting_key TEXT PRIMARY KEY,
+                setting_value TEXT,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )");
+            $db->exec("INSERT INTO settings_new (setting_key, setting_value) SELECT key, value FROM settings");
+            $db->exec("DROP TABLE settings");
+            $db->exec("ALTER TABLE settings_new RENAME TO settings");
+        }
+        
+        // Ensure updated_at column exists
         try {
             $db->exec("ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
         } catch (Exception $e) {
