@@ -773,12 +773,13 @@ function MainApp({ currentUser, onLogout }) {
         // Load all data from SQLite via API
         const data = await loadAllData();
         
-        setProducts(data.products || []);
-        setCustomers(data.customers || []);
-        setCategories(data.categories || []);
-        setSuppliers(data.suppliers || []);
-        setSales(data.sales || []);
-        setSettings(data.settings ? {...DEFAULT_SETTINGS, ...data.settings} : {...DEFAULT_SETTINGS});
+        // Ensure all data arrays are valid
+        setProducts(Array.isArray(data.products) ? data.products : []);
+        setCustomers(Array.isArray(data.customers) ? data.customers : []);
+        setCategories(Array.isArray(data.categories) ? data.categories : []);
+        setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : []);
+        setSales(Array.isArray(data.sales) ? data.sales : []);
+        setSettings(data.settings && typeof data.settings === 'object' ? {...DEFAULT_SETTINGS, ...data.settings} : {...DEFAULT_SETTINGS});
         setReady(true);
       } catch (error) {
         console.error('Failed to load data from server:', error);
@@ -800,12 +801,12 @@ function MainApp({ currentUser, onLogout }) {
   const refreshData = async () => {
     try {
       const data = await loadAllData();
-      setProducts(data.products || []);
-      setCustomers(data.customers || []);
-      setCategories(data.categories || []);
-      setSuppliers(data.suppliers || []);
-      setSales(data.sales || []);
-      setSettings(data.settings ? {...DEFAULT_SETTINGS, ...data.settings} : {...DEFAULT_SETTINGS});
+      setProducts(Array.isArray(data.products) ? data.products : []);
+      setCustomers(Array.isArray(data.customers) ? data.customers : []);
+      setCategories(Array.isArray(data.categories) ? data.categories : []);
+      setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : []);
+      setSales(Array.isArray(data.sales) ? data.sales : []);
+      setSettings(data.settings && typeof data.settings === 'object' ? {...DEFAULT_SETTINGS, ...data.settings} : {...DEFAULT_SETTINGS});
     } catch (error) {
       console.error('Failed to refresh data:', error);
     }

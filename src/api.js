@@ -64,7 +64,17 @@ async function api(endpoint, options = {}) {
       headers,
     });
     
-    const data = await response.json();
+    // Get raw text first to check for valid JSON
+    const text = await response.text();
+    let data;
+    
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error('Invalid JSON response from:', url);
+      console.error('Response text:', text.substring(0, 500));
+      throw new Error('Invalid JSON response from server');
+    }
     
     if (!response.ok) {
       if (response.status === 401) {
