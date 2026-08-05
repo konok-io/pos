@@ -418,8 +418,29 @@ export async function loadAllData() {
       categories: categoriesData,
     };
   } catch (error) {
-    console.error('Failed to load data:', error);
-    throw error;
+    console.error('Failed to load data from API, trying localStorage...', error);
+    
+    // Fallback to localStorage for Electron app
+    try {
+      const localProducts = JSON.parse(localStorage.getItem('pos_products') || '[]');
+      const localCustomers = JSON.parse(localStorage.getItem('pos_customers') || '[]');
+      const localSales = JSON.parse(localStorage.getItem('pos_sales') || '[]');
+      const localSettings = JSON.parse(localStorage.getItem('pos_settings') || '{}');
+      const localSuppliers = JSON.parse(localStorage.getItem('pos_suppliers') || '[]');
+      const localCategories = JSON.parse(localStorage.getItem('pos_categories') || '[]');
+      
+      return {
+        products: localProducts,
+        customers: localCustomers,
+        sales: localSales,
+        settings: localSettings,
+        suppliers: localSuppliers,
+        categories: localCategories,
+      };
+    } catch (localError) {
+      console.error('Failed to load from localStorage:', localError);
+      throw error;
+    }
   }
 }
 

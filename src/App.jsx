@@ -7882,13 +7882,37 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const save = async () => {
     try {
-      const result = await upd.settings.update(form);
-      if (result.success) {
+      // Check if running in Electron (standalone app)
+      const isElectron = window.electronAPI;
+      
+      if (isElectron) {
+        // Save to localStorage for Electron app
+        localStorage.setItem('pos_settings', JSON.stringify(form));
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
         alert('✅ সেটিংস সংরক্ষিত হয়েছে!');
       } else {
-        alert('❌ সেটিংস সংরক্ষণ ব্যর্থ হয়েছে!');
+        // Try API save for web version
+        try {
+          const result = await upd.settings.update(form);
+          if (result.success) {
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
+            alert('✅ সেটিংস সংরক্ষিত হয়েছে!');
+          } else {
+            // Fallback to localStorage
+            localStorage.setItem('pos_settings', JSON.stringify(form));
+            setSaved(true);
+            setTimeout(() => setSaved(false), 3000);
+            alert('✅ সেটিংস সংরক্ষিত হয়েছে! (লোকাল)');
+          }
+        } catch {
+          // Fallback to localStorage
+          localStorage.setItem('pos_settings', JSON.stringify(form));
+          setSaved(true);
+          setTimeout(() => setSaved(false), 3000);
+          alert('✅ সেটিংস সংরক্ষিত হয়েছে! (লোকাল)');
+        }
       }
     } catch (error) {
       console.error('Failed to save settings:', error);
