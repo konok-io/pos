@@ -21,6 +21,49 @@ switch ($method) {
 }
 
 /**
+ * Detect settings table schema type
+ * Returns: 'keyvalue' or 'single-row'
+ */
+function detectSettingsSchema($db) {
+    $result = $db->query("PRAGMA table_info(settings)");
+    $columns = [];
+    while ($row = $result->fetch()) {
+        $columns[$row['name']] = [
+            'type' => $row['type'],
+            'pk' => $row['pk'],
+            'notnull' => $row['notnull']
+        ];
+    }
+    
+    // Check for key-value schema
+    if (isset($columns['setting_key']) || isset($columns['key']) || isset($columns['name'])) {
+        // Key-value schema
+        $keyCol = isset($columns['setting_key']) ? 'setting_key' : (isset($columns['key']) ? 'key' : 'name');
+        $valueCol = isset($columns['setting_value']) ? 'setting_value' : (isset($columns['value']) ? 'value' : (isset($columns['data']) ? 'data' : null));
+        
+        if ($valueCol) {
+            return [
+                'type' => 'keyvalue',
+                'keyCol' => $keyCol,
+                'valueCol' => $valueCol,
+                'hasUpdatedAt' => isset($columns['updated_at'])
+            ];
+        }
+    }
+    
+    // Check for single-row schema (has id with CHECK constraint)
+    if (isset($columns['id'])) {
+        // Single-row schema - all settings are columns in one row
+        return [
+            'type' => 'single-row',
+            'columns' => array_keys($columns)
+        ];
+    }
+    
+    return null;
+}
+
+/**
  * Get all settings
  */
 function getSettings() {
@@ -34,67 +77,50 @@ function getSettings() {
             return;
         }
         
-        // Detect actual column names - auto-detect ANY two-column schema
-        $columns = [];
-        $columnNames = [];
-        $result = $db->query("PRAGMA table_info(settings)");
-        while ($row = $result->fetch()) {
-            $colName = $row['name'];
-            $columns[$colName] = true;
-            $columnNames[] = $colName;
-        }
-        
-        // Determine which columns to use - priority order
-        $keyCol = null;
-        $valueCol = null;
-        
-        // Key column priority: setting_key > key > name
-        if (isset($columns['setting_key'])) {
-            $keyCol = 'setting_key';
-        } elseif (isset($columns['key'])) {
-            $keyCol = 'key';
-        } elseif (isset($columns['name'])) {
-            $keyCol = 'name';
-        }
-        
-        // Value column priority: setting_value > value > data
-        if (isset($columns['setting_value'])) {
-            $valueCol = 'setting_value';
-        } elseif (isset($columns['value'])) {
-            $valueCol = 'value';
-        } elseif (isset($columns['data'])) {
-            $valueCol = 'data';
-        }
-        
-        // Fallback: If no recognized columns, use first two columns
-        if ((!$keyCol || !$valueCol) && count($columnNames) >= 2) {
-            $keyCol = $columnNames[0];
-            $valueCol = $columnNames[1];
-        }
-        
-        if (!$keyCol || !$valueCol) {
-            response(null, 'Settings table schema error: cannot determine columns. Found: ' . implode(',', $columnNames), 500);
+        // Detect schema
+        $schema = detectSettingsSchema($db);
+        if (!$schema) {
+            response(null, 'Unknown settings table schema', 500);
             return;
         }
         
-        $stmt = $db->query("SELECT \"$keyCol\", \"$valueCol\" FROM settings");
-        $rows = $stmt->fetchAll();
-
-        $settings = [];
-        foreach ($rows as $row) {
-            $key = $row[$keyCol];
-            $value = $row[$valueCol];
-            if ($value !== null && $value !== '') {
-                $decoded = @json_decode($value, true);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    $settings[$key] = $decoded;
-                } else {
-                    $settings[$key] = $value;
+        if ($schema['type'] === 'keyvalue') {
+            // Key-value schema
+            $stmt = $db->query("SELECT \"" . $schema['keyCol'] . "\", \"" . $schema['valueCol'] . "\" FROM settings");
+            $rows = $stmt->fetchAll();
+            
+            $settings = [];
+            foreach ($rows as $row) {
+                $key = $row[$schema['keyCol']];
+                $value = $row[$schema['valueCol']];
+                if ($value !== null && $value !== '') {
+                    $decoded = @json_decode($value, true);
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $settings[$key] = $decoded;
+                    } else {
+                        $settings[$key] = $value;
+                    }
                 }
             }
+            response($settings);
+        } else {
+            // Single-row schema - get all columns as settings
+            $cols = $schema['columns'];
+            $placeholders = implode(',', array_fill(0, count($cols), '?'));
+            $stmt = $db->prepare("SELECT * FROM settings LIMIT 1");
+            $stmt->execute();
+            $row = $stmt->fetch();
+            
+            $settings = [];
+            if ($row) {
+                foreach ($cols as $col) {
+                    if ($col !== 'id' && isset($row[$col])) {
+                        $settings[$col] = $row[$col];
+                    }
+                }
+            }
+            response($settings);
         }
-
-        response($settings);
 
     } catch (Exception $e) {
         response(null, 'Failed to fetch settings: ' . $e->getMessage(), 500);
@@ -115,85 +141,51 @@ function updateSettings() {
     try {
         $db = getDB();
         
-        // Get detailed column info
-        $columns = [];
-        $columnNames = [];
-        $result = $db->query("PRAGMA table_info(settings)");
-        while ($row = $result->fetch()) {
-            $colName = $row['name'];
-            $columns[$colName] = [
-                'name' => $colName,
-                'type' => $row['type'],
-                'pk' => $row['pk'],
-                'notnull' => $row['notnull'],
-                'dflt_value' => $row['dflt_value']
-            ];
-            $columnNames[] = $colName;
-        }
-        
-        // Determine which columns to use - priority order
-        $keyCol = null;
-        $valueCol = null;
-        $hasUpdatedAt = false;
-        
-        // Check if updated_at column exists
-        $hasUpdatedAt = isset($columns['updated_at']);
-        
-        // Key column priority: setting_key > key > name
-        if (isset($columns['setting_key'])) {
-            $keyCol = 'setting_key';
-        } elseif (isset($columns['key'])) {
-            $keyCol = 'key';
-        } elseif (isset($columns['name'])) {
-            $keyCol = 'name';
-        }
-        
-        // Value column priority: setting_value > value > data
-        if (isset($columns['setting_value'])) {
-            $valueCol = 'setting_value';
-        } elseif (isset($columns['value'])) {
-            $valueCol = 'value';
-        } elseif (isset($columns['data'])) {
-            $valueCol = 'data';
-        }
-        
-        // Fallback: If no recognized columns, use first two non-pk columns
-        if ((!$keyCol || !$valueCol) && count($columnNames) >= 2) {
-            $nonPkCols = [];
-            foreach ($columnNames as $col) {
-                if ($columns[$col]['pk'] == 0) {
-                    $nonPkCols[] = $col;
-                }
-            }
-            if (count($nonPkCols) >= 2) {
-                $keyCol = $nonPkCols[0];
-                $valueCol = $nonPkCols[1];
-            } elseif (count($nonPkCols) >= 1 && count($columnNames) >= 2) {
-                $keyCol = $nonPkCols[0];
-                $valueCol = $columnNames[1];
-            }
-        }
-        
-        if (!$keyCol || !$valueCol) {
-            response(null, 'Settings table schema error: cannot determine columns. Found: ' . implode(',', $columnNames), 500);
+        // Detect schema
+        $schema = detectSettingsSchema($db);
+        if (!$schema) {
+            response(null, 'Unknown settings table schema', 500);
             return;
         }
-
-        foreach ($input as $key => $value) {
-            // Validate key to prevent SQL injection
-            if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key)) {
-                continue;
+        
+        if ($schema['type'] === 'keyvalue') {
+            // Key-value schema - update/insert each key
+            foreach ($input as $key => $value) {
+                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key)) {
+                    continue;
+                }
+                $valueToSave = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
+                
+                if ($schema['hasUpdatedAt']) {
+                    $stmt = $db->prepare("INSERT OR REPLACE INTO settings (\"" . $schema['keyCol'] . "\", \"" . $schema['valueCol'] . "\", updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)");
+                } else {
+                    $stmt = $db->prepare("INSERT OR REPLACE INTO settings (\"" . $schema['keyCol'] . "\", \"" . $schema['valueCol'] . "\") VALUES (?, ?)");
+                }
+                $stmt->execute([$key, $valueToSave]);
+            }
+        } else {
+            // Single-row schema - UPDATE existing row
+            // Map input keys to column names
+            $updateCols = [];
+            $params = [];
+            
+            foreach ($input as $key => $value) {
+                // Map camelCase to snake_case for column names
+                $colName = preg_replace('/([A-Z])/', '_$1', $key);
+                $colName = strtolower($colName);
+                $colName = ltrim($colName, '_');
+                
+                // Check if column exists
+                if (in_array($colName, $schema['columns'])) {
+                    $updateCols[] = "\"$colName\" = ?";
+                    $params[] = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
+                }
             }
             
-            $valueToSave = is_array($value) ? json_encode($value, JSON_UNESCAPED_UNICODE) : $value;
-            
-            // Build query dynamically based on available columns
-            if ($hasUpdatedAt) {
-                $stmt = $db->prepare("INSERT OR REPLACE INTO settings (\"$keyCol\", \"$valueCol\", updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)");
-                $stmt->execute([$key, $valueToSave]);
-            } else {
-                $stmt = $db->prepare("INSERT OR REPLACE INTO settings (\"$keyCol\", \"$valueCol\") VALUES (?, ?)");
-                $stmt->execute([$key, $valueToSave]);
+            if (!empty($updateCols)) {
+                $sql = "UPDATE settings SET " . implode(', ', $updateCols);
+                $stmt = $db->prepare($sql);
+                $stmt->execute($params);
             }
         }
 
