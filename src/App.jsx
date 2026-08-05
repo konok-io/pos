@@ -776,10 +776,10 @@ function MainApp({ currentUser, onLogout }) {
   }, []);
 
   useEffect(() => {
-    // Async function to load data from MySQL API
+    // Async function to load data from SQLite API
     async function loadData() {
       try {
-        // Load all data from MySQL via API
+        // Load all data from SQLite via API
         const data = await loadAllData();
         
         setProducts(data.products || []);
@@ -1048,7 +1048,7 @@ function MainApp({ currentUser, onLogout }) {
 
   // Hard refresh - just reload page to fetch fresh data from server
   const handleHardRefresh = () => {
-    // Hard reload bypassing browser cache - all data comes from PHP/MySQL server
+    // Hard reload bypassing browser cache - all data comes from SQLite database
     window.location.reload(true);
   };
 
@@ -6573,7 +6573,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
   const [expenses, setExpenses] = useState([]);
   const [incomes, setIncomes] = useState([]);
   
-  // Load expenses and incomes from MySQL API
+  // Load expenses and incomes from SQLite API
   useEffect(() => {
     async function loadData() {
       try {
@@ -6664,7 +6664,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
   const totalExpense = totalPurchaseExpense + totalManualExpense;
   const netProfit = totalIncome - totalExpense;
 
-  // Save expense to MySQL database
+  // Save expense to SQLite database
   const saveExpense = async () => {
     if (!expenseForm.title?.trim()) { alert('ব্যয়ের বিবরণ দিন'); return; }
     if (!expenseForm.amount || expenseForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
@@ -6710,7 +6710,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
     }
   };
 
-  // Save income to MySQL
+  // Save income to SQLite
   const saveIncome = async () => {
     if (!incomeForm.title?.trim()) { alert('আয়ের বিবরণ দিন'); return; }
     if (!incomeForm.amount || incomeForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
@@ -8203,7 +8203,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
   const currentUser = getUser();
   const isSuperAdmin = currentUser?.role === 'super_admin';
   
-  // Load users from MySQL API
+  // Load users from SQLite API
   useEffect(() => {
     async function loadUsers() {
       try {
@@ -8220,7 +8220,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const save = async () => {
     try {
-      // Always save to MySQL database via API
+      // Always save to SQLite database via API
       const result = await upd.settings.update(form);
       if (result.success) {
         setSaved(true);
@@ -9781,7 +9781,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 <button
                   onClick={async () => {
                     if(confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
-                      // Delete all data from MySQL
+                      // Delete all data from SQLite
                       for(const p of products) { await products.delete(p.id); }
                       for(const c of customers) { await customers.delete(c.id); }
                       for(const s of suppliers) { await suppliersApi.delete(s.id); }
@@ -9789,7 +9789,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       for(const s of sales) { await sales.delete(s.id); }
                       for(const p of purchases) { await purchases.delete(p.id); }
                       for(const u of users) { await users.delete(u.id); }
-                      // Clear local storage
+                      // Clear session storage
                       clearAuth();
                       alert('সব ডেটা মুছা হয়েছে।');
                       window.location.reload();

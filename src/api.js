@@ -385,7 +385,7 @@ export const users = {
 };
 
 // ============================================================================
-// DATA LOADER - Load all initial data from MySQL
+// DATA LOADER - Load all initial data from SQLite
 // ============================================================================
 
 export async function loadAllData() {
