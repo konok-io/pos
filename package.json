@@ -30,6 +30,7 @@
  "build": {
   "appId": "com.pos.system",
   "productName": "POS সিস্টেম",
+  "asar": false,
   "directories": {
     "output": "release"
   },
