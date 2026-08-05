@@ -237,7 +237,7 @@ function DynamicMenu({tab, setTab, tabs}) {
   const menuGroups = [
     { id: 'inventory', items: otherTabs.filter(t => ['products', 'newproduct'].includes(t.id)) },
     { id: 'management', items: otherTabs.filter(t => ['suppliers', 'customers'].includes(t.id)) },
-    { id: 'tools', items: otherTabs.filter(t => ['barcode', 'inventory', 'income', 'settings'].includes(t.id)) },
+    { id: 'tools', items: otherTabs.filter(t => ['barcode', 'inventory', 'income', 'reports', 'settings'].includes(t.id)) },
   ];
 
   const renderMenuButton = (t) => {
@@ -1032,6 +1032,7 @@ function MainApp({ currentUser, onLogout }) {
     {id:'inventory',icon:'🏭',label:'স্টক'},
     {id:'lowstock',icon:'⚠️',label:'স্টক কম'},
     {id:'income',icon:'💰',label:'আয়/ব্যয়'},
+    {id:'reports',icon:'📊',label:'রিপোর্ট'},
     {id:'settings',icon:'⚙️',label:'সেটিংস'},
   ];
 
@@ -1119,6 +1120,7 @@ function MainApp({ currentUser, onLogout }) {
         {tab==='inventory' && <InventoryScreen {...props} />}
         {tab==='lowstock'  && <LowStockScreen {...props} />}
         {tab==='income'    && <IncomeScreen {...props} />}
+        {tab==='reports'   && <ReportsScreen {...props} />}
         {tab==='settings'  && <SettingsScreen {...props} />}
       </div>
     </div>
@@ -7164,6 +7166,978 @@ ${filteredExpenses.length > 0 ? `
   );
 }
 
+   REPORTS SCREEN
+═══════════════════════════════════════════ */
+function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
+  const [activeTab, setActiveTab] = useState('summary');
+  const [period, setPeriod] = useState('today');
+  const [from, setFrom] = useState(today());
+  const [to, setTo] = useState(today());
+  const [viewPurchase, setViewPurchase] = useState(null);
+  const [viewSale, setViewSale] = useState(null);
+  const [salesSearch, setSalesSearch] = useState('');
+  const [purchaseSearch, setPurchaseSearch] = useState('');
+
+  const tabs = [
+    { id: 'summary', label: '📊 সামারি', icon: '📊' },
+    { id: 'sales', label: '🧾 বিক্রয় হিস্ট্রি', icon: '🧾' },
+    { id: 'purchases', label: '📦 পারচেজ হিস্ট্রি', icon: '📦' },
+  ];
+
+  const filterByPeriod = (items, dateField = 'date') => {
+    const n = new Date();
+    return items.filter(item => {
+      const d = new Date(item[dateField]);
+      if(period==='today')  return d.toDateString()===n.toDateString();
+      if(period==='week')   return d >= new Date(n.getFullYear(),n.getMonth(),n.getDate()-6);
+      if(period==='month')  return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();
+      if(period==='custom') return d>=new Date(from)&&d<=new Date(to+'T23:59:59');
+      return true;
+    });
+  };
+
+  const filterSales = () => filterByPeriod(sales);
+  const filterPurchases = () => filterByPeriod(purchases);
+
+  const filteredPurchases = filterPurchases().filter(p => 
+    !purchaseSearch || 
+    p.id.toLowerCase().includes(purchaseSearch.toLowerCase()) ||
+    (p.supplier||'').toLowerCase().includes(purchaseSearch.toLowerCase())
+  );
+
+const filteredSales = filterSales().filter(s => !salesSearch || s.id.toLowerCase().includes(salesSearch.toLowerCase()) || (s.custName||'').toLowerCase().includes(salesSearch.toLowerCase()));
+  const totalSales =  filteredSales.reduce((s,i)=>s+i.total,0);
+  const totalPaid  =  filteredSales.reduce((s,i)=>s+i.paid,0);
+  const totalDue   =  filteredSales.reduce((s,i)=>s+i.due,0);
+  const totalProfit=  filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.profit||0),0),0);
+  const allCredit  = customers.reduce((s,c)=>s+(c.credit||0),0);
+  const profitPct  = totalSales>0 ? (totalProfit/totalSales*100).toFixed(1) : 0;
+
+  const getPeriodLabel = () => {
+    if (period === 'today') return 'আজ';
+    if (period === 'week') return 'এই সপ্তাহ';
+    if (period === 'month') return 'এই মাস';
+    if (period === 'all') return 'সব সময়';
+    return `${from} থেকে ${to}`;
+  };
+
+  // Print Sale Receipt for ReportsScreen
+  const printSaleReceipt = (sale) => {
+    const s = settings || {};
+    const headerText = s.receiptLogo || s.receiptHeader || '🧾 বিক্রয় রিসিট';
+    const footerText = s.receiptFooter || 'ধন্যবাদ';
+    const fontSize = s.receiptFontSize || 11;
+    const showLogo = s.receiptShowLogo !== false;
+    const showAddress = s.receiptShowAddress !== false;
+    const showPhone = s.receiptShowPhone !== false;
+    const showCustomer = s.receiptShowCustomer !== false;
+    const showVat = s.receiptShowVat !== false;
+    const showQr = s.receiptShowQr !== false;
+    
+    const saleDate = new Date(sale.date);
+    const dateStr = saleDate.toLocaleDateString('bn-BD');
+    const timeStr = saleDate.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
+<title>বিক্রয় রিসিট</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { width: 80mm; }
+body { font-family: 'Tiro Bangla', 'Courier New', monospace; width: 80mm; margin: 0; padding: 2mm; font-size: ${fontSize}px; color: #000; background: #fff; }
+.center { text-align: center; }
+.border { border-bottom: 1px dashed #000; padding-bottom: 6px; margin-bottom: 6px; }
+.row { display: flex; justify-content: space-between; margin: 2px 0; }
+table { width: 100%; border-collapse: collapse; font-size: ${fontSize - 1}px; }
+th { border-bottom: 1px dashed #000; padding: 3px 0; text-align: left; }
+td { padding: 3px 0; }
+td:nth-child(2) { text-align: center; }
+td:nth-child(3), td:nth-child(4) { text-align: right; }
+.total { border-top: 1px dashed #000; margin-top: 5px; padding-top: 5px; font-weight: bold; }
+.footer { text-align: center; margin-top: 10px; border-top: 1px dashed #000; padding-top: 6px; font-size: ${fontSize - 2}px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  ${showLogo !== false ? '<div style="font-size:' + (fontSize + 3) + 'px;font-weight:bold;">' + headerText + '</div>' : ''}
+  ${showAddress !== false && s.name ? '<div style="font-size:' + (fontSize - 1) + 'px;">' + s.name + '</div>' : ''}
+  ${showAddress !== false && s.address ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.address + '</div>' : ''}
+  ${showPhone !== false && s.phone ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.phone + '</div>' : ''}
+  ${showPhone !== false && s.taxId ? '<div style="font-weight:bold;font-size:' + (fontSize - 2) + 'px;">VAT নং: ' + s.taxId + '</div>' : ''}
+  ${showPhone !== false && s.taxId ? '<div style="font-weight:bold;font-size:' + (fontSize - 2) + 'px;">✚ সরলীকৃত কর চালান</div>' : ''}
+  <div style="font-size:${fontSize - 1}px;margin-top:4px;">Invoice ID: ${sale.id.replace(/\D/g,'').slice(-8)}</div>
+  <div style="font-size:${fontSize - 2}px;">${dateStr} | ${timeStr}</div>
+</div>
+${showCustomer !== false ? '<div style="margin-bottom:6px;font-size:' + (fontSize - 1) + 'px;">' : '<div style="margin-bottom:6px;">'}
+  ${showCustomer !== false ? '<div>গ্রাহক: ' + sale.custName + '</div>' : ''}
+  ${showPhone !== false && sale.phone ? '<div>ফোন: ' + sale.phone + '</div>' : ''}
+</div>
+<div style="border-top:1px dotted #000;margin:4px 0;"></div>
+<table>
+  <thead><tr><th style="text-align:left;padding:3px 0;">পণ্য</th><th style="text-align:center;padding:3px 0;">পরি</th><th style="text-align:right;padding:3px 0;">দাম</th><th style="text-align:right;padding:3px 0;">মোট</th></tr></thead>
+  <tbody>
+    ${(sale.items||[]).map(i => '<tr><td>' + i.name + (i.company ? '<br><span style="font-size:' + (fontSize - 3) + 'px;color:#666;">' + i.company + '</span>' : '') + '</td><td style="text-align:center;">' + i.qty + ' ' + (i.unit || 'পিস') + '</td><td style="text-align:right;">৳' + i.sellP.toFixed(2) + '</td><td style="text-align:right;">৳' + (i.qty * i.sellP).toFixed(2) + '</td></tr>').join('')}
+  </tbody>
+</table>
+<div style="border-top:1px dashed #000;margin-top:6px;padding-top:6px;">
+<div class="row"><span>সাবটোটাল:</span><span>৳${(sale.subtotal || sale.total).toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+${showVat !== false && sale.vatAmount > 0 ? '<div class="row"><span>ভ্যাট (' + (sale.vatPercent || 15) + '%):</span><span>৳' + sale.vatAmount.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+${sale.discount > 0 ? '<div class="row"><span>ছাড়:</span><span>-৳' + sale.discount.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+<div class="total row"><span>মোট:</span><span>৳${sale.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+<div class="row"><span>পরিশোধ:</span><span>৳${sale.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+${sale.change > 0 ? '<div class="row"><span>ফেরত:</span><span>৳' + sale.change.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+${sale.due > 0 ? '<div class="total row" style="color:#c00;"><span>বাকি:</span><span>৳' + sale.due.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+</div>
+${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style="width:48px;height:48px;margin:0 auto 4px;padding:2px;border:2px solid #000;"><div style="width:100%;height:100%;background:repeating-linear-gradient(0deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(90deg,#000 0px,#000 2px,#fff 2px,#fff 4px),repeating-linear-gradient(45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px),repeating-linear-gradient(-45deg,transparent 0px,transparent 2px,#fff 2px,#fff 4px);background-size:4px 4px,4px 4px,8px 8px,8px 8px;background-position:0 0,0 0,2px 2px,-2px 2px;"></div></div><div style="font-size:7px;color:#000;font-weight:bold;">🧾 ZATCA QR</div></div>' : ''}
+<div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
+</body>
+</html>`;
+
+    try {
+      const win = window.open('', '_blank', 'width=350,height=600,left=100,top=100');
+      if (win) {
+        win.document.open();
+        win.document.write(html);
+        win.document.close();
+        win.onload = function() { win.print(); };
+      } else {
+        alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
+      }
+    } catch(e) { alert('প্রিন্ট করতে সমস্যা হয়েছে!'); }
+  };
+
+  const exportSalesCSV = () => {
+    const rows = [['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','ক্রয়মূল্য','বিক্রয়মূল্য','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'],
+      ... filteredSales.map(s=>[new Date(s.date).toLocaleDateString('en-GB'),s.id,s.custName,(s.items||[]).length,
+        (s.items||[]).reduce((a,i)=>a+(i.qty||0)*(i.buyP||0),0).toFixed(2),
+        s.total,s.paid,s.due,
+        (s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toFixed(2),
+        ((s.items||[]).reduce((a,i)=>a+(i.qty||0)*(i.buyP||0),0)*0.15).toFixed(2),
+        (s.total*15/115).toFixed(2),
+        ((s.total*15/115)-(s.items||[]).reduce((a,i)=>a+(i.qty||0)*(i.buyP||0),0)*0.15).toFixed(2)])];
+    const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+    a.download='sales-report.csv'; a.click();
+  };
+
+  const exportPurchasesCSV = () => {
+    const rows = [['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট','সর্বমোট'],
+      ...filteredPurchases.map(p=>{
+        const total = p.items.reduce((s,i)=>s+(i.stock||0)*(i.buyP||0),0);
+        const vat = total * 0.15;
+        return [new Date(p.date).toLocaleDateString('en-GB'),p.id,p.supplier,p.totalItems,total,vat,total+vat];
+      })];
+    const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+    a.download='purchase-report.csv'; a.click();
+  };
+
+  const printPurchases = () => {
+    const periodLabel = getPeriodLabel();
+    const purchases = filterPurchases();
+    const totalPurchase = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0)*(i.buyP||0), 0), 0);
+    const totalItems = purchases.reduce((s,p) => s + p.items.reduce((a,i) => a + (i.stock||0), 0), 0);
+    const totalVat = purchases.reduce((s,p) => {const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;}, 0);
+    const grandTotal = totalPurchase + totalVat;
+    
+    let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
+      <title>পারচেজ হিস্ট্রি</title>
+      <style>
+        @page { size: A4 landscape; margin: 12.7mm; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Tiro Bangla',Arial,sans-serif; padding:12px; font-size:12px; }
+        .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
+        .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
+        .header p { color:#666; font-size:11px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
+        td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
+        tr:nth-child(even) { background:#fafafa; }
+        .total-row { background:#e0f7f0 !important; font-weight:700; }
+        .total-row td { border:1px solid #b2dfdb; font-size:12px; color:#00897b; }
+        .footer { margin-top:12px; text-align:center; color:#999; font-size:10px; }
+        @media print { body { padding:0; } }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>📦 পারচেজ হিস্ট্রি</h1>
+        <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>তারিখ</th>
+            <th>পারচেজ আইডি</th>
+            <th>সরবরাহকারী</th>
+            <th style="text-align:center;">পণ্য</th>
+            <th style="text-align:right;">মোট খরচ</th>
+            <th style="text-align:right;">ভ্যাট</th>
+            <th style="text-align:right;">সর্বমোট</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    
+    purchases.forEach(p => {
+      html += `
+          <tr>
+            <td>${new Date(p.date).toLocaleDateString('bn-BD')}</td>
+            <td style="font-family:monospace;color:#00897b;font-weight:600;">${p.id}</td>
+            <td>${p.supplier}</td>
+            <td style="text-align:center;">${p.items.reduce((a,i)=>a+(i.stock||0),0)}টি</td>
+            <td style="text-align:right;font-weight:600;">৳${p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#c62828;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0) * 0.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:700;color:#00897b;">৳${(p.items.reduce((s,i) => s + (i.stock||0)*(i.buyP||0), 0) * 1.15).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>`;
+    });
+    
+    html += `
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="2" style="text-align:right;">মোট:</td>
+            <td style="text-align:left;">${purchases.length}টি বিল</td>
+            <td style="text-align:center;">${totalItems}টি</td>
+            <td style="text-align:right;">৳${totalPurchase.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:bold;color:#00897b;">৳${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${purchases.length}টি পারচেজ</div>
+    </body>
+    </html>`;
+    
+    const win = window.open('', '', 'width=1000,height=600');
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.onload = function() { setTimeout(() => win.print(), 100); };
+  };
+
+  const printSales = () => {
+    const periodLabel = getPeriodLabel();
+    const totalSellingPrice = filteredSales.reduce((s,sale)=>s+sale.total/1.15,0);
+    const totalVatOnTotal = filteredSales.reduce((s,sale)=>s+sale.total*0.15,0);
+    const totalVatOnSelling = filteredSales.reduce((s,sale)=>s+(sale.total/1.15)*0.15,0);
+    const totalVatDiff = filteredSales.reduce((s,sale)=>{const t=sale.total*0.15;const v=(sale.total/1.15)*0.15;return s+(t-v);},0);
+    
+    let html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet">
+      <title>পারচেজ হিস্ট্রি</title>
+      <style>
+        @page { size: A4 landscape; margin: 12.7mm; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Tiro Bangla','Courier New',monospace; padding:12px; font-size:12px; }
+        .header { text-align:center; margin-bottom:12px; border-bottom:2px solid #00897b; padding-bottom:8px; }
+        .header h1 { color:#00897b; font-size:20px; margin-bottom:4px; }
+        .header p { color:#666; font-size:11px; }
+        table { width:100%; border-collapse:collapse; margin-bottom:12px; }
+        th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:left; font-size:10px; color:#00897b; font-weight:700; }
+        td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
+        tr:nth-child(even) { background:#fafafa; }
+        .total-row { background:#e8f5e9 !important; font-weight:700; }
+        .total-row td { border:1px solid #a5d6a7; color:#2e7d32; font-size:12px; }
+        .footer { margin-top:12px; text-align:center; color:#999; font-size:10px; }
+        @media print { body { padding:0; } }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>🧾 বিক্রি হিস্ট্রি</h1>
+        <p>${periodLabel} - ${new Date().toLocaleDateString('bn-BD')}</p>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>তারিখ</th>
+            <th>বিল নং</th>
+            <th>কাস্টমার</th>
+            <th style="text-align:center;">পণ্য</th>
+            <th style="text-align:right;">ক্রয়মূল্য</th>
+            <th style="text-align:right;">বিক্রয়মূল্য</th>
+            <th style="text-align:right;">পরিশোধ</th>
+            <th style="text-align:right;">বাকি</th>
+            <th style="text-align:right;">লাভ</th>
+            <th style="text-align:right;">ক্রয় ভ্যাট</th>
+            <th style="text-align:right;">বিক্রয় ভ্যাট</th>
+            <th style="text-align:right;">অবশিষ্ট ভ্যাট</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    
+    filteredSales.forEach(s => {
+      const purchasePrice = (s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0);
+      const purchaseVat = purchasePrice*0.15;
+      const salesVat = s.total*15/115;
+      const remainingVat = salesVat - purchaseVat;
+      html += `
+          <tr>
+            <td>${new Date(s.date).toLocaleDateString('bn-BD')}</td>
+            <td style="font-family:monospace;color:#00897b;font-weight:600;">#${s.id.slice(-6).toUpperCase()}</td>
+            <td>${s.custName}</td>
+            <td style="text-align:center;">${(s.items||[]).length}টি</td>
+            <td style="text-align:right;font-weight:600;color:#666;">৳${purchasePrice.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:600;color:#00897b;">৳${s.total.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#2e7d32;">৳${s.paid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:${s.due>0?'#c62828':'#999'};">৳${s.due.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#2e7d32;">৳${(s.items||[]).reduce((a,i)=>a+(i.profit||0),0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#c62828;">৳${purchaseVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;color:#00897b;">৳${salesVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;font-weight:600;color:${remainingVat>0?'#ff6f00':'#2e7d32'};">৳${remainingVat.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>`;
+    });
+    
+    html += `
+        </tbody>
+        <tfoot>
+          <tr class="total-row">
+            <td colspan="2" style="text-align:right;">মোট:</td>
+            <td style="text-align:left;">${filteredSales.length}টি বিল</td>
+            <td style="text-align:center;">${filteredSales.reduce((c,i)=>c+(i.items||[]).reduce((a,it)=>a+(it.qty||0),0),0)}টি</td>
+            <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0),0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalSales.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalDue.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${totalProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+i.total*15/115,0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+            <td style="text-align:right;">৳${filteredSales.reduce((s,i)=>s+(i.total*15/115)-(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0).toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          </tr>
+        </tfoot>
+      </table>
+      <div class="footer">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')} | ${filteredSales.length}টি বিক্রয়</div>
+    </body>
+    </html>`;
+    
+    const win = window.open('', '', 'width=1000,height=600');
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.onload = function() { setTimeout(() => win.print(), 100); };
+  };
+
+  const statCards = [
+    {l:'মোট বিক্রয়',v:fmt(totalSales),icon:'💰',c:T.teal,bg:T.tealLight},
+    {l:'মোট লাভ',v:fmt(totalProfit),icon:'📈',c:T.green,bg:T.greenLight},
+    {l:'লাভের হার',v:`${profitPct}%`,icon:'🎯',c:T.green,bg:T.greenLight},
+    {l:'পরিশোধ হয়েছে',v:fmt(totalPaid),icon:'✅',c:T.green,bg:T.greenLight},
+    {l:'বাকি বিক্রয়',v:fmt(totalDue),icon:'⏳',c:T.amber,bg:T.amberLight},
+    {l:'বিলের সংখ্যা',v:filteredSales.length,icon:'🧾',c:T.teal,bg:T.tealLight},
+    {l:'সব কাস্টমার বাকি',v:fmt(allCredit),icon:'💳',c:T.red,bg:T.redLight},
+  ];
+
+  return (
+    <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden',background:T.gray50}}>
+      {/* Tab Menu */}
+      <div style={{
+        background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+        padding:'12px 16px 0',
+        display:'flex',
+        gap:0,
+        boxShadow:'0 2px 8px rgba(0,0,0,0.15)'
+      }}>
+        {tabs.map((tab, index) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            style={{
+              padding:'12px 20px',
+              background: activeTab === tab.id ? T.white : 'transparent',
+              color: activeTab === tab.id ? T.teal : 'rgba(255,255,255,0.8)',
+              border: 'none',
+              borderTopLeftRadius: activeTab === tab.id ? '12px' : '0',
+              borderTopRightRadius: activeTab === tab.id ? '12px' : '0',
+              fontSize:'14px',
+              fontWeight: activeTab === tab.id ? '700' : '600',
+              cursor:'pointer',
+              transition:'all 0.2s ease',
+              display:'flex',
+              alignItems:'center',
+              gap:'8px',
+              marginBottom: activeTab === tab.id ? '-1px' : '0',
+              borderBottom: activeTab === tab.id ? '3px solid ' + T.teal : '3px solid transparent',
+              boxShadow: activeTab === tab.id ? '0 -2px 10px rgba(0,0,0,0.1)' : 'none',
+            }}
+          >
+            <span style={{fontSize:'18px'}}>{tab.icon}</span>
+            <span>{tab.label.replace(/^[^\s]+\s/, '')}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Period Filters */}
+      <div style={{
+        padding:'12px 16px',
+        display:'flex',
+        gap:'10px',
+        alignItems:'center',
+        background:T.white,
+        borderBottom:`1px solid ${T.gray200}`,
+        flexWrap:'wrap'
+      }}>
+        <span style={{fontSize:'13px',fontWeight:'600',color:T.gray600,marginRight:'4px'}}>📅 সময়কাল:</span>
+        {[
+          {v:'today',l:'আজ',icon:'📆'},
+          {v:'week',l:'এই সপ্তাহ',icon:'📅'},
+          {v:'month',l:'এই মাস',icon:'🗓️'},
+          {v:'all',l:'সব সময়',icon:'♾️'},
+        ].map(p=>(
+          <button key={p.v} onClick={()=>setPeriod(p.v)} style={{
+            padding:'8px 14px',
+            background: period === p.v ? T.teal : T.gray100,
+            color: period === p.v ? T.white : T.gray600,
+            border: 'none',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display:'flex',
+            alignItems:'center',
+            gap:'6px',
+            transition:'all 0.2s',
+            boxShadow: period === p.v ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
+          }}>
+            <span>{p.icon}</span>
+            <span>{p.l}</span>
+          </button>
+        ))}
+        
+        {/* Date Range */}
+        <div style={{display:'flex',alignItems:'center',gap:'8px',marginLeft:'4px'}}>
+          <button 
+            onClick={()=>setPeriod(period === 'custom' ? 'today' : 'custom')} 
+            style={{
+              padding:'8px 14px',
+              background: period === 'custom' ? T.teal : T.gray100,
+              color: period === 'custom' ? T.white : T.gray600,
+              border: 'none',
+              borderRadius: '20px',
+              fontSize: '13px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              display:'flex',
+              alignItems:'center',
+              gap:'6px',
+              transition:'all 0.2s',
+            }}
+          >
+            📅 নির্দিষ্ট তারিখ
+          </button>
+          {period === 'custom' && (
+            <>
+              <input 
+                type="date" 
+                value={from} 
+                onChange={e=>setFrom(e.target.value)} 
+                style={{
+                  ...input,
+                  width:140,
+                  fontSize:12,
+                  padding:'6px 10px',
+                  borderRadius:7,
+                  border:`1px solid ${T.gray200}`,
+                }}
+              />
+              <span style={{color:T.gray400,fontSize:12}}>থেকে</span>
+              <input 
+                type="date" 
+                value={to} 
+                onChange={e=>setTo(e.target.value)} 
+                style={{
+                  ...input,
+                  width:140,
+                  fontSize:12,
+                  padding:'6px 10px',
+                  borderRadius:7,
+                  border:`1px solid ${T.gray200}`,
+                }}
+              />
+            </>
+          )}
+        </div>
+
+        {/* CSV Export */}
+        <button 
+          style={{
+            padding:'8px 16px',
+            background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
+            color: T.white,
+            border: 'none',
+            borderRadius: '20px',
+            fontSize: '13px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            display:'flex',
+            alignItems:'center',
+            gap:'6px',
+            marginLeft:'auto',
+            transition:'all 0.2s',
+            boxShadow:'0 2px 8px rgba(5,150,105,0.3)',
+          }}
+          onClick={() => {
+            if (activeTab === 'sales') exportSalesCSV();
+            else if (activeTab === 'purchases') exportPurchasesCSV();
+            else {
+              const rows = [['রিপোর্ট সামারি'],
+                [`${getPeriodLabel()}`],
+                [],
+                ['মোট বিক্রয়', totalSales],
+                ['মোট লাভ', totalProfit],
+                ['লাভের হার', `${profitPct}%`],
+                ['পরিশোধ হয়েছে', totalPaid],
+                ['বাকি বিক্রয়', totalDue],
+                ['বিলের সংখ্যা', filteredSales.length],
+                ['সব কাস্টমার বাকি', allCredit],
+              ];
+              const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+              a.download='summary-report.csv'; a.click();
+            }
+          }}
+        >
+          📤 CSV এক্সপোর্ট
+        </button>
+      </div>
+
+      {/* Content Area */}
+      <div style={{flex:1,overflow:'auto',padding:16}}>
+        {/* Summary Tab */}
+        {activeTab === 'summary' && (
+          <div>
+            {/* Stat cards */}
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(170px,1fr))',gap:12,marginBottom:16}}>
+              {statCards.map(s=>(
+                <div key={s.l} style={{
+                  ...card,
+                  textAlign:'center',
+                  background:s.bg,
+                  border:'none',
+                  padding:20,
+                  borderRadius:12,
+                  boxShadow:'0 2px 8px rgba(0,0,0,0.06)',
+                }}>
+                  <div style={{fontSize:28,marginBottom:8}}>{s.icon}</div>
+                  <div style={{fontSize:22,fontWeight:800,color:s.c}}>{s.v}</div>
+                  <div style={{fontSize:12,color:T.gray600,marginTop:4,fontWeight:500}}>{s.l}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* P&L */}
+            <div style={{...card,padding:20,borderRadius:12}}>
+              <h3 style={{margin:'0 0 16px',fontSize:16,fontWeight:700,color:T.gray700,display:'flex',alignItems:'center',gap:8}}>
+                📊 লাভ-ক্ষতির হিসাব
+              </h3>
+              {[
+                {l:'মোট বিক্রয় আয়',v:totalSales,c:T.gray900},
+                {l:'পণ্যের ক্রয়মূল্য (COGS)',v:-(totalSales-totalProfit),c:T.red},
+                {l:'মোট লাভ',v:totalProfit,c:T.green,bold:true,line:true},
+                {l:'লাভের হার',v:`${profitPct}%`,c:T.teal,bold:true,str:true},
+              ].map((r,i)=>(
+                <div key={i} style={{
+                  display:'flex',
+                  justifyContent:'space-between',
+                  padding:'12px 0',
+                  borderTop:r.line?`2px solid ${T.gray200}`:'none',
+                  marginTop:r.line?8:0
+                }}>
+                  <span style={{color:T.gray600,fontSize:14}}>{r.l}</span>
+                  <span style={{fontWeight:r.bold?800:600,fontSize:r.bold?16:14,color:r.c}}>{r.str?r.v:fmt(r.v)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Sales History Tab */}
+        {activeTab === 'sales' && (
+          <div style={card}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+              <h3 style={{margin:0,fontSize:16,fontWeight:700,color:T.gray700,display:'flex',alignItems:'center',gap:8}}>
+                🧾 বিক্রি হিস্ট্রি ({filteredSales.length}টি বিল)
+              </h3>
+              <div style={{display:'flex',gap:10,alignItems:'center'}}>
+                <input
+                  value={salesSearch}
+                  onChange={e=>setSalesSearch(e.target.value)}
+                  placeholder="🔍 খুঁজুন..."
+                  style={{
+                    ...input,
+                    padding:'8px 12px',
+                    fontSize:12,
+                    width:180,
+                    borderRadius:8,
+                  }}
+                />
+                <button onClick={printSales} style={{
+                  ...btn('ghost'),
+                  padding:'8px 14px',
+                  fontSize:13,
+                  borderRadius:8,
+                  display:'flex',
+                  alignItems:'center',
+                  gap:6,
+                }}>🖨️ প্রিন্ট</button>
+              </div>
+            </div>
+            <div style={{overflow:'auto'}}>
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.gray50}}>
+                    {['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','ক্রয়মূল্য','বিক্রয়মূল্য','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'].map(h=>(
+                      <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredSales.length===0 ? (
+                    <tr><td colSpan={12} style={{padding:40,textAlign:'center',color:T.gray400}}>
+                      <div style={{fontSize:48,marginBottom:12}}>📭</div>
+                      নির্বাচিত সময়ে কোনো বিক্রয় নেই
+                    </td></tr>
+                  ) : [...filteredSales].reverse().map((s,i)=>(
+                    <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                      <td style={{padding:'12px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
+                      <td style={{padding:'12px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600,fontFamily:'monospace'}} onClick={()=>setViewSale(s)}>{s.id}</td>
+                      <td style={{padding:'12px',fontSize:12}}>{s.custName}</td>
+                      <td style={{padding:'12px',fontSize:12,color:T.gray400}}>{(s.items||[]).length}টি</td>
+                      <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.gray600}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0))}</td>
+                      <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.teal}}>{fmt(s.total)}</td>
+                      <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt(s.paid)}</td>
+                      <td style={{padding:'12px',fontWeight:s.due>0?700:400,color:s.due>0?T.red:T.gray400}}>{fmt(s.due)}</td>
+                      <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.profit||0),0))}</td>
+                      <td style={{padding:'12px',fontSize:13,color:T.red}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15)}</td>
+                      <td style={{padding:'12px',fontSize:13,color:T.teal}}>{fmt(s.total*15/115)}</td>
+                      <td style={{padding:'12px',fontSize:13,fontWeight:600,color:T.amber}}>{fmt((s.total*15/115)-(s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr style={{background:T.tealLight}}>
+                    <td colSpan={2} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট:</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{filteredSales.length}টি বিল</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{filteredSales.reduce((c,i)=>c+(i.items||[]).reduce((a,it)=>a+(it.qty||0),0),0)}টি</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{fmt(filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0),0))}</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(totalSales)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalPaid)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:totalDue>0?T.red:T.gray400}}>{fmt(totalDue)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalProfit)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.red}}>{fmt(filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0))}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(filteredSales.reduce((s,i)=>s+i.total*15/115,0))}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.amber}}>{fmt(filteredSales.reduce((s,i)=>s+(i.total*15/115)-(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0))}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Purchase History Tab */}
+        {activeTab === 'purchases' && (
+          <div style={card}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:16}}>
+              <h3 style={{margin:0,fontSize:16,fontWeight:700,color:T.gray700,display:'flex',alignItems:'center',gap:8}}>
+                📦 পারচেজ হিস্ট্রি ({filterPurchases().length}টি)
+              </h3>
+              <div style={{display:'flex',gap:10,alignItems:'center'}}>
+                <input 
+                  value={purchaseSearch} 
+                  onChange={e=>setPurchaseSearch(e.target.value)} 
+                  placeholder="🔍 খুঁজুন..." 
+                  style={{
+                    ...input,
+                    padding:'8px 12px',
+                    fontSize:12,
+                    width:180,
+                    borderRadius:8,
+                  }}
+                />
+                <button onClick={printPurchases} style={{
+                  ...btn('ghost'),
+                  padding:'8px 14px',
+                  fontSize:13,
+                  borderRadius:8,
+                  display:'flex',
+                  alignItems:'center',
+                  gap:6,
+                }}>🖨️ প্রিন্ট</button>
+              </div>
+            </div>
+            <div style={{overflow:'auto'}}>
+              <table style={{width:'100%',borderCollapse:'collapse'}}>
+                <thead>
+                  <tr style={{background:T.gray50}}>
+                    {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট','সর্বমোট'].map(h=>(
+                      <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPurchases.length===0 ? (
+                    <tr><td colSpan={7} style={{padding:40,textAlign:'center',color:T.gray400}}>
+                      <div style={{fontSize:48,marginBottom:12}}>📭</div>
+                      কোনো পারচেজ নেই
+                    </td></tr>
+                  ) : [...filteredPurchases].reverse().map((p,i)=>{
+                    const total = p.items.reduce((s,i)=>s+(i.stock||0)*(i.buyP||0),0);
+                    const vat = total * 0.15;
+                    const grandTotal = total + vat;
+                    return (
+                      <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewPurchase(p)}>
+                        <td style={{padding:'12px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
+                        <td style={{padding:'12px',fontSize:12,fontFamily:'monospace',color:T.teal,fontWeight:600}}>{p.id}</td>
+                        <td style={{padding:'12px',fontSize:12}}>{p.supplier}</td>
+                        <td style={{padding:'12px',fontSize:12,color:T.gray400}}>{p.totalItems}টি</td>
+                        <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.green}}>{fmt(total)}</td>
+                        <td style={{padding:'12px',fontSize:12,color:T.red}}>{fmt(vat)}</td>
+                        <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(grandTotal)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr style={{background:T.tealLight}}>
+                    <td colSpan={2} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.teal}}>মোট:</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{filteredPurchases.length}টি বিল</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0),0),0)}টি</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>s+p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0),0))}</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.red}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t*0.15;},0))}</td>
+                    <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(filteredPurchases.reduce((s,p)=>{const t=p.items.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0);return s+t+t*0.15;},0))}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Purchase Detail Modal */}
+      {viewPurchase && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setViewPurchase(null)}>
+          <div style={{background:T.white,borderRadius:16,padding:24,width:520,maxHeight:'85vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
+              <div>
+                <div style={{fontWeight:800,fontSize:20,color:T.teal}}>{viewPurchase.id}</div>
+                <div style={{fontSize:12,color:T.gray500,marginTop:6}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:13,marginTop:6}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
+              </div>
+              <div style={{display:'flex',gap:10}}>
+                <button onClick={()=>{
+                  const grandTotal = viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0);
+                  const s = settings || {};
+                  const headerText = s.purchaseIcon || s.purchaseHeader || '🛒 পারচেজ ইনভয়েস';
+                  const footerText = s.purchaseFooter || 'ধন্যবাদ';
+                  const fontSize = s.purchaseFontSize || 11;
+                  const showLogo = s.purchaseShowLogo !== false;
+                  const showAddress = s.purchaseShowAddress !== false;
+                  const showSupplier = s.purchaseShowSupplier !== false;
+                  const showPhone = s.purchaseShowPhone !== false;
+                  const showVat = s.purchaseShowVat !== false;
+                  const vatAmount = showVat ? grandTotal * 0.15 : 0;
+                  
+                  // Get supplier info
+                  const supplierInfo = suppliers.find(sup=>(sup.name||'').toLowerCase()===(viewPurchase.supplier||'').toLowerCase());
+                  
+                  let html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>পারচেজ ইনভয়েস</title>
+<style>
+@page { size: 80mm auto; margin: 0; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { width: 80mm; }
+body { font-family:'Tiro Bangla','Courier New',monospace; width:80mm; margin:0; padding:2mm; font-size:${fontSize}px; color:#000; background:#fff; }
+.center { text-align:center; }
+.border { border-bottom:1px dashed #000; padding-bottom:6px; margin-bottom:6px; }
+.row { display:flex; justify-content:space-between; margin:2px 0; }
+table { width:100%; border-collapse:collapse; font-size:${fontSize-1}px; }
+th { text-align:left; padding:3px 0; border-bottom:1px dashed #000; }
+td { padding:3px 0; }
+td:nth-child(2) { text-align:center; }
+td:nth-child(3), td:nth-child(4) { text-align:right; }
+.total { border-top:1px dashed #000; margin-top:5px; padding-top:5px; font-weight:bold; }
+.footer { text-align:center; margin-top:10px; border-top:1px dashed #000; padding-top:6px; font-size:${fontSize-2}px; }
+</style>
+</head>
+<body>
+<div class="center border">
+  ${showLogo !== false ? '<div style="font-size:' + (fontSize + 3) + 'px;font-weight:bold;">' + (headerText) + '</div>' : ''}
+  ${showAddress !== false && s.name ? '<div style="font-size:' + (fontSize - 1) + 'px;">' + s.name + '</div>' : ''}
+  ${showAddress !== false && s.address ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.address + '</div>' : ''}
+  ${showPhone !== false && s.phone ? '<div style="font-size:' + (fontSize - 2) + 'px;">' + s.phone + '</div>' : ''}
+  ${showPhone !== false && s.taxId ? '<div style="font-weight:bold;font-size:' + (fontSize - 2) + 'px;">Seller VAT: ' + s.taxId + '</div>' : ''}
+  <div style="font-size:${fontSize - 1}px;margin-top:4px;">Invoice ID: ${viewPurchase.id.replace(/\D/g,'').slice(-8)}</div>
+  <div style="font-size:${fontSize - 2}px;">${new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+</div>
+${showSupplier !== false ? '<div style="margin-bottom:6px;font-size:' + (fontSize - 1) + 'px;">' : '<div style="margin-bottom:6px;">'}
+  ${showSupplier !== false ? '<div>সরবরাহকারী: ' + viewPurchase.supplier + '</div>' : ''}
+  ${showPhone !== false && viewPurchase.phone ? '<div>ফোন: ' + viewPurchase.phone + '</div>' : ''}
+  ${showSupplier !== false && supplierInfo?.crNumber ? '<div style="font-weight:bold;font-size:' + (fontSize - 1) + 'px;margin-top:2px;">CR: ' + supplierInfo.crNumber + '</div>' : ''}
+  ${showSupplier !== false && supplierInfo?.vatNumber ? '<div style="font-weight:bold;font-size:' + (fontSize - 1) + 'px;margin-top:2px;">VAT: ' + supplierInfo.vatNumber + '</div>' : ''}
+  ${showSupplier !== false && supplierInfo?.address ? '<div style="font-size:' + (fontSize - 2) + 'px;margin-top:2px;">ঠিকানা: ' + supplierInfo.address + '</div>' : ''}
+</div>
+<div style="border-top:1px dotted #000;margin:4px 0;"></div>
+<table>
+  <thead><tr><th>পণ্য</th><th style="text-align:center;">পরি</th><th style="text-align:right;">দাম</th><th style="text-align:right;">মোট</th></tr></thead>
+  <tbody>`;
+                  viewPurchase.items.forEach(item => {
+                    const qty = item.stock||0;
+                    const price = item.buyP||0;
+                    html += '<tr><td>' + item.name + (item.company ? '<br><span style="font-size:' + (fontSize - 3) + 'px;color:#666;">' + item.company + '</span>' : '') + '</td><td style="text-align:center;">' + qty + ' ' + (item.unit||'পিস') + '</td><td style="text-align:right;">৳' + price.toFixed(2) + '</td><td style="text-align:right;">৳' + (qty*price).toFixed(2) + '</td></tr>';
+                  });
+                  html += `</tbody>
+</table>
+<div style="border-top:1px dashed #000;margin-top:6px;padding-top:6px;">
+<div class="row"><span>মূল্য:</span><span>৳${grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2})}</span></div>
+${showVat !== false ? '<div class="row"><span>ভ্যাট (১৫%):</span><span>৳' + vatAmount.toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;padding-top:4px;" class="total row"><span>মোট (ভ্যাট সহ):</span><span>৳' + (grandTotal + vatAmount).toLocaleString('en-US', {minimumFractionDigits: 2}) + '</span></div>' : ''}
+</div>
+<div class="footer">${footerText}<br>${new Date().toLocaleDateString('bn-BD')}</div>
+</body>
+</html>`;
+                  try {
+                    const win = window.open('', '_blank', 'width=350,height=600,left=100,top=100');
+                    if (win) {
+                      win.document.open();
+                      win.document.write(html);
+                      win.document.close();
+                      win.onload = function() { win.print(); };
+                    } else {
+                      alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
+                    }
+                  } catch(e) { alert('প্রিন্ট করতে সমস্যা হয়েছে!'); }
+                }} style={{...btn('primary'),padding:'10px 16px',borderRadius:8}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'10px 16px',borderRadius:8}}>✕</button>
+              </div>
+            </div>
+            <table style={{width:'100%',borderCollapse:'collapse',tableLayout:'fixed'}}>
+              <thead>
+                <tr style={{background:T.gray50}}>
+                  <th style={{padding:'10px 12px',textAlign:'left',fontSize:12,color:T.gray600,width:'40%'}}>পণ্যের নাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'center',fontSize:12,color:T.gray600,width:'20%'}}>পরিমাণ</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>দাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>মোট</th>
+                </tr></thead>
+              <tbody>
+                {viewPurchase.items.map((item,i) => {
+                  const qty = item.stock || 0;
+                  const price = item.buyP || 0;
+                  const total = qty * price;
+                  return (
+                    <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
+                      <td style={{padding:'10px 12px',fontSize:13,verticalAlign:'top'}}>
+                        <div style={{fontWeight:600}}>{item.name}</div>
+                        {item.company && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{item.company}</div>}
+                      </td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,fontSize:13,verticalAlign:'middle'}}>{qty} {item.unit || 'পিস'}</td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontSize:13,verticalAlign:'middle'}}>{fmt(price)}</td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green,fontSize:13,verticalAlign:'middle'}}>{fmt(total)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr style={{background:T.tealLight}}>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:700,fontSize:14,textAlign:'right'}}>সর্বমোট:</td>
+                  <td style={{padding:'12px',textAlign:'right',fontWeight:800,fontSize:18,color:T.teal}}>
+                    {fmt(viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0))}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Sale Detail Modal */}
+      {viewSale && (
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:100}} onClick={()=>setViewSale(null)}>
+          <div style={{background:T.white,borderRadius:16,padding:24,width:520,maxHeight:'85vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
+              <div>
+                <div style={{fontWeight:800,fontSize:20,color:T.teal}}>#{viewSale.id.slice(-6).toUpperCase()}</div>
+                <div style={{fontSize:12,color:T.gray500,marginTop:6}}>📅 {new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:13,marginTop:6}}>👤 কাস্টমার: {viewSale.custName}</div>
+                {viewSale.phone && <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📱 {viewSale.phone}</div>}
+              </div>
+              <div style={{display:'flex',gap:10}}>
+                <button onClick={()=>printSaleReceipt(viewSale)} style={{...btn('primary'),padding:'10px 16px',borderRadius:8}}>🖨️ প্রিন্ট</button>
+                <button onClick={()=>setViewSale(null)} style={{...btn(),padding:'10px 16px',borderRadius:8}}>✕</button>
+              </div>
+            </div>
+            <table style={{width:'100%',borderCollapse:'collapse',tableLayout:'fixed'}}>
+              <thead>
+                <tr style={{background:T.gray50}}>
+                  <th style={{padding:'10px 12px',textAlign:'left',fontSize:12,color:T.gray600,width:'40%'}}>পণ্যের নাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'center',fontSize:12,color:T.gray600,width:'20%'}}>পরিমাণ</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>দাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>মোট</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(viewSale.items||[]).map((item,i) => (
+                  <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
+                    <td style={{padding:'10px 12px',fontSize:13,verticalAlign:'top'}}>
+                      <div style={{fontWeight:600}}>{item.name}</div>
+                      {item.company && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{item.company}</div>}
+                    </td>
+                    <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,fontSize:13,verticalAlign:'middle'}}>{item.qty} {item.unit || 'পিস'}</td>
+                    <td style={{padding:'10px 12px',textAlign:'right',fontSize:13,verticalAlign:'middle'}}>{fmt(item.sellP)}</td>
+                    <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green,fontSize:13,verticalAlign:'middle'}}>{fmt(item.qty * item.sellP)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr style={{background:T.gray100}}>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:600,fontSize:13,textAlign:'right'}}>সাবটোটাল</td>
+                  <td style={{padding:'12px',textAlign:'right',fontWeight:700,fontSize:14}}>{fmt(viewSale.total)}</td>
+                </tr>
+                {viewSale.vatEnabled && viewSale.vat > 0 && (
+                  <tr style={{background:T.gray100}}>
+                    <td colSpan={3} style={{padding:'12px',fontSize:13,color:T.gray600,textAlign:'right'}}>ভ্যাট ({viewSale.vatRate}%)</td>
+                    <td style={{padding:'12px',textAlign:'right',fontSize:13,color:T.gray600}}>{fmt(viewSale.vat)}</td>
+                  </tr>
+                )}
+                <tr style={{background:T.greenLight}}>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.green,textAlign:'right'}}>মোট</td>
+                  <td style={{padding:'12px',textAlign:'right',fontWeight:800,fontSize:18,color:T.green}}>{fmt(viewSale.total + (viewSale.vat||0))}</td>
+                </tr>
+                <tr style={{background:T.greenLight}}>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:600,fontSize:13,color:T.green,textAlign:'right'}}>পরিশোধ হয়েছে</td>
+                  <td style={{padding:12,textAlign:'right',fontWeight:700,fontSize:14,color:T.green}}>{fmt(viewSale.paid)}</td>
+                </tr>
+                {viewSale.due > 0 && (
+                  <tr style={{background:T.redLight}}>
+                    <td colSpan={3} style={{padding:'12px',fontWeight:700,fontSize:14,color:T.red,textAlign:'right'}}>বাকি</td>
+                    <td style={{padding:'12px',textAlign:'right',fontWeight:800,fontSize:14,color:T.red}}>{fmt(viewSale.due)}</td>
+                  </tr>
+                )}
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════
 /* ═══════════════════════════════════════════
    SETTINGS SCREEN - NEW PROFESSIONAL DESIGN
 ═══════════════════════════════════════════ */
