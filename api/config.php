@@ -80,30 +80,86 @@ class Database {
      */
     private function runMigrations() {
         try {
-            // Migration: settings table column names
+            // Check if settings table exists
+            $result = $this->connection->query("SELECT name FROM sqlite_master WHERE type='table' AND name='settings'");
+            if ($result->fetchColumn() === false) {
+                return; // Table doesn't exist yet
+            }
+            
+            // Get all columns
             $result = $this->connection->query("PRAGMA table_info(settings)");
             $columns = [];
             while ($row = $result->fetch()) {
                 $columns[$row['name']] = true;
             }
             
-            // If table exists with old schema (key/value columns)
-            if (isset($columns['key']) && isset($columns['value']) && !isset($columns['setting_key'])) {
-                try {
-                    // Try RENAME COLUMN first (SQLite 3.25+)
-                    $this->connection->exec("ALTER TABLE settings RENAME COLUMN key TO setting_key");
-                    $this->connection->exec("ALTER TABLE settings RENAME COLUMN value TO setting_value");
-                } catch (Exception $e) {
-                    // Fallback: Recreate table
-                    $this->connection->exec("CREATE TABLE settings_new (
-                        setting_key TEXT PRIMARY KEY,
-                        setting_value TEXT,
-                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                    )");
-                    $this->connection->exec("INSERT INTO settings_new (setting_key, setting_value) SELECT key, value FROM settings");
-                    $this->connection->exec("DROP TABLE settings");
-                    $this->connection->exec("ALTER TABLE settings_new RENAME TO settings");
+            // Check if migration already done
+            if (isset($columns['setting_key']) && isset($columns['setting_value'])) {
+                // Migration already applied, just ensure updated_at exists
+                if (!isset($columns['updated_at'])) {
+                    try {
+                        $this->connection->exec("ALTER TABLE settings ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP");
+                    } catch (Exception $e) {
+                        // Column might already exist
+                    }
                 }
+                return;
+            }
+            
+            // Migration needed - identify source columns
+            $keyCol = null;
+            $valueCol = null;
+            
+            // Detect key column
+            if (isset($columns['key'])) {
+                $keyCol = 'key';
+            } elseif (isset($columns['setting_key'])) {
+                $keyCol = 'setting_key';
+            }
+            
+            // Detect value column
+            if (isset($columns['value'])) {
+                $valueCol = 'value';
+            } elseif (isset($columns['setting_value'])) {
+                $valueCol = 'setting_value';
+            }
+            
+            // If we have key and value columns, rename them
+            if ($keyCol && $valueCol && $keyCol !== 'setting_key') {
+                try {
+                    $this->connection->exec("ALTER TABLE settings RENAME COLUMN $keyCol TO setting_key");
+                } catch (Exception $e) {
+                    // RENAME failed, will use recreate method
+                    $keyCol = null;
+                }
+            }
+            
+            if ($valueCol && $valueCol !== 'setting_value') {
+                try {
+                    $this->connection->exec("ALTER TABLE settings RENAME COLUMN $valueCol TO setting_value");
+                } catch (Exception $e) {
+                    // RENAME failed, will use recreate method
+                    $valueCol = null;
+                }
+            }
+            
+            // If columns couldn't be renamed, recreate table
+            if (!$keyCol || !$valueCol) {
+                // Get data from existing table with any column names
+                $this->connection->exec("CREATE TABLE settings_new (
+                    setting_key TEXT PRIMARY KEY,
+                    setting_value TEXT,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                )");
+                
+                // Try to copy data - use COALESCE for flexible column names (quoted for reserved words)
+                $this->connection->exec("INSERT INTO settings_new (setting_key, setting_value) 
+                    SELECT COALESCE(\"key\", setting_key, name, 'unknown'), 
+                           COALESCE(value, setting_value, data, description, '')
+                    FROM settings");
+                
+                $this->connection->exec("DROP TABLE settings");
+                $this->connection->exec("ALTER TABLE settings_new RENAME TO settings");
             }
             
             // Ensure updated_at column exists
