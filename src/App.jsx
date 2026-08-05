@@ -148,8 +148,7 @@ function BannerImageUpload({ value, onChange }) {
 }
 
 /* ─────────────── API SERVICE (MySQL Backend) ─────────────── */
-// All business data is stored in MySQL via PHP API
-// Only auth token and UI preferences are stored in localStorage
+// All data is stored in MySQL via PHP API - NO localStorage used
 import { 
   auth, products, customers, sales, suppliers as suppliersApi, categories as categoriesApi, 
   expenses, incomes, settings, users, loadAllData,
@@ -736,22 +735,6 @@ function MainApp({ currentUser, onLogout }) {
     document.documentElement.style.padding = '0';
   }, []);
 
-  // Initialize time and tab from localStorage on mount
-  useEffect(() => {
-    // Initialize tab from localStorage
-    const savedTab = localStorage.getItem('pos_current_tab');
-    if (savedTab) {
-      setTab(savedTab);
-    }
-  }, []);
-
-  // Save tab to localStorage when it changes
-  useEffect(() => {
-    if (tab) {
-      localStorage.setItem('pos_current_tab', tab);
-    }
-  }, [tab]);
-
   // Listen for fullscreen changes
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -776,29 +759,19 @@ function MainApp({ currentUser, onLogout }) {
 
   // Auto-enter fullscreen on page load if it was requested before reload
   useEffect(() => {
-    const wantFullscreen = localStorage.getItem('pos_want_fullscreen');
-    if (wantFullscreen === 'true') {
-      localStorage.removeItem('pos_want_fullscreen');
-      // Wait for page to fully load, then try fullscreen
-      const tryFullscreen = () => {
-        try {
-          document.documentElement.requestFullscreen().then(() => {
-            setIsFullscreen(true);
-          }).catch(() => {
-            // Try again after a short delay
-            setTimeout(() => {
-              try {
-                document.documentElement.requestFullscreen().catch(() => {});
-              } catch(e) {}
-            }, 500);
-          });
-        } catch(e) {}
-      };
-      // Delay to ensure page is ready
-      if (document.readyState === 'complete') {
-        setTimeout(tryFullscreen, 300);
-      } else {
-        window.addEventListener('load', () => setTimeout(tryFullscreen, 300));
+    // Wait for page to fully load, then try fullscreen
+    const tryFullscreen = () => {
+      try {
+        document.documentElement.requestFullscreen().then(() => {
+          setIsFullscreen(true);
+        }).catch(() => {});
+      } catch(e) {}
+    };
+    // Delay to ensure page is ready
+    if (document.readyState === 'complete') {
+      setTimeout(tryFullscreen, 300);
+    } else {
+      window.addEventListener('load', () => setTimeout(tryFullscreen, 300));
       }
     }
   }, []);
@@ -1083,12 +1056,10 @@ function MainApp({ currentUser, onLogout }) {
   // Fullscreen toggle function
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
-      localStorage.setItem('pos_want_fullscreen', 'true');
       document.documentElement.requestFullscreen().catch(err => {
         console.log('Fullscreen error:', err);
       });
     } else {
-      localStorage.removeItem('pos_want_fullscreen');
       document.exitFullscreen();
     }
   };
@@ -1174,12 +1145,21 @@ export default function App() {
 
   useEffect(() => {
     async function checkAuth() {
-      // Check if user is logged in from localStorage (user OR token)
+      // Check if user is logged in (from in-memory storage - no localStorage)
       const user = getUser();
       const token = getToken();
-      if (user || token) {
-        setCurrentUser(user);
-        setIsLoggedIn(true);
+      if (user && token) {
+        // Verify token is still valid with server
+        try {
+          const result = await auth.check();
+          if (result.success) {
+            setCurrentUser(user);
+            setIsLoggedIn(true);
+          }
+        } catch (e) {
+          // Token invalid, clear auth
+          clearAuth();
+        }
       }
       setIsLoading(false);
     }
@@ -3812,7 +3792,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
   const [viewSupplier, setViewSupplier] = useState(null);
   const [viewCategory, setViewCategory] = useState(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(null);
-  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('pos_suppliers_tab') || 'companies'); // companies, products, categories
+  const [activeTab, setActiveTab] = useState('companies'); // companies, products, categories
   const [productForm, setProductForm] = useState({company:'',cat:'',name:'',barcode:'',unit:'পিস',buyP:'',sellP:'',stock:0,minStock:5});
   const [catForm, setCatForm] = useState({name:''});
   const [companyQ, setCompanyQ] = useState('');
@@ -3856,11 +3836,6 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
       alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
     }
   };
-
-  // Save activeTab to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('pos_suppliers_tab', activeTab);
-  }, [activeTab]);
 
   // Click outside to close dropdowns - only close when clicking outside the modal
   useEffect(() => {
@@ -8246,37 +8221,14 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
   const save = async () => {
     try {
-      // Check if running in Electron (standalone app)
-      const isElectron = window.electronAPI;
-      
-      if (isElectron) {
-        // Save to localStorage for Electron app
-        localStorage.setItem('pos_settings', JSON.stringify(form));
+      // Always save to MySQL database via API
+      const result = await upd.settings.update(form);
+      if (result.success) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
         alert('✅ সেটিংস সংরক্ষিত হয়েছে!');
       } else {
-        // Try API save for web version
-        try {
-          const result = await upd.settings.update(form);
-          if (result.success) {
-            setSaved(true);
-            setTimeout(() => setSaved(false), 3000);
-            alert('✅ সেটিংস সংরক্ষিত হয়েছে!');
-          } else {
-            // Fallback to localStorage
-            localStorage.setItem('pos_settings', JSON.stringify(form));
-            setSaved(true);
-            setTimeout(() => setSaved(false), 3000);
-            alert('✅ সেটিংস সংরক্ষিত হয়েছে! (লোকাল)');
-          }
-        } catch {
-          // Fallback to localStorage
-          localStorage.setItem('pos_settings', JSON.stringify(form));
-          setSaved(true);
-          setTimeout(() => setSaved(false), 3000);
-          alert('✅ সেটিংস সংরক্ষিত হয়েছে! (লোকাল)');
-        }
+        throw new Error(result.error || 'Save failed');
       }
     } catch (error) {
       console.error('Failed to save settings:', error);

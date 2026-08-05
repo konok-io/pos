@@ -1,38 +1,28 @@
 /**
  * API Service - POS System
  * All business data is stored in MySQL via PHP API
- * ONLY auth token and UI preferences are stored in localStorage
+ * NO localStorage is used - all data comes from the database
  */
 
 // API Base URL
 const API_BASE = '/api';
 
 // ============================================================================
-// AUTH STORAGE (Only auth-related data allowed in localStorage)
+// AUTH STORAGE (Session only - not persisted in localStorage)
 // ============================================================================
 
-const AUTH_TOKEN_KEY = 'pos_auth_token';
-const AUTH_USER_KEY = 'pos_auth_user';
+let currentToken = null;
+let currentUser = null;
 
-export const getToken = () => localStorage.getItem(AUTH_TOKEN_KEY);
-export const setToken = (token) => {
-  if (token) localStorage.setItem(AUTH_TOKEN_KEY, token);
-  else localStorage.removeItem(AUTH_TOKEN_KEY);
-};
+export const getToken = () => currentToken;
+export const setToken = (token) => { currentToken = token; };
 
-export const getUser = () => {
-  const user = localStorage.getItem(AUTH_USER_KEY);
-  return user ? JSON.parse(user) : null;
-};
-
-export const setUser = (user) => {
-  if (user) localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
-  else localStorage.removeItem(AUTH_USER_KEY);
-};
+export const getUser = () => currentUser;
+export const setUser = (user) => { currentUser = user; };
 
 export const clearAuth = () => {
-  setToken(null);
-  setUser(null);
+  currentToken = null;
+  currentUser = null;
 };
 
 // ============================================================================
@@ -418,29 +408,8 @@ export async function loadAllData() {
       categories: categoriesData,
     };
   } catch (error) {
-    console.error('Failed to load data from API, trying localStorage...', error);
-    
-    // Fallback to localStorage for Electron app
-    try {
-      const localProducts = JSON.parse(localStorage.getItem('pos_products') || '[]');
-      const localCustomers = JSON.parse(localStorage.getItem('pos_customers') || '[]');
-      const localSales = JSON.parse(localStorage.getItem('pos_sales') || '[]');
-      const localSettings = JSON.parse(localStorage.getItem('pos_settings') || '{}');
-      const localSuppliers = JSON.parse(localStorage.getItem('pos_suppliers') || '[]');
-      const localCategories = JSON.parse(localStorage.getItem('pos_categories') || '[]');
-      
-      return {
-        products: localProducts,
-        customers: localCustomers,
-        sales: localSales,
-        settings: localSettings,
-        suppliers: localSuppliers,
-        categories: localCategories,
-      };
-    } catch (localError) {
-      console.error('Failed to load from localStorage:', localError);
-      throw error;
-    }
+    console.error('Failed to load data from API:', error);
+    throw error;
   }
 }
 
