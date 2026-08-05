@@ -66,6 +66,11 @@ async function api(endpoint, options = {}) {
     
     // Get raw text first to check for valid JSON
     const text = await response.text();
+    
+    // Debug logging
+    console.log('API Request:', options.method || 'GET', url);
+    console.log('Token:', token ? token.substring(0, 20) + '...' : 'none');
+    
     let data;
     
     try {
@@ -77,6 +82,7 @@ async function api(endpoint, options = {}) {
     }
     
     if (!response.ok) {
+      console.error('API Error Response:', data);
       if (response.status === 401) {
         clearAuth();
         window.location.reload();
