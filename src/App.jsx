@@ -4179,10 +4179,21 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
           // Get supplier info with new columns
           const csvCode = (row['কোম্পানি আইডি'] || row['company code'] || row['code'] || '').trim();
           const csvName = (row['সরবরাহকারীর নাম'] || row['name'] || '').trim();
+          const csvCategory = (row['ক্যাটাগরি'] || row['category'] || '').trim();
           const csvCrNumber = (row['CR নম্বর'] || row['cr number'] || '').trim();
           const csvVatNumber = (row['VAT নম্বর'] || row['vat number'] || '').trim();
           const csvPhone = (row['ফোন'] || row['phone'] || '').trim();
           const csvAddress = (row['ঠিকানা'] || row['address'] || '').trim();
+          
+          // Validate and add category if provided
+          if (csvCategory) {
+            const catExists = newCategories.some(c => (c.name||'').toLowerCase() === (csvCategory||'').toLowerCase());
+            if (!catExists && !csvCategories.has((csvCategory||'').toLowerCase())) {
+              const newCat = { id: genId(), name: csvCategory };
+              newCategories.push(newCat);
+              csvCategories.add((csvCategory||'').toLowerCase());
+            }
+          }
           
           // Validate and add supplier
           if (csvName) {
@@ -4258,6 +4269,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
         
         let msg = `✅ আমদানি সম্পন্ন!\n\n`;
         msg += `🏢 নতুন সরবরাহকারী: ${companiesAdded}টি\n`;
+        msg += `📂 নতুন ক্যাটাগরি: ${categoriesAdded}টি\n`;
         if (errors.length > 0) {
           msg += `\n⚠️ সমস্যা: ${errors.length}টি\n`;
           msg += errors.slice(0, 5).join('\n');
@@ -4273,12 +4285,185 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
     e.target.value = '';
   };
 
+  // Products state for products tab
+  const [newProduct, setNewProduct] = useState({name:'',barcode:'',unit:'পিস',stock:'',minStock:'',buyP:'',sellP:'',vatPercent:'',company:'',cat:''});
+  const [viewProduct, setViewProduct] = useState(null);
+  
+  // Filter products for search
+  const filteredProducts = products.filter(p => !search || (p.name||'').toLowerCase().includes((search||'').toLowerCase()) || (p.barcode||'').includes(search));
+
+  // Add new product
+  const handleAddProduct = async () => {
+    if (!newProduct.name?.trim()) {
+      alert('পণ্যের নাম লিখুন!');
+      return;
+    }
+    
+    // Generate product ID
+    const maxId = products.reduce((max, p) => {
+      const match = p.id?.match(/P-(\d+)/);
+      return match ? Math.max(max, parseInt(match[1])) : max;
+    }, 50);
+    const newId = `P-${String(maxId + 1).padStart(5, '0')}`;
+    
+    const product = {
+      id: newId,
+      name: newProduct.name.trim(),
+      barcode: newProduct.barcode || '',
+      unit: newProduct.unit || 'পিস',
+      stock: parseFloat(newProduct.stock) || 0,
+      minStock: parseFloat(newProduct.minStock) || 5,
+      buyP: parseFloat(newProduct.buyP) || 0,
+      sellP: parseFloat(newProduct.sellP) || 0,
+      vatPercent: parseFloat(newProduct.vatPercent) || 0,
+      company: newProduct.company || '',
+      cat: newProduct.cat || ''
+    };
+    
+    await upd.products([...products, product]);
+    setNewProduct({name:'',barcode:'',unit:'পিস',stock:'',minStock:'',buyP:'',sellP:'',vatPercent:'',company:'',cat:''});
+    alert(`✅ পণ্য যোগ করা হয়েছে!\nআইডি: ${newId}`);
+  };
+
+  // Download demo CSV for products
+  const downloadProductsCSV = () => {
+    const csv = `পণ্যের নাম,বারকোড,একক,স্টক,মিন স্টক,ক্রয়মূল্য,বিক্রয়মূল্য,VAT %,সরবরাহকারী,ক্যাটাগরি
+মিনিকেট চাল 5kg,001,বস্তা,50,10,2500,2800,15,মিনিকেট ফুডস,খাদ্যপণ্য
+মিনিকেট চাল 10kg,002,বস্তা,30,5,4800,5200,15,মিনিকেট ফুডস,খাদ্যপণ্য
+সুজি চিপস,003,পিস,200,50,20,25,15,সুজান বেভারেজ,স্ন্যাকস
+সুজি বিস্কুট,004,পিস,150,40,15,20,15,সুজান বেভারেজ,স্ন্যাকস
+আল-মারওয়া মসলা,005,পিস,100,20,50,65,15,আল-মারওয়া ট্রেডিং,মসলা`;
+    const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'পণ্য.csv';
+    a.click();
+  };
+
+  // CSV Import Handler for products
+  const handleProductsCsvImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const text = event.target.result;
+        const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+        
+        if (lines.length < 2) {
+          alert('CSV ফাইলে কমপক্ষে হেডার ও একটি ডাটা থাকতে হবে');
+          return;
+        }
+        
+        // Parse CSV header
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        
+        // Parse data rows
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const values = [];
+          let current = '';
+          let inQuotes = false;
+          for (const char of lines[i]) {
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              values.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          values.push(current.trim());
+          
+          const row = {};
+          headers.forEach((h, idx) => {
+            row[h] = values[idx] || '';
+          });
+          rows.push(row);
+        }
+        
+        let newProducts = [...products];
+        let addedCount = 0;
+        const errors = [];
+        
+        // Generate starting ID
+        const maxId = products.reduce((max, p) => {
+          const match = p.id?.match(/P-(\d+)/);
+          return match ? Math.max(max, parseInt(match[1])) : max;
+        }, 50);
+        
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          const rowNum = i + 2;
+          
+          const csvName = (row['পণ্যের নাম'] || row['name'] || '').trim();
+          
+          if (!csvName) {
+            errors.push(`সারি ${rowNum}: পণ্যের নাম খালি`);
+            continue;
+          }
+          
+          // Check if product already exists by name
+          const exists = newProducts.some(p => (p.name||'').toLowerCase().trim() === csvName.toLowerCase());
+          if (exists) {
+            errors.push(`সারি ${rowNum}: পণ্য "${csvName}" ইতিমধ্যে আছে`);
+            continue;
+          }
+          
+          const csvBarcode = (row['বারকোড'] || row['barcode'] || '').trim();
+          const csvUnit = (row['একক'] || row['unit'] || 'পিস').trim();
+          const csvStock = parseFloat(row['স্টক'] || row['stock'] || 0) || 0;
+          const csvMinStock = parseFloat(row['মিন স্টক'] || row['min stock'] || 5) || 5;
+          const csvBuyP = parseFloat(row['ক্রয়মূল্য'] || row['buy price'] || 0) || 0;
+          const csvSellP = parseFloat(row['বিক্রয়মূল্য'] || row['sell price'] || 0) || 0;
+          const csvVatPercent = parseFloat(row['VAT %'] || row['vat'] || 0) || 0;
+          const csvCompany = (row['সরবরাহকারী'] || row['company'] || '').trim();
+          const csvCat = (row['ক্যাটাগরি'] || row['category'] || '').trim();
+          
+          const newId = `P-${String(maxId + 1 + i).padStart(5, '0')}`;
+          
+          newProducts.push({
+            id: newId,
+            name: csvName,
+            barcode: csvBarcode,
+            unit: csvUnit,
+            stock: csvStock,
+            minStock: csvMinStock,
+            buyP: csvBuyP,
+            sellP: csvSellP,
+            vatPercent: csvVatPercent,
+            company: csvCompany,
+            cat: csvCat
+          });
+          addedCount++;
+        }
+        
+        await upd.products(newProducts);
+        
+        let msg = `✅ ${addedCount}টি পণ্য যোগ করা হয়েছে!\n`;
+        if (errors.length > 0) {
+          msg += `\n⚠️ সমস্যা: ${errors.length}টি\n`;
+          msg += errors.slice(0, 5).join('\n');
+          if (errors.length > 5) msg += `\n... এবং আরও ${errors.length - 5}টি`;
+        }
+        alert(msg);
+        e.target.value = '';
+      } catch (err) {
+        console.error('CSV import error:', err);
+        alert('❌ CSV ইম্পোর্ট ব্যর্থ হয়েছে!');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   // Download demo CSV for suppliers
   const downloadSuppliersCSV = () => {
-    const csv = `কোম্পানি আইডি,সরবরাহকারীর নাম,CR নম্বর,VAT নম্বর,ফোন,ঠিকানা
-C-00001,মিনিকেট ফুডস,1234567890,312345678901234,0501234567,রিয়াদ সৌদি আরব
-C-00002,সুজান বেভারেজ,9876543210,398765432109876,0509876543,জেদ্দাহ সৌদি আরব
-C-00003,আল-মারওয়া ট্রেডিং,5678901234,456789012345678,0551234567,দাম্মাম সৌদি আরব`;
+    const csv = `কোম্পানি আইডি,সরবরাহকারীর নাম,ক্যাটাগরি,CR নম্বর,VAT নম্বর,ফোন,ঠিকানা
+C-00001,মিনিকেট ফুডস,খাদ্যপণ্য,1234567890,312345678901234,0501234567,রিয়াদ সৌদি আরব
+C-00002,সুজান বেভারেজ,পানীয়,9876543210,398765432109876,0509876543,জেদ্দাহ সৌদি আরব
+C-00003,আল-মারওয়া ট্রেডিং,মসলা,5678901234,456789012345678,0551234567,দাম্মাম সৌদি আরব`;
     const blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -4494,7 +4679,7 @@ C-00003,আল-মারওয়া ট্রেডিং,5678901234,4567890123
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100%'}}>
-      {/* Sub tabs - Only Companies, Categories, and CSV Import */}
+      {/* Sub tabs - Companies, Categories, Products */}
       <div style={{display:'flex',gap:8,alignItems:'center',background:T.white,padding:'10px 12px',flexWrap:'wrap'}}>
         <button onClick={()=>setActiveTab('companies')} style={{
           padding:'8px 14px',
@@ -4522,16 +4707,29 @@ C-00003,আল-মারওয়া ট্রেডিং,5678901234,4567890123
         }}>
           📂 ক্যাটাগরি ({categories.length})
         </button>
+        <button onClick={()=>setActiveTab('products')} style={{
+          padding:'8px 14px',
+          borderRadius:7,
+          whiteSpace:'nowrap',
+          border:`1px solid ${activeTab==='products'?T.teal:T.gray200}`,
+          background:activeTab==='products'?T.teal:T.gray100,
+          color:activeTab==='products'?T.white:T.gray600,
+          cursor:'pointer',
+          fontWeight:600,
+          fontSize:13,
+        }}>
+          📦 পণ্য ({products.length})
+        </button>
         {/* Search and Add button - right aligned */}
         <div style={{marginLeft:'auto',display:'flex',gap:8,alignItems:'center',paddingRight:12}}>
           <div style={{position:'relative'}}>
             <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
             <input value={search} onChange={e=>setSearch(e.target.value)} 
-              placeholder={activeTab==='companies'?'সরবরাহকারী খুঁজুন...':'ক্যাটাগরি খুঁজুন...'}
+              placeholder={activeTab==='companies'?'সরবরাহকারী খুঁজুন...':activeTab==='categories'?'ক্যাটাগরি খুঁজুন...':'পণ্য খুঁজুন...'}
               style={{...input,paddingLeft:32,padding:'6px 12px',fontSize:12}}/>
           </div>
           <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>setModal({mode:'add'})}>
-            {activeTab==='companies'?'🏢 সরবরাহকারী যোগ করুন':'📂 ক্যাটাগরি যোগ করুন'}
+            {activeTab==='companies'?'🏢 সরবরাহকারী যোগ করুন':activeTab==='categories'?'📂 ক্যাটাগরি যোগ করুন':'📦 পণ্য যোগ করুন'}
           </button>
         </div>
       </div>
@@ -4619,6 +4817,165 @@ C-00003,আল-মারওয়া ট্রেডিং,5678901234,4567890123
                           ) : (
                             <button disabled style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14,opacity:0.5,cursor:'not-allowed'}} title="পণ্য আছে বলে মুছা যাবে না">🗑️</button>
                           )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PRODUCTS TAB */}
+        {activeTab === 'products' && (
+          <div>
+            {/* Top Section: CSV Import + Add Product Form */}
+            <div style={{display:'grid',gridTemplateColumns:'1fr 2.5fr',gap:16,marginBottom:16}}>
+              {/* Left: CSV Import - Smaller */}
+              <div style={{...card,padding:20,display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',textAlign:'center'}}>
+                <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
+                <input type="file" accept=".csv" onChange={handleProductsCsvImport} id="productsCsvInput" style={{display:'none'}} />
+                <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12,justifyContent:'center'}}>
+                  <label htmlFor="productsCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:12,padding:'8px 16px'}}>
+                    📁 CSV ফাইল
+                  </label>
+                  <button onClick={downloadProductsCSV} style={{...btn(),fontSize:12,padding:'8px 16px'}}>
+                    📥 ডেমো
+                  </button>
+                </div>
+                <div style={{fontSize:11,color:T.gray500}}>
+                  পণ্যের নাম অবশ্যই দিতে হবে
+                </div>
+              </div>
+              
+              {/* Right: Add New Product - Larger */}
+              <div style={{...card,padding:16}}>
+                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal,textAlign:'center'}}>➕ নতুন পণ্য</h3>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:8}}>
+                  <input 
+                    type="text" 
+                    placeholder="📦 পণ্যের নাম *" 
+                    value={newProduct.name || ''} 
+                    onChange={e=>setNewProduct({...newProduct,name:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="🔢 বারকোড" 
+                    value={newProduct.barcode || ''} 
+                    onChange={e=>setNewProduct({...newProduct,barcode:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <select 
+                    value={newProduct.unit || 'পিস'} 
+                    onChange={e=>setNewProduct({...newProduct,unit:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  >
+                    <option value="পিস">পিস</option>
+                    <option value="কেজি">কেজি</option>
+                    <option value="লিটার">লিটার</option>
+                    <option value="বস্তা">বস্তা</option>
+                    <option value="বোতল">বোতল</option>
+                    <option value="কার্টন">কার্টন</option>
+                    <option value="বক্স">বক্স</option>
+                  </select>
+                  <input 
+                    type="number" 
+                    placeholder="📥 স্টক" 
+                    value={newProduct.stock || ''} 
+                    onChange={e=>setNewProduct({...newProduct,stock:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="⚠️ মিন স্টক" 
+                    value={newProduct.minStock || ''} 
+                    onChange={e=>setNewProduct({...newProduct,minStock:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="💰 ক্রয়মূল্য" 
+                    value={newProduct.buyP || ''} 
+                    onChange={e=>setNewProduct({...newProduct,buyP:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="💵 বিক্রয়মূল্য" 
+                    value={newProduct.sellP || ''} 
+                    onChange={e=>setNewProduct({...newProduct,sellP:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="🧾 VAT %" 
+                    value={newProduct.vatPercent || ''} 
+                    onChange={e=>setNewProduct({...newProduct,vatPercent:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  />
+                </div>
+                <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginTop:8}}>
+                  <select 
+                    value={newProduct.company || ''} 
+                    onChange={e=>setNewProduct({...newProduct,company:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  >
+                    <option value="">🏢 সরবরাহকারী সিলেক্ট করুন</option>
+                    {allSuppliers.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+                  </select>
+                  <select 
+                    value={newProduct.cat || ''} 
+                    onChange={e=>setNewProduct({...newProduct,cat:e.target.value})}
+                    style={{...input,padding:'8px 10px',fontSize:12}}
+                  >
+                    <option value="">📂 ক্যাটাগরি সিলেক্ট করুন</option>
+                    {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <button 
+                  onClick={handleAddProduct}
+                  style={{...btn('primary'),padding:'10px 16px',fontSize:13,marginTop:12,width:'100%',display:'flex',alignItems:'center',justifyContent:'center',gap:8}}
+                >
+                  ✅ পণ্য যুক্ত করুন
+                </button>
+              </div>
+            </div>
+
+            {/* Middle: Stats + Print */}
+            <div style={{...card,marginBottom:12,padding:12,display:'flex',justifyContent:'space-between',alignItems:'center',background:T.white,borderRadius:10}}>
+              <span style={{fontSize:13,color:T.gray600}}>📦 মোট: {filteredProducts.length}টি পণ্য</span>
+              <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>পণ্য লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4 landscape;margin:12.7mm}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:22px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#e0f7f0;font-weight:700;color:#00897b}.total{background:#e0f7f0;font-weight:700}</style></head><body><div class="header"><h1>📦 পণ্য লিস্ট</h1></div><table><thead><tr><th style="width:5%">ক্রম</th><th style="width:25%">পণ্যের নাম</th><th style="width:10%">বারকোড</th><th style="width:10%">সরবরাহকারী</th><th style="width:10%">ক্যাটাগরি</th><th style="width:8%">স্টক</th><th style="width:10%">ক্রয়</th><th style="width:10%">বিক্রয়</th><th style="width:12%">মোট মূল্য</th></tr></thead><tbody>${filteredProducts.map((p,i)=>`<tr><td style="width:5%">${i+1}</td><td style="width:25%">${p.name}</td><td style="width:10%">${p.barcode||'-'}</td><td style="width:10%">${p.company||'-'}</td><td style="width:10%">${p.cat||'-'}</td><td style="width:8%;text-align:center">${p.stock||0} ${p.unit||'পিস'}</td><td style="width:10%;text-align:right">৳${(p.buyP||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td><td style="width:10%;text-align:right">৳${(p.sellP||0).toLocaleString('en-US',{minimumFractionDigits:2})}</td><td style="width:12%;text-align:right">৳${((p.stock||0)*(p.sellP||0)).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="8">মোট পণ্য: ${filteredProducts.length}টি</td><td>মোট: ৳${filteredProducts.reduce((s,p)=>s+((p.stock||0)*(p.sellP||0)),0).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
+            </div>
+
+            {/* Bottom: Products List Table */}
+            <div style={{...card,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 420px)'}}>
+              <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
+                <thead>
+                  <tr style={{background:T.tealLight}}>
+                    {['ক্রম','পণ্যের নাম','বারকোড','সরবরাহকারী','ক্যাটাগরি','স্টক','বিক্রয়','একশন'].map((h,i)=>(
+                      <th key={i} style={{padding:'10px 8px',textAlign:i===7?'center':'left',fontSize:10,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+              </table>
+              <div style={{flex:1,overflow:'auto'}}>
+                <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
+                  <tbody>
+                    {filteredProducts.length === 0 ? (
+                      <tr><td colSpan={8} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো পণ্য পাওয়া যায়নি</td></tr>
+                    ) : filteredProducts.map((p,i)=>(
+                      <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
+                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{i+1}</td>
+                        <td style={{padding:'10px 8px',fontWeight:600,fontSize:12,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.name}</td>
+                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.barcode||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.company||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.cat||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{p.stock||0} {p.unit||'পিস'}</td>
+                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:700,color:T.green}}>৳{(p.sellP||0).toLocaleString()}</td>
+                        <td style={{padding:'10px 8px',whiteSpace:'nowrap',textAlign:'center'}}>
+                          <button onClick={()=>setViewProduct(p)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
                         </td>
                       </tr>
                     ))}
