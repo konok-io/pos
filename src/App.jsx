@@ -757,22 +757,13 @@ function MainApp({ currentUser, onLogout }) {
     }
   }, []);
 
-  // Auto-enter fullscreen on page load
+  // Listen for fullscreen changes
   useEffect(() => {
-    // Wait for page to fully load, then try fullscreen
-    const tryFullscreen = () => {
-      try {
-        document.documentElement.requestFullscreen().then(() => {
-          setIsFullscreen(true);
-        }).catch(() => {});
-      } catch(e) {}
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
     };
-    // Delay to ensure page is ready
-    if (document.readyState === 'complete') {
-      setTimeout(tryFullscreen, 300);
-    } else {
-      window.addEventListener('load', () => setTimeout(tryFullscreen, 300));
-    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   useEffect(() => {
