@@ -41,6 +41,10 @@ function getSettings() {
             $columns[$row['name']] = true;
         }
         
+        // Debug: Return detected columns for troubleshooting
+        // Remove this in production
+        // response(['debug_columns' => array_keys($columns)]);
+        
         // Determine which columns to use - priority order
         $keyCol = null;
         $valueCol = null;
@@ -64,7 +68,9 @@ function getSettings() {
         }
         
         if (!$keyCol || !$valueCol) {
-            response(null, 'Settings table schema error: missing columns', 500);
+            // Debug info - list actual columns
+            $actualColumns = array_keys($columns);
+            response(null, 'Settings table schema error: columns=' . implode(',', $actualColumns), 500);
             return;
         }
         
