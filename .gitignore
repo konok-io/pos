@@ -4,3 +4,8 @@ node_modules/
 
 # Database - stored outside web root
 .pos_data/
+
+# Legacy database files (not used anymore)
+api/database.php
+dist/api/database.php
+public/api/database.php
