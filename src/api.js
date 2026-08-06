@@ -2,10 +2,9 @@
  * API Service - POS System
  * All data is stored in SQLite database via PHP API
  * Session management is handled server-side via PHP sessions
- * NO localStorage/sessionStorage used for any data
  */
 
-// API Base URL
+// API Base URL - point to public/api
 const API_BASE = '/api';
 
 // ============================================================================
@@ -14,8 +13,8 @@ const API_BASE = '/api';
 
 let currentUser = null;
 
-export const getToken = () => null; // No token stored - PHP sessions handle auth
-export const setToken = () => {}; // No-op
+export const getToken = () => null;
+export const setToken = () => {};
 export const getUser = () => currentUser;
 export const setUser = (user) => { currentUser = user; };
 export const clearAuth = () => { currentUser = null; };
@@ -36,10 +35,9 @@ async function api(endpoint, options = {}) {
     const response = await fetch(url, {
       ...options,
       headers,
-      credentials: 'include', // Include cookies for PHP sessions
+      credentials: 'include',
     });
     
-    // Get raw text first to check for valid JSON
     const text = await response.text();
     
     console.log('API Request:', options.method || 'GET', url);
@@ -57,12 +55,10 @@ async function api(endpoint, options = {}) {
     if (!response.ok) {
       console.error('API Error Response:', data);
       if (response.status === 401) {
-        // Session expired or invalid - clear local state and redirect to login
         clearAuth();
-        // Dispatch event so App component can handle logout
         window.dispatchEvent(new CustomEvent('auth:logout'));
       }
-      throw new Error(data.error || 'Request failed');
+      throw new Error(data.error || data.message || 'Request failed');
     }
     
     return data;
@@ -107,16 +103,15 @@ export const auth = {
   async check() {
     try {
       const data = await api('auth.php');
-      // Handle the new response format with authenticated flag
+      
+      // Handle response with authenticated flag
       if (data.success) {
         if (data.data?.authenticated === true && data.data?.user) {
           setUser(data.data.user);
           return { success: true, authenticated: true, user: data.data.user };
         } else if (data.data?.authenticated === false) {
-          // User is not authenticated, but this is expected behavior
           return { success: true, authenticated: false };
         } else if (data.data?.user) {
-          // Legacy format: {success: true, data: {user: {...}}}
           setUser(data.data.user);
           return { success: true, authenticated: true, user: data.data.user };
         }
@@ -124,7 +119,6 @@ export const auth = {
       return { success: true, authenticated: false };
     } catch (error) {
       console.error('Auth check failed:', error);
-      // Don't clear auth on network errors - just return not authenticated
       return { success: false, authenticated: false };
     }
   },
@@ -144,7 +138,11 @@ export const products = {
     if (category) params.append('category', category);
     const query = params.toString();
     const data = await api(`products.php${query ? '?' + query : ''}`);
-    return data.success ? data.data : [];
+    // API returns array directly in data field
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(product) {
@@ -174,7 +172,10 @@ export const customers = {
   async getAll(search = '') {
     const query = search ? `?search=${encodeURIComponent(search)}` : '';
     const data = await api(`customers.php${query}`);
-    return data.success ? data.data : [];
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(customer) {
@@ -208,7 +209,10 @@ export const sales = {
     if (to) params.append('to', to);
     const query = params.toString();
     const data = await api(`sales.php${query ? '?' + query : ''}`);
-    return data.success ? data.data : [];
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(sale) {
@@ -234,7 +238,10 @@ export const purchases = {
     if (to) params.append('to', to);
     const query = params.toString();
     const data = await api(`purchases.php${query ? '?' + query : ''}`);
-    return data.success ? data.data : [];
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(purchase) {
@@ -257,7 +264,10 @@ export const suppliers = {
   async getAll(search = '') {
     const query = search ? `?search=${encodeURIComponent(search)}` : '';
     const data = await api(`suppliers.php${query}`);
-    return data.success ? data.data : [];
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(supplier) {
@@ -286,7 +296,10 @@ export const suppliers = {
 export const categories = {
   async getAll() {
     const data = await api('categories.php');
-    return data.success ? data.data : [];
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(category) {
@@ -318,7 +331,13 @@ export const expenses = {
     if (from) params.append('from', from);
     if (to) params.append('to', to);
     const data = await api(`expenses.php?${params}`);
-    return data.success ? data.data : [];
+    if (data.success && data.data?.items) {
+      return data.data.items;
+    }
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(expense) {
@@ -343,7 +362,13 @@ export const incomes = {
     if (from) params.append('from', from);
     if (to) params.append('to', to);
     const data = await api(`expenses.php?${params}`);
-    return data.success ? data.data : [];
+    if (data.success && data.data?.items) {
+      return data.data.items;
+    }
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(income) {
@@ -365,7 +390,10 @@ export const incomes = {
 export const settings = {
   async get() {
     const data = await api('settings.php');
-    return data.success ? data.data : {};
+    if (data.success) {
+      return data.data || {};
+    }
+    return {};
   },
   
   async update(settingsData) {
@@ -383,7 +411,10 @@ export const settings = {
 export const users = {
   async getAll() {
     const data = await api('users.php');
-    return data.success ? data.data : [];
+    if (data.success) {
+      return Array.isArray(data.data) ? data.data : [];
+    }
+    return [];
   },
   
   async create(user) {
