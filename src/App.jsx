@@ -387,11 +387,9 @@ function LoginScreen({ onLogin, settings }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const currentYear = new Date().getFullYear();
   const businessName = settings?.name || 'আপনার দোকান';
-  const businessAddress = settings?.address || '';
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -399,18 +397,16 @@ function LoginScreen({ onLogin, settings }) {
     setLoading(true);
 
     try {
-      // Accept both full email and username
       const loginIdentifier = username.includes('@') ? username : `${username}@konok.io`;
       const result = await auth.login(loginIdentifier, password);
       
       if (result.success && result.data.user) {
         onLogin(result.data.user);
       } else {
-        setError('❌ ব্যবহারকারীর নাম বা পাসওয়ার্ড ভুল!');
+        setError('ব্যবহারকারীর নাম বা পাসওয়ার্ড ভুল!');
       }
     } catch (err) {
-      setError('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
-      console.error('Login error:', err);
+      setError('সার্ভারে সংযোগ করতে ব্যর্থ!');
     }
     setLoading(false);
   };
@@ -423,350 +419,154 @@ function LoginScreen({ onLogin, settings }) {
       alignItems: 'center',
       justifyContent: 'center',
       padding: 20,
-      position: 'relative',
-      overflow: 'hidden',
     }}>
-      {/* Background Grid Pattern */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `
-          linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
-        `,
-        backgroundSize: '50px 50px',
-      }} />
-
-      {/* Top Bar */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: 4,
-        background: 'linear-gradient(90deg, #14B8A6, #0D9488, #0F766E)',
-      }} />
-
-      {/* Login Container */}
-      <div style={{
-        width: '100%',
-        maxWidth: 400,
-        position: 'relative',
-        zIndex: 10,
-      }}>
-        {/* Header Card */}
+      <div style={{ width: '100%', maxWidth: 420 }}>
+        {/* Header */}
         <div style={{
-          background: '#FFFFFF',
+          background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '32px 32px 24px',
+          padding: '24px',
           textAlign: 'center',
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.1)',
         }}>
-          {/* Logo */}
           <div style={{
-            width: 80,
-            height: 80,
-            background: 'linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)',
-            borderRadius: '20px',
+            width: 64, height: 64,
+            background: 'linear-gradient(135deg, #0F766E, #14B8A6)',
+            borderRadius: 16,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 16px',
-            boxShadow: '0 8px 24px rgba(15,118,110,0.4)',
-          }}>
-            <span style={{ fontSize: 40 }}>🏪</span>
-          </div>
-
-          <h1 style={{ 
-            margin: '0 0 4px', 
-            fontSize: 26, 
-            fontWeight: 800, 
-            color: '#0F766E',
-            letterSpacing: '-0.5px'
-          }}>
+            margin: '0 auto 12px',
+            fontSize: 32,
+          }}>🏪</div>
+          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#0F766E' }}>
             {businessName}
           </h1>
-          
           <div style={{
             display: 'inline-flex',
-            alignItems: 'center',
             gap: 6,
-            padding: '6px 14px',
+            padding: '4px 12px',
             background: '#F0FDFA',
             borderRadius: 20,
             marginTop: 8,
+            fontSize: 12,
+            color: '#0F766E',
+            fontWeight: 600,
           }}>
-            <span style={{ fontSize: 12 }}>💼</span>
-            <span style={{ 
-              fontSize: 12, 
-              color: '#0F766E',
-              fontWeight: 600,
-            }}>
-              POS ম্যানেজমেন্ট সিস্টেম
-            </span>
+            💼 POS ম্যানেজমেন্ট সিস্টেম
           </div>
         </div>
 
-        {/* Login Form Card */}
+        {/* Login Form */}
         <div style={{
-          background: '#FFFFFF',
+          background: '#fff',
           borderRadius: '0 0 20px 20px',
-          padding: '24px 32px 32px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.15)',
+          padding: '20px 24px 24px',
         }}>
-          <div style={{
-            textAlign: 'center',
-            marginBottom: 24,
-            paddingBottom: 16,
-            borderBottom: '2px dashed #E5E7EB',
-          }}>
-            <h2 style={{
-              margin: 0,
-              fontSize: 18,
-              fontWeight: 700,
-              color: '#1F2937',
-            }}>
-              👋 স্বাগতম!
-            </h2>
-            <p style={{
-              margin: '6px 0 0',
-              fontSize: 13,
-              color: '#6B7280',
-            }}>
-              লগইন করে শুরু করুন
-            </p>
-          </div>
-
-          <form onSubmit={handleLogin}>
-            {/* Username Field */}
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ 
-                display: 'block',
-                marginBottom: 6,
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#374151',
-              }}>
-                👤 ব্যবহারকারীর নাম
+          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+            {/* Username */}
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
+                👤 ইউজার নাম
               </label>
-              <div style={{ position: 'relative' }}>
-                <span style={{
-                  position: 'absolute',
-                  left: 14,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize: 16,
-                }}>👤</span>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="admin বা admin@konok.io"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '14px 14px 14px 42px',
-                    fontSize: 15,
-                    border: '2px solid #E5E7EB',
-                    borderRadius: 12,
-                    outline: 'none',
-                    transition: 'all 0.2s',
-                    boxSizing: 'border-box',
-                    color: '#1F2937',
-                    background: '#F9FAFB',
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#0F766E';
-                    e.target.style.background = '#FFFFFF';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#E5E7EB';
-                    e.target.style.background = '#F9FAFB';
-                  }}
-                />
-              </div>
-              <p style={{
-                margin: '4px 0 0',
-                fontSize: 11,
-                color: '#9CA3AF',
-              }}>
-                ✨ শুধু "admin" বা পুরো ইমেইল দুটোই চলবে
-              </p>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="admin"
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  fontSize: 14,
+                  border: '2px solid #E5E7EB',
+                  borderRadius: 10,
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0F766E'}
+                onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
+              />
             </div>
 
-            {/* Password Field */}
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ 
-                display: 'block',
-                marginBottom: 6,
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#374151',
-              }}>
+            {/* Password */}
+            <div style={{ width: 140 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
                 🔐 পাসওয়ার্ড
               </label>
-              <div style={{ position: 'relative' }}>
-                <span style={{
-                  position: 'absolute',
-                  left: 14,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  fontSize: 16,
-                }}>🔒</span>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="পাসওয়ার্ড লিখুন"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '14px 50px 14px 42px',
-                    fontSize: 15,
-                    border: '2px solid #E5E7EB',
-                    borderRadius: 12,
-                    outline: 'none',
-                    transition: 'all 0.2s',
-                    boxSizing: 'border-box',
-                    color: '#1F2937',
-                    background: '#F9FAFB',
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#0F766E';
-                    e.target.style.background = '#FFFFFF';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#E5E7EB';
-                    e.target.style.background = '#F9FAFB';
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute',
-                    right: 12,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: 18,
-                    padding: 4,
-                  }}
-                >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
-                </button>
-              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="******"
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  fontSize: 14,
+                  border: '2px solid #E5E7EB',
+                  borderRadius: 10,
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#0F766E'}
+                onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
+              />
             </div>
-
-            {/* Error Message */}
-            {error && (
-              <div style={{
-                padding: '12px 14px',
-                background: '#FEF2F2',
-                borderRadius: 10,
-                marginBottom: 16,
-                color: '#DC2626',
-                fontSize: 13,
-                fontWeight: 500,
-                border: '1px solid #FECACA',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-              }}>
-                <span>⚠️</span>
-                <span>{error}</span>
-              </div>
-            )}
 
             {/* Login Button */}
             <button
               type="submit"
               disabled={loading}
               style={{
-                width: '100%',
-                padding: '14px',
-                background: loading 
-                  ? '#9CA3AF' 
-                  : 'linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)',
-                color: '#FFFFFF',
+                padding: '12px 20px',
+                background: loading ? '#9CA3AF' : '#0F766E',
+                color: '#fff',
                 border: 'none',
-                borderRadius: 12,
-                fontSize: 15,
+                borderRadius: 10,
+                fontSize: 14,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s',
-                boxShadow: loading 
-                  ? 'none' 
-                  : '0 4px 14px rgba(15,118,110,0.4)',
-                letterSpacing: '0.3px',
-              }}
-              onMouseOver={(e) => {
-                if (!loading) {
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 6px 20px rgba(15,118,110,0.5)';
-                }
-              }}
-              onMouseOut={(e) => {
-                e.target.style.transform = 'translateY(0)';
-                e.target.style.boxShadow = '0 4px 14px rgba(15,118,110,0.4)';
+                whiteSpace: 'nowrap',
               }}
             >
-              {loading ? (
-                <span>⏳ লোড হচ্ছে...</span>
-              ) : (
-                <span>🚀 লগইন করুন</span>
-              )}
+              {loading ? '⏳' : 'লগইন'}
             </button>
           </form>
 
-          {/* Quick Login Hint */}
-          <div style={{
-            marginTop: 20,
-            padding: 12,
-            background: '#F0FDFA',
-            borderRadius: 10,
-            textAlign: 'center',
-          }}>
-            <p style={{
-              margin: 0,
+          {/* Error */}
+          {error && (
+            <div style={{
+              marginTop: 12,
+              padding: '10px 12px',
+              background: '#FEF2F2',
+              borderRadius: 8,
+              color: '#DC2626',
               fontSize: 12,
-              color: '#0F766E',
               fontWeight: 500,
             }}>
-              💡 ডেমো: admin / @rsm@k@1A
-            </p>
+              ⚠️ {error}
+            </div>
+          )}
+
+          {/* Hint */}
+          <div style={{
+            marginTop: 16,
+            padding: 10,
+            background: '#F0FDFA',
+            borderRadius: 8,
+            textAlign: 'center',
+            fontSize: 11,
+            color: '#0F766E',
+          }}>
+            💡 ডেমো: admin / @rsm@k@1A
           </div>
         </div>
 
         {/* Footer */}
-        <div style={{ 
-          marginTop: 24, 
-          textAlign: 'center',
-        }}>
-          <p style={{ 
-            margin: 0, 
-            fontSize: 12, 
-            color: 'rgba(255,255,255,0.6)',
-          }}>
-            © {currentYear} {businessName} | সর্বস্বত্ব সংরক্ষিত
-          </p>
+        <div style={{ textAlign: 'center', marginTop: 16, color: 'rgba(255,255,255,0.6)', fontSize: 11 }}>
+          © {currentYear} {businessName}
         </div>
       </div>
-
-      {/* Bottom Decorative */}
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 4,
-        background: 'linear-gradient(90deg, #14B8A6, #0D9488, #0F766E)',
-      }} />
     </div>
   );
 }
