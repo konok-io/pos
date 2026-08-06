@@ -41,27 +41,12 @@ function getUsers() {
     try {
         $db = getDB();
         
-        // Get all available columns from users table
-        $columns = $db->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
-        $columnNames = array_column($columns, 'name');
-        
-        // Build SELECT query with available columns
-        $selectColumns = ['id', 'name', 'email', 'role', 'created_at'];
-        $optionalColumns = ['username', 'phone', 'status'];
-        foreach ($optionalColumns as $col) {
-            if (in_array($col, $columnNames)) {
-                $selectColumns[] = $col;
-            }
-        }
-        
-        $selectStr = implode(', ', $selectColumns);
-        
         // Super Admin can see all users
         // Admin and Staff can see everyone except Super Admin
         if ($auth['user_role'] === 'super_admin') {
-            $stmt = $db->query("SELECT $selectStr FROM users ORDER BY created_at DESC");
+            $stmt = $db->query("SELECT * FROM users ORDER BY created_at DESC");
         } else {
-            $stmt = $db->query("SELECT $selectStr FROM users WHERE role != 'super_admin' ORDER BY created_at DESC");
+            $stmt = $db->query("SELECT * FROM users WHERE role != 'super_admin' ORDER BY created_at DESC");
         }
         
         $users = $stmt->fetchAll();

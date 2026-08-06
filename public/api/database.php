@@ -313,41 +313,39 @@ function initDatabase($pdo) {
 // Run database initialization
 initDatabase($pdo);
 
-// Drop and recreate users table if schema is wrong
-try {
-    $columns = $pdo->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
-    $columnNames = array_column($columns, 'name');
+// Drop and recreate users table if schema is wrong (force recreation)
+$columns = $pdo->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
+$columnNames = array_column($columns, 'name');
+
+// If 'username' or 'status' column is missing, recreate the table with correct schema
+if (!in_array('username', $columnNames) || !in_array('status', $columnNames)) {
+    // Backup existing data
+    $stmt = $pdo->query("SELECT id, name, email, password, role FROM users");
+    $existingUsers = $stmt->fetchAll();
     
-    // If 'username' column is missing, recreate the table with correct schema
-    if (!in_array('username', $columnNames) || !in_array('status', $columnNames)) {
-        // Backup existing data
-        $stmt = $pdo->query("SELECT id, name, email, password, role FROM users");
-        $existingUsers = $stmt->fetchAll();
-        
-        // Drop and recreate table
-        $pdo->exec("DROP TABLE IF EXISTS users");
-        $pdo->exec("
-            CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                username TEXT UNIQUE,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                role TEXT DEFAULT 'staff',
-                phone TEXT,
-                status TEXT DEFAULT 'active',
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        ");
-        
-        // Restore users
-        foreach ($existingUsers as $user) {
-            $stmt = $pdo->prepare("INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$user['id'], $user['name'], $user['email'], $user['password'], $user['role']]);
-        }
+    // Drop table
+    $pdo->exec("DROP TABLE IF EXISTS users");
+    
+    // Recreate with correct schema
+    $pdo->exec("
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            username TEXT UNIQUE,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL,
+            role TEXT DEFAULT 'staff',
+            phone TEXT,
+            status TEXT DEFAULT 'active',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+    
+    // Restore users
+    foreach ($existingUsers as $user) {
+        $stmt = $pdo->prepare("INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$user['id'], $user['name'], $user['email'], $user['password'], $user['role']]);
     }
-} catch (Exception $e) {
-    // Ignore migration errors
 }
 
 // Run migrations AFTER tables are created
