@@ -44,9 +44,9 @@ function getUsers() {
         // Super Admin can see all users
         // Admin and Staff can see everyone except Super Admin
         if ($auth['user_role'] === 'super_admin') {
-            $stmt = $db->query("SELECT id, name, email, role, phone, status, created_at FROM users ORDER BY created_at DESC");
+            $stmt = $db->query("SELECT id, name, email, role, status, created_at FROM users ORDER BY created_at DESC");
         } else {
-            $stmt = $db->query("SELECT id, name, email, role, phone, status, created_at FROM users WHERE role != 'super_admin' ORDER BY created_at DESC");
+            $stmt = $db->query("SELECT id, name, email, role, status, created_at FROM users WHERE role != 'super_admin' ORDER BY created_at DESC");
         }
         
         $users = $stmt->fetchAll();
