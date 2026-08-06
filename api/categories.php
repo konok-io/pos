@@ -46,7 +46,10 @@ function getCategories() {
  * Create new category
  */
 function createCategory() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
@@ -82,7 +85,10 @@ function createCategory() {
  * Update category
  */
 function updateCategory() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     if (!isset($input['id'])) {
@@ -114,7 +120,10 @@ function updateCategory() {
  * Delete category
  */
 function deleteCategory() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     $id = $_GET['id'] ?? '';
     

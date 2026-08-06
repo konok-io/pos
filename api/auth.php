@@ -123,14 +123,18 @@ function logout() {
 
 /**
  * Check authentication - Returns current session user
+ * Always returns 200 with authenticated flag (never 401)
  */
 function checkAuth() {
     // Check if user is logged in via session
     if (!isset($_SESSION['user_id'])) {
-        response(null, 'Not authenticated', 401);
+        // Return 200 with authenticated: false instead of 401
+        response(['authenticated' => false], null, 200);
+        return;
     }
     
     response([
+        'authenticated' => true,
         'user' => [
             'id' => $_SESSION['user_id'],
             'name' => $_SESSION['user_name'],
@@ -143,15 +147,17 @@ function checkAuth() {
 
 /**
  * Authenticate request - Returns user info from session
+ * Returns null if not authenticated (caller handles the response)
  */
 function authenticate() {
     if (!isset($_SESSION['user_id'])) {
-        response(null, 'Authentication required', 401);
+        return null;
     }
     
     return [
         'user_id' => $_SESSION['user_id'],
         'user_name' => $_SESSION['user_name'],
+        'user_email' => $_SESSION['user_email'],
         'user_role' => $_SESSION['user_role']
     ];
 }

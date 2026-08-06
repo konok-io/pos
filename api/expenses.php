@@ -74,6 +74,9 @@ function getExpenses() {
  */
 function createExpense() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
@@ -107,6 +110,9 @@ function createExpense() {
  */
 function deleteExpense() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     if (!in_array($auth['user_role'], ['super_admin', 'admin'])) {
         response(null, 'Permission denied', 403);
@@ -168,6 +174,9 @@ function getIncomes() {
  */
 function createIncome() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
@@ -201,6 +210,9 @@ function createIncome() {
  */
 function deleteIncome() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     if (!in_array($auth['user_role'], ['super_admin', 'admin'])) {
         response(null, 'Permission denied', 403);

@@ -107,13 +107,25 @@ export const auth = {
   async check() {
     try {
       const data = await api('auth.php');
-      if (data.success && data.data?.user) {
-        setUser(data.data.user);
+      // Handle the new response format with authenticated flag
+      if (data.success) {
+        if (data.data?.authenticated === true && data.data?.user) {
+          setUser(data.data.user);
+          return { success: true, authenticated: true, user: data.data.user };
+        } else if (data.data?.authenticated === false) {
+          // User is not authenticated, but this is expected behavior
+          return { success: true, authenticated: false };
+        } else if (data.data?.user) {
+          // Legacy format: {success: true, data: {user: {...}}}
+          setUser(data.data.user);
+          return { success: true, authenticated: true, user: data.data.user };
+        }
       }
-      return data;
+      return { success: true, authenticated: false };
     } catch (error) {
       console.error('Auth check failed:', error);
-      return { success: false };
+      // Don't clear auth on network errors - just return not authenticated
+      return { success: false, authenticated: false };
     }
   },
   

@@ -74,6 +74,9 @@ function getSales() {
  */
 function createSale() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
@@ -160,6 +163,9 @@ function createSale() {
  */
 function deleteSale() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     // Only super_admin and admin can delete sales
     if (!in_array($auth['user_role'], ['super_admin', 'admin'])) {

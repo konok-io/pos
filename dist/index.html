@@ -6,7 +6,6 @@
     <meta name="description" content="POS সিস্টেম - বিক্রয়, স্টক ও হিসাব ব্যবস্থা" />
     <title>POS সিস্টেম</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="stylesheet" crossorigin href="./assets/index-DRZmt6CH.css">
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font-family: system-ui, -apple-system, sans-serif; }
@@ -22,7 +21,7 @@
         z-index: 9999;
       }
       #preloader.hidden {
-        display: none !important;
+        display: none;
       }
       .preloader-icon {
         font-size: 80px;
@@ -45,20 +44,9 @@
       #root:empty {
         display: none;
       }
-      /* Ensure preloader stays visible as fallback */
-      body.loading #preloader {
-        display: flex !important;
-      }
     </style>
-    <script>
-      // Fallback: if React doesn't load in 3 seconds, ensure preloader is visible
-      document.body.classList.add('loading');
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          document.body.classList.remove('loading');
-        }, 3000);
-      });
-    </script>
+    <script type="module" crossorigin src="./assets/index-Dt9D0uHO.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DRZmt6CH.css">
   </head>
   <body>
     <div id="preloader">
@@ -67,6 +55,5 @@
       <div class="preloader-text">লোড হচ্ছে...</div>
     </div>
     <div id="root"></div>
-    <script type="module" crossorigin src="./assets/index-CO4UDL4q.js"></script>
   </body>
 </html>

@@ -284,6 +284,22 @@ class Database {
                 minStock REAL DEFAULT 0,
                 cat TEXT,
                 company TEXT,
+                mrp REAL DEFAULT 0,
+                image TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+
+            -- Product history table
+            CREATE TABLE IF NOT EXISTS product_history (
+                id TEXT PRIMARY KEY,
+                product_id TEXT,
+                product_name TEXT,
+                type TEXT,
+                quantity INTEGER DEFAULT 0,
+                stock_before INTEGER DEFAULT 0,
+                stock_after INTEGER DEFAULT 0,
+                note TEXT,
+                user_id TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -302,12 +318,19 @@ class Database {
             CREATE TABLE IF NOT EXISTS sales (
                 id TEXT PRIMARY KEY,
                 items TEXT NOT NULL,
-                total REAL NOT NULL,
+                subtotal REAL DEFAULT 0,
                 discount REAL DEFAULT 0,
+                total REAL DEFAULT 0,
                 vat REAL DEFAULT 0,
+                vatRate REAL DEFAULT 0,
                 paid REAL NOT NULL,
+                due REAL DEFAULT 0,
                 change REAL DEFAULT 0,
                 customer_id TEXT,
+                payment_method TEXT DEFAULT 'cash',
+                invoice_number TEXT,
+                user_id TEXT,
+                user_name TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -317,6 +340,8 @@ class Database {
                 items TEXT NOT NULL,
                 total REAL NOT NULL,
                 supplier_id TEXT,
+                user_id TEXT,
+                user_name TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -327,6 +352,8 @@ class Database {
                 amount REAL NOT NULL,
                 type TEXT DEFAULT 'expenses',
                 note TEXT,
+                user_id TEXT,
+                user_name TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -346,11 +373,23 @@ class Database {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
+            -- Sessions table (for PHP session storage reference)
+            CREATE TABLE IF NOT EXISTS sessions (
+                id TEXT PRIMARY KEY,
+                user_id TEXT,
+                data TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                expires_at DATETIME
+            );
+
             -- Insert default settings if not exists
             INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('shop_name', 'POS সিস্টেম');
             INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('address', '');
             INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('phone', '');
             INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('vat_percent', '15');
+            INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('name', 'আমার দোকান');
+            INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('vatEnabled', 'true');
+            INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES ('vatPercent', '15');
             
             -- Insert default super admin user if not exists
             INSERT OR IGNORE INTO users (id, name, email, password, role) 

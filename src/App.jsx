@@ -1039,15 +1039,22 @@ export default function App() {
         const result = await auth.check();
         console.log('Auth check result:', result);
         
-        if (result.success && result.data?.user) {
+        // Check the authenticated flag from the new response format
+        if (result.authenticated === true && result.user) {
+          setCurrentUser(result.user);
+          setIsLoggedIn(true);
+        } else if (result.success && result.data?.user) {
+          // Legacy format support
           setCurrentUser(result.data.user);
           setIsLoggedIn(true);
         } else {
+          // Not authenticated - show login screen (this is normal, not an error)
           setIsLoggedIn(false);
         }
       } catch (e) {
         console.log('Auth check failed:', e.message);
-        // API failed - still allow login screen to show
+        // API failed - don't logout, just show login screen
+        // This prevents auto-logout on page refresh when API is slow
         setIsLoggedIn(false);
       }
       
@@ -3726,7 +3733,7 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
 /* ═══════════════════════════════════════════
    SUPPLIERS SCREEN
 ═══════════════════════════════════════════ */
-function SuppliersScreen({suppliers, products, categories, purchases, upd}) {
+function SuppliersScreen({suppliers, products, categories, purchases, upd, refreshData}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState({});

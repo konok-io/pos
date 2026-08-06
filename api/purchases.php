@@ -68,6 +68,9 @@ function getPurchases() {
  */
 function createPurchase() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
@@ -153,6 +156,9 @@ function createPurchase() {
  */
 function deletePurchase() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     if (!in_array($auth['user_role'], ['super_admin', 'admin'])) {
         response(null, 'Permission denied', 403);

@@ -63,7 +63,10 @@ function getSuppliers() {
  * Create new supplier
  */
 function createSupplier() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
@@ -105,7 +108,10 @@ function createSupplier() {
  * Update supplier
  */
 function updateSupplier() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     if (!isset($input['id'])) {
@@ -141,7 +147,10 @@ function updateSupplier() {
  * Delete supplier
  */
 function deleteSupplier() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     $id = $_GET['id'] ?? '';
     

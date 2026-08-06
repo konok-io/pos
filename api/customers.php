@@ -63,7 +63,10 @@ function getCustomers() {
  * Create new customer
  */
 function createCustomer() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     $id = uniqid() . '-' . substr(md5(uniqid()), 0, 5);
@@ -105,7 +108,10 @@ function createCustomer() {
  * Update customer
  */
 function updateCustomer() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
     
     if (!isset($input['id'])) {
@@ -141,7 +147,10 @@ function updateCustomer() {
  * Delete customer
  */
 function deleteCustomer() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     $id = $_GET['id'] ?? '';
     

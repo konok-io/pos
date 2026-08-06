@@ -81,7 +81,10 @@ function getSettings() {
  * Accepts all camelCase keys from frontend
  */
 function updateSettings() {
-    authenticate();
+    $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     $input = @json_decode(file_get_contents('php://input'), true);
 
     if (empty($input) || json_last_error() !== JSON_ERROR_NONE) {

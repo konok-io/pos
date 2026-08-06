@@ -31,6 +31,9 @@ switch ($method) {
  */
 function getUsers() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     if ($auth['user_role'] !== 'super_admin') {
         response(null, 'Permission denied. Super Admin only.', 403);
@@ -53,6 +56,9 @@ function getUsers() {
  */
 function createUser() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     if ($auth['user_role'] !== 'super_admin') {
         response(null, 'Permission denied. Super Admin only.', 403);
@@ -108,6 +114,9 @@ function createUser() {
  */
 function updateUser() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     if ($auth['user_role'] !== 'super_admin') {
         response(null, 'Permission denied. Super Admin only.', 403);
@@ -156,6 +165,9 @@ function updateUser() {
  */
 function deleteUser() {
     $auth = authenticate();
+    if (!$auth) {
+        response(null, 'Authentication required', 401);
+    }
     
     if ($auth['user_role'] !== 'super_admin') {
         response(null, 'Permission denied. Super Admin only.', 403);
