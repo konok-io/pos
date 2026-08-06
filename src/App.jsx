@@ -546,11 +546,10 @@ function LoginScreen({ onLogin, settings }) {
             </div>
           )}
 
-        </div>
-
-        {/* Footer */}
-        <div style={{ textAlign: 'center', marginTop: 16, color: 'rgba(255,255,255,0.6)', fontSize: 11 }}>
-          © {currentYear} {businessName}
+          {/* Footer */}
+          <div style={{ textAlign: 'center', marginTop: 16, paddingTop: 12, borderTop: '1px dashed #E5E7EB', fontSize: 11, color: '#9CA3AF' }}>
+            © {currentYear} {businessName}
+          </div>
         </div>
       </div>
     </div>
