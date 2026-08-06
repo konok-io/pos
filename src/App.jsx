@@ -425,34 +425,32 @@ function LoginScreen({ onLogin, settings }) {
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '24px',
-          textAlign: 'center',
+          padding: '20px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}>
           <div style={{
-            width: 64, height: 64,
+            width: 52, height: 52,
             background: 'linear-gradient(135deg, #0F766E, #14B8A6)',
-            borderRadius: 16,
+            borderRadius: 14,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 12px',
-            fontSize: 32,
+            fontSize: 28,
           }}>🏪</div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#0F766E' }}>
-            {businessName}
-          </h1>
-          <div style={{
-            display: 'inline-flex',
-            gap: 6,
-            padding: '4px 12px',
-            background: '#F0FDFA',
-            borderRadius: 20,
-            marginTop: 8,
-            fontSize: 12,
-            color: '#0F766E',
-            fontWeight: 600,
-          }}>
-            💼 POS ম্যানেজমেন্ট সিস্টেম
+          <div style={{ textAlign: 'right' }}>
+            <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#0F766E' }}>
+              {businessName}
+            </h1>
+            <div style={{
+              fontSize: 11,
+              color: '#0F766E',
+              fontWeight: 600,
+              marginTop: 2,
+            }}>
+              💼 POS ম্যানেজমেন্ট সিস্টেম
+            </div>
           </div>
         </div>
 
