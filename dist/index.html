@@ -6,10 +6,50 @@
     <meta name="description" content="POS সিস্টেম - বিক্রয়, স্টক ও হিসাব ব্যবস্থা" />
     <title>POS সিস্টেম</title>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: system-ui, -apple-system, sans-serif; }
+      #preloader {
+        position: fixed;
+        inset: 0;
+        background: #0F766E;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        z-index: 9999;
+      }
+      #preloader.hidden {
+        display: none;
+      }
+      .preloader-icon {
+        font-size: 80px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+      .preloader-title {
+        color: white;
+        font-size: 32px;
+        font-weight: 700;
+      }
+      .preloader-text {
+        color: rgba(255,255,255,0.8);
+        font-size: 16px;
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+      }
+    </style>
     <script type="module" crossorigin src="./assets/index-qFDdn5gd.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-DRZmt6CH.css">
   </head>
   <body>
+    <div id="preloader">
+      <div class="preloader-icon">🏪</div>
+      <div class="preloader-title">POS সিস্টেম</div>
+      <div class="preloader-text">লোড হচ্ছে...</div>
+    </div>
     <div id="root"></div>
   </body>
 </html>
