@@ -684,8 +684,8 @@ function MainApp({ currentUser, onLogout }) {
         setSettings(data.settings && typeof data.settings === 'object' ? {...DEFAULT_SETTINGS, ...data.settings} : {...DEFAULT_SETTINGS});
         setReady(true);
       } catch (error) {
-        console.error('Failed to load data from server:', error);
-        // Still set ready to show UI, but with empty data
+        console.error('Failed to load data from API:', error);
+        // API failed - use empty data, but still show UI
         setProducts([]);
         setCustomers([]);
         setCategories([]);
@@ -1047,22 +1047,30 @@ export default function App() {
         }
       } catch (e) {
         console.log('Auth check failed:', e.message);
+        // API failed - still allow login screen to show
         setIsLoggedIn(false);
       }
       
       setIsLoading(false);
       setAuthChecked(true);
-      
-      // Hide HTML preloader when app is ready
-      if (window.preloaderControl) {
-        window.preloaderControl.hide();
-      }
     }
     
     // Small delay to ensure DOM is ready
     const timer = setTimeout(checkAuth, 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Effect to hide HTML preloader AFTER React has rendered the loading/login state
+  useEffect(() => {
+    // Only hide HTML preloader after auth check is complete and React has rendered
+    if (!isLoading && authChecked && window.preloaderControl) {
+      // Small delay to ensure React's loading screen or login screen has rendered
+      const hideTimer = setTimeout(() => {
+        window.preloaderControl.hide();
+      }, 100);
+      return () => clearTimeout(hideTimer);
+    }
+  }, [isLoading, authChecked]);
 
   // Listen for logout events from API
   useEffect(() => {
@@ -1076,12 +1084,14 @@ export default function App() {
   }, []);
 
   const handleLogin = (user) => {
-    // Hide HTML preloader on login
-    if (window.preloaderControl) {
-      window.preloaderControl.hide();
-    }
     setCurrentUser(user);
     setIsLoggedIn(true);
+    // Hide HTML preloader after state update and React re-render
+    if (window.preloaderControl) {
+      setTimeout(() => {
+        window.preloaderControl.hide();
+      }, 50);
+    }
   };
 
   const handleLogout = async () => {

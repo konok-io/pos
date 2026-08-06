@@ -3,14 +3,24 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
+// Signal that React has started loading
+window.__REACT_LOADED__ = false;
+
 // Expose preloader control globally so App can control it
-window.preloaderControl = {
+window.preloaderControl = window.preloaderControl || {
   hide: () => {
     const preloader = document.getElementById('preloader');
     if (preloader) {
       preloader.classList.add('hidden');
-      setTimeout(() => preloader.remove(), 400);
+      setTimeout(() => {
+        if (preloader.parentNode) {
+          preloader.remove();
+        }
+      }, 400);
     }
+    // Remove fallback loading class
+    document.body.classList.remove('loading');
+    window.__REACT_LOADED__ = true;
   },
   show: () => {
     const preloader = document.getElementById('preloader');
@@ -20,6 +30,7 @@ window.preloaderControl = {
         document.body.appendChild(preloader);
       }
     }
+    document.body.classList.add('loading');
   }
 };
 
@@ -34,14 +45,18 @@ class ErrorBoundary extends React.Component {
     return { hasError: true }
   }
 
-  componentDidCatch(error) {
-    console.error('App Error:', error)
+  componentDidCatch(error, errorInfo) {
+    console.error('App Error:', error, errorInfo)
   }
 
   render() {
     if (this.state.hasError) {
-      // Hide preloader on error
-      window.preloaderControl?.hide();
+      // Hide preloader on error with a delay to ensure error screen renders
+      if (window.preloaderControl?.hide) {
+        setTimeout(() => {
+          window.preloaderControl.hide();
+        }, 50);
+      }
       return (
         <div style={{
           display: 'flex',
@@ -84,3 +99,6 @@ root.render(
     <App />
   </ErrorBoundary>
 )
+
+// Signal that React has rendered
+window.__REACT_LOADED__ = true;
