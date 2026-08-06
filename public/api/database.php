@@ -269,9 +269,6 @@ function initDatabase($pdo) {
         )
     ");
     
-    // Migration: Add missing columns to existing tables
-    migrateDatabase($pdo);
-    
     // Insert default admin user if not exists
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ? OR role = 'admin'");
     $stmt->execute(['admin@pos.local']);
@@ -314,6 +311,9 @@ function initDatabase($pdo) {
 
 // Run database initialization
 initDatabase($pdo);
+
+// Run migrations AFTER tables are created
+migrateDatabase($pdo);
 
 /**
  * Send JSON response
