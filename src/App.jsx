@@ -414,13 +414,40 @@ function LoginScreen({ onLogin, settings }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#0F766E',
+      background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #0D9488 100%)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: 20,
+      position: 'relative',
+      overflow: 'hidden',
     }}>
-      <div style={{ width: '100%', maxWidth: 420 }}>
+      {/* Background Pattern */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                          radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
+                          radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)`,
+      }} />
+      
+      {/* Top Bar */}
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, right: 0,
+        height: 4,
+        background: 'linear-gradient(90deg, #5EEAD4, #2DD4BF, #14B8A6)',
+      }} />
+      
+      {/* Bottom Bar */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0, left: 0, right: 0,
+        height: 4,
+        background: 'linear-gradient(90deg, #14B8A6, #2DD4BF, #5EEAD4)',
+      }} />
+
+      <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div style={{
           background: '#fff',
