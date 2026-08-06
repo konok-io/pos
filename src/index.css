@@ -1,15 +1,28 @@
-/* ─────────────── FONTS (Google Fonts) ─────────────── */
-/* Bangla Font - Hind Siliguri (Free Google Font) */
-@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+/* ─────────────── FONTS ─────────────── */
 
-/* English Font - Noto Sans */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
+/* Bengali Font - Custom Bangla TTF */
+@font-face {
+  font-family: 'BanglaFont';
+  src: url('/fonts/bangla.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* English Font - Custom English TTF */
+@font-face {
+  font-family: 'EnglishFont';
+  src: url('/fonts/English.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Hind Siliguri', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif;
 }
 
 html, body {
@@ -30,28 +43,33 @@ body {
   flex-direction: column;
 }
 
-/* All buttons use Bangla font */
-button {
-  font-family: 'Hind Siliguri', 'Segoe UI', system-ui, sans-serif !important;
+/* Default font for all elements */
+button, input, select, textarea, p, span, div, label, h1, h2, h3, h4, h5, h6 {
+  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
 }
 
-/* All inputs use Bangla font */
-input {
-  font-family: 'Hind Siliguri', 'Segoe UI', system-ui, sans-serif !important;
+/* English font class - applied dynamically */
+.english-font {
+  font-family: 'EnglishFont', 'Segoe UI', system-ui, sans-serif !important;
 }
 
-input::placeholder {
-  font-family: 'Hind Siliguri', 'Segoe UI', system-ui, sans-serif !important;
+/* Bengali font class - applied dynamically */
+.bengali-font {
+  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
 }
 
-/* Numbers only - use English font */
+/* Numbers and English text - use English font */
 input[type="number"],
 input[type="tel"],
 .price,
 .amount,
 .quantity,
 .total,
-.currency,
-.english {
-  font-family: 'Noto Sans', 'Segoe UI', system-ui, sans-serif !important;
+.currency {
+  font-family: 'EnglishFont', 'Segoe UI', system-ui, sans-serif !important;
+}
+
+/* Placeholder styling */
+input::placeholder {
+  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
 }
