@@ -3,16 +3,18 @@
     RewriteEngine On
     RewriteBase /
     
-    # If requesting from root, serve from dist
-    RewriteCond %{REQUEST_URI} !^/dist/
-    RewriteCond %{REQUEST_URI} !^/api/
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ dist/$1 [L]
+    # Serve existing files directly
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
     
-    # Serve existing files directly from dist
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteCond %{REQUEST_URI} !^/api/
-    RewriteRule ^ dist/index.html [L]
+    # Serve existing directories directly  
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+    
+    # API requests go to api folder
+    RewriteCond %{REQUEST_URI} ^/api/
+    RewriteRule ^api/(.*)$ api/$1 [L]
+    
+    # All other requests go to dist folder
+    RewriteRule ^(.*)$ dist/$1 [L]
 </IfModule>
