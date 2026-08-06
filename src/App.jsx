@@ -745,31 +745,76 @@ function MainApp({ currentUser, onLogout }) {
   }, []);
 
   // Product operations - API-based
+  // Update function for products - accepts array, does diff-based updates
+  const updateProducts = async (newProducts) => {
+    try {
+      const currentIds = new Set(products.map(p => p.id));
+      const newIds = new Set(newProducts.map(p => p.id));
+      
+      // Find deleted items
+      const toDelete = products.filter(p => !newIds.has(p.id));
+      for (const p of toDelete) {
+        await products.delete(p.id);
+      }
+      
+      // Find added items
+      const toAdd = newProducts.filter(p => !currentIds.has(p.id));
+      for (const p of toAdd) {
+        await products.create(p);
+      }
+      
+      // Find updated items
+      const toUpdate = newProducts.filter(np => {
+        const op = products.find(p => p.id === np.id);
+        return op && JSON.stringify(op) !== JSON.stringify(np);
+      });
+      for (const p of toUpdate) {
+        await products.update(p);
+      }
+      
+      await refreshData();
+    } catch (error) {
+      console.error('Failed to update products:', error);
+    }
+  };
+
+  // Update function for categories - accepts array, does diff-based updates
+  const updateCategories = async (newCategories) => {
+    try {
+      const currentIds = new Set(categories.map(c => c.id));
+      const newIds = new Set(newCategories.map(c => c.id));
+      
+      // Find deleted items
+      const toDelete = categories.filter(c => !newIds.has(c.id));
+      for (const c of toDelete) {
+        await categoriesApi.delete(c.id);
+      }
+      
+      // Find added items
+      const toAdd = newCategories.filter(c => !currentIds.has(c.id));
+      for (const c of toAdd) {
+        await categoriesApi.create(c);
+      }
+      
+      // Find updated items
+      const toUpdate = newCategories.filter(nc => {
+        const oc = categories.find(c => c.id === nc.id);
+        return oc && JSON.stringify(oc) !== JSON.stringify(nc);
+      });
+      for (const c of toUpdate) {
+        await categoriesApi.update(c);
+      }
+      
+      await refreshData();
+    } catch (error) {
+      console.error('Failed to update categories:', error);
+    }
+  };
+
   const upd = {
-    // Products
-    products: {
-      add: async (product) => {
-        const result = await products.create(product);
-        if (result.success) {
-          await refreshData();
-        }
-        return result;
-      },
-      update: async (product) => {
-        const result = await products.update(product);
-        if (result.success) {
-          await refreshData();
-        }
-        return result;
-      },
-      delete: async (id) => {
-        const result = await products.delete(id);
-        if (result.success) {
-          await refreshData();
-        }
-        return result;
-      },
-      refresh: refreshData,
+    // Products - now a function that accepts array
+    products: async (newProducts) => {
+      await updateProducts(newProducts);
     },
     // Customers
     customers: {
@@ -839,30 +884,9 @@ function MainApp({ currentUser, onLogout }) {
       },
       refresh: refreshData,
     },
-    // Categories
-    categories: {
-      add: async (category) => {
-        const result = await categoriesApi.create(category);
-        if (result.success) {
-          await refreshData();
-        }
-        return result;
-      },
-      update: async (category) => {
-        const result = await categoriesApi.update(category);
-        if (result.success) {
-          await refreshData();
-        }
-        return result;
-      },
-      delete: async (id) => {
-        const result = await categoriesApi.delete(id);
-        if (result.success) {
-          await refreshData();
-        }
-        return result;
-      },
-      refresh: refreshData,
+    // Categories - now a function that accepts array
+    categories: async (newCategories) => {
+      await updateCategories(newCategories);
     },
     // Purchases
     purchases: {
