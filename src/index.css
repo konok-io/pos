@@ -1,25 +1,15 @@
-/* ─────────────── FONTS ─────────────── */
-@font-face {
-  font-family: 'BanglaFont';
-  src: url('/fonts/bangla.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* ─────────────── FONTS (Google Fonts) ─────────────── */
+/* Bangla Font - Hind Siliguri (Free Google Font) */
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
 
-@font-face {
-  font-family: 'EnglishFont';
-  src: url('/fonts/English.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* English Font - Noto Sans */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700&display=swap');
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Hind Siliguri', 'Segoe UI', system-ui, sans-serif;
 }
 
 html, body {
@@ -42,16 +32,16 @@ body {
 
 /* All buttons use Bangla font */
 button {
-  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: 'Hind Siliguri', 'Segoe UI', system-ui, sans-serif !important;
 }
 
 /* All inputs use Bangla font */
 input {
-  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: 'Hind Siliguri', 'Segoe UI', system-ui, sans-serif !important;
 }
 
 input::placeholder {
-  font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: 'Hind Siliguri', 'Segoe UI', system-ui, sans-serif !important;
 }
 
 /* Numbers only - use English font */
@@ -63,5 +53,5 @@ input[type="tel"],
 .total,
 .currency,
 .english {
-  font-family: 'EnglishFont', 'Segoe UI', system-ui, sans-serif !important;
+  font-family: 'Noto Sans', 'Segoe UI', system-ui, sans-serif !important;
 }
