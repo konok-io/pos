@@ -1,3 +1,6 @@
 release/
 node_modules/
 .env
+
+# Database - stored outside web root
+.pos_data/

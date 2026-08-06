@@ -10,8 +10,13 @@
 // Start output buffering to prevent any output before JSON
 ob_start();
 
-// Database file path (relative to this file)
-define('DB_PATH', __DIR__ . '/database.sqlite');
+// Database file path - stored OUTSIDE web root to survive deployments
+// Store in parent directory's .pos_data folder
+$posDataDir = dirname(__DIR__) . '/.pos_data';
+if (!is_dir($posDataDir)) {
+    mkdir($posDataDir, 0755, true);
+}
+define('DB_PATH', $posDataDir . '/database.sqlite');
 
 // API Configuration
 define('API_VERSION', '1.0');
