@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Serve static assets directly
+    RewriteCond %{REQUEST_URI} ^/assets/ [OR]
+    RewriteCond %{REQUEST_URI} ^/fonts/ [OR]
+    RewriteCond %{REQUEST_URI} \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$
+    RewriteRule ^ - [L]
+    
+    # Let PHP handle API requests
+    RewriteCond %{REQUEST_URI} ^/api/
+    RewriteRule ^api/(.*)$ api/$1 [L]
+    
+    # Redirect all other requests to index.html
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.html [L]
+</IfModule>

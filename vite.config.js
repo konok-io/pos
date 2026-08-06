@@ -1,15 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
   base: './',
+  root: '.',
   build: {
-    outDir: 'dist',
+    outDir: '.',
     assetsDir: 'assets',
     sourcemap: false,
     minify: 'esbuild',
     rollupOptions: {
+      input: './index.html',
       output: {
         manualChunks: undefined,
         chunkFileNames: 'assets/[name]-[hash].js',
