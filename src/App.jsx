@@ -1035,43 +1035,61 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     async function checkAuth() {
+      // Get stored credentials
       const user = getUser();
       const token = getToken();
       
+      console.log('Checking auth:', { hasUser: !!user, hasToken: !!token });
+      
       if (user && token) {
-        // Trust stored credentials initially - show loader while verifying
+        // Trust stored credentials immediately
         setCurrentUser(user);
         setIsLoggedIn(true);
         
-        // Verify with server in background (don't logout on failure)
+        // Verify with server in background
         try {
           const result = await auth.check();
+          console.log('Auth check result:', result);
           if (result.success) {
-            // Session still valid
-            setCurrentUser(user);
+            setCurrentUser(result.data?.user || user);
             setIsLoggedIn(true);
           } else {
-            // Server says session invalid, but don't logout immediately
-            // This handles the case where server is unreachable
+            // Server returned success: false, but don't logout
+            // This handles network errors gracefully
+            console.log('Auth check returned false, but trusting stored credentials');
           }
         } catch (e) {
-          // Network error - trust stored credentials, don't logout
-          console.log('Auth check failed, trusting stored credentials');
+          // Network error - trust stored credentials
+          console.log('Auth check failed:', e.message, '- trusting stored credentials');
         }
+      } else {
+        // No stored credentials
+        setIsLoggedIn(false);
       }
+      
       setIsLoading(false);
+      setAuthChecked(true);
+      
       // Hide HTML preloader when app is ready
-      window.preloaderControl?.hide();
+      if (window.preloaderControl) {
+        window.preloaderControl.hide();
+      }
     }
-    checkAuth();
+    
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(checkAuth, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleLogin = (user) => {
     // Hide HTML preloader on login
-    window.preloaderControl?.hide();
+    if (window.preloaderControl) {
+      window.preloaderControl.hide();
+    }
     setCurrentUser(user);
     setIsLoggedIn(true);
   };
@@ -1082,7 +1100,8 @@ export default function App() {
     setIsLoggedIn(false);
   };
 
-  if (isLoading) {
+  // Show loader while checking auth
+  if (isLoading || !authChecked) {
     return (
       <div style={{
         position: 'fixed',
