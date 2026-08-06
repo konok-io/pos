@@ -21,8 +21,14 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: false,
-    host: 'pos.test',
-    https: false
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/pos/api')
+      }
+    }
   },
   preview: {
     port: 4173,
