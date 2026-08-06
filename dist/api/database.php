@@ -47,6 +47,78 @@ try {
 }
 
 /**
+ * Run database migrations - add missing columns to existing tables
+ */
+function migrateDatabase($pdo) {
+    // Users table migrations
+    $columns = $pdo->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
+    $existingColumns = array_column($columns, 'name');
+    
+    // Add username column if missing
+    if (!in_array('username', $existingColumns)) {
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN username TEXT UNIQUE");
+        } catch (Exception $e) {
+            // Column might already exist in some SQLite versions
+        }
+    }
+    
+    // Add phone column if missing
+    if (!in_array('phone', $existingColumns)) {
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN phone TEXT");
+        } catch (Exception $e) {
+            // Column might already exist
+        }
+    }
+    
+    // Products table migrations
+    $columns = $pdo->query("PRAGMA table_info(products)")->fetchAll(PDO::FETCH_ASSOC);
+    $existingColumns = array_column($columns, 'name');
+    
+    // Add missing columns to products
+    $productColumns = ['cost_price', 'min_stock', 'unit', 'description', 'image', 'supplier_id', 'sku'];
+    foreach ($productColumns as $col) {
+        if (!in_array($col, $existingColumns)) {
+            try {
+                $pdo->exec("ALTER TABLE products ADD COLUMN $col TEXT");
+            } catch (Exception $e) {
+                // Ignore errors
+            }
+        }
+    }
+    
+    // Customers table migrations
+    $columns = $pdo->query("PRAGMA table_info(customers)")->fetchAll(PDO::FETCH_ASSOC);
+    $existingColumns = array_column($columns, 'name');
+    
+    // Add balance column if missing
+    if (!in_array('balance', $existingColumns)) {
+        try {
+            $pdo->exec("ALTER TABLE customers ADD COLUMN balance REAL DEFAULT 0");
+        } catch (Exception $e) {
+            // Ignore
+        }
+    }
+    
+    // Settings table - check if using old schema
+    $columns = $pdo->query("PRAGMA table_info(settings)")->fetchAll(PDO::FETCH_ASSOC);
+    $existingColumns = array_column($columns, 'name');
+    
+    if (in_array('key', $existingColumns) && !in_array('setting_key', $existingColumns)) {
+        // Old schema: rename 'key' to 'setting_key'
+        try {
+            $pdo->exec("ALTER TABLE settings ADD COLUMN setting_key TEXT UNIQUE");
+            $pdo->exec("ALTER TABLE settings ADD COLUMN setting_value TEXT");
+            // Copy data
+            $pdo->exec("UPDATE settings SET setting_key = key, setting_value = value WHERE setting_key IS NULL");
+        } catch (Exception $e) {
+            // Ignore
+        }
+    }
+}
+
+/**
  * Run database migrations - create tables if they don't exist
  */
 function initDatabase($pdo) {
@@ -196,6 +268,9 @@ function initDatabase($pdo) {
             expires_at DATETIME
         )
     ");
+    
+    // Migration: Add missing columns to existing tables
+    migrateDatabase($pdo);
     
     // Insert default admin user if not exists
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE email = ? OR role = 'admin'");
