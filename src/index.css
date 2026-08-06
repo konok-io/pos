@@ -43,30 +43,19 @@ body {
   flex-direction: column;
 }
 
-/* Default font for all elements */
+/* Default font for all elements - Bengali */
 button, input, select, textarea, p, span, div, label, h1, h2, h3, h4, h5, h6 {
   font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
 }
 
-/* English font class - applied dynamically */
+/* English font class - applied dynamically for pure English text */
 .english-font {
   font-family: 'EnglishFont', 'Segoe UI', system-ui, sans-serif !important;
 }
 
-/* Bengali font class - applied dynamically */
+/* Bengali font class - applied dynamically for Bengali text */
 .bengali-font {
   font-family: 'BanglaFont', 'Segoe UI', system-ui, sans-serif !important;
-}
-
-/* Numbers and English text - use English font */
-input[type="number"],
-input[type="tel"],
-.price,
-.amount,
-.quantity,
-.total,
-.currency {
-  font-family: 'EnglishFont', 'Segoe UI', system-ui, sans-serif !important;
 }
 
 /* Placeholder styling */

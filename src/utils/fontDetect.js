@@ -6,6 +6,9 @@
 // Regex to detect Bengali characters (Unicode range: U+0980-U+09FF)
 const BENGALI_REGEX = /[\u0980-\u09FF]/;
 
+// Regex to detect English characters only (A-Z, a-z, 0-9, basic punctuation)
+const ENGLISH_ONLY_REGEX = /^[A-Za-z0-9\s\-\_\.\,\!\?\@\#\$\%\^\&\*\(\)\+\=\[\]\{\}\\\|\;\:'"<>\/\?\`\~\,]+$/;
+
 /**
  * Check if text contains Bengali characters
  * @param {string} text - The text to check
@@ -17,12 +20,31 @@ export function hasBengali(text) {
 }
 
 /**
+ * Check if text is English only (no Bengali characters)
+ * @param {string} text - The text to check
+ * @returns {boolean} - True if text is English only
+ */
+export function isEnglishOnly(text) {
+  if (!text || typeof text !== 'string') return true;
+  return ENGLISH_ONLY_REGEX.test(text);
+}
+
+/**
  * Get font class based on text content
  * @param {string} text - The text to check
  * @returns {string} - 'bengali-font' or 'english-font'
  */
 export function getFontClass(text) {
-  return hasBengali(text) ? 'bengali-font' : 'english-font';
+  // If has Bengali characters, use Bengali font
+  if (hasBengali(text)) {
+    return 'bengali-font';
+  }
+  // If English only, use English font
+  if (isEnglishOnly(text)) {
+    return 'english-font';
+  }
+  // Default to Bengali for mixed content
+  return 'bengali-font';
 }
 
 /**
@@ -84,6 +106,7 @@ export function initFontDetection() {
 
 export default {
   hasBengali,
+  isEnglishOnly,
   getFontClass,
   applyFontToElement,
   applyFontsToChildren,
