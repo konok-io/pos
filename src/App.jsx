@@ -422,29 +422,46 @@ function LoginScreen({ onLogin, settings }) {
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Background Pattern */}
+      {/* Background Circles */}
       <div style={{
         position: 'absolute',
-        top: 0, left: 0, right: 0, bottom: 0,
-        backgroundImage: `radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                          radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
-                          radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 0%, transparent 70%)`,
+        top: '-15%',
+        left: '-10%',
+        width: 400,
+        height: 400,
+        background: 'rgba(20, 184, 166, 0.2)',
+        borderRadius: '50%',
+        filter: 'blur(60px)',
       }} />
-      
-      {/* Top Bar */}
       <div style={{
         position: 'absolute',
-        top: 0, left: 0, right: 0,
-        height: 4,
-        background: 'linear-gradient(90deg, #5EEAD4, #2DD4BF, #14B8A6)',
+        bottom: '-20%',
+        right: '-15%',
+        width: 500,
+        height: 500,
+        background: 'rgba(13, 148, 136, 0.25)',
+        borderRadius: '50%',
+        filter: 'blur(80px)',
       }} />
-      
-      {/* Bottom Bar */}
       <div style={{
         position: 'absolute',
-        bottom: 0, left: 0, right: 0,
-        height: 4,
-        background: 'linear-gradient(90deg, #14B8A6, #2DD4BF, #5EEAD4)',
+        top: '40%',
+        right: '-5%',
+        width: 200,
+        height: 200,
+        background: 'rgba(45, 212, 191, 0.15)',
+        borderRadius: '50%',
+        filter: 'blur(40px)',
+      }} />
+      <div style={{
+        position: 'absolute',
+        bottom: '30%',
+        left: '-8%',
+        width: 300,
+        height: 300,
+        background: 'rgba(94, 234, 212, 0.1)',
+        borderRadius: '50%',
+        filter: 'blur(50px)',
       }} />
 
       <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
