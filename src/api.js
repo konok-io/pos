@@ -1,44 +1,24 @@
 /**
  * API Service - POS System
- * All business data is stored in SQLite database via PHP API
- * Auth token stored in localStorage (persists until explicitly cleared)
+ * All data is stored in SQLite database via PHP API
+ * Session management is handled server-side via PHP sessions
+ * NO localStorage/sessionStorage used for any data
  */
 
 // API Base URL
 const API_BASE = '/api';
 
 // ============================================================================
-// AUTH STORAGE (localStorage - persists until explicitly cleared)
+// AUTH STATE (managed in memory only, not persisted)
 // ============================================================================
 
-const TOKEN_KEY = 'pos_auth_token';
-const USER_KEY = 'pos_auth_user';
+let currentUser = null;
 
-export const getToken = () => localStorage.getItem(TOKEN_KEY);
-export const setToken = (token) => { 
-  if (token) {
-    localStorage.setItem(TOKEN_KEY, token);
-  } else {
-    localStorage.removeItem(TOKEN_KEY);
-  }
-};
-
-export const getUser = () => {
-  const user = localStorage.getItem(USER_KEY);
-  return user ? JSON.parse(user) : null;
-};
-export const setUser = (user) => {
-  if (user) {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(USER_KEY);
-  }
-};
-
-export const clearAuth = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-};
+export const getToken = () => null; // No token stored - PHP sessions handle auth
+export const setToken = () => {}; // No-op
+export const getUser = () => currentUser;
+export const setUser = (user) => { currentUser = user; };
+export const clearAuth = () => { currentUser = null; };
 
 // ============================================================================
 // API REQUEST WRAPPER
@@ -46,29 +26,23 @@ export const clearAuth = () => {
 
 async function api(endpoint, options = {}) {
   const url = `${API_BASE}/${endpoint}`;
-  const token = getToken();
   
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
   
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  
   try {
     const response = await fetch(url, {
       ...options,
       headers,
+      credentials: 'include', // Include cookies for PHP sessions
     });
     
     // Get raw text first to check for valid JSON
     const text = await response.text();
     
-    // Debug logging
     console.log('API Request:', options.method || 'GET', url);
-    console.log('Token:', token ? token.substring(0, 20) + '...' : 'none');
     
     let data;
     
@@ -83,11 +57,10 @@ async function api(endpoint, options = {}) {
     if (!response.ok) {
       console.error('API Error Response:', data);
       if (response.status === 401) {
+        // Session expired or invalid - clear local state and redirect to login
         clearAuth();
-        // Only reload if not already on login page
-        if (window.location.pathname !== '/login') {
-          window.location.reload();
-        }
+        // Dispatch event so App component can handle logout
+        window.dispatchEvent(new CustomEvent('auth:logout'));
       }
       throw new Error(data.error || 'Request failed');
     }
@@ -105,26 +78,21 @@ async function api(endpoint, options = {}) {
 
 export const auth = {
   async login(email, password) {
-    // Super Admin hardcoded check
-    if (email === 'admin@konok.io' && password === '@rsm@k@1A') {
-      const superAdmin = { id: 'super-admin', name: 'Super Admin', email: 'admin@konok.io', role: 'super_admin' };
-      const token = 'super-admin-token-' + Date.now();
-      setToken(token);
-      setUser(superAdmin);
-      return { success: true, data: { user: superAdmin, token } };
+    try {
+      const data = await api('auth.php', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+      
+      if (data.success && data.data?.user) {
+        setUser(data.data.user);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
     }
-    
-    const data = await api('auth.php', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-    
-    if (data.success && data.data.token) {
-      setToken(data.data.token);
-      setUser(data.data.user);
-    }
-    
-    return data;
   },
   
   async logout() {
@@ -138,14 +106,19 @@ export const auth = {
   
   async check() {
     try {
-      return await api('auth.php');
-    } catch {
+      const data = await api('auth.php');
+      if (data.success && data.data?.user) {
+        setUser(data.data.user);
+      }
+      return data;
+    } catch (error) {
+      console.error('Auth check failed:', error);
       return { success: false };
     }
   },
   
   getUser,
-  isAuthenticated: () => !!getToken(),
+  isAuthenticated: () => currentUser !== null,
 };
 
 // ============================================================================

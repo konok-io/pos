@@ -30,6 +30,7 @@ if (DEBUG_MODE) {
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Credentials: true');
 header('Content-Type: application/json; charset=utf-8');
 
 // Handle preflight requests
@@ -37,6 +38,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     ob_end_clean();
     http_response_code(200);
     exit();
+}
+
+// Start PHP session for auth management
+// Session data is stored in database.sqlite file
+ini_set('session.save_path', __DIR__);
+ini_set('session.save_handler', 'files');
+ini_set('session.gc_maxlifetime', 86400); // 24 hours
+ini_set('session.cookie_lifetime', 86400); // 24 hours
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_strict_mode', 1);
+
+session_start();
+
+// Update session expiry on activity
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 86400)) {
+    // Session expired, regenerate
+    session_unset();
+    session_destroy();
+    session_start();
+}
+$_SESSION['LAST_ACTIVITY'] = time();
+
+// Regenerate session ID periodically for security
+if (!isset($_SESSION['CREATED'])) {
+    $_SESSION['CREATED'] = time();
+} else if (time() - $_SESSION['CREATED'] > 1800) {
+    // Session ID older than 30 minutes, regenerate
+    session_regenerate_id(true);
+    $_SESSION['CREATED'] = time();
 }
 
 /**

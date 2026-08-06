@@ -148,7 +148,7 @@ function BannerImageUpload({ value, onChange }) {
 }
 
 /* ─────────────── API SERVICE (SQLite Backend) ─────────────── */
-// All data is stored in SQLite via PHP API - NO localStorage used
+// All data is stored in SQLite via PHP API - NO localStorage/sessionStorage used
 import { 
   auth, products, customers, sales, suppliers as suppliersApi, categories as categoriesApi, 
   expenses, incomes, settings as settingsApi, users as usersApi, loadAllData,
@@ -613,15 +613,9 @@ function MainApp({ currentUser, onLogout }) {
   const logoutRef = useRef(onLogout);
   logoutRef.current = onLogout;
   
-  const [tab, setTab] = useState(() => {
-    // Restore tab from localStorage
-    const savedTab = localStorage.getItem('pos_current_tab');
-    return savedTab || 'pos';
-  });
+  const [tab, setTab] = useState('pos');
 
-  // Save tab to localStorage when it changes
   const handleTabChange = (newTab) => {
-    localStorage.setItem('pos_current_tab', newTab);
     setTab(newTab);
   };
   const [products, setProducts] = useState([]);
@@ -1039,35 +1033,20 @@ export default function App() {
 
   useEffect(() => {
     async function checkAuth() {
-      // Get stored credentials
-      const user = getUser();
-      const token = getToken();
+      console.log('Checking PHP session auth...');
       
-      console.log('Checking auth:', { hasUser: !!user, hasToken: !!token });
-      
-      if (user && token) {
-        // Trust stored credentials immediately
-        setCurrentUser(user);
-        setIsLoggedIn(true);
+      try {
+        const result = await auth.check();
+        console.log('Auth check result:', result);
         
-        // Verify with server in background
-        try {
-          const result = await auth.check();
-          console.log('Auth check result:', result);
-          if (result.success) {
-            setCurrentUser(result.data?.user || user);
-            setIsLoggedIn(true);
-          } else {
-            // Server returned success: false, but don't logout
-            // This handles network errors gracefully
-            console.log('Auth check returned false, but trusting stored credentials');
-          }
-        } catch (e) {
-          // Network error - trust stored credentials
-          console.log('Auth check failed:', e.message, '- trusting stored credentials');
+        if (result.success && result.data?.user) {
+          setCurrentUser(result.data.user);
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
         }
-      } else {
-        // No stored credentials
+      } catch (e) {
+        console.log('Auth check failed:', e.message);
         setIsLoggedIn(false);
       }
       
@@ -1083,6 +1062,17 @@ export default function App() {
     // Small delay to ensure DOM is ready
     const timer = setTimeout(checkAuth, 100);
     return () => clearTimeout(timer);
+  }, []);
+
+  // Listen for logout events from API
+  useEffect(() => {
+    const handleLogoutEvent = () => {
+      setCurrentUser(null);
+      setIsLoggedIn(false);
+    };
+    
+    window.addEventListener('auth:logout', handleLogoutEvent);
+    return () => window.removeEventListener('auth:logout', handleLogoutEvent);
   }, []);
 
   const handleLogin = (user) => {
