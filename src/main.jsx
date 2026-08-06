@@ -3,6 +3,15 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
+// Hide preloader when app mounts
+const hidePreloader = () => {
+  const preloader = document.getElementById('preloader');
+  if (preloader) {
+    preloader.classList.add('hidden');
+    setTimeout(() => preloader.remove(), 400);
+  }
+};
+
 // Simple error boundary component
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -16,6 +25,10 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error) {
     console.error('App Error:', error)
+  }
+
+  componentDidMount() {
+    hidePreloader();
   }
 
   render() {
