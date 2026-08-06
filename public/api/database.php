@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Database path - use absolute path to project root
-$projectRoot = dirname(dirname(__DIR__));
+$projectRoot = dirname(__DIR__);
 $dbPath = $projectRoot . '/database/pos_database.sqlite';
 
 // Ensure database directory exists
@@ -312,6 +312,43 @@ function initDatabase($pdo) {
 
 // Run database initialization
 initDatabase($pdo);
+
+// Drop and recreate users table if schema is wrong
+try {
+    $columns = $pdo->query("PRAGMA table_info(users)")->fetchAll(PDO::FETCH_ASSOC);
+    $columnNames = array_column($columns, 'name');
+    
+    // If 'username' column is missing, recreate the table with correct schema
+    if (!in_array('username', $columnNames) || !in_array('status', $columnNames)) {
+        // Backup existing data
+        $stmt = $pdo->query("SELECT id, name, email, password, role FROM users");
+        $existingUsers = $stmt->fetchAll();
+        
+        // Drop and recreate table
+        $pdo->exec("DROP TABLE IF EXISTS users");
+        $pdo->exec("
+            CREATE TABLE users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                username TEXT UNIQUE,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                role TEXT DEFAULT 'staff',
+                phone TEXT,
+                status TEXT DEFAULT 'active',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ");
+        
+        // Restore users
+        foreach ($existingUsers as $user) {
+            $stmt = $pdo->prepare("INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$user['id'], $user['name'], $user['email'], $user['password'], $user['role']]);
+        }
+    }
+} catch (Exception $e) {
+    // Ignore migration errors
+}
 
 // Run migrations AFTER tables are created
 migrateDatabase($pdo);
