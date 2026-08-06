@@ -546,18 +546,6 @@ function LoginScreen({ onLogin, settings }) {
             </div>
           )}
 
-          {/* Hint */}
-          <div style={{
-            marginTop: 16,
-            padding: 10,
-            background: '#F0FDFA',
-            borderRadius: 8,
-            textAlign: 'center',
-            fontSize: 11,
-            color: '#0F766E',
-          }}>
-            💡 ডেমো: admin / @rsm@k@1A
-          </div>
         </div>
 
         {/* Footer */}
