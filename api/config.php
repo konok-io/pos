@@ -118,6 +118,27 @@ class Database {
     }
 
     /**
+     * Migration: Add status column to users table if missing
+     */
+    private function addUsersStatusColumn() {
+        try {
+            // Get users table columns
+            $result = $this->connection->query("PRAGMA table_info(users)");
+            $columns = [];
+            while ($row = $result->fetch()) {
+                $columns[$row['name']] = true;
+            }
+            
+            // Add status column if missing
+            if (!isset($columns['status'])) {
+                $this->connection->exec("ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'active'");
+            }
+        } catch (Exception $e) {
+            // Column might already exist or table doesn't exist - ignore
+        }
+    }
+
+    /**
      * Run database migrations for schema updates
      */
     private function runMigrations() {
@@ -127,6 +148,9 @@ class Database {
             if ($result->fetchColumn() === false) {
                 return; // Table doesn't exist yet
             }
+            
+            // Migration: Add status column to users table if missing
+            $this->addUsersStatusColumn();
             
             // Get all columns
             $result = $this->connection->query("PRAGMA table_info(settings)");
@@ -247,6 +271,7 @@ class Database {
                 email TEXT UNIQUE NOT NULL,
                 password TEXT NOT NULL,
                 role TEXT DEFAULT 'operator',
+                status TEXT DEFAULT 'active',
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
