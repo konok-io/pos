@@ -31,13 +31,17 @@ React → PHP API → SQLite Database → Local File
       Memory (auth token in session only)
 ```
 
+### Database Location
+```
+.pos_data/database.sqlite  ← STORED OUTSIDE web root!
+                            This survives git pulls and deployments!
+```
+
 ### Build Output
 ```
 release/POS সিস্টেম Setup 0.0.0.exe
 ├── dist/           ← Frontend (React app)
-├── api/            ← Backend (PHP + SQLite)
-│   └── database.sqlite  ← Auto-created on first run
-├── electron/
+├── api/            ← Backend (PHP API)
 ├── public/
 └── router.php
 ```
@@ -52,7 +56,7 @@ release/POS সিস্টেম Setup 0.0.0.exe
 - Session Storage: Temporary data
 
 ### ✅ AFTER (New)
-- **SQLite Database:** All business data
+- **SQLite Database:** All business data in `.pos_data/database.sqlite`
 - **Session Memory:** Auth token (in-memory only, not persisted)
 - **NO localStorage:** Removed completely
 - **NO IndexedDB:** Removed completely
@@ -97,8 +101,14 @@ Password: @rsm@k@1A
 1. Run the installer: `POS সিস্টেম Setup 0.0.0.exe`
 2. The app will automatically create the SQLite database on first run
 
+### For Production (Linux/Server):
+1. Clone the repo or `git pull` latest
+2. Run `npm run build`
+3. Use `./deploy.sh /var/www/html/pos` or manually copy files
+4. Database is created automatically in `.pos_data/` folder
+
 ### Reset Database:
-1. Delete `api/database.sqlite`
+1. Delete `.pos_data/database.sqlite`
 2. Restart the app
 3. Database will be recreated automatically with default data
 
@@ -106,12 +116,14 @@ Password: @rsm@k@1A
 
 ## Benefits
 
-1. **Offline Capable:** Works without internet
-2. **Portable:** Copy the app folder to any computer
-3. **No Setup:** SQLite database auto-created
-4. **Secure:** All data stored locally
-5. **Fast:** SQLite is highly optimized
-6. **Reliable:** No data loss from browser cache clearing
+1. **Deployment Safe:** Database survives `git pull` and deployments
+2. **Offline Capable:** Works without internet
+3. **Portable:** Copy the app folder to any computer
+4. **No Setup:** SQLite database auto-created
+5. **Secure:** All data stored locally
+6. **Fast:** SQLite is highly optimized
+7. **Reliable:** No data loss from browser cache clearing
+8. **No Data Loss:** `git pull` and `npm run build` do NOT delete data
 
 ---
 
@@ -119,6 +131,8 @@ Password: @rsm@k@1A
 
 | Commit | Description |
 |--------|-------------|
+| `cc6e7eb` | Store database OUTSIDE web root (.pos_data/) |
+| `e34db0f` | Add status column migration for users table |
 | `62ad6ce` | Add router.php to Electron build files |
 | `e4eb179` | Add api folder to Electron build files |
 | `48cc0ed` | Update all MySQL references to SQLite |
@@ -133,3 +147,5 @@ Password: @rsm@k@1A
 **GitHub:** https://github.com/konok-io/pos
 
 **All business data is now stored in SQLite. Clearing browser storage will NOT delete any data.**
+
+**Database is stored in `.pos_data/` folder OUTSIDE the web root - git pulls will NOT delete your data!**
