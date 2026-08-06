@@ -27,7 +27,10 @@ switch ($method) {
 }
 
 /**
- * Get all users (super_admin only)
+ * Get all users
+ * - Super Admin can see all users including other Super Admins
+ * - Admin can see all users EXCEPT Super Admin
+ * - Staff can see all users EXCEPT Super Admin
  */
 function getUsers() {
     $auth = authenticate();
@@ -35,13 +38,17 @@ function getUsers() {
         response(null, 'Authentication required', 401);
     }
     
-    if ($auth['user_role'] !== 'super_admin') {
-        response(null, 'Permission denied. Super Admin only.', 403);
-    }
-    
     try {
         $db = getDB();
-        $stmt = $db->query("SELECT id, name, email, role, created_at FROM users WHERE role != 'super_admin' ORDER BY created_at DESC");
+        
+        // Super Admin can see all users
+        // Admin and Staff can see everyone except Super Admin
+        if ($auth['user_role'] === 'super_admin') {
+            $stmt = $db->query("SELECT id, name, username, email, role, phone, status, created_at FROM users ORDER BY created_at DESC");
+        } else {
+            $stmt = $db->query("SELECT id, name, username, email, role, phone, status, created_at FROM users WHERE role != 'super_admin' ORDER BY created_at DESC");
+        }
+        
         $users = $stmt->fetchAll();
         
         response($users);
