@@ -425,7 +425,7 @@ function LoginScreen({ onLogin, settings }) {
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '20px 24px',
+          padding: '20px 24px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
