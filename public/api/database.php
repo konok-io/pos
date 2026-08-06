@@ -16,8 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Database path (two levels up from public/api)
-$dbPath = __DIR__ . '/../../database/pos_database.sqlite';
+// Database path - use absolute path to project root
+$projectRoot = dirname(dirname(__DIR__));
+$dbPath = $projectRoot . '/database/pos_database.sqlite';
 
 // Ensure database directory exists
 $dbDir = dirname($dbPath);
