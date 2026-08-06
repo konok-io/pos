@@ -85,7 +85,10 @@ async function api(endpoint, options = {}) {
       console.error('API Error Response:', data);
       if (response.status === 401) {
         clearAuth();
-        window.location.reload();
+        // Only reload if not already on login page
+        if (window.location.pathname !== '/login') {
+          window.location.reload();
+        }
       }
       throw new Error(data.error || 'Request failed');
     }

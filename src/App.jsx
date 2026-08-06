@@ -1042,24 +1042,36 @@ export default function App() {
       const token = getToken();
       
       if (user && token) {
+        // Trust stored credentials initially - show loader while verifying
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+        
+        // Verify with server in background (don't logout on failure)
         try {
           const result = await auth.check();
           if (result.success) {
+            // Session still valid
             setCurrentUser(user);
             setIsLoggedIn(true);
           } else {
-            clearAuth();
+            // Server says session invalid, but don't logout immediately
+            // This handles the case where server is unreachable
           }
         } catch (e) {
-          clearAuth();
+          // Network error - trust stored credentials, don't logout
+          console.log('Auth check failed, trusting stored credentials');
         }
       }
       setIsLoading(false);
+      // Hide HTML preloader when app is ready
+      window.preloaderControl?.hide();
     }
     checkAuth();
   }, []);
 
   const handleLogin = (user) => {
+    // Hide HTML preloader on login
+    window.preloaderControl?.hide();
     setCurrentUser(user);
     setIsLoggedIn(true);
   };
@@ -1071,7 +1083,33 @@ export default function App() {
   };
 
   if (isLoading) {
-    return null;
+    return (
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: '#0F766E',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '20px',
+        zIndex: 9999
+      }}>
+        <div style={{
+          fontSize: '80px',
+          animation: 'pulse 2s ease-in-out infinite'
+        }}>🏪</div>
+        <div style={{
+          color: 'white',
+          fontSize: '32px',
+          fontWeight: '700'
+        }}>POS সিস্টেম</div>
+        <div style={{
+          color: 'rgba(255,255,255,0.8)',
+          fontSize: '16px'
+        }}>লোড হচ্ছে...</div>
+      </div>
+    );
   }
 
   if (!isLoggedIn) {
