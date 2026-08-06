@@ -17,11 +17,10 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
       
-      /* Preloader - prevents FOUC */
       #preloader {
         position: fixed;
         inset: 0;
-        background: linear-gradient(135deg, #0F766E 0%, #115E59 100%);
+        background: #0F766E;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -52,8 +51,6 @@
         to { transform: rotate(360deg); }
       }
     </style>
-    <script type="module" crossorigin src="./assets/index-Cm0ceL81.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-DRZmt6CH.css">
   </head>
   <body>
     <div id="preloader">
@@ -61,17 +58,6 @@
       <div class="text">POS সিস্টেম লোড হচ্ছে...</div>
     </div>
     <div id="root"></div>
-    <script>
-      // Hide preloader when app is ready
-      window.addEventListener('load', function() {
-        setTimeout(function() {
-          var preloader = document.getElementById('preloader');
-          if (preloader) preloader.classList.add('hidden');
-          setTimeout(function() {
-            if (preloader && preloader.parentNode) preloader.parentNode.removeChild(preloader);
-          }, 400);
-        }, 100);
-      });
-    </script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
