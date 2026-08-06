@@ -26,8 +26,9 @@ if (DEBUG_MODE) {
     ini_set('display_errors', 0);
 }
 
-// CORS Headers
-header('Access-Control-Allow-Origin: *');
+// CORS Headers - Use specific origin instead of * for credentials support
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '*';
+header('Access-Control-Allow-Origin: ' . $origin);
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 header('Access-Control-Allow-Credentials: true');
@@ -35,20 +36,31 @@ header('Content-Type: application/json; charset=utf-8');
 
 // Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Access-Control-Allow-Credentials: true');
     ob_end_clean();
     http_response_code(200);
     exit();
 }
 
 // Start PHP session for auth management
-// Session data is stored in database.sqlite file
+// Session data is stored in files in the api directory
 ini_set('session.save_path', __DIR__);
 ini_set('session.save_handler', 'files');
 ini_set('session.gc_maxlifetime', 86400); // 24 hours
-ini_set('session.cookie_lifetime', 86400); // 24 hours
+ini_set('session.cookie_lifetime', 0); // Session cookie (expires when browser closes)
 ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.use_strict_mode', 1);
+ini_set('session.use_only_cookies', 1);
 
+// Set cookie path to the base path of the application
+// Detect if we're in a subdirectory
+$scriptPath = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+$cookiePath = $scriptPath ?: '/';
+ini_set('session.cookie_path', $cookiePath);
+
+// Start session
 session_start();
 
 // Update session expiry on activity

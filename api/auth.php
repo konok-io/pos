@@ -101,19 +101,19 @@ function logout() {
     // Clear all session data
     $_SESSION = [];
     
+    // Get session cookie params
+    $params = session_get_cookie_params();
+    
     // Delete session cookie
-    if (ini_get("session.use_cookies")) {
-        $params = session_get_cookie_params();
-        setcookie(
-            session_name(),
-            '',
-            time() - 42000,
-            $params["path"],
-            $params["domain"],
-            $params["secure"],
-            $params["httponly"]
-        );
-    }
+    setcookie(
+        session_name(),
+        '',
+        time() - 42000,
+        $params['path'] ?? '/',
+        $params['domain'] ?? '',
+        isset($params['secure']) && $params['secure'],
+        isset($params['httponly']) && $params['httponly']
+    );
     
     // Destroy the session
     session_destroy();
