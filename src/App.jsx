@@ -922,13 +922,7 @@ function MainApp({ currentUser, onLogout }) {
     },
   };
 
-  if (!ready) return (
-    <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'#0F766E',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:20}}>
-      <div style={{fontSize:64}}>🏪</div>
-      <div style={{color:'white',fontSize:24,fontWeight:'bold'}}>POS সিস্টেম</div>
-      <div style={{color:'rgba(255,255,255,0.8)',fontSize:16}}>লোড হচ্ছে...</div>
-    </div>
-  );
+  if (!ready) return null;
 
   const tabs = [
     {id:'pos',icon:'🛒',label:'বিক্রয়'},
@@ -1077,16 +1071,7 @@ export default function App() {
   };
 
   if (isLoading) {
-    return (
-      <div style={{
-        position:'fixed',top:0,left:0,right:0,bottom:0,
-        background:'#0F766E',display:'flex',alignItems:'center',
-        justifyContent:'center',flexDirection:'column',gap:20
-      }}>
-        <div style={{fontSize:64}}>🏪</div>
-        <div style={{color:'white',fontSize:24,fontWeight:700}}>লোড হচ্ছে...</div>
-      </div>
-    );
+    return null;
   }
 
   if (!isLoggedIn) {
