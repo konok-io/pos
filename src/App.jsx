@@ -914,6 +914,12 @@ function MainApp({ currentUser, onLogout }) {
         console.error('Failed to update purchases:', error);
       }
     },
+    // ProductHistory - function (history is stored in products data, just refresh)
+    productHistory: async (newHistory) => {
+      // Product history is stored within products data
+      // Just refresh to get latest data
+      await refreshData();
+    },
     // Settings
     settings: {
       update: async (settingsData) => {
