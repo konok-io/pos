@@ -246,6 +246,34 @@ class Database {
                     // Column might already exist
                 }
             }
+            
+            // Migration: Add columns to purchases table if missing
+            try {
+                $stmt = $this->connection->query("PRAGMA table_info(purchases)");
+                $columns = [];
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $columns[$row['name']] = true;
+                }
+                
+                $migrations = [
+                    'subtotal' => 'ALTER TABLE purchases ADD COLUMN subtotal REAL NOT NULL DEFAULT 0',
+                    'paid' => 'ALTER TABLE purchases ADD COLUMN paid REAL NOT NULL DEFAULT 0',
+                    'due' => 'ALTER TABLE purchases ADD COLUMN due REAL NOT NULL DEFAULT 0',
+                    'invoice_number' => 'ALTER TABLE purchases ADD COLUMN invoice_number TEXT'
+                ];
+                
+                foreach ($migrations as $col => $sql) {
+                    if (!isset($columns[$col])) {
+                        try {
+                            $this->connection->exec($sql);
+                        } catch (Exception $e) {
+                            // Column might already exist
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                // Ignore migration errors
+            }
         } catch (Exception $e) {
             // Ignore migration errors - table might not exist yet
         }
@@ -368,8 +396,12 @@ class Database {
             CREATE TABLE IF NOT EXISTS purchases (
                 id TEXT PRIMARY KEY,
                 items TEXT NOT NULL,
+                subtotal REAL NOT NULL DEFAULT 0,
                 total REAL NOT NULL,
+                paid REAL NOT NULL DEFAULT 0,
+                due REAL NOT NULL DEFAULT 0,
                 supplier_id TEXT,
+                invoice_number TEXT,
                 user_id TEXT,
                 user_name TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP
