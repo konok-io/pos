@@ -898,23 +898,21 @@ function MainApp({ currentUser, onLogout }) {
     categories: async (newCategories) => {
       await updateCategories(newCategories);
     },
-    // Purchases
-    purchases: {
-      add: async (purchase) => {
-        const result = await purchasesApi.create(purchase);
-        if (result.success) {
-          await refreshData();
+    // Purchases - function that accepts array (for add only)
+    purchases: async (newPurchases) => {
+      try {
+        const currentIds = new Set(purchases.map(p => p.id));
+        
+        // Find added items only (purchases are created via purchase invoice)
+        const toAdd = newPurchases.filter(p => !currentIds.has(p.id));
+        for (const p of toAdd) {
+          await purchasesApi.create(p);
         }
-        return result;
-      },
-      delete: async (id) => {
-        const result = await purchasesApi.delete(id);
-        if (result.success) {
-          await refreshData();
-        }
-        return result;
-      },
-      refresh: refreshData,
+        
+        await refreshData();
+      } catch (error) {
+        console.error('Failed to update purchases:', error);
+      }
     },
     // Settings
     settings: {
@@ -2375,9 +2373,10 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
       const msg = `⚠️ এই পণ্যটি ${relatedPurchases.length}টি পারচেজে আছে।\n\nপারচেজ ডেটা ও স্টক হিস্ট্রি সহ সম্পূর্ণ মুছে ফেলতে "ঠিক আছে" দিন।\nশুধু পণ্য মুছতে "বাতিল" করুন।`;
       if (!confirm(msg)) return;
       
-      // Delete related purchases
-      const purchaseIds = relatedPurchases.map(p=>p.id);
-      await upd.purchases(purchases.filter(p=>!purchaseIds.includes(p.id)));
+      // Delete related purchases one by one
+      for (const p of relatedPurchases) {
+        await purchasesApi.delete(p.id);
+      }
     } else {
       if (!confirm('এই পণ্যটি মুছে ফেলবেন?')) return;
     }
