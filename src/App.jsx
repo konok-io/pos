@@ -4288,6 +4288,39 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd, refre
     };
     
     await upd.products([...products, product]);
+    
+    // Create purchase invoice if there's stock and supplier
+    if (product.stock > 0 && product.company) {
+      try {
+        // Find supplier by company name
+        const supplier = suppliers.find(s => (s.name||'').toLowerCase() === (product.company||'').toLowerCase());
+        if (supplier) {
+          const purchaseResult = await purchasesApi.create({
+            supplier_id: supplier.id,
+            items: [{
+              name: product.name,
+              qty: product.stock,
+              buyP: product.buyP,
+              sellP: product.sellP,
+              unit: product.unit
+            }],
+            subtotal: product.stock * product.buyP,
+            total: product.stock * product.buyP,
+            paid: 0,
+            due: product.stock * product.buyP
+          });
+          
+          if (purchaseResult.success) {
+            setNewProduct({name:'',barcode:'',unit:'পিস',stock:'',minStock:'',buyP:'',sellP:'',vatPercent:'',company:'',cat:''});
+            alert(`✅ পণ্য যোগ করা হয়েছে!\n\n📦 পারচেজ ইনভয়েস তৈরি হয়েছে!\nআইডি: ${newId}\nইনভয়েস: ${purchaseResult.data?.invoice_number || 'N/A'}`);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Failed to create purchase:', err);
+      }
+    }
+    
     setNewProduct({name:'',barcode:'',unit:'পিস',stock:'',minStock:'',buyP:'',sellP:'',vatPercent:'',company:'',cat:''});
     alert(`✅ পণ্য যোগ করা হয়েছে!\nআইডি: ${newId}`);
   };
@@ -4409,7 +4442,72 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd, refre
         
         await upd.products(newProducts);
         
+        // Create purchase invoices for each supplier
+        const purchaseResults = [];
+        const supplierProducts = {};
+        
+        // Group products by supplier
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          const csvName = (row['পণ্যের নাম'] || row['name'] || '').trim();
+          const csvCompany = (row['সরবরাহকারী'] || row['company'] || '').trim();
+          const csvStock = parseFloat(row['স্টক'] || row['stock'] || 0) || 0;
+          const csvBuyP = parseFloat(row['ক্রয়মূল্য'] || row['buy price'] || 0) || 0;
+          const csvSellP = parseFloat(row['বিক্রয়মূল্য'] || row['sell price'] || 0) || 0;
+          const csvUnit = (row['একক'] || row['unit'] || 'পিস').trim();
+          
+          if (csvCompany && csvStock > 0) {
+            if (!supplierProducts[csvCompany]) {
+              supplierProducts[csvCompany] = [];
+            }
+            supplierProducts[csvCompany].push({
+              name: csvName,
+              qty: csvStock,
+              buyP: csvBuyP,
+              sellP: csvSellP,
+              unit: csvUnit
+            });
+          }
+        }
+        
+        // Create purchase invoices for each supplier
+        for (const [companyName, items] of Object.entries(supplierProducts)) {
+          try {
+            const supplier = suppliers.find(s => (s.name||'').toLowerCase() === companyName.toLowerCase());
+            if (supplier) {
+              const subtotal = items.reduce((sum, item) => sum + (item.qty * item.buyP), 0);
+              const result = await purchasesApi.create({
+                supplier_id: supplier.id,
+                items: items,
+                subtotal: subtotal,
+                total: subtotal,
+                paid: 0,
+                due: subtotal
+              });
+              
+              if (result.success) {
+                purchaseResults.push({
+                  supplier: companyName,
+                  invoice: result.data?.invoice_number || 'N/A',
+                  items: items.length
+                });
+              }
+            }
+          } catch (err) {
+            console.error('Failed to create purchase for', companyName, err);
+          }
+        }
+        
         let msg = `✅ ${addedCount}টি পণ্য যোগ করা হয়েছে!\n`;
+        
+        // Add purchase invoice info to message
+        if (purchaseResults.length > 0) {
+          msg += `\n📦 ${purchaseResults.length}টি পারচেজ ইনভয়েস তৈরি:\n`;
+          purchaseResults.forEach(pr => {
+            msg += `• ${pr.supplier}: ${pr.invoice} (${pr.items}টি পণ্য)\n`;
+          });
+        }
+        
         if (errors.length > 0) {
           msg += `\n⚠️ সমস্যা: ${errors.length}টি\n`;
           msg += errors.slice(0, 5).join('\n');
