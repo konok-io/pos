@@ -162,7 +162,8 @@ import {
   settings as settingsApi, 
   users as usersApi, 
   loadAllData,
-  getToken, setToken, getUser, setUser, clearAuth
+  getToken, setToken, getUser, setUser, clearAuth,
+  appState
 } from './api.js';
 
 /* ─────────────── DEFAULT SUPER ADMIN ─────────────── */
@@ -625,8 +626,18 @@ function MainApp({ currentUser, onLogout }) {
   
   const [tab, setTab] = useState('pos');
 
+  // Load saved tab from SQLite on mount
+  useEffect(() => {
+    appState.get('currentTab').then(savedTab => {
+      if (savedTab && ['pos', 'products', 'customers', 'sales', 'suppliers', 'categories', 'purchases', 'inventory', 'expenses', 'reports', 'settings'].includes(savedTab)) {
+        setTab(savedTab);
+      }
+    }).catch(() => {});
+  }, []);
+
   const handleTabChange = (newTab) => {
     setTab(newTab);
+    appState.set('currentTab', newTab).catch(() => {});
   };
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);

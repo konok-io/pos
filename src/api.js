@@ -19,6 +19,23 @@ export const getUser = () => currentUser;
 export const setUser = (user) => { currentUser = user; };
 export const clearAuth = () => { currentUser = null; };
 
+// App State - stored in SQLite
+export const appState = {
+  get: async (key) => {
+    const data = await api('state.php');
+    return data.data?.[key] || null;
+  },
+  set: async (key, value) => {
+    return await api('state.php', {
+      method: 'POST',
+      body: JSON.stringify({ [key]: value }),
+    });
+  },
+  getAll: async () => {
+    return await api('state.php');
+  },
+};
+
 // ============================================================================
 // API REQUEST WRAPPER
 // ============================================================================
