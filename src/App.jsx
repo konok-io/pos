@@ -4502,7 +4502,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
         }}>
           📂 ক্যাটাগরি ({categories.length})
         </button>
-        {/* Search and Add button - right aligned */}
+        {/* Search - right aligned */}
         <div style={{marginLeft:'auto',display:'flex',gap:8,alignItems:'center',paddingRight:12}}>
           <div style={{position:'relative'}}>
             <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
@@ -4510,9 +4510,6 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
               placeholder={activeTab==='companies'?'সরবরাহকারী খুঁজুন...':'ক্যাটাগরি খুঁজুন...'}
               style={{...input,paddingLeft:32,padding:'6px 12px',fontSize:12}}/>
           </div>
-          <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>setModal({mode:'add'})}>
-            {activeTab==='companies'?'🏢 সরবরাহকারী যোগ করুন':'📂 ক্যাটাগরি যোগ করুন'}
-          </button>
         </div>
       </div>
 
