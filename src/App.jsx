@@ -623,23 +623,10 @@ function MainApp({ currentUser, onLogout }) {
   const logoutRef = useRef(onLogout);
   logoutRef.current = onLogout;
   
-  // Load saved tab from localStorage
-  const getSavedTab = () => {
-    try {
-      const saved = localStorage.getItem('pos_current_tab');
-      return saved || 'pos';
-    } catch {
-      return 'pos';
-    }
-  };
-  
-  const [tab, setTab] = useState(getSavedTab);
+  const [tab, setTab] = useState('pos');
 
   const handleTabChange = (newTab) => {
     setTab(newTab);
-    try {
-      localStorage.setItem('pos_current_tab', newTab);
-    } catch {}
   };
   const [products, setProducts] = useState([]);
   const [customers, setCustomers] = useState([]);

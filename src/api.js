@@ -8,37 +8,16 @@
 const API_BASE = '/api';
 
 // ============================================================================
-// AUTH STATE (persisted in localStorage)
+// AUTH STATE (managed in memory only, not persisted)
 // ============================================================================
 
-const AUTH_KEY = 'pos_current_user';
-
-const loadUser = () => {
-  try {
-    const stored = localStorage.getItem(AUTH_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch {
-    return null;
-  }
-};
-
-let currentUser = loadUser();
+let currentUser = null;
 
 export const getToken = () => null;
 export const setToken = () => {};
 export const getUser = () => currentUser;
-export const setUser = (user) => { 
-  currentUser = user; 
-  if (user) {
-    localStorage.setItem(AUTH_KEY, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(AUTH_KEY);
-  }
-};
-export const clearAuth = () => { 
-  currentUser = null; 
-  localStorage.removeItem(AUTH_KEY);
-};
+export const setUser = (user) => { currentUser = user; };
+export const clearAuth = () => { currentUser = null; };
 
 // ============================================================================
 // API REQUEST WRAPPER
