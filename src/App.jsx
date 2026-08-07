@@ -150,8 +150,18 @@ function BannerImageUpload({ value, onChange }) {
 /* ─────────────── API SERVICE (SQLite Backend) ─────────────── */
 // All data is stored in SQLite via PHP API - NO localStorage/sessionStorage used
 import { 
-  auth, products, customers, sales, suppliers as suppliersApi, categories as categoriesApi, 
-  expenses, incomes, settings as settingsApi, users as usersApi, loadAllData,
+  auth, 
+  products as productsApi, 
+  customers as customersApi, 
+  sales as salesApi, 
+  purchases as purchasesApi,
+  suppliers as suppliersApi, 
+  categories as categoriesApi, 
+  expenses as expensesApi, 
+  incomes as incomesApi, 
+  settings as settingsApi, 
+  users as usersApi, 
+  loadAllData,
   getToken, setToken, getUser, setUser, clearAuth
 } from './api.js';
 
@@ -754,13 +764,13 @@ function MainApp({ currentUser, onLogout }) {
       // Find deleted items
       const toDelete = products.filter(p => !newIds.has(p.id));
       for (const p of toDelete) {
-        await products.delete(p.id);
+        await productsApi.delete(p.id);
       }
       
       // Find added items
       const toAdd = newProducts.filter(p => !currentIds.has(p.id));
       for (const p of toAdd) {
-        await products.create(p);
+        await productsApi.create(p);
       }
       
       // Find updated items
@@ -769,7 +779,7 @@ function MainApp({ currentUser, onLogout }) {
         return op && JSON.stringify(op) !== JSON.stringify(np);
       });
       for (const p of toUpdate) {
-        await products.update(p);
+        await productsApi.update(p);
       }
       
       await refreshData();
@@ -819,21 +829,21 @@ function MainApp({ currentUser, onLogout }) {
     // Customers
     customers: {
       add: async (customer) => {
-        const result = await customers.create(customer);
+        const result = await customersApi.create(customer);
         if (result.success) {
           await refreshData();
         }
         return result;
       },
       update: async (customer) => {
-        const result = await customers.update(customer);
+        const result = await customersApi.update(customer);
         if (result.success) {
           await refreshData();
         }
         return result;
       },
       delete: async (id) => {
-        const result = await customers.delete(id);
+        const result = await customersApi.delete(id);
         if (result.success) {
           await refreshData();
         }
@@ -844,14 +854,14 @@ function MainApp({ currentUser, onLogout }) {
     // Sales
     sales: {
       add: async (sale) => {
-        const result = await sales.create(sale);
+        const result = await salesApi.create(sale);
         if (result.success) {
           await refreshData();
         }
         return result;
       },
       delete: async (id) => {
-        const result = await sales.delete(id);
+        const result = await salesApi.delete(id);
         if (result.success) {
           await refreshData();
         }
@@ -891,14 +901,14 @@ function MainApp({ currentUser, onLogout }) {
     // Purchases
     purchases: {
       add: async (purchase) => {
-        const result = await purchases.create(purchase);
+        const result = await purchasesApi.create(purchase);
         if (result.success) {
           await refreshData();
         }
         return result;
       },
       delete: async (id) => {
-        const result = await purchases.delete(id);
+        const result = await purchasesApi.delete(id);
         if (result.success) {
           await refreshData();
         }
@@ -6548,8 +6558,8 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
     async function loadData() {
       try {
         const [expensesData, incomesData] = await Promise.all([
-          expenses.getAll(),
-          incomes.getAll(),
+          expensesApi.getAll(),
+          incomesApi.getAll(),
         ]);
         setExpensesList(expensesData || []);
         setIncomesList(incomesData || []);
@@ -6640,7 +6650,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
     if (!expenseForm.amount || expenseForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
     
     try {
-      const result = await expenses.create({
+      const result = await expensesApi.create({
         title: expenseForm.title.trim(),
         amount: parseFloat(expenseForm.amount),
         note: expenseForm.note || ''
@@ -6648,7 +6658,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       
       if (result.success) {
         // Reload expenses from API
-        const expensesData = await expenses.getAll();
+        const expensesData = await expensesApi.getAll();
         setExpensesList(expensesData || []);
         
         setExpenseForm({title:'',amount:'',note:''});
@@ -6667,9 +6677,9 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
   const deleteExpense = async (id) => {
     if (!confirm('এই ব্যয় মুছে ফেলবেন?')) return;
     try {
-      const result = await expenses.delete(id);
+      const result = await expensesApi.delete(id);
       if (result.success) {
-        const expensesData = await expenses.getAll();
+        const expensesData = await expensesApi.getAll();
         setExpensesList(expensesData || []);
       } else {
         alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
@@ -6686,7 +6696,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
     if (!incomeForm.amount || incomeForm.amount <= 0) { alert('সঠিক পরিমাণ দিন'); return; }
     
     try {
-      const result = await incomes.create({
+      const result = await incomesApi.create({
         title: incomeForm.title.trim(),
         amount: parseFloat(incomeForm.amount),
         note: incomeForm.note || ''
@@ -6694,7 +6704,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       
       if (result.success) {
         // Reload incomes from API
-        const incomesData = await incomes.getAll();
+        const incomesData = await incomesApi.getAll();
         setIncomesList(incomesData || []);
         
         setIncomeForm({title:'',amount:'',note:''});
@@ -6713,9 +6723,9 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
   const deleteIncome = async (id) => {
     if (!confirm('এই আয় মুছে ফেলবেন?')) return;
     try {
-      const result = await incomes.delete(id);
+      const result = await incomesApi.delete(id);
       if (result.success) {
-        const incomesData = await incomes.getAll();
+        const incomesData = await incomesApi.getAll();
         setIncomesList(incomesData || []);
       } else {
         alert('ব্যর্থ: ' + (result.error || 'Unknown error'));
@@ -9693,7 +9703,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   { l: '📂 ক্যাটাগরি ডেটা', c: categories.length, btn: 'সব ক্যাটাগরি মুছে ফেলুন', fn: async () => { if(confirm('সব ক্যাটাগরি মুছে ফেলবেন?')) { for(const c of categories) { await categories.delete(c.id); } await refreshData(); alert('ক্যাটাগরি মুছা হয়েছে।'); } } },
                   { l: '🛒 বিক্রয় ডেটা', c: sales.length, btn: 'সব বিক্রয় মুছে ফেলুন', fn: async () => { if(confirm('সব বিক্রয় মুছে ফেলবেন?')) { for(const s of sales) { await sales.delete(s.id); } await refreshData(); alert('বিক্রয় মুছা হয়েছে।'); } } },
                   { l: '👥 কাস্টমার ডেটা', c: customers.length, btn: 'সব কাস্টমার মুছে ফেলুন', fn: async () => { if(confirm('সব কাস্টমার মুছে ফেলবেন?')) { for(const c of customers) { await customers.delete(c.id); } await refreshData(); alert('কাস্টমার মুছা হয়েছে।'); } } },
-                  { l: '🛒 পারচেজ হিস্ট্রি', c: purchases.length, btn: 'সব পারচেজ হিস্ট্রি মুছে ফেলুন', fn: async () => { if(confirm('সব পারচেজ হিস্ট্রি মুছে ফেলবেন?')) { for(const p of purchases) { await purchases.delete(p.id); } await refreshData(); alert('পারচেজ হিস্ট্রি মুছা হয়েছে।'); } } },
+                  { l: '🛒 পারচেজ হিস্ট্রি', c: purchases.length, btn: 'সব পারচেজ হিস্ট্রি মুছে ফেলুন', fn: async () => { if(confirm('সব পারচেজ হিস্ট্রি মুছে ফেলবেন?')) { for(const p of purchases) { await purchasesApi.delete(p.id); } await refreshData(); alert('পারচেজ হিস্ট্রি মুছা হয়েছে।'); } } },
                   { l: '👤 সকল ইউজার (সুপার এডমিন ছাড়া)', c: users.length, btn: 'সব ইউজার মুছে ফেলুন', fn: async () => { if(confirm('সুপার এডমিন ছাড়া সব ইউজার মুছে ফেলবেন?')) { for(const u of users) { await usersApi.delete(u.id); } const userList = await usersApi.getAll(); setUsers(userList || []); alert('সব ইউজার মুছা হয়েছে।'); } } },
                 ].map((d, i) => (
                   <div key={i} style={{
@@ -9742,7 +9752,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       for(const s of suppliers) { await suppliersApi.delete(s.id); }
                       for(const cat of categories) { await categoriesApi.delete(cat.id); }
                       for(const s of sales) { await sales.delete(s.id); }
-                      for(const p of purchases) { await purchases.delete(p.id); }
+                      for(const p of purchases) { await purchasesApi.delete(p.id); }
                       for(const u of users) { await usersApi.delete(u.id); }
                       // Clear session storage
                       clearAuth();
