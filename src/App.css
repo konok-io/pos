@@ -5,3 +5,8 @@
   font-size: 40px !important;
   line-height: 1 !important;
 }
+
+/* Header business name - override global 14px */
+.header-business-name {
+  font-size: 22px !important;
+}
