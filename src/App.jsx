@@ -1377,10 +1377,15 @@ export default function App() {
         await openDB();
         setDbReady(true);
         
-        // Check license acceptance from database
-        const license = await get(STORES.license, 'status');
-        if (license && license.accepted === true) {
-          setLicenseAccepted(true);
+        // Check license acceptance from API
+        try {
+          const res = await fetch('http://localhost:8765/api/license');
+          const data = await res.json();
+          if (data.data && data.data.accepted === 1) {
+            setLicenseAccepted(true);
+          }
+        } catch (e) {
+          console.log('License check failed, using default');
         }
       } catch (e) {
         console.error('Failed to initialize:', e);

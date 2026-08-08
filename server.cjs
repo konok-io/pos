@@ -110,7 +110,12 @@ function parseBody(req) {
 
 // Send JSON response
 function sendJSON(res, data, status = 200) {
-  res.writeHead(status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+  res.writeHead(status, { 
+    'Content-Type': 'application/json', 
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type'
+  });
   res.end(JSON.stringify(data));
 }
 
@@ -122,6 +127,18 @@ function getParams(url) {
 
 // API Routes
 async function handleRequest(req, res) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400'
+    });
+    res.end();
+    return;
+  }
+  
   const url = req.url.split('?')[0];
   const method = req.method;
   const body = method !== 'GET' && method !== 'DELETE' ? await parseBody(req) : {};
