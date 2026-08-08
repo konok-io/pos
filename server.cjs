@@ -58,9 +58,6 @@ try {
       note TEXT, user_id TEXT, user_name TEXT, created_at TEXT
     );
     CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
-    CREATE TABLE IF NOT EXISTS license (
-      key TEXT PRIMARY KEY, accepted INTEGER, firstRunDate TEXT, licenseKey TEXT, isLicensed INTEGER, trialDays INTEGER, activatedDate TEXT
-    );
   `);
   
   // Initialize defaults
@@ -281,14 +278,6 @@ async function handleRequest(req, res) {
       for (const [key, value] of Object.entries(body)) {
         db.prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)').run(key, String(value));
       }
-      sendJSON(res, { success: true });
-    } else if (url === '/api/license' && method === 'GET') {
-      const row = db.prepare('SELECT * FROM license WHERE key = ?').get('status');
-      sendJSON(res, { success: true, data: row || null });
-    } else if (url === '/api/license' && method === 'POST') {
-      db.prepare('INSERT OR REPLACE INTO license (key, accepted, firstRunDate, licenseKey, isLicensed, trialDays, activatedDate) VALUES (?, ?, ?, ?, ?, ?, ?)')
-        .run('status', body.accepted ? 1 : 0, body.firstRunDate || new Date().toISOString(), body.licenseKey || '',
-             body.isLicensed ? 1 : 0, body.trialDays || 7, body.activatedDate || null);
       sendJSON(res, { success: true });
     } else if (url === '/api/state' && method === 'GET') {
       sendJSON(res, { success: true, data: {} });

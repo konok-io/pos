@@ -165,7 +165,7 @@ export async function loadAllData() {
 export const STORES = {
   users: 'users', categories: 'categories', products: 'products', suppliers: 'suppliers',
   customers: 'customers', sales: 'sales', purchases: 'purchases', expenses: 'expenses',
-  settings: 'settings', productHistory: 'productHistory', license: 'license'
+  settings: 'settings', productHistory: 'productHistory'
 };
 
 // Database initialization

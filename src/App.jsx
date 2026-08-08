@@ -7,290 +7,6 @@ const GlobalStyle = () => {
   return null;
 };
 
-/* --------------- LICENSE API (stored in database) --------------- */
-const TRIAL_DAYS = 7;
-
-// Check trial status from database
-async function getTrialStatus() {
-  try {
-    const res = await fetch('http://localhost:8765/api/license');
-    const data = await res.json();
-    const license = data.data;
-    
-    if (!license || !license.firstRunDate) {
-      return { daysLeft: TRIAL_DAYS, isExpired: false };
-    }
-    
-    const firstRun = new Date(license.firstRunDate);
-    const now = new Date();
-    const daysPassed = Math.floor((now - firstRun) / (1000 * 60 * 60 * 24));
-    const daysLeft = Math.max(0, TRIAL_DAYS - daysPassed);
-    
-    return { daysLeft, isExpired: daysLeft <= 0 };
-  } catch {
-    return { daysLeft: TRIAL_DAYS, isExpired: false };
-  }
-}
-
-// Save license status to database
-async function saveTrialStatus(licenseData) {
-  await fetch('http://localhost:8765/api/license', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(licenseData)
-  });
-}
-
-// Verify license (offline validation)
-async function verifyLicense(licenseKey) {
-  if (licenseKey && licenseKey.length >= 10) {
-    return { success: true };
-  }
-  return { success: false, error: 'Invalid license key' };
-}
-
-// Activate license (save to database)
-async function activateLicense(licenseKey) {
-  await saveTrialStatus({
-    licenseKey,
-    activated: true,
-    activatedDate: new Date().toISOString()
-  });
-  return { success: true };
-}
-
-/* --------------- LICENSE MODAL --------------- */
-function LicenseModal({ onAccept }) {
-  const [showLicenseKey, setShowLicenseKey] = useState(false);
-  const [licenseKey, setLicenseKey] = useState('');
-  const [licenseError, setLicenseError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [daysLeft, setDaysLeft] = useState(TRIAL_DAYS);
-
-  useEffect(() => {
-    getTrialStatus().then(status => setDaysLeft(status.daysLeft));
-  }, []);
-
-  const handleAccept = async () => {
-    const licenseData = {
-      accepted: true,
-      acceptedDate: new Date().toISOString(),
-      firstRunDate: new Date().toISOString(),
-      trialDays: TRIAL_DAYS
-    };
-    await saveTrialStatus(licenseData);
-    onAccept();
-  };
-
-  const handleLicenseKeySubmit = async () => {
-    if (!licenseKey.trim()) {
-      setLicenseError('Please enter a license key');
-      return;
-    }
-    
-    setLoading(true);
-    setLicenseError('');
-    
-    const result = await activateLicense(licenseKey.trim());
-    
-    if (result.success) {
-      const licenseData = {
-        accepted: true,
-        acceptedDate: new Date().toISOString(),
-        firstRunDate: new Date().toISOString(),
-        licenseKey: licenseKey.trim(),
-        isLicensed: true,
-        trialDays: 0
-      };
-      await saveTrialStatus(licenseData);
-      onAccept();
-    } else {
-      setLicenseError(result.error || 'Invalid license key');
-    }
-    
-    setLoading(false);
-  };
-
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 99999,
-      background: 'rgba(0,0,0,0.8)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'BanglaFont, "Segoe UI", system-ui, sans-serif'
-    }}>
-      <div style={{
-        background: 'white', borderRadius: 16, width: '90%', maxWidth: 600,
-        maxHeight: '90vh', overflow: 'hidden', boxShadow: '0 25px 50px rgba(0,0,0,0.25)'
-      }}>
-        {/* Header */}
-        <div style={{
-          background: 'linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)',
-          padding: '20px 24px', color: 'white'
-        }}>
-          <h2 style={{ margin: 0, fontSize: 22, fontWeight: 700 }}>
-            🏪 POS System - License Agreement
-          </h2>
-          <p style={{ margin: '8px 0 0', opacity: 0.9, fontSize: 14 }}>
-            Version 1.1.2000
-          </p>
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: 24, maxHeight: 400, overflowY: 'auto' }}>
-          {!showLicenseKey ? (
-            <>
-              <div style={{
-                background: '#f3f4f6', padding: 16, borderRadius: 8,
-                fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap', maxHeight: 280, overflowY: 'auto'
-              }}>
-SOFTWARE LICENSE AGREEMENT (EULA)
-=======================================
-
-1. ACCEPTANCE
-By installing or using this software, you agree to be bound by all terms and conditions of this agreement.
-
-2. LICENSE
-This software is licensed, not sold. You are granted permission to use this software solely for your own use.
-
-3. RESTRICTIONS
-You may NOT:
-- Copy, modify, distribute, or sell this software
-- Reverse engineer or decompile this software
-- Use for illegal or fraudulent purposes
-
-4. DISCLAIMER
-This software is provided "AS IS" without any warranty or guarantee. Use at your own risk.
-
-5. DATA BACKUP
-Data you create is your responsibility. Regular backups are recommended.
-
-6. TRIAL PERIOD
-You can use this software FREE for 7 days without a license key.
-
-7. TERMINATION
-Violation of this agreement will result in automatic termination of your license.
-
-8. CONTACT
-For questions: support@possystem.com
-              </div>
-
-              {/* Trial Info */}
-              <div style={{
-                marginTop: 16, padding: 12, background: daysLeft <= 3 ? '#FEE2E2' : '#FEF3C7', 
-                borderRadius: 8, border: `1px solid ${daysLeft <= 3 ? '#EF4444' : '#F59E0B'}`
-              }}>
-                <div style={{ fontSize: 14, color: daysLeft <= 3 ? '#991B1B' : '#92400E' }}>
-                  ⏰ <strong>Free Trial:</strong> You can use this software FREE for {TRIAL_DAYS} days.
-                  <br/>
-                  {daysLeft > 0 ? `Days remaining: ${daysLeft}` : '⚠️ Trial expired! Please enter a valid license key to continue.'}
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <div style={{ fontSize: 48, marginBottom: 16 }}>🔑</div>
-                <h3 style={{ margin: '0 0 8px', color: '#0F766E' }}>Enter License Key</h3>
-                <p style={{ margin: 0, color: '#6B7280', fontSize: 14 }}>
-                  If you have a license key, enter it below. Otherwise, use the free trial.
-                </p>
-              </div>
-
-              <input
-                type="text"
-                value={licenseKey}
-                onChange={(e) => { setLicenseKey(e.target.value); setLicenseError(''); }}
-                placeholder="XXXX-XXXX-XXXX-XXXX"
-                disabled={loading}
-                style={{
-                  width: '100%', padding: '14px 16px', fontSize: 18,
-                  border: `2px solid ${licenseError ? '#EF4444' : '#E5E7EB'}`,
-                  borderRadius: 8, textAlign: 'center', letterSpacing: 2,
-                  boxSizing: 'border-box', opacity: loading ? 0.6 : 1
-                }}
-              />
-              {licenseError && (
-                <p style={{ color: '#EF4444', fontSize: 13, margin: '8px 0 0', textAlign: 'center' }}>
-                  {licenseError}
-                </p>
-              )}
-
-              <div style={{ marginTop: 16, padding: 12, background: daysLeft > 0 ? '#F3F4F6' : '#FEE2E2', borderRadius: 8 }}>
-                <p style={{ margin: 0, fontSize: 13, color: daysLeft > 0 ? '#6B7280' : '#991B1B' }}>
-                  {daysLeft > 0 
-                    ? `💡 Don't have a license? You can use the free ${TRIAL_DAYS}-day trial!`
-                    : '⚠️ Trial expired! Contact support@possystem.com to purchase a license.'
-                  }
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div style={{
-          padding: 16, borderTop: '1px solid #E5E7EB',
-          display: 'flex', gap: 12, justifyContent: 'flex-end'
-        }}>
-          {daysLeft <= 0 ? (
-            // Trial expired - must enter license key
-            <button
-              onClick={() => setShowLicenseKey(true)}
-              style={{
-                padding: '12px 24px', fontSize: 14, cursor: 'pointer',
-                background: '#059669', border: 'none', borderRadius: 8,
-                color: 'white', fontWeight: 600
-              }}
-            >
-              🔑 Enter License Key
-            </button>
-          ) : (
-            // Trial active - show normal buttons
-            <>
-              <button
-                onClick={() => setShowLicenseKey(!showLicenseKey)}
-                disabled={loading}
-                style={{
-                  padding: '12px 24px', fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
-                  background: '#F3F4F6', border: 'none', borderRadius: 8,
-                  color: '#374151', opacity: loading ? 0.6 : 1
-                }}
-              >
-                {showLicenseKey ? '📜 Back to License' : '🔑 Have License Key?'}
-              </button>
-
-              {showLicenseKey ? (
-                <button
-                  onClick={handleLicenseKeySubmit}
-                  disabled={loading}
-                  style={{
-                    padding: '12px 24px', fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
-                    background: '#059669', border: 'none', borderRadius: 8,
-                    color: 'white', fontWeight: 600, opacity: loading ? 0.6 : 1
-                  }}
-                >
-                  {loading ? 'Activating...' : 'Activate License ✓'}
-                </button>
-              ) : (
-                <button
-                  onClick={handleAccept}
-                  style={{
-                    padding: '12px 32px', fontSize: 14, cursor: 'pointer',
-                    background: '#0F766E', border: 'none', borderRadius: 8,
-                    color: 'white', fontWeight: 600
-                  }}
-                >
-                  I Accept & Start Free Trial →
-                </button>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* --------------- UTILITIES --------------- */
 const genId = () => `${Date.now()}-${Math.random().toString(36).substr(2,5)}`;
 const fmt = (n) => `৳${(+n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
@@ -1367,26 +1083,14 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
   const [dbReady, setDbReady] = useState(false);
-  const [licenseAccepted, setLicenseAccepted] = useState(false);
   
-  // Initialize database and check license
+  // Initialize database
   useEffect(() => {
     async function initApp() {
       try {
         // Initialize database
         await openDB();
         setDbReady(true);
-        
-        // Check license acceptance from API
-        try {
-          const res = await fetch('http://localhost:8765/api/license');
-          const data = await res.json();
-          if (data.data && data.data.accepted === 1) {
-            setLicenseAccepted(true);
-          }
-        } catch (e) {
-          console.log('License check failed, using default');
-        }
       } catch (e) {
         console.error('Failed to initialize:', e);
         setDbReady(true); // Continue anyway
@@ -1394,10 +1098,6 @@ export default function App() {
     }
     initApp();
   }, []);
-  
-  const handleLicenseAccept = () => {
-    setLicenseAccepted(true);
-  };
 
   // Show loading while initializing
   if (!dbReady) {
@@ -1413,11 +1113,6 @@ export default function App() {
         </div>
       </div>
     );
-  }
-
-  // Show license modal if not accepted
-  if (!licenseAccepted) {
-    return <LicenseModal onAccept={handleLicenseAccept} />;
   }
 
   useEffect(() => {
