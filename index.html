@@ -30,13 +30,17 @@
       #root:empty {
         display: none;
       }
+      /* Preloader font sizes - highest priority */
+      body #preloader > div:first-child { font-size: 60px !important; }
+      body #preloader > div:nth-child(2) { font-size: 48px !important; font-weight: 700 !important; color: white !important; }
+      body #preloader > div:nth-child(3) { font-size: 22px !important; color: rgba(255,255,255,0.8) !important; }
     </style>
   </head>
   <body>
     <div id="preloader">
-      <div style="font-size:60px!important;animation:pulse 2s ease-in-out infinite">🏪</div>
-      <div style="font-size:48px!important;font-weight:700!important;color:white!important">POS সিস্টেম</div>
-      <div style="font-size:22px!important;color:rgba(255,255,255,0.8)!important">লোড হচ্ছে...</div>
+      <div>🏪</div>
+      <div>POS সিস্টেম</div>
+      <div>লোড হচ্ছে...</div>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
