@@ -57,16 +57,10 @@
     },
     "nsis": {
       "oneClick": false,
-      "perMachine": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "POS সিস্টেম",
-      "license": "LICENSE.txt",
-      "language": "1033",
-      "showLanguageDialog": false,
-      "displayLanguageSelector": false,
-      "include": "installer.nsh"
+      "license": "LICENSE.txt"
     }
   },
   "author": "POS Team",
