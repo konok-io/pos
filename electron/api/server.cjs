@@ -14,8 +14,8 @@ let db = null;
 
 function getDBPath() {
   if (!DB_PATH) {
-    const app = require('electron').app || require('electron').remote?.app;
-    const userDataPath = app?.getPath?.('userData') || process.cwd();
+    const { app } = require('electron');
+    const userDataPath = app.getPath('userData');
     DB_PATH = path.join(userDataPath, 'database.sqlite');
   }
   return DB_PATH;
@@ -528,7 +528,7 @@ function start(port = 8765) {
   });
   
   return new Promise((resolve) => {
-    server.listen(port, () => {
+    server.listen(port, '127.0.0.1', () => {
       console.log(`POS API Server running on port ${port}`);
       resolve(port);
     });

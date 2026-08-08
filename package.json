@@ -8,6 +8,7 @@
     "build": "vite build && node -e \"const fs=require('fs');const path=require('path');function copyDir(s,d){fs.mkdirSync(d,{recursive:true});fs.readdirSync(s).forEach(f=>{const sp=path.join(s,f),dp=path.join(d,f);fs.statSync(sp).isDirectory()?copyDir(sp,dp):fs.copyFileSync(sp,dp)})};fs.existsSync('public/api')&&copyDir('public/api','dist/api');fs.existsSync('public/fonts')&&copyDir('public/fonts','dist/fonts');fs.existsSync('public/favicon.svg')&&fs.copyFileSync('public/favicon.svg','dist/favicon.svg');fs.existsSync('public/.htaccess')&&fs.copyFileSync('public/.htaccess','dist/.htaccess');fs.existsSync('public/icon.ico')&&fs.copyFileSync('public/icon.ico','dist/icon.ico');fs.existsSync('public/icon.svg')&&fs.copyFileSync('public/icon.svg','dist/icon.svg');\"",
     "lint": "eslint .",
     "preview": "vite preview",
+    "postinstall": "electron-builder install-app-deps",
     "electron:build:win": "npm run build && electron-builder --win"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "socket.io": "^4.8.3"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.2.0",
     "@eslint/js": "^10.0.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
@@ -35,7 +37,7 @@
   "build": {
     "appId": "com.pos.system",
     "productName": "POS System",
-    "asar": false,
+    "asar": true,
     "directories": {
       "output": "release"
     },
@@ -44,6 +46,9 @@
       "database/**/*",
       "electron/**/*",
       "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*"
     ],
     "win": {
       "target": [
