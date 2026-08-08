@@ -18,14 +18,10 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: false,
     },
-    show: false,
+    show: true,
     backgroundColor: '#0F766E',
-  });
-
-  // Show when ready
-  mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
   });
 
   // Load app
@@ -33,7 +29,9 @@ function createWindow() {
     mainWindow.loadURL('http://localhost:5173');
   } else {
     // Production: Load the built dist folder
-    mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
+    const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
+    console.log('Loading:', indexPath);
+    mainWindow.loadFile(indexPath);
   }
 
   // F12 to toggle DevTools
