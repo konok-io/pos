@@ -1,187 +1,71 @@
 /**
  * POS System API Server
- * Pure Node.js + SQLite - No PHP Required!
+ * Simple JSON File Storage - No Native Modules!
  */
 
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-let DB_PATH;
+let DATA_DIR;
 let db = null;
 
-function getDBPath() {
-  if (!DB_PATH) {
+function getDataDir() {
+  if (!DATA_DIR) {
     const { app } = require('electron');
-    const userDataPath = app.getPath('userData');
-    DB_PATH = path.join(userDataPath, 'database.sqlite');
+    DATA_DIR = app.getPath('userData');
   }
-  return DB_PATH;
+  return DATA_DIR;
+}
+
+function getDBPath() {
+  return path.join(getDataDir(), 'data.json');
 }
 
 function initDB() {
-  const Database = require('better-sqlite3');
   const dbPath = getDBPath();
-
   const dir = path.dirname(dbPath);
+  
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  db = new Database(dbPath);
-  db.pragma('journal_mode = WAL');
-  db.pragma('foreign_keys = ON');
+  if (!fs.existsSync(dbPath)) {
+    const defaultData = {
+      users: [{
+        id: 'super_admin',
+        name: 'Super Admin',
+        email: 'admin@konok.io',
+        password: '@rsm@k@1A',
+        role: 'super_admin',
+        status: 'active'
+      }],
+      categories: [],
+      suppliers: [],
+      products: [],
+      customers: [],
+      sales: [],
+      purchases: [],
+      expenses: [],
+      settings: {
+        shop_name: 'POS System',
+        name: 'My Shop',
+        vatEnabled: 'true',
+        vatPercent: '15'
+      },
+      auth_tokens: []
+    };
+    fs.writeFileSync(dbPath, JSON.stringify(defaultData, null, 2));
+  }
 
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      role TEXT DEFAULT 'operator',
-      status TEXT DEFAULT 'active',
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS categories (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      company TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS suppliers (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      phone TEXT,
-      email TEXT,
-      address TEXT,
-      company TEXT,
-      cr_number TEXT,
-      vat_number TEXT,
-      code TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS products (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      barcode TEXT,
-      unit TEXT DEFAULT 'pcs',
-      buyP REAL DEFAULT 0,
-      sellP REAL DEFAULT 0,
-      stock REAL DEFAULT 0,
-      minStock REAL DEFAULT 0,
-      cat TEXT,
-      company TEXT,
-      mrp REAL DEFAULT 0,
-      image TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS product_history (
-      id TEXT PRIMARY KEY,
-      product_id TEXT,
-      product_name TEXT,
-      type TEXT,
-      quantity INTEGER DEFAULT 0,
-      stock_before INTEGER DEFAULT 0,
-      stock_after INTEGER DEFAULT 0,
-      note TEXT,
-      user_id TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS customers (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      phone TEXT,
-      email TEXT,
-      address TEXT,
-      balance REAL DEFAULT 0,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS sales (
-      id TEXT PRIMARY KEY,
-      items TEXT NOT NULL,
-      subtotal REAL DEFAULT 0,
-      discount REAL DEFAULT 0,
-      total REAL DEFAULT 0,
-      vat REAL DEFAULT 0,
-      vatRate REAL DEFAULT 0,
-      paid REAL NOT NULL,
-      due REAL DEFAULT 0,
-      change REAL DEFAULT 0,
-      customer_id TEXT,
-      payment_method TEXT DEFAULT 'cash',
-      invoice_number TEXT,
-      user_id TEXT,
-      user_name TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS purchases (
-      id TEXT PRIMARY KEY,
-      items TEXT NOT NULL,
-      subtotal REAL NOT NULL DEFAULT 0,
-      total REAL NOT NULL,
-      paid REAL NOT NULL DEFAULT 0,
-      due REAL NOT NULL DEFAULT 0,
-      supplier_id TEXT,
-      invoice_number TEXT,
-      user_id TEXT,
-      user_name TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS expenses (
-      id TEXT PRIMARY KEY,
-      title TEXT NOT NULL,
-      amount REAL NOT NULL,
-      type TEXT DEFAULT 'expense',
-      note TEXT,
-      user_id TEXT,
-      user_name TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS settings (
-      setting_key TEXT PRIMARY KEY,
-      setting_value TEXT,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS auth_tokens (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      token TEXT UNIQUE NOT NULL,
-      user_id TEXT NOT NULL,
-      user_name TEXT,
-      user_email TEXT,
-      user_role TEXT,
-      expires_at DATETIME,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-  `);
-
-  const defaultSettings = [
-    ['shop_name', 'POS System'],
-    ['address', ''],
-    ['phone', ''],
-    ['vat_percent', '15'],
-    ['name', 'My Shop'],
-    ['vatEnabled', 'true'],
-    ['vatPercent', '15']
-  ];
-
-  const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)');
-  defaultSettings.forEach(([key, value]) => insertSetting.run(key, value));
-
-  db.prepare('INSERT OR IGNORE INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)').run(
-    'super_admin', 'Super Admin', 'admin@konok.io', '@rsm@k@1A', 'super_admin'
-  );
-
+  const content = fs.readFileSync(dbPath, 'utf8');
+  db = JSON.parse(content);
   return db;
+}
+
+function saveDB() {
+  const dbPath = getDBPath();
+  fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
 }
 
 function getDB() {
@@ -204,7 +88,7 @@ function json(res, data, error = null, code = 200) {
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type'
   });
-  res.end(JSON.stringify({ success: error === null, data, error }, null, 2));
+  res.end(JSON.stringify({ success: error === null, data, error }));
 }
 
 function parseBody(req) {
@@ -301,15 +185,24 @@ async function handleAuth(req, res, existingToken) {
 
   if (action === 'login') {
     const { email, password } = body;
-    const db = getDB();
+    const data = getDB();
 
+    // Check super admin
     if (email === 'admin@konok.io' && password === '@rsm@k@1A') {
       const userData = { id: 'super-admin', name: 'Super Admin', email: 'admin@konok.io', role: 'super_admin' };
       const newToken = generateToken();
-
-      db.prepare('INSERT OR REPLACE INTO auth_tokens (token, user_id, user_name, user_email, user_role, expires_at) VALUES (?, ?, ?, ?, ?, datetime("now", "+30 days"))').run(
-        newToken, userData.id, userData.name, userData.email, userData.role
-      );
+      
+      // Clean old tokens
+      data.auth_tokens = data.auth_tokens.filter(t => t.expires_at > Date.now());
+      data.auth_tokens.push({
+        token: newToken,
+        user_id: userData.id,
+        user_name: userData.name,
+        user_email: userData.email,
+        user_role: userData.role,
+        expires_at: Date.now() + (30 * 24 * 60 * 60 * 1000)
+      });
+      saveDB();
 
       res.writeHead(200, {
         'Content-Type': 'application/json',
@@ -321,14 +214,22 @@ async function handleAuth(req, res, existingToken) {
       return;
     }
 
-    const user = db.prepare('SELECT * FROM users WHERE email = ? AND password = ?').get(email, password);
+    // Check regular users
+    const user = data.users.find(u => u.email === email && u.password === password);
     if (user) {
       const userData = { id: user.id, name: user.name, email: user.email, role: user.role };
       const newToken = generateToken();
-
-      db.prepare('INSERT OR REPLACE INTO auth_tokens (token, user_id, user_name, user_email, user_role, expires_at) VALUES (?, ?, ?, ?, ?, datetime("now", "+30 days"))').run(
-        newToken, user.id, user.name, user.email, user.role
-      );
+      
+      data.auth_tokens = data.auth_tokens.filter(t => t.expires_at > Date.now());
+      data.auth_tokens.push({
+        token: newToken,
+        user_id: user.id,
+        user_name: user.name,
+        user_email: user.email,
+        user_role: user.role,
+        expires_at: Date.now() + (30 * 24 * 60 * 60 * 1000)
+      });
+      saveDB();
 
       res.writeHead(200, {
         'Content-Type': 'application/json',
@@ -351,8 +252,8 @@ function handleAuthCheck(req, res, token) {
     return;
   }
 
-  const db = getDB();
-  const authRow = db.prepare('SELECT * FROM auth_tokens WHERE token = ? AND expires_at > datetime("now")').get(token);
+  const data = getDB();
+  const authRow = data.auth_tokens.find(t => t.token === token && t.expires_at > Date.now());
 
   if (authRow) {
     json(res, {
@@ -371,8 +272,9 @@ function handleAuthCheck(req, res, token) {
 
 function handleLogout(req, res, token) {
   if (token) {
-    const db = getDB();
-    db.prepare('DELETE FROM auth_tokens WHERE token = ?').run(token);
+    const data = getDB();
+    data.auth_tokens = data.auth_tokens.filter(t => t.token !== token);
+    saveDB();
   }
   res.writeHead(200, {
     'Content-Type': 'application/json',
@@ -385,8 +287,8 @@ function handleLogout(req, res, token) {
 
 function getAuthUser(token) {
   if (!token) return null;
-  const db = getDB();
-  const authRow = db.prepare('SELECT * FROM auth_tokens WHERE token = ? AND expires_at > datetime("now")').get(token);
+  const data = getDB();
+  const authRow = data.auth_tokens.find(t => t.token === token && t.expires_at > Date.now());
   if (!authRow) return null;
   return {
     id: authRow.user_id,
@@ -397,12 +299,14 @@ function getAuthUser(token) {
 }
 
 async function handleAPI(req, res, token, pathname) {
-  const db = getDB();
+  const data = getDB();
   const endpoint = pathname.replace('/api/', '').replace('.php', '');
   const method = req.method;
   const user = getAuthUser(token);
 
-  if (!user && !['products', 'categories', 'customers', 'suppliers', 'sales'].includes(endpoint)) {
+  // Public endpoints
+  const publicEndpoints = ['products', 'categories', 'customers', 'suppliers', 'sales'];
+  if (!user && !publicEndpoints.includes(endpoint)) {
     json(res, null, 'Authentication required', 401);
     return;
   }
@@ -413,28 +317,27 @@ async function handleAPI(req, res, token, pathname) {
     switch (endpoint) {
       case 'users':
         if (method === 'GET') {
-          if (user && user.role === 'super_admin') {
-            result = db.prepare('SELECT id, name, email, role, status, created_at FROM users').all();
-          } else if (user) {
-            result = db.prepare('SELECT id, name, email, role, status, created_at FROM users WHERE role != "super_admin"').all();
-          }
-        } else if (method === 'POST' && user && user.role === 'super_admin') {
+          result = data.users.map(u => ({ id: u.id, name: u.name, email: u.email, role: u.role, status: u.status, created_at: u.created_at }));
+        } else if (method === 'POST' && user?.role === 'super_admin') {
           const body = await parseBody(req);
           const id = 'user_' + Date.now();
-          db.prepare('INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)').run(
-            id, body.name, body.email, body.password || '1234', body.role || 'operator'
-          );
+          data.users.push({
+            id, name: body.name, email: body.email, password: body.password || '1234',
+            role: body.role || 'operator', status: 'active', created_at: new Date().toISOString()
+          });
+          saveDB();
           result = { id, ...body };
         }
         break;
 
       case 'categories':
         if (method === 'GET') {
-          result = db.prepare('SELECT * FROM categories ORDER BY name').all();
+          result = data.categories;
         } else if (method === 'POST') {
           const body = await parseBody(req);
           const id = 'cat_' + Date.now();
-          db.prepare('INSERT INTO categories (id, name, company) VALUES (?, ?, ?)').run(id, body.name, body.company || '');
+          data.categories.push({ id, name: body.name, company: body.company || '', created_at: new Date().toISOString() });
+          saveDB();
           result = { id, ...body };
         }
         break;
@@ -443,86 +346,95 @@ async function handleAPI(req, res, token, pathname) {
         if (method === 'GET') {
           const search = new URL(req.url, 'http://localhost:8765').searchParams.get('search') || '';
           if (search) {
-            result = db.prepare('SELECT * FROM products WHERE name LIKE ? OR barcode LIKE ? ORDER BY name').all('%' + search + '%', '%' + search + '%');
+            const s = search.toLowerCase();
+            result = data.products.filter(p => p.name.toLowerCase().includes(s) || (p.barcode && p.barcode.includes(search)));
           } else {
-            result = db.prepare('SELECT * FROM products ORDER BY name').all();
+            result = data.products;
           }
         } else if (method === 'POST') {
           const body = await parseBody(req);
           const id = body.id || 'prod_' + Date.now();
-          db.prepare('INSERT OR REPLACE INTO products (id, name, barcode, unit, buyP, sellP, stock, minStock, cat, company, mrp, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
-            id, body.name, body.barcode || '', body.unit || 'pcs', body.buyP || 0, body.sellP || 0,
-            body.stock || 0, body.minStock || 0, body.cat || '', body.company || '', body.mrp || 0, body.image || ''
-          );
+          const existing = data.products.findIndex(p => p.id === id);
+          const product = {
+            id, name: body.name, barcode: body.barcode || '', unit: body.unit || 'pcs',
+            buyP: body.buyP || 0, sellP: body.sellP || 0, stock: body.stock || 0,
+            minStock: body.minStock || 0, cat: body.cat || '', company: body.company || '',
+            mrp: body.mrp || 0, image: body.image || ''
+          };
+          if (existing >= 0) {
+            data.products[existing] = product;
+          } else {
+            data.products.push(product);
+          }
+          saveDB();
           result = { id, ...body };
         }
         break;
 
       case 'suppliers':
         if (method === 'GET') {
-          result = db.prepare('SELECT * FROM suppliers ORDER BY name').all();
+          result = data.suppliers;
         } else if (method === 'POST') {
           const body = await parseBody(req);
           const id = 'sup_' + Date.now();
-          db.prepare('INSERT INTO suppliers (id, name, phone, email, address, company) VALUES (?, ?, ?, ?, ?, ?)').run(
-            id, body.name, body.phone || '', body.email || '', body.address || '', body.company || ''
-          );
+          data.suppliers.push({ id, name: body.name, phone: body.phone || '', email: body.email || '', address: body.address || '', company: body.company || '' });
+          saveDB();
           result = { id, ...body };
         }
         break;
 
       case 'customers':
         if (method === 'GET') {
-          result = db.prepare('SELECT * FROM customers ORDER BY name').all();
+          result = data.customers;
         } else if (method === 'POST') {
           const body = await parseBody(req);
           const id = 'cust_' + Date.now();
-          db.prepare('INSERT INTO customers (id, name, phone, email, address, balance) VALUES (?, ?, ?, ?, ?, ?)').run(
-            id, body.name, body.phone || '', body.email || '', body.address || '', body.balance || 0
-          );
+          data.customers.push({ id, name: body.name, phone: body.phone || '', email: body.email || '', address: body.address || '', balance: body.balance || 0 });
+          saveDB();
           result = { id, ...body };
         }
         break;
 
       case 'sales':
         if (method === 'GET') {
-          result = db.prepare('SELECT * FROM sales ORDER BY created_at DESC LIMIT 100').all();
+          result = data.sales.slice(-100).reverse();
         } else if (method === 'POST') {
           const body = await parseBody(req);
           const id = 'sale_' + Date.now();
-          db.prepare('INSERT INTO sales (id, items, subtotal, discount, total, vat, vatRate, paid, due, change, customer_id, payment_method, invoice_number, user_id, user_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
-            id, JSON.stringify(body.items), body.subtotal || 0, body.discount || 0, body.total || 0,
-            body.vat || 0, body.vatRate || 0, body.paid || 0, body.due || 0, body.change || 0,
-            body.customer_id || '', body.payment_method || 'cash', body.invoice_number || '',
-            body.user_id || '', body.user_name || ''
-          );
+          data.sales.push({
+            id, items: JSON.stringify(body.items), subtotal: body.subtotal || 0, discount: body.discount || 0,
+            total: body.total || 0, vat: body.vat || 0, vatRate: body.vatRate || 0,
+            paid: body.paid || 0, due: body.due || 0, change: body.change || 0,
+            customer_id: body.customer_id || '', payment_method: body.payment_method || 'cash',
+            invoice_number: body.invoice_number || '', user_id: body.user_id || '', user_name: body.user_name || '',
+            created_at: new Date().toISOString()
+          });
+          saveDB();
           result = { id, ...body };
         }
         break;
 
       case 'expenses':
         if (method === 'GET') {
-          result = db.prepare('SELECT * FROM expenses ORDER BY created_at DESC').all();
+          result = data.expenses;
         } else if (method === 'POST') {
           const body = await parseBody(req);
           const id = 'exp_' + Date.now();
-          db.prepare('INSERT INTO expenses (id, title, amount, type, note, user_id, user_name) VALUES (?, ?, ?, ?, ?, ?, ?)').run(
-            id, body.title, body.amount, body.type || 'expense', body.note || '', body.user_id || '', body.user_name || ''
-          );
+          data.expenses.push({ id, title: body.title, amount: body.amount, type: body.type || 'expense', note: body.note || '', user_id: body.user_id || '', user_name: body.user_name || '' });
+          saveDB();
           result = { id, ...body };
         }
         break;
 
       case 'settings':
         if (method === 'GET') {
-          const rows = db.prepare('SELECT setting_key, setting_value FROM settings').all();
-          result = {};
-          rows.forEach(row => result[row.setting_key] = row.setting_value);
+          result = data.settings;
         } else if (method === 'POST') {
           const body = await parseBody(req);
           for (const [key, value] of Object.entries(body)) {
-            db.prepare('INSERT OR REPLACE INTO settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime("now"))').run(key, String(value));
+            data.settings[key] = String(value);
           }
+          saveDB();
           result = body;
         }
         break;
@@ -540,10 +452,9 @@ async function handleAPI(req, res, token, pathname) {
 
 function start(port = 8765) {
   initDB();
-
   const server = http.createServer(handleRoute);
 
-return new Promise((resolve) => {
+  return new Promise((resolve) => {
     server.listen(port, '127.0.0.1', () => {
       console.log('POS API Server running on port ' + port);
       resolve(port);
