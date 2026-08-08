@@ -1171,15 +1171,28 @@ export default function App() {
         <div style={{
           width: '50px',
           height: '50px',
-          borderRadius: '50%',
-          border: '3px solid rgba(255,255,255,0.2)',
-          borderTopColor: '#ffffff',
-          animation: 'preloader-spin 0.8s linear infinite',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
+          position: 'relative'
         }}>
-          <span style={{ fontSize: '40px' }}>🏪</span>
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            border: '3px solid rgba(255,255,255,0.2)',
+            borderTopColor: '#ffffff',
+            animation: 'preloader-spin 0.8s linear infinite'
+          }} />
+          <img 
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-size='70'%3E%F0%9F%8F%AA%3C/text%3E%3C/svg%3E"
+            alt="🏪"
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '40px',
+              height: '40px'
+            }}
+          />
         </div>
         <style>{`@keyframes preloader-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
