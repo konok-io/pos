@@ -1,4 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron');
+const os = require('os');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   platform: process.platform,
@@ -17,7 +18,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   license: {
     getMachineId: () => {
-      const os = require('os');
       const info = os.hostname() + os.platform() + os.arch();
       let hash = 0;
       for (let i = 0; i < info.length; i++) {

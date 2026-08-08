@@ -42,6 +42,7 @@
       "database/**/*",
       "electron/**/*",
       "public/icon.ico",
+      "public/icon.svg",
       "package.json"
     ],
     "win": {
@@ -65,5 +66,5 @@
   },
   "author": "POS Team",
   "description": "POS System - Sales, Stock & Accounting Management",
-  "main": "electron/main.js"
+  "main": "electron/main.cjs"
 }
