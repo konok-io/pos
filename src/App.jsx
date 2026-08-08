@@ -1169,8 +1169,8 @@ export default function App() {
         zIndex: 9999
       }}>
         <div style={{
-          width: '50px',
-          height: '50px',
+          width: '60px',
+          height: '60px',
           position: 'relative'
         }}>
           <div style={{
