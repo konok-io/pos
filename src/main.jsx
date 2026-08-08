@@ -12,21 +12,21 @@ window.preloaderControl = window.preloaderControl || {
   hide: () => {
     const preloader = document.getElementById('preloader');
     if (preloader) {
-      preloader.classList.add('hidden');
+      // Use inline style to hide instead of class
+      preloader.style.display = 'none';
       setTimeout(() => {
         if (preloader.parentNode) {
           preloader.remove();
         }
       }, 400);
     }
-    // Remove fallback loading class
     document.body.classList.remove('loading');
     window.__REACT_LOADED__ = true;
   },
   show: () => {
     const preloader = document.getElementById('preloader');
     if (preloader) {
-      preloader.classList.remove('hidden');
+      preloader.style.display = 'flex';
       if (!document.body.contains(preloader)) {
         document.body.appendChild(preloader);
       }

@@ -9,40 +9,18 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font-family: system-ui, -apple-system, sans-serif; }
-      #preloader {
-        position: fixed;
-        inset: 0;
-        background: #0F766E;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 24px;
-        z-index: 9999;
-      }
-      #preloader.hidden {
-        display: none;
-      }
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-      }
       #root:empty {
         display: none;
       }
-      /* Preloader font sizes - highest priority */
-      body #preloader > div:first-child { font-size: 60px !important; }
-      body #preloader > div:nth-child(2) { font-size: 48px !important; font-weight: 700 !important; color: white !important; }
-      body #preloader > div:nth-child(3) { font-size: 22px !important; color: rgba(255,255,255,0.8) !important; }
     </style>
-    <script type="module" crossorigin src="./assets/index-bxCXbTiR.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-X24w70vm.css">
+    <script type="module" crossorigin src="./assets/index-CM34mA-N.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DZvvaXQQ.css">
   </head>
   <body>
-    <div id="preloader">
-      <div>🏪</div>
-      <div>POS সিস্টেম</div>
-      <div>লোড হচ্ছে...</div>
+    <div style="position:fixed;inset:0;background:#0F766E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;z-index:9999" id="preloader">
+      <div style="font-size:60px;font-family:system-ui,sans-serif;-webkit-font-smoothing:antialiased">🏪</div>
+      <div style="font-size:48px;font-weight:700;color:#ffffff;font-family:system-ui,sans-serif">POS সিস্টেম</div>
+      <div style="font-size:22px;color:rgba(255,255,255,0.8);font-family:system-ui,sans-serif">লোড হচ্ছে...</div>
     </div>
     <div id="root"></div>
   </body>
