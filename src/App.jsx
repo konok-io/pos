@@ -105,7 +105,7 @@ function BannerImageUpload({ value, onChange }) {
           style={{
             position: 'absolute', top: 10, right: 10, padding: '8px 14px',
             background: 'rgba(0,0,0,0.75)', color: '#fff', border: 'none', borderRadius: 8,
-            cursor: 'pointer', fontSize: 13, fontWeight: 600
+            cursor: 'pointer', fontSize: 19, fontWeight: 600
           }}
         >
           ✕ মুছুন
@@ -133,14 +133,14 @@ function BannerImageUpload({ value, onChange }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
           padding: '24px', border: `2px dashed ${isDragging ? '#0F766E' : '#d1d5db'}`,
           borderRadius: 12, background: isDragging ? '#F0FDFA' : '#f9fafb',
-          cursor: 'pointer', fontSize: 14, color: '#6b7280', maxWidth: 500,
+          cursor: 'pointer', fontSize: 19, color: '#6b7280', maxWidth: 500,
           transition: 'all 0.2s'
         }}
       >
         <span style={{ fontSize: 28 }}>📁</span>
         <span>ছবি আপলোড করুন (JPG, PNG - সর্বোচ্চ 5MB)</span>
       </div>
-      <p style={{ fontSize: 12, color: '#9ca3af', marginTop: 8 }}>
+      <p style={{ fontSize: 19, color: '#9ca3af', marginTop: 8 }}>
         অথবা ছবিটি এখানে টেনে আনুন
       </p>
     </div>
@@ -192,7 +192,7 @@ const btn = (type='default',size='md') => {
   const border = type==='ghost' ? `1px solid ${T.gray200}` : 'none';
   return {
     padding: size==='sm' ? '5px 10px' : size==='lg' ? '12px 24px' : '8px 14px',
-    fontSize: size==='sm' ? 12 : size==='lg' ? 15 : 13,
+    fontSize: size==='sm' ? 14 : size==='lg' ? 16 : 15,
     background: bg, color, border,
     borderRadius:7, cursor:'pointer', fontWeight:600,
     display:'inline-flex', alignItems:'center', gap:5,
@@ -209,7 +209,7 @@ const card = {
   background:T.white, borderRadius:10, padding:16,
   boxShadow:'0 1px 4px rgba(0,0,0,0.08)', border:`1px solid ${T.gray200}`,
 };
-const label = { fontSize:11, fontWeight:700, color:T.gray400, marginBottom:4, display:'block', textTransform:'uppercase', letterSpacing:'0.5px' };
+const label = { fontSize:14, fontWeight:700, color:T.gray400, marginBottom:4, display:'block', textTransform:'uppercase', letterSpacing:'0.5px' };
 
 /* ─────────────── MODAL WRAPPER ─────────────── */
 function Modal({onClose, title, children, width=460}) {
@@ -263,7 +263,7 @@ function DynamicMenu({tab, onTabChange, tabs}) {
         cursor: 'pointer',
         color: isActive ? T.white : T.gray600,
         fontWeight: isActive ? 600 : 500,
-        fontSize: 14,
+        fontSize: 19,
         display: 'flex', 
         alignItems: 'center', 
         gap: 6,
@@ -336,7 +336,7 @@ function DynamicMenu({tab, onTabChange, tabs}) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 14,
+          fontSize: 19,
           color: T.gray600,
           marginRight: 4,
           flexShrink: 0,
@@ -380,7 +380,7 @@ function DynamicMenu({tab, onTabChange, tabs}) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 14,
+          fontSize: 19,
           color: T.gray600,
           marginLeft: 4,
           flexShrink: 0,
@@ -470,14 +470,14 @@ function LoginScreen({ onLogin, settings }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 28,
+            fontSize: 29,
           }}>🏪</div>
           <div style={{ textAlign: 'right' }}>
-            <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#0F766E' }}>
+            <h1 style={{ margin: 0, fontSize: 19, fontWeight: 700, color: '#0F766E' }}>
               {businessName}
             </h1>
             <div style={{
-              fontSize: 11,
+              fontSize: 19,
               color: '#0F766E',
               fontWeight: 600,
               marginTop: 2,
@@ -496,7 +496,7 @@ function LoginScreen({ onLogin, settings }) {
           <form onSubmit={handleLogin} style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
             {/* Username */}
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
+              <label style={{ fontSize: 19, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
                 👤 ইউজার নাম
               </label>
               <input
@@ -508,7 +508,7 @@ function LoginScreen({ onLogin, settings }) {
                 style={{
                   width: '100%',
                   padding: '12px 14px',
-                  fontSize: 14,
+                  fontSize: 19,
                   border: '2px solid #E5E7EB',
                   borderRadius: 10,
                   outline: 'none',
@@ -521,7 +521,7 @@ function LoginScreen({ onLogin, settings }) {
 
             {/* Password */}
             <div style={{ width: 140 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
+              <label style={{ fontSize: 19, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
                 🔐 পাসওয়ার্ড
               </label>
               <input
@@ -533,7 +533,7 @@ function LoginScreen({ onLogin, settings }) {
                 style={{
                   width: '100%',
                   padding: '12px 14px',
-                  fontSize: 14,
+                  fontSize: 19,
                   border: '2px solid #E5E7EB',
                   borderRadius: 10,
                   outline: 'none',
@@ -554,7 +554,7 @@ function LoginScreen({ onLogin, settings }) {
                 color: '#fff',
                 border: 'none',
                 borderRadius: 10,
-                fontSize: 14,
+                fontSize: 19,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
@@ -572,7 +572,7 @@ function LoginScreen({ onLogin, settings }) {
               background: '#FEF2F2',
               borderRadius: 8,
               color: '#DC2626',
-              fontSize: 12,
+              fontSize: 19,
               fontWeight: 500,
             }}>
               ⚠️ {error}
@@ -580,7 +580,7 @@ function LoginScreen({ onLogin, settings }) {
           )}
 
           {/* Footer */}
-          <div style={{ textAlign: 'center', marginTop: 16, paddingTop: 12, borderTop: '1px dashed #E5E7EB', fontSize: 11, color: '#9CA3AF' }}>
+          <div style={{ textAlign: 'center', marginTop: 16, paddingTop: 12, borderTop: '1px dashed #E5E7EB', fontSize: 19, color: '#9CA3AF' }}>
             © {currentYear} {businessName}
           </div>
         </div>
@@ -613,7 +613,7 @@ function TimeDisplay() {
       <div style={{fontSize:14,fontWeight:600,color:T.gray900}}>
         {currentTime ? currentTime.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '--:--:--'}
       </div>
-      <div style={{fontSize:11,color:T.gray400}}>
+      <div style={{fontSize:14,color:T.gray400}}>
         {currentTime ? currentTime.toLocaleDateString('en-GB',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}) : '------'}
       </div>
     </div>
@@ -1012,7 +1012,7 @@ function MainApp({ currentUser, onLogout }) {
             <div style={{width:44,height:44,background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,boxShadow:'0 4px 12px rgba(15,118,110,0.3)'}}>🏪</div>
             <div>
               <div style={{fontWeight:800,fontSize:17,color:T.gray900,lineHeight:1.2}}>{settings.name}</div>
-              <div style={{fontSize:11,color:T.gray400}}>POS ম্যানেজমেন্ট সিস্টেম</div>
+              <div style={{fontSize:14,color:T.gray400}}>POS ম্যানেজমেন্ট সিস্টেম</div>
             </div>
           </div>
           
@@ -1576,17 +1576,17 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
       <div style={{...card,width:360,padding:24}}>
         <div style={{fontSize:18,fontWeight:700,marginBottom:16,textAlign:'center'}}>👤 নতুন কাস্টমার যোগ করুন</div>
         <div style={{marginBottom:12}}>
-          <label style={{fontSize:12,color:T.gray500,marginBottom:4,display:'block'}}>নাম *</label>
+          <label style={{fontSize:14,color:T.gray500,marginBottom:4,display:'block'}}>নাম *</label>
           <input value={newCustName} onChange={e=>setNewCustName(e.target.value)} 
             placeholder="কাস্টমারের নাম" style={{...input,height:42}} autoFocus />
         </div>
         <div style={{marginBottom:12}}>
-          <label style={{fontSize:12,color:T.gray500,marginBottom:4,display:'block'}}>ফোন</label>
+          <label style={{fontSize:14,color:T.gray500,marginBottom:4,display:'block'}}>ফোন</label>
           <input value={newCustPhone} onChange={e=>setNewCustPhone(e.target.value)} 
             placeholder="মোবাইল নম্বর" style={{...input,height:42}} />
         </div>
         <div style={{marginBottom:20}}>
-          <label style={{fontSize:12,color:T.gray500,marginBottom:4,display:'block'}}>ঠিকানা</label>
+          <label style={{fontSize:14,color:T.gray500,marginBottom:4,display:'block'}}>ঠিকানা</label>
           <input value={newCustAddr} onChange={e=>setNewCustAddr(e.target.value)} 
             placeholder="ঠিকানা" style={{...input,height:42}} />
         </div>
@@ -1613,10 +1613,10 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         {/* Product name search */}
         <div style={{padding:'8px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center'}}>
           <div style={{position:'relative',flex:1}}>
-            <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:13}}>🔍</span>
+            <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:15}}>🔍</span>
             <input ref={searchRef} value={search} onChange={e=>setSearch(e.target.value)} onKeyDown={handleSearchKeyDown}
               placeholder="পণ্যের নাম বা বারকোড..."
-              style={{...input,paddingLeft:32,height:34,fontSize:12,borderRadius:7,border:`1.5px solid ${T.gray200}`,background:'#fafbfc'}}
+              style={{...input,paddingLeft:32,height:34,fontSize:14,borderRadius:7,border:`1.5px solid ${T.gray200}`,background:'#fafbfc'}}
             />
           </div>
         </div>
@@ -1633,7 +1633,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               color:T.teal,
               border:`1.5px solid ${T.teal}30`,
               padding:'6px 14px',
-              fontSize:12,
+              fontSize:14,
               fontWeight:600,
               boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
             }}>📦 স্টক আছে <span style={{fontWeight:700,marginLeft:4}}>({allCount})</span></div>
@@ -1645,7 +1645,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               color:T.orange,
               border:`1.5px solid ${T.orange}30`,
               padding:'6px 14px',
-              fontSize:12,
+              fontSize:14,
               fontWeight:600,
               boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
             }}>⚠️ স্টক কম <span style={{fontWeight:700,marginLeft:4}}>({lowStockCount})</span></div>
@@ -1657,7 +1657,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               color:T.red,
               border:`1.5px solid ${T.red}30`,
               padding:'6px 14px',
-              fontSize:12,
+              fontSize:14,
               fontWeight:600,
               boxShadow:'0 1px 3px rgba(0,0,0,0.05)',
             }}>⚠️ স্টক শেষ <span style={{fontWeight:700,marginLeft:4}}>({outOfStockCount})</span></div>
@@ -1672,28 +1672,28 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 onChange={e=>{setSelCat('স্টক আছে');setCatSearch(e.target.value);setShowCatDrop(true);}} 
                 onFocus={()=>setShowCatDrop(true)}
                 placeholder="ক্যাটাগরি..."
-                style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
+                style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:14,height:32}}
               />
               {selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && (
                 <button onClick={()=>{setSelCat('স্টক আছে');setCatSearch('');}} style={{
                   position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
                   background:'none',border:'none',cursor:'pointer',padding:4,
-                  color:T.gray400,fontSize:11,lineHeight:1
+                  color:T.gray400,fontSize:14,lineHeight:1
                 }}>✕</button>
               )}
               {showCatDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
                   {filteredCats.length === 0 ? (
-                    <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো ক্যাটাগরি পাওয়া যায়নি</div>
+                    <div style={{padding:'8px 12px',color:T.gray400,fontSize:14}}>কোনো ক্যাটাগরি পাওয়া যায়নি</div>
                   ) : filteredCats.map(c=>(
                     <div key={c} onClick={()=>{setSelCat(c);setCatSearch('');setShowCatDrop(false);}} style={{
                       padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
                       background:selCat===c?T.tealLight:'transparent',
                       borderBottom:`1px solid ${T.gray100}`,
-                      fontSize:12,
+                      fontSize:14,
                     }}>
                       <span style={{color:selCat===c?T.teal:T.gray900}}>{c}</span>
-                      <span style={{color:T.gray400,fontSize:11}}>{catCounts[c] || 0}</span>
+                      <span style={{color:T.gray400,fontSize:14}}>{catCounts[c] || 0}</span>
                     </div>
                   ))}
                 </div>
@@ -1706,28 +1706,28 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 onChange={e=>{setSelComp('সব সরবরাহকারী');setCompSearch(e.target.value);setShowCompDrop(true);}} 
                 onFocus={()=>setShowCompDrop(true)}
                 placeholder="কোম্পানি..."
-                style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:12,height:32}}
+                style={{...input,borderRadius:7,padding:'6px 28px 6px 10px',fontSize:14,height:32}}
               />
               {selComp !== 'সব সরবরাহকারী' && (
                 <button onClick={()=>{setSelComp('সব সরবরাহকারী');setCompSearch('');}} style={{
                   position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',
                   background:'none',border:'none',cursor:'pointer',padding:4,
-                  color:T.gray400,fontSize:11,lineHeight:1
+                  color:T.gray400,fontSize:14,lineHeight:1
                 }}>✕</button>
               )}
               {showCompDrop && (
                 <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:T.white,border:`1px solid ${T.teal}`,borderRadius:7,marginTop:4,maxHeight:200,overflowY:'auto',boxShadow:'0 2px 8px rgba(0,0,0,0.1)'}}>
                   {filteredComps.length === 0 ? (
-                    <div style={{padding:'8px 12px',color:T.gray400,fontSize:12}}>কোনো সরবরাহকারী পাওয়া যায়নি</div>
+                    <div style={{padding:'8px 12px',color:T.gray400,fontSize:14}}>কোনো সরবরাহকারী পাওয়া যায়নি</div>
                   ) : filteredComps.map(c=>(
                     <div key={c} onClick={()=>{setSelComp(c);setCompSearch('');setShowCompDrop(false);}} style={{
                       padding:'6px 12px',cursor:'pointer',display:'flex',justifyContent:'space-between',
                       background:selComp===c?T.tealLight:'transparent',
                       borderBottom:`1px solid ${T.gray100}`,
-                      fontSize:12,
+                      fontSize:14,
                     }}>
                       <span style={{color:selComp===c?T.teal:T.gray900}}>{c}</span>
-                      <span style={{color:T.gray400,fontSize:11}}>{compCounts[c] || 0}</span>
+                      <span style={{color:T.gray400,fontSize:14}}>{compCounts[c] || 0}</span>
                     </div>
                   ))}
                 </div>
@@ -1741,12 +1741,12 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           {selComp !== 'সব সরবরাহকারী' || (selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম') ? (
             <div>
               <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-                <span style={{fontSize:13,fontWeight:600,color:T.gray600}}>
+                <span style={{fontSize:15,fontWeight:600,color:T.gray600}}>
                   {selComp !== 'সব সরবরাহকারী' && `🏢 ${selComp} (${filtered.length}টি পণ্য)`}
                   {selComp === 'সব সরবরাহকারী' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && `📁 ${selCat} (${filtered.length}টি পণ্য)`}
                   {selComp !== 'সব সরবরাহকারী' && selCat !== 'স্টক আছে' && selCat !== 'স্টক শেষ' && selCat !== 'স্টক কম' && ' - ' + selCat}
                 </span>
-                <button onClick={()=>{setSelComp('সব সরবরাহকারী');setSelCat('স্টক আছে');setCompSearch('');setCatSearch('');}} style={{fontSize:11,padding:'4px 10px',border:'none',borderRadius:5,background:T.gray200,cursor:'pointer',color:T.gray600}}>✕ মুছুন</button>
+                <button onClick={()=>{setSelComp('সব সরবরাহকারী');setSelCat('স্টক আছে');setCompSearch('');setCatSearch('');}} style={{fontSize:14,padding:'4px 10px',border:'none',borderRadius:5,background:T.gray200,cursor:'pointer',color:T.gray600}}>✕ মুছুন</button>
               </div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:10}}>
                 {filtered.map(p => (
@@ -1758,10 +1758,10 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                     boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
                     outline:'none',
                   }}>
-                    <div style={{fontSize:11,fontWeight:600,marginBottom:4,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.name}</div>
+                    <div style={{fontSize:14,fontWeight:600,marginBottom:4,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{p.name}</div>
                     <div style={{fontSize:16,fontWeight:800,color:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.teal}}>{fmt(p.sellP)}</div>
-                    <div style={{fontSize:10,color:T.gray400,marginTop:2}}>/{p.unit}</div>
-                    <div style={{marginTop:6,padding:'2px 6px',borderRadius:8,fontSize:10,fontWeight:600,display:'inline-block',
+                    <div style={{fontSize:14,color:T.gray400,marginTop:2}}>/{p.unit}</div>
+                    <div style={{marginTop:6,padding:'2px 6px',borderRadius:8,fontSize:14,fontWeight:600,display:'inline-block',
                       background:p.stock<=0?T.red:p.stock<=p.minStock?T.amber:T.tealLight,
                       color:p.stock<=0?'#fff':p.stock<=p.minStock?'#fff':T.teal}}>
                       {p.stock}
@@ -1792,7 +1792,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               <div style={{textAlign:'center',marginBottom:20}}>
                 <div style={{fontSize:28,fontWeight:800,color:T.teal,marginBottom:8}}>{settings.name}</div>
                 {settings.phone && <div style={{fontSize:14,color:T.gray600,marginTop:4}}>📞 {settings.phone}</div>}
-                {settings.address && <div style={{fontSize:13,color:T.gray500,marginTop:4}}>📍 {settings.address}</div>}
+                {settings.address && <div style={{fontSize:15,color:T.gray500,marginTop:4}}>📍 {settings.address}</div>}
               </div>
               {/* Demo Illustration */}
               <svg width="260" height="160" viewBox="0 0 280 180" style={{marginBottom:16}}>
@@ -1815,7 +1815,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               </svg>
               <div style={{padding:'16px',textAlign:'center'}}>
                 <div style={{fontSize:15,color:T.gray500,fontWeight:600}}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
-                <div style={{fontSize:12,marginTop:8,color:T.gray400}}>অথবা সরবরাহকারী/ক্যাটাগরি সিলেক্ট করুন</div>
+                <div style={{fontSize:14,marginTop:8,color:T.gray400}}>অথবা সরবরাহকারী/ক্যাটাগরি সিলেক্ট করুন</div>
               </div>
             </div>
           )}
@@ -1828,7 +1828,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         <div style={{padding:'12px 16px',borderBottom:`1px solid #e5e7eb`,background:T.white,flexShrink:0}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:10}}>
             <h3 style={{fontSize:15,fontWeight:700,color:T.gray900,margin:0,display:'flex',alignItems:'center',gap:6}}>🛒 কার্ট</h3>
-            <span style={{background:T.gray900,color:T.white,padding:'2px 10px',borderRadius:12,fontSize:12,fontWeight:600}}>{cart.length}</span>
+            <span style={{background:T.gray900,color:T.white,padding:'2px 10px',borderRadius:12,fontSize:14,fontWeight:600}}>{cart.length}</span>
           </div>
           
           {/* Customer Input - Compact */}
@@ -1837,27 +1837,27 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               onFocus={()=>setShowCustDrop(true)}
               onMouseDown={() => { setShowCustDrop(true); }}
               placeholder="কাস্টমার খুঁজুন..."
-              style={{...input,fontSize:12,borderRadius:8,padding:'8px 12px',border:'1.5px solid #e5e7eb',background:'#fafbfc'}}
+              style={{...input,fontSize:14,borderRadius:8,padding:'8px 12px',border:'1.5px solid #e5e7eb',background:'#fafbfc'}}
             />
             {due > 0 && !selCust && cart.length > 0 && (
-              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',background:T.teal,border:'none',borderRadius:6,color:'white',cursor:'pointer',fontSize:11,padding:'4px 8px',display:'flex',alignItems:'center',gap:4,fontWeight:700}}>
+              <button onClick={()=>setShowAddCust(true)} style={{position:'absolute',right:6,top:'50%',transform:'translateY(-50%)',background:T.teal,border:'none',borderRadius:6,color:'white',cursor:'pointer',fontSize:14,padding:'4px 8px',display:'flex',alignItems:'center',gap:4,fontWeight:700}}>
                 +
               </button>
             )}
           </div>
           
           {due > 0 && !selCust && cart.length > 0 && !custQ && (
-            <div style={{fontSize:11,color:T.red,marginTop:6,textAlign:'center',padding:'4px 8px',background:T.redLight,borderRadius:6}}>⚠️ কাস্টমার যোগ করুন</div>
+            <div style={{fontSize:14,color:T.red,marginTop:6,textAlign:'center',padding:'4px 8px',background:T.redLight,borderRadius:6}}>⚠️ কাস্টমার যোগ করুন</div>
           )}
           
           {selCust && (
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',borderRadius:10,border:'1px solid #86efac'}}>
               <div style={{display:'flex',alignItems:'center',gap:6}}>
                 <span style={{color:T.green,fontSize:14}}>✓</span>
-                <span style={{fontSize:12,color:T.green,fontWeight:600}}>{selCust.name}</span>
-                {selCust.credit>0 && <span style={{color:T.red,fontSize:11,fontWeight:500}}>(বাকি: {fmt(selCust.credit)})</span>}
+                <span style={{fontSize:14,color:T.green,fontWeight:600}}>{selCust.name}</span>
+                {selCust.credit>0 && <span style={{color:T.red,fontSize:14,fontWeight:500}}>(বাকি: {fmt(selCust.credit)})</span>}
               </div>
-              <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:11,background:'none',border:'none',color:T.gray400,cursor:'pointer',padding:2}}>✕</button>
+              <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:14,background:'none',border:'none',color:T.gray400,cursor:'pointer',padding:2}}>✕</button>
             </div>
           )}
           
@@ -1867,13 +1867,13 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               style={{position:'absolute',left:16,right:16,top:'100%',background:T.white,border:'1.5px solid #e5e7eb',borderRadius:10,boxShadow:'0 6px 20px rgba(0,0,0,0.1)',zIndex:50,maxHeight:180,overflow:'auto',marginTop:4}}>
               {customers.filter(c=>(c.name||'').includes(custQ)||(c.phone||'').includes(custQ)).map(c=>(
                 <div key={c.id} onClick={()=>{setSelCust(c);setCustQ(c.name);setShowCustDrop(false);}}
-                  style={{padding:'10px 14px',cursor:'pointer',fontSize:13,borderBottom:`1px solid #f0f0f0`,display:'flex',justifyContent:'space-between'}}>
+                  style={{padding:'10px 14px',cursor:'pointer',fontSize:15,borderBottom:`1px solid #f0f0f0`,display:'flex',justifyContent:'space-between'}}>
                   <span><strong>{c.name}</strong>{c.phone?` · ${c.phone}`:''}</span>
-                  {c.credit>0 && <span style={{color:T.red,fontSize:11,fontWeight:600}}>বাকি {fmt(c.credit)}</span>}
+                  {c.credit>0 && <span style={{color:T.red,fontSize:14,fontWeight:600}}>বাকি {fmt(c.credit)}</span>}
                 </div>
               ))}
               {customers.filter(c=>(c.name||'').includes(custQ)||(c.phone||'').includes(custQ)).length===0 && (
-                <div style={{padding:'10px 14px',fontSize:13,color:T.gray400}}>কাস্টমার পাওয়া যায়নি</div>
+                <div style={{padding:'10px 14px',fontSize:15,color:T.gray400}}>কাস্টমার পাওয়া যায়নি</div>
               )}
             </div>
           )}
@@ -1885,7 +1885,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <div style={{textAlign:'center',padding:'30px 16px',background:T.white,margin:8,borderRadius:8,border:'1px solid #e5e7eb'}}>
               <div style={{fontSize:36,marginBottom:8}}>🛒</div>
               <div style={{fontSize:14,fontWeight:600,color:T.gray500,marginBottom:4}}>কার্ট খালি</div>
-              <div style={{fontSize:13,color:T.gray400}}>বাম দিক থেকে পণ্য যোগ করুন</div>
+              <div style={{fontSize:15,color:T.gray400}}>বাম দিক থেকে পণ্য যোগ করুন</div>
             </div>
           ) : (
             <div style={{padding:'8px 16px'}}>
@@ -1894,16 +1894,16 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                   {/* Product Name & Qty */}
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:8}}>
-                      <span style={{fontSize:12,fontWeight:600,color:T.gray900,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{item.name}</span>
-                      <span style={{fontSize:12,fontWeight:700,color:T.teal,flexShrink:0}}>{fmt(item.sellP*item.qty)}</span>
+                      <span style={{fontSize:14,fontWeight:600,color:T.gray900,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',flex:1}}>{item.name}</span>
+                      <span style={{fontSize:14,fontWeight:700,color:T.teal,flexShrink:0}}>{fmt(item.sellP*item.qty)}</span>
                     </div>
                     <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:2}}>
-                      <span style={{fontSize:12,color:T.gray500}}>{item.qty} × {fmt(item.sellP)}</span>
+                      <span style={{fontSize:14,color:T.gray500}}>{item.qty} × {fmt(item.sellP)}</span>
                       <div style={{display:'flex',alignItems:'center',gap:4}}>
-                        <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:22,height:22,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:12,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>−</button>
-                        <span style={{fontSize:12,fontWeight:600,minWidth:18,textAlign:'center'}}>{item.qty}</span>
-                        <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:22,height:22,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:12,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>+</button>
-                        <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:22,height:22,border:'none',borderRadius:4,background:T.redLight,cursor:'pointer',fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',color:T.red,marginLeft:4}}>✕</button>
+                        <button onClick={()=>updQty(item.id,item.qty-1)} style={{width:22,height:22,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>−</button>
+                        <span style={{fontSize:14,fontWeight:600,minWidth:18,textAlign:'center'}}>{item.qty}</span>
+                        <button onClick={()=>updQty(item.id,item.qty+1)} style={{width:22,height:22,border:'none',borderRadius:4,background:T.gray100,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',color:T.gray600}}>+</button>
+                        <button onClick={()=>setCart(p=>p.filter(i=>i.id!==item.id))} style={{width:22,height:22,border:'none',borderRadius:4,background:T.redLight,cursor:'pointer',fontSize:14,display:'flex',alignItems:'center',justifyContent:'center',color:T.red,marginLeft:4}}>✕</button>
                       </div>
                     </div>
                   </div>
@@ -1919,29 +1919,29 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           <div style={{border:'1px solid #e5e7eb',borderRadius:8,overflow:'hidden',marginBottom:8}}>
             {/* Header */}
             <div style={{background:T.gray100,padding:'8px 12px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db'}}>
-              <span style={{fontSize:13,color:T.gray600,fontWeight:600}}>সাবটোটাল ({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
-              <span style={{fontSize:13,fontWeight:600,color:T.gray700}}>{fmt(subtotal)}</span>
+              <span style={{fontSize:15,color:T.gray600,fontWeight:600}}>সাবটোটাল ({cart.reduce((s,i)=>s+i.qty,0)} আইটেম)</span>
+              <span style={{fontSize:15,fontWeight:600,color:T.gray700}}>{fmt(subtotal)}</span>
             </div>
             
             {/* Discount Row */}
             {(parseFloat(discount)||0) > 0 && (
               <div style={{padding:'6px 12px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db',background:T.greenLight}}>
-                <span style={{fontSize:13,color:T.green}}>ছাড়</span>
-                <span style={{fontSize:13,fontWeight:600,color:T.green}}>−{fmt(parseFloat(discount)||0)}</span>
+                <span style={{fontSize:15,color:T.green}}>ছাড়</span>
+                <span style={{fontSize:15,fontWeight:600,color:T.green}}>−{fmt(parseFloat(discount)||0)}</span>
               </div>
             )}
             
             {/* VAT Row */}
             {vatAmount > 0 && (
               <div style={{padding:'6px 12px',display:'flex',justifyContent:'space-between',borderBottom:'1px dashed #d1d5db',background:T.amberLight}}>
-                <span style={{fontSize:13,color:T.amber}}>ভ্যাট ({vatPercent}%)</span>
-                <span style={{fontSize:13,fontWeight:600,color:T.amber}}>+{fmt(vatAmount)}</span>
+                <span style={{fontSize:15,color:T.amber}}>ভ্যাট ({vatPercent}%)</span>
+                <span style={{fontSize:15,fontWeight:600,color:T.amber}}>+{fmt(vatAmount)}</span>
               </div>
             )}
             
             {/* Grand Total */}
             <div style={{padding:'8px 10px',display:'flex',justifyContent:'space-between',alignItems:'center',background:T.gray900}}>
-              <span style={{fontSize:12,color:T.white,fontWeight:700}}>মোট দেনা</span>
+              <span style={{fontSize:14,color:T.white,fontWeight:700}}>মোট দেনা</span>
               <span style={{fontSize:18,color:T.white,fontWeight:800}}>{fmt(total)}</span>
             </div>
           </div>
@@ -1950,10 +1950,10 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           <div style={{display:'flex',gap:6,marginBottom:8}}>
             <input value={discount} onChange={e=>setDiscount(e.target.value)} type="number" min="0"
               placeholder="ছাড়"
-              style={{flex:1,border:'1px solid #e5e7eb',borderRadius:6,padding:'5px 8px',fontSize:11,outline:'none',background:'#fafbfc',width:'100%',boxSizing:'border-box',color:T.green}}/>
+              style={{flex:1,border:'1px solid #e5e7eb',borderRadius:6,padding:'5px 8px',fontSize:14,outline:'none',background:'#fafbfc',width:'100%',boxSizing:'border-box',color:T.green}}/>
             <input value={vatPercent} onChange={e=>setVatPercent(e.target.value)} type="number" min="0" max="100"
               placeholder="ভ্যাট"
-              style={{width:55,border:'1px solid #e5e7eb',borderRadius:6,padding:'5px 6px',fontSize:11,outline:'none',background:'#fafbfc',boxSizing:'border-box',color:T.amber,textAlign:'center'}}/>
+              style={{width:55,border:'1px solid #e5e7eb',borderRadius:6,padding:'5px 6px',fontSize:14,outline:'none',background:'#fafbfc',boxSizing:'border-box',color:T.amber,textAlign:'center'}}/>
           </div>
           
           {/* Payment Input */}
@@ -1971,13 +1971,13 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           
           {/* Due/Change Alert */}
           {due > 0 && (
-            <div style={{fontSize:11,marginBottom:6,padding:'5px 8px',borderRadius:6,
+            <div style={{fontSize:14,marginBottom:6,padding:'5px 8px',borderRadius:6,
               background:T.redLight, color:T.red, fontWeight:600,textAlign:'center'}}>
               ⚠️ বাকি: {fmt(due)}{selCust ? '' : ' (কাস্টমার দরকার)'}
             </div>
           )}
           {paidAmt > total && (
-            <div style={{fontSize:11,marginBottom:6,padding:'5px 8px',borderRadius:6,
+            <div style={{fontSize:14,marginBottom:6,padding:'5px 8px',borderRadius:6,
               background:T.greenLight, color:T.green, fontWeight:600,textAlign:'center'}}>
               💵 ফেরত: {fmt(change)}
             </div>
@@ -1986,7 +1986,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           {/* Action Buttons */}
           <div style={{display:'grid',gridTemplateColumns:'auto 1fr',gap:6}}>
             <button onClick={()=>{setCart([]);setDiscount('');setPaid('');setSelCust(null);setCustQ('');}}
-              style={{padding:'8px 10px',borderRadius:8,border:'1px solid #e5e7eb',background:T.white,color:T.gray600,fontWeight:600,fontSize:12,cursor:'pointer'}}>
+              style={{padding:'8px 10px',borderRadius:8,border:'1px solid #e5e7eb',background:T.white,color:T.gray600,fontWeight:600,fontSize:14,cursor:'pointer'}}>
               🗑️
             </button>
             <button ref={checkoutRef} onClick={checkout} 
@@ -2441,11 +2441,11 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
                     style={{padding:14,background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`,cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                     <div>
                       <div style={{fontWeight:700,color:T.teal,fontSize:14}}>{p.id}</div>
-                      <div style={{fontSize:12,color:T.gray500,marginTop:2}}>{new Date(p.date).toLocaleDateString('bn-BD')} • {p.supplier}</div>
+                      <div style={{fontSize:14,color:T.gray500,marginTop:2}}>{new Date(p.date).toLocaleDateString('bn-BD')} • {p.supplier}</div>
                     </div>
                     <div style={{textAlign:'right'}}>
                       <div style={{fontWeight:700,color:T.green}}>{fmt(totalCost)}</div>
-                      <div style={{fontSize:12,color:T.gray500}}>{p.totalItems}টি পণ্য • {p.totalStock} একক</div>
+                      <div style={{fontSize:14,color:T.gray500}}>{p.totalItems}টি পণ্য • {p.totalStock} একক</div>
                     </div>
                   </div>
                 );
@@ -2460,16 +2460,16 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                   <div>
                     <div style={{fontWeight:800,fontSize:18,color:T.teal}}>{viewPurchase.id}</div>
-                    <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-                    <div style={{fontSize:13,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
+                    <div style={{fontSize:14,color:T.gray500,marginTop:4}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+                    <div style={{fontSize:15,marginTop:4}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
                     {viewPurchase.supplierCrNumber && (
-                      <div style={{fontSize:11,marginTop:4,fontWeight:600,color:T.teal}}>🏢 CR: {viewPurchase.supplierCrNumber}</div>
+                      <div style={{fontSize:14,marginTop:4,fontWeight:600,color:T.teal}}>🏢 CR: {viewPurchase.supplierCrNumber}</div>
                     )}
                     {viewPurchase.supplierVatNumber && (
-                      <div style={{fontSize:11,marginTop:2,fontWeight:600,color:T.green}}>🧾 VAT: {viewPurchase.supplierVatNumber}</div>
+                      <div style={{fontSize:14,marginTop:2,fontWeight:600,color:T.green}}>🧾 VAT: {viewPurchase.supplierVatNumber}</div>
                     )}
                     {viewPurchase.supplierAddress && (
-                      <div style={{fontSize:11,marginTop:2,color:T.gray600}}>📍 {viewPurchase.supplierAddress}</div>
+                      <div style={{fontSize:14,marginTop:2,color:T.gray600}}>📍 {viewPurchase.supplierAddress}</div>
                     )}
                   </div>
                   <div style={{display:'flex',gap:8,alignItems:'flex-start'}}>
@@ -2555,18 +2555,18 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                           alert('প্রিন্ট করতে পপ-আপ অনুমতি দিন!');
                         }
                       } catch(e) { alert('প্রিন্ট করতে সমস্যা হয়েছে!'); }
-                    }} style={{...btn('primary'),padding:'6px 12px',fontSize:12}}>🖨️ প্রিন্ট</button>
-                    <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px',fontSize:12}}>✕</button>
+                    }} style={{...btn('primary'),padding:'6px 12px',fontSize:14}}>🖨️ প্রিন্ট</button>
+                    <button onClick={()=>setViewPurchase(null)} style={{...btn(),padding:'6px 12px',fontSize:14}}>✕</button>
                   </div>
                 </div>
               </div>
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.gray50}}>
-                    <th style={{padding:8,textAlign:'left',fontSize:11,color:T.gray600}}>পণ্যের নাম</th>
-                    <th style={{padding:8,textAlign:'center',fontSize:11,color:T.gray600}}>পরিমাণ</th>
-                    <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>দাম</th>
-                    <th style={{padding:8,textAlign:'right',fontSize:11,color:T.gray600}}>মোট</th>
+                    <th style={{padding:8,textAlign:'left',fontSize:14,color:T.gray600}}>পণ্যের নাম</th>
+                    <th style={{padding:8,textAlign:'center',fontSize:14,color:T.gray600}}>পরিমাণ</th>
+                    <th style={{padding:8,textAlign:'right',fontSize:14,color:T.gray600}}>দাম</th>
+                    <th style={{padding:8,textAlign:'right',fontSize:14,color:T.gray600}}>মোট</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -2576,12 +2576,12 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     const total = qty * price;
                     return (
                       <tr key={i} style={{borderBottom:`1px solid ${T.gray100}`}}>
-                        <td style={{padding:10,fontSize:13}}>
+                        <td style={{padding:10,fontSize:15}}>
                           <div style={{fontWeight:600}}>{item.name}</div>
-                          <div style={{fontSize:11,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
+                          <div style={{fontSize:14,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
                         </td>
                         <td style={{padding:10,textAlign:'center',fontWeight:600}}>{qty} {item.unit || 'পিস'}</td>
-                        <td style={{padding:10,textAlign:'right',fontSize:13}}>{fmt(price)}</td>
+                        <td style={{padding:10,textAlign:'right',fontSize:15}}>{fmt(price)}</td>
                         <td style={{padding:10,textAlign:'right',fontWeight:700,color:T.green}}>{fmt(total)}</td>
                       </tr>
                     );
@@ -2589,7 +2589,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 </tbody>
                 <tfoot>
                   <tr style={{background:T.tealLight}}>
-                    <td colSpan={3} style={{padding:10,fontWeight:700,fontSize:13}}>সর্বমোট</td>
+                    <td colSpan={3} style={{padding:10,fontWeight:700,fontSize:15}}>সর্বমোট</td>
                     <td style={{padding:10,textAlign:'right',fontWeight:800,fontSize:16,color:T.teal}}>
                       {fmt(viewPurchase.items.reduce((s,i) => s + (i.stock || 0) * (i.buyP || 0), 0))}
                     </td>
@@ -2611,7 +2611,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
         <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
           <button style={btn()} onClick={()=>{setShowAddForm(false);setPurchaseItems([]);setCsvData([]);}}>← ফিরে যান</button>
           <span style={{fontWeight:700,fontSize:15}}>📦 নতুন পণ্য সংরক্ষণ</span>
-          <span style={{fontSize:12,color:T.gray500,marginLeft:'auto'}}>{purchaseItems.length}টি পণ্য যোগ হয়েছে</span>
+          <span style={{fontSize:14,color:T.gray500,marginLeft:'auto'}}>{purchaseItems.length}টি পণ্য যোগ হয়েছে</span>
         </div>
         
         <div style={{display:'flex',flex:1,overflow:'hidden'}}>
@@ -2626,7 +2626,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
               <div style={{display:'flex',flexDirection:'column',gap:8,alignItems:'flex-start'}}>
                 <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
                   <input type="file" accept=".csv" onChange={handleCsvImport} id="csvInput" style={{display:'none'}} />
-                  <label htmlFor="csvInput" style={{...btn('primary'),cursor:'pointer',fontSize:13,padding:'10px 20px'}}>
+                  <label htmlFor="csvInput" style={{...btn('primary'),cursor:'pointer',fontSize:15,padding:'10px 20px'}}>
                     📁 পণ্যের CSV আপলোড করুন
                   </label>
                   <button onClick={() => {
@@ -2638,16 +2638,16 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     a.download = 'পণ্যের_তালিকা.csv';
                     a.click();
                     URL.revokeObjectURL(url);
-                  }} style={{...btn('ghost'),fontSize:12,padding:'8px 16px'}}>
+                  }} style={{...btn('ghost'),fontSize:14,padding:'8px 16px'}}>
                     📥 ডেমো CSV ডাউনলোড
                   </button>
                 </div>
-                <div style={{fontSize:11,color:T.gray600}}>
+                <div style={{fontSize:14,color:T.gray600}}>
                   💡 CSV ফাইলে সরবরাহকারী কোড, সরবরাহকারীর নাম ও ক্যাটাগরি অবশ্যই ডাটাবেজে থাকতে হবে
                 </div>
               </div>
               {csvData.length > 0 && (
-                <div style={{marginTop:8,fontSize:12,color:T.teal,fontWeight:600}}>
+                <div style={{marginTop:8,fontSize:14,color:T.teal,fontWeight:600}}>
                   ✓ {csvData.length}টি পণ্য আপলোড হয়েছে
                 </div>
               )}
@@ -2666,14 +2666,14 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     onClick={()=>setShowCompanyList(true)}
                     onBlur={()=>setTimeout(()=>setShowCompanyList(false),200)}
                     placeholder="সরবরাহকারীর নাম লিখুন..."
-                    style={{...input,fontSize:13,flex:1}} />
-                  <button type="button" onClick={()=>setShowCompanyList(!showCompanyList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
+                    style={{...input,fontSize:15,flex:1}} />
+                  <button type="button" onClick={()=>setShowCompanyList(!showCompanyList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:15}}>▼</button>
                 </div>
                 {showCompanyList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                     {uniqueCompanies.filter(c=>c && c.toLowerCase().includes((supplierQ||'').toLowerCase())).map((c,i)=>(
                       <div key={i} onClick={()=>{const sup=suppliers.find(s=>(s.name||'').toLowerCase().trim()===c.toLowerCase());setSupplierQ(c);setForm(f=>({...f,company:c,supplierCrNumber:sup?.crNumber||'',supplierVatNumber:sup?.vatNumber||'',supplierAddress:sup?.address||''}));setShowCompanyList(false);}}
-                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:15}}>
                         {c}
                       </div>
                     ))}
@@ -2697,14 +2697,14 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     onClick={()=>setShowCategoryList(true)}
                     onBlur={()=>setTimeout(()=>setShowCategoryList(false),200)}
                     placeholder="ক্যাটাগরি লিখুন..."
-                    style={{...input,fontSize:13,flex:1}} />
-                  <button type="button" onClick={()=>setShowCategoryList(!showCategoryList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
+                    style={{...input,fontSize:15,flex:1}} />
+                  <button type="button" onClick={()=>setShowCategoryList(!showCategoryList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:15}}>▼</button>
                 </div>
                 {showCategoryList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                     {uniqueCategories.filter(c=>c && c.toLowerCase().includes((form.cat||'').toLowerCase())).map((c,i)=>(
                       <div key={i} onClick={()=>{setForm(f=>({...f,cat:c}));setShowCategoryList(false);}}
-                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:15}}>
                         {c}
                       </div>
                     ))}
@@ -2723,7 +2723,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 <div style={{flex:1}}>
                   <label style={label}>④ বারকোড</label>
                   <input value={barcodeVal} onChange={e=>handleBarcode(e.target.value)} placeholder="বারকোড..."
-                    style={{...input,fontSize:13}} />
+                    style={{...input,fontSize:15}} />
                 </div>
                 <div style={{flex:2, position:'relative'}}>
                   <label style={label}>③ পণ্যের নাম *</label>
@@ -2732,16 +2732,16 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                       onClick={()=>setShowProductList(true)}
                       onBlur={()=>setTimeout(()=>setShowProductList(false),200)}
                       placeholder="পণ্যের নাম লিখুন..."
-                      style={{...input,fontSize:13,flex:1}} />
-                    <button type="button" onClick={()=>setShowProductList(!showProductList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:13}}>▼</button>
+                      style={{...input,fontSize:15,flex:1}} />
+                    <button type="button" onClick={()=>setShowProductList(!showProductList)} style={{...btn('ghost'),padding:'6px 12px',fontSize:15}}>▼</button>
                   </div>
                   {showProductList && (
                     <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:200,overflow:'auto',marginTop:4}}>
                       {products.filter(p=>!(p.name||'').includes('(ক্যাটাগরি)') && (p.name||'').toLowerCase().includes((form.name||'').toLowerCase())).slice(0,20).map((p,i)=>(
                         <div key={i} onClick={()=>{selectProduct(p);setShowProductList(false);}}
-                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:13}}>
+                          style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:15}}>
                           <div style={{fontWeight:600}}>{p.name}</div>
-                          <div style={{fontSize:11,color:T.gray400}}>{p.company} • {p.cat}</div>
+                          <div style={{fontSize:14,color:T.gray400}}>{p.company} • {p.cat}</div>
                         </div>
                       ))}
                       {form.name && !products.some(p=>!(p.name||'').includes('(ক্যাটাগরি)') && (p.name||'').toLowerCase()===(form.name||'').toLowerCase()) && (
@@ -2760,31 +2760,31 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 <div>
                   <label style={label}>📥 একক</label>
                   <input value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} placeholder="পিস..."
-                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                    style={{...input,fontSize:14,padding:'6px 8px'}} />
                 </div>
                 <div>
                   <label style={label}>📥 স্টক</label>
                   <input value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} type="number" placeholder="০"
-                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                    style={{...input,fontSize:14,padding:'6px 8px'}} />
                 </div>
                 <div>
                   <label style={label}>⚠️ মিন স্টক</label>
                   <input value={form.minStock} onChange={e=>setForm(f=>({...f,minStock:e.target.value}))} type="number" placeholder="৫"
-                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                    style={{...input,fontSize:14,padding:'6px 8px'}} />
                 </div>
                 <div>
                   <label style={label}>💰 ক্রয়মূল্য</label>
                   <input value={form.buyP} onChange={e=>setForm(f=>({...f,buyP:e.target.value}))} type="number" placeholder="০"
-                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                    style={{...input,fontSize:14,padding:'6px 8px'}} />
                 </div>
                 <div>
                   <label style={label}>💵 বিক্রয়মূল্য</label>
                   <input value={form.sellP} onChange={e=>setForm(f=>({...f,sellP:e.target.value}))} type="number" placeholder="০"
-                    style={{...input,fontSize:12,padding:'6px 8px'}} />
+                    style={{...input,fontSize:14,padding:'6px 8px'}} />
                 </div>
                 <div>
                   <label style={label}>📊 লাভ</label>
-                  <div style={{padding:'6px 8px',background:T.greenLight,borderRadius:6,fontWeight:700,color:T.green,fontSize:13}}>
+                  <div style={{padding:'6px 8px',background:T.greenLight,borderRadius:6,fontWeight:700,color:T.green,fontSize:15}}>
                     {form.buyP > 0 && form.sellP > 0 ? (
                       <>{(((+form.sellP) - (+form.buyP)).toFixed(2))} ({(((+form.sellP - +form.buyP) / +form.buyP * 100).toFixed(1))}%)</>
                     ) : (
@@ -2816,16 +2816,16 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                   <div key={item.id} style={{padding:10,background:T.white,borderRadius:8,marginBottom:6,border:`1px solid ${T.gray200}`}}>
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                       <div style={{flex:1}}>
-                        <div style={{fontWeight:600,fontSize:13}}>{item.name}</div>
-                        <div style={{fontSize:11,color:T.gray500}}>{item.company} • {item.barcode}</div>
-                        {item.cat && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>📂 {item.cat}</div>}
-                        <div style={{fontSize:12,marginTop:4}}>
+                        <div style={{fontWeight:600,fontSize:15}}>{item.name}</div>
+                        <div style={{fontSize:14,color:T.gray500}}>{item.company} • {item.barcode}</div>
+                        {item.cat && <div style={{fontSize:14,color:T.gray400,marginTop:2}}>📂 {item.cat}</div>}
+                        <div style={{fontSize:14,marginTop:4}}>
                           <span style={{color:T.teal}}>৳{item.buyP || 0}</span> → <span style={{color:T.green}}>৳{item.sellP || 0}</span>
                         </div>
                       </div>
                       <div style={{textAlign:'right'}}>
                         <div style={{fontWeight:700,fontSize:14}}>{item.stock || 0} {item.unit}</div>
-                        <button onClick={()=>removeItem(item.id)} style={{fontSize:11,color:T.red,background:'none',border:'none',cursor:'pointer',marginTop:4}}>✕ মুছুন</button>
+                        <button onClick={()=>removeItem(item.id)} style={{fontSize:14,color:T.red,background:'none',border:'none',cursor:'pointer',marginTop:4}}>✕ মুছুন</button>
                       </div>
                     </div>
                   </div>
@@ -2859,7 +2859,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           color:productTab==='list'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           📋 পণ্য তালিকা
         </button>
@@ -2872,7 +2872,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           color:productTab==='history'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           📜 দাম পরিবর্তনের হিস্ট্রি ({productHistory.filter(h => h.type === 'price_buy' || h.type === 'price_sell').length})
         </button>
@@ -2885,7 +2885,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           color:productTab==='deleted'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           🗑️ পণ্য ডিলিট ({productHistory.filter(h => h.type === 'product_delete').length})
         </button>
@@ -2904,24 +2904,24 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 <table style={{width:'100%',borderCollapse:'collapse'}}>
                   <thead>
                     <tr style={{background:T.tealLight}}>
-                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
-                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
-                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তনের ধরন</th>
-                      <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন দাম</th>
-                      <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন দাম</th>
-                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>পরিবর্তনের ধরন</th>
+                      <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,fontWeight:700,color:T.teal}}>পুরাতন দাম</th>
+                      <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,fontWeight:700,color:T.teal}}>নতুন দাম</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[...priceHistory].reverse().map((h,i)=>(
                       <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                           {new Date(h.timestamp).toLocaleString('bn-BD')}
                         </td>
-                        <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
-                        <td style={{padding:'10px 12px',fontSize:12}}>
-                          {h.type === 'price_buy' && <span style={{background:T.orangeLight,color:T.orange,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>ক্রয়মূল্য</span>}
-                          {h.type === 'price_sell' && <span style={{background:T.tealLight,color:T.teal,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>বিক্রয়মূল্য</span>}
+                        <td style={{padding:'10px 12px',fontWeight:600,fontSize:15}}>{h.productName}</td>
+                        <td style={{padding:'10px 12px',fontSize:14}}>
+                          {h.type === 'price_buy' && <span style={{background:T.orangeLight,color:T.orange,padding:'3px 10px',borderRadius:12,fontSize:14,fontWeight:600}}>ক্রয়মূল্য</span>}
+                          {h.type === 'price_sell' && <span style={{background:T.tealLight,color:T.teal,padding:'3px 10px',borderRadius:12,fontSize:14,fontWeight:600}}>বিক্রয়মূল্য</span>}
                         </td>
                         <td style={{padding:'10px 12px',textAlign:'right',fontWeight:600,color:T.red}}>
                           {fmt(h.oldValue)}
@@ -2929,9 +2929,9 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                         <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
                           {fmt(h.newValue)}
                         </td>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                           <div style={{fontWeight:600}}>{h.user}</div>
-                          {h.userEmail && <div style={{fontSize:11,color:T.gray400}}>{h.userEmail}</div>}
+                          {h.userEmail && <div style={{fontSize:14,color:T.gray400}}>{h.userEmail}</div>}
                         </td>
                       </tr>
                     ))}
@@ -2956,23 +2956,23 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                 <table style={{width:'100%',borderCollapse:'collapse'}}>
                   <thead>
                     <tr style={{background:T.redLight}}>
-                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.red}}>তারিখ ও সময়</th>
-                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.red}}>পণ্যের নাম</th>
-                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.red}}>কোম্পানি</th>
-                      <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.red}}>ডিলিটের সময় স্টক</th>
-                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.red}}>ব্যবহারকারী</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.red}}>তারিখ ও সময়</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.red}}>পণ্যের নাম</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.red}}>কোম্পানি</th>
+                      <th style={{padding:'10px 12px',textAlign:'center',fontSize:14,fontWeight:700,color:T.red}}>ডিলিটের সময় স্টক</th>
+                      <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.red}}>ব্যবহারকারী</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[...deleteHistory].reverse().map((h,i)=>(
                       <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                           {new Date(h.timestamp).toLocaleString('bn-BD')}
                         </td>
-                        <td style={{padding:'10px 12px',fontWeight:600,fontSize:13,color:T.red}}>{h.productName}</td>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{h.productCompany || '-'}</td>
+                        <td style={{padding:'10px 12px',fontWeight:600,fontSize:15,color:T.red}}>{h.productName}</td>
+                        <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>{h.productCompany || '-'}</td>
                         <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,color:T.orange}}>{h.stockAtDeletion || 0}</td>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                        <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                           <div style={{fontWeight:600}}>{h.user}</div>
                         </td>
                       </tr>
@@ -2995,7 +2995,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           borderRadius:7, whiteSpace:'nowrap',
           background:stockFilter==='স্টক আছে'?T.teal:T.gray100,
           color:stockFilter==='স্টক আছে'?T.white:T.gray600,
-          border:'none', padding:'8px 14px', fontSize:13,
+          border:'none', padding:'8px 14px', fontSize:15,
         }}>📦 স্টক আছে ({stockCount})</button>
         
         {/* স্টক শেষ ট্যাব */}
@@ -3004,7 +3004,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
           borderRadius:7, whiteSpace:'nowrap',
           background:stockFilter==='স্টক শেষ'?T.red:T.redLight,
           color:stockFilter==='স্টক শেষ'?T.white:T.red,
-          border:'none', padding:'8px 14px', fontSize:13,
+          border:'none', padding:'8px 14px', fontSize:15,
         }}>⚠️ স্টক শেষ ({outOfStockCount})</button>
         
         <div style={{position:'relative',flex:'1 1 200px',minWidth:150}}>
@@ -3049,7 +3049,7 @@ ${printFiltered.map(p => {
           win.focus();
           setTimeout(() => { if (!win.closed) { win.print(); } }, 250);
         }}>🖨️ প্রিন্ট</button>
-        <span style={{fontSize:12,color:T.gray400,marginLeft:'auto'}}>{filtered.length}টি পণ্য</span>
+        <span style={{fontSize:14,color:T.gray400,marginLeft:'auto'}}>{filtered.length}টি পণ্য</span>
       </div>
 
       <div style={{flex:1,overflow:'auto',padding:12}}>
@@ -3067,7 +3067,7 @@ ${printFiltered.map(p => {
             <thead>
               <tr style={{background:T.tealLight}}>
                 {['সরবরাহকারী কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','ক্রয়মূল্য','বিক্রয়মূল্য','লাভ (%)','VAT (১৫%)','মোট (VAT সহ)','স্টক','একক','একশন'].map((h,i)=>(
-                  <th key={i} style={{padding:'10px 12px',textAlign:i===11?'center':'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                  <th key={i} style={{padding:'10px 12px',textAlign:i===11?'center':'left',fontSize:14,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -3083,21 +3083,21 @@ ${printFiltered.map(p => {
                 const totalWithVat = parseFloat((p.sellP + vatAmount).toFixed(2));
                 return (
                   <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                    <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:14,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
                     <td style={{padding:'10px 12px'}}>
                       <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
-                      {p.barcode && <div style={{fontSize:11,color:T.gray400,fontFamily:'monospace'}}>{p.barcode}</div>}
+                      {p.barcode && <div style={{fontSize:14,color:T.gray400,fontFamily:'monospace'}}>{p.barcode}</div>}
                     </td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
-                    <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
-                    <td style={{padding:'10px 12px',fontSize:13}}>{fmt(p.buyP)}</td>
+                    <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>{p.company||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:15,color:T.gray600}}>{p.cat||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:15}}>{fmt(p.buyP)}</td>
                     <td style={{padding:'10px 12px',fontWeight:700,fontSize:14}}>{fmt(p.sellP)}</td>
                     <td style={{padding:'10px 12px'}}>
-                      <span style={{fontSize:12,fontWeight:600,color:profitPct>0?T.green:T.red}}>
+                      <span style={{fontSize:14,fontWeight:600,color:profitPct>0?T.green:T.red}}>
                         {fmt(p.sellP-p.buyP)} ({profitPct}%)
                       </span>
                     </td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.amber,fontWeight:600}}>
+                    <td style={{padding:'10px 12px',fontSize:14,color:T.amber,fontWeight:600}}>
                       {vatRate}%
                     </td>
                     <td style={{padding:'10px 12px',fontWeight:700,fontSize:14,color:T.teal}}>
@@ -3105,9 +3105,9 @@ ${printFiltered.map(p => {
                     </td>
                     <td style={{padding:'10px 12px'}}>
                       <span style={{fontWeight:700,fontSize:15,color:isLowStock?T.red:T.gray900}}>{fmtN(p.stock)}</span>
-                      {isLowStock && <span style={{fontSize:10,color:T.red,marginLeft:4}}>⚠️ কম</span>}
+                      {isLowStock && <span style={{fontSize:14,color:T.red,marginLeft:4}}>⚠️ কম</span>}
                     </td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
+                    <td style={{padding:'10px 12px',fontSize:14,color:T.gray400}}>{p.unit}</td>
                     <td style={{padding:'10px 12px',display:'flex',gap:6,justifyContent:'center'}}>
                       <button style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setViewProduct(p)} title="দেখুন">👁️</button>
                       <button style={{...btn('primary','sm'),padding:'5px 8px',fontSize:14}} onClick={()=>setEditProduct({...p})} title="সম্পাদনা">✏️</button>
@@ -3138,11 +3138,11 @@ ${printFiltered.map(p => {
             
             <div style={{marginBottom:12}}>
               <div style={{fontWeight:600,fontSize:14,marginBottom:8}}>{editProduct.name}</div>
-              <div style={{fontSize:12,color:T.gray400}}>{editProduct.company} • {editProduct.cat || '-'}</div>
+              <div style={{fontSize:14,color:T.gray400}}>{editProduct.company} • {editProduct.cat || '-'}</div>
             </div>
 
             <div style={{marginBottom:16}}>
-              <label style={{fontSize:12,fontWeight:600,color:T.gray600,marginBottom:6,display:'block'}}>ক্রয়মূল্য (৳)</label>
+              <label style={{fontSize:14,fontWeight:600,color:T.gray600,marginBottom:6,display:'block'}}>ক্রয়মূল্য (৳)</label>
               <input 
                 type="number" 
                 value={editProduct.buyP}
@@ -3152,7 +3152,7 @@ ${printFiltered.map(p => {
             </div>
 
             <div style={{marginBottom:20}}>
-              <label style={{fontSize:12,fontWeight:600,color:T.gray600,marginBottom:6,display:'block'}}>বিক্রয়মূল্য (৳)</label>
+              <label style={{fontSize:14,fontWeight:600,color:T.gray600,marginBottom:6,display:'block'}}>বিক্রয়মূল্য (৳)</label>
               <input 
                 type="number" 
                 value={editProduct.sellP}
@@ -3180,35 +3180,35 @@ ${printFiltered.map(p => {
             
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginBottom:20}}>
               <div>
-                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>পণ্যের নাম</div>
+                <div style={{fontSize:14,color:T.gray400,marginBottom:4}}>পণ্যের নাম</div>
                 <div style={{fontWeight:600,fontSize:14}}>{viewProduct.name}</div>
               </div>
               <div>
-                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>বারকোড</div>
-                <div style={{fontFamily:'monospace',fontSize:13}}>{viewProduct.barcode || '-'}</div>
+                <div style={{fontSize:14,color:T.gray400,marginBottom:4}}>বারকোড</div>
+                <div style={{fontFamily:'monospace',fontSize:15}}>{viewProduct.barcode || '-'}</div>
               </div>
               <div>
-                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>কোম্পানি</div>
-                <div style={{fontSize:13}}>{viewProduct.company || '-'}</div>
+                <div style={{fontSize:14,color:T.gray400,marginBottom:4}}>কোম্পানি</div>
+                <div style={{fontSize:15}}>{viewProduct.company || '-'}</div>
               </div>
               <div>
-                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>ক্যাটাগরি</div>
-                <div style={{fontSize:13}}>{viewProduct.cat || '-'}</div>
+                <div style={{fontSize:14,color:T.gray400,marginBottom:4}}>ক্যাটাগরি</div>
+                <div style={{fontSize:15}}>{viewProduct.cat || '-'}</div>
               </div>
               <div>
-                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>ক্রয়মূল্য</div>
+                <div style={{fontSize:14,color:T.gray400,marginBottom:4}}>ক্রয়মূল্য</div>
                 <div style={{fontWeight:700,fontSize:16,color:T.orange}}>{fmt(viewProduct.buyP)}</div>
               </div>
               <div>
-                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>বিক্রয়মূল্য</div>
+                <div style={{fontSize:14,color:T.gray400,marginBottom:4}}>বিক্রয়মূল্য</div>
                 <div style={{fontWeight:700,fontSize:16,color:T.teal}}>{fmt(viewProduct.sellP)}</div>
               </div>
               <div>
-                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>স্টক</div>
+                <div style={{fontSize:14,color:T.gray400,marginBottom:4}}>স্টক</div>
                 <div style={{fontWeight:700,fontSize:16,color:viewProduct.stock <= viewProduct.minStock ? T.red : T.green}}>{viewProduct.stock} {viewProduct.unit}</div>
               </div>
               <div>
-                <div style={{fontSize:11,color:T.gray400,marginBottom:4}}>মিনিমাম স্টক</div>
+                <div style={{fontSize:14,color:T.gray400,marginBottom:4}}>মিনিমাম স্টক</div>
                 <div style={{fontSize:14}}>{viewProduct.minStock} {viewProduct.unit}</div>
               </div>
             </div>
@@ -3577,14 +3577,14 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
           />
           <button onClick={findPurchase} style={{...btn('primary'),padding:'10px 20px'}}>🔍 খুঁজুন</button>
         </div>
-        <div style={{fontSize:11,color:T.gray400,marginTop:6}}>
+        <div style={{fontSize:14,color:T.gray400,marginTop:6}}>
           💡 পারচেজ আইডি (PO-12345678) বা বারকোড নম্বর দিয়ে সার্চ করুন
         </div>
         
         {/* Recent Purchases */}
         {purchases.length > 0 && (
           <div style={{marginTop:12}}>
-            <div style={{fontSize:12,color:T.gray500,marginBottom:6}}>সাম্প্রতিক পারচেজ:</div>
+            <div style={{fontSize:14,color:T.gray500,marginBottom:6}}>সাম্প্রতিক পারচেজ:</div>
             <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
               {purchases.slice(-5).reverse().map(p => (
                 <button key={p.id} onClick={()=>{
@@ -3598,7 +3598,7 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                   setBarcodeCounts(counts);
                 }} style={{
                   padding:'4px 10px',border:`1px solid ${T.gray200}`,borderRadius:20,
-                  background:T.white,fontSize:11,cursor:'pointer',color:T.gray600
+                  background:T.white,fontSize:14,cursor:'pointer',color:T.gray600
                 }}>{p.id}</button>
               ))}
             </div>
@@ -3612,7 +3612,7 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
           <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <div>
               <div style={{fontWeight:700,color:T.teal}}>{selectedPurchase.id}</div>
-              <div style={{fontSize:12,color:T.gray500}}>{new Date(selectedPurchase.date).toLocaleDateString('bn-BD')} • {selectedPurchase.supplier}</div>
+              <div style={{fontSize:14,color:T.gray500}}>{new Date(selectedPurchase.date).toLocaleDateString('bn-BD')} • {selectedPurchase.supplier}</div>
             </div>
             <button onClick={printBarcodes} style={{...btn('primary'),padding:'10px 20px'}}>🖨️ সব বারকোড প্রিন্ট করুন</button>
           </div>
@@ -3628,13 +3628,13 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
               }}>
                 <div style={{flex:1}}>
                   <div style={{fontWeight:600,fontSize:14,marginBottom:2}}>{item.name}</div>
-                  <div style={{fontSize:12,color:T.gray500}}>
+                  <div style={{fontSize:14,color:T.gray500}}>
                     বারকোড: <span style={{fontFamily:'monospace',color:T.teal}}>{item.barcode || item.id}</span>
                   </div>
-                  <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | সরবরাহকারী: {item.company || '-'}</div>
+                  <div style={{fontSize:14,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | সরবরাহকারী: {item.company || '-'}</div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:6}}>
-                  <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
+                  <span style={{fontSize:14,color:T.gray500}}>কাউন্ট:</span>
                   <input 
                     type="number" 
                     min="0"
@@ -3642,7 +3642,7 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
                     onChange={e=>updateCount(idx, e.target.value)}
                     style={{...input,width:60,textAlign:'center',padding:'6px'}}
                   />
-                  <button onClick={()=>updateCount(idx, 0)} style={{...btn('danger'),padding:'6px 10px',fontSize:12}} title="প্রিন্ট থেকে বাদ দিন">✕</button>
+                  <button onClick={()=>updateCount(idx, 0)} style={{...btn('danger'),padding:'6px 10px',fontSize:14}} title="প্রিন্ট থেকে বাদ দিন">✕</button>
                   <button onClick={()=>{
                     // Print single barcode (A4 size)
                     const barcodeValue = item.barcode || item.id;
@@ -3720,7 +3720,7 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
                     win.document.open();
                     win.document.write(html);
                     win.document.close();
-                  }} style={{...btn('ghost'),padding:'6px 12px',fontSize:12}}>🖨️</button>
+                  }} style={{...btn('ghost'),padding:'6px 12px',fontSize:14}}>🖨️</button>
                 </div>
               </div>
               );
@@ -3747,13 +3747,13 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
               }}>
                 <div style={{flex:1}}>
                   <div style={{fontWeight:600,fontSize:14,marginBottom:2}}>{item.name}</div>
-                  <div style={{fontSize:12,color:T.gray500}}>
+                  <div style={{fontSize:14,color:T.gray500}}>
                     বারকোড: <span style={{fontFamily:'monospace',color:T.teal}}>{item.barcode}</span>
                   </div>
-                  <div style={{fontSize:11,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | সরবরাহকারী: {item.company || '-'}</div>
+                  <div style={{fontSize:14,color:T.gray400}}>মূল্য: ৳{item.sellP || 0} | সরবরাহকারী: {item.company || '-'}</div>
                 </div>
                 <div style={{display:'flex',alignItems:'center',gap:6}}>
-                  <span style={{fontSize:12,color:T.gray500}}>কাউন্ট:</span>
+                  <span style={{fontSize:14,color:T.gray500}}>কাউন্ট:</span>
                   <input 
                     type="number" 
                     min="1"
@@ -3761,8 +3761,8 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
                     onChange={e=>updateBarcodeListCount(item.listIdx, e.target.value)}
                     style={{...input,width:60,textAlign:'center',padding:'6px'}}
                   />
-                  <button onClick={()=>printSingleBarcode(item, item.count || 1)} style={{...btn('primary'),padding:'6px 10px',fontSize:12}}>🖨️</button>
-                  <button onClick={()=>removeBarcodeListItem(item.listIdx)} style={{...btn('danger'),padding:'6px 10px',fontSize:12}}>✕</button>
+                  <button onClick={()=>printSingleBarcode(item, item.count || 1)} style={{...btn('primary'),padding:'6px 10px',fontSize:14}}>🖨️</button>
+                  <button onClick={()=>removeBarcodeListItem(item.listIdx)} style={{...btn('danger'),padding:'6px 10px',fontSize:14}}>✕</button>
                 </div>
               </div>
             ))}
@@ -4291,8 +4291,8 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
         <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`}}>
           <button style={btn()} onClick={()=>setShowPurchaseHistory(null)}>← ফিরে যান</button>
           <span style={{fontWeight:700,fontSize:15}}>📦 {showPurchaseHistory.name} - পারচেজ হিস্ট্রি</span>
-          <span style={{fontSize:12,color:T.gray500,marginLeft:'auto'}}>{supplierPurchases.length}টি পারচেজ</span>
-          <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{const tot=s=>s.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0)*1.15;const grandTotal=supplierPurchases.reduce((s,p)=>s+tot(p.items),0);const totalItems=supplierPurchases.reduce((s,p)=>s+p.totalItems,0);const totalStock=supplierPurchases.reduce((s,p)=>s+p.totalStock,0);const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>পারচেজ হিস্ট্রি</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#e0f7f0;font-weight:700;color:#00897b}.total{background:#e0f7f0;font-weight:700}</style></head><body><h2>📦 ${showPurchaseHistory.name} - পারচেজ হিস্ট্রি</h2><br/><table><thead><tr><th>তারিখ</th><th style="text-align:center">আইডি</th><th style="text-align:center">পণ্য</th><th style="text-align:center">একক</th><th>মোট</th></tr></thead><tbody>${[...supplierPurchases].reverse().map(p=>`<tr><td>${new Date(p.date).toLocaleDateString('bn-BD')}</td><td style="text-align:center">${p.id}</td><td style="text-align:center">${p.totalItems}টি</td><td style="text-align:center">${p.totalStock}</td><td>৳${tot(p.items).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="1" style="text-align:right">মোট:</td><td style="text-align:left">পারচেজ: ${supplierPurchases.length}টি</td><td style="text-align:center">পণ্য: ${totalItems}টি</td><td style="text-align:center">একক: ${totalStock}টি</td><td>৳${grandTotal.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr></tfoot></table><p style="margin-top:20px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
+          <span style={{fontSize:14,color:T.gray500,marginLeft:'auto'}}>{supplierPurchases.length}টি পারচেজ</span>
+          <button style={{...btn('primary'),padding:'6px 12px',fontSize:14}} onClick={()=>{const tot=s=>s.reduce((a,i)=>a+(i.stock||0)*(i.buyP||0),0)*1.15;const grandTotal=supplierPurchases.reduce((s,p)=>s+tot(p.items),0);const totalItems=supplierPurchases.reduce((s,p)=>s+p.totalItems,0);const totalStock=supplierPurchases.reduce((s,p)=>s+p.totalStock,0);const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>পারচেজ হিস্ট্রি</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#e0f7f0;font-weight:700;color:#00897b}.total{background:#e0f7f0;font-weight:700}</style></head><body><h2>📦 ${showPurchaseHistory.name} - পারচেজ হিস্ট্রি</h2><br/><table><thead><tr><th>তারিখ</th><th style="text-align:center">আইডি</th><th style="text-align:center">পণ্য</th><th style="text-align:center">একক</th><th>মোট</th></tr></thead><tbody>${[...supplierPurchases].reverse().map(p=>`<tr><td>${new Date(p.date).toLocaleDateString('bn-BD')}</td><td style="text-align:center">${p.id}</td><td style="text-align:center">${p.totalItems}টি</td><td style="text-align:center">${p.totalStock}</td><td>৳${tot(p.items).toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="1" style="text-align:right">মোট:</td><td style="text-align:left">পারচেজ: ${supplierPurchases.length}টি</td><td style="text-align:center">পণ্য: ${totalItems}টি</td><td style="text-align:center">একক: ${totalStock}টি</td><td>৳${grandTotal.toLocaleString('en-US',{minimumFractionDigits:2})}</td></tr></tfoot></table><p style="margin-top:20px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
         </div>
         <div style={{flex:1,overflow:'auto',padding:12}}>
           {supplierPurchases.length === 0 ? (
@@ -4303,9 +4303,9 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                 <div key={p.id} style={{padding:14,background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`}}>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}}>
                     <div style={{fontWeight:700,color:T.teal}}>{p.id}</div>
-                    <div style={{fontSize:12,color:T.gray500}}>{new Date(p.date).toLocaleDateString('bn-BD')}</div>
+                    <div style={{fontSize:14,color:T.gray500}}>{new Date(p.date).toLocaleDateString('bn-BD')}</div>
                   </div>
-                  <div style={{display:'flex',gap:16,fontSize:13}}>
+                  <div style={{display:'flex',gap:16,fontSize:15}}>
                     <span>📦 {p.totalItems}টি পণ্য</span>
                     <span>📋 {p.totalStock} একক</span>
                   </div>
@@ -4331,7 +4331,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
           <button style={btn()} onClick={()=>setViewSupplier(null)}>← ফিরে যান</button>
           <div style={{display:'flex',flexDirection:'column'}}>
             <span style={{fontWeight:700,fontSize:18,color:T.teal}}>🏢 {viewSupplier.name}</span>
-            <span style={{fontSize:12,color:T.gray500,marginTop:4}}>
+            <span style={{fontSize:14,color:T.gray500,marginTop:4}}>
               {viewSupplier.phone && `📞 ${viewSupplier.phone}`}
               {viewSupplier.phone && viewSupplier.crNumber && ' | '}
               {viewSupplier.crNumber && `CR: ${viewSupplier.crNumber}`}
@@ -4339,7 +4339,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
               {viewSupplier.vatNumber && `VAT: ${viewSupplier.vatNumber}`}
             </span>
             {viewSupplier.address && (
-              <span style={{fontSize:12,color:T.gray400,marginTop:4}}>📍 {viewSupplier.address}</span>
+              <span style={{fontSize:14,color:T.gray400,marginTop:4}}>📍 {viewSupplier.address}</span>
             )}
           </div>
           <div style={{marginLeft:'auto',display:'flex',gap:8}}>
@@ -4360,19 +4360,19 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
           <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:16}}>
             <div style={{...card,padding:20,textAlign:'center'}}>
               <div style={{fontSize:32,fontWeight:800,color:T.teal}}>{supProducts.length}</div>
-              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>পণ্য</div>
+              <div style={{fontSize:14,color:T.gray400,marginTop:4}}>পণ্য</div>
             </div>
             <div style={{...card,padding:20,textAlign:'center'}}>
               <div style={{fontSize:32,fontWeight:800,color:T.green}}>{supPurchases.length}</div>
-              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>পারচেজ</div>
+              <div style={{fontSize:14,color:T.gray400,marginTop:4}}>পারচেজ</div>
             </div>
             <div style={{...card,padding:20,textAlign:'center'}}>
               <div style={{fontSize:32,fontWeight:800,color:T.orange}}>{supPurchases.reduce((s,p)=>s+p.totalStock,0)}</div>
-              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>একক</div>
+              <div style={{fontSize:14,color:T.gray400,marginTop:4}}>একক</div>
             </div>
             <div style={{...card,padding:20,textAlign:'center'}}>
               <div style={{fontSize:32,fontWeight:800,color:T.teal}}>{fmt(totalPurchase)}</div>
-              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>মোট (VAT)</div>
+              <div style={{fontSize:14,color:T.gray400,marginTop:4}}>মোট (VAT)</div>
             </div>
           </div>
 
@@ -4380,7 +4380,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
           <div style={{...card,padding:0}}>
             <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <span style={{fontWeight:700,fontSize:14}}>📦 পণ্য</span>
-              <span style={{fontSize:12,color:T.gray400}}>{supProducts.length}টি</span>
+              <span style={{fontSize:14,color:T.gray400}}>{supProducts.length}টি</span>
             </div>
             {supProducts.length === 0 ? (
               <div style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পণ্য নেই</div>
@@ -4391,9 +4391,9 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                     <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA'}}>
                       <td style={{padding:'12px 16px'}}>
                         <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
-                        <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{p.barcode}</div>
+                        <div style={{fontSize:14,color:T.gray400,marginTop:2}}>{p.barcode}</div>
                       </td>
-                      <td style={{padding:'12px 16px',textAlign:'center',color:T.gray600,fontSize:13}}>{p.stock} {p.unit}</td>
+                      <td style={{padding:'12px 16px',textAlign:'center',color:T.gray600,fontSize:15}}>{p.stock} {p.unit}</td>
                       <td style={{padding:'12px 16px',textAlign:'right',fontWeight:600,color:T.gray600}}>{fmt(p.buyP)}</td>
                       <td style={{padding:'12px 16px',textAlign:'right',fontWeight:700,color:T.teal,fontSize:14}}>{fmt(p.sellP)}</td>
                     </tr>
@@ -4420,7 +4420,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
           <div style={{display:'flex',flexDirection:'column'}}>
             <span style={{fontWeight:700,fontSize:18,color:T.teal}}>📂 {viewCategory.name}</span>
             {viewCategory.company && (
-              <span style={{fontSize:12,color:T.gray500,marginTop:4}}>🏢 {viewCategory.company}</span>
+              <span style={{fontSize:14,color:T.gray500,marginTop:4}}>🏢 {viewCategory.company}</span>
             )}
           </div>
           <div style={{marginLeft:'auto',display:'flex',gap:8}}>
@@ -4444,15 +4444,15 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
           <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12,marginBottom:16}}>
             <div style={{...card,padding:20,textAlign:'center'}}>
               <div style={{fontSize:32,fontWeight:800,color:T.teal}}>{catProducts.length}</div>
-              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>পণ্য</div>
+              <div style={{fontSize:14,color:T.gray400,marginTop:4}}>পণ্য</div>
             </div>
             <div style={{...card,padding:20,textAlign:'center'}}>
               <div style={{fontSize:32,fontWeight:800,color:T.orange}}>{catProducts.reduce((s,p)=>s+p.stock,0)}</div>
-              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>স্টক</div>
+              <div style={{fontSize:14,color:T.gray400,marginTop:4}}>স্টক</div>
             </div>
             <div style={{...card,padding:20,textAlign:'center'}}>
               <div style={{fontSize:32,fontWeight:800,color:T.green}}>{fmt(totalValue)}</div>
-              <div style={{fontSize:12,color:T.gray400,marginTop:4}}>মূল্য</div>
+              <div style={{fontSize:14,color:T.gray400,marginTop:4}}>মূল্য</div>
             </div>
           </div>
 
@@ -4460,7 +4460,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
           <div style={{...card,padding:0}}>
             <div style={{padding:'14px 16px',borderBottom:`1px solid ${T.gray100}`,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <span style={{fontWeight:700,fontSize:14}}>📦 পণ্য</span>
-              <span style={{fontSize:12,color:T.gray400}}>{catProducts.length}টি</span>
+              <span style={{fontSize:14,color:T.gray400}}>{catProducts.length}টি</span>
             </div>
             {catProducts.length === 0 ? (
               <div style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো পণ্য নেই</div>
@@ -4471,9 +4471,9 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                     <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA'}}>
                       <td style={{padding:'12px 16px'}}>
                         <div style={{fontWeight:600,fontSize:14}}>{p.name}</div>
-                        <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{p.barcode}</div>
+                        <div style={{fontSize:14,color:T.gray400,marginTop:2}}>{p.barcode}</div>
                       </td>
-                      <td style={{padding:'12px 16px',textAlign:'center',color:T.gray600,fontSize:13}}>{p.stock} {p.unit}</td>
+                      <td style={{padding:'12px 16px',textAlign:'center',color:T.gray600,fontSize:15}}>{p.stock} {p.unit}</td>
                       <td style={{padding:'12px 16px',textAlign:'right',fontWeight:600,color:T.gray600}}>{fmt(p.buyP)}</td>
                       <td style={{padding:'12px 16px',textAlign:'right',fontWeight:700,color:T.teal,fontSize:14}}>{fmt(p.sellP)}</td>
                     </tr>
@@ -4501,7 +4501,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
           color:activeTab==='companies'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           🏢 সরবরাহকারী ({allSuppliers.length})
         </button>
@@ -4514,7 +4514,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
           color:activeTab==='categories'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           📂 ক্যাটাগরি ({categories.length})
         </button>
@@ -4524,7 +4524,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
             <span style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',color:T.gray400}}>🔍</span>
             <input value={search} onChange={e=>setSearch(e.target.value)} 
               placeholder={activeTab==='companies'?'সরবরাহকারী খুঁজুন...':'ক্যাটাগরি খুঁজুন...'}
-              style={{...input,paddingLeft:32,padding:'6px 12px',fontSize:12}}/>
+              style={{...input,paddingLeft:32,padding:'6px 12px',fontSize:14}}/>
           </div>
         </div>
       </div>
@@ -4541,21 +4541,21 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                 <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
                 <input type="file" accept=".csv" onChange={handleCategoriesCsvImport} id="categoriesCsvInput" style={{display:'none'}} />
                 <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12,justifyContent:'center'}}>
-                  <label htmlFor="categoriesCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:12,padding:'8px 16px'}}>
+                  <label htmlFor="categoriesCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:14,padding:'8px 16px'}}>
                     📁 CSV ফাইল
                   </label>
-                  <button onClick={downloadCategoriesCSV} style={{...btn(),fontSize:12,padding:'8px 16px'}}>
+                  <button onClick={downloadCategoriesCSV} style={{...btn(),fontSize:14,padding:'8px 16px'}}>
                     📥 ডেমো
                   </button>
                 </div>
-                <div style={{fontSize:11,color:T.gray500}}>
+                <div style={{fontSize:14,color:T.gray500}}>
                   ক্যাটাগরি ডুপ্লিকেট হবে না
                 </div>
               </div>
               
               {/* Right: Add New Category - Larger */}
               <div style={{...card,padding:16}}>
-                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal,textAlign:'center'}}>➕ নতুন ক্যাটাগরি</h3>
+                <h3 style={{margin:'0 0 10px',fontSize:15,color:T.teal,textAlign:'center'}}>➕ নতুন ক্যাটাগরি</h3>
                 <div style={{display:'grid',gridTemplateColumns:'3fr 1fr',gap:8}}>
                   <input 
                     type="text" 
@@ -4563,11 +4563,11 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                     value={catForm.name} 
                     onChange={e=>setCatForm({name:e.target.value})}
                     onKeyDown={e=>e.key==='Enter'&&saveCategory()}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    style={{...input,padding:'8px 10px',fontSize:14}}
                   />
                   <button 
                     onClick={saveCategory}
-                    style={{...btn('primary'),padding:'8px 10px',fontSize:12,height:'38px',display:'flex',alignItems:'center',justifyContent:'center'}}
+                    style={{...btn('primary'),padding:'8px 10px',fontSize:14,height:'38px',display:'flex',alignItems:'center',justifyContent:'center'}}
                   >
                     ✅ যুক্ত করুন
                   </button>
@@ -4577,15 +4577,15 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
 
             {/* Middle: Stats + Print */}
             <div style={{...card,marginBottom:12,padding:12,display:'flex',justifyContent:'space-between',alignItems:'center',background:T.white,borderRadius:10}}>
-              <span style={{fontSize:13,color:T.gray600}}>মোট: {categories.filter(c => !search || (c.name||'').toLowerCase().includes(search.toLowerCase())).length}টি ক্যাটাগরি</span>
-              <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>ক্যাটাগরি লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4;margin:15mm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px 12px}th{background:#e0f7f0;font-weight:700;color:#00897b}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:20px}.center{text-align:center}tr:nth-child(even){background:#f9f9f9}.total{background:#e0f7f0;font-weight:700}.total td{text-align:center}</style></head><body><div class="header"><h1>📂 ক্যাটাগরি লিস্ট</h1></div><table><thead><tr><th class="center" style="width:15%">ক্রম</th><th style="width:55%">ক্যাটাগরির নাম</th><th class="center" style="width:30%">পণ্য সংখ্যা</th></tr></thead><tbody>${categories.map((c,i)=>`<tr><td class="center">${i+1}</td><td>${c.name}</td><td class="center">${products.filter(p=>p.cat===c.name).length}টি</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="3">মোট ক্যাটাগরি: ${categories.length}টি | পণ্য: ${products.filter(p=>p.cat&&p.name).length}টি</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
+              <span style={{fontSize:15,color:T.gray600}}>মোট: {categories.filter(c => !search || (c.name||'').toLowerCase().includes(search.toLowerCase())).length}টি ক্যাটাগরি</span>
+              <button style={{...btn('primary'),padding:'6px 12px',fontSize:14}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>ক্যাটাগরি লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4;margin:15mm}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:10px 12px}th{background:#e0f7f0;font-weight:700;color:#00897b}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:20px}.center{text-align:center}tr:nth-child(even){background:#f9f9f9}.total{background:#e0f7f0;font-weight:700}.total td{text-align:center}</style></head><body><div class="header"><h1>📂 ক্যাটাগরি লিস্ট</h1></div><table><thead><tr><th class="center" style="width:15%">ক্রম</th><th style="width:55%">ক্যাটাগরির নাম</th><th class="center" style="width:30%">পণ্য সংখ্যা</th></tr></thead><tbody>${categories.map((c,i)=>`<tr><td class="center">${i+1}</td><td>${c.name}</td><td class="center">${products.filter(p=>p.cat===c.name).length}টি</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="3">মোট ক্যাটাগরি: ${categories.length}টি | পণ্য: ${products.filter(p=>p.cat&&p.name).length}টি</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
             </div>
             <div style={{...card,marginBottom:16,display:'flex',flexDirection:'column',maxHeight:'calc(100vh - 320px)'}}>
               <table style={{width:'100%',borderCollapse:'collapse',background:T.white,tableLayout:'fixed'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
                     {['ক্রম','ক্যাটাগরির নাম','পণ্য সংখ্যা','একশন'].map((h,i)=>(
-                      <th key={i} style={{padding:'10px 12px',textAlign:i===3?'center':'left',fontSize:11,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                      <th key={i} style={{padding:'10px 12px',textAlign:i===3?'center':'left',fontSize:14,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -4597,9 +4597,9 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                       <tr><td colSpan={4} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো ক্যাটাগরি পাওয়া যায়নি</td></tr>
                     ) : categories.filter(c => !search || (c.name||'').toLowerCase().includes(search.toLowerCase())).map((cat,i)=>(
                       <tr key={cat.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{i+1}</td>
+                        <td style={{padding:'10px 12px',fontSize:14,color:T.teal,fontWeight:600}}>{i+1}</td>
                         <td style={{padding:'10px 12px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat.name}</td>
-                        <td style={{padding:'10px 12px',fontSize:12,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
+                        <td style={{padding:'10px 12px',fontSize:14,color:T.teal,fontWeight:600}}>{products.filter(p=>p.cat===cat.name).length}</td>
                         <td style={{padding:'10px 12px',display:'flex',gap:6,justifyContent:'center'}}>
                           <button onClick={()=>setViewCategory(cat)} style={{...btn('ghost','sm'),padding:'5px 8px',fontSize:14}}>👁️</button>
                           {products.filter(p=>p.cat===cat.name).length === 0 ? (
@@ -4634,18 +4634,18 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                 <h3 style={{margin:'0 0 12px',fontSize:14,color:T.teal}}>📥 সিএসবি ইম্পোর্ট</h3>
                 <input type="file" accept=".csv" onChange={handleSuppliersCsvImport} id="suppliersCsvInput" style={{display:'none'}} />
                 <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:12,justifyContent:'center'}}>
-                  <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:12,padding:'8px 16px'}}>
+                  <label htmlFor="suppliersCsvInput" style={{...btn('primary'),cursor:'pointer',fontSize:14,padding:'8px 16px'}}>
                     📁 CSV ফাইল
                   </label>
-                  <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:12,padding:'8px 16px'}}>
+                  <button onClick={downloadSuppliersCSV} style={{...btn(),fontSize:14,padding:'8px 16px'}}>
                     📥 ডেমো
                   </button>
                 </div>
-                <div style={{fontSize:11,color:T.gray500}}>
+                <div style={{fontSize:14,color:T.gray500}}>
                   কোম্পানি/ক্যাটাগরি ডুপ্লিকেট হবে না
                 </div>
                 {csvImportResult && (
-                  <div style={{marginTop:10,padding:8,background:T.tealLight,borderRadius:6,fontSize:11}}>
+                  <div style={{marginTop:10,padding:8,background:T.tealLight,borderRadius:6,fontSize:14}}>
                     ✅ আমদানি সফল
                   </div>
                 )}
@@ -4653,49 +4653,49 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
               
               {/* Right: Add New Supplier - Larger */}
               <div style={{...card,padding:16}}>
-                <h3 style={{margin:'0 0 10px',fontSize:13,color:T.teal,textAlign:'center'}}>➕ নতুন সরবরাহকারী</h3>
+                <h3 style={{margin:'0 0 10px',fontSize:15,color:T.teal,textAlign:'center'}}>➕ নতুন সরবরাহকারী</h3>
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr 1fr',gap:8}}>
                   <input 
                     type="text" 
                     placeholder="🔢 আইডি (খালি=অটো)" 
                     value={newSupplier.code || ''} 
                     onChange={e=>setNewSupplier({...newSupplier,code:e.target.value})}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    style={{...input,padding:'8px 10px',fontSize:14}}
                   />
                   <input 
                     type="text" 
                     placeholder="🏢 নাম *" 
                     value={newSupplier.name} 
                     onChange={e=>setNewSupplier({...newSupplier,name:e.target.value})}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    style={{...input,padding:'8px 10px',fontSize:14}}
                   />
                   <input 
                     type="text" 
                     placeholder="📱 ফোন" 
                     value={newSupplier.phone} 
                     onChange={e=>setNewSupplier({...newSupplier,phone:e.target.value})}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    style={{...input,padding:'8px 10px',fontSize:14}}
                   />
                   <input 
                     type="text" 
                     placeholder="📧 ইমেইল" 
                     value={newSupplier.email} 
                     onChange={e=>setNewSupplier({...newSupplier,email:e.target.value})}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    style={{...input,padding:'8px 10px',fontSize:14}}
                   />
                   <input 
                     type="text" 
                     placeholder="🧾 CR নম্বর" 
                     value={newSupplier.crNumber || ''} 
                     onChange={e=>setNewSupplier({...newSupplier,crNumber:e.target.value})}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    style={{...input,padding:'8px 10px',fontSize:14}}
                   />
                   <input 
                     type="text" 
                     placeholder="🧾 VAT নম্বর" 
                     value={newSupplier.vatNumber || ''} 
                     onChange={e=>setNewSupplier({...newSupplier,vatNumber:e.target.value})}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    style={{...input,padding:'8px 10px',fontSize:14}}
                     maxLength={15}
                   />
                   <input 
@@ -4703,11 +4703,11 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                     placeholder="📍 ঠিকানা" 
                     value={newSupplier.address} 
                     onChange={e=>setNewSupplier({...newSupplier,address:e.target.value})}
-                    style={{...input,padding:'8px 10px',fontSize:12}}
+                    style={{...input,padding:'8px 10px',fontSize:14}}
                   />
                   <button 
                     onClick={handleAddSupplier}
-                    style={{...btn('primary'),padding:'8px 10px',fontSize:12,height:'38px',display:'flex',alignItems:'center',justifyContent:'center'}}
+                    style={{...btn('primary'),padding:'8px 10px',fontSize:14,height:'38px',display:'flex',alignItems:'center',justifyContent:'center'}}
                   >
                     ✅ যুক্ত করুন
                   </button>
@@ -4717,8 +4717,8 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
 
             {/* Middle: Stats + Print */}
             <div style={{...card,marginBottom:12,padding:12,display:'flex',justifyContent:'space-between',alignItems:'center',background:T.white,borderRadius:10}}>
-              <span style={{fontSize:13,color:T.gray600}}>🏢 মোট: {filtered.length}টি সরবরাহকারী</span>
-              <button style={{...btn('primary'),padding:'6px 12px',fontSize:12}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>সরবরাহকারী লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4 landscape;margin:12.7mm}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:22px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#e0f7f0;font-weight:700;color:#00897b}.total{background:#e0f7f0;font-weight:700}</style></head><body><div class="header"><h1>🏢 সরবরাহকারী লিস্ট</h1></div><table><thead><tr><th style="width:5%">ক্রম</th><th style="width:25%">সরবরাহকারীর নাম</th><th style="width:25%">ঠিকানা</th><th style="width:12%">ফোন</th><th style="width:12%">CR নম্বর</th><th style="width:14%">VAT নম্বর</th><th style="width:7%">পণ্য</th></tr></thead><tbody>${filtered.map((s,i)=>`<tr><td style="width:5%">${i+1}</td><td style="width:25%">${s.name}</td><td style="width:25%">${s.address||'-'}</td><td style="width:12%">${s.phone||'-'}</td><td style="width:12%">${s.crNumber||'-'}</td><td style="width:14%">${s.vatNumber||'-'}</td><td style="width:7%;text-align:center">${getProductsCount(s.name)}</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="6">মোট সরবরাহকারী: ${filtered.length}টি</td><td>পণ্য: ${filtered.reduce((s,sup)=>s+getProductsCount(sup.name),0)}টি</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
+              <span style={{fontSize:15,color:T.gray600}}>🏢 মোট: {filtered.length}টি সরবরাহকারী</span>
+              <button style={{...btn('primary'),padding:'6px 12px',fontSize:14}} onClick={()=>{const html=`<!DOCTYPE html><html><head><link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap" rel="stylesheet"><title>সরবরাহকারী লিস্ট</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla',Arial,sans-serif;padding:20px;font-size:12px}@page{size:A4 landscape;margin:12.7mm}.header{text-align:center;border-bottom:2px solid #00897b;padding-bottom:12px;margin-bottom:20px}.header h1{color:#00897b;font-size:22px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#e0f7f0;font-weight:700;color:#00897b}.total{background:#e0f7f0;font-weight:700}</style></head><body><div class="header"><h1>🏢 সরবরাহকারী লিস্ট</h1></div><table><thead><tr><th style="width:5%">ক্রম</th><th style="width:25%">সরবরাহকারীর নাম</th><th style="width:25%">ঠিকানা</th><th style="width:12%">ফোন</th><th style="width:12%">CR নম্বর</th><th style="width:14%">VAT নম্বর</th><th style="width:7%">পণ্য</th></tr></thead><tbody>${filtered.map((s,i)=>`<tr><td style="width:5%">${i+1}</td><td style="width:25%">${s.name}</td><td style="width:25%">${s.address||'-'}</td><td style="width:12%">${s.phone||'-'}</td><td style="width:12%">${s.crNumber||'-'}</td><td style="width:14%">${s.vatNumber||'-'}</td><td style="width:7%;text-align:center">${getProductsCount(s.name)}</td></tr>`).join('')}</tbody><tfoot><tr class="total"><td colspan="6">মোট সরবরাহকারী: ${filtered.length}টি</td><td>পণ্য: ${filtered.reduce((s,sup)=>s+getProductsCount(sup.name),0)}টি</td></tr></tfoot></table><p style="margin-top:20px;text-align:center;color:#999;font-size:11px">প্রিন্ট তারিখ: ${new Date().toLocaleString('bn-BD')}</p></body></html>`;const w=window.open('','_blank');w.document.write(html);w.document.close();w.onload=()=>setTimeout(()=>w.print(),100);}}>🖨️ প্রিন্ট</button>
             </div>
 
             {/* Bottom: Suppliers List Table */}
@@ -4727,7 +4727,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                 <thead>
                   <tr style={{background:T.tealLight}}>
                     {['ক্রম','সরবরাহকারীর নাম','ঠিকানা','CR নম্বর','VAT নম্বর','পণ্য','একশন'].map((h,i)=>(
-                      <th key={i} style={{padding:'10px 8px',textAlign:i===6?'center':'left',fontSize:10,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
+                      <th key={i} style={{padding:'10px 8px',textAlign:i===6?'center':'left',fontSize:14,fontWeight:700,color:T.teal,letterSpacing:'0.3px',whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -4739,14 +4739,14 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                       <tr><td colSpan={7} style={{padding:40,textAlign:'center',color:T.gray400}}>কোনো সরবরাহকারী পাওয়া যায়নি</td></tr>
                     ) : filtered.map((s,i)=>(
                       <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{i+1}</td>
-                        <td style={{padding:'10px 8px',fontWeight:600,fontSize:12,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.name}</td>
-                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.address||'-'}</td>
-                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.crNumber||'-'}</td>
-                        <td style={{padding:'10px 8px',fontSize:10,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.vatNumber||'-'}</td>
-                        <td style={{padding:'10px 8px',fontSize:11,fontWeight:600,color:T.teal}}>{getProductsCount(s.name)}</td>
+                        <td style={{padding:'10px 8px',fontSize:14,fontWeight:600,color:T.teal}}>{i+1}</td>
+                        <td style={{padding:'10px 8px',fontWeight:600,fontSize:14,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.name}</td>
+                        <td style={{padding:'10px 8px',fontSize:14,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.address||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:14,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.crNumber||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:14,color:T.gray600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.vatNumber||'-'}</td>
+                        <td style={{padding:'10px 8px',fontSize:14,fontWeight:600,color:T.teal}}>{getProductsCount(s.name)}</td>
                         <td style={{padding:'10px 8px',whiteSpace:'nowrap',textAlign:'center'}}>
-                          <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:11,padding:'4px 8px'}}>👁️</button>
+                          <button onClick={()=>setViewSupplier(s)} style={{...btn(),fontSize:14,padding:'4px 8px'}}>👁️</button>
                           {!s.isAuto && (
                             <>
                               <button onClick={e=>{e.stopPropagation();setForm({...s});setModal({mode:'edit',id:s.id});}} style={{...btn('primary'),padding:'4px 6px'}}>✏️</button>
@@ -4776,12 +4776,12 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                   <input value={form.name||''} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="সরবরাহকারীর নাম" style={input} autoFocus />
                 </div>
                 <div style={{marginBottom:12}}>
-                  <label style={label}>🏢 CR নম্বর <span style={{fontSize:10,color:T.gray500}}>(কমার্শিয়াল রেজিস্ট্রেশন)</span></label>
+                  <label style={label}>🏢 CR নম্বর <span style={{fontSize:14,color:T.gray500}}>(কমার্শিয়াল রেজিস্ট্রেশন)</span></label>
                   <input value={form.crNumber||''} onChange={e=>setForm(f=>({...f,crNumber:e.target.value}))} placeholder="CR নম্বর" style={input} />
                 </div>
                 {modal.mode === 'add' && (
                   <div style={{marginBottom:12}}>
-                    <label style={label}>🔢 কোম্পানি আইডি <span style={{fontSize:11,color:T.gray500}}>(খালি রাখলে অটো হবে)</span></label>
+                    <label style={label}>🔢 কোম্পানি আইডি <span style={{fontSize:14,color:T.gray500}}>(খালি রাখলে অটো হবে)</span></label>
                     <input value={form.code||''} onChange={e=>setForm(f=>({...f,code:e.target.value}))} placeholder={`যেমন: C-${String(suppliers.length + 1).padStart(5, '0')}`} style={input} />
                   </div>
                 )}
@@ -4790,7 +4790,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                   <input value={form.phone||''} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} placeholder="মোবাইল নম্বর" style={input} />
                 </div>
                 <div style={{marginBottom:12}}>
-                  <label style={label}>🧾 সরবরাহকারীর VAT নম্বর (১৫ ডিজিট) <span style={{fontSize:10,color:T.gray500}}>ZATCA ক্রেডিটের জন্য জরুরি</span></label>
+                  <label style={label}>🧾 সরবরাহকারীর VAT নম্বর (১৫ ডিজিট) <span style={{fontSize:14,color:T.gray500}}>ZATCA ক্রেডিটের জন্য জরুরি</span></label>
                   <input value={form.vatNumber||''} onChange={e=>setForm(f=>({...f,vatNumber:e.target.value}))} placeholder="১৫ ডিজিটের VAT নম্বর" style={input} maxLength={15} />
                 </div>
                 <div style={{marginBottom:16}}>
@@ -4802,7 +4802,7 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
                   <button onClick={saveCompany} style={{...btn('primary'),flex:1}} disabled={!form.name?.trim()}>💾 সংরক্ষণ করুন</button>
                 </div>
                 {modal.mode === 'add' && (
-                  <div style={{marginTop:12,fontSize:11,color:T.gray500,textAlign:'center'}}>
+                  <div style={{marginTop:12,fontSize:14,color:T.gray500,textAlign:'center'}}>
                     💡 সংরক্ষণের পর আবার নতুন সরবরাহকারী যোগ করতে পারবেন
                   </div>
                 )}
@@ -4846,7 +4846,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
   const input = {
     width:'100%',padding:'10px 12px',
     border:`1.5px solid ${T.gray200}`,
-    borderRadius:8,fontSize:13,outline:'none',boxSizing:'border-box',
+    borderRadius:8,fontSize:15,outline:'none',boxSizing:'border-box',
     background:T.gray50,
     transition:'all 0.2s ease',
     color:T.gray800
@@ -4856,7 +4856,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
     background:T.white,
     boxShadow:'0 0 0 3px rgba(0,150,136,0.1)'
   };
-  const label = {display:'block',marginBottom:6,fontWeight:600,fontSize:13,color:T.gray600};
+  const label = {display:'block',marginBottom:6,fontWeight:600,fontSize:15,color:T.gray600};
   const btn = (type='ghost',size='md') => {
     const base = {border:'none',borderRadius:8,cursor:'pointer',fontWeight:600,fontSize:size==='sm'?11:13,transition:'all 0.2s'};
     const colors = {
@@ -5112,7 +5112,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
     <div style={{height:'100%',display:'flex',flexDirection:'column',overflow:'hidden',background:T.gray50}}>
       <div style={{padding:'10px 12px',display:'flex',gap:8,alignItems:'center',background:T.white,borderBottom:`1px solid ${T.gray200}`,flexWrap:'wrap'}}>
         <span style={{fontWeight:700,fontSize:15}}>📦 নতুন পণ্য সংরক্ষণ</span>
-        <span style={{fontSize:12,color:T.gray500,marginLeft:'auto'}}>{purchaseItems.length}টি পণ্য যোগ হয়েছে</span>
+        <span style={{fontSize:14,color:T.gray500,marginLeft:'auto'}}>{purchaseItems.length}টি পণ্য যোগ হয়েছে</span>
         {purchaseItems.length > 0 && (
           <button onClick={savePurchase} style={{...btn('primary'),padding:'8px 16px'}}>💾 সব সংরক্ষণ করুন</button>
         )}
@@ -5132,7 +5132,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
               <span>📥</span> ডেমো CSV
             </button>
             {csvData.length > 0 && (
-              <span style={{fontSize:12,color:T.teal,fontWeight:600,background:T.tealLight,padding:'6px 12px',borderRadius:20}}>
+              <span style={{fontSize:14,color:T.teal,fontWeight:600,background:T.tealLight,padding:'6px 12px',borderRadius:20}}>
                 ✓ {csvData.length}টি পণ্য যোগ হয়েছে
               </span>
             )}
@@ -5152,16 +5152,16 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
                     onChange={e=>{setSupplierQ(e.target.value);setForm(f=>({...f,company:e.target.value}));setShowCompanyList(true);}}
                     onFocus={()=>setShowCompanyList(true)}
                     placeholder="সরবরাহকারীর নাম..."
-                    style={{...input,flex:1,fontSize:13}} 
+                    style={{...input,flex:1,fontSize:15}} 
                     onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                     onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
-                  <button type="button" onClick={()=>setShowCompanyList(!showCompanyList)} style={{...btn('ghost'),padding:'4px 8px',fontSize:11}}>▼</button>
+                  <button type="button" onClick={()=>setShowCompanyList(!showCompanyList)} style={{...btn('ghost'),padding:'4px 8px',fontSize:14}}>▼</button>
                 </div>
                 {showCompanyList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:180,overflow:'auto',marginTop:2}}>
                     {filteredCompanies.map((c,i)=>(
                       <div key={i} onClick={()=>{const sup=suppliers.find(s=>(s.name||'').toLowerCase().trim()===c.toLowerCase());setSupplierQ(c);setForm(f=>({...f,company:c,supplierCrNumber:sup?.crNumber||'',supplierVatNumber:sup?.vatNumber||'',supplierAddress:sup?.address||''}));setShowCompanyList(false);}}
-                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:12}}>{c}</div>
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:14}}>{c}</div>
                     ))}
                   </div>
                 )}
@@ -5204,16 +5204,16 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
                     onChange={e=>{setForm(f=>({...f,cat:e.target.value}));setShowCategoryList(true);}}
                     onFocus={()=>setShowCategoryList(true)}
                     placeholder="ক্যাটাগরি..."
-                    style={{...input,flex:1,fontSize:13}} 
+                    style={{...input,flex:1,fontSize:15}} 
                     onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                     onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
-                  <button type="button" onClick={()=>setShowCategoryList(!showCategoryList)} style={{...btn('ghost'),padding:'4px 8px',fontSize:11}}>▼</button>
+                  <button type="button" onClick={()=>setShowCategoryList(!showCategoryList)} style={{...btn('ghost'),padding:'4px 8px',fontSize:14}}>▼</button>
                 </div>
                 {showCategoryList && (
                   <div style={{position:'absolute',left:0,right:0,top:'100%',background:T.white,border:`1px solid ${T.gray200}`,borderRadius:8,boxShadow:'0 4px 12px rgba(0,0,0,0.1)',zIndex:50,maxHeight:180,overflow:'auto',marginTop:2}}>
                     {filteredCategories.map((c,i)=>(
                       <div key={i} onClick={()=>{setForm(f=>({...f,cat:c}));setShowCategoryList(false);}}
-                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:12}}>{c}</div>
+                        style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:14}}>{c}</div>
                     ))}
                   </div>
                 )}
@@ -5226,7 +5226,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
               <div>
                 <label style={label}>📦 পণ্যের নাম *</label>
                 <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="পণ্যের নাম..." 
-                  style={{...input,fontSize:13}} 
+                  style={{...input,fontSize:15}} 
                   onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                   onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})} />
               </div>
@@ -5243,7 +5243,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
                     setForm(f=>({...f,name:'',barcode:'',company:'',cat:'',unit:'পিস',buyP:'',sellP:'',stock:'',minStock:'5',supplierCrNumber:'',supplierVatNumber:'',supplierAddress:''}));
                   }
                 }} placeholder="বারকোড লিখে Enter চাপুন..." 
-                  style={{...input,fontSize:13}} 
+                  style={{...input,fontSize:15}} 
                   onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                   onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})}
                   onKeyDown={e => {
@@ -5280,7 +5280,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
             <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:16}}>
               <div>
                 <label style={label}>📥 একক</label>
-                <select value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} style={{...input,appearance:'none',cursor:'pointer',backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 8px center',paddingRight:28,fontSize:12}}
+                <select value={form.unit} onChange={e=>setForm(f=>({...f,unit:e.target.value}))} style={{...input,appearance:'none',cursor:'pointer',backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,backgroundRepeat:'no-repeat',backgroundPosition:'right 8px center',paddingRight:28,fontSize:14}}
                   onFocus={(e) => Object.assign(e.target.style, inputFocus)}
                   onBlur={(e) => Object.assign(e.target.style, {borderColor: T.gray200, background: T.gray50})}>
                   <option value="পিস">পিস</option>
@@ -5324,7 +5324,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
               </div>
               <div>
                 <label style={label}>📊 লাভ</label>
-                <div style={{padding:'7px 10px',background:T.greenLight,borderRadius:6,fontWeight:700,color:T.green,fontSize:13,border:`1px solid ${T.gray200}`}}>
+                <div style={{padding:'7px 10px',background:T.greenLight,borderRadius:6,fontWeight:700,color:T.green,fontSize:15,border:`1px solid ${T.gray200}`}}>
                   {form.buyP > 0 && form.sellP > 0 ? (
                     <>{(((+form.sellP) - (+form.buyP)).toFixed(0))} ({(((+form.sellP - +form.buyP) / +form.buyP) * 100).toFixed(0)}%)</>
                   ) : (
@@ -5345,7 +5345,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
               </div>
               <div>
                 <label style={label}>💰 VAT পরিমাণ</label>
-                <div style={{padding:'7px 10px',background:T.orangeLight,borderRadius:6,fontWeight:700,color:T.orange,fontSize:13,border:`1px solid ${T.gray200}`}}>
+                <div style={{padding:'7px 10px',background:T.orangeLight,borderRadius:6,fontWeight:700,color:T.orange,fontSize:15,border:`1px solid ${T.gray200}`}}>
                   {form.sellP > 0 ? (
                     <>{((+form.sellP * 0.15).toFixed(2))}</>
                   ) : (
@@ -5355,7 +5355,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
               </div>
               <div>
                 <label style={label}>💵 মোট বিক্রয়মূল্য</label>
-                <div style={{padding:'7px 10px',background:T.tealLight,borderRadius:6,fontWeight:700,color:T.teal,fontSize:13,border:`1px solid ${T.gray200}`}}>
+                <div style={{padding:'7px 10px',background:T.tealLight,borderRadius:6,fontWeight:700,color:T.teal,fontSize:15,border:`1px solid ${T.gray200}`}}>
                   {form.sellP > 0 ? (
                     <>{((+form.sellP * 1.15).toFixed(2))}</>
                   ) : (
@@ -5379,22 +5379,22 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
           {purchaseItems.length === 0 ? (
             <div style={{textAlign:'center',padding:40,color:T.gray400,background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`}}>
               কোনো পণ্য যোগ হয়নি<br/>
-              <span style={{fontSize:12}}>উপরের ফর্ম পূরণ করে পণ্য যোগ করুন</span>
+              <span style={{fontSize:14}}>উপরের ফর্ম পূরণ করে পণ্য যোগ করুন</span>
             </div>
           ) : (
             purchaseItems.map((item,i) => (
               <div key={item.id} style={{...card,padding:10,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                 <div style={{flex:1}}>
                   <div style={{fontWeight:600,fontSize:14,marginBottom:4}}>{item.name}</div>
-                  <div style={{fontSize:12,color:T.gray500}}>
+                  <div style={{fontSize:14,color:T.gray500}}>
                     🏢 {item.company} • 📂 {item.cat || '-'}
                   </div>
-                  <div style={{fontSize:12,color:T.gray500,display:'flex',gap:8,marginTop:4}}>
+                  <div style={{fontSize:14,color:T.gray500,display:'flex',gap:8,marginTop:4}}>
                     <span>📦 {item.stock} {item.unit}</span>
                     <span>💰 {fmt(item.buyP)}</span>
                     <span>💵 {fmt(item.sellP)}</span>
                   </div>
-                  {item.barcode && <div style={{fontSize:11,color:T.gray400,fontFamily:'monospace',marginTop:2}}>🔢 {item.barcode}</div>}
+                  {item.barcode && <div style={{fontSize:14,color:T.gray400,fontFamily:'monospace',marginTop:2}}>🔢 {item.barcode}</div>}
                 </div>
                 <button onClick={()=>removeItem(item.id)} style={{...btn('danger'),padding:'6px 10px',marginLeft:8}}>🗑️</button>
               </div>
@@ -5473,7 +5473,7 @@ function CustomersScreen({customers, sales, upd}) {
           <thead>
             <tr style={{background:T.tealLight}}>
               {['তারিখ','বিল নং','পণ্য','মোট','পরিশোধ','বাকি'].map(h=>(
-                <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>{h}</th>
+                <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -5481,9 +5481,9 @@ function CustomersScreen({customers, sales, upd}) {
             {custSales.length===0 ? <tr><td colSpan={6} style={{padding:30,textAlign:'center',color:T.gray400}}>কোনো লেনদেন নেই</td></tr>
             : [...custSales].reverse().map((s,i)=>(
               <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                <td style={{padding:'10px 12px',fontSize:13}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
-                <td style={{padding:'10px 12px',fontSize:12,fontFamily:'monospace',color:T.teal}}>#{s.id.toUpperCase()}</td>
-                <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{(s.items||[]).length}টি পণ্য</td>
+                <td style={{padding:'10px 12px',fontSize:15}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
+                <td style={{padding:'10px 12px',fontSize:14,fontFamily:'monospace',color:T.teal}}>#{s.id.toUpperCase()}</td>
+                <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>{(s.items||[]).length}টি পণ্য</td>
                 <td style={{padding:'10px 12px',fontWeight:600}}>{fmt(s.total)}</td>
                 <td style={{padding:'10px 12px',color:T.green,fontWeight:600}}>{fmt(s.paid)}</td>
                 <td style={{padding:'10px 12px',fontWeight:700,color:s.due>0?T.red:T.green}}>{fmt(s.due)}</td>
@@ -5517,7 +5517,7 @@ function CustomersScreen({customers, sales, upd}) {
         </div>
         <button style={btn('primary')} onClick={()=>{setForm({name:'',phone:'',address:'',credit:0});setModal({mode:'add'});}}>+ কাস্টমার যোগ</button>
         <button style={btn()} onClick={exportCSV}>📤 CSV রপ্তানি</button>
-        {totalCreditAll>0 && <span style={{fontSize:12,color:T.red,fontWeight:600}}>মোট বাকি: {fmt(totalCreditAll)}</span>}
+        {totalCreditAll>0 && <span style={{fontSize:14,color:T.red,fontWeight:600}}>মোট বাকি: {fmt(totalCreditAll)}</span>}
       </div>
       <div style={{flex:1,overflow:'auto',padding:12}}>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(270px,1fr))',gap:10}}>
@@ -5526,17 +5526,17 @@ function CustomersScreen({customers, sales, upd}) {
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:10}}>
                 <div>
                   <div style={{fontWeight:700,fontSize:15,marginBottom:3}}>{c.name}</div>
-                  <div style={{fontSize:13,color:T.gray600}}>📞 {c.phone||'ফোন নেই'}</div>
-                  {c.address && <div style={{fontSize:12,color:T.gray400,marginTop:2}}>📍 {c.address}</div>}
+                  <div style={{fontSize:15,color:T.gray600}}>📞 {c.phone||'ফোন নেই'}</div>
+                  {c.address && <div style={{fontSize:14,color:T.gray400,marginTop:2}}>📍 {c.address}</div>}
                 </div>
                 <div style={{textAlign:'right'}}>
                   {(c.credit||0)>0 ? (
                     <div>
-                      <div style={{fontSize:11,color:T.red,fontWeight:700}}>বাকি আছে</div>
+                      <div style={{fontSize:14,color:T.red,fontWeight:700}}>বাকি আছে</div>
                       <div style={{fontSize:18,fontWeight:800,color:T.red}}>{fmt(c.credit)}</div>
                     </div>
                   ) : (
-                    <div style={{fontSize:12,color:T.green,fontWeight:600}}>✓ কোনো বাকি নেই</div>
+                    <div style={{fontSize:14,color:T.green,fontWeight:600}}>✓ কোনো বাকি নেই</div>
                   )}
                 </div>
               </div>
@@ -5675,7 +5675,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
           color:invTab==='list'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           📦 স্টক তালিকা
         </button>
@@ -5688,7 +5688,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
           color:invTab==='increase'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           ⬆️ স্টক বাড়ানো ({purchaseHistory.length})
         </button>
@@ -5701,7 +5701,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
           color:invTab==='decrease'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           ⬇️ স্টক কমানো ({saleHistory.length})
         </button>
@@ -5714,7 +5714,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
           color:invTab==='manual'?T.white:T.gray600,
           cursor:'pointer',
           fontWeight:600,
-          fontSize:13,
+          fontSize:15,
         }}>
           🔧 ম্যানুয়াল স্টক পরিবর্তন ({manualHistory.length})
         </button>
@@ -5731,27 +5731,27 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পারচেজ আইডি</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
-                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>বেশি হয়েছে</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>পারচেজ আইডি</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:14,fontWeight:700,color:T.teal}}>বেশি হয়েছে</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,fontWeight:700,color:T.teal}}>পুরাতন</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,fontWeight:700,color:T.teal}}>নতুন</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...purchaseHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                      <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>
+                      <td style={{padding:'10px 12px',fontSize:14,fontWeight:600,color:T.teal}}>
                         {h.purchaseId || '-'}
                       </td>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                      <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
                       </td>
-                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
-                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:12}}>
-                        <span style={{background:T.greenLight,color:T.green,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:15}}>{h.productName}</td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:14}}>
+                        <span style={{background:T.greenLight,color:T.green,padding:'3px 10px',borderRadius:12,fontSize:14,fontWeight:600}}>
                           +{h.newValue - h.oldValue}
                         </span>
                       </td>
@@ -5761,7 +5761,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
                         {h.newValue}
                       </td>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                      <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                         <div style={{fontWeight:600}}>{h.user}</div>
                       </td>
                     </tr>
@@ -5784,27 +5784,27 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ইনভয়েস</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
-                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>কম হয়েছে</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>ইনভয়েস</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:14,fontWeight:700,color:T.teal}}>কম হয়েছে</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,fontWeight:700,color:T.teal}}>পুরাতন</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,fontWeight:700,color:T.teal}}>নতুন</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...saleHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                      <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>
+                      <td style={{padding:'10px 12px',fontSize:14,fontWeight:600,color:T.teal}}>
                         {h.saleId || '-'}
                       </td>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                      <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
                       </td>
-                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
-                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:12}}>
-                        <span style={{background:T.redLight,color:T.red,padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600}}>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:15}}>{h.productName}</td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:14}}>
+                        <span style={{background:T.redLight,color:T.red,padding:'3px 10px',borderRadius:12,fontSize:14,fontWeight:600}}>
                           -{h.oldValue - h.newValue}
                         </span>
                       </td>
@@ -5814,7 +5814,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
                         {h.newValue}
                       </td>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                      <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                         <div style={{fontWeight:600}}>{h.user}</div>
                       </td>
                     </tr>
@@ -5837,26 +5837,26 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
               <table style={{width:'100%',borderCollapse:'collapse'}}>
                 <thead>
                   <tr style={{background:T.tealLight}}>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
-                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:11,fontWeight:700,color:T.teal}}>পরিবর্তন</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
-                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:11,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
-                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>তারিখ ও সময়</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>পণ্যের নাম</th>
+                    <th style={{padding:'10px 12px',textAlign:'center',fontSize:14,fontWeight:700,color:T.teal}}>পরিবর্তন</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,fontWeight:700,color:T.teal}}>পুরাতন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,fontWeight:700,color:T.teal}}>নতুন স্টক</th>
+                    <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>ব্যবহারকারী</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[...manualHistory].reverse().map((h,i)=>(
                     <tr key={h.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                      <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                         {new Date(h.timestamp).toLocaleString('bn-BD')}
                       </td>
-                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:13}}>{h.productName}</td>
-                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:12}}>
+                      <td style={{padding:'10px 12px',fontWeight:600,fontSize:15}}>{h.productName}</td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontSize:14}}>
                         <span style={{
                           background: h.newValue > h.oldValue ? T.greenLight : T.redLight,
                           color: h.newValue > h.oldValue ? T.green : T.red,
-                          padding:'3px 10px',borderRadius:12,fontSize:11,fontWeight:600
+                          padding:'3px 10px',borderRadius:12,fontSize:14,fontWeight:600
                         }}>
                           {h.newValue > h.oldValue ? '+' : ''}{h.newValue - h.oldValue}
                         </span>
@@ -5867,7 +5867,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
                       <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green}}>
                         {h.newValue}
                       </td>
-                      <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>
+                      <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>
                         <div style={{fontWeight:600}}>{h.user}</div>
                       </td>
                     </tr>
@@ -5890,12 +5890,12 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
               borderRadius:'50%',animation:'spin 0.8s linear infinite'
             }}></div>
             <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-            <span style={{fontSize:11,color:T.gray500}}>লোড হচ্ছে...</span>
+            <span style={{fontSize:14,color:T.gray500}}>লোড হচ্ছে...</span>
           </div>
         ) : (
           <>
             <button onClick={()=>{setStockFilter('all');setSearch('');}} style={{
-              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:11,
+              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:14,
               padding:'6px 12px',transition:'all 0.15s',
               background:stockFilter==='all'?'#00897b':'#fff',
               color:stockFilter==='all'?'#fff':'#64748b',
@@ -5904,7 +5904,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
               সকল <span style={{opacity:0.7}}>({realProducts.length})</span>
             </button>
             <button onClick={()=>{setStockFilter(stockFilter==='proper'?'all':'proper');setSearch('');}} style={{
-              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:11,
+              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:14,
               padding:'6px 12px',transition:'all 0.15s',
               background:stockFilter==='proper'?'#16A34A':'#fff',
               color:stockFilter==='proper'?'#fff':'#64748b',
@@ -5913,7 +5913,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
               ঠিক আছে <span style={{opacity:0.7}}>({properStock.length})</span>
             </button>
             <button onClick={()=>{setStockFilter(stockFilter==='low'?'all':'low');setSearch('');}} style={{
-              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:11,
+              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:14,
               padding:'6px 12px',transition:'all 0.15s',
               background:stockFilter==='low'?'#EA580C':'#fff',
               color:stockFilter==='low'?'#fff':'#64748b',
@@ -5922,7 +5922,7 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
               কম <span style={{opacity:0.7}}>({lowStock.length})</span>
             </button>
             <button onClick={()=>{setStockFilter(stockFilter==='out'?'all':'out');setSearch('');}} style={{
-              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:11,
+              border:'none',borderRadius:6,cursor:'pointer',fontWeight:600,fontSize:14,
               padding:'6px 12px',transition:'all 0.15s',
               background:stockFilter==='out'?'#DC2626':'#fff',
               color:stockFilter==='out'?'#fff':'#64748b',
@@ -5933,8 +5933,8 @@ function InventoryScreen({products, suppliers, productHistory, upd, currentUser}
           </>
         )}
         <div style={{position:'relative',flex:'1 1 180px'}}>
-          <span style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:12}}>🔍</span>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:28,height:32,fontSize:11,borderRadius:6}}/>
+          <span style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)',color:T.gray400,fontSize:14}}>🔍</span>
+          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="পণ্য খুঁজুন..." style={{...input,paddingLeft:28,height:32,fontSize:14,borderRadius:6}}/>
         </div>
         <button style={btn('ghost')} onClick={()=>{
           const printFiltered = filtered.length > 0 ? filtered : realProducts;
@@ -5984,16 +5984,16 @@ ${printFiltered.map(p => {
           win.focus();
           setTimeout(() => { if (!win.closed) { win.print(); } }, 250);
         }}>🖨️ প্রিন্ট</button>
-        <div style={{fontSize:12,color:T.gray600}}>স্টক মূল্য: <strong style={{color:T.teal}}>{fmt(totalValue)}</strong></div>
+        <div style={{fontSize:14,color:T.gray600}}>স্টক মূল্য: <strong style={{color:T.teal}}>{fmt(totalValue)}</strong></div>
       </div>
 
       {(lowStock.length>0||outOfStock.length>0) && (
         <div style={{padding:'8px 12px',display:'flex',gap:8,flexWrap:'wrap',borderBottom:`1px solid ${T.gray200}`,background:T.amberLight}}>
           {outOfStock.length>0 && (
-            <span style={{fontSize:12,color:T.red,fontWeight:600}}>🚨 স্টক শেষ ({outOfStock.length}টি): {outOfStock.map(p=>p.name).join(', ')}</span>
+            <span style={{fontSize:14,color:T.red,fontWeight:600}}>🚨 স্টক শেষ ({outOfStock.length}টি): {outOfStock.map(p=>p.name).join(', ')}</span>
           )}
           {lowStock.length>0 && (
-            <span style={{fontSize:12,color:T.amber,fontWeight:600}}>⚠️ কম স্টক ({lowStock.length}টি): {lowStock.map(p=>p.name).join(', ')}</span>
+            <span style={{fontSize:14,color:T.amber,fontWeight:600}}>⚠️ কম স্টক ({lowStock.length}টি): {lowStock.map(p=>p.name).join(', ')}</span>
           )}
         </div>
       )}
@@ -6013,7 +6013,7 @@ ${printFiltered.map(p => {
             <thead>
               <tr style={{background:T.tealLight}}>
                 {['সরবরাহকারী কোড','পণ্যের নাম','কোম্পানি','ক্যাটাগরি','স্টক','একক','মিনস্টক','স্টক মূল্য','অবস্থা',''].map(h=>(
-                  <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.teal}}>{h}</th>
+                  <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.teal}}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -6025,16 +6025,16 @@ ${printFiltered.map(p => {
                 const supCode = suppliers.find(s=>(s.name||'').toLowerCase()===(p.company||'').toLowerCase())?.code||'';
                 return (
                   <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                    <td style={{padding:'10px 12px',fontSize:12,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:14,fontWeight:600,color:T.teal}}>{supCode||'-'}</td>
                     <td style={{padding:'10px 12px',fontWeight:600}}>{p.name}</td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray600}}>{p.company||'-'}</td>
-                    <td style={{padding:'10px 12px',fontSize:13,color:T.gray600}}>{p.cat||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:14,color:T.gray600}}>{p.company||'-'}</td>
+                    <td style={{padding:'10px 12px',fontSize:15,color:T.gray600}}>{p.cat||'-'}</td>
                     <td style={{padding:'10px 12px',fontWeight:800,fontSize:18,color:stColor}}>{fmtN(p.stock)}</td>
-                    <td style={{padding:'10px 12px',fontSize:12,color:T.gray400}}>{p.unit}</td>
-                    <td style={{padding:'10px 12px',fontSize:13}}>{p.minStock}</td>
-                    <td style={{padding:'10px 12px',fontSize:13,fontWeight:600}}>{fmt(p.sellP*p.stock)}</td>
+                    <td style={{padding:'10px 12px',fontSize:14,color:T.gray400}}>{p.unit}</td>
+                    <td style={{padding:'10px 12px',fontSize:15}}>{p.minStock}</td>
+                    <td style={{padding:'10px 12px',fontSize:15,fontWeight:600}}>{fmt(p.sellP*p.stock)}</td>
                     <td style={{padding:'10px 12px'}}>
-                      <span style={{padding:'3px 10px',borderRadius:20,fontSize:11,fontWeight:700,background:stColor+'20',color:stColor}}>{stLabel}</span>
+                      <span style={{padding:'3px 10px',borderRadius:20,fontSize:14,fontWeight:700,background:stColor+'20',color:stColor}}>{stLabel}</span>
                     </td>
                     <td style={{padding:'10px 12px'}}>
                       <button style={btn('primary','sm')} onClick={()=>{setModal(p);setAdjType('add');setAdjQty('');setAdjNote('');}}>+ স্টক</button>
@@ -6050,7 +6050,7 @@ ${printFiltered.map(p => {
       {modal && (
         <Modal onClose={()=>setModal(null)} title={`স্টক আপডেট: ${modal.name}`} width={360}>
           <div style={{padding:'10px 14px',background:T.tealLight,borderRadius:8,marginBottom:14,display:'flex',justifyContent:'space-between'}}>
-            <span style={{fontSize:13,color:T.gray600}}>বর্তমান স্টক</span>
+            <span style={{fontSize:15,color:T.gray600}}>বর্তমান স্টক</span>
             <span style={{fontWeight:800,fontSize:18,color:T.teal}}>{modal.stock} {modal.unit}</span>
           </div>
           <div style={{display:'flex',gap:6,marginBottom:14}}>
@@ -6063,7 +6063,7 @@ ${printFiltered.map(p => {
           <label style={label}>পরিমাণ ({modal.unit})</label>
           <input value={adjQty} onChange={e=>setAdjQty(e.target.value)} type="number" min="1" style={{...input,marginBottom:12}} autoFocus/>
           {adjQty && (
-            <div style={{padding:'8px 12px',background:adjType==='add'?T.greenLight:T.redLight,borderRadius:8,fontSize:13,fontWeight:600,color:adjType==='add'?T.green:T.red,marginBottom:12}}>
+            <div style={{padding:'8px 12px',background:adjType==='add'?T.greenLight:T.redLight,borderRadius:8,fontSize:15,fontWeight:600,color:adjType==='add'?T.green:T.red,marginBottom:12}}>
               আপডেটের পর: {adjType==='add'?modal.stock+(parseInt(adjQty)||0):Math.max(0,modal.stock-(parseInt(adjQty)||0))} {modal.unit}
             </div>
           )}
@@ -6112,13 +6112,13 @@ function LowStockScreen({products, upd}) {
           <div style={{display: 'flex', alignItems: 'center', gap: 10}}>
             <span style={{fontSize: 24}}>⚠️</span>
             <div>
-              <div style={{fontSize: 16, fontWeight: 700, color: T.gray900}}>স্টক কম পণ্যসমূহ</div>
-              <div style={{fontSize: 12, color: T.gray500}}>মিনিমাম স্টকের নিচে পণ্য</div>
+              <div style={{fontSize: 19, fontWeight: 700, color: T.gray900}}>স্টক কম পণ্যসমূহ</div>
+              <div style={{fontSize: 19, color: T.gray500}}>মিনিমাম স্টকের নিচে পণ্য</div>
             </div>
           </div>
           <div style={{textAlign: 'right'}}>
-            <div style={{fontSize: 20, fontWeight: 800, color: T.orange}}>{filtered.length}টি পণ্য</div>
-            <div style={{fontSize: 12, color: T.gray500}}>স্টক মূল্য: <strong style={{color: T.teal}}>{fmt(totalValue)}</strong></div>
+            <div style={{fontSize: 21, fontWeight: 800, color: T.orange}}>{filtered.length}টি পণ্য</div>
+            <div style={{fontSize: 19, color: T.gray500}}>স্টক মূল্য: <strong style={{color: T.teal}}>{fmt(totalValue)}</strong></div>
           </div>
         </div>
         
@@ -6129,7 +6129,7 @@ function LowStockScreen({products, upd}) {
             value={search} 
             onChange={e => setSearch(e.target.value)} 
             placeholder="পণ্য বা সরবরাহকারী খুঁজুন..." 
-            style={{...input, paddingLeft: 32, height: 36, fontSize: 13}}
+            style={{...input, paddingLeft: 32, height: 36, fontSize: 15}}
           />
         </div>
       </div>
@@ -6143,13 +6143,13 @@ function LowStockScreen({products, upd}) {
               borderRadius: '50%', animation: 'spin 1s linear infinite'
             }}></div>
             <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-            <div style={{fontSize: 14, color: T.gray500}}>লোড হচ্ছে...</div>
+            <div style={{fontSize: 19, color: T.gray500}}>লোড হচ্ছে...</div>
           </div>
         ) : filtered.length === 0 ? (
           <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 16}}>
             <div style={{fontSize: 64}}>✅</div>
-            <div style={{fontSize: 18, fontWeight: 700, color: T.green}}>সব পণ্যে পর্যাপ্ত স্টক আছে!</div>
-            <div style={{fontSize: 13, color: T.gray500}}>কোনো পণ্য স্টক কম নেই</div>
+            <div style={{fontSize: 19, fontWeight: 700, color: T.green}}>সব পণ্যে পর্যাপ্ত স্টক আছে!</div>
+            <div style={{fontSize: 19, color: T.gray500}}>কোনো পণ্য স্টক কম নেই</div>
           </div>
         ) : (
           <div style={{display: 'flex', flexDirection: 'column', gap: 10}}>
@@ -6160,8 +6160,8 @@ function LowStockScreen({products, upd}) {
               }}>
                 <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start'}}>
                   <div style={{flex: 1}}>
-                    <div style={{fontSize: 15, fontWeight: 700, color: T.gray900, marginBottom: 4}}>{p.name}</div>
-                    <div style={{fontSize: 12, color: T.gray500}}>
+                    <div style={{fontSize: 19, fontWeight: 700, color: T.gray900, marginBottom: 4}}>{p.name}</div>
+                    <div style={{fontSize: 19, color: T.gray500}}>
                       {p.company && <span>🏢 {p.company}</span>}
                       {p.cat && <span style={{marginLeft: 8}}>📁 {p.cat}</span>}
                     </div>
@@ -6170,7 +6170,7 @@ function LowStockScreen({products, upd}) {
                     <div style={{
                       display: 'inline-flex', alignItems: 'center', gap: 4,
                       background: T.orangeLight, color: T.orange,
-                      padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700
+                      padding: '4px 12px', borderRadius: 20, fontSize: 19, fontWeight: 700
                     }}>
                       ⚠️ স্টক কম
                     </div>
@@ -6179,20 +6179,20 @@ function LowStockScreen({products, upd}) {
                 
                 <div style={{display: 'flex', gap: 16, marginTop: 12, paddingTop: 12, borderTop: `1px solid ${T.gray100}`}}>
                   <div style={{flex: 1}}>
-                    <div style={{fontSize: 11, color: T.gray500, marginBottom: 2}}>বর্তমান স্টক</div>
-                    <div style={{fontSize: 22, fontWeight: 800, color: T.orange}}>{p.stock} <span style={{fontSize: 12, fontWeight: 400, color: T.gray500}}>/ {p.unit}</span></div>
+                    <div style={{fontSize: 19, color: T.gray500, marginBottom: 2}}>বর্তমান স্টক</div>
+                    <div style={{fontSize: 23, fontWeight: 800, color: T.orange}}>{p.stock} <span style={{fontSize: 19, fontWeight: 400, color: T.gray500}}>/ {p.unit}</span></div>
                   </div>
                   <div style={{flex: 1}}>
-                    <div style={{fontSize: 11, color: T.gray500, marginBottom: 2}}>মিনিমাম স্টক</div>
-                    <div style={{fontSize: 22, fontWeight: 800, color: T.gray700}}>{p.minStock} <span style={{fontSize: 12, fontWeight: 400, color: T.gray500}}>/ {p.unit}</span></div>
+                    <div style={{fontSize: 19, color: T.gray500, marginBottom: 2}}>মিনিমাম স্টক</div>
+                    <div style={{fontSize: 23, fontWeight: 800, color: T.gray700}}>{p.minStock} <span style={{fontSize: 19, fontWeight: 400, color: T.gray500}}>/ {p.unit}</span></div>
                   </div>
                   <div style={{flex: 1}}>
-                    <div style={{fontSize: 11, color: T.gray500, marginBottom: 2}}>বিক্রয় মূল্য</div>
-                    <div style={{fontSize: 22, fontWeight: 800, color: T.teal}}>{fmt(p.sellP)}</div>
+                    <div style={{fontSize: 19, color: T.gray500, marginBottom: 2}}>বিক্রয় মূল্য</div>
+                    <div style={{fontSize: 23, fontWeight: 800, color: T.teal}}>{fmt(p.sellP)}</div>
                   </div>
                   <div style={{flex: 1}}>
-                    <div style={{fontSize: 11, color: T.gray500, marginBottom: 2}}>স্টক ঘাটতি</div>
-                    <div style={{fontSize: 22, fontWeight: 800, color: T.red}}>{p.minStock - p.stock}</div>
+                    <div style={{fontSize: 19, color: T.gray500, marginBottom: 2}}>স্টক ঘাটতি</div>
+                    <div style={{fontSize: 23, fontWeight: 800, color: T.red}}>{p.minStock - p.stock}</div>
                   </div>
                 </div>
               </div>
@@ -6240,8 +6240,8 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
   }, []);
 
   const card = {background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`,boxShadow:'0 2px 8px rgba(0,0,0,0.04)'};
-  const input = {width:'100%',padding:'10px 12px',border:`1.5px solid ${T.gray200}`,borderRadius:8,fontSize:13,outline:'none',boxSizing:'border-box',background:T.gray50,color:T.gray800};
-  const label = {display:'block',marginBottom:6,fontWeight:600,fontSize:13,color:T.gray600};
+  const input = {width:'100%',padding:'10px 12px',border:`1.5px solid ${T.gray200}`,borderRadius:8,fontSize:15,outline:'none',boxSizing:'border-box',background:T.gray50,color:T.gray800};
+  const label = {display:'block',marginBottom:6,fontWeight:600,fontSize:15,color:T.gray600};
   const btn = (type='ghost',size='md') => {
     const base = {border:'none',borderRadius:8,cursor:'pointer',fontWeight:600,fontSize:size==='sm'?11:13,transition:'all 0.2s'};
     const colors = {
@@ -6605,7 +6605,7 @@ ${filteredExpenses.length > 0 ? `
         <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
           {periods.map(p => (
             <button key={p.id} onClick={()=>setPeriod(p.id)} style={{
-              padding:'6px 14px',border:'none',borderRadius:20,cursor:'pointer',fontWeight:600,fontSize:12,
+              padding:'6px 14px',border:'none',borderRadius:20,cursor:'pointer',fontWeight:600,fontSize:14,
               background: period === p.id ? T.teal : T.gray100,
               color: period === p.id ? T.white : T.gray600,
               transition:'all 0.2s'
@@ -6628,43 +6628,43 @@ ${filteredExpenses.length > 0 ? `
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:16,marginBottom:20}}>
           {/* Sales Income Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${T.green}`}}>
-            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>🛒 বিক্রয় আয়</div>
+            <div style={{fontSize:14,color:T.gray500,marginBottom:4}}>🛒 বিক্রয় আয়</div>
             <div style={{fontSize:24,fontWeight:800,color:T.green}}>{fmt(totalSalesIncome)}</div>
-            <div style={{fontSize:11,color:T.gray400,marginTop:4}}>{filteredSales.length}টি বিক্রয়</div>
+            <div style={{fontSize:14,color:T.gray400,marginTop:4}}>{filteredSales.length}টি বিক্রয়</div>
           </div>
           
           {/* Manual Income Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${T.teal}`}}>
-            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>💰 ম্যানুয়াল আয়</div>
+            <div style={{fontSize:14,color:T.gray500,marginBottom:4}}>💰 ম্যানুয়াল আয়</div>
             <div style={{fontSize:24,fontWeight:800,color:T.teal}}>{fmt(totalManualIncome)}</div>
-            <div style={{fontSize:11,color:T.gray400,marginTop:4}}>{filteredIncomes.length}টি আয়</div>
+            <div style={{fontSize:14,color:T.gray400,marginTop:4}}>{filteredIncomes.length}টি আয়</div>
           </div>
           
           {/* Total Income Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${T.green}`,background:'#f0fdf4'}}>
-            <div style={{fontSize:12,color:T.gray600,marginBottom:4}}>📈 মোট আয়</div>
+            <div style={{fontSize:14,color:T.gray600,marginBottom:4}}>📈 মোট আয়</div>
             <div style={{fontSize:28,fontWeight:800,color:T.green}}>{fmt(totalIncome)}</div>
           </div>
           
           {/* Purchase Expense Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${T.orange}`}}>
-            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>📦 পারচেজ ব্যয়</div>
+            <div style={{fontSize:14,color:T.gray500,marginBottom:4}}>📦 পারচেজ ব্যয়</div>
             <div style={{fontSize:24,fontWeight:800,color:T.orange}}>{fmt(totalPurchaseExpense)}</div>
-            <div style={{fontSize:11,color:T.gray400,marginTop:4}}>{filteredPurchases.length}টি পারচেজ</div>
+            <div style={{fontSize:14,color:T.gray400,marginTop:4}}>{filteredPurchases.length}টি পারচেজ</div>
           </div>
           
           {/* Manual Expense Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${T.red}`}}>
-            <div style={{fontSize:12,color:T.gray500,marginBottom:4}}>📝 ম্যানুয়াল ব্যয়</div>
+            <div style={{fontSize:14,color:T.gray500,marginBottom:4}}>📝 ম্যানুয়াল ব্যয়</div>
             <div style={{fontSize:24,fontWeight:800,color:T.red}}>{fmt(totalManualExpense)}</div>
-            <div style={{fontSize:11,color:T.gray400,marginTop:4}}>{filteredExpenses.length}টি ব্যয়</div>
+            <div style={{fontSize:14,color:T.gray400,marginTop:4}}>{filteredExpenses.length}টি ব্যয়</div>
           </div>
           
           {/* Net Profit Card */}
           <div style={{...card,padding:20,borderLeft:`4px solid ${netProfit >= 0 ? T.teal : T.red}`,background:netProfit >= 0 ? '#f0fdfa' : '#fef2f2'}}>
-            <div style={{fontSize:12,color:T.gray600,marginBottom:4}}>💵 নীট লাভ/ক্ষতি</div>
+            <div style={{fontSize:14,color:T.gray600,marginBottom:4}}>💵 নীট লাভ/ক্ষতি</div>
             <div style={{fontSize:28,fontWeight:800,color:netProfit >= 0 ? T.teal : T.red}}>{fmt(netProfit)}</div>
-            <div style={{fontSize:11,color:T.gray500,marginTop:4}}>মোট ব্যয়: {fmt(totalExpense)}</div>
+            <div style={{fontSize:14,color:T.gray500,marginTop:4}}>মোট ব্যয়: {fmt(totalExpense)}</div>
           </div>
         </div>
 
@@ -6676,8 +6676,8 @@ ${filteredExpenses.length > 0 ? `
               {filteredIncomes.map(i => (
                 <div key={i.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:T.greenLight,borderRadius:8}}>
                   <div>
-                    <div style={{fontWeight:600,fontSize:13}}>{i.title}</div>
-                    <div style={{fontSize:11,color:T.gray500}}>{new Date(i.date).toLocaleDateString('bn-BD')}{i.note ? ` • ${i.note}` : ''}</div>
+                    <div style={{fontWeight:600,fontSize:15}}>{i.title}</div>
+                    <div style={{fontSize:14,color:T.gray500}}>{new Date(i.date).toLocaleDateString('bn-BD')}{i.note ? ` • ${i.note}` : ''}</div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     <span style={{fontWeight:700,color:T.green,fontSize:14}}>{fmt(i.amount)}</span>
@@ -6697,8 +6697,8 @@ ${filteredExpenses.length > 0 ? `
               {filteredExpenses.map(e => (
                 <div key={e.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:T.redLight,borderRadius:8}}>
                   <div>
-                    <div style={{fontWeight:600,fontSize:13}}>{e.title}</div>
-                    <div style={{fontSize:11,color:T.gray500}}>{new Date(e.date).toLocaleDateString('bn-BD')}{e.note ? ` • ${e.note}` : ''}</div>
+                    <div style={{fontWeight:600,fontSize:15}}>{e.title}</div>
+                    <div style={{fontSize:14,color:T.gray500}}>{new Date(e.date).toLocaleDateString('bn-BD')}{e.note ? ` • ${e.note}` : ''}</div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     <span style={{fontWeight:700,color:T.red,fontSize:14}}>{fmt(e.amount)}</span>
@@ -6717,7 +6717,7 @@ ${filteredExpenses.length > 0 ? `
             <div style={{display:'flex',flexDirection:'column',gap:6}}>
               {filteredSales.slice(0, 10).map(s => (
                 <div key={s.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',background:T.gray50,borderRadius:6}}>
-                  <div style={{fontSize:12}}>
+                  <div style={{fontSize:14}}>
                     <span style={{fontWeight:600}}>{s.id}</span>
                     <span style={{color:T.gray500,marginLeft:8}}>{new Date(s.date).toLocaleDateString('bn-BD')}</span>
                     {s.customer && <span style={{color:T.teal,marginLeft:8}}>{s.customer}</span>}
@@ -6726,7 +6726,7 @@ ${filteredExpenses.length > 0 ? `
                 </div>
               ))}
               {filteredSales.length > 10 && (
-                <div style={{textAlign:'center',color:T.gray500,fontSize:12,padding:8}}>
+                <div style={{textAlign:'center',color:T.gray500,fontSize:14,padding:8}}>
                   ... এবং আরও {filteredSales.length - 10}টি
                 </div>
               )}
@@ -6743,7 +6743,7 @@ ${filteredExpenses.length > 0 ? `
                 const total = p.items.reduce((s, i) => s + (i.buyP || 0) * (i.stock || 0), 0);
                 return (
                   <div key={p.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 12px',background:T.gray50,borderRadius:6}}>
-                    <div style={{fontSize:12}}>
+                    <div style={{fontSize:14}}>
                       <span style={{fontWeight:600}}>{p.id}</span>
                       <span style={{color:T.gray500,marginLeft:8}}>{new Date(p.date).toLocaleDateString('bn-BD')}</span>
                       {p.supplier && <span style={{color:T.orange,marginLeft:8}}>{p.supplier}</span>}
@@ -6753,7 +6753,7 @@ ${filteredExpenses.length > 0 ? `
                 );
               })}
               {filteredPurchases.length > 10 && (
-                <div style={{textAlign:'center',color:T.gray500,fontSize:12,padding:8}}>
+                <div style={{textAlign:'center',color:T.gray500,fontSize:14,padding:8}}>
                   ... এবং আরও {filteredPurchases.length - 10}টি
                 </div>
               )}
@@ -7304,13 +7304,13 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 style={{
                   ...input,
                   width:140,
-                  fontSize:12,
+                  fontSize:14,
                   padding:'6px 10px',
                   borderRadius:7,
                   border:`1px solid ${T.gray200}`,
                 }}
               />
-              <span style={{color:T.gray400,fontSize:12}}>থেকে</span>
+              <span style={{color:T.gray400,fontSize:14}}>থেকে</span>
               <input 
                 type="date" 
                 value={to} 
@@ -7318,7 +7318,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 style={{
                   ...input,
                   width:140,
-                  fontSize:12,
+                  fontSize:14,
                   padding:'6px 10px',
                   borderRadius:7,
                   border:`1px solid ${T.gray200}`,
@@ -7391,7 +7391,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 }}>
                   <div style={{fontSize:28,marginBottom:8}}>{s.icon}</div>
                   <div style={{fontSize:22,fontWeight:800,color:s.c}}>{s.v}</div>
-                  <div style={{fontSize:12,color:T.gray600,marginTop:4,fontWeight:500}}>{s.l}</div>
+                  <div style={{fontSize:14,color:T.gray600,marginTop:4,fontWeight:500}}>{s.l}</div>
                 </div>
               ))}
             </div>
@@ -7437,7 +7437,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                   style={{
                     ...input,
                     padding:'8px 12px',
-                    fontSize:12,
+                    fontSize:14,
                     width:180,
                     borderRadius:8,
                   }}
@@ -7445,7 +7445,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 <button onClick={printSales} style={{
                   ...btn('ghost'),
                   padding:'8px 14px',
-                  fontSize:13,
+                  fontSize:15,
                   borderRadius:8,
                   display:'flex',
                   alignItems:'center',
@@ -7458,7 +7458,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 <thead>
                   <tr style={{background:T.gray50}}>
                     {['তারিখ','ইনভয়েস আইডি','কাস্টমার','পণ্য','ক্রয়মূল্য','বিক্রয়মূল্য','পরিশোধ','বাকি','লাভ','ক্রয় ভ্যাট','বিক্রয় ভ্যাট','অবশিষ্ট ভ্যাট'].map(h=>(
-                      <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
+                      <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -7470,18 +7470,18 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                     </td></tr>
                   ) : [...filteredSales].reverse().map((s,i)=>(
                     <tr key={s.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`}}>
-                      <td style={{padding:'12px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
-                      <td style={{padding:'12px',fontSize:12,cursor:'pointer',color:T.teal,fontWeight:600,fontFamily:'monospace'}} onClick={()=>setViewSale(s)}>{s.id}</td>
-                      <td style={{padding:'12px',fontSize:12}}>{s.custName}</td>
-                      <td style={{padding:'12px',fontSize:12,color:T.gray400}}>{(s.items||[]).length}টি</td>
-                      <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.gray600}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0))}</td>
-                      <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.teal}}>{fmt(s.total)}</td>
-                      <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt(s.paid)}</td>
+                      <td style={{padding:'12px',fontSize:14,whiteSpace:'nowrap'}}>{new Date(s.date).toLocaleDateString('en-GB')}</td>
+                      <td style={{padding:'12px',fontSize:14,cursor:'pointer',color:T.teal,fontWeight:600,fontFamily:'monospace'}} onClick={()=>setViewSale(s)}>{s.id}</td>
+                      <td style={{padding:'12px',fontSize:14}}>{s.custName}</td>
+                      <td style={{padding:'12px',fontSize:14,color:T.gray400}}>{(s.items||[]).length}টি</td>
+                      <td style={{padding:'12px',fontWeight:600,fontSize:15,color:T.gray600}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0))}</td>
+                      <td style={{padding:'12px',fontWeight:600,fontSize:15,color:T.teal}}>{fmt(s.total)}</td>
+                      <td style={{padding:'12px',color:T.green,fontSize:15}}>{fmt(s.paid)}</td>
                       <td style={{padding:'12px',fontWeight:s.due>0?700:400,color:s.due>0?T.red:T.gray400}}>{fmt(s.due)}</td>
-                      <td style={{padding:'12px',color:T.green,fontSize:13}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.profit||0),0))}</td>
-                      <td style={{padding:'12px',fontSize:13,color:T.red}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15)}</td>
-                      <td style={{padding:'12px',fontSize:13,color:T.teal}}>{fmt(s.total*15/115)}</td>
-                      <td style={{padding:'12px',fontSize:13,fontWeight:600,color:T.amber}}>{fmt((s.total*15/115)-(s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15)}</td>
+                      <td style={{padding:'12px',color:T.green,fontSize:15}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.profit||0),0))}</td>
+                      <td style={{padding:'12px',fontSize:15,color:T.red}}>{fmt((s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15)}</td>
+                      <td style={{padding:'12px',fontSize:15,color:T.teal}}>{fmt(s.total*15/115)}</td>
+                      <td style={{padding:'12px',fontSize:15,fontWeight:600,color:T.amber}}>{fmt((s.total*15/115)-(s.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -7492,12 +7492,12 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{filteredSales.reduce((c,i)=>c+(i.items||[]).reduce((a,it)=>a+(it.qty||0),0),0)}টি</td>
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.gray600}}>{fmt(filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0),0))}</td>
                     <td style={{padding:'12px',fontWeight:800,fontSize:14,color:T.teal}}>{fmt(totalSales)}</td>
-                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalPaid)}</td>
-                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:totalDue>0?T.red:T.gray400}}>{fmt(totalDue)}</td>
-                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.green}}>{fmt(totalProfit)}</td>
-                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.red}}>{fmt(filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0))}</td>
-                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(filteredSales.reduce((s,i)=>s+i.total*15/115,0))}</td>
-                    <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.amber}}>{fmt(filteredSales.reduce((s,i)=>s+(i.total*15/115)-(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0))}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:15,color:T.green}}>{fmt(totalPaid)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:15,color:totalDue>0?T.red:T.gray400}}>{fmt(totalDue)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:15,color:T.green}}>{fmt(totalProfit)}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:15,color:T.red}}>{fmt(filteredSales.reduce((s,i)=>s+(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0))}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:15,color:T.teal}}>{fmt(filteredSales.reduce((s,i)=>s+i.total*15/115,0))}</td>
+                    <td style={{padding:'12px',fontWeight:700,fontSize:15,color:T.amber}}>{fmt(filteredSales.reduce((s,i)=>s+(i.total*15/115)-(i.items||[]).reduce((a,it)=>a+(it.qty||0)*(it.buyP||0),0)*0.15,0))}</td>
                   </tr>
                 </tfoot>
               </table>
@@ -7520,7 +7520,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                   style={{
                     ...input,
                     padding:'8px 12px',
-                    fontSize:12,
+                    fontSize:14,
                     width:180,
                     borderRadius:8,
                   }}
@@ -7528,7 +7528,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 <button onClick={printPurchases} style={{
                   ...btn('ghost'),
                   padding:'8px 14px',
-                  fontSize:13,
+                  fontSize:15,
                   borderRadius:8,
                   display:'flex',
                   alignItems:'center',
@@ -7541,7 +7541,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                 <thead>
                   <tr style={{background:T.gray50}}>
                     {['তারিখ','পারচেজ আইডি','সরবরাহকারী','পণ্য','মোট খরচ','ভ্যাট','সর্বমোট'].map(h=>(
-                      <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:11,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
+                      <th key={h} style={{padding:'10px 12px',textAlign:'left',fontSize:14,fontWeight:700,color:T.gray500,borderBottom:`1px solid ${T.gray200}`,whiteSpace:'nowrap'}}>{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -7557,13 +7557,13 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
                     const grandTotal = total + vat;
                     return (
                       <tr key={p.id} style={{background:i%2===0?T.white:'#FAFAFA',borderBottom:`1px solid ${T.gray100}`,cursor:'pointer'}} onClick={()=>setViewPurchase(p)}>
-                        <td style={{padding:'12px',fontSize:12,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
-                        <td style={{padding:'12px',fontSize:12,fontFamily:'monospace',color:T.teal,fontWeight:600}}>{p.id}</td>
-                        <td style={{padding:'12px',fontSize:12}}>{p.supplier}</td>
-                        <td style={{padding:'12px',fontSize:12,color:T.gray400}}>{p.totalItems}টি</td>
-                        <td style={{padding:'12px',fontWeight:600,fontSize:13,color:T.green}}>{fmt(total)}</td>
-                        <td style={{padding:'12px',fontSize:12,color:T.red}}>{fmt(vat)}</td>
-                        <td style={{padding:'12px',fontWeight:700,fontSize:13,color:T.teal}}>{fmt(grandTotal)}</td>
+                        <td style={{padding:'12px',fontSize:14,whiteSpace:'nowrap'}}>{new Date(p.date).toLocaleDateString('en-GB')}</td>
+                        <td style={{padding:'12px',fontSize:14,fontFamily:'monospace',color:T.teal,fontWeight:600}}>{p.id}</td>
+                        <td style={{padding:'12px',fontSize:14}}>{p.supplier}</td>
+                        <td style={{padding:'12px',fontSize:14,color:T.gray400}}>{p.totalItems}টি</td>
+                        <td style={{padding:'12px',fontWeight:600,fontSize:15,color:T.green}}>{fmt(total)}</td>
+                        <td style={{padding:'12px',fontSize:14,color:T.red}}>{fmt(vat)}</td>
+                        <td style={{padding:'12px',fontWeight:700,fontSize:15,color:T.teal}}>{fmt(grandTotal)}</td>
                       </tr>
                     );
                   })}
@@ -7591,8 +7591,8 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
               <div>
                 <div style={{fontWeight:800,fontSize:20,color:T.teal}}>{viewPurchase.id}</div>
-                <div style={{fontSize:12,color:T.gray500,marginTop:6}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-                <div style={{fontSize:13,marginTop:6}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
+                <div style={{fontSize:14,color:T.gray500,marginTop:6}}>📅 {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:15,marginTop:6}}>🏢 সরবরাহকারী: {viewPurchase.supplier}</div>
               </div>
               <div style={{display:'flex',gap:10}}>
                 <button onClick={()=>{
@@ -7687,10 +7687,10 @@ ${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;pad
             <table style={{width:'100%',borderCollapse:'collapse',tableLayout:'fixed'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  <th style={{padding:'10px 12px',textAlign:'left',fontSize:12,color:T.gray600,width:'40%'}}>পণ্যের নাম</th>
-                  <th style={{padding:'10px 12px',textAlign:'center',fontSize:12,color:T.gray600,width:'20%'}}>পরিমাণ</th>
-                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>দাম</th>
-                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>মোট</th>
+                  <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,color:T.gray600,width:'40%'}}>পণ্যের নাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'center',fontSize:14,color:T.gray600,width:'20%'}}>পরিমাণ</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,color:T.gray600,width:'20%'}}>দাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,color:T.gray600,width:'20%'}}>মোট</th>
                 </tr></thead>
               <tbody>
                 {viewPurchase.items.map((item,i) => {
@@ -7699,13 +7699,13 @@ ${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;pad
                   const total = qty * price;
                   return (
                     <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
-                      <td style={{padding:'10px 12px',fontSize:13,verticalAlign:'top'}}>
+                      <td style={{padding:'10px 12px',fontSize:15,verticalAlign:'top'}}>
                         <div style={{fontWeight:600}}>{item.name}</div>
-                        {item.company && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{item.company}</div>}
+                        {item.company && <div style={{fontSize:14,color:T.gray400,marginTop:2}}>{item.company}</div>}
                       </td>
-                      <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,fontSize:13,verticalAlign:'middle'}}>{qty} {item.unit || 'পিস'}</td>
-                      <td style={{padding:'10px 12px',textAlign:'right',fontSize:13,verticalAlign:'middle'}}>{fmt(price)}</td>
-                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green,fontSize:13,verticalAlign:'middle'}}>{fmt(total)}</td>
+                      <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,fontSize:15,verticalAlign:'middle'}}>{qty} {item.unit || 'পিস'}</td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontSize:15,verticalAlign:'middle'}}>{fmt(price)}</td>
+                      <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green,fontSize:15,verticalAlign:'middle'}}>{fmt(total)}</td>
                     </tr>
                   );
                 })}
@@ -7730,9 +7730,9 @@ ${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;pad
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:20,borderBottom:'2px solid '+T.gray200,paddingBottom:16}}>
               <div>
                 <div style={{fontWeight:800,fontSize:20,color:T.teal}}>#{viewSale.id.slice(-6).toUpperCase()}</div>
-                <div style={{fontSize:12,color:T.gray500,marginTop:6}}>📅 {new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
-                <div style={{fontSize:13,marginTop:6}}>👤 কাস্টমার: {viewSale.custName}</div>
-                {viewSale.phone && <div style={{fontSize:12,color:T.gray500,marginTop:4}}>📱 {viewSale.phone}</div>}
+                <div style={{fontSize:14,color:T.gray500,marginTop:6}}>📅 {new Date(viewSale.date).toLocaleDateString('bn-BD')}</div>
+                <div style={{fontSize:15,marginTop:6}}>👤 কাস্টমার: {viewSale.custName}</div>
+                {viewSale.phone && <div style={{fontSize:14,color:T.gray500,marginTop:4}}>📱 {viewSale.phone}</div>}
               </div>
               <div style={{display:'flex',gap:10}}>
                 <button onClick={()=>printSaleReceipt(viewSale)} style={{...btn('primary'),padding:'10px 16px',borderRadius:8}}>🖨️ প্রিন্ট</button>
@@ -7742,34 +7742,34 @@ ${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;pad
             <table style={{width:'100%',borderCollapse:'collapse',tableLayout:'fixed'}}>
               <thead>
                 <tr style={{background:T.gray50}}>
-                  <th style={{padding:'10px 12px',textAlign:'left',fontSize:12,color:T.gray600,width:'40%'}}>পণ্যের নাম</th>
-                  <th style={{padding:'10px 12px',textAlign:'center',fontSize:12,color:T.gray600,width:'20%'}}>পরিমাণ</th>
-                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>দাম</th>
-                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:12,color:T.gray600,width:'20%'}}>মোট</th>
+                  <th style={{padding:'10px 12px',textAlign:'left',fontSize:14,color:T.gray600,width:'40%'}}>পণ্যের নাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'center',fontSize:14,color:T.gray600,width:'20%'}}>পরিমাণ</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,color:T.gray600,width:'20%'}}>দাম</th>
+                  <th style={{padding:'10px 12px',textAlign:'right',fontSize:14,color:T.gray600,width:'20%'}}>মোট</th>
                 </tr>
               </thead>
               <tbody>
                 {(viewSale.items||[]).map((item,i) => (
                   <tr key={i} style={{borderBottom:'1px solid '+T.gray100}}>
-                    <td style={{padding:'10px 12px',fontSize:13,verticalAlign:'top'}}>
+                    <td style={{padding:'10px 12px',fontSize:15,verticalAlign:'top'}}>
                       <div style={{fontWeight:600}}>{item.name}</div>
-                      {item.company && <div style={{fontSize:11,color:T.gray400,marginTop:2}}>{item.company}</div>}
+                      {item.company && <div style={{fontSize:14,color:T.gray400,marginTop:2}}>{item.company}</div>}
                     </td>
-                    <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,fontSize:13,verticalAlign:'middle'}}>{item.qty} {item.unit || 'পিস'}</td>
-                    <td style={{padding:'10px 12px',textAlign:'right',fontSize:13,verticalAlign:'middle'}}>{fmt(item.sellP)}</td>
-                    <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green,fontSize:13,verticalAlign:'middle'}}>{fmt(item.qty * item.sellP)}</td>
+                    <td style={{padding:'10px 12px',textAlign:'center',fontWeight:600,fontSize:15,verticalAlign:'middle'}}>{item.qty} {item.unit || 'পিস'}</td>
+                    <td style={{padding:'10px 12px',textAlign:'right',fontSize:15,verticalAlign:'middle'}}>{fmt(item.sellP)}</td>
+                    <td style={{padding:'10px 12px',textAlign:'right',fontWeight:700,color:T.green,fontSize:15,verticalAlign:'middle'}}>{fmt(item.qty * item.sellP)}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr style={{background:T.gray100}}>
-                  <td colSpan={3} style={{padding:'12px',fontWeight:600,fontSize:13,textAlign:'right'}}>সাবটোটাল</td>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:600,fontSize:15,textAlign:'right'}}>সাবটোটাল</td>
                   <td style={{padding:'12px',textAlign:'right',fontWeight:700,fontSize:14}}>{fmt(viewSale.total)}</td>
                 </tr>
                 {viewSale.vatEnabled && viewSale.vat > 0 && (
                   <tr style={{background:T.gray100}}>
-                    <td colSpan={3} style={{padding:'12px',fontSize:13,color:T.gray600,textAlign:'right'}}>ভ্যাট ({viewSale.vatRate}%)</td>
-                    <td style={{padding:'12px',textAlign:'right',fontSize:13,color:T.gray600}}>{fmt(viewSale.vat)}</td>
+                    <td colSpan={3} style={{padding:'12px',fontSize:15,color:T.gray600,textAlign:'right'}}>ভ্যাট ({viewSale.vatRate}%)</td>
+                    <td style={{padding:'12px',textAlign:'right',fontSize:15,color:T.gray600}}>{fmt(viewSale.vat)}</td>
                   </tr>
                 )}
                 <tr style={{background:T.greenLight}}>
@@ -7777,7 +7777,7 @@ ${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;pad
                   <td style={{padding:'12px',textAlign:'right',fontWeight:800,fontSize:18,color:T.green}}>{fmt(viewSale.total + (viewSale.vat||0))}</td>
                 </tr>
                 <tr style={{background:T.greenLight}}>
-                  <td colSpan={3} style={{padding:'12px',fontWeight:600,fontSize:13,color:T.green,textAlign:'right'}}>পরিশোধ হয়েছে</td>
+                  <td colSpan={3} style={{padding:'12px',fontWeight:600,fontSize:15,color:T.green,textAlign:'right'}}>পরিশোধ হয়েছে</td>
                   <td style={{padding:12,textAlign:'right',fontWeight:700,fontSize:14,color:T.green}}>{fmt(viewSale.paid)}</td>
                 </tr>
                 {viewSale.due > 0 && (
@@ -8035,10 +8035,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
         
         <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <h1 style={{ margin: 0, fontSize: 28, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
+            <h1 style={{ margin: 0, fontSize: 29, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
               ⚙️ সেটিংস
             </h1>
-            <p style={{ margin: '8px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
+            <p style={{ margin: '8px 0 0', fontSize: 19, color: 'rgba(255,255,255,0.8)' }}>
               আপনার POS সিস্টেম কনফিগার করুন
             </p>
           </div>
@@ -8050,7 +8050,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
             color: saved ? '#fff' : '#0F766E',
             border: 'none',
             borderRadius: 12,
-            fontSize: 14,
+            fontSize: 19,
             fontWeight: 700,
             cursor: 'pointer',
             display: 'flex',
@@ -8093,7 +8093,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 display: 'flex',
                 alignItems: 'center',
                 gap: 8,
-                fontSize: 14,
+                fontSize: 19,
                 fontWeight: 600,
                 transition: 'all 0.2s ease',
                 background: activeTab === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
@@ -8128,18 +8128,18 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 24,
+                fontSize: 25,
                 color: '#fff'
               }}>⚙️</div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>সাধারণ তথ্য</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>আপনার ব্যবসার মূল তথ্য</p>
+                <h3 style={{ margin: 0, fontSize: 21, fontWeight: 700, color: '#1e293b' }}>সাধারণ তথ্য</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 19, color: '#64748b' }}>আপনার ব্যবসার মূল তথ্য</p>
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 24 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   🏪 ব্যবসার নাম *
                 </label>
                 <input
@@ -8148,7 +8148,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -8163,7 +8163,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   📞 মোবাইল নম্বর
                 </label>
                 <input
@@ -8172,7 +8172,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -8187,7 +8187,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   📍 ঠিকানা
                 </label>
                 <input
@@ -8196,7 +8196,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -8211,7 +8211,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   📧 ইমেইল
                 </label>
                 <input
@@ -8221,7 +8221,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -8236,8 +8236,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  🔢 আপনার VAT নম্বর (TIN) <span style={{fontSize:11,color:T.gray500}}>পারচেজ ইনভয়েসে দেখানো হবে</span>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
+                  🔢 আপনার VAT নম্বর (TIN) <span style={{fontSize:14,color:T.gray500}}>পারচেজ ইনভয়েসে দেখানো হবে</span>
                 </label>
                 <input
                   value={form.taxId || ''}
@@ -8245,7 +8245,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -8260,7 +8260,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   🏢 কমার্শিয়াল রেজিস্ট্রেশন (CR) *
                 </label>
                 <input
@@ -8269,7 +8269,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -8286,10 +8286,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               <div style={{ gridColumn: '1 / -1', padding: '20px 24px', background: '#f8fafc', borderRadius: 12, marginTop: 8, border: '2px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
                   <div>
-                    <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>
+                    <h4 style={{ margin: 0, fontSize: 19, fontWeight: 700, color: '#1e293b' }}>
                       🧾 ZATCA ই-ইনভয়েসিং {form.zatkaEnabled ? '✅ সক্রিয়' : '❌ নিষ্ক্রিয়'}
                     </h4>
-                    <p style={{ margin: '6px 0 0', fontSize: 12, color: '#64748b' }}>
+                    <p style={{ margin: '6px 0 0', fontSize: 19, color: '#64748b' }}>
                       সৌদি আরবের ZATCA নিয়ম অনুযায়ী ই-ইনভয়েস জমা দিন
                     </p>
                   </div>
@@ -8301,7 +8301,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       color: '#fff',
                       border: 'none',
                       borderRadius: 8,
-                      fontSize: 13,
+                      fontSize: 19,
                       fontWeight: 600,
                       cursor: 'pointer'
                     }}
@@ -8312,7 +8312,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
                 {/* Phase Selection */}
                 <div style={{ marginBottom: 20 }}>
-                  <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>📦 ফেজ সিলেক্ট করুন</h5>
+                  <h5 style={{ margin: '0 0 12px', fontSize: 19, fontWeight: 600, color: '#0F766E' }}>📦 ফেজ সিলেক্ট করুন</h5>
                   <div style={{ display: 'flex', gap: 12 }}>
                     <button
                       onClick={() => setForm(p => ({...p, zatcaPhase: 'phase1'}))}
@@ -8323,14 +8323,14 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         color: form.zatcaPhase === 'phase1' ? '#fff' : '#64748b',
                         border: form.zatcaPhase === 'phase1' ? '2px solid #0F766E' : '2px solid #e2e8f0',
                         borderRadius: 10,
-                        fontSize: 14,
+                        fontSize: 19,
                         fontWeight: 600,
                         cursor: 'pointer',
                         textAlign: 'left'
                       }}
                     >
                       <div style={{ marginBottom: 4 }}>📱 Phase 1 (সিমপ্লিফাইড)</div>
-                      <div style={{ fontSize: 11, fontWeight: 400, opacity: form.zatcaPhase === 'phase1' ? 0.8 : 0.6 }}>
+                      <div style={{ fontSize: 19, fontWeight: 400, opacity: form.zatcaPhase === 'phase1' ? 0.8 : 0.6 }}>
                         B2C - QR কোড + বেসিক ইনভয়েস (রিসিট)
                       </div>
                     </button>
@@ -8343,14 +8343,14 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         color: form.zatcaPhase === 'phase2' ? '#fff' : '#64748b',
                         border: form.zatcaPhase === 'phase2' ? '2px solid #0F766E' : '2px solid #e2e8f0',
                         borderRadius: 10,
-                        fontSize: 14,
+                        fontSize: 19,
                         fontWeight: 600,
                         cursor: 'pointer',
                         textAlign: 'left'
                       }}
                     >
                       <div style={{ marginBottom: 4 }}>🏢 Phase 2 (স্ট্যান্ডার্ড)</div>
-                      <div style={{ fontSize: 11, fontWeight: 400, opacity: form.zatcaPhase === 'phase2' ? 0.8 : 0.6 }}>
+                      <div style={{ fontSize: 19, fontWeight: 400, opacity: form.zatcaPhase === 'phase2' ? 0.8 : 0.6 }}>
                         B2B - XML UBL + API ক্লিয়ারেন্স + রিয়েল-টাইম রিপোর্টিং
                       </div>
                     </button>
@@ -8359,10 +8359,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
                 {/* API Credentials - Common for both phases */}
                 <div style={{ marginBottom: 20 }}>
-                  <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔑 API ক্রেডেনশিয়ালস</h5>
+                  <h5 style={{ margin: '0 0 12px', fontSize: 19, fontWeight: 600, color: '#0F766E' }}>🔑 API ক্রেডেনশিয়ালস</h5>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                     <div>
-                      <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                      <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                         🌐 API URL
                       </label>
                       <input
@@ -8371,7 +8371,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         style={{
                           width: '100%',
                           padding: '12px 14px',
-                          fontSize: 14,
+                          fontSize: 19,
                           border: '2px solid #e2e8f0',
                           borderRadius: 8,
                           outline: 'none',
@@ -8386,7 +8386,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                      <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                         👤 ইউজারনেম
                       </label>
                       <input
@@ -8395,7 +8395,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         style={{
                           width: '100%',
                           padding: '12px 14px',
-                          fontSize: 14,
+                          fontSize: 19,
                           border: '2px solid #e2e8f0',
                           borderRadius: 8,
                           outline: 'none',
@@ -8410,7 +8410,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                      <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                         🔐 পাসওয়ার্ড
                       </label>
                       <input
@@ -8420,7 +8420,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         style={{
                           width: '100%',
                           padding: '12px 14px',
-                          fontSize: 14,
+                          fontSize: 19,
                           border: '2px solid #e2e8f0',
                           borderRadius: 8,
                           outline: 'none',
@@ -8440,10 +8440,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 {/* Phase 1 Fields - CSID for Simplified Invoices */}
                 {form.zatcaPhase === 'phase1' && (
                   <div style={{ marginBottom: 20 }}>
-                    <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔐 Phase 1 ক্রিপ্টোগ্রাফিক আইডেন্টিফায়ার</h5>
+                    <h5 style={{ margin: '0 0 12px', fontSize: 19, fontWeight: 600, color: '#0F766E' }}>🔐 Phase 1 ক্রিপ্টোগ্রাফিক আইডেন্টিফায়ার</h5>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
                       <div>
-                        <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                        <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                           🏷️ OID (Organizational Identifier)
                         </label>
                         <input
@@ -8452,7 +8452,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           style={{
                             width: '100%',
                             padding: '12px 14px',
-                            fontSize: 14,
+                            fontSize: 19,
                             border: '2px solid #e2e8f0',
                             borderRadius: 8,
                             outline: 'none',
@@ -8467,7 +8467,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         />
                       </div>
                       <div>
-                        <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                        <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                           🆔 CSID (Cryptographic Stamp ID)
                         </label>
                         <input
@@ -8476,7 +8476,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           style={{
                             width: '100%',
                             padding: '12px 14px',
-                            fontSize: 14,
+                            fontSize: 19,
                             border: '2px solid #e2e8f0',
                             borderRadius: 8,
                             outline: 'none',
@@ -8498,10 +8498,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 {form.zatcaPhase === 'phase2' && (
                   <>
                     <div style={{ marginBottom: 20 }}>
-                      <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔐 Phase 2 ক্রিপ্টোগ্রাফিক আইডেন্টিফায়ার</h5>
+                      <h5 style={{ margin: '0 0 12px', fontSize: 19, fontWeight: 600, color: '#0F766E' }}>🔐 Phase 2 ক্রিপ্টোগ্রাফিক আইডেন্টিফায়ার</h5>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
                         <div>
-                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                             🏷️ OID (Organizational Identifier)
                           </label>
                           <input
@@ -8510,7 +8510,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                             style={{
                               width: '100%',
                               padding: '12px 14px',
-                              fontSize: 14,
+                              fontSize: 19,
                               border: '2px solid #e2e8f0',
                               borderRadius: 8,
                               outline: 'none',
@@ -8525,7 +8525,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           />
                         </div>
                         <div>
-                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                             🆔 CSID (Cryptographic Stamp ID)
                           </label>
                           <input
@@ -8534,7 +8534,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                             style={{
                               width: '100%',
                               padding: '12px 14px',
-                              fontSize: 14,
+                              fontSize: 19,
                               border: '2px solid #e2e8f0',
                               borderRadius: 8,
                               outline: 'none',
@@ -8549,7 +8549,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           />
                         </div>
                         <div>
-                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                             🔑 প্রাইভেট কী (Private Key)
                           </label>
                           <input
@@ -8558,7 +8558,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                             style={{
                               width: '100%',
                               padding: '12px 14px',
-                              fontSize: 14,
+                              fontSize: 19,
                               border: '2px solid #e2e8f0',
                               borderRadius: 8,
                               outline: 'none',
@@ -8577,10 +8577,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
                     {/* Phase 2 - OAuth2 Client Credentials */}
                     <div style={{ marginBottom: 20 }}>
-                      <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#0F766E' }}>🔑 OAuth2 Client Credentials (Phase 2 এর জন্য প্রয়োজন)</h5>
+                      <h5 style={{ margin: '0 0 12px', fontSize: 19, fontWeight: 600, color: '#0F766E' }}>🔑 OAuth2 Client Credentials (Phase 2 এর জন্য প্রয়োজন)</h5>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
                         <div>
-                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                             🆔 Client ID
                           </label>
                           <input
@@ -8589,7 +8589,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                             style={{
                               width: '100%',
                               padding: '12px 14px',
-                              fontSize: 14,
+                              fontSize: 19,
                               border: '2px solid #e2e8f0',
                               borderRadius: 8,
                               outline: 'none',
@@ -8604,7 +8604,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           />
                         </div>
                         <div>
-                          <label style={{ display: 'block', marginBottom: 6, fontSize: 12, fontWeight: 600, color: '#475569' }}>
+                          <label style={{ display: 'block', marginBottom: 6, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                             🔐 Client Secret
                           </label>
                           <input
@@ -8614,7 +8614,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                             style={{
                               width: '100%',
                               padding: '12px 14px',
-                              fontSize: 14,
+                              fontSize: 19,
                               border: '2px solid #e2e8f0',
                               borderRadius: 8,
                               outline: 'none',
@@ -8635,7 +8635,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
                 {/* ZATCA Required Fields Info */}
                 <div style={{ marginTop: 16, padding: '12px 16px', background: form.zatcaPhase === 'phase1' ? '#ecfdf5' : '#dbeafe', borderRadius: 8, border: `1px solid ${form.zatcaPhase === 'phase1' ? '#059669' : '#3b82f6'}` }}>
-                  <p style={{ margin: 0, fontSize: 12, color: form.zatcaPhase === 'phase1' ? '#065f46' : '#1e40af' }}>
+                  <p style={{ margin: 0, fontSize: 19, color: form.zatcaPhase === 'phase1' ? '#065f46' : '#1e40af' }}>
                     <strong>📋 {form.zatcaPhase === 'phase1' ? 'Phase 1 QR কোডে যা থাকবে:' : 'Phase 2 ইনভয়েসে যা থাকবে:'}</strong><br/>
                     {form.zatcaPhase === 'phase1' ? (
                       <>বিক্রেতার নাম • VAT নম্বর • CR নম্বর • ইনভয়েস তারিখ • মোট পরিমাণ (VAT সহ) • VAT পরিমাণ</>
@@ -8647,7 +8647,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
                 {/* VAT Settings */}
                 <div style={{ marginTop: 24 }}>
-                  <h5 style={{ margin: '0 0 16px', fontSize: 14, fontWeight: 600, color: '#1e293b' }}>💰 ভ্যাট সেটিংস</h5>
+                  <h5 style={{ margin: '0 0 16px', fontSize: 19, fontWeight: 600, color: '#1e293b' }}>💰 ভ্যাট সেটিংস</h5>
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -8658,10 +8658,10 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     border: `2px solid ${form.vatEnabled ? '#059669' : '#ef4444'}`
                   }}>
                     <div>
-                      <h4 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#1e293b' }}>
+                      <h4 style={{ margin: 0, fontSize: 19, fontWeight: 600, color: '#1e293b' }}>
                         ভ্যাট সক্রিয় {form.vatEnabled ? '✅' : '❌'}
                       </h4>
-                      <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                      <p style={{ margin: '4px 0 0', fontSize: 19, color: '#64748b' }}>
                         {form.vatEnabled ? 'সকল বিক্রয়ে ভ্যাট যোগ হবে' : 'ভ্যাট গণনা বন্ধ আছে'}
                       </p>
                     </div>
@@ -8673,7 +8673,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         color: '#fff',
                         border: 'none',
                         borderRadius: 8,
-                        fontSize: 13,
+                        fontSize: 19,
                         fontWeight: 600,
                         cursor: 'pointer'
                       }}
@@ -8693,7 +8693,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       alignItems: 'center',
                       gap: 16
                     }}>
-                      <label style={{ fontSize: 13, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>
+                      <label style={{ fontSize: 19, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>
                         ডিফল্ট ভ্যাট শতাংশ:
                       </label>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -8706,7 +8706,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           style={{
                             width: 100,
                             padding: '12px 14px',
-                            fontSize: 16,
+                            fontSize: 19,
                             fontWeight: 700,
                             border: '2px solid #86efac',
                             borderRadius: 8,
@@ -8716,7 +8716,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                             background: '#fff'
                           }}
                         />
-                        <span style={{ fontSize: 18, fontWeight: 700, color: '#166534' }}>%</span>
+                        <span style={{ fontSize: 19, fontWeight: 700, color: '#166534' }}>%</span>
                       </div>
                     </div>
                   )}
@@ -8743,12 +8743,12 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 24,
+                fontSize: 25,
                 color: '#fff'
               }}>🎨</div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডিজাইন সেটিংস</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>রিসিট টেমপ্লেট ও হোম পেজ ব্যানার</p>
+                <h3 style={{ margin: 0, fontSize: 21, fontWeight: 700, color: '#1e293b' }}>ডিজাইন সেটিংস</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 19, color: '#64748b' }}>রিসিট টেমপ্লেট ও হোম পেজ ব্যানার</p>
               </div>
             </div>
 
@@ -8757,11 +8757,11 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
               {/* Left Column - Settings */}
               <div>
-                <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>🧾 বিক্রয় ইনভয়েস প্রিন্ট টেমপ্লেট</h4>
+                <h4 style={{ margin: '0 0 16px', fontSize: 19, fontWeight: 600, color: '#1e293b' }}>🧾 বিক্রয় ইনভয়েস প্রিন্ট টেমপ্লেট</h4>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                       হেডার টাইটেল
                     </label>
                     <input
@@ -8770,7 +8770,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       style={{
                         width: '100%',
                         padding: '12px 14px',
-                        fontSize: 14,
+                        fontSize: 19,
                         border: '2px solid #e2e8f0',
                         borderRadius: 8,
                         outline: 'none',
@@ -8783,7 +8783,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                       ফুটার টেক্সট
                     </label>
                     <input
@@ -8792,7 +8792,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       style={{
                         width: '100%',
                         padding: '12px 14px',
-                        fontSize: 14,
+                        fontSize: 19,
                         border: '2px solid #e2e8f0',
                         borderRadius: 8,
                         outline: 'none',
@@ -8805,7 +8805,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                       আইকন
                     </label>
                     <input
@@ -8814,7 +8814,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       style={{
                         width: '100%',
                         padding: '12px 14px',
-                        fontSize: 14,
+                        fontSize: 19,
                         border: '2px solid #e2e8f0',
                         borderRadius: 8,
                         outline: 'none',
@@ -8827,7 +8827,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                       ফন্ট সাইজ
                     </label>
                     <select
@@ -8836,7 +8836,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       style={{
                         width: '100%',
                         padding: '12px 14px',
-                        fontSize: 14,
+                        fontSize: 19,
                         border: '2px solid #e2e8f0',
                         borderRadius: 8,
                         outline: 'none',
@@ -8855,7 +8855,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 </div>
 
                 <div style={{ padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '2px solid #e2e8f0' }}>
-                  <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
+                  <h5 style={{ margin: '0 0 12px', fontSize: 19, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                     {[
                       { key: 'receiptShowLogo', label: 'লোগো/আইকন' },
@@ -8872,18 +8872,18 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           onChange={e => setForm(p => ({...p, [item.key]: e.target.checked}))}
                           style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#0F766E' }}
                         />
-                        <span style={{ fontSize: 13, color: '#475569' }}>{item.label}</span>
+                        <span style={{ fontSize: 19, color: '#475569' }}>{item.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
                 {/* Purchase Template Settings */}
-                <h4 style={{ margin: '32px 0 16px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>🛒 পারচেজ ইনভয়েস প্রিন্ট টেমপ্লেট</h4>
+                <h4 style={{ margin: '32px 0 16px', fontSize: 19, fontWeight: 600, color: '#1e293b' }}>🛒 পারচেজ ইনভয়েস প্রিন্ট টেমপ্লেট</h4>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
                   <div>
-                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                       হেডার টাইটেল
                     </label>
                     <input
@@ -8892,7 +8892,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       style={{
                         width: '100%',
                         padding: '12px 14px',
-                        fontSize: 14,
+                        fontSize: 19,
                         border: '2px solid #e2e8f0',
                         borderRadius: 8,
                         outline: 'none',
@@ -8905,7 +8905,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                       ফুটার টেক্সট
                     </label>
                     <input
@@ -8914,7 +8914,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       style={{
                         width: '100%',
                         padding: '12px 14px',
-                        fontSize: 14,
+                        fontSize: 19,
                         border: '2px solid #e2e8f0',
                         borderRadius: 8,
                         outline: 'none',
@@ -8927,7 +8927,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                       আইকন
                     </label>
                     <input
@@ -8936,7 +8936,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       style={{
                         width: '100%',
                         padding: '12px 14px',
-                        fontSize: 14,
+                        fontSize: 19,
                         border: '2px solid #e2e8f0',
                         borderRadius: 8,
                         outline: 'none',
@@ -8949,7 +8949,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                       ফন্ট সাইজ
                     </label>
                     <select
@@ -8958,7 +8958,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       style={{
                         width: '100%',
                         padding: '12px 14px',
-                        fontSize: 14,
+                        fontSize: 19,
                         border: '2px solid #e2e8f0',
                         borderRadius: 8,
                         outline: 'none',
@@ -8977,7 +8977,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 </div>
 
                 <div style={{ padding: '16px 20px', background: '#f8fafc', borderRadius: 12, border: '2px solid #e2e8f0', marginBottom: 16 }}>
-                  <h5 style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
+                  <h5 style={{ margin: '0 0 12px', fontSize: 19, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
                     {[
                       { key: 'purchaseShowLogo', label: 'লোগো/আইকন' },
@@ -8994,7 +8994,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                           onChange={e => setForm(p => ({...p, [item.key]: e.target.checked}))}
                           style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#0F766E' }}
                         />
-                        <span style={{ fontSize: 13, color: '#475569' }}>{item.label}</span>
+                        <span style={{ fontSize: 19, color: '#475569' }}>{item.label}</span>
                       </label>
                     ))}
                   </div>
@@ -9003,11 +9003,11 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
               {/* Right Column - Sales & Purchase Preview */}
               <div>
-                <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>👁️ প্রিভিউ</h4>
+                <h4 style={{ margin: '0 0 16px', fontSize: 19, fontWeight: 600, color: '#1e293b' }}>👁️ প্রিভিউ</h4>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                   {/* Sales Preview */}
                   <div style={{ background: '#f1f5f9', borderRadius: 12, padding: 16 }}>
-                    <div style={{ marginBottom: 8, fontSize: 12, fontWeight: 600, color: '#0F766E' }}>🧾 বিক্রয় ইনভয়েস</div>
+                    <div style={{ marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#0F766E' }}>🧾 বিক্রয় ইনভয়েস</div>
                     <div style={{ background: '#fff', padding: `${form.receiptFontSize||11}px`, width: 220, margin: '0 auto', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: `${form.receiptFontSize||11}px`, fontFamily: "'Tiro Bangla','Courier New',monospace", color: '#000' }}>
                       <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 6, marginBottom: 6 }}>
                         {form.receiptShowLogo!==false&&<div style={{ fontWeight: 'bold', fontSize: `${(form.receiptFontSize||11)+3}px` }}>{form.receiptLogo||form.receiptHeader||'🧾 বিক্রয়'}</div>}
@@ -9042,7 +9042,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
                   {/* Purchase Preview */}
                   <div style={{ background: '#f1f5f9', borderRadius: 12, padding: 16 }}>
-                    <div style={{ marginBottom: 8, fontSize: 12, fontWeight: 600, color: '#0F766E' }}>🛒 পারচেজ ইনভয়েস</div>
+                    <div style={{ marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#0F766E' }}>🛒 পারচেজ ইনভয়েস</div>
                     <div style={{ background: '#fff', padding: `${form.purchaseFontSize||11}px`, width: 220, margin: '0 auto', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', fontSize: `${form.purchaseFontSize||11}px`, fontFamily: "'Tiro Bangla','Courier New',monospace", color: '#000' }}>
                       <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 6, marginBottom: 6 }}>
                         {form.purchaseShowLogo!==false&&<div style={{ fontWeight: 'bold', fontSize: `${(form.purchaseFontSize||11)+3}px` }}>{form.purchaseIcon||form.purchaseHeader||'🛒 পারচেজ'}</div>}
@@ -9082,8 +9082,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
             {/* Home Page Banner Section - Below the 2-column grid */}
             <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0', margin: '0 0 24px' }} />
-            <h4 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>🏠 হোম পেজ ব্যানার ছবি</h4>
-            <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>
+            <h4 style={{ margin: '0 0 16px', fontSize: 19, fontWeight: 600, color: '#1e293b' }}>🏠 হোম পেজ ব্যানার ছবি</h4>
+            <p style={{ margin: '0 0 16px', fontSize: 19, color: '#64748b', lineHeight: 1.6 }}>
               বিক্রয় পেজে ডিফল্টে দেখানোর জন্য একটি ছবি আপলোড করুন। সরবরাহকারী/ক্যাটাগরি সিলেক্ট করলে এই ছবি লুকিয়ে যাবে।
             </p>
 
@@ -9107,7 +9107,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     border: 'none',
                     borderRadius: 8,
                     cursor: 'pointer',
-                    fontSize: 13,
+                    fontSize: 19,
                     fontWeight: 600
                   }}
                 >
@@ -9127,7 +9127,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               cursor: 'pointer',
               background: '#f8fafc',
               transition: 'all 0.2s',
-              fontSize: 14,
+              fontSize: 19,
               color: '#64748b'
             }}
             onMouseOver={e => { e.currentTarget.style.borderColor = '#0F766E'; e.currentTarget.style.background = '#f0fdfa'; }}
@@ -9159,12 +9159,12 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 24,
+                    fontSize: 25,
                     color: '#fff'
                   }}>👥</div>
                   <div>
-                    <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ইউজার ম্যানেজমেন্ট</h3>
-                    <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>সিস্টেম ইউজার যোগ ও পরিচালনা</p>
+                    <h3 style={{ margin: 0, fontSize: 21, fontWeight: 700, color: '#1e293b' }}>ইউজার ম্যানেজমেন্ট</h3>
+                    <p style={{ margin: '4px 0 0', fontSize: 19, color: '#64748b' }}>সিস্টেম ইউজার যোগ ও পরিচালনা</p>
                   </div>
                 </div>
                 <button
@@ -9175,7 +9175,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     color: '#fff',
                     border: 'none',
                     borderRadius: 10,
-                    fontSize: 14,
+                    fontSize: 19,
                     fontWeight: 700,
                     cursor: 'pointer',
                     display: 'flex',
@@ -9195,7 +9195,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 border: '1px solid #99f6e4',
                 marginBottom: 24
               }}>
-                <p style={{ margin: 0, fontSize: 13, color: '#115e59', lineHeight: 1.6 }}>
+                <p style={{ margin: 0, fontSize: 19, color: '#115e59', lineHeight: 1.6 }}>
                   👑 সুপার এডমিন (admin@konok.io) সবসময় সক্রিয় থাকে এবং মুছে যায় না।
                 </p>
               </div>
@@ -9219,12 +9219,12 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 22,
+                    fontSize: 23,
                     color: '#fff'
                   }}>👑</div>
                   <div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: '#1e293b' }}>Super Admin</div>
-                    <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>admin@konok.io</div>
+                    <div style={{ fontSize: 19, fontWeight: 700, color: '#1e293b' }}>Super Admin</div>
+                    <div style={{ fontSize: 19, color: '#64748b', marginTop: 2 }}>admin@konok.io</div>
                   </div>
                 </div>
                 <div style={{
@@ -9232,7 +9232,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   background: '#0F766E',
                   color: '#fff',
                   borderRadius: 8,
-                  fontSize: 12,
+                  fontSize: 19,
                   fontWeight: 700
                 }}>👑 সুপার</div>
               </div>
@@ -9257,13 +9257,13 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: 20,
+                      fontSize: 21,
                       color: '#fff',
                       fontWeight: 700
                     }}>{u.name?.charAt(0).toUpperCase()}</div>
                     <div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{u.name}</div>
-                      <div style={{ fontSize: 13, color: '#64748b', marginTop: 2 }}>{u.email}</div>
+                      <div style={{ fontSize: 19, fontWeight: 700, color: '#1e293b' }}>{u.name}</div>
+                      <div style={{ fontSize: 19, color: '#64748b', marginTop: 2 }}>{u.email}</div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -9272,7 +9272,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                       background: u.role === 'admin' ? '#64748b' : '#f59e0b',
                       color: '#fff',
                       borderRadius: 8,
-                      fontSize: 11,
+                      fontSize: 19,
                       fontWeight: 700
                     }}>
                       {u.role === 'admin' ? '🛡️ এডমিন' : '🛒 অপারেটর'}
@@ -9305,7 +9305,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
               {users.length === 0 && (
                 <div style={{ textAlign: 'center', padding: 48, color: '#94a3b8' }}>
-                  <div style={{ fontSize: 48, marginBottom: 12 }}>👥</div>
+                  <div style={{ fontSize: 49, marginBottom: 12 }}>👥</div>
                   <div style={{ fontSize: 15 }}>কোনো ইউজার নেই</div>
                 </div>
               )}
@@ -9319,9 +9319,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
               border: '1px solid #e2e8f0',
               textAlign: 'center'
             }}>
-              <div style={{ fontSize: 72, marginBottom: 20 }}>🔒</div>
-              <h3 style={{ margin: '0 0 12px', fontSize: 20, fontWeight: 700, color: '#374151' }}>এক্সেস সীমাবদ্ধ</h3>
-              <p style={{ margin: 0, fontSize: 14, color: '#6b7280' }}>শুধুমাত্র সুপার এডমিন এই পেজ দেখতে পারবেন।</p>
+              <div style={{ fontSize: 73, marginBottom: 20 }}>🔒</div>
+              <h3 style={{ margin: '0 0 12px', fontSize: 21, fontWeight: 700, color: '#374151' }}>এক্সেস সীমাবদ্ধ</h3>
+              <p style={{ margin: 0, fontSize: 19, color: '#6b7280' }}>শুধুমাত্র সুপার এডমিন এই পেজ দেখতে পারবেন।</p>
             </div>
           )
         )}
@@ -9344,12 +9344,12 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 24,
+                  fontSize: 25,
                   color: '#fff'
                 }}>⚠️</div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>ডেটা রিসেট</h3>
-                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ডেটা মুছে ফেলার জন্য সতর্ক ব্যবহার করুন</p>
+                  <h3 style={{ margin: 0, fontSize: 21, fontWeight: 700, color: '#1e293b' }}>ডেটা রিসেট</h3>
+                  <p style={{ margin: '4px 0 0', fontSize: 19, color: '#64748b' }}>ডেটা মুছে ফেলার জন্য সতর্ক ব্যবহার করুন</p>
                 </div>
               </div>
 
@@ -9360,7 +9360,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 border: '1px solid #fecaca',
                 marginBottom: 24
               }}>
-                <p style={{ margin: 0, fontSize: 13, color: '#dc2626', lineHeight: 1.6 }}>
+                <p style={{ margin: 0, fontSize: 19, color: '#dc2626', lineHeight: 1.6 }}>
                   ⚠️ সতর্কতা: নিচের অপশনগুলো ব্যবহারে ডেটা স্থায়ীভাবে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।
                 </p>
               </div>
@@ -9381,8 +9381,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     borderRadius: 14,
                     border: '1px solid #fecaca'
                   }}>
-                    <h4 style={{ margin: '0 0 8px', fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{d.l}</h4>
-                    <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b' }}>মোট {d.c}টি আইটেম</p>
+                    <h4 style={{ margin: '0 0 8px', fontSize: 19, fontWeight: 700, color: '#1e293b' }}>{d.l}</h4>
+                    <p style={{ margin: '0 0 16px', fontSize: 19, color: '#64748b' }}>মোট {d.c}টি আইটেম</p>
                     <button
                       onClick={d.fn}
                       style={{
@@ -9392,7 +9392,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         color: '#fff',
                         border: 'none',
                         borderRadius: 10,
-                        fontSize: 13,
+                        fontSize: 19,
                         fontWeight: 700,
                         cursor: 'pointer'
                       }}
@@ -9410,8 +9410,8 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 borderRadius: 14,
                 border: '2px solid #ef4444'
               }}>
-                <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 700, color: '#dc2626' }}>💥 সম্পূর্ণ রিসেট</h4>
-                <p style={{ margin: '0 0 16px', fontSize: 13, color: '#6b7280' }}>সমস্ত ডেটা মুছে ফেলুন। এটি পূর্বাবস্থায় ফেরানো যাবে না।</p>
+                <h4 style={{ margin: '0 0 8px', fontSize: 19, fontWeight: 700, color: '#dc2626' }}>💥 সম্পূর্ণ রিসেট</h4>
+                <p style={{ margin: '0 0 16px', fontSize: 19, color: '#6b7280' }}>সমস্ত ডেটা মুছে ফেলুন। এটি পূর্বাবস্থায় ফেরানো যাবে না।</p>
                 <button
                   onClick={async () => {
                     if(confirm('⚠️ সত্যিই সব ডেটা মুছে ফেলবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না।')) {
@@ -9436,7 +9436,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     color: '#fff',
                     border: 'none',
                     borderRadius: 10,
-                    fontSize: 14,
+                    fontSize: 19,
                     fontWeight: 700,
                     cursor: 'pointer'
                   }}
@@ -9471,7 +9471,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
             boxShadow: '0 25px 50px rgba(0,0,0,0.25)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
-              <h3 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1e293b' }}>
+              <h3 style={{ margin: 0, fontSize: 21, fontWeight: 700, color: '#1e293b' }}>
                 {editingUser ? '✏️ ইউজার এডিট করুন' : '➕ নতুন ইউজার যোগ করুন'}
               </h3>
               <button
@@ -9482,7 +9482,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   border: 'none',
                   borderRadius: 10,
                   cursor: 'pointer',
-                  fontSize: 18,
+                  fontSize: 19,
                   color: '#64748b'
                 }}
               >✕</button>
@@ -9490,7 +9490,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   👤 নাম
                 </label>
                 <input
@@ -9500,7 +9500,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -9514,7 +9514,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   📧 ইমেইল
                 </label>
                 <input
@@ -9524,7 +9524,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -9538,7 +9538,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 8, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 8, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   🔐 পাসওয়ার্ড
                 </label>
                 <input
@@ -9548,7 +9548,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   style={{
                     width: '100%',
                     padding: '14px 16px',
-                    fontSize: 15,
+                    fontSize: 19,
                     border: '2px solid #e2e8f0',
                     borderRadius: 10,
                     outline: 'none',
@@ -9562,7 +9562,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 10, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                <label style={{ display: 'block', marginBottom: 10, fontSize: 19, fontWeight: 600, color: '#475569' }}>
                   🎭 রোল নির্বাচন করুন
                 </label>
                 <div style={{ display: 'flex', gap: 10 }}>
@@ -9582,7 +9582,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                         color: userForm.role === r.v ? '#fff' : '#64748b',
                         border: 'none',
                         borderRadius: 10,
-                        fontSize: 11,
+                        fontSize: 19,
                         fontWeight: 700,
                         cursor: 'pointer',
                         transition: 'all 0.2s'
@@ -9592,7 +9592,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                     </button>
                   ))}
                 </div>
-                <p style={{ margin: '10px 0 0', fontSize: 12, color: '#94a3b8', lineHeight: 1.5 }}>
+                <p style={{ margin: '10px 0 0', fontSize: 19, color: '#94a3b8', lineHeight: 1.5 }}>
                   সুপার = সব এক্সেস | এডমিন = সব (ইউজার ছাড়া) | অপারেটর = শুধু বিক্রয়
                 </p>
               </div>
@@ -9607,7 +9607,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   background: '#f1f5f9',
                   border: 'none',
                   borderRadius: 12,
-                  fontSize: 14,
+                  fontSize: 19,
                   fontWeight: 700,
                   cursor: 'pointer',
                   color: '#64748b'
@@ -9621,7 +9621,7 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
                   border: 'none',
                   borderRadius: 12,
-                  fontSize: 14,
+                  fontSize: 19,
                   fontWeight: 700,
                   cursor: 'pointer',
                   color: '#fff',
