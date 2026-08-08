@@ -49,6 +49,9 @@ function login() {
         $_SESSION['user_role'] = 'super_admin';
         $_SESSION['login_time'] = time();
         
+        // Save session to database immediately
+        saveSessionToDB();
+        
         response([
             'user' => [
                 'id' => 'super-admin',
@@ -79,6 +82,9 @@ function login() {
         $_SESSION['user_role'] = $user['role'];
         $_SESSION['login_time'] = time();
         
+        // Save session to database immediately
+        saveSessionToDB();
+        
         response([
             'user' => [
                 'id' => $user['id'],
@@ -91,6 +97,30 @@ function login() {
         
     } catch (Exception $e) {
         response(null, 'Login failed: ' . $e->getMessage(), 500);
+    }
+}
+
+/**
+ * Save session to database
+ */
+function saveSessionToDB() {
+    try {
+        $db = getDB();
+        $sessionId = session_id();
+        $sessionData = array(
+            'user_id' => $_SESSION['user_id'] ?? null,
+            'user_name' => $_SESSION['user_name'] ?? null,
+            'user_email' => $_SESSION['user_email'] ?? null,
+            'user_role' => $_SESSION['user_role'] ?? null,
+            'login_time' => $_SESSION['login_time'] ?? null,
+        );
+        $data = json_encode($sessionData);
+        $expiresAt = date('Y-m-d H:i:s', time() + 604800); // 7 days
+        
+        $stmt = $db->prepare("INSERT OR REPLACE INTO sessions (id, data, expires_at, created_at) VALUES (?, ?, ?, datetime('now'))");
+        $stmt->execute([$sessionId, $data, $expiresAt]);
+    } catch (Exception $e) {
+        // Ignore errors - session will still work in memory
     }
 }
 
@@ -143,6 +173,9 @@ function checkAuth() {
         response(['authenticated' => false], null, 200);
         return;
     }
+    
+    // Refresh session in database to extend expiry
+    saveSessionToDB();
     
     response([
         'authenticated' => true,

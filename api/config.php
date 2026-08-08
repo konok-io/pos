@@ -52,69 +52,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Use database-based session for persistence across builds/restarts
 // Session data is stored in SQLite database in .pos_data directory
 
-// Session lifetime: 7 days for better persistence
-ini_set('session.gc_maxlifetime', 604800); // 7 days
-ini_set('session.cookie_lifetime', 604800); // 7 days cookie
+// Session lifetime: 30 days for better persistence
+ini_set('session.gc_maxlifetime', 2592000); // 30 days
+ini_set('session.cookie_lifetime', 2592000); // 30 days cookie
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_samesite', 'Lax');
-ini_set('session.use_strict_mode', 1);
+ini_set('session.use_strict_mode', 0); // Disable to allow session restoration
 ini_set('session.use_only_cookies', 1);
 
 // Set cookie path to root to work across all paths
 ini_set('session.cookie_path', '/');
 
-// Start PHP session (minimal, just for session ID)
+// Start PHP session
 session_start();
 
 // Update session expiry on activity
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 604800)) {
-    // Session expired (7 days), regenerate
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 2592000)) {
+    // Session expired (30 days), clear it
     $_SESSION = array();
-    session_destroy();
-    session_start();
 }
+
+// Always update last activity
 $_SESSION['LAST_ACTIVITY'] = time();
 
-// Load session data from database if exists
+// Load session data from database if session is empty but exists in DB
 $sessionId = session_id();
 $db = null;
-try {
-    $db = getDB();
-    $stmt = $db->prepare("SELECT data FROM sessions WHERE id = ? AND expires_at > datetime('now')");
-    $stmt->execute([$sessionId]);
-    $row = $stmt->fetch();
-    if ($row && $row['data']) {
-        $sessionData = json_decode($row['data'], true);
-        if (is_array($sessionData)) {
-            foreach ($sessionData as $key => $value) {
-                $_SESSION[$key] = $value;
-            }
-        }
-    }
-} catch (Exception $e) {
-    // Continue with empty session if database fails
-}
-
-// Save session data to database before output
-register_shutdown_function(function() use ($sessionId, $db) {
-    if ($db && session_status() === PHP_SESSION_ACTIVE) {
-        try {
-            $sessionData = array();
-            foreach ($_SESSION as $key => $value) {
-                if (!in_array($key, array('LAST_ACTIVITY', 'CREATED'))) {
-                    $sessionData[$key] = $value;
+if (!isset($_SESSION['user_id'])) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("SELECT data FROM sessions WHERE id = ? AND expires_at > datetime('now')");
+        $stmt->execute([$sessionId]);
+        $row = $stmt->fetch();
+        if ($row && $row['data']) {
+            $sessionData = json_decode($row['data'], true);
+            if (is_array($sessionData) && isset($sessionData['user_id'])) {
+                foreach ($sessionData as $key => $value) {
+                    $_SESSION[$key] = $value;
                 }
             }
-            $data = json_encode($sessionData);
-            $expiresAt = date('Y-m-d H:i:s', time() + 604800);
-            
-            $stmt = $db->prepare("INSERT OR REPLACE INTO sessions (id, data, expires_at) VALUES (?, ?, ?)");
-            $stmt->execute([$sessionId, $data, $expiresAt]);
-        } catch (Exception $e) {
-            // Ignore errors on shutdown
         }
+    } catch (Exception $e) {
+        // Continue with empty session if database fails
     }
-});
+}
+
+// Save session data to database if user is logged in
+if (isset($_SESSION['user_id'])) {
+    try {
+        if (!$db) $db = getDB();
+        $sessionData = array(
+            'user_id' => $_SESSION['user_id'],
+            'user_name' => $_SESSION['user_name'] ?? '',
+            'user_email' => $_SESSION['user_email'] ?? '',
+            'user_role' => $_SESSION['user_role'] ?? '',
+            'login_time' => $_SESSION['login_time'] ?? time(),
+        );
+        $data = json_encode($sessionData);
+        $expiresAt = date('Y-m-d H:i:s', time() + 2592000); // 30 days
+        
+        $stmt = $db->prepare("INSERT OR REPLACE INTO sessions (id, data, expires_at, created_at) VALUES (?, ?, ?, datetime('now'))");
+        $stmt->execute([$sessionId, $data, $expiresAt]);
+    } catch (Exception $e) {
+        // Ignore errors
+    }
+}
 
 /**
  * Database Connection Class
