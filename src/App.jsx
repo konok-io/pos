@@ -1,88 +1,57 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import "./App.css";
+import database, { STORES } from "./db";
 
 /* --------------- GLOBAL CSS RESET --------------- */
 const GlobalStyle = () => {
   return null;
 };
 
-/* --------------- LICENSE API --------------- */
-const LICENSE_SERVER_URL = 'https://konok.io/api';
+/* --------------- LICENSE API (stored in IndexedDB) --------------- */
 const TRIAL_DAYS = 7;
+const LICENSE_STORE = 'license';
 
-// Generate unique installation ID
-function getInstallationId() {
-  let installId = localStorage.getItem('pos_installation_id');
-  if (!installId) {
-    installId = 'POS-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('pos_installation_id', installId);
+// Check trial status from IndexedDB
+async function getTrialStatus() {
+  try {
+    const license = await database.get(LICENSE_STORE, 'status');
+    if (!license || !license.firstRunDate) {
+      return { daysLeft: TRIAL_DAYS, isExpired: false };
+    }
+    
+    const firstRun = new Date(license.firstRunDate);
+    const now = new Date();
+    const daysPassed = Math.floor((now - firstRun) / (1000 * 60 * 60 * 24));
+    const daysLeft = Math.max(0, TRIAL_DAYS - daysPassed);
+    
+    return { daysLeft, isExpired: daysLeft <= 0 };
+  } catch {
+    return { daysLeft: TRIAL_DAYS, isExpired: false };
   }
-  return installId;
 }
 
-// Check trial status
-function getTrialStatus() {
-  const license = JSON.parse(localStorage.getItem('pos_license') || '{}');
-  if (!license.firstRunDate) return { daysLeft: TRIAL_DAYS, isExpired: false };
-  
-  const firstRun = new Date(license.firstRunDate);
-  const now = new Date();
-  const daysPassed = Math.floor((now - firstRun) / (1000 * 60 * 60 * 24));
-  const daysLeft = Math.max(0, TRIAL_DAYS - daysPassed);
-  
-  return { daysLeft, isExpired: daysLeft <= 0 };
+// Save license status to IndexedDB
+async function saveTrialStatus(licenseData) {
+  await database.add(LICENSE_STORE, { key: 'status', ...licenseData });
 }
 
-// Verify license with server
+// Verify license (offline validation)
 async function verifyLicense(licenseKey) {
-  try {
-    const installId = getInstallationId();
-    const response = await fetch(`${LICENSE_SERVER_URL}/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        license_key: licenseKey,
-        installation_id: installId,
-        domain: window.location.hostname
-      })
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Verification failed');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('License verification error:', error);
-    return { success: false, error: error.message };
+  // Simple offline validation - just check format
+  if (licenseKey && licenseKey.length >= 10) {
+    return { success: true };
   }
+  return { success: false, error: 'Invalid license key' };
 }
 
-// Activate license
+// Activate license (save to IndexedDB)
 async function activateLicense(licenseKey) {
-  try {
-    const installId = getInstallationId();
-    const response = await fetch(`${LICENSE_SERVER_URL}/activate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        license_key: licenseKey,
-        installation_id: installId,
-        domain: window.location.hostname
-      })
-    });
-    
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Activation failed');
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('License activation error:', error);
-    return { success: false, error: error.message };
-  }
+  await saveTrialStatus({
+    licenseKey,
+    activated: true,
+    activatedDate: new Date().toISOString()
+  });
+  return { success: true };
 }
 
 /* --------------- LICENSE MODAL --------------- */
@@ -91,16 +60,20 @@ function LicenseModal({ onAccept }) {
   const [licenseKey, setLicenseKey] = useState('');
   const [licenseError, setLicenseError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { daysLeft } = getTrialStatus();
+  const [daysLeft, setDaysLeft] = useState(TRIAL_DAYS);
 
-  const handleAccept = () => {
+  useEffect(() => {
+    getTrialStatus().then(status => setDaysLeft(status.daysLeft));
+  }, []);
+
+  const handleAccept = async () => {
     const licenseData = {
       accepted: true,
       acceptedDate: new Date().toISOString(),
       firstRunDate: new Date().toISOString(),
       trialDays: TRIAL_DAYS
     };
-    localStorage.setItem('pos_license', JSON.stringify(licenseData));
+    await saveTrialStatus(licenseData);
     onAccept();
   };
 
@@ -124,7 +97,7 @@ function LicenseModal({ onAccept }) {
         isLicensed: true,
         trialDays: 0
       };
-      localStorage.setItem('pos_license', JSON.stringify(licenseData));
+      await saveTrialStatus(licenseData);
       onAccept();
     } else {
       setLicenseError(result.error || 'Invalid license key');
@@ -725,7 +698,7 @@ function LoginScreen({ onLogin, settings }) {
         setError('ব্যবহারকারীর নাম বা পাসওয়ার্ড ভুল!');
       }
     } catch (err) {
-      setError('সার্ভারে সংযোগ করতে ব্যর্থ!');
+      setError('সমস্যা হয়েছে! আবার চেষ্টা করুন।');
     }
     setLoading(false);
   };
@@ -1388,20 +1361,50 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
-  const [licenseAccepted, setLicenseAccepted] = useState(() => {
-    try {
-      const license = localStorage.getItem('pos_license');
-      if (license) {
-        const licenseData = JSON.parse(license);
-        return licenseData.accepted === true;
+  const [dbReady, setDbReady] = useState(false);
+  const [licenseAccepted, setLicenseAccepted] = useState(false);
+  
+  // Initialize database and check license
+  useEffect(() => {
+    async function initApp() {
+      try {
+        // Initialize IndexedDB
+        await database.openDB();
+        await database.initializeDefaults();
+        setDbReady(true);
+        
+        // Check license acceptance from IndexedDB
+        const license = await database.get(STORES.license, 'status');
+        if (license && license.accepted === true) {
+          setLicenseAccepted(true);
+        }
+      } catch (e) {
+        console.error('Failed to initialize:', e);
+        setDbReady(true); // Continue anyway
       }
-    } catch (e) {}
-    return false;
-  });
+    }
+    initApp();
+  }, []);
   
   const handleLicenseAccept = () => {
     setLicenseAccepted(true);
   };
+
+  // Show loading while initializing
+  if (!dbReady) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        height: '100vh', background: '#0F766E', color: 'white',
+        fontFamily: 'BanglaFont, "Segoe UI", system-ui, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>🏪</div>
+          <div>লোড হচ্ছে...</div>
+        </div>
+      </div>
+    );
+  }
 
   // Show license modal if not accepted
   if (!licenseAccepted) {
@@ -1410,7 +1413,7 @@ export default function App() {
 
   useEffect(() => {
     async function checkAuth() {
-      console.log('Checking PHP session auth...');
+      console.log('Checking auth...');
       
       try {
         const result = await auth.check();
@@ -1425,13 +1428,11 @@ export default function App() {
           setCurrentUser(result.data.user);
           setIsLoggedIn(true);
         } else {
-          // Not authenticated - show login screen (this is normal, not an error)
+          // Not authenticated - show login screen
           setIsLoggedIn(false);
         }
       } catch (e) {
         console.log('Auth check failed:', e.message);
-        // API failed - don't logout, just show login screen
-        // This prevents auto-logout on page refresh when API is slow
         setIsLoggedIn(false);
       }
       
@@ -4173,7 +4174,7 @@ function SuppliersScreen({suppliers, products, categories, purchases, upd, refre
       }
     } catch (error) {
       console.error('Failed to add supplier:', error);
-      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+      alert('❌ সমস্যা হয়েছে!');
     }
   };
 
@@ -6683,7 +6684,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       }
     } catch (error) {
       console.error('Failed to save expense:', error);
-      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+      alert('❌ সমস্যা হয়েছে!');
     }
   };
 
@@ -6700,7 +6701,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       }
     } catch (error) {
       console.error('Failed to delete expense:', error);
-      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+      alert('❌ সমস্যা হয়েছে!');
     }
   };
 
@@ -6729,7 +6730,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       }
     } catch (error) {
       console.error('Failed to save income:', error);
-      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+      alert('❌ সমস্যা হয়েছে!');
     }
   };
 
@@ -6746,7 +6747,7 @@ function IncomeScreen({sales, purchases, upd, refreshData}) {
       }
     } catch (error) {
       console.error('Failed to delete income:', error);
-      alert('❌ সার্ভারে সংযোগ করতে ব্যর্থ!');
+      alert('❌ সমস্যা হয়েছে!');
     }
   };
 
