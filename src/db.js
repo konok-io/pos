@@ -3,7 +3,7 @@
  * Makes HTTP requests to local API server
  */
 
-const API_BASE = 'http://localhost:8765/api';
+const API_BASE = '/api';
 
 // Auth state (in-memory only)
 let currentUser = null;
