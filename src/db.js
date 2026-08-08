@@ -49,6 +49,7 @@ async function api(endpoint, options = {}) {
 
     const res = await fetch(fullUrl, {
       method,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...(body ? { 'Body': JSON.stringify(body) } : {})
@@ -76,7 +77,7 @@ async function api(endpoint, options = {}) {
 // Auth API
 export const auth = {
   login: (email, password) => api('auth', { method: 'POST', body: { action: 'login', email, password } }),
-  check: () => api('auth', { method: 'GET' }),
+  check: (options = {}) => api('auth', { method: 'GET', ...options }),
   logout: () => api('auth', { method: 'DELETE' })
 };
 
