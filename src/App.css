@@ -2,5 +2,6 @@
 
 /* Header icon - override global CSS */
 .header-icon {
-  font-size: 48px !important;
+  font-size: 40px !important;
+  line-height: 1 !important;
 }
