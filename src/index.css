@@ -18,6 +18,20 @@
   font-display: swap;
 }
 
+/* Hide HTML preloader once React renders */
+#root:not(:empty) ~ #preloader,
+#preloader.hidden {
+  display: none !important;
+}
+
+/* Auto-hide preloader after short delay */
+@keyframes hidePreloader {
+  to { opacity: 0; pointer-events: none; }
+}
+#preloader {
+  animation: hidePreloader 0.3s ease-out 0.5s forwards;
+}
+
 * {
   margin: 0;
   padding: 0;

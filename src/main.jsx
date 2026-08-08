@@ -4,9 +4,6 @@ import './index.css'
 import App from './App.jsx'
 import { initFontDetection } from './utils/fontDetect.js'
 
-// Signal that React has started loading
-window.__REACT_LOADED__ = false;
-
 // Simple error boundary component
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -66,27 +63,6 @@ root.render(
     <App />
   </ErrorBoundary>
 )
-
-// Auto-hide HTML preloader after React renders successfully
-const hidePreloader = () => {
-  const preloader = document.getElementById('preloader');
-  if (preloader) {
-    preloader.style.display = 'none';
-    setTimeout(() => {
-      if (preloader.parentNode) {
-        preloader.remove();
-      }
-    }, 100);
-  }
-};
-
-// Hide preloader once React renders (even if showing login screen)
-requestAnimationFrame(() => {
-  requestAnimationFrame(hidePreloader);
-});
-
-// Signal that React has rendered
-window.__REACT_LOADED__ = true;
 
 // Initialize font detection for Bengali/English dynamic switching
 initFontDetection();
