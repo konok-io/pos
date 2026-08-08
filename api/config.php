@@ -48,75 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Start PHP session for auth management
-// Use database-based session for persistence across builds/restarts
-// Session data is stored in SQLite database in .pos_data directory
-
-// Session lifetime: 30 days for better persistence
-ini_set('session.gc_maxlifetime', 2592000); // 30 days
-ini_set('session.cookie_lifetime', 2592000); // 30 days cookie
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_samesite', 'Lax');
-ini_set('session.use_strict_mode', 0); // Disable to allow session restoration
-ini_set('session.use_only_cookies', 1);
-
-// Set cookie path to root to work across all paths
-ini_set('session.cookie_path', '/');
-
-// Start PHP session
-session_start();
-
-// Update session expiry on activity
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 2592000)) {
-    // Session expired (30 days), clear it
-    $_SESSION = array();
-}
-
-// Always update last activity
-$_SESSION['LAST_ACTIVITY'] = time();
-
-// Load session data from database if session is empty but exists in DB
-$sessionId = session_id();
-$db = null;
-if (!isset($_SESSION['user_id'])) {
-    try {
-        $db = getDB();
-        $stmt = $db->prepare("SELECT data FROM sessions WHERE id = ? AND expires_at > datetime('now')");
-        $stmt->execute([$sessionId]);
-        $row = $stmt->fetch();
-        if ($row && $row['data']) {
-            $sessionData = json_decode($row['data'], true);
-            if (is_array($sessionData) && isset($sessionData['user_id'])) {
-                foreach ($sessionData as $key => $value) {
-                    $_SESSION[$key] = $value;
-                }
-            }
-        }
-    } catch (Exception $e) {
-        // Continue with empty session if database fails
-    }
-}
-
-// Save session data to database if user is logged in
-if (isset($_SESSION['user_id'])) {
-    try {
-        if (!$db) $db = getDB();
-        $sessionData = array(
-            'user_id' => $_SESSION['user_id'],
-            'user_name' => $_SESSION['user_name'] ?? '',
-            'user_email' => $_SESSION['user_email'] ?? '',
-            'user_role' => $_SESSION['user_role'] ?? '',
-            'login_time' => $_SESSION['login_time'] ?? time(),
-        );
-        $data = json_encode($sessionData);
-        $expiresAt = date('Y-m-d H:i:s', time() + 2592000); // 30 days
-        
-        $stmt = $db->prepare("INSERT OR REPLACE INTO sessions (id, data, expires_at, created_at) VALUES (?, ?, ?, datetime('now'))");
-        $stmt->execute([$sessionId, $data, $expiresAt]);
-    } catch (Exception $e) {
-        // Ignore errors
-    }
-}
+// Auth is now handled via persistent tokens stored in cookies and database
+// No PHP session required - see auth.php for token-based authentication
 
 /**
  * Database Connection Class
@@ -198,6 +131,30 @@ class Database {
     }
 
     /**
+     * Migration: Create auth_tokens table for persistent login
+     */
+    private function createAuthTokensTable() {
+        try {
+            $result = $this->connection->query("SELECT name FROM sqlite_master WHERE type='table' AND name='auth_tokens'");
+            if ($result->fetchColumn() === false) {
+                $this->connection->exec("
+                    CREATE TABLE IF NOT EXISTS auth_tokens (
+                        token TEXT PRIMARY KEY,
+                        user_id TEXT NOT NULL,
+                        user_name TEXT,
+                        user_email TEXT,
+                        user_role TEXT,
+                        expires_at DATETIME NOT NULL,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                ");
+            }
+        } catch (Exception $e) {
+            // Table might already exist
+        }
+    }
+
+    /**
      * Run database migrations for schema updates
      */
     private function runMigrations() {
@@ -213,6 +170,9 @@ class Database {
             
             // Migration: Add data column to sessions table
             $this->addSessionsDataColumn();
+            
+            // Migration: Create auth_tokens table
+            $this->createAuthTokensTable();
             
             // Get all columns
             $result = $this->connection->query("PRAGMA table_info(settings)");

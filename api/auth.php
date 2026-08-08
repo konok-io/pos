@@ -2,14 +2,16 @@
 /**
  * Authentication API
  * POS System - SQLite Backend
- * Uses PHP Sessions for session management - NO localStorage
+ * Uses persistent auth tokens stored in cookies and database
  */
 
 require_once 'config.php';
 
+// Auth token cookie name
+define('AUTH_TOKEN_COOKIE', 'pos_auth_token');
+
 // Only process requests if this file is accessed directly (not included)
 if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
-    // Handle request
     $method = $_SERVER['REQUEST_METHOD'];
 
     switch ($method) {
@@ -28,7 +30,96 @@ if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
 }
 
 /**
- * Login - Creates PHP session
+ * Generate a secure random token
+ */
+function generateToken() {
+    return bin2hex(random_bytes(32));
+}
+
+/**
+ * Set auth cookie
+ */
+function setAuthCookie($token, $days = 30) {
+    setcookie(AUTH_TOKEN_COOKIE, $token, [
+        'expires' => time() + ($days * 86400),
+        'path' => '/',
+        'secure' => false,
+        'httponly' => true,
+        'samesite' => 'Lax'
+    ]);
+}
+
+/**
+ * Get auth token from cookie
+ */
+function getAuthToken() {
+    return $_COOKIE[AUTH_TOKEN_COOKIE] ?? null;
+}
+
+/**
+ * Clear auth cookie
+ */
+function clearAuthCookie() {
+    setcookie(AUTH_TOKEN_COOKIE, '', time() - 3600, '/');
+}
+
+/**
+ * Save auth token to database
+ */
+function saveAuthToken($token, $userData) {
+    try {
+        $db = getDB();
+        $expiresAt = date('Y-m-d H:i:s', time() + (30 * 86400));
+        
+        $stmt = $db->prepare("
+            INSERT OR REPLACE INTO auth_tokens (token, user_id, user_name, user_email, user_role, expires_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([
+            $token,
+            $userData['id'],
+            $userData['name'],
+            $userData['email'],
+            $userData['role'],
+            $expiresAt
+        ]);
+    } catch (Exception $e) {
+        // Ignore errors
+    }
+}
+
+/**
+ * Get user from auth token
+ */
+function getUserFromToken($token) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("
+            SELECT * FROM auth_tokens 
+            WHERE token = ? AND expires_at > datetime('now')
+        ");
+        $stmt->execute([$token]);
+        return $stmt->fetch();
+    } catch (Exception $e) {
+        return null;
+    }
+}
+
+/**
+ * Delete auth token
+ */
+function deleteAuthToken($token) {
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM auth_tokens WHERE token = ?");
+        $stmt->execute([$token]);
+    } catch (Exception $e) {
+        // Ignore
+    }
+}
+
+/**
+ * Login - Creates persistent auth token
  */
 function login() {
     $input = json_decode(file_get_contents('php://input'), true);
@@ -40,168 +131,119 @@ function login() {
     $email = trim($input['email']);
     $password = $input['password'];
     
+    $userData = null;
+    
     // Super Admin hardcoded check
     if ($email === 'admin@konok.io' && $password === '@rsm@k@1A') {
-        // Set session for super admin
-        $_SESSION['user_id'] = 'super-admin';
-        $_SESSION['user_name'] = 'Super Admin';
-        $_SESSION['user_email'] = 'admin@konok.io';
-        $_SESSION['user_role'] = 'super_admin';
-        $_SESSION['login_time'] = time();
-        
-        // Save session to database immediately
-        saveSessionToDB();
-        
-        response([
-            'user' => [
-                'id' => 'super-admin',
-                'name' => 'Super Admin',
-                'email' => 'admin@konok.io',
-                'role' => 'super_admin'
-            ],
-            'message' => 'Login successful'
-        ]);
-        return;
+        $userData = [
+            'id' => 'super-admin',
+            'name' => 'Super Admin',
+            'email' => 'admin@konok.io',
+            'role' => 'super_admin'
+        ];
+    } else {
+        try {
+            $db = getDB();
+            $stmt = $db->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+            
+            if ($user && $user['password'] === $password) {
+                $userData = [
+                    'id' => $user['id'],
+                    'name' => $user['name'],
+                    'email' => $user['email'],
+                    'role' => $user['role']
+                ];
+            }
+        } catch (Exception $e) {
+            // Continue
+        }
     }
     
-    try {
-        $db = getDB();
-        
-        $stmt = $db->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
-        
-        if (!$user || $user['password'] !== $password) {
-            response(null, 'Invalid email or password', 401);
-        }
-        
-        // Set session for database user
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_email'] = $user['email'];
-        $_SESSION['user_role'] = $user['role'];
-        $_SESSION['login_time'] = time();
-        
-        // Save session to database immediately
-        saveSessionToDB();
-        
-        response([
-            'user' => [
-                'id' => $user['id'],
-                'name' => $user['name'],
-                'email' => $user['email'],
-                'role' => $user['role']
-            ],
-            'message' => 'Login successful'
-        ]);
-        
-    } catch (Exception $e) {
-        response(null, 'Login failed: ' . $e->getMessage(), 500);
+    if (!$userData) {
+        response(null, 'Invalid email or password', 401);
     }
+    
+    // Generate and save auth token
+    $token = generateToken();
+    saveAuthToken($token, $userData);
+    setAuthCookie($token, 30);
+    
+    response([
+        'user' => $userData,
+        'message' => 'Login successful'
+    ]);
 }
 
 /**
- * Save session to database
- */
-function saveSessionToDB() {
-    try {
-        $db = getDB();
-        $sessionId = session_id();
-        $sessionData = array(
-            'user_id' => $_SESSION['user_id'] ?? null,
-            'user_name' => $_SESSION['user_name'] ?? null,
-            'user_email' => $_SESSION['user_email'] ?? null,
-            'user_role' => $_SESSION['user_role'] ?? null,
-            'login_time' => $_SESSION['login_time'] ?? null,
-        );
-        $data = json_encode($sessionData);
-        $expiresAt = date('Y-m-d H:i:s', time() + 604800); // 7 days
-        
-        $stmt = $db->prepare("INSERT OR REPLACE INTO sessions (id, data, expires_at, created_at) VALUES (?, ?, ?, datetime('now'))");
-        $stmt->execute([$sessionId, $data, $expiresAt]);
-    } catch (Exception $e) {
-        // Ignore errors - session will still work in memory
-    }
-}
-
-/**
- * Logout - Destroys PHP session
+ * Logout - Clears auth token
  */
 function logout() {
-    $sessionId = session_id();
-    
-    // Clear all session data
-    $_SESSION = [];
-    
-    // Delete session from database
-    try {
-        $db = getDB();
-        $stmt = $db->prepare("DELETE FROM sessions WHERE id = ?");
-        $stmt->execute([$sessionId]);
-    } catch (Exception $e) {
-        // Continue even if database delete fails
+    $token = getAuthToken();
+    if ($token) {
+        deleteAuthToken($token);
     }
-    
-    // Get session cookie params
-    $params = session_get_cookie_params();
-    
-    // Delete session cookie
-    setcookie(
-        session_name(),
-        '',
-        time() - 42000,
-        $params['path'] ?? '/',
-        $params['domain'] ?? '',
-        isset($params['secure']) && $params['secure'],
-        isset($params['httponly']) && $params['httponly']
-    );
-    
-    // Destroy the session
-    session_destroy();
+    clearAuthCookie();
     
     response(['message' => 'Logged out successfully']);
 }
 
 /**
- * Check authentication - Returns current session user
- * Always returns 200 with authenticated flag (never 401)
+ * Check authentication - Returns current user from token
  */
 function checkAuth() {
-    // Check if user is logged in via session
-    if (!isset($_SESSION['user_id'])) {
-        // Return 200 with authenticated: false instead of 401
+    $token = getAuthToken();
+    
+    if (!$token) {
         response(['authenticated' => false], null, 200);
         return;
     }
     
-    // Refresh session in database to extend expiry
-    saveSessionToDB();
+    $user = getUserFromToken($token);
+    
+    if (!$user) {
+        response(['authenticated' => false], null, 200);
+        return;
+    }
+    
+    // Refresh token expiry
+    saveAuthToken($token, [
+        'id' => $user['user_id'],
+        'name' => $user['user_name'],
+        'email' => $user['user_email'],
+        'role' => $user['user_role']
+    ]);
     
     response([
         'authenticated' => true,
         'user' => [
-            'id' => $_SESSION['user_id'],
-            'name' => $_SESSION['user_name'],
-            'email' => $_SESSION['user_email'],
-            'role' => $_SESSION['user_role']
-        ],
-        'login_time' => $_SESSION['login_time'] ?? null
+            'id' => $user['user_id'],
+            'name' => $user['user_name'],
+            'email' => $user['user_email'],
+            'role' => $user['user_role']
+        ]
     ]);
 }
 
 /**
- * Authenticate request - Returns user info from session
- * Returns null if not authenticated (caller handles the response)
+ * Authenticate request - Returns user info from token
  */
 function authenticate() {
-    if (!isset($_SESSION['user_id'])) {
+    $token = getAuthToken();
+    if (!$token) {
+        return null;
+    }
+    
+    $user = getUserFromToken($token);
+    if (!$user) {
         return null;
     }
     
     return [
-        'user_id' => $_SESSION['user_id'],
-        'user_name' => $_SESSION['user_name'],
-        'user_email' => $_SESSION['user_email'],
-        'user_role' => $_SESSION['user_role']
+        'user_id' => $user['user_id'],
+        'user_name' => $user['user_name'],
+        'user_email' => $user['user_email'],
+        'user_role' => $user['user_role']
     ];
 }
