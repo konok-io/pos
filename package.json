@@ -41,7 +41,28 @@
       "database/**/*",
       "electron/**/*",
       "package.json"
-    ]
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "POS সিস্টেম",
+      "license": "LICENSE.txt",
+      "language": "1033",
+      "showLanguageDialog": false,
+      "displayLanguageSelector": false,
+      "include": "installer.nsh"
+    }
   },
   "author": "POS Team",
   "description": "POS সিস্টেম - বিক্রয়, স্টক ও হিসাব ব্যবস্থা",
