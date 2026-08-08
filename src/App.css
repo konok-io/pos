@@ -1,1 +1,6 @@
 /* App specific styles - currently empty, styles are in App.jsx */
+
+/* Header icon - override global CSS */
+.header-icon {
+  font-size: 48px !important;
+}

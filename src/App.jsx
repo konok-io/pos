@@ -471,8 +471,7 @@ function LoginScreen({ onLogin, settings }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 48,
-            }}>🏪</div>
+            }} className="header-icon">🏪</div>
             <div style={{ flex: 1, textAlign: 'right' }}>
               <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0F766E' }}>
                 {businessName}
