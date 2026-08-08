@@ -453,34 +453,34 @@ function LoginScreen({ onLogin, settings }) {
         borderRadius: '50%',
       }} />
 
-      <div style={{ width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 }}>
+      <div style={{ width: '100%', maxWidth: 460, position: 'relative', zIndex: 1 }}>
         {/* Header */}
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '20px 24px 0',
+          padding: '24px 28px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
           <div style={{
-            width: 52, height: 52,
+            width: 60, height: 60,
             background: 'linear-gradient(135deg, #0F766E, #14B8A6)',
-            borderRadius: 14,
+            borderRadius: 16,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 29,
+            fontSize: 32,
           }}>🏪</div>
           <div style={{ textAlign: 'right' }}>
-            <h1 style={{ margin: 0, fontSize: 19, fontWeight: 700, color: '#0F766E' }}>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0F766E' }}>
               {businessName}
             </h1>
             <div style={{
-              fontSize: 19,
+              fontSize: 20,
               color: '#0F766E',
               fontWeight: 600,
-              marginTop: 2,
+              marginTop: 4,
             }}>
               💼 POS ম্যানেজমেন্ট সিস্টেম
             </div>
@@ -491,12 +491,12 @@ function LoginScreen({ onLogin, settings }) {
         <div style={{
           background: '#fff',
           borderRadius: '0 0 20px 20px',
-          padding: '20px 24px 24px',
+          padding: '24px 28px 28px',
         }}>
-          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
             {/* Username */}
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: 19, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
+              <label style={{ fontSize: 16, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
                 👤 ইউজার নাম
               </label>
               <input
@@ -507,10 +507,10 @@ function LoginScreen({ onLogin, settings }) {
                 required
                 style={{
                   width: '100%',
-                  padding: '12px 14px',
-                  fontSize: 19,
+                  padding: '14px 16px',
+                  fontSize: 18,
                   border: '2px solid #E5E7EB',
-                  borderRadius: 10,
+                  borderRadius: 12,
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
@@ -520,8 +520,8 @@ function LoginScreen({ onLogin, settings }) {
             </div>
 
             {/* Password */}
-            <div style={{ width: 140 }}>
-              <label style={{ fontSize: 19, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
+            <div style={{ width: 160 }}>
+              <label style={{ fontSize: 16, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
                 🔐 পাসওয়ার্ড
               </label>
               <input
@@ -532,10 +532,10 @@ function LoginScreen({ onLogin, settings }) {
                 required
                 style={{
                   width: '100%',
-                  padding: '12px 14px',
-                  fontSize: 19,
+                  padding: '14px 16px',
+                  fontSize: 18,
                   border: '2px solid #E5E7EB',
-                  borderRadius: 10,
+                  borderRadius: 12,
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
@@ -549,12 +549,12 @@ function LoginScreen({ onLogin, settings }) {
               type="submit"
               disabled={loading}
               style={{
-                padding: '12px 20px',
+                padding: '14px 24px',
                 background: loading ? '#9CA3AF' : '#0F766E',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 10,
-                fontSize: 19,
+                borderRadius: 12,
+                fontSize: 18,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
@@ -567,12 +567,12 @@ function LoginScreen({ onLogin, settings }) {
           {/* Error */}
           {error && (
             <div style={{
-              marginTop: 12,
-              padding: '10px 12px',
+              marginTop: 14,
+              padding: '12px 14px',
               background: '#FEF2F2',
-              borderRadius: 8,
+              borderRadius: 10,
               color: '#DC2626',
-              fontSize: 19,
+              fontSize: 16,
               fontWeight: 500,
             }}>
               ⚠️ {error}
@@ -580,7 +580,7 @@ function LoginScreen({ onLogin, settings }) {
           )}
 
           {/* Footer */}
-          <div style={{ textAlign: 'center', marginTop: 16, paddingTop: 12, borderTop: '1px dashed #E5E7EB', fontSize: 19, color: '#9CA3AF' }}>
+          <div style={{ textAlign: 'center', marginTop: 18, paddingTop: 14, borderTop: '1px dashed #E5E7EB', fontSize: 16, color: '#9CA3AF' }}>
             © {currentYear} {businessName}
           </div>
         </div>
