@@ -1149,18 +1149,6 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Effect to hide HTML preloader AFTER React has rendered the loading/login state
-  useEffect(() => {
-    // Only hide HTML preloader after auth check is complete and React has rendered
-    if (!isLoading && authChecked && window.preloaderControl) {
-      // Small delay to ensure React's loading screen or login screen has rendered
-      const hideTimer = setTimeout(() => {
-        window.preloaderControl.hide();
-      }, 100);
-      return () => clearTimeout(hideTimer);
-    }
-  }, [isLoading, authChecked]);
-
   // Listen for logout events from API
   useEffect(() => {
     const handleLogoutEvent = () => {
@@ -1175,12 +1163,6 @@ export default function App() {
   const handleLogin = (user) => {
     setCurrentUser(user);
     setIsLoggedIn(true);
-    // Hide HTML preloader after state update and React re-render
-    if (window.preloaderControl) {
-      setTimeout(() => {
-        window.preloaderControl.hide();
-      }, 50);
-    }
   };
 
   const handleLogout = async () => {

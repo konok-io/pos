@@ -7,34 +7,6 @@ import { initFontDetection } from './utils/fontDetect.js'
 // Signal that React has started loading
 window.__REACT_LOADED__ = false;
 
-// Expose preloader control globally so App can control it
-window.preloaderControl = window.preloaderControl || {
-  hide: () => {
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-      // Use inline style to hide instead of class
-      preloader.style.display = 'none';
-      setTimeout(() => {
-        if (preloader.parentNode) {
-          preloader.remove();
-        }
-      }, 400);
-    }
-    document.body.classList.remove('loading');
-    window.__REACT_LOADED__ = true;
-  },
-  show: () => {
-    const preloader = document.getElementById('preloader');
-    if (preloader) {
-      preloader.style.display = 'flex';
-      if (!document.body.contains(preloader)) {
-        document.body.appendChild(preloader);
-      }
-    }
-    document.body.classList.add('loading');
-  }
-};
-
 // Simple error boundary component
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -52,12 +24,6 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      // Hide preloader on error with a delay to ensure error screen renders
-      if (window.preloaderControl?.hide) {
-        setTimeout(() => {
-          window.preloaderControl.hide();
-        }, 50);
-      }
       return (
         <div style={{
           display: 'flex',
@@ -100,6 +66,24 @@ root.render(
     <App />
   </ErrorBoundary>
 )
+
+// Auto-hide HTML preloader after React renders successfully
+const hidePreloader = () => {
+  const preloader = document.getElementById('preloader');
+  if (preloader) {
+    preloader.style.display = 'none';
+    setTimeout(() => {
+      if (preloader.parentNode) {
+        preloader.remove();
+      }
+    }, 100);
+  }
+};
+
+// Hide preloader once React renders (even if showing login screen)
+requestAnimationFrame(() => {
+  requestAnimationFrame(hidePreloader);
+});
 
 // Signal that React has rendered
 window.__REACT_LOADED__ = true;
