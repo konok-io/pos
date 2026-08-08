@@ -473,8 +473,8 @@ function LoginScreen({ onLogin, settings }) {
               justifyContent: 'center',
               fontSize: 32,
             }}>🏪</div>
-            <div style={{ flex: 1, textAlign: 'right' }}>
-              <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0F766E' }}>
+            <div style={{ flex: 1 }}>
+              <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0F766E', textAlign: 'center' }}>
                 {businessName}
               </h1>
               <div style={{
@@ -482,6 +482,7 @@ function LoginScreen({ onLogin, settings }) {
                 color: '#0F766E',
                 fontWeight: 600,
                 marginTop: 4,
+                textAlign: 'right',
               }}>
                 💼 POS ম্যানেজমেন্ট সিস্টেম
               </div>
