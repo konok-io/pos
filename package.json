@@ -11,10 +11,12 @@
     "electron:build:win": "npm run build && electron-builder --win"
   },
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
     "esbuild": "^0.28.1",
     "jsbarcode": "^3.12.3",
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

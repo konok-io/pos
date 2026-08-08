@@ -1,10 +1,10 @@
 /**
  * API Service - POS System
- * All data is stored in SQLite database via PHP API
- * Session management is handled server-side via PHP sessions
+ * All data is stored in SQLite database via Node.js API
+ * Session management is handled server-side
  */
 
-// API Base URL - point to public/api
+// API Base URL - point to local API server
 const API_BASE = '/api';
 
 // ============================================================================
