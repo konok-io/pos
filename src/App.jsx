@@ -1,20 +1,20 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import "./App.css";
-import database, { STORES } from "./db";
+import { openDB, get, add, STORES } from "./db";
 
 /* --------------- GLOBAL CSS RESET --------------- */
 const GlobalStyle = () => {
   return null;
 };
 
-/* --------------- LICENSE API (stored in IndexedDB) --------------- */
+/* --------------- LICENSE API (stored in database) --------------- */
 const TRIAL_DAYS = 7;
-const LICENSE_STORE = 'license';
 
-// Check trial status from IndexedDB
+// Check trial status from database
 async function getTrialStatus() {
   try {
-    const license = await database.get(LICENSE_STORE, 'status');
+    await openDB();
+    const license = await get(STORES.license, 'status');
     if (!license || !license.firstRunDate) {
       return { daysLeft: TRIAL_DAYS, isExpired: false };
     }
@@ -30,21 +30,20 @@ async function getTrialStatus() {
   }
 }
 
-// Save license status to IndexedDB
+// Save license status to database
 async function saveTrialStatus(licenseData) {
-  await database.add(LICENSE_STORE, { key: 'status', ...licenseData });
+  await add(STORES.license, { key: 'status', ...licenseData });
 }
 
 // Verify license (offline validation)
 async function verifyLicense(licenseKey) {
-  // Simple offline validation - just check format
   if (licenseKey && licenseKey.length >= 10) {
     return { success: true };
   }
   return { success: false, error: 'Invalid license key' };
 }
 
-// Activate license (save to IndexedDB)
+// Activate license (save to database)
 async function activateLicense(licenseKey) {
   await saveTrialStatus({
     licenseKey,
@@ -1368,13 +1367,12 @@ export default function App() {
   useEffect(() => {
     async function initApp() {
       try {
-        // Initialize IndexedDB
-        await database.openDB();
-        await database.initializeDefaults();
+        // Initialize database
+        await openDB();
         setDbReady(true);
         
-        // Check license acceptance from IndexedDB
-        const license = await database.get(STORES.license, 'status');
+        // Check license acceptance from database
+        const license = await get(STORES.license, 'status');
         if (license && license.accepted === true) {
           setLicenseAccepted(true);
         }

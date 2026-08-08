@@ -1,10 +1,10 @@
 /**
  * API Service - POS System
- * Works completely offline using IndexedDB
- * No server needed - all data stored locally in browser
+ * Works completely offline using IndexedDB/SQLite
+ * No server needed - all data stored locally
  */
 
-import database, { STORES } from './db';
+import { getAll, get, add, remove, searchProducts, STORES } from './db';
 
 // ============================================================================
 // AUTH STATE (managed in memory only, not persisted)
@@ -18,18 +18,18 @@ export const getUser = () => currentUser;
 export const setUser = (user) => { currentUser = user; };
 export const clearAuth = () => { currentUser = null; };
 
-// App State - stored in IndexedDB
+// App State - stored in database
 export const appState = {
   get: async (key) => {
-    const data = await database.get(STORES.settings, key);
+    const data = await get(STORES.settings, key);
     return data?.value || null;
   },
   set: async (key, value) => {
-    await database.add(STORES.settings, { key, value });
+    await add(STORES.settings, { key, value });
     return { success: true };
   },
   getAll: async () => {
-    const all = await database.getAll(STORES.settings);
+    const all = await getAll(STORES.settings);
     const result = {};
     all.forEach(item => result[item.key] = item.value);
     return result;
@@ -88,7 +88,7 @@ async function api(endpoint, options = {}) {
 
 async function handleAuth(method, body) {
   if (method === 'POST' && body.action === 'login') {
-    const users = await database.getAll(STORES.users);
+    const users = await getAll(STORES.users);
     const user = users.find(u => 
       u.email === body.email && u.password === body.password
     );
@@ -125,300 +125,177 @@ async function handleAuth(method, body) {
 
 async function handleUsers(method, body) {
   if (method === 'GET') {
-    const users = await database.getAll(STORES.users);
+    const users = await getAll(STORES.users);
     return {
       success: true,
       data: users.map(u => ({
-        id: u.id,
-        name: u.name,
-        email: u.email,
-        role: u.role,
-        status: u.status,
-        created_at: u.created_at
+        id: u.id, name: u.name, email: u.email, role: u.role, status: u.status, created_at: u.created_at
       }))
     };
   } else if (method === 'POST') {
     const id = body.id || `user_${Date.now()}`;
     const user = {
-      id,
-      name: body.name,
-      email: body.email,
-      password: body.password || '1234',
-      role: body.role || 'operator',
-      status: 'active',
-      created_at: new Date().toISOString()
+      id, name: body.name, email: body.email, password: body.password || '1234',
+      role: body.role || 'operator', status: 'active', created_at: new Date().toISOString()
     };
-    await database.add(STORES.users, user);
+    await add(STORES.users, user);
     return { success: true, data: user };
   }
   return { success: false, error: 'Invalid method' };
 }
 
-// ============================================================================
-// CATEGORIES HANDLERS
-// ============================================================================
-
 async function handleCategories(method, body, url) {
   if (method === 'GET') {
-    const categories = await database.getAll(STORES.categories);
+    const categories = await getAll(STORES.categories);
     return { success: true, data: categories };
   } else if (method === 'POST') {
     const id = body.id || `cat_${Date.now()}`;
     const category = { id, name: body.name, company: body.company || '', created_at: new Date().toISOString() };
-    await database.add(STORES.categories, category);
+    await add(STORES.categories, category);
     return { success: true, data: category };
   } else if (method === 'DELETE') {
     const params = new URL(url, 'http://localhost').searchParams;
     const id = params.get('id');
-    if (id) await database.remove(STORES.categories, id);
+    if (id) await remove(STORES.categories, id);
     return { success: true };
   }
   return { success: false, error: 'Invalid method' };
 }
-
-// ============================================================================
-// PRODUCTS HANDLERS
-// ============================================================================
 
 async function handleProducts(method, body, url) {
   if (method === 'GET') {
     const params = new URL(url, 'http://localhost').searchParams;
     const search = params.get('search') || '';
-    const products = await database.searchProducts(search);
+    const products = await searchProducts(search);
     return { success: true, data: products };
   } else if (method === 'POST') {
     const id = body.id || `prod_${Date.now()}`;
     const product = {
-      id,
-      name: body.name,
-      barcode: body.barcode || '',
-      unit: body.unit || 'পিস',
-      buyP: parseFloat(body.buyP) || 0,
-      sellP: parseFloat(body.sellP) || 0,
-      stock: parseFloat(body.stock) || 0,
-      minStock: parseFloat(body.minStock) || 0,
-      cat: body.cat || '',
-      company: body.company || '',
-      mrp: parseFloat(body.mrp) || 0,
-      image: body.image || '',
-      created_at: new Date().toISOString()
+      id, name: body.name, barcode: body.barcode || '', unit: body.unit || 'পিস',
+      buyP: parseFloat(body.buyP) || 0, sellP: parseFloat(body.sellP) || 0,
+      stock: parseFloat(body.stock) || 0, minStock: parseFloat(body.minStock) || 0,
+      cat: body.cat || '', company: body.company || '', mrp: parseFloat(body.mrp) || 0,
+      image: body.image || '', created_at: new Date().toISOString()
     };
-    await database.add(STORES.products, product);
+    await add(STORES.products, product);
     return { success: true, data: product };
   } else if (method === 'DELETE') {
     const params = new URL(url, 'http://localhost').searchParams;
     const id = params.get('id');
-    if (id) await database.remove(STORES.products, id);
+    if (id) await remove(STORES.products, id);
     return { success: true };
   }
   return { success: false, error: 'Invalid method' };
 }
 
-// ============================================================================
-// SUPPLIERS HANDLERS
-// ============================================================================
-
 async function handleSuppliers(method, body) {
   if (method === 'GET') {
-    const suppliers = await database.getAll(STORES.suppliers);
+    const suppliers = await getAll(STORES.suppliers);
     return { success: true, data: suppliers };
   } else if (method === 'POST') {
     const id = body.id || `sup_${Date.now()}`;
-    const supplier = {
-      id,
-      name: body.name,
-      phone: body.phone || '',
-      email: body.email || '',
-      address: body.address || '',
-      company: body.company || '',
-      created_at: new Date().toISOString()
-    };
-    await database.add(STORES.suppliers, supplier);
+    const supplier = { id, name: body.name, phone: body.phone || '', email: body.email || '',
+      address: body.address || '', company: body.company || '', created_at: new Date().toISOString() };
+    await add(STORES.suppliers, supplier);
     return { success: true, data: supplier };
   }
   return { success: false, error: 'Invalid method' };
 }
 
-// ============================================================================
-// CUSTOMERS HANDLERS
-// ============================================================================
-
 async function handleCustomers(method, body) {
   if (method === 'GET') {
-    const customers = await database.getAll(STORES.customers);
+    const customers = await getAll(STORES.customers);
     return { success: true, data: customers };
   } else if (method === 'POST') {
     const id = body.id || `cust_${Date.now()}`;
-    const customer = {
-      id,
-      name: body.name,
-      phone: body.phone || '',
-      email: body.email || '',
-      address: body.address || '',
-      balance: parseFloat(body.balance) || 0,
-      created_at: new Date().toISOString()
-    };
-    await database.add(STORES.customers, customer);
+    const customer = { id, name: body.name, phone: body.phone || '', email: body.email || '',
+      address: body.address || '', balance: parseFloat(body.balance) || 0, created_at: new Date().toISOString() };
+    await add(STORES.customers, customer);
     return { success: true, data: customer };
   }
   return { success: false, error: 'Invalid method' };
 }
 
-// ============================================================================
-// SALES HANDLERS
-// ============================================================================
-
 async function handleSales(method, body) {
   if (method === 'GET') {
-    const sales = await database.getAll(STORES.sales);
+    const sales = await getAll(STORES.sales);
     sales.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     return { success: true, data: sales.slice(0, 100) };
   } else if (method === 'POST') {
     const id = body.id || `sale_${Date.now()}`;
     const sale = {
-      id,
-      items: typeof body.items === 'string' ? body.items : JSON.stringify(body.items),
-      subtotal: parseFloat(body.subtotal) || 0,
-      discount: parseFloat(body.discount) || 0,
-      total: parseFloat(body.total) || 0,
-      vat: parseFloat(body.vat) || 0,
-      vatRate: parseFloat(body.vatRate) || 0,
-      paid: parseFloat(body.paid) || 0,
-      due: parseFloat(body.due) || 0,
-      change: parseFloat(body.change) || 0,
-      customer_id: body.customer_id || '',
-      payment_method: body.payment_method || 'cash',
-      invoice_number: body.invoice_number || '',
-      user_id: body.user_id || '',
-      user_name: body.user_name || '',
+      id, items: typeof body.items === 'string' ? body.items : JSON.stringify(body.items),
+      subtotal: parseFloat(body.subtotal) || 0, discount: parseFloat(body.discount) || 0,
+      total: parseFloat(body.total) || 0, vat: parseFloat(body.vat) || 0, vatRate: parseFloat(body.vatRate) || 0,
+      paid: parseFloat(body.paid) || 0, due: parseFloat(body.due) || 0, change: parseFloat(body.change) || 0,
+      customer_id: body.customer_id || '', payment_method: body.payment_method || 'cash',
+      invoice_number: body.invoice_number || '', user_id: body.user_id || '', user_name: body.user_name || '',
       created_at: new Date().toISOString()
     };
-    await database.add(STORES.sales, sale);
-    
-    // Update product stock
-    try {
-      const items = typeof sale.items === 'string' ? JSON.parse(sale.items) : sale.items;
-      for (const item of items) {
-        const product = await database.get(STORES.products, item.id);
-        if (product) {
-          product.stock = Math.max(0, product.stock - item.qty);
-          await database.add(STORES.products, product);
-        }
-      }
-    } catch (e) {
-      console.error('Error updating stock:', e);
-    }
-    
+    await add(STORES.sales, sale);
     return { success: true, data: sale };
   }
   return { success: false, error: 'Invalid method' };
 }
 
-// ============================================================================
-// PURCHASES HANDLERS
-// ============================================================================
-
 async function handlePurchases(method, body) {
   if (method === 'GET') {
-    const purchases = await database.getAll(STORES.purchases);
+    const purchases = await getAll(STORES.purchases);
     return { success: true, data: purchases };
   } else if (method === 'POST') {
     const id = body.id || `pur_${Date.now()}`;
     const purchase = {
-      id,
-      items: typeof body.items === 'string' ? body.items : JSON.stringify(body.items),
-      subtotal: parseFloat(body.subtotal) || 0,
-      total: parseFloat(body.total) || 0,
-      paid: parseFloat(body.paid) || 0,
-      due: parseFloat(body.due) || 0,
-      supplier_id: body.supplier_id || '',
-      invoice_number: body.invoice_number || '',
-      user_id: body.user_id || '',
-      user_name: body.user_name || '',
-      created_at: new Date().toISOString()
+      id, items: typeof body.items === 'string' ? body.items : JSON.stringify(body.items),
+      subtotal: parseFloat(body.subtotal) || 0, total: parseFloat(body.total) || 0,
+      paid: parseFloat(body.paid) || 0, due: parseFloat(body.due) || 0,
+      supplier_id: body.supplier_id || '', invoice_number: body.invoice_number || '',
+      user_id: body.user_id || '', user_name: body.user_name || '', created_at: new Date().toISOString()
     };
-    await database.add(STORES.purchases, purchase);
-    
-    // Update product stock
-    try {
-      const items = typeof purchase.items === 'string' ? JSON.parse(purchase.items) : purchase.items;
-      for (const item of items) {
-        const product = await database.get(STORES.products, item.id);
-        if (product) {
-          product.stock = (product.stock || 0) + (item.qty || 0);
-          await database.add(STORES.products, product);
-        }
-      }
-    } catch (e) {
-      console.error('Error updating stock:', e);
-    }
-    
+    await add(STORES.purchases, purchase);
     return { success: true, data: purchase };
   }
   return { success: false, error: 'Invalid method' };
 }
 
-// ============================================================================
-// EXPENSES HANDLERS
-// ============================================================================
-
 async function handleExpenses(method, body, url) {
   if (method === 'GET') {
-    const expenses = await database.getAll(STORES.expenses);
+    const expenses = await getAll(STORES.expenses);
     expenses.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     return { success: true, data: expenses };
   } else if (method === 'POST') {
     const id = body.id || `exp_${Date.now()}`;
-    const expense = {
-      id,
-      title: body.title,
-      amount: parseFloat(body.amount) || 0,
-      type: body.type || 'expense',
-      note: body.note || '',
-      user_id: body.user_id || '',
-      user_name: body.user_name || '',
-      created_at: new Date().toISOString()
-    };
-    await database.add(STORES.expenses, expense);
+    const expense = { id, title: body.title, amount: parseFloat(body.amount) || 0,
+      type: body.type || 'expense', note: body.note || '', user_id: body.user_id || '',
+      user_name: body.user_name || '', created_at: new Date().toISOString() };
+    await add(STORES.expenses, expense);
     return { success: true, data: expense };
   } else if (method === 'DELETE') {
     const params = new URL(url, 'http://localhost').searchParams;
     const id = params.get('id');
-    if (id) await database.remove(STORES.expenses, id);
+    if (id) await remove(STORES.expenses, id);
     return { success: true };
   }
   return { success: false, error: 'Invalid method' };
 }
 
-// ============================================================================
-// SETTINGS HANDLERS
-// ============================================================================
-
 async function handleSettings(method, body) {
   if (method === 'GET') {
-    const all = await database.getAll(STORES.settings);
+    const all = await getAll(STORES.settings);
     const result = {};
     all.forEach(item => result[item.key] = item.value);
     return { success: true, data: result };
   } else if (method === 'POST') {
     for (const [key, value] of Object.entries(body)) {
-      await database.add(STORES.settings, { key, value });
+      await add(STORES.settings, { key, value });
     }
     return { success: true, data: body };
   }
   return { success: false, error: 'Invalid method' };
 }
 
-// ============================================================================
-// STATE HANDLERS
-// ============================================================================
-
 async function handleState(method, body) {
-  if (method === 'GET') {
-    return { success: true, data: {} };
-  } else if (method === 'POST') {
-    return { success: true };
-  }
+  if (method === 'GET') return { success: true, data: {} };
+  else if (method === 'POST') return { success: true };
   return { success: false, error: 'Invalid method' };
 }
 
