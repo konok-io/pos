@@ -3,6 +3,9 @@
     RewriteEngine On
     RewriteBase /
 
+    # Root index.html -> dist/src/index.html
+    RewriteRule ^index\.html$ dist/src/index.html [L]
+
     # Fonts - serve from dist/fonts folder
     RewriteRule ^fonts/(.*)$ dist/fonts/$1 [L]
 
