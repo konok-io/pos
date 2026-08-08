@@ -1090,36 +1090,28 @@ export default function App() {
 
   useEffect(() => {
     async function checkAuth() {
-      console.log('Checking auth...');
-      
       try {
-        const result = await auth.check();
-        console.log('Auth check result:', result);
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
         
-        // Check the authenticated flag from the new response format
+        const result = await auth.check({ signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         if (result.authenticated === true && result.user) {
           setCurrentUser(result.user);
           setIsLoggedIn(true);
         } else if (result.success && result.data?.user) {
-          // Legacy format support
           setCurrentUser(result.data.user);
           setIsLoggedIn(true);
-        } else {
-          // Not authenticated - show login screen
-          setIsLoggedIn(false);
         }
       } catch (e) {
-        console.log('Auth check failed:', e.message);
-        setIsLoggedIn(false);
+        console.log('Auth check skipped:', e.message);
       }
-      
       setIsLoading(false);
       setAuthChecked(true);
     }
-    
-    // Small delay to ensure DOM is ready
-    const timer = setTimeout(checkAuth, 100);
-    return () => clearTimeout(timer);
+    checkAuth();
   }, []);
 
   // Listen for logout events from API
