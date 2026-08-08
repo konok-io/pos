@@ -6,7 +6,6 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const { Server } = require('socket.io');
 
 let DB_PATH;
 let db = null;
@@ -544,15 +543,7 @@ function start(port = 8765) {
 
   const server = http.createServer(handleRoute);
 
-  const io = new Server(server, {
-    cors: { origin: '*', credentials: true }
-  });
-
-  io.on('connection', (socket) => {
-    console.log('Client connected');
-  });
-
-  return new Promise((resolve) => {
+return new Promise((resolve) => {
     server.listen(port, '127.0.0.1', () => {
       console.log('POS API Server running on port ' + port);
       resolve(port);
