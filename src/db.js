@@ -1,155 +1,10 @@
 /**
  * POS System - Database Layer
- * Uses IndexedDB for browser, SQLite for Electron
+ * Uses SQLite at C:\laragon\www\.pos_data
  */
 
-// Check if we're in Electron
-const isElectron = typeof window !== 'undefined' && window.require;
-
 /**
- * IndexedDB implementation for browser
- */
-class IndexedDBStore {
-  constructor() {
-    this.db = null;
-    this.dbName = 'POS_System_DB';
-    this.dbVersion = 1;
-  }
-
-  async open() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, this.dbVersion);
-      
-      request.onerror = () => reject(request.error);
-      
-      request.onsuccess = () => {
-        this.db = request.result;
-        resolve(this.db);
-      };
-      
-      request.onupgradeneeded = (event) => {
-        const db = event.target.result;
-        
-        const stores = [
-          'users', 'categories', 'products', 'suppliers', 
-          'customers', 'sales', 'purchases', 'expenses', 
-          'settings', 'productHistory', 'license'
-        ];
-        
-        stores.forEach(name => {
-          if (!db.objectStoreNames.contains(name)) {
-            if (name === 'users') {
-              const store = db.createObjectStore(name, { keyPath: 'id' });
-              store.createIndex('email', 'email', { unique: true });
-            } else if (name === 'products') {
-              const store = db.createObjectStore(name, { keyPath: 'id' });
-              store.createIndex('barcode', 'barcode', { unique: false });
-            } else if (name === 'settings' || name === 'license') {
-              db.createObjectStore(name, { keyPath: 'key' });
-            } else {
-              db.createObjectStore(name, { keyPath: 'id' });
-            }
-          }
-        });
-      };
-    });
-  }
-
-  async getAll(storeName) {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(storeName, 'readonly');
-      const store = tx.objectStore(storeName);
-      const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async get(storeName, key) {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(storeName, 'readonly');
-      const store = tx.objectStore(storeName);
-      const request = store.get(key);
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async add(storeName, data) {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(storeName, 'readwrite');
-      const store = tx.objectStore(storeName);
-      const request = store.put(data);
-      request.onsuccess = () => resolve(data);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async remove(storeName, key) {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(storeName, 'readwrite');
-      const store = tx.objectStore(storeName);
-      const request = store.delete(key);
-      request.onsuccess = () => resolve(true);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async clear(storeName) {
-    return new Promise((resolve, reject) => {
-      const tx = this.db.transaction(storeName, 'readwrite');
-      const store = tx.objectStore(storeName);
-      const request = store.clear();
-      request.onsuccess = () => resolve(true);
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  async searchProducts(query) {
-    const products = await this.getAll('products');
-    if (!query) return products;
-    const q = query.toLowerCase();
-    return products.filter(p => 
-      p.name?.toLowerCase().includes(q) || 
-      p.barcode?.toLowerCase().includes(q)
-    );
-  }
-
-  async initializeDefaults() {
-    const admin = await this.get('users', 'super_admin');
-    if (!admin) {
-      await this.add('users', {
-        id: 'super_admin',
-        name: 'Super Admin',
-        email: 'admin@konok.io',
-        password: '@rsm@k@1A',
-        role: 'super_admin',
-        status: 'active',
-        created_at: new Date().toISOString()
-      });
-    }
-    
-    const defaultSettings = [
-      ['shop_name', 'POS সিস্টেম'],
-      ['name', 'আমার দোকান'],
-      ['address', ''],
-      ['phone', ''],
-      ['vat_percent', '15'],
-      ['vatEnabled', 'true'],
-      ['vatPercent', '15']
-    ];
-    
-    for (const [key, value] of defaultSettings) {
-      const existing = await this.get('settings', key);
-      if (!existing) {
-        await this.add('settings', { key, value });
-      }
-    }
-  }
-}
-
-/**
- * SQLite implementation for Electron (native)
+ * SQLite implementation for web server
  */
 class SQLiteStore {
   constructor() {
@@ -160,16 +15,17 @@ class SQLiteStore {
   async open() {
     const path = require('path');
     const fs = require('fs');
-    const { app } = window.require('electron');
     
-    const userDataPath = app.getPath('userData');
-    this.dbPath = path.join(userDataPath, 'database.sqlite');
+    // Data directory: C:\laragon\www\.pos_data
+    const dataDir = 'C:\\laragon\\www\\.pos_data';
+    this.dbPath = path.join(dataDir, 'database.sqlite');
     
-    if (!fs.existsSync(userDataPath)) {
-      fs.mkdirSync(userDataPath, { recursive: true });
+    // Create directory if not exists
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
     }
     
-    const Database = window.require('better-sqlite3');
+    const Database = require('better-sqlite3');
     this.db = new Database(this.dbPath);
     this.db.pragma('journal_mode = WAL');
     this.db.pragma('foreign_keys = ON');
@@ -264,15 +120,12 @@ class SQLiteStore {
   }
 }
 
-// Export store types
-export { IndexedDBStore, SQLiteStore };
-
 // Auto-select based on environment
 let dbInstance = null;
 
 export async function openDB() {
   if (!dbInstance) {
-    dbInstance = isElectron ? new SQLiteStore() : new IndexedDBStore();
+    dbInstance = new SQLiteStore();
     await dbInstance.open();
   }
   return dbInstance;
