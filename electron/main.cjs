@@ -4,19 +4,12 @@ const path = require('path');
 // Environment check
 const isDev = !app.isPackaged;
 
-// Main window reference
 let mainWindow = null;
-let apiServer = null;
 
-// Start Node.js API server
-async function startAPIServer() {
-  try {
-    const { start } = require('./api/server.cjs');
-    const port = await start(8765);
-    return `http://localhost:${port}`;
-  } catch (err) {
-    console.error('Failed to start API server:', err);
-    return null;
+function showError(title, message) {
+  console.error(title + ': ' + message);
+  if (mainWindow) {
+    dialog.showErrorBox(title, message);
   }
 }
 
@@ -33,25 +26,54 @@ async function createWindow() {
       nodeIntegration: false,
       sandbox: false,
     },
-    show: true,
+    show: false,
     backgroundColor: '#0F766E',
   });
 
-  // Load app
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
-  } else {
-    // Production: Start API server and load from localhost
-    const baseURL = await startAPIServer();
-    if (baseURL) {
-      console.log('API Server started at:', baseURL);
-      mainWindow.loadURL(baseURL);
+  // Show when ready
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
+
+  // Load app with error handling
+  try {
+    if (isDev) {
+      console.log('Loading dev server at http://localhost:5173');
+      mainWindow.loadURL('http://localhost:5173');
     } else {
-      // Fallback to file if server fails
-      const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
-      mainWindow.loadFile(indexPath);
+      // Production: Start API server and load from localhost
+      console.log('Starting API server...');
+      const { start } = require('./api/server.cjs');
+      const port = await start(8765);
+      console.log('API Server started at: http://localhost:' + port);
+      
+      mainWindow.loadURL('http://localhost:' + port);
     }
+  } catch (err) {
+    console.error('Failed to load app:', err);
+    showError('Load Error', 'Failed to start: ' + err.message);
   }
+
+  // Handle load errors
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
+    console.error('Failed to load:', errorCode, errorDescription);
+    showError('Load Error', 'Failed to load page\n\nError: ' + errorCode + '\n' + errorDescription);
+  });
+
+  // Log console errors from renderer
+  mainWindow.webContents.on('console-message', (event, level, message, line, sourceId) => {
+    if (level >= 2) { // Error level
+      console.error('Renderer Error:', message);
+    }
+  });
+
+  // Catch renderer errors
+  mainWindow.webContents.on('render-process-gone', (event, details) => {
+    console.error('Renderer process gone:', details);
+    if (details.reason !== 'clean-exit') {
+      showError('App Crashed', details.reason + '\n\nExit code: ' + details.exitCode);
+    }
+  });
 
   // F12 to toggle DevTools
   mainWindow.webContents.on('before-input-event', (event, input) => {
@@ -78,81 +100,23 @@ async function createWindow() {
 // Create menu
 function createMenu() {
   const template = [
-    // FILE MENU
     {
       label: 'File',
       submenu: [
         { label: 'Hard Refresh', accelerator: 'CmdOrCtrl+Shift+R', click: () => mainWindow?.webContents.reloadIgnoringCache() },
         { label: 'Refresh App', accelerator: 'CmdOrCtrl+R', click: () => mainWindow?.reload() },
         { type: 'separator' },
-        { label: 'Export Data', click: () => mainWindow?.webContents.send('menu-action', 'export') },
-        { label: 'Import Data', click: () => mainWindow?.webContents.send('menu-action', 'import') },
-        { type: 'separator' },
-        { label: 'Print Receipt', accelerator: 'CmdOrCtrl+P', click: () => mainWindow?.webContents.send('menu-action', 'print') },
-        { type: 'separator' },
-        { role: 'quit', label: 'Exit' },
+        { label: 'Exit', click: () => app.quit() },
       ],
     },
-    // EDIT MENU
-    {
-      label: 'Edit',
-      submenu: [
-        { role: 'undo', label: 'Undo' },
-        { role: 'redo', label: 'Redo' },
-        { type: 'separator' },
-        { role: 'cut', label: 'Cut' },
-        { role: 'copy', label: 'Copy' },
-        { role: 'paste', label: 'Paste' },
-        { role: 'selectAll', label: 'Select All' },
-      ],
-    },
-    // POS MENU (Application Menus)
-    {
-      label: 'POS',
-      submenu: [
-        { label: '🛒 Sales', accelerator: 'CmdOrCtrl+1', click: () => mainWindow?.webContents.send('switch-tab', 'pos') },
-        { label: '📦 All Products', accelerator: 'CmdOrCtrl+2', click: () => mainWindow?.webContents.send('switch-tab', 'products') },
-        { label: '➕ New Product', accelerator: 'CmdOrCtrl+3', click: () => mainWindow?.webContents.send('switch-tab', 'newproduct') },
-        { label: '📊 Barcode', accelerator: 'CmdOrCtrl+4', click: () => mainWindow?.webContents.send('switch-tab', 'barcode') },
-        { type: 'separator' },
-        { label: '🏢 Suppliers', accelerator: 'CmdOrCtrl+5', click: () => mainWindow?.webContents.send('switch-tab', 'suppliers') },
-        { label: '👥 Customers', accelerator: 'CmdOrCtrl+6', click: () => mainWindow?.webContents.send('switch-tab', 'customers') },
-        { type: 'separator' },
-        { label: '🏭 Stock', accelerator: 'CmdOrCtrl+7', click: () => mainWindow?.webContents.send('switch-tab', 'inventory') },
-        { label: '⚠️ Low Stock', accelerator: 'CmdOrCtrl+8', click: () => mainWindow?.webContents.send('switch-tab', 'lowstock') },
-        { type: 'separator' },
-        { label: '💰 Income/Expense', accelerator: 'CmdOrCtrl+9', click: () => mainWindow?.webContents.send('switch-tab', 'income') },
-        { label: '📈 Reports', click: () => mainWindow?.webContents.send('switch-tab', 'reports') },
-        { label: '⚙️ Settings', click: () => mainWindow?.webContents.send('switch-tab', 'settings') },
-      ],
-    },
-    // VIEW MENU
     {
       label: 'View',
       submenu: [
-        { label: 'Hard Refresh', accelerator: 'CmdOrCtrl+Shift+R', click: () => mainWindow?.webContents.reloadIgnoringCache() },
-        { role: 'reload', label: 'Refresh' },
-        { role: 'forceReload', label: 'Force Reload' },
-        { type: 'separator' },
-        { role: 'resetZoom', label: 'Reset Zoom' },
-        { role: 'zoomIn', label: 'Zoom In' },
-        { role: 'zoomOut', label: 'Zoom Out' },
+        { label: 'Developer Tools', accelerator: 'F12', click: () => mainWindow?.webContents.toggleDevTools() },
         { type: 'separator' },
         { role: 'togglefullscreen', label: 'Toggle Fullscreen' },
-        ...(isDev ? [{ type: 'separator' }, { role: 'toggleDevTools', label: 'Developer Tools' }] : []),
       ],
     },
-    // WINDOW MENU
-    {
-      label: 'Window',
-      submenu: [
-        { role: 'minimize', label: 'Minimize' },
-        { role: 'zoom', label: 'Maximize' },
-        { type: 'separator' },
-        { role: 'close', label: 'Close' },
-      ],
-    },
-    // HELP MENU
     {
       label: 'Help',
       submenu: [
@@ -163,40 +127,30 @@ function createMenu() {
               type: 'info',
               title: 'About POS System',
               message: 'POS System v1.1.2000',
-              detail: 'Sales, Stock & Accounting Management\n\n🏪 POS Management System\n\n© 2026 All Rights Reserved',
+              detail: 'Sales, Stock & Accounting Management\n\n© 2026 All Rights Reserved',
             });
           },
         },
-        { type: 'separator' },
-        { label: 'Documentation', click: () => shell.openExternal('https://konok.io/docs') },
-        { label: 'Contact Support', click: () => shell.openExternal('mailto:support@konok.io') },
       ],
     },
   ];
 
-  // Mac specific menu
-  if (process.platform === 'darwin') {
-    template.unshift({
-      label: app.name,
-      submenu: [
-        { role: 'about' },
-        { type: 'separator' },
-        { role: 'services' },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideOthers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' },
-      ],
-    });
-  }
-
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
+// Global error handlers
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  showError('System Error', 'An unexpected error occurred:\n\n' + err.message);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+});
+
 // App ready
 app.whenReady().then(() => {
+  console.log('App starting...');
   createMenu();
   createWindow();
 
@@ -207,17 +161,8 @@ app.whenReady().then(() => {
   });
 });
 
-// Stop API server
-function stopAPIServer() {
-  if (apiServer) {
-    apiServer.close();
-    apiServer = null;
-  }
-}
-
 // Quit when all windows closed
 app.on('window-all-closed', () => {
-  stopAPIServer();
   if (process.platform !== 'darwin') {
     app.quit();
   }
