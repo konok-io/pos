@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import "./App.css";
 
-/* ─────────────── GLOBAL CSS RESET ─────────────── */
+/* --------------- GLOBAL CSS RESET --------------- */
 const GlobalStyle = () => {
   return null;
 };
 
-/* ─────────────── LICENSE API ─────────────── */
+/* --------------- LICENSE API --------------- */
 const LICENSE_SERVER_URL = 'https://konok.io/api';
 const TRIAL_DAYS = 7;
 
@@ -85,7 +85,7 @@ async function activateLicense(licenseKey) {
   }
 }
 
-/* ─────────────── LICENSE MODAL ─────────────── */
+/* --------------- LICENSE MODAL --------------- */
 function LicenseModal({ onAccept }) {
   const [showLicenseKey, setShowLicenseKey] = useState(false);
   const [licenseKey, setLicenseKey] = useState('');
@@ -166,7 +166,7 @@ function LicenseModal({ onAccept }) {
                 fontSize: 14, lineHeight: 1.7, whiteSpace: 'pre-wrap', maxHeight: 280, overflowY: 'auto'
               }}>
 SOFTWARE LICENSE AGREEMENT (EULA)
-═══════════════════════════════════════
+=======================================
 
 1. ACCEPTANCE
 By installing or using this software, you agree to be bound by all terms and conditions of this agreement.
@@ -176,9 +176,9 @@ This software is licensed, not sold. You are granted permission to use this soft
 
 3. RESTRICTIONS
 You may NOT:
-• Copy, modify, distribute, or sell this software
-• Reverse engineer or decompile this software
-• Use for illegal or fraudulent purposes
+- Copy, modify, distribute, or sell this software
+- Reverse engineer or decompile this software
+- Use for illegal or fraudulent purposes
 
 4. DISCLAIMER
 This software is provided "AS IS" without any warranty or guarantee. Use at your own risk.
@@ -293,14 +293,14 @@ For questions: support@possystem.com
   );
 }
 
-/* ─────────────── UTILITIES ─────────────── */
+/* --------------- UTILITIES --------------- */
 const genId = () => `${Date.now()}-${Math.random().toString(36).substr(2,5)}`;
 const fmt = (n) => `৳${(+n||0).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 const fmtN = (n) => (+n||0).toLocaleString('en-IN');
 const today = () => new Date().toISOString().split('T')[0];
 const now = () => new Date().toISOString();
 
-/* ─────────────── BANNER IMAGE UPLOAD ─────────────── */
+/* --------------- BANNER IMAGE UPLOAD --------------- */
 function BannerImageUpload({ value, onChange }) {
   const [preview, setPreview] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -435,7 +435,7 @@ function BannerImageUpload({ value, onChange }) {
   );
 }
 
-/* ─────────────── API SERVICE (SQLite Backend) ─────────────── */
+/* --------------- API SERVICE (SQLite Backend) --------------- */
 // All data is stored in SQLite via PHP API - NO localStorage/sessionStorage used
 import { 
   auth, 
@@ -454,7 +454,7 @@ import {
   appState
 } from './api.js';
 
-/* ─────────────── DEFAULT SUPER ADMIN ─────────────── */
+/* --------------- DEFAULT SUPER ADMIN --------------- */
 const DEFAULT_SUPER_ADMIN = {
   email: 'admin@konok.io',
   password: '@rsm@k@1A',
@@ -462,7 +462,7 @@ const DEFAULT_SUPER_ADMIN = {
   name: 'Super Admin',
 };
 
-/* ─────────────── DESIGN TOKENS ─────────────── */
+/* --------------- DESIGN TOKENS --------------- */
 const T = {
   teal:'#0F766E', tealDark:'#115E59', tealLight:'#F0FDFA', tealMid:'#CCFBF1',
   orange:'#EA580C', orangeLight:'#FFF7ED',
@@ -499,7 +499,7 @@ const card = {
 };
 const label = { fontSize:14, fontWeight:700, color:T.gray400, marginBottom:4, display:'block', textTransform:'uppercase', letterSpacing:'0.5px' };
 
-/* ─────────────── MODAL WRAPPER ─────────────── */
+/* --------------- MODAL WRAPPER --------------- */
 function Modal({onClose, title, children, width=460}) {
   return (
     <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.45)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:200,padding:16}}>
@@ -514,7 +514,7 @@ function Modal({onClose, title, children, width=460}) {
   );
 }
 
-/* ─────────────── DYNAMIC MENU COMPONENT ─────────────── */
+/* --------------- DYNAMIC MENU COMPONENT --------------- */
 function DynamicMenu({tab, onTabChange, tabs}) {
   const menuRef = useRef(null);
 
@@ -678,9 +678,9 @@ function DynamicMenu({tab, onTabChange, tabs}) {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    LOGIN SCREEN - POS Management Style
-═══════════════════════════════════════════ */
+=========================================== */
 function LoginScreen({ onLogin, settings }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -878,7 +878,7 @@ function LoginScreen({ onLogin, settings }) {
   );
 }
 
-/* ─────────────── MAIN APP ─────────────── */
+/* --------------- MAIN APP --------------- */
 const DEFAULT_SETTINGS = {name:'আমার দোকান',address:'',phone:'',vatEnabled:true,vatPercent:15};
 
 function LoginPage({ onLogin }) {
@@ -1362,7 +1362,7 @@ function MainApp({ currentUser, onLogout }) {
   );
 }
 
-/* ─────────────── APP WRAPPER ─────────────── */
+/* --------------- APP WRAPPER --------------- */
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -1524,9 +1524,9 @@ export default function App() {
   return <MainApp currentUser={currentUser} onLogout={handleLogout} />;
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    POS SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function POSScreen({products, customers, sales, settings, categories, upd, productHistory, currentUser, refreshData}) {
   // Cart is managed in component state (memory only)
   const [cart, setCart] = useState([]);
@@ -1938,7 +1938,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
 
   return (
     <div style={{display:'flex',height:'100%',overflow:'hidden',width:'100%',background:T.gray50}}>
-      {/* ── LEFT: Products ── */}
+      {/* -- LEFT: Products -- */}
       <div style={{flex:1,display:'flex',flexDirection:'column',overflow:'hidden',minWidth:0}}>
         {/* Product name search */}
         <div style={{padding:'8px 14px',background:T.white,borderBottom:`1px solid ${T.gray200}`,display:'flex',gap:8,alignItems:'center'}}>
@@ -2152,7 +2152,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
         </div>
       </div>
 
-      {/* ── RIGHT: Cart ── Modern Minimal Design */}
+      {/* -- RIGHT: Cart -- Modern Minimal Design */}
       <div style={{width:360,display:'flex',flexDirection:'column',background:'#fafbfc',borderLeft:`1px solid #e5e7eb`}}>
         {/* Cart Header - Compact */}
         <div style={{padding:'12px 16px',borderBottom:`1px solid #e5e7eb`,background:T.white,flexShrink:0}}>
@@ -2336,9 +2336,9 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    PRODUCTS SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function ProductsScreen({products, suppliers, categories, purchases, productHistory, upd, settings}) {
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -2771,11 +2771,11 @@ function ProductsScreen({products, suppliers, categories, purchases, productHist
                     style={{padding:14,background:T.white,borderRadius:10,border:`1px solid ${T.gray200}`,cursor:'pointer',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
                     <div>
                       <div style={{fontWeight:700,color:T.teal,fontSize:14}}>{p.id}</div>
-                      <div style={{fontSize:14,color:T.gray500,marginTop:2}}>{new Date(p.date).toLocaleDateString('bn-BD')} • {p.supplier}</div>
+                      <div style={{fontSize:14,color:T.gray500,marginTop:2}}>{new Date(p.date).toLocaleDateString('bn-BD')} - {p.supplier}</div>
                     </div>
                     <div style={{textAlign:'right'}}>
                       <div style={{fontWeight:700,color:T.green}}>{fmt(totalCost)}</div>
-                      <div style={{fontSize:14,color:T.gray500}}>{p.totalItems}টি পণ্য • {p.totalStock} একক</div>
+                      <div style={{fontSize:14,color:T.gray500}}>{p.totalItems}টি পণ্য - {p.totalStock} একক</div>
                     </div>
                   </div>
                 );
@@ -2908,7 +2908,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                       <tr key={i} style={{borderBottom:`1px solid ${T.gray100}`}}>
                         <td style={{padding:10,fontSize:15}}>
                           <div style={{fontWeight:600}}>{item.name}</div>
-                          <div style={{fontSize:14,color:T.gray400}}>{item.company} • {item.cat || '-'}</div>
+                          <div style={{fontSize:14,color:T.gray400}}>{item.company} - {item.cat || '-'}</div>
                         </td>
                         <td style={{padding:10,textAlign:'center',fontWeight:600}}>{qty} {item.unit || 'পিস'}</td>
                         <td style={{padding:10,textAlign:'right',fontSize:15}}>{fmt(price)}</td>
@@ -3071,7 +3071,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                         <div key={i} onClick={()=>{selectProduct(p);setShowProductList(false);}}
                           style={{padding:'8px 12px',cursor:'pointer',borderBottom:`1px solid ${T.gray100}`,fontSize:15}}>
                           <div style={{fontWeight:600}}>{p.name}</div>
-                          <div style={{fontSize:14,color:T.gray400}}>{p.company} • {p.cat}</div>
+                          <div style={{fontSize:14,color:T.gray400}}>{p.company} - {p.cat}</div>
                         </div>
                       ))}
                       {form.name && !products.some(p=>!(p.name||'').includes('(ক্যাটাগরি)') && (p.name||'').toLowerCase()===(form.name||'').toLowerCase()) && (
@@ -3147,7 +3147,7 @@ td:nth-child(3), td:nth-child(4) { text-align:right; }
                     <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
                       <div style={{flex:1}}>
                         <div style={{fontWeight:600,fontSize:15}}>{item.name}</div>
-                        <div style={{fontSize:14,color:T.gray500}}>{item.company} • {item.barcode}</div>
+                        <div style={{fontSize:14,color:T.gray500}}>{item.company} - {item.barcode}</div>
                         {item.cat && <div style={{fontSize:14,color:T.gray400,marginTop:2}}>📂 {item.cat}</div>}
                         <div style={{fontSize:14,marginTop:4}}>
                           <span style={{color:T.teal}}>৳{item.buyP || 0}</span> → <span style={{color:T.green}}>৳{item.sellP || 0}</span>
@@ -3468,7 +3468,7 @@ ${printFiltered.map(p => {
             
             <div style={{marginBottom:12}}>
               <div style={{fontWeight:600,fontSize:14,marginBottom:8}}>{editProduct.name}</div>
-              <div style={{fontSize:14,color:T.gray400}}>{editProduct.company} • {editProduct.cat || '-'}</div>
+              <div style={{fontSize:14,color:T.gray400}}>{editProduct.company} - {editProduct.cat || '-'}</div>
             </div>
 
             <div style={{marginBottom:16}}>
@@ -3551,9 +3551,9 @@ ${printFiltered.map(p => {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    BARCODE SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function BarcodeScreen({purchases, products}) {
   const [purchaseId, setPurchaseId] = useState('');
   const [selectedPurchase, setSelectedPurchase] = useState(null);
@@ -3942,7 +3942,7 @@ body { font-family: Arial, sans-serif; padding: 5mm; background: #fff; }
           <div style={{marginBottom:12,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
             <div>
               <div style={{fontWeight:700,color:T.teal}}>{selectedPurchase.id}</div>
-              <div style={{fontSize:14,color:T.gray500}}>{new Date(selectedPurchase.date).toLocaleDateString('bn-BD')} • {selectedPurchase.supplier}</div>
+              <div style={{fontSize:14,color:T.gray500}}>{new Date(selectedPurchase.date).toLocaleDateString('bn-BD')} - {selectedPurchase.supplier}</div>
             </div>
             <button onClick={printBarcodes} style={{...btn('primary'),padding:'10px 20px'}}>🖨️ সব বারকোড প্রিন্ট করুন</button>
           </div>
@@ -4110,9 +4110,9 @@ ${barcodeData.map((item, i) => `<div class="barcode-item">
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    SUPPLIERS SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function SuppliersScreen({suppliers, products, categories, purchases, upd, refreshData}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
@@ -5160,9 +5160,9 @@ C-00003,আল-মারওয়া ট্রেডিং,মসলা,56789012
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    NEW PRODUCT SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function NewProductScreen({products, suppliers, categories, purchases, upd, currentUser, productHistory}) {
   const [purchaseItems, setPurchaseItems] = useState([]);
   const [supplierQ, setSupplierQ] = useState('');
@@ -5717,7 +5717,7 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
                 <div style={{flex:1}}>
                   <div style={{fontWeight:600,fontSize:14,marginBottom:4}}>{item.name}</div>
                   <div style={{fontSize:14,color:T.gray500}}>
-                    🏢 {item.company} • 📂 {item.cat || '-'}
+                    🏢 {item.company} - 📂 {item.cat || '-'}
                   </div>
                   <div style={{fontSize:14,color:T.gray500,display:'flex',gap:8,marginTop:4}}>
                     <span>📦 {item.stock} {item.unit}</span>
@@ -5736,9 +5736,9 @@ function NewProductScreen({products, suppliers, categories, purchases, upd, curr
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    CUSTOMERS SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function CustomersScreen({customers, sales, upd}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
@@ -5901,9 +5901,9 @@ function CustomersScreen({customers, sales, upd}) {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    INVENTORY SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function InventoryScreen({products, suppliers, productHistory, upd, currentUser}) {
   const [search, setSearch] = useState('');
   const [modal, setModal] = useState(null);
@@ -6410,9 +6410,9 @@ ${printFiltered.map(p => {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    LOW STOCK SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function LowStockScreen({products, upd}) {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -6534,9 +6534,9 @@ function LowStockScreen({products, upd}) {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    INCOME SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function IncomeScreen({sales, purchases, upd, refreshData}) {
   const [period, setPeriod] = useState('month');
   const [from, setFrom] = useState(() => {
@@ -7007,7 +7007,7 @@ ${filteredExpenses.length > 0 ? `
                 <div key={i.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:T.greenLight,borderRadius:8}}>
                   <div>
                     <div style={{fontWeight:600,fontSize:15}}>{i.title}</div>
-                    <div style={{fontSize:14,color:T.gray500}}>{new Date(i.date).toLocaleDateString('bn-BD')}{i.note ? ` • ${i.note}` : ''}</div>
+                    <div style={{fontSize:14,color:T.gray500}}>{new Date(i.date).toLocaleDateString('bn-BD')}{i.note ? ` - ${i.note}` : ''}</div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     <span style={{fontWeight:700,color:T.green,fontSize:14}}>{fmt(i.amount)}</span>
@@ -7028,7 +7028,7 @@ ${filteredExpenses.length > 0 ? `
                 <div key={e.id} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 12px',background:T.redLight,borderRadius:8}}>
                   <div>
                     <div style={{fontWeight:600,fontSize:15}}>{e.title}</div>
-                    <div style={{fontSize:14,color:T.gray500}}>{new Date(e.date).toLocaleDateString('bn-BD')}{e.note ? ` • ${e.note}` : ''}</div>
+                    <div style={{fontSize:14,color:T.gray500}}>{new Date(e.date).toLocaleDateString('bn-BD')}{e.note ? ` - ${e.note}` : ''}</div>
                   </div>
                   <div style={{display:'flex',alignItems:'center',gap:8}}>
                     <span style={{fontWeight:700,color:T.red,fontSize:14}}>{fmt(e.amount)}</span>
@@ -7153,9 +7153,9 @@ ${filteredExpenses.length > 0 ? `
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    REPORTS SCREEN
-═══════════════════════════════════════════ */
+=========================================== */
 function ReportsScreen({sales, customers, purchases, settings, suppliers}) {
   const [activeTab, setActiveTab] = useState('summary');
   const [period, setPeriod] = useState('today');
@@ -8125,9 +8125,9 @@ ${showVat !== false ? '<div style="border-top:1px dashed #000;margin-top:4px;pad
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ===========================================
    SETTINGS SCREEN - NEW PROFESSIONAL DESIGN
-═══════════════════════════════════════════ */
+=========================================== */
 function SettingsScreen({settings, products, suppliers, categories, purchases, sales, customers, productHistory, upd}) {
   const [form, setForm] = useState({
     name: '',
@@ -8968,9 +8968,9 @@ function SettingsScreen({settings, products, suppliers, categories, purchases, s
                   <p style={{ margin: 0, fontSize: 19, color: form.zatcaPhase === 'phase1' ? '#065f46' : '#1e40af' }}>
                     <strong>📋 {form.zatcaPhase === 'phase1' ? 'Phase 1 QR কোডে যা থাকবে:' : 'Phase 2 ইনভয়েসে যা থাকবে:'}</strong><br/>
                     {form.zatcaPhase === 'phase1' ? (
-                      <>বিক্রেতার নাম • VAT নম্বর • CR নম্বর • ইনভয়েস তারিখ • মোট পরিমাণ (VAT সহ) • VAT পরিমাণ</>
+                      <>বিক্রেতার নাম - VAT নম্বর - CR নম্বর - ইনভয়েস তারিখ - মোট পরিমাণ (VAT সহ) - VAT পরিমাণ</>
                     ) : (
-                      <>বিক্রেতার নাম • VAT নম্বর • CR নম্বর • ইনভয়েস তারিখ • মোট পরিমাণ (VAT সহ) • VAT পরিমাণ • UUID • হ্যাশ মান • XML UBL 2.1 ফরম্যাট • রিয়েল-টাইম ক্লিয়ারেন্স API</>
+                      <>বিক্রেতার নাম - VAT নম্বর - CR নম্বর - ইনভয়েস তারিখ - মোট পরিমাণ (VAT সহ) - VAT পরিমাণ - UUID - হ্যাশ মান - XML UBL 2.1 ফরম্যাট - রিয়েল-টাইম ক্লিয়ারেন্স API</>
                     )}
                   </p>
                 </div>
