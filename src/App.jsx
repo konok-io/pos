@@ -1011,7 +1011,7 @@ function MainApp({ currentUser, onLogout }) {
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',height:64}}>
           {/* Logo Section */}
           <div style={{display:'flex',alignItems:'center',gap:14,flexShrink:0}}>
-            <div style={{width:44,height:44,background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',fontSize:22,boxShadow:'0 4px 12px rgba(15,118,110,0.3)'}}>🏪</div>
+            <div className="header-logo-icon" style={{width:44,height:44,background:'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 12px rgba(15,118,110,0.3)'}}>🏪</div>
             <div>
               <div className="header-business-name" style={{fontWeight:800,fontSize:22,color:T.gray900,lineHeight:1.2}}>{settings.name}</div>
               <div style={{fontSize:14,color:T.gray400}}>POS ম্যানেজমেন্ট সিস্টেম</div>

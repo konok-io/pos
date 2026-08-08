@@ -6,6 +6,12 @@
   line-height: 1 !important;
 }
 
+/* Header logo icon - override global 14px */
+.header-logo-icon {
+  font-size: 28px !important;
+  line-height: 1 !important;
+}
+
 /* Header business name - override global 14px */
 .header-business-name {
   font-size: 22px !important;
