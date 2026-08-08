@@ -1,5 +1,21 @@
 <?php
 /**
+ * POS System Auth API
+ */
+
+// CORS headers for cookie-based auth
+header('Access-Control-Allow-Origin: http://pos.test');
+header('Access-Control-Allow-Credentials: true');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Handle preflight
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+/**
  * Authentication API
  * POS System - SQLite Backend
  * Uses persistent auth tokens stored in cookies and database
