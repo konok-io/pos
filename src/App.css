@@ -16,3 +16,16 @@
 .header-business-name {
   font-size: 22px !important;
 }
+
+/* Store info section - home page */
+.store-info-name {
+  font-size: 28px !important;
+}
+
+.store-info-phone {
+  font-size: 18px !important;
+}
+
+.store-info-address {
+  font-size: 17px !important;
+}

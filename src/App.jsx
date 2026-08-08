@@ -1800,18 +1800,18 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               <img src={settings.bannerImage} alt="Welcome" style={{width:'100%',height:'100%',objectFit:'cover',position:'absolute',inset:0}}/>
               {/* Business Info - Top Right */}
               <div style={{position:'absolute',top:30,right:30,textAlign:'center',padding:'28px 36px',background:'rgba(255,255,255,0.25)',borderRadius:20,backdropFilter:'blur(8px)',maxWidth:400}}>
-                <div style={{fontSize:32,fontWeight:800,color:T.teal,marginBottom:12}}>{settings.name}</div>
-                {settings.phone && <div style={{fontSize:18,color:'#1F2937',marginTop:8}}>📞 {settings.phone}</div>}
-                {settings.address && <div style={{fontSize:17,color:'#4B5563',marginTop:8}}>📍 {settings.address}</div>}
+                <div className="store-info-name" style={{fontSize:32,fontWeight:800,color:T.teal,marginBottom:12}}>{settings.name}</div>
+                {settings.phone && <div className="store-info-phone" style={{fontSize:18,color:'#1F2937',marginTop:8}}>📞 {settings.phone}</div>}
+                {settings.address && <div className="store-info-address" style={{fontSize:17,color:'#4B5563',marginTop:8}}>📍 {settings.address}</div>}
               </div>
             </div>
           ) : (
             <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100%',background:T.white,borderRadius:12,overflow:'hidden'}}>
               {/* Business Info from Settings */}
               <div style={{textAlign:'center',marginBottom:20}}>
-                <div style={{fontSize:28,fontWeight:800,color:T.teal,marginBottom:8}}>{settings.name}</div>
-                {settings.phone && <div style={{fontSize:14,color:T.gray600,marginTop:4}}>📞 {settings.phone}</div>}
-                {settings.address && <div style={{fontSize:15,color:T.gray500,marginTop:4}}>📍 {settings.address}</div>}
+                <div className="store-info-name" style={{fontSize:28,fontWeight:800,color:T.teal,marginBottom:8}}>{settings.name}</div>
+                {settings.phone && <div className="store-info-phone" style={{fontSize:18,color:T.gray600,marginTop:4}}>📞 {settings.phone}</div>}
+                {settings.address && <div className="store-info-address" style={{fontSize:17,color:T.gray500,marginTop:4}}>📍 {settings.address}</div>}
               </div>
               {/* Demo Illustration */}
               <svg width="260" height="160" viewBox="0 0 280 180" style={{marginBottom:16}}>
