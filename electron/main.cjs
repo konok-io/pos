@@ -1,14 +1,54 @@
 const { app, BrowserWindow, Menu, shell, dialog } = require('electron');
 const path = require('path');
+const { spawn } = require('child_process');
 
 // Environment check
 const isDev = !app.isPackaged;
 
 // Main window reference
 let mainWindow = null;
+let phpServer = null;
+
+// Start PHP built-in server for API
+function startPHPServer() {
+  return new Promise((resolve) => {
+    const distPath = path.join(__dirname, '..', 'dist');
+    const port = 8765;
+    
+    // Start PHP built-in server
+    phpServer = spawn('php', ['-S', `localhost:${port}`, '-t', distPath], {
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: false
+    });
+    
+    let started = false;
+    
+    phpServer.stderr.on('data', (data) => {
+      const output = data.toString();
+      console.log('PHP Server:', output);
+      if (output.includes('started') && !started) {
+        started = true;
+        resolve(`http://localhost:${port}`);
+      }
+    });
+    
+    phpServer.on('error', (err) => {
+      console.error('PHP Server Error:', err.message);
+      resolve(null);
+    });
+    
+    // Fallback timeout
+    setTimeout(() => {
+      if (!started) {
+        started = true;
+        resolve(`http://localhost:${port}`);
+      }
+    }, 2000);
+  });
+}
 
 // Create main window
-function createWindow() {
+async function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -28,10 +68,16 @@ function createWindow() {
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
   } else {
-    // Production: Load the built dist folder
-    const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
-    console.log('Loading:', indexPath);
-    mainWindow.loadFile(indexPath);
+    // Production: Start PHP server and load from localhost
+    const baseURL = await startPHPServer();
+    if (baseURL) {
+      console.log('PHP Server started at:', baseURL);
+      mainWindow.loadURL(baseURL);
+    } else {
+      // Fallback to file if PHP not available
+      const indexPath = path.join(__dirname, '..', 'dist', 'index.html');
+      mainWindow.loadFile(indexPath);
+    }
   }
 
   // F12 to toggle DevTools
@@ -188,8 +234,17 @@ app.whenReady().then(() => {
   });
 });
 
+// Stop PHP server
+function stopPHPServer() {
+  if (phpServer) {
+    phpServer.kill();
+    phpServer = null;
+  }
+}
+
 // Quit when all windows closed
 app.on('window-all-closed', () => {
+  stopPHPServer();
   if (process.platform !== 'darwin') {
     app.quit();
   }
