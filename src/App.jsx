@@ -1082,38 +1082,11 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
-  const [dbReady, setDbReady] = useState(false);
-  
+
   // Initialize database
   useEffect(() => {
-    async function initApp() {
-      try {
-        // Initialize database
-        await openDB();
-        setDbReady(true);
-      } catch (e) {
-        console.error('Failed to initialize:', e);
-        setDbReady(true); // Continue anyway
-      }
-    }
-    initApp();
+    openDB().catch(e => console.error('DB init error:', e));
   }, []);
-
-  // Show loading while initializing
-  if (!dbReady) {
-    return (
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        height: '100vh', background: '#0F766E', color: 'white',
-        fontFamily: 'BanglaFont, "Segoe UI", system-ui, sans-serif'
-      }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🏪</div>
-          <div>লোড হচ্ছে...</div>
-        </div>
-      </div>
-    );
-  }
 
   useEffect(() => {
     async function checkAuth() {
