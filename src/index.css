@@ -64,8 +64,8 @@ input::placeholder {
   font-size: 14px !important;
 }
 
-/* Global minimum font size */
-* {
+/* Global minimum font size - exclude preloader */
+*:not(#preloader):not(#preloader *) {
   font-size: 14px !important;
 }
 
