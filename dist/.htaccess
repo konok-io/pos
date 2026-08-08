@@ -1,0 +1,27 @@
+# Serve static files from dist folder
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Fonts - serve from dist/fonts folder
+    RewriteRule ^fonts/(.*)$ dist/fonts/$1 [L]
+
+    # Favicon - serve from dist folder
+    RewriteRule ^favicon\.svg$ dist/favicon.svg [L]
+
+    # API requests go to api folder first
+    RewriteRule ^api/(.*)$ api/$1 [L]
+    RewriteCond %{REQUEST_URI} ^/api$
+    RewriteRule ^(.*)$ api/ [L]
+
+    # Serve existing files directly
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Serve existing directories directly
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # All other requests go to dist folder
+    RewriteRule ^(.*)$ dist/$1 [L]
+</IfModule>
