@@ -1368,24 +1368,22 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
-  const [licenseAccepted, setLicenseAccepted] = useState(false);
-
-  // Check license on mount
-  useEffect(() => {
-    const checkLicense = () => {
+  
+  // Check license synchronously on mount
+  const licenseAccepted = (() => {
+    try {
       const license = localStorage.getItem('pos_license');
       if (license) {
         const licenseData = JSON.parse(license);
-        if (licenseData.accepted) {
-          setLicenseAccepted(true);
-        }
+        return licenseData.accepted === true;
       }
-    };
-    checkLicense();
-  }, []);
-
+    } catch (e) {}
+    return false;
+  })();
+  
   const handleLicenseAccept = () => {
-    setLicenseAccepted(true);
+    // Reload to re-render with license accepted
+    window.location.reload();
   };
 
   // Show license modal if not accepted
