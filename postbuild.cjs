@@ -27,4 +27,10 @@ if (fs.existsSync('dist/src/index.html')) {
   fs.copyFileSync('dist/src/index.html', 'index.html');
 }
 
+// Also copy fonts and favicon to ROOT for direct serving (bypass rewrite issues)
+if (fs.existsSync('public/fonts')) copyDir('public/fonts', 'fonts');
+if (fs.existsSync('public/favicon.svg')) fs.copyFileSync('public/favicon.svg', 'favicon.svg');
+if (fs.existsSync('public/icon.ico')) fs.copyFileSync('public/icon.ico', 'icon.ico');
+if (fs.existsSync('public/icon.svg')) fs.copyFileSync('public/icon.svg', 'icon.svg');
+
 console.log('Post-build assets copied');
