@@ -1164,6 +1164,7 @@ export default function App() {
         inset: 0,
         background: '#0F766E',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 9999
@@ -1193,6 +1194,10 @@ export default function App() {
               height: '36px'
             }}
           />
+        </div>
+        <div style={{ textAlign: 'center', marginTop: '16px' }}>
+          <h3 style={{ color: '#ffffff', fontSize: '18px', fontWeight: '700', margin: '0 0 4px 0' }}>POS সিস্টেম</h3>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', margin: 0 }}>লোড হচ্ছে...</p>
         </div>
         <style>{`@keyframes preloader-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>

@@ -37,13 +37,32 @@
         width: 36px !important;
         height: 36px !important;
       }
+      #preloader-text {
+        text-align: center;
+        margin-top: 16px;
+      }
+      #preloader-text h3 {
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+      }
+      #preloader-text p {
+        color: rgba(255,255,255,0.7);
+        font-size: 14px;
+        margin: 0;
+      }
     </style>
   </head>
   <body>
-    <div style="position:fixed;inset:0;background:#0F766E;display:flex;align-items:center;justify-content:center;z-index:9999" id="preloader">
+    <div style="position:fixed;inset:0;background:#0F766E;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999" id="preloader">
       <div id="preloader-box">
         <div id="preloader-spinner"></div>
         <img id="preloader-icon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='55%25' dominant-baseline='central' text-anchor='middle' font-size='70'%3E%F0%9F%8F%AA%3C/text%3E%3C/svg%3E" alt="🏪" />
+      </div>
+      <div id="preloader-text">
+        <h3>POS সিস্টেম</h3>
+        <p>লোড হচ্ছে...</p>
       </div>
     </div>
     <div id="root"></div>
