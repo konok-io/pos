@@ -1098,10 +1098,10 @@ export default function App() {
         const result = await auth.check({ signal: controller.signal });
         clearTimeout(timeoutId);
         
-        if (result.authenticated === true && result.user) {
-          setCurrentUser(result.user);
+        if (result.data?.authenticated === true && result.data?.user) {
+          setCurrentUser(result.data.user);
           setIsLoggedIn(true);
-        } else if (result.success && result.data?.user) {
+        } else if (result.data?.user) {
           setCurrentUser(result.data.user);
           setIsLoggedIn(true);
         }

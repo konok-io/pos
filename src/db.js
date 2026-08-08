@@ -41,11 +41,12 @@ async function api(endpoint, options = {}) {
   const method = options.method || 'GET';
   const body = options.body;
   const url = options.url || '';
-  
+  const isArrayEndpoint = ['products', 'customers', 'sales', 'categories', 'suppliers', 'expenses', 'purchases', 'users'].some(e => endpoint.includes(e)) && method === 'GET';
+
   try {
     let fullUrl = `${API_BASE}/${endpoint}`;
     if (url) fullUrl += url;
-    
+
     const res = await fetch(fullUrl, {
       method,
       headers: {
@@ -54,8 +55,18 @@ async function api(endpoint, options = {}) {
       },
       body: ['POST', 'PUT', 'PATCH'].includes(method) ? JSON.stringify(body) : undefined
     });
+
+    const data = await res.json();
     
-    return await res.json();
+    // Handle HTTP errors
+    if (!res.ok) {
+      if (res.status === 401) {
+        return isArrayEndpoint ? { success: false, data: [], error: 'Unauthorized' } : { success: false, error: 'Unauthorized' };
+      }
+      return { success: false, error: data.error || 'Request failed' };
+    }
+    
+    return data;
   } catch (err) {
     console.error('API Error:', err);
     return { success: false, error: err.message };
