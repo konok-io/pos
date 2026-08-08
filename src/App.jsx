@@ -454,7 +454,7 @@ function LoginScreen({ onLogin, settings }) {
       }} />
 
       <div style={{ width: '100%', maxWidth: 460, position: 'relative', zIndex: 1 }}>
-        {/* Header - Center aligned */}
+        {/* Header - Icon left, text centered */}
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
@@ -463,7 +463,7 @@ function LoginScreen({ onLogin, settings }) {
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, width: '100%' }}>
             <div style={{
               width: 60, height: 60,
               background: 'linear-gradient(135deg, #0F766E, #14B8A6)',
@@ -473,7 +473,7 @@ function LoginScreen({ onLogin, settings }) {
               justifyContent: 'center',
               fontSize: 32,
             }}>🏪</div>
-            <div style={{ textAlign: 'center' }}>
+            <div style={{ flex: 1, textAlign: 'center' }}>
               <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0F766E' }}>
                 {businessName}
               </h1>
