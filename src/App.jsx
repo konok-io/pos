@@ -204,7 +204,7 @@ For questions: support@possystem.com
                 <div style={{ fontSize: 14, color: daysLeft <= 3 ? '#991B1B' : '#92400E' }}>
                   ⏰ <strong>Free Trial:</strong> You can use this software FREE for {TRIAL_DAYS} days.
                   <br/>
-                  {daysLeft > 0 ? `Days remaining: ${daysLeft}` : 'Trial expired! Please enter license key.'}
+                  {daysLeft > 0 ? `Days remaining: ${daysLeft}` : '⚠️ Trial expired! Please enter a valid license key to continue.'}
                 </div>
               </div>
             </>
@@ -237,9 +237,12 @@ For questions: support@possystem.com
                 </p>
               )}
 
-              <div style={{ marginTop: 16, padding: 12, background: '#F3F4F6', borderRadius: 8 }}>
-                <p style={{ margin: 0, fontSize: 13, color: '#6B7280' }}>
-                  💡 Don't have a license? Close this and use the free {TRIAL_DAYS}-day trial!
+              <div style={{ marginTop: 16, padding: 12, background: daysLeft > 0 ? '#F3F4F6' : '#FEE2E2', borderRadius: 8 }}>
+                <p style={{ margin: 0, fontSize: 13, color: daysLeft > 0 ? '#6B7280' : '#991B1B' }}>
+                  {daysLeft > 0 
+                    ? `💡 Don't have a license? You can use the free ${TRIAL_DAYS}-day trial!`
+                    : '⚠️ Trial expired! Contact support@possystem.com to purchase a license.'
+                  }
                 </p>
               </div>
             </>
@@ -251,41 +254,58 @@ For questions: support@possystem.com
           padding: 16, borderTop: '1px solid #E5E7EB',
           display: 'flex', gap: 12, justifyContent: 'flex-end'
         }}>
-          <button
-            onClick={() => setShowLicenseKey(!showLicenseKey)}
-            disabled={loading}
-            style={{
-              padding: '12px 24px', fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
-              background: '#F3F4F6', border: 'none', borderRadius: 8,
-              color: '#374151', opacity: loading ? 0.6 : 1
-            }}
-          >
-            {showLicenseKey ? '📜 Back to License' : '🔑 Have License Key?'}
-          </button>
-
-          {showLicenseKey ? (
+          {daysLeft <= 0 ? (
+            // Trial expired - must enter license key
             <button
-              onClick={handleLicenseKeySubmit}
-              disabled={loading}
+              onClick={() => setShowLicenseKey(true)}
               style={{
-                padding: '12px 24px', fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
+                padding: '12px 24px', fontSize: 14, cursor: 'pointer',
                 background: '#059669', border: 'none', borderRadius: 8,
-                color: 'white', fontWeight: 600, opacity: loading ? 0.6 : 1
-              }}
-            >
-              {loading ? 'Activating...' : 'Activate License ✓'}
-            </button>
-          ) : (
-            <button
-              onClick={handleAccept}
-              style={{
-                padding: '12px 32px', fontSize: 14, cursor: 'pointer',
-                background: '#0F766E', border: 'none', borderRadius: 8,
                 color: 'white', fontWeight: 600
               }}
             >
-              I Accept & Start Free Trial →
+              🔑 Enter License Key
             </button>
+          ) : (
+            // Trial active - show normal buttons
+            <>
+              <button
+                onClick={() => setShowLicenseKey(!showLicenseKey)}
+                disabled={loading}
+                style={{
+                  padding: '12px 24px', fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
+                  background: '#F3F4F6', border: 'none', borderRadius: 8,
+                  color: '#374151', opacity: loading ? 0.6 : 1
+                }}
+              >
+                {showLicenseKey ? '📜 Back to License' : '🔑 Have License Key?'}
+              </button>
+
+              {showLicenseKey ? (
+                <button
+                  onClick={handleLicenseKeySubmit}
+                  disabled={loading}
+                  style={{
+                    padding: '12px 24px', fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
+                    background: '#059669', border: 'none', borderRadius: 8,
+                    color: 'white', fontWeight: 600, opacity: loading ? 0.6 : 1
+                  }}
+                >
+                  {loading ? 'Activating...' : 'Activate License ✓'}
+                </button>
+              ) : (
+                <button
+                  onClick={handleAccept}
+                  style={{
+                    padding: '12px 32px', fontSize: 14, cursor: 'pointer',
+                    background: '#0F766E', border: 'none', borderRadius: 8,
+                    color: 'white', fontWeight: 600
+                  }}
+                >
+                  I Accept & Start Free Trial →
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
