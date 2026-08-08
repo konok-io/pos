@@ -49,42 +49,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Start PHP session for auth management
-// Session data is stored in files in the api directory
-ini_set('session.save_path', __DIR__);
-ini_set('session.save_handler', 'files');
-ini_set('session.gc_maxlifetime', 86400); // 24 hours
-ini_set('session.cookie_lifetime', 0); // Session cookie (expires when browser closes)
+// Use database-based session for persistence across builds/restarts
+// Session data is stored in SQLite database in .pos_data directory
+
+// Session lifetime: 7 days for better persistence
+ini_set('session.gc_maxlifetime', 604800); // 7 days
+ini_set('session.cookie_lifetime', 604800); // 7 days cookie
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.use_strict_mode', 1);
 ini_set('session.use_only_cookies', 1);
 
-// Set cookie path to the base path of the application
-// Detect if we're in a subdirectory
-$scriptPath = dirname($_SERVER['SCRIPT_NAME'] ?? '');
-$cookiePath = $scriptPath ?: '/';
-ini_set('session.cookie_path', $cookiePath);
+// Set cookie path to root to work across all paths
+ini_set('session.cookie_path', '/');
 
-// Start session
+// Start PHP session (minimal, just for session ID)
 session_start();
 
 // Update session expiry on activity
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 86400)) {
-    // Session expired, regenerate
-    session_unset();
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 604800)) {
+    // Session expired (7 days), regenerate
+    $_SESSION = array();
     session_destroy();
     session_start();
 }
 $_SESSION['LAST_ACTIVITY'] = time();
 
-// Regenerate session ID periodically for security
-if (!isset($_SESSION['CREATED'])) {
-    $_SESSION['CREATED'] = time();
-} else if (time() - $_SESSION['CREATED'] > 1800) {
-    // Session ID older than 30 minutes, regenerate
-    session_regenerate_id(true);
-    $_SESSION['CREATED'] = time();
+// Load session data from database if exists
+$sessionId = session_id();
+$db = null;
+try {
+    $db = getDB();
+    $stmt = $db->prepare("SELECT data FROM sessions WHERE id = ? AND expires_at > datetime('now')");
+    $stmt->execute([$sessionId]);
+    $row = $stmt->fetch();
+    if ($row && $row['data']) {
+        $sessionData = json_decode($row['data'], true);
+        if (is_array($sessionData)) {
+            foreach ($sessionData as $key => $value) {
+                $_SESSION[$key] = $value;
+            }
+        }
+    }
+} catch (Exception $e) {
+    // Continue with empty session if database fails
 }
+
+// Save session data to database before output
+register_shutdown_function(function() use ($sessionId, $db) {
+    if ($db && session_status() === PHP_SESSION_ACTIVE) {
+        try {
+            $sessionData = array();
+            foreach ($_SESSION as $key => $value) {
+                if (!in_array($key, array('LAST_ACTIVITY', 'CREATED'))) {
+                    $sessionData[$key] = $value;
+                }
+            }
+            $data = json_encode($sessionData);
+            $expiresAt = date('Y-m-d H:i:s', time() + 604800);
+            
+            $stmt = $db->prepare("INSERT OR REPLACE INTO sessions (id, data, expires_at) VALUES (?, ?, ?)");
+            $stmt->execute([$sessionId, $data, $expiresAt]);
+        } catch (Exception $e) {
+            // Ignore errors on shutdown
+        }
+    }
+});
 
 /**
  * Database Connection Class
@@ -144,6 +174,28 @@ class Database {
     }
 
     /**
+     * Migration: Ensure sessions table has data column
+     */
+    private function addSessionsDataColumn() {
+        try {
+            $result = $this->connection->query("PRAGMA table_info(sessions)");
+            $columns = [];
+            while ($row = $result->fetch()) {
+                $columns[$row['name']] = true;
+            }
+            
+            if (!isset($columns['data'])) {
+                $this->connection->exec("ALTER TABLE sessions ADD COLUMN data TEXT");
+            }
+            if (!isset($columns['expires_at'])) {
+                $this->connection->exec("ALTER TABLE sessions ADD COLUMN expires_at DATETIME");
+            }
+        } catch (Exception $e) {
+            // Column might already exist or table doesn't exist - ignore
+        }
+    }
+
+    /**
      * Run database migrations for schema updates
      */
     private function runMigrations() {
@@ -156,6 +208,9 @@ class Database {
             
             // Migration: Add status column to users table if missing
             $this->addUsersStatusColumn();
+            
+            // Migration: Add data column to sessions table
+            $this->addSessionsDataColumn();
             
             // Get all columns
             $result = $this->connection->query("PRAGMA table_info(settings)");

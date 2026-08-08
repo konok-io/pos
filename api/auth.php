@@ -98,8 +98,19 @@ function login() {
  * Logout - Destroys PHP session
  */
 function logout() {
+    $sessionId = session_id();
+    
     // Clear all session data
     $_SESSION = [];
+    
+    // Delete session from database
+    try {
+        $db = getDB();
+        $stmt = $db->prepare("DELETE FROM sessions WHERE id = ?");
+        $stmt->execute([$sessionId]);
+    } catch (Exception $e) {
+        // Continue even if database delete fails
+    }
     
     // Get session cookie params
     $params = session_get_cookie_params();
