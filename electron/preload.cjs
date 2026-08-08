@@ -17,14 +17,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   license: {
     getMachineId: () => {
-      // Generate machine ID without os module
-      const info = navigator.userAgent + screen.width + screen.height + screen.colorDepth;
-      let hash = 0;
-      for (let i = 0; i < info.length; i++) {
-        hash = ((hash << 5) - hash) + info.charCodeAt(i);
-        hash = hash & hash;
-      }
-      return 'POS-' + Math.abs(hash).toString(16).toUpperCase();
+      // Simple hash based on timestamp and random
+      return 'POS-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
     },
     check: async () => ({ status: 'active', message: 'Offline Mode' }),
     activate: async () => ({ success: true }),
