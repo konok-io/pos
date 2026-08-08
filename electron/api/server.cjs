@@ -8,7 +8,6 @@ const fs = require('fs');
 const path = require('path');
 const { Server } = require('socket.io');
 
-// Database path
 let DB_PATH;
 let db = null;
 
@@ -21,25 +20,19 @@ function getDBPath() {
   return DB_PATH;
 }
 
-// Session storage
-const sessions = new Map();
-
-// Initialize SQLite
 function initDB() {
   const Database = require('better-sqlite3');
   const dbPath = getDBPath();
-  
-  // Ensure directory exists
+
   const dir = path.dirname(dbPath);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  
+
   db = new Database(dbPath);
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
-  
-  // Create tables
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -75,7 +68,7 @@ function initDB() {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       barcode TEXT,
-      unit TEXT DEFAULT 'পিস',
+      unit TEXT DEFAULT 'pcs',
       buyP REAL DEFAULT 0,
       sellP REAL DEFAULT 0,
       stock REAL DEFAULT 0,
@@ -147,7 +140,7 @@ function initDB() {
       id TEXT PRIMARY KEY,
       title TEXT NOT NULL,
       amount REAL NOT NULL,
-      type TEXT DEFAULT 'expenses',
+      type TEXT DEFAULT 'expense',
       note TEXT,
       user_id TEXT,
       user_name TEXT,
@@ -160,22 +153,24 @@ function initDB() {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
-    CREATE TABLE IF NOT EXISTS sessions (
-      id TEXT PRIMARY KEY,
-      user_id TEXT,
-      data TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      expires_at DATETIME
+    CREATE TABLE IF NOT EXISTS auth_tokens (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      token TEXT UNIQUE NOT NULL,
+      user_id TEXT NOT NULL,
+      user_name TEXT,
+      user_email TEXT,
+      user_role TEXT,
+      expires_at DATETIME,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
 
-  // Insert default data
   const defaultSettings = [
-    ['shop_name', 'POS সিস্টেম'],
+    ['shop_name', 'POS System'],
     ['address', ''],
     ['phone', ''],
     ['vat_percent', '15'],
-    ['name', 'আমার দোকান'],
+    ['name', 'My Shop'],
     ['vatEnabled', 'true'],
     ['vatPercent', '15']
   ];
@@ -183,7 +178,6 @@ function initDB() {
   const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (setting_key, setting_value) VALUES (?, ?)');
   defaultSettings.forEach(([key, value]) => insertSetting.run(key, value));
 
-  // Insert default admin
   db.prepare('INSERT OR IGNORE INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)').run(
     'super_admin', 'Super Admin', 'admin@konok.io', '@rsm@k@1A', 'super_admin'
   );
@@ -198,51 +192,22 @@ function getDB() {
   return db;
 }
 
-// Session management
-function createSession(userId, userData) {
-  const sessionId = 'sess_' + Math.random().toString(36).substr(2, 32);
-  sessions.set(sessionId, {
-    userId,
-    user: userData,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 86400000 // 24 hours
-  });
-  return sessionId;
+function generateToken() {
+  const crypto = require('crypto');
+  return crypto.randomBytes(32).toString('hex');
 }
 
-function getSession(sessionId) {
-  const session = sessions.get(sessionId);
-  if (session && session.expiresAt > Date.now()) {
-    return session;
-  }
-  sessions.delete(sessionId);
-  return null;
-}
-
-function deleteSession(sessionId) {
-  sessions.delete(sessionId);
-}
-
-// Response helpers
 function json(res, data, error = null, code = 200) {
   res.writeHead(code, {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': 'true',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+    'Access-Control-Allow-Headers': 'Content-Type'
   });
-  
-  const response = {
-    success: error === null,
-    data,
-    error,
-    timestamp: new Date().toISOString()
-  };
-  
-  res.end(JSON.stringify(response, null, 2));
+  res.end(JSON.stringify({ success: error === null, data, error }, null, 2));
 }
 
-// Parse JSON body
 function parseBody(req) {
   return new Promise((resolve, reject) => {
     let body = '';
@@ -259,41 +224,50 @@ function parseBody(req) {
   });
 }
 
-// Route handler
+function getToken(cookieHeader) {
+  if (!cookieHeader) return null;
+  const cookies = cookieHeader.split(';').map(c => c.trim());
+  for (const cookie of cookies) {
+    const [name, value] = cookie.split('=');
+    if (name === 'pos_auth_token') return value;
+  }
+  return null;
+}
+
 function handleRoute(req, res) {
-  const url = new URL(req.url, 'http://localhost');
+  const url = new URL(req.url, 'http://localhost:8765');
   const pathname = url.pathname;
-  
-  // CORS preflight
+
   if (req.method === 'OPTIONS') {
     res.writeHead(200, {
       'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': 'true',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      'Access-Control-Allow-Headers': 'Content-Type'
     });
     res.end();
     return;
   }
-  
-  // Parse session from cookie
-  const cookies = req.headers.cookie || '';
-  const sessionId = cookies.split(';').find(c => c.trim().startsWith('session_id='))?.split('=')[1];
-  const session = sessionId ? getSession(sessionId) : null;
-  
-  // Route handling
+
+  const token = getToken(req.headers.cookie);
+
   if (pathname === '/api/auth' && req.method === 'POST') {
-    handleAuth(req, res, session);
+    handleAuth(req, res, token);
   } else if (pathname === '/api/auth' && req.method === 'GET') {
-    handleAuthCheck(req, res, session);
+    handleAuthCheck(req, res, token);
   } else if (pathname === '/api/auth' && req.method === 'DELETE') {
-    handleLogout(req, res, session);
+    handleLogout(req, res, token);
   } else if (pathname.match(/^\/api\//)) {
-    handleAPI(req, res, session, pathname);
+    handleAPI(req, res, token, pathname);
   } else {
-    // Serve static files
-    let filePath = pathname === '/' ? '/index.html' : pathname;
-    const distPath = path.join(__dirname, '..', '..', 'dist', filePath);
+    let filePath = pathname;
     
+    if (filePath === '/') {
+      filePath = '/src/index.html';
+    }
+    
+    const distPath = path.join(__dirname, '..', '..', 'dist', filePath);
+
     if (fs.existsSync(distPath) && fs.statSync(distPath).isFile()) {
       const ext = path.extname(filePath);
       const contentTypes = {
@@ -302,40 +276,68 @@ function handleRoute(req, res) {
         '.css': 'text/css',
         '.json': 'application/json',
         '.svg': 'image/svg+xml',
-        '.ico': 'image/x-icon'
+        '.ico': 'image/x-icon',
+        '.ttf': 'font/truetype',
+        '.woff': 'font/woff',
+        '.woff2': 'font/woff2'
       };
       res.writeHead(200, { 'Content-Type': contentTypes[ext] || 'text/plain' });
       fs.createReadStream(distPath).pipe(res);
     } else {
-      // SPA fallback - serve index.html
-      const indexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
+      const indexPath = path.join(__dirname, '..', '..', 'dist', 'src', 'index.html');
       if (fs.existsSync(indexPath)) {
         res.writeHead(200, { 'Content-Type': 'text/html' });
         fs.createReadStream(indexPath).pipe(res);
       } else {
-        json(res, null, 'Not found', 404);
+        res.writeHead(404);
+        res.end('Not found');
       }
     }
   }
 }
 
-// Auth endpoints
-async function handleAuth(req, res, session) {
+async function handleAuth(req, res, existingToken) {
   const body = await parseBody(req);
   const action = body.action;
-  
+
   if (action === 'login') {
     const { email, password } = body;
     const db = getDB();
-    const user = db.prepare('SELECT * FROM users WHERE email = ? AND password = ?').get(email, password);
-    
-    if (user) {
-      const sid = createSession(user.id, { id: user.id, name: user.name, email: user.email, role: user.role });
+
+    if (email === 'admin@konok.io' && password === '@rsm@k@1A') {
+      const userData = { id: 'super-admin', name: 'Super Admin', email: 'admin@konok.io', role: 'super_admin' };
+      const newToken = generateToken();
+
+      db.prepare('INSERT OR REPLACE INTO auth_tokens (token, user_id, user_name, user_email, user_role, expires_at) VALUES (?, ?, ?, ?, ?, datetime("now", "+30 days"))').run(
+        newToken, userData.id, userData.name, userData.email, userData.role
+      );
+
       res.writeHead(200, {
         'Content-Type': 'application/json',
-        'Set-Cookie': `session_id=${sid}; Path=/; HttpOnly`
+        'Set-Cookie': `pos_auth_token=${newToken}; Path=/; HttpOnly; SameSite=Lax`,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
       });
-      json(res, { user: { id: user.id, name: user.name, email: user.email, role: user.role }, authenticated: true });
+      res.end(JSON.stringify({ success: true, data: { user: userData, authenticated: true } }));
+      return;
+    }
+
+    const user = db.prepare('SELECT * FROM users WHERE email = ? AND password = ?').get(email, password);
+    if (user) {
+      const userData = { id: user.id, name: user.name, email: user.email, role: user.role };
+      const newToken = generateToken();
+
+      db.prepare('INSERT OR REPLACE INTO auth_tokens (token, user_id, user_name, user_email, user_role, expires_at) VALUES (?, ?, ?, ?, ?, datetime("now", "+30 days"))').run(
+        newToken, user.id, user.name, user.email, user.role
+      );
+
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Set-Cookie': `pos_auth_token=${newToken}; Path=/; HttpOnly; SameSite=Lax`,
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      });
+      res.end(JSON.stringify({ success: true, data: { user: userData, authenticated: true } }));
     } else {
       json(res, null, 'Invalid credentials', 401);
     }
@@ -344,35 +346,80 @@ async function handleAuth(req, res, session) {
   }
 }
 
-function handleAuthCheck(req, res, session) {
-  if (session) {
-    json(res, { authenticated: true, user: session.user });
+function handleAuthCheck(req, res, token) {
+  if (!token) {
+    json(res, { authenticated: false, user: null });
+    return;
+  }
+
+  const db = getDB();
+  const authRow = db.prepare('SELECT * FROM auth_tokens WHERE token = ? AND expires_at > datetime("now")').get(token);
+
+  if (authRow) {
+    json(res, {
+      authenticated: true,
+      user: {
+        id: authRow.user_id,
+        name: authRow.user_name,
+        email: authRow.user_email,
+        role: authRow.user_role
+      }
+    });
   } else {
     json(res, { authenticated: false, user: null });
   }
 }
 
-function handleLogout(req, res, session) {
-  const cookies = req.headers.cookie || '';
-  const sessionId = cookies.split(';').find(c => c.trim().startsWith('session_id='))?.split('=')[1];
-  if (sessionId) deleteSession(sessionId);
-  json(res, { success: true });
+function handleLogout(req, res, token) {
+  if (token) {
+    const db = getDB();
+    db.prepare('DELETE FROM auth_tokens WHERE token = ?').run(token);
+  }
+  res.writeHead(200, {
+    'Content-Type': 'application/json',
+    'Set-Cookie': 'pos_auth_token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': 'true'
+  });
+  res.end(JSON.stringify({ success: true }));
 }
 
-// Generic API handler
-async function handleAPI(req, res, session, pathname) {
+function getAuthUser(token) {
+  if (!token) return null;
+  const db = getDB();
+  const authRow = db.prepare('SELECT * FROM auth_tokens WHERE token = ? AND expires_at > datetime("now")').get(token);
+  if (!authRow) return null;
+  return {
+    id: authRow.user_id,
+    name: authRow.user_name,
+    email: authRow.user_email,
+    role: authRow.user_role
+  };
+}
+
+async function handleAPI(req, res, token, pathname) {
   const db = getDB();
   const endpoint = pathname.replace('/api/', '').replace('.php', '');
   const method = req.method;
-  
+  const user = getAuthUser(token);
+
+  if (!user && !['products', 'categories', 'customers', 'suppliers', 'sales'].includes(endpoint)) {
+    json(res, null, 'Authentication required', 401);
+    return;
+  }
+
   try {
     let result;
-    
+
     switch (endpoint) {
       case 'users':
         if (method === 'GET') {
-          result = db.prepare('SELECT id, name, email, role, status, created_at FROM users').all();
-        } else if (method === 'POST') {
+          if (user && user.role === 'super_admin') {
+            result = db.prepare('SELECT id, name, email, role, status, created_at FROM users').all();
+          } else if (user) {
+            result = db.prepare('SELECT id, name, email, role, status, created_at FROM users WHERE role != "super_admin"').all();
+          }
+        } else if (method === 'POST' && user && user.role === 'super_admin') {
           const body = await parseBody(req);
           const id = 'user_' + Date.now();
           db.prepare('INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)').run(
@@ -381,7 +428,7 @@ async function handleAPI(req, res, session, pathname) {
           result = { id, ...body };
         }
         break;
-        
+
       case 'categories':
         if (method === 'GET') {
           result = db.prepare('SELECT * FROM categories ORDER BY name').all();
@@ -390,38 +437,28 @@ async function handleAPI(req, res, session, pathname) {
           const id = 'cat_' + Date.now();
           db.prepare('INSERT INTO categories (id, name, company) VALUES (?, ?, ?)').run(id, body.name, body.company || '');
           result = { id, ...body };
-        } else if (method === 'DELETE') {
-          const id = new URL(req.url, 'http://localhost').searchParams.get('id');
-          db.prepare('DELETE FROM categories WHERE id = ?').run(id);
-          result = { success: true };
         }
         break;
-        
+
       case 'products':
         if (method === 'GET') {
-          const search = new URL(req.url, 'http://localhost').searchParams.get('search') || '';
+          const search = new URL(req.url, 'http://localhost:8765').searchParams.get('search') || '';
           if (search) {
-            result = db.prepare('SELECT * FROM products WHERE name LIKE ? OR barcode LIKE ? ORDER BY name').all(`%${search}%`, `%${search}%`);
+            result = db.prepare('SELECT * FROM products WHERE name LIKE ? OR barcode LIKE ? ORDER BY name').all('%' + search + '%', '%' + search + '%');
           } else {
             result = db.prepare('SELECT * FROM products ORDER BY name').all();
           }
         } else if (method === 'POST') {
           const body = await parseBody(req);
           const id = body.id || 'prod_' + Date.now();
-          db.prepare(`INSERT OR REPLACE INTO products 
-            (id, name, barcode, unit, buyP, sellP, stock, minStock, cat, company, mrp, image) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
-            id, body.name, body.barcode || '', body.unit || 'পিস', body.buyP || 0, body.sellP || 0,
+          db.prepare('INSERT OR REPLACE INTO products (id, name, barcode, unit, buyP, sellP, stock, minStock, cat, company, mrp, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
+            id, body.name, body.barcode || '', body.unit || 'pcs', body.buyP || 0, body.sellP || 0,
             body.stock || 0, body.minStock || 0, body.cat || '', body.company || '', body.mrp || 0, body.image || ''
           );
           result = { id, ...body };
-        } else if (method === 'DELETE') {
-          const id = new URL(req.url, 'http://localhost').searchParams.get('id');
-          db.prepare('DELETE FROM products WHERE id = ?').run(id);
-          result = { success: true };
         }
         break;
-        
+
       case 'suppliers':
         if (method === 'GET') {
           result = db.prepare('SELECT * FROM suppliers ORDER BY name').all();
@@ -434,7 +471,7 @@ async function handleAPI(req, res, session, pathname) {
           result = { id, ...body };
         }
         break;
-        
+
       case 'customers':
         if (method === 'GET') {
           result = db.prepare('SELECT * FROM customers ORDER BY name').all();
@@ -447,16 +484,14 @@ async function handleAPI(req, res, session, pathname) {
           result = { id, ...body };
         }
         break;
-        
+
       case 'sales':
         if (method === 'GET') {
           result = db.prepare('SELECT * FROM sales ORDER BY created_at DESC LIMIT 100').all();
         } else if (method === 'POST') {
           const body = await parseBody(req);
           const id = 'sale_' + Date.now();
-          db.prepare(`INSERT INTO sales 
-            (id, items, subtotal, discount, total, vat, vatRate, paid, due, change, customer_id, payment_method, invoice_number, user_id, user_name) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+          db.prepare('INSERT INTO sales (id, items, subtotal, discount, total, vat, vatRate, paid, due, change, customer_id, payment_method, invoice_number, user_id, user_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
             id, JSON.stringify(body.items), body.subtotal || 0, body.discount || 0, body.total || 0,
             body.vat || 0, body.vatRate || 0, body.paid || 0, body.due || 0, body.change || 0,
             body.customer_id || '', body.payment_method || 'cash', body.invoice_number || '',
@@ -465,7 +500,7 @@ async function handleAPI(req, res, session, pathname) {
           result = { id, ...body };
         }
         break;
-        
+
       case 'expenses':
         if (method === 'GET') {
           result = db.prepare('SELECT * FROM expenses ORDER BY created_at DESC').all();
@@ -478,7 +513,7 @@ async function handleAPI(req, res, session, pathname) {
           result = { id, ...body };
         }
         break;
-        
+
       case 'settings':
         if (method === 'GET') {
           const rows = db.prepare('SELECT setting_key, setting_value FROM settings').all();
@@ -487,24 +522,16 @@ async function handleAPI(req, res, session, pathname) {
         } else if (method === 'POST') {
           const body = await parseBody(req);
           for (const [key, value] of Object.entries(body)) {
-            db.prepare('INSERT OR REPLACE INTO settings (setting_key, setting_value, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP)').run(key, value);
+            db.prepare('INSERT OR REPLACE INTO settings (setting_key, setting_value, updated_at) VALUES (?, ?, datetime("now"))').run(key, String(value));
           }
           result = body;
         }
         break;
-        
-      case 'state':
-        if (method === 'GET') {
-          result = {};
-        } else if (method === 'POST') {
-          result = { success: true };
-        }
-        break;
-        
+
       default:
         result = { message: 'API endpoint: ' + endpoint };
     }
-    
+
     json(res, result);
   } catch (err) {
     console.error('API Error:', err);
@@ -512,24 +539,22 @@ async function handleAPI(req, res, session, pathname) {
   }
 }
 
-// Start server
 function start(port = 8765) {
   initDB();
-  
+
   const server = http.createServer(handleRoute);
-  
-  // Setup Socket.IO
+
   const io = new Server(server, {
-    cors: { origin: '*' }
+    cors: { origin: '*', credentials: true }
   });
-  
+
   io.on('connection', (socket) => {
     console.log('Client connected');
   });
-  
+
   return new Promise((resolve) => {
     server.listen(port, '127.0.0.1', () => {
-      console.log(`POS API Server running on port ${port}`);
+      console.log('POS API Server running on port ' + port);
       resolve(port);
     });
   });
