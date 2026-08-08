@@ -1,44 +1,44 @@
-সফটওয়্যার লাইসেন্স চুক্তি (EULA)
+SOFTWARE LICENSE AGREEMENT (EULA)
 ═══════════════════════════════
 
-স্বাগতম! এই সফটওয়্যার ব্যবহারের আগে অনুগ্রহ করে এই চুক্তিটি মনোযোগ সহকারে পড়ুন।
+Welcome! Please read this agreement carefully before installing or using this software.
 
-১. গ্রহণযোগ্যতা
+1. ACCEPTANCE
 ─────────────
-এই সফটওয়্যার ইনস্টল বা ব্যবহার করার মাধ্যমে, আপনি এই চুক্তির সকল শর্তাবলী মেনে নিচ্ছেন বলে ধরে নেওয়া হবে। যদি আপনি এই শর্তাবলীতে একমত না হন, তাহলে এই সফটওয়্যার ইনস্টল বা ব্যবহার করবেন না।
+By installing or using this software, you agree to be bound by all terms and conditions of this agreement. If you do not agree to these terms, do not install or use this software.
 
-২. লাইসেন্স
+2. LICENSE
 ───────────
-এই সফটওয়্যার একটি লাইসেন্স প্রদান করা হয়েছে, বিক্রি করা হয়নি। আপনি এই সফটওয়্যার শুধুমাত্র ব্যবহারের জন্য অনুমতি পাচ্ছেন।
+This software is licensed, not sold. You are granted permission to use this software solely for your own use.
 
-৩. ব্যবহারের সীমাবদ্ধতা
-────────────────────
-আপনি এই সফটওয়্যার:
-• অনুলিপি, পরিবর্তন, বিতরণ বা বিক্রি করতে পারবেন না
-• রিভার্স ইঞ্জিনিয়ারিং বা ডিকম্পাইল করতে পারবেন না
-• অবৈধ বা প্রতারণামূলক কাজে ব্যবহার করতে পারবেন না
+3. RESTRICTIONS
+────────────────
+You may NOT:
+• Copy, modify, distribute, or sell this software
+• Reverse engineer or decompile this software
+• Use for illegal or fraudulent purposes
 
-৪. দায়িত্ব
-───────────
-এই সফটওয়্যার "যেমন আছে" ভিত্তিতে প্রদান করা হয়েছে। কোনো ওয়ারেন্টি বা গ্যারান্টি নেই। ব্যবহারের ঝুঁকি শুধুমাত্র ব্যবহারকারীর।
+4. DISCLAIMER
+─────────────
+This software is provided "AS IS" without any warranty or guarantee. Use at your own risk.
 
-৫. ডেটা সংরক্ষণ
+5. DATA BACKUP
 ──────────────
-আপনার ব্যবহার করা ডেটা আপনার নিজের দায়িত্বে সংরক্ষণ করুন। নিয়মিত ব্যাকআপ নিন।
+Data you create is your responsibility. Regular backups are recommended.
 
-৬. আপডেট
-────────
-সফটওয়্যার সময়ে সময়ে আপডেট পেতে পারে। আপডেটের শর্তাবলীও এই চুক্তির অন্তর্ভুক্ত।
-
-৭. সমাপ্তি
+6. UPDATES
 ──────────
-এই চুক্তি লঙ্ঘন করলে আপনার লাইসেন্স স্বয়ংক্রিয়ভাবে বাতিল হয়ে যাবে।
+The software may receive updates from time to time. Update terms are included in this agreement.
 
-৮. যোগাযোগ
-──────────
-কোনো প্রশ্ন থাকলে যোগাযোগ করুন:
-• ইমেইল: support@possystem.com
+7. TERMINATION
+──────────────
+Violation of this agreement will result in automatic termination of your license.
+
+8. CONTACT
+───────────
+For questions, contact:
+• Email: support@possystem.com
 
 ═══════════════════════════════
 
-লাইসেন্স চুক্তি পড়ে উপরের "I Accept" বাটনে ক্লিক করে এগিয়ে যান।
+Click "I Accept" above to proceed after reading the license agreement.
