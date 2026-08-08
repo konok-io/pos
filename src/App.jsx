@@ -1164,25 +1164,24 @@ export default function App() {
         inset: 0,
         background: '#0F766E',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: '20px',
         zIndex: 9999
       }}>
         <div style={{
-          fontSize: '80px',
-          animation: 'pulse 2s ease-in-out infinite'
-        }}>🏪</div>
-        <div style={{
-          color: 'white',
-          fontSize: '32px',
-          fontWeight: '700'
-        }}>POS সিস্টেম</div>
-        <div style={{
-          color: 'rgba(255,255,255,0.8)',
-          fontSize: '16px'
-        }}>লোড হচ্ছে...</div>
+          width: '50px',
+          height: '50px',
+          borderRadius: '50%',
+          border: '3px solid rgba(255,255,255,0.2)',
+          borderTopColor: '#ffffff',
+          animation: 'preloader-spin 0.8s linear infinite',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <span style={{ fontSize: '40px' }}>🏪</span>
+        </div>
+        <style>{`@keyframes preloader-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
