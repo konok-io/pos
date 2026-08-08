@@ -183,8 +183,8 @@ function createMenu() {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
               title: 'About POS System',
-              message: 'POS System v1.0.0',
-              detail: 'Sales, Stock & Accounting Management\n\n© 2026 All Rights Reserved',
+              message: 'POS System v1.1.2000',
+              detail: 'Sales, Stock & Accounting Management\n\n🏪 POS Management System\n\n© 2026 All Rights Reserved',
             });
           },
         },
