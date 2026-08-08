@@ -454,35 +454,37 @@ function LoginScreen({ onLogin, settings }) {
       }} />
 
       <div style={{ width: '100%', maxWidth: 460, position: 'relative', zIndex: 1 }}>
-        {/* Header */}
+        {/* Header - Center aligned with content on right */}
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
           padding: '24px 28px 0',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
         }}>
-          <div style={{
-            width: 60, height: 60,
-            background: 'linear-gradient(135deg, #0F766E, #14B8A6)',
-            borderRadius: 16,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 32,
-          }}>🏪</div>
-          <div style={{ textAlign: 'right' }}>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0F766E' }}>
-              {businessName}
-            </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, justifyContent: 'flex-end', width: '100%' }}>
             <div style={{
-              fontSize: 20,
-              color: '#0F766E',
-              fontWeight: 600,
-              marginTop: 4,
-            }}>
-              💼 POS ম্যানেজমেন্ট সিস্টেম
+              width: 60, height: 60,
+              background: 'linear-gradient(135deg, #0F766E, #14B8A6)',
+              borderRadius: 16,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 32,
+            }}>🏪</div>
+            <div style={{ textAlign: 'right' }}>
+              <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0F766E' }}>
+                {businessName}
+              </h1>
+              <div style={{
+                fontSize: 20,
+                color: '#0F766E',
+                fontWeight: 600,
+                marginTop: 4,
+              }}>
+                💼 POS ম্যানেজমেন্ট সিস্টেম
+              </div>
             </div>
           </div>
         </div>
