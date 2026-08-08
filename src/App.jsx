@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, memo } from "react";
 import "./App.css";
-import { openDB, get, add, STORES } from "./db";
+import { openDB, settings } from "./db";
 
 /* --------------- GLOBAL CSS RESET --------------- */
 const GlobalStyle = () => {
@@ -13,8 +13,10 @@ const TRIAL_DAYS = 7;
 // Check trial status from database
 async function getTrialStatus() {
   try {
-    await openDB();
-    const license = await get(STORES.license, 'status');
+    const res = await fetch('http://localhost:8765/api/license');
+    const data = await res.json();
+    const license = data.data;
+    
     if (!license || !license.firstRunDate) {
       return { daysLeft: TRIAL_DAYS, isExpired: false };
     }
@@ -32,7 +34,11 @@ async function getTrialStatus() {
 
 // Save license status to database
 async function saveTrialStatus(licenseData) {
-  await add(STORES.license, { key: 'status', ...licenseData });
+  await fetch('http://localhost:8765/api/license', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(licenseData)
+  });
 }
 
 // Verify license (offline validation)
@@ -444,7 +450,7 @@ import {
   loadAllData,
   getToken, setToken, getUser, setUser, clearAuth,
   appState
-} from './api.js';
+} from './db.js';
 
 /* --------------- DEFAULT SUPER ADMIN --------------- */
 const DEFAULT_SUPER_ADMIN = {

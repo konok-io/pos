@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:full": "node dev-server.js",
+    "server": "node server.cjs",
+    "dev:full": "node server.cjs & vite",
     "build": "vite build && node -e \"const fs=require('fs');const path=require('path');function copyDir(s,d){fs.mkdirSync(d,{recursive:true});fs.readdirSync(s).forEach(f=>{const sp=path.join(s,f),dp=path.join(d,f);fs.statSync(sp).isDirectory()?copyDir(sp,dp):fs.copyFileSync(sp,dp)})};fs.existsSync('public/api')&&copyDir('public/api','dist/api');fs.existsSync('public/fonts')&&copyDir('public/fonts','dist/fonts');fs.existsSync('public/favicon.svg')&&fs.copyFileSync('public/favicon.svg','dist/favicon.svg');fs.existsSync('public/.htaccess')&&fs.copyFileSync('public/.htaccess','dist/.htaccess');fs.existsSync('public/icon.ico')&&fs.copyFileSync('public/icon.ico','dist/icon.ico');fs.existsSync('public/icon.svg')&&fs.copyFileSync('public/icon.svg','dist/icon.svg');\"",
     "lint": "eslint .",
     "preview": "vite preview",

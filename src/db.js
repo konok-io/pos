@@ -1,164 +1,164 @@
 /**
- * POS System - Database Layer
- * Uses SQLite at C:\laragon\www\.pos_data
+ * POS System - API Client (Browser)
+ * Makes HTTP requests to local API server
  */
 
-/**
- * SQLite implementation for web server
- */
-class SQLiteStore {
-  constructor() {
-    this.db = null;
-    this.dbPath = null;
-  }
+const API_BASE = 'http://localhost:8765/api';
 
-  async open() {
-    const path = require('path');
-    const fs = require('fs');
+// Auth state (in-memory only)
+let currentUser = null;
+
+export const getToken = () => null;
+export const setToken = () => {};
+export const getUser = () => currentUser;
+export const setUser = (user) => { currentUser = user; };
+export const clearAuth = () => { currentUser = null; };
+
+// App state
+export const appState = {
+  get: async (key) => {
+    const res = await fetch(`${API_BASE}/settings`);
+    const data = await res.json();
+    return data.data?.[key] || null;
+  },
+  set: async (key, value) => {
+    await fetch(`${API_BASE}/settings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ [key]: value })
+    });
+    return { success: true };
+  },
+  getAll: async () => {
+    const res = await fetch(`${API_BASE}/settings`);
+    const data = await res.json();
+    return data.data || {};
+  },
+};
+
+// API wrapper
+async function api(endpoint, options = {}) {
+  const method = options.method || 'GET';
+  const body = options.body;
+  const url = options.url || '';
+  
+  try {
+    let fullUrl = `${API_BASE}/${endpoint}`;
+    if (url) fullUrl += url;
     
-    // Data directory: C:\laragon\www\.pos_data
-    const dataDir = 'C:\\laragon\\www\\.pos_data';
-    this.dbPath = path.join(dataDir, 'database.sqlite');
+    const res = await fetch(fullUrl, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(body ? { 'Body': JSON.stringify(body) } : {})
+      },
+      body: ['POST', 'PUT', 'PATCH'].includes(method) ? JSON.stringify(body) : undefined
+    });
     
-    // Create directory if not exists
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
-    
-    const Database = require('better-sqlite3');
-    this.db = new Database(this.dbPath);
-    this.db.pragma('journal_mode = WAL');
-    this.db.pragma('foreign_keys = ON');
-    
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL, role TEXT DEFAULT 'operator', status TEXT DEFAULT 'active', created_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS categories (
-        id TEXT PRIMARY KEY, name TEXT, company TEXT, created_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS products (
-        id TEXT PRIMARY KEY, name TEXT, barcode TEXT, unit TEXT DEFAULT 'পিস',
-        buyP REAL DEFAULT 0, sellP REAL DEFAULT 0, stock REAL DEFAULT 0, minStock REAL DEFAULT 0,
-        cat TEXT, company TEXT, mrp REAL DEFAULT 0, image TEXT, created_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS suppliers (
-        id TEXT PRIMARY KEY, name TEXT, phone TEXT, email TEXT, address TEXT, company TEXT, created_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS customers (
-        id TEXT PRIMARY KEY, name TEXT, phone TEXT, email TEXT, address TEXT, balance REAL DEFAULT 0, created_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS sales (
-        id TEXT PRIMARY KEY, items TEXT, subtotal REAL DEFAULT 0, discount REAL DEFAULT 0, total REAL DEFAULT 0,
-        vat REAL DEFAULT 0, vatRate REAL DEFAULT 0, paid REAL DEFAULT 0, due REAL DEFAULT 0, change REAL DEFAULT 0,
-        customer_id TEXT, payment_method TEXT DEFAULT 'cash', invoice_number TEXT, user_id TEXT, user_name TEXT, created_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS purchases (
-        id TEXT PRIMARY KEY, items TEXT, subtotal REAL DEFAULT 0, total REAL DEFAULT 0,
-        paid REAL DEFAULT 0, due REAL DEFAULT 0, supplier_id TEXT, invoice_number TEXT, user_id TEXT, user_name TEXT, created_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS expenses (
-        id TEXT PRIMARY KEY, title TEXT, amount REAL DEFAULT 0, type TEXT DEFAULT 'expense',
-        note TEXT, user_id TEXT, user_name TEXT, created_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT);
-      CREATE TABLE IF NOT EXISTS license (
-        key TEXT PRIMARY KEY, accepted INTEGER, firstRunDate TEXT, licenseKey TEXT, isLicensed INTEGER, trialDays INTEGER, activatedDate TEXT
-      );
-    `);
-    
-    return this.db;
-  }
-
-  getAll(storeName) {
-    return this.db.prepare(`SELECT * FROM ${storeName}`).all();
-  }
-
-  get(storeName, key) {
-    return this.db.prepare(`SELECT * FROM ${storeName} WHERE id = ? OR key = ?`).get(key, key);
-  }
-
-  add(storeName, data) {
-    const keys = Object.keys(data).join(', ');
-    const placeholders = Object.keys(data).map(() => '?').join(', ');
-    this.db.prepare(`INSERT OR REPLACE INTO ${storeName} (${keys}) VALUES (${placeholders})`).run(...Object.values(data));
-    return data;
-  }
-
-  remove(storeName, key) {
-    this.db.prepare(`DELETE FROM ${storeName} WHERE id = ? OR key = ?`).run(key, key);
-    return true;
-  }
-
-  clear(storeName) {
-    this.db.prepare(`DELETE FROM ${storeName}`).run();
-    return true;
-  }
-
-  searchProducts(query) {
-    if (!query) return this.db.prepare('SELECT * FROM products ORDER BY name').all();
-    return this.db.prepare('SELECT * FROM products WHERE LOWER(name) LIKE ? OR LOWER(barcode) LIKE ?')
-      .all(`%${query}%`, `%${query}%`);
-  }
-
-  async initializeDefaults() {
-    const existing = this.db.prepare('SELECT id FROM users WHERE id = ?').get('super_admin');
-    if (!existing) {
-      this.db.prepare('INSERT INTO users (id, name, email, password, role, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-        .run('super_admin', 'Super Admin', 'admin@konok.io', '@rsm@k@1A', 'super_admin', 'active', new Date().toISOString());
-    }
-    
-    const defaultSettings = [
-      ['shop_name', 'POS সিস্টেম'], ['name', 'আমার দোকান'], ['address', ''],
-      ['phone', ''], ['vat_percent', '15'], ['vatEnabled', 'true'], ['vatPercent', '15']
-    ];
-    
-    for (const [key, value] of defaultSettings) {
-      this.db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)').run(key, value);
-    }
+    return await res.json();
+  } catch (err) {
+    console.error('API Error:', err);
+    return { success: false, error: err.message };
   }
 }
 
-// Auto-select based on environment
-let dbInstance = null;
+// Auth API
+export const auth = {
+  login: (email, password) => api('auth', { method: 'POST', body: { action: 'login', email, password } }),
+  check: () => api('auth', { method: 'GET' }),
+  logout: () => api('auth', { method: 'DELETE' })
+};
 
-export async function openDB() {
-  if (!dbInstance) {
-    dbInstance = new SQLiteStore();
-    await dbInstance.open();
-  }
-  return dbInstance;
-}
+// Products API
+export const products = {
+  getAll: (search) => api('products', { method: 'GET', url: search ? `?search=${encodeURIComponent(search)}` : '' }),
+  create: (data) => api('products', { method: 'POST', body: data }),
+  update: (data) => api('products', { method: 'POST', body: data }),
+  delete: (id) => api('products', { method: 'DELETE', url: `?id=${id}` })
+};
 
-export async function getAll(storeName) {
-  if (!dbInstance) await openDB();
-  return dbInstance.getAll(storeName);
-}
+// Customers API
+export const customers = {
+  getAll: () => api('customers', { method: 'GET' }),
+  create: (data) => api('customers', { method: 'POST', body: data }),
+  update: (data) => api('customers', { method: 'POST', body: data })
+};
 
-export async function get(storeName, key) {
-  if (!dbInstance) await openDB();
-  return dbInstance.get(storeName, key);
-}
+// Sales API
+export const sales = {
+  getAll: () => api('sales', { method: 'GET' }),
+  create: (data) => api('sales', { method: 'POST', body: data })
+};
 
-export async function add(storeName, data) {
-  if (!dbInstance) await openDB();
-  return dbInstance.add(storeName, data);
-}
+// Purchases API
+export const purchases = {
+  getAll: () => api('purchases', { method: 'GET' }),
+  create: (data) => api('purchases', { method: 'POST', body: data })
+};
 
-export async function remove(storeName, key) {
-  if (!dbInstance) await openDB();
-  return dbInstance.remove(storeName, key);
-}
+// Suppliers API
+export const suppliers = {
+  getAll: () => api('suppliers', { method: 'GET' }),
+  create: (data) => api('suppliers', { method: 'POST', body: data }),
+  update: (data) => api('suppliers', { method: 'POST', body: data })
+};
 
-export async function searchProducts(query) {
-  if (!dbInstance) await openDB();
-  return dbInstance.searchProducts(query);
-}
+// Categories API
+export const categories = {
+  getAll: () => api('categories', { method: 'GET' }),
+  create: (data) => api('categories', { method: 'POST', body: data }),
+  delete: (id) => api('categories', { method: 'DELETE', url: `?id=${id}` })
+};
 
-export async function initializeDefaults() {
-  if (!dbInstance) await openDB();
-  return dbInstance.initializeDefaults();
+// Expenses API
+export const expenses = {
+  getAll: () => api('expenses', { method: 'GET' }),
+  create: (data) => api('expenses', { method: 'POST', body: data }),
+  delete: (id) => api('expenses', { method: 'DELETE', url: `?id=${id}` })
+};
+
+// Incomes API (alias)
+export const incomes = {
+  getAll: () => api('incomes', { method: 'GET' }),
+  create: (data) => api('incomes', { method: 'POST', body: data }),
+  delete: (id) => api('incomes', { method: 'DELETE', url: `?id=${id}` })
+};
+
+// Settings API
+export const settings = {
+  getAll: () => api('settings', { method: 'GET' }),
+  save: (data) => api('settings', { method: 'POST', body: data })
+};
+
+// Users API
+export const users = {
+  getAll: () => api('users', { method: 'GET' }),
+  create: (data) => api('users', { method: 'POST', body: data })
+};
+
+// Load all data
+export async function loadAllData() {
+  const [productsList, customersList, salesList, categoriesList, suppliersList, expensesList, settingsData, usersList] = await Promise.all([
+    products.getAll(),
+    customers.getAll(),
+    sales.getAll(),
+    categories.getAll(),
+    suppliers.getAll(),
+    expenses.getAll(),
+    settings.getAll(),
+    users.getAll()
+  ]);
+  
+  return {
+    products: productsList?.data || [],
+    customers: customersList?.data || [],
+    sales: salesList?.data || [],
+    categories: categoriesList?.data || [],
+    suppliers: suppliersList?.data || [],
+    expenses: expensesList?.data || [],
+    settings: settingsData?.data || {},
+    users: usersList?.data || []
+  };
 }
 
 // STORES constant
@@ -168,4 +168,18 @@ export const STORES = {
   settings: 'settings', productHistory: 'productHistory', license: 'license'
 };
 
-export default { STORES, openDB, getAll, get, add, remove, searchProducts, initializeDefaults };
+// Database initialization
+export async function openDB() {
+  return Promise.resolve();
+}
+
+export async function initializeDefaults() {
+  // No-op for client
+}
+
+export default {
+  STORES,
+  openDB,
+  initializeDefaults,
+  appState
+};
