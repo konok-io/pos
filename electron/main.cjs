@@ -1,48 +1,11 @@
 const { app, BrowserWindow, Menu, shell, dialog } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
-const fs = require('fs');
 
 // Environment check
-const isDev = process.env.NODE_ENV === 'development';
-
-// PHP Server for production
-let phpServer = null;
+const isDev = !app.isPackaged;
 
 // Main window reference
 let mainWindow = null;
-
-// Start PHP development server
-function startPHPServer() {
-  const projectDir = path.join(__dirname, '..');
-  const routerPath = path.join(projectDir, 'router.php');
-  
-  // Check if router.php exists
-  if (!fs.existsSync(routerPath)) {
-    console.error('router.php not found at:', routerPath);
-    return;
-  }
-  
-  // Find PHP executable
-  const phpPath = process.platform === 'win32' ? 'php' : 'php';
-  
-  phpServer = spawn(phpPath, ['-S', 'localhost:8080', routerPath], {
-    stdio: 'ignore',
-    detached: true
-  });
-  
-  phpServer.unref();
-  
-  console.log('PHP server started on http://localhost:8080');
-}
-
-// Stop PHP server
-function stopPHPServer() {
-  if (phpServer) {
-    phpServer.kill();
-    phpServer = null;
-  }
-}
 
 // Create main window
 function createWindow() {
@@ -57,7 +20,7 @@ function createWindow() {
       nodeIntegration: false,
     },
     show: false,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#0F766E',
   });
 
   // Show when ready
@@ -69,9 +32,8 @@ function createWindow() {
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
   } else {
-    // Production: Start PHP server and serve app from there
-    startPHPServer();
-    mainWindow.loadURL('http://localhost:8080');
+    // Production: Load the built dist folder
+    mainWindow.loadFile(path.join(__dirname, '..', 'dist', 'index.html'));
   }
 
   // F12 to toggle DevTools
@@ -230,7 +192,6 @@ app.whenReady().then(() => {
 
 // Quit when all windows closed
 app.on('window-all-closed', () => {
-  stopPHPServer();
   if (process.platform !== 'darwin') {
     app.quit();
   }
