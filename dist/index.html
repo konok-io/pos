@@ -12,15 +12,24 @@
       #root:empty {
         display: none;
       }
+      @keyframes preloader-spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes preloader-pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+      }
     </style>
     <script type="module" crossorigin src="./assets/index-CM34mA-N.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-DZvvaXQQ.css">
   </head>
   <body>
-    <div style="position:fixed;inset:0;background:#0F766E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;z-index:9999" id="preloader">
-      <div style="font-size:60px;font-family:system-ui,sans-serif;-webkit-font-smoothing:antialiased">🏪</div>
-      <div style="font-size:48px;font-weight:700;color:#ffffff;font-family:system-ui,sans-serif">POS সিস্টেম</div>
-      <div style="font-size:22px;color:rgba(255,255,255,0.8);font-family:system-ui,sans-serif">লোড হচ্ছে...</div>
+    <div style="position:fixed;inset:0;background:#0F766E;display:flex;align-items:center;justify-content:center;z-index:9999" id="preloader">
+      <div style="width:120px;height:120px;position:relative;display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;width:120px;height:120px;border-radius:50%;border:4px solid rgba(255,255,255,0.2);border-top-color:#ffffff;animation:preloader-spin 1s linear infinite"></div>
+        <div style="font-size:50px;animation:preloader-pulse 1.5s ease-in-out infinite">🏪</div>
+      </div>
     </div>
     <div id="root"></div>
   </body>
