@@ -1189,8 +1189,8 @@ export default function App() {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '40px',
-              height: '40px'
+              width: '36px',
+              height: '36px'
             }}
           />
         </div>
