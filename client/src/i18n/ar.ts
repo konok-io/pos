@@ -131,4 +131,62 @@ export const ar = {
   deleteSuccess: 'تم الحذف بنجاح',
   saveSuccess: 'تم الحفظ بنجاح',
   error: 'خطأ',
+  invalidCredentials: 'البريد الإلكتروني أو كلمة المرور غير صحيحة!',
+
+  // Product Grid
+  searchProductBarcode: 'ابحث باسم المنتج أو الباركود',
+  orSelectCategorySupplier: 'أو اختر الفئة/المورد',
+  stock: 'المخزون',
+  noProductsYet: 'لا توجد منتجات بعد',
+  addProductsToGetStarted: 'أضف منتجات للبدء',
+  addFirstProduct: 'أضف المنتج الأول',
+
+  // Alerts
+  stockFinished: 'المخزون نفد!',
+  maxStock: 'الحد الأقصى للمخزون',
+  cartEmpty: 'السلة فارغة!',
+  selectCustomerOrPayFull: 'اختر عميل أو ادفع المبلغ الكامل!',
+
+  // Product List
+  productList: 'قائمة المنتجات',
+  purchasePrice: 'سعر الشراء',
+  sellPrice: 'سعر البيع',
+  category: 'الفئة',
+  balance: 'الرصيد',
+  balanceDue: 'المبلغ المستحق',
+
+  // Sale List
+  salesList: 'قائمة المبيعات',
+  noSalesYet: 'لا توجد مبيعات بعد',
+
+  // Reports
+  reports: 'التقارير',
+  totalProducts: 'إجمالي المنتجات',
+  totalCustomers: 'إجمالي العملاء',
+  totalSales: 'إجمالي المبيعات',
+  todaySales: 'مبيعات اليوم',
+  totalDue: 'إجمالي المستحق',
+  lowStockProducts: 'منتجات مخزون منخفض',
+
+  // Settings
+  settings: 'الإعدادات',
+  storeSettings: 'إعدادات المتجر',
+
+  // Add/Edit Product
+  addProduct: 'إضافة منتج',
+  editProduct: 'تعديل منتج',
+  productName: 'اسم المنتج',
+  productCode: 'كود المنتج',
+  enterProductName: 'أدخل اسم المنتج',
+  enterProductCode: 'أدخل كود المنتج',
+  unit: 'الوحدة',
+  selectCategory: 'اختر الفئة',
+  selectSupplier: 'اختر المورد',
+  save: 'حفظ',
+
+  // Login
+  loginTitle: 'تسجيل الدخول',
+  email: 'البريد الإلكتروني',
+  password: 'كلمة المرور',
+  signIn: 'دخول',
 };

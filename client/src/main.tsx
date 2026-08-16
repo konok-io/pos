@@ -42,7 +42,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
         }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '48px' }}>⚠️</div>
-            <div style={{ fontSize: '24px', marginTop: '16px' }}>কিছু সমস্যা হয়েছে</div>
+            <div style={{ fontSize: '24px', marginTop: '16px' }}>Something went wrong</div>
             <button
               onClick={() => window.location.reload()}
               style={{
@@ -56,7 +56,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 fontWeight: 'bold'
               }}
             >
-              পুনরায় চেষ্টা করুন
+              Try Again
             </button>
           </div>
         </div>

@@ -131,4 +131,62 @@ export const hi = {
   deleteSuccess: 'सफलतापूर्वक हटाया गया',
   saveSuccess: 'सफलतापूर्वक सेव किया गया',
   error: 'त्रुटि',
+  invalidCredentials: 'ईमेल या पासवर्ड गलत!',
+
+  // Product Grid
+  searchProductBarcode: 'उत्पाद का नाम या बारकोड द्वारा खोजें',
+  orSelectCategorySupplier: 'या श्रेणी/आपूर्तिकर्ता चुनें',
+  stock: 'स्टॉक',
+  noProductsYet: 'अभी तक कोई उत्पाद नहीं',
+  addProductsToGetStarted: 'आरंभ करने के लिए उत्पाद जोड़ें',
+  addFirstProduct: 'पहला उत्पाद जोड़ें',
+
+  // Alerts
+  stockFinished: 'स्टॉक खत्म!',
+  maxStock: 'अधिकतम स्टॉक',
+  cartEmpty: 'कार्ट खाली है!',
+  selectCustomerOrPayFull: 'ग्राहक चुनें या पूर्ण राशि दें!',
+
+  // Product List
+  productList: 'उत्पाद सूची',
+  purchasePrice: 'खरीद मूल्य',
+  sellPrice: 'बिक्री मूल्य',
+  category: 'श्रेणी',
+  balance: 'शेष',
+  balanceDue: 'बकाया',
+
+  // Sale List
+  salesList: 'बिक्री सूची',
+  noSalesYet: 'अभी तक कोई बिक्री नहीं',
+
+  // Reports
+  reports: 'रिपोर्ट',
+  totalProducts: 'कुल उत्पाद',
+  totalCustomers: 'कुल ग्राहक',
+  totalSales: 'कुल बिक्री',
+  todaySales: 'आज की बिक्री',
+  totalDue: 'कुल बकाया',
+  lowStockProducts: 'कम स्टॉक वाले उत्पाद',
+
+  // Settings
+  settings: 'सेटिंग्स',
+  storeSettings: 'स्टोर सेटिंग्स',
+
+  // Add/Edit Product
+  addProduct: 'उत्पाद जोड़ें',
+  editProduct: 'उत्पाद संपादित करें',
+  productName: 'उत्पाद का नाम',
+  productCode: 'उत्पाद कोड',
+  enterProductName: 'उत्पाद का नाम दर्ज करें',
+  enterProductCode: 'उत्पाद कोड दर्ज करें',
+  unit: 'इकाई',
+  selectCategory: 'श्रेणी चुनें',
+  selectSupplier: 'आपूर्तिकर्ता चुनें',
+  save: 'सेव करें',
+
+  // Login
+  loginTitle: 'लॉगिन',
+  email: 'ईमेल',
+  password: 'पासवर्ड',
+  signIn: 'साइन इन करें',
 };

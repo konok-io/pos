@@ -111,7 +111,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       localStorage.setItem('pos_user', JSON.stringify(DEFAULT_ADMIN));
       onLogin();
     } else {
-      setError('ব্যবহারকারীর নাম বা পাসওয়ার্ড ভুল!');
+      setError(t('invalidCredentials'));
     }
     setLoading(false);
   };
@@ -219,7 +219,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             {/* Password */}
             <div style={{ width: 160 }}>
               <label style={{ fontSize: 15, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
-                🔐 পাসওয়ার্ড
+                🔐 {t('password')}
               </label>
               <input
                 type="password"
@@ -259,7 +259,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 fontFamily: 'inherit',
               }}
             >
-              {loading ? '⏳' : 'লগইন'}
+              {loading ? '⏳' : t('signIn')}
             </button>
           </form>
 
@@ -446,7 +446,7 @@ export default function App() {
   // Add to cart
   const addToCart = (product: Product) => {
     if (product.stock <= 0) {
-      alert(`"${product.name}" এর স্টক শেষ!`);
+      alert(`"${product.name}" ${t('stockFinished')}`);
       return;
     }
 
@@ -454,7 +454,7 @@ export default function App() {
       const existing = prev.find(item => item.productId === product.id);
       if (existing) {
         if (existing.quantity >= product.stock) {
-          alert(`সর্বোচ্চ স্টক: ${product.stock} ${product.unit}`);
+          alert(`${t('maxStock')}: ${product.stock} ${product.unit}`);
           return prev;
         }
         return prev.map(item =>
@@ -483,7 +483,7 @@ export default function App() {
         const newQty = item.quantity + delta;
         if (newQty < 1) return item;
         if (newQty > item.maxStock) {
-          alert(`সর্বোচ্চ স্টক: ${item.maxStock}`);
+          alert(`${t('maxStock')}: ${item.maxStock}`);
           return item;
         }
         return { ...item, quantity: newQty };
@@ -505,12 +505,12 @@ export default function App() {
   // Checkout
   const handleCheckout = () => {
     if (cart.length === 0) {
-      alert('কার্টে কোনো পণ্য নেই!');
+      alert(t('cartEmpty'));
       return;
     }
 
     if (due > 0 && !selectedCustomer) {
-      alert('⚠️ বাকি বিক্রয় করতে গ্রাহক সিলেক্ট করুন অথবা পূর্ণ পরিশোধ করুন!');
+      alert('⚠️ ' + t('selectCustomerOrPayFull'));
       return;
     }
 
@@ -891,8 +891,8 @@ export default function App() {
                         <path d="M208 90 L216 98 L232 82" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round"/>
                       </svg>
                       <div style={{ padding: '16px', textAlign: 'center' }}>
-                        <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 600 }}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
-                        <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>অথবা ক্যাটাগরি/সরবরাহকারী সিলেক্ট করুন</div>
+                        <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 600 }}>{t('searchProductBarcode')}</div>
+                        <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>{t('orSelectCategorySupplier')}</div>
                       </div>
                     </div>
                   ) : (
@@ -1154,17 +1154,17 @@ export default function App() {
 
         {currentTab === 'products' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>📦 পণ্য তালিকা</h2>
+            <h2 style={{ marginBottom: 16 }}>📦 {t('productList')}</h2>
             <div className="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>নাম</th>
-                    <th>কোড</th>
-                    <th>ক্রয়মূল্য</th>
-                    <th>বিক্রয়মূল্য</th>
-                    <th>স্টক</th>
-                    <th>ক্যাটাগরি</th>
+                    <th>{t('name')}</th>
+                    <th>{t('code')}</th>
+                    <th>{t('purchasePrice')}</th>
+                    <th>{t('sellPrice')}</th>
+                    <th>{t('stock')}</th>
+                    <th>{t('category')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1190,15 +1190,15 @@ export default function App() {
 
         {currentTab === 'customers' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>👥 গ্রাহক তালিকা</h2>
+            <h2 style={{ marginBottom: 16 }}>👥 {t('customerList')}</h2>
             <div className="table-container">
               <table>
                 <thead>
                   <tr>
-                    <th>নাম</th>
-                    <th>ফোন</th>
-                    <th>ঠিকানা</th>
-                    <th>বাকি</th>
+                    <th>{t('name')}</th>
+                    <th>{t('phone')}</th>
+                    <th>{t('address')}</th>
+                    <th>{t('balance')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1222,22 +1222,22 @@ export default function App() {
 
         {currentTab === 'sales' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>💰 বিক্রয় তালিকা</h2>
+            <h2 style={{ marginBottom: 16 }}>💰 {t('salesList')}</h2>
             <div className="table-container">
               <table>
                 <thead>
                   <tr>
                     <th>Invoice</th>
-                    <th>তারিখ</th>
-                    <th>গ্রাহক</th>
-                    <th>মোট</th>
-                    <th>পরিশোধ</th>
-                    <th>বাকি</th>
+                    <th>{t('date')}</th>
+                    <th>{t('customer')}</th>
+                    <th>{t('total')}</th>
+                    <th>{t('paid')}</th>
+                    <th>{t('due')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {sales.length === 0 ? (
-                    <tr><td colSpan={6} style={{ textAlign: 'center', color: '#9CA3AF' }}>কোনো বিক্রয় নেই</td></tr>
+                    <tr><td colSpan={6} style={{ textAlign: 'center', color: '#9CA3AF' }}>{t('noSalesYet')}</td></tr>
                   ) : (
                     sales.map(s => (
                       <tr key={s.id}>
@@ -1262,34 +1262,34 @@ export default function App() {
 
         {currentTab === 'reports' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>📊 রিপোর্ট</h2>
+            <h2 style={{ marginBottom: 16 }}>📊 {t('reports')}</h2>
             <div className="stats-grid">
               <div className="stat-card">
-                <div className="label">মোট পণ্য</div>
+                <div className="label">{t('totalProducts')}</div>
                 <div className="value">{products.length}</div>
               </div>
               <div className="stat-card">
-                <div className="label">মোট গ্রাহক</div>
+                <div className="label">{t('totalCustomers')}</div>
                 <div className="value">{customers.length}</div>
               </div>
               <div className="stat-card">
-                <div className="label">মোট বিক্রয়</div>
+                <div className="label">{t('totalSales')}</div>
                 <div className="value">{fmt(sales.reduce((sum, s) => sum + s.total, 0))}</div>
               </div>
               <div className="stat-card">
-                <div className="label">আজকের বিক্রয়</div>
+                <div className="label">{t('todaySales')}</div>
                 <div className="value">
                   {fmt(sales.filter(s => new Date(s.date).toDateString() === new Date().toDateString()).reduce((sum, s) => sum + s.total, 0))}
                 </div>
               </div>
               <div className="stat-card">
-                <div className="label">মোট বাকি</div>
+                <div className="label">{t('totalDue')}</div>
                 <div className="value" style={{ color: '#EF4444' }}>
                   {fmt(sales.reduce((sum, s) => sum + s.due, 0))}
                 </div>
               </div>
               <div className="stat-card">
-                <div className="label">কম স্টক পণ্য</div>
+                <div className="label">{t('lowStockProducts')}</div>
                 <div className="value" style={{ color: '#F59E0B' }}>
                   {products.filter(p => p.stock <= 10).length}
                 </div>
@@ -1300,10 +1300,10 @@ export default function App() {
 
         {currentTab === 'settings' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>⚙️ সেটিংস</h2>
+            <h2 style={{ marginBottom: 16 }}>⚙️ {t('settings')}</h2>
             <div className="card" style={{ maxWidth: 500 }}>
               <div className="form-group">
-                <label className="label">ভ্যাট শতাংশ (%)</label>
+                <label className="label">{t('vat')} (%)</label>
                 <input
                   type="number"
                   className="input"
@@ -1322,43 +1322,43 @@ export default function App() {
 
         {currentTab === 'newproduct' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>➕ নতুন পণ্য যোগ করুন</h2>
+            <h2 style={{ marginBottom: 16 }}>➕ {t('addProduct')}</h2>
             <div className="card" style={{ maxWidth: 600 }}>
               <div className="form-group">
-                <label className="label">পণ্যের নাম</label>
-                <input type="text" className="input" placeholder="পণ্যের নাম লিখুন" />
+                <label className="label">{t('productName')}</label>
+                <input type="text" className="input" placeholder={t('enterProductName')} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div className="form-group">
-                  <label className="label">ক্রয়মূল্য</label>
-                  <input type="number" className="input" placeholder="০" />
+                  <label className="label">{t('purchasePrice')}</label>
+                  <input type="number" className="input" placeholder="0" />
                 </div>
                 <div className="form-group">
-                  <label className="label">বিক্রয়মূল্য</label>
-                  <input type="number" className="input" placeholder="০" />
+                  <label className="label">{t('sellPrice')}</label>
+                  <input type="number" className="input" placeholder="0" />
                 </div>
               </div>
               <div className="form-group">
-                <label className="label">স্টক</label>
-                <input type="number" className="input" placeholder="০" />
+                <label className="label">{t('stock')}</label>
+                <input type="number" className="input" placeholder="0" />
               </div>
-              <button className="btn btn-primary">পণ্য যোগ করুন</button>
+              <button className="btn btn-primary">{t('addProduct')}</button>
             </div>
           </div>
         )}
 
         {currentTab === 'barcode' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>📊 বারকোড জেনারেটর</h2>
+            <h2 style={{ marginBottom: 16 }}>📊 {t('barcode')}</h2>
             <div className="card" style={{ maxWidth: 500 }}>
               <div className="form-group">
-                <label className="label">পণ্য কোড</label>
-                <input type="text" className="input" placeholder="কোড লিখুন" />
+                <label className="label">{t('code')}</label>
+                <input type="text" className="input" placeholder={t('code')} />
               </div>
-              <button className="btn btn-primary">বারকোড তৈরি করুন</button>
+              <button className="btn btn-primary">{t('barcode')}</button>
               <div style={{ marginTop: 20, textAlign: 'center', padding: 20, background: '#F9FAFB', borderRadius: 8 }}>
                 <div style={{ fontSize: 48 }}>📊</div>
-                <p style={{ color: '#9CA3AF', marginTop: 8 }}>বারকোড এখানে দেখা যাবে</p>
+                <p style={{ color: '#9CA3AF', marginTop: 8 }}>{t('barcode')} preview</p>
               </div>
             </div>
           </div>

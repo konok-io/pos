@@ -131,4 +131,62 @@ export const bn = {
   deleteSuccess: 'সফলভাবে মুছে ফেলা হয়েছে',
   saveSuccess: 'সফলভাবে সেভ করা হয়েছে',
   error: 'ত্রুটি',
+  invalidCredentials: 'ইমেইল বা পাসওয়ার্ড ভুল!',
+
+  // Product Grid
+  searchProductBarcode: 'পণ্যের নাম বা বারকোড দিয়ে খুঁজুন',
+  orSelectCategorySupplier: 'অথবা ক্যাটাগরি/সরবরাহকারী সিলেক্ট করুন',
+  stock: 'স্টক',
+  noProductsYet: 'কোনো পণ্য নেই',
+  addProductsToGetStarted: 'পণ্য যোগ করে শুরু করুন',
+  addFirstProduct: 'প্রথম পণ্য যোগ করুন',
+
+  // Alerts
+  stockFinished: 'স্টক শেষ!',
+  maxStock: 'সর্বোচ্চ স্টক',
+  cartEmpty: 'কার্টে কোনো পণ্য নেই!',
+  selectCustomerOrPayFull: 'গ্রাহক সিলেক্ট করুন অথবা পূর্ণ পরিশোধ করুন!',
+
+  // Product List
+  productList: 'পণ্য তালিকা',
+  purchasePrice: 'ক্রয়মূল্য',
+  sellPrice: 'বিক্রয়মূল্য',
+  category: 'ক্যাটাগরি',
+  balance: 'বাকি',
+  balanceDue: 'বাকি',
+
+  // Sale List
+  salesList: 'বিক্রয় তালিকা',
+  noSalesYet: 'কোনো বিক্রয় নেই',
+
+  // Reports
+  reports: 'রিপোর্ট',
+  totalProducts: 'মোট পণ্য',
+  totalCustomers: 'মোট গ্রাহক',
+  totalSales: 'মোট বিক্রয়',
+  todaySales: 'আজকের বিক্রয়',
+  totalDue: 'মোট বাকি',
+  lowStockProducts: 'কম স্টক পণ্য',
+
+  // Settings
+  settings: 'সেটিংস',
+  storeSettings: 'স্টোর সেটিংস',
+
+  // Add/Edit Product
+  addProduct: 'পণ্য যোগ করুন',
+  editProduct: 'পণ্য সম্পাদনা',
+  productName: 'পণ্যের নাম',
+  productCode: 'পণ্যের কোড',
+  enterProductName: 'পণ্যের নাম লিখুন',
+  enterProductCode: 'পণ্যের কোড লিখুন',
+  unit: 'ইউনিট',
+  selectCategory: 'ক্যাটাগরি নির্বাচন',
+  selectSupplier: 'সরবরাহকারী নির্বাচন',
+  save: 'সেভ করুন',
+
+  // Login
+  loginTitle: 'লগইন',
+  email: 'ইমেইল',
+  password: 'পাসওয়ার্ড',
+  signIn: 'সাইন ইন করুন',
 };

@@ -131,4 +131,62 @@ export const en = {
   deleteSuccess: 'Deleted successfully',
   saveSuccess: 'Saved successfully',
   error: 'Error',
+  invalidCredentials: 'Invalid email or password',
+
+  // Product Grid
+  searchProductBarcode: 'Search by product name or barcode',
+  orSelectCategorySupplier: 'Or select category/supplier',
+  stock: 'Stock',
+  noProductsYet: 'No products yet',
+  addProductsToGetStarted: 'Add products to get started',
+  addFirstProduct: 'Add First Product',
+
+  // Alerts
+  stockFinished: 'stock finished!',
+  maxStock: 'Maximum stock',
+  cartEmpty: 'Cart is empty!',
+  selectCustomerOrPayFull: 'Select customer or pay full amount!',
+
+  // Product List
+  productList: 'Product List',
+  purchasePrice: 'Purchase Price',
+  sellPrice: 'Sell Price',
+  category: 'Category',
+  balance: 'Balance',
+  balanceDue: 'Balance Due',
+
+  // Sale List
+  salesList: 'Sales List',
+  noSalesYet: 'No sales yet',
+
+  // Reports
+  reports: 'Reports',
+  totalProducts: 'Total Products',
+  totalCustomers: 'Total Customers',
+  totalSales: 'Total Sales',
+  todaySales: "Today's Sales",
+  totalDue: 'Total Due',
+  lowStockProducts: 'Low Stock Products',
+
+  // Settings
+  settings: 'Settings',
+  storeSettings: 'Store Settings',
+
+  // Add/Edit Product
+  addProduct: 'Add Product',
+  editProduct: 'Edit Product',
+  productName: 'Product Name',
+  productCode: 'Product Code',
+  enterProductName: 'Enter product name',
+  enterProductCode: 'Enter product code',
+  unit: 'Unit',
+  selectCategory: 'Select Category',
+  selectSupplier: 'Select Supplier',
+  save: 'Save',
+
+  // Login
+  loginTitle: 'Login',
+  email: 'Email',
+  password: 'Password',
+  signIn: 'Sign In',
 };
