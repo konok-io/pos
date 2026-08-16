@@ -1,0 +1,21 @@
+{
+  "name": "pos-management",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev:client",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "npm run build:client",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "start": "npm run start:server",
+    "start:server": "cd server && npm start",
+    "start:client": "cd client && npm run preview",
+    "db:setup": "cd server && npm run db:setup",
+    "db:seed": "cd server && npm run db:seed",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build:all": "npm run build:client && npm run build:server"
+  },
+  "description": "POS Management System - Client & Server"
+}

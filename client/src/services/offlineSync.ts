@@ -128,7 +128,8 @@ class OfflineSyncService {
   }
 
   async getLastSyncTime(): Promise<string | null> {
-    return this.getSetting<string>('lastSyncTime') || null;
+    const result = await this.getSetting<string>('lastSyncTime');
+    return result ?? null;
   }
 
   async setLastSyncTime(time: string) {

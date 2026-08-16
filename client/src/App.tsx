@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import './index.css';
 
 // Default admin credentials
@@ -198,7 +198,6 @@ export default function App() {
   const [paidAmount, setPaidAmount] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [showCustomerModal, setShowCustomerModal] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
 
@@ -325,11 +324,6 @@ export default function App() {
       }
       return item;
     }).filter(item => item.quantity > 0));
-  };
-
-  // Remove from cart
-  const removeFromCart = (productId: string) => {
-    setCart(prev => prev.filter(item => item.productId !== productId));
   };
 
   // Calculate totals
