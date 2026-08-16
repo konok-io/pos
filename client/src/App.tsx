@@ -920,41 +920,22 @@ export default function App() {
                   )
                 )}
               </div>
-              </div>
             </div>
 
             {/* -- RIGHT: Cart -- */}
             <div style={{ width: 360, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: '1px solid #e5e7eb' }}>
               {/* Cart Header */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0 }}>🛒 কার্ট</h3>
-                    <span style={{ background: '#111827', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
-                  </div>
-                  <button 
-                    onClick={() => setShowHeldSales(!showHeldSales)}
-                    style={{
-                      padding: '6px 12px', borderRadius: 8, border: 'none',
-                      background: showHeldSales ? '#0F766E' : heldSales.length > 0 ? '#F0FDF4' : '#F9FAFB',
-                      color: showHeldSales ? '#fff' : heldSales.length > 0 ? '#0F766E' : '#9CA3AF',
-                      fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                      border: heldSales.length > 0 ? '1px solid #0F766E' : '1px solid #E5E7EB',
-                    }}>
-                    📋 হোল্ড {heldSales.length > 0 && `(${heldSales.length})`}
-                  </button>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 কার্ট</h3>
+                  <span style={{ background: '#111827', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
                 </div>
-                {/* Stock Summary - Inline */}
-                <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
-                  <div style={{ borderRadius: 6, background: '#F0FDFA', color: '#0F766E', padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>
-                    📦 {products.filter(p => p.stock > 0).length}
-                  </div>
-                  <div style={{ borderRadius: 6, background: '#FFF7ED', color: '#EA580C', padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>
-                    ⚠️ {products.filter(p => p.stock > 0 && p.stock <= 10).length}
-                  </div>
-                  <div style={{ borderRadius: 6, background: '#FEF2F2', color: '#DC2626', padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>
-                    ⚠️ {products.filter(p => p.stock <= 0).length}
-                  </div>
+                {/* Customer Input */}
+                <div style={{ position: 'relative' }}>
+                  <input
+                    placeholder="কাস্টমার খুঁজুন..."
+                    style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                  />
                 </div>
               </div>
 
@@ -1045,7 +1026,7 @@ export default function App() {
                 )}
 
                 {/* Action Buttons */}
-                <div style={{ display: 'flex', gap: 6 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 6 }}>
                   <button 
                     onClick={() => {
                       if (cart.length > 0) {
@@ -1067,7 +1048,6 @@ export default function App() {
                   <button onClick={handleCheckout}
                     disabled={cart.length === 0}
                     style={{
-                      flex: 1,
                       padding: '12px 16px', borderRadius: 10, border: 'none',
                       background: cart.length > 0 ? '#EA580C' : '#e5e7eb',
                       color: '#fff', fontWeight: 700, fontSize: 15,
@@ -1378,6 +1358,7 @@ export default function App() {
           </div>
         )}
       </div>
+    </div>
 
       {/* Receipt Modal */}
       {showReceiptModal && lastSale && (
