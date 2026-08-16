@@ -735,7 +735,7 @@ export default function App() {
                     </div>
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
                     {filteredProducts.map(product => (
                       <button
                         key={product.id}
@@ -744,22 +744,73 @@ export default function App() {
                         style={{
                           background: product.stock <= 0 ? '#FEF2F2' : product.stock <= 10 ? '#FFF7ED' : '#FFFFFF',
                           border: `1.5px solid ${product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#E5E7EB'}`,
-                          borderRadius: 10,
-                          padding: '12px 10px',
+                          borderRadius: 12,
+                          padding: 12,
                           cursor: product.stock > 0 ? 'pointer' : 'not-allowed',
                           textAlign: 'left',
-                          transition: 'all 0.15s',
-                          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                          transition: 'all 0.2s',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                           outline: 'none',
+                          display: 'flex',
+                          gap: 12,
+                          opacity: product.stock <= 0 ? 0.7 : 1,
                         }}
                       >
-                        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>
-                        <div style={{ fontSize: 16, fontWeight: 800, color: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#0F766E' }}>{fmt(product.sellPrice)}</div>
-                        <div style={{ fontSize: 14, color: '#9CA3AF', marginTop: 2 }}>/{product.unit}</div>
-                        <div style={{ marginTop: 6, padding: '2px 6px', borderRadius: 8, fontSize: 14, fontWeight: 600, display: 'inline-block',
-                          background: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#F0FDFA',
-                          color: product.stock <= 0 ? '#fff' : product.stock <= 10 ? '#fff' : '#0F766E' }}>
-                          {product.stock}
+                        {/* Product Image */}
+                        <div style={{
+                          width: 80,
+                          height: 80,
+                          borderRadius: 10,
+                          background: product.stock <= 0 ? '#fecaca' : product.stock <= 10 ? '#fed7aa' : '#F0FDFA',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                          overflow: 'hidden',
+                          border: `2px solid ${product.stock <= 0 ? '#fca5a5' : product.stock <= 10 ? '#fdba74' : '#99f6e4'}`,
+                        }}>
+                          {product.image ? (
+                            <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          ) : (
+                            <span style={{ fontSize: 36 }}>📦</span>
+                          )}
+                        </div>
+
+                        {/* Product Info */}
+                        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                          {/* Top: Name */}
+                          <div style={{ marginBottom: 4 }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
+                              {product.name}
+                            </div>
+                          </div>
+
+                          {/* Middle: Barcode & Unit */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                            <div style={{ fontSize: 11, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              📊 {product.code || 'N/A'}
+                            </div>
+                            <div style={{ fontSize: 11, color: '#9CA3AF' }}>
+                              /{product.unit}
+                            </div>
+                          </div>
+
+                          {/* Bottom: Price & Stock */}
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                            <div style={{ fontSize: 18, fontWeight: 800, color: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#0F766E', lineHeight: 1 }}>
+                              {fmt(product.sellPrice)}
+                            </div>
+                            <div style={{ 
+                              padding: '3px 8px',
+                              borderRadius: 6,
+                              fontSize: 12,
+                              fontWeight: 700,
+                              background: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#0F766E',
+                              color: '#fff'
+                            }}>
+                              স্টক: {product.stock}
+                            </div>
+                          </div>
                         </div>
                       </button>
                     ))}
