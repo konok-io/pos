@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLanguage, languages, Language } from '../i18n';
 import { defaultTranslations } from '../i18n';
 
 export default function TranslationSettings() {
-  const { t, language, customTranslations, syncTranslations, saveTranslation } = useLanguage();
+  const { language, customTranslations, syncTranslations, saveTranslation } = useLanguage();
   const [selectedLang, setSelectedLang] = useState<Language>(language);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingKey, setEditingKey] = useState<string | null>(null);

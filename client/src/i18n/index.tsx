@@ -61,8 +61,6 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     hi: {},
   });
 
-  const [isLoaded, setIsLoaded] = useState(false);
-
   // Fetch custom translations from API
   const fetchTranslations = async () => {
     try {
@@ -74,7 +72,6 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     } catch (error) {
       console.log('Using default translations');
     }
-    setIsLoaded(true);
   };
 
   useEffect(() => {
