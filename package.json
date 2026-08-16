@@ -5,12 +5,23 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "echo \"No tests specified\" && exit 0",
+    "build": "vite build"
   },
-  "keywords": ["product", "import", "csv", "sql.js"],
+  "keywords": [
+    "product",
+    "import",
+    "csv",
+    "sql.js"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "sql.js": "^1.14.2"
+    "@vitejs/plugin-react": "^6.0.5",
+    "esbuild": "^0.28.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "sql.js": "^1.14.2",
+    "vite": "^8.2.1"
   }
 }
