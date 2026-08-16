@@ -639,165 +639,225 @@ export default function App() {
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflow: 'auto', width: '100%', padding: 16, background: '#F9FAFB' }}>
+      <div style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
         {currentTab === 'pos' && (
-          <div className="pos-layout">
-            {/* Category Sidebar */}
-            <aside className="pos-sidebar">
-              <h4 style={{ marginBottom: 12, fontSize: 14, color: '#6B7280' }}>ক্যাটাগরি</h4>
-              <ul className="category-list">
-                <li
-                  className={`category-item ${selectedCategory === 'all' ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory('all')}
-                >
-                  <span>📦 সব পণ্য</span>
-                  <span className="category-count">{products.length}</span>
-                </li>
-                {categories.map(cat => {
-                  const count = products.filter(p => p.categoryId === cat.id).length;
-                  return (
-                    <li
-                      key={cat.id}
-                      className={`category-item ${selectedCategory === cat.id ? 'active' : ''}`}
-                      onClick={() => setSelectedCategory(cat.id)}
-                    >
-                      <span>{cat.icon} {cat.name}</span>
-                      <span className="category-count">{count}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </aside>
-
-            {/* Product Grid */}
-            <main className="pos-main">
-              <div className="search-bar">
-                <input
-                  type="text"
-                  className="search-input"
-                  placeholder="পণ্য খুঁজুন... (নাম বা কোড দিয়ে)"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  autoFocus
-                />
-              </div>
-              <div className="product-grid">
-                {filteredProducts.length === 0 ? (
-                  <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
-                    <div className="empty-state-icon">📦</div>
-                    <p>কোনো পণ্য পাওয়া যায়নি</p>
-                  </div>
-                ) : (
-                  filteredProducts.map(product => (
-                    <div
-                      key={product.id}
-                      className={`product-card ${product.stock <= 0 ? 'out-of-stock' : ''}`}
-                      onClick={() => addToCart(product)}
-                    >
-                      <div className="product-card-image">{product.image}</div>
-                      <div className="product-card-name">{product.name}</div>
-                      <div className="product-card-price">{fmt(product.sellPrice)}</div>
-                      <div className="product-card-stock">স্টক: {product.stock} {product.unit}</div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </main>
-
-            {/* Cart */}
-            <aside className="pos-cart">
-              <div className="cart-header">
-                <span>🛒 কার্ট ({cart.length})</span>
-                {cart.length > 0 && (
-                  <button className="btn btn-sm btn-secondary" onClick={() => setCart([])}>
-                    খালি করুন
-                  </button>
-                )}
+          <div style={{ display: 'flex', height: '100%', overflow: 'hidden', width: '100%', background: '#F9FAFB' }}>
+            {/* -- LEFT: Products -- */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+              {/* Product name search */}
+              <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div style={{ position: 'relative', flex: 1 }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
+                  <input
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="পণ্যের নাম বা বারকোড..."
+                    style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 14, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
               </div>
 
-              <div className="cart-items">
-                {cart.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-state-icon">🛒</div>
-                    <p>কার্ট খালি</p>
+              {/* Filter row */}
+              <div style={{ padding: '6px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+                {/* Left: Stock summary */}
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#F0FDFA', color: '#0F766E', border: '1.5px solid rgba(15,118,110,0.3)', padding: '6px 14px', fontSize: 14, fontWeight: 600 }}>
+                    📦 স্টক আছে <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0).length})</span>
                   </div>
-                ) : (
-                  cart.map(item => (
-                    <div key={item.id} className="cart-item">
-                      <div className="cart-item-info">
-                        <div className="cart-item-name">{item.name}</div>
-                        <div className="cart-item-price">{fmt(item.sellPrice)} × {item.quantity}</div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <button className="qty-btn" onClick={() => updateQuantity(item.productId, -1)}>−</button>
-                        <span style={{ minWidth: 24, textAlign: 'center' }}>{item.quantity}</span>
-                        <button className="qty-btn" onClick={() => updateQuantity(item.productId, 1)}>+</button>
-                      </div>
-                      <div className="cart-item-total">{fmt(item.sellPrice * item.quantity)}</div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              <div className="cart-footer">
-                <div className="cart-summary">
-                  <div className="cart-summary-row">
-                    <span>সাবটোটাল:</span>
-                    <span>{fmt(subtotal)}</span>
+                  <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#FFF7ED', color: '#EA580C', border: '1.5px solid rgba(234,88,12,0.3)', padding: '6px 14px', fontSize: 14, fontWeight: 600 }}>
+                    ⚠️ স্টক কম <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0 && p.stock <= 10).length})</span>
                   </div>
-                  <div className="cart-summary-row">
-                    <span>ডিসকাউন্ট:</span>
-                    <span>
-                      <input
-                        type="number"
-                        value={discount}
-                        onChange={(e) => setDiscount(e.target.value)}
-                        placeholder="0"
-                        style={{ width: 80, padding: '4px 8px', border: '1px solid #E5E7EB', borderRadius: 6, textAlign: 'right' }}
-                      />
-                    </span>
+                  <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#FEF2F2', color: '#DC2626', border: '1.5px solid rgba(220,38,38,0.3)', padding: '6px 14px', fontSize: 14, fontWeight: 600 }}>
+                    ⚠️ স্টক শেষ <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock <= 0).length})</span>
                   </div>
-                  <div className="cart-summary-row">
-                    <span>ভ্যাট ({vatPercent}%):</span>
-                    <span>{fmt(vatAmount)}</span>
-                  </div>
-                  <div className="cart-summary-row total">
-                    <span>মোট:</span>
-                    <span>{fmt(total)}</span>
-                  </div>
-                  <div className="cart-summary-row" style={{ marginTop: 12 }}>
-                    <span>পরিশোধ:</span>
-                    <input
-                      type="number"
-                      value={paidAmount}
-                      onChange={(e) => setPaidAmount(e.target.value)}
-                      placeholder={total.toString()}
-                      style={{ width: 100, padding: '4px 8px', border: '1px solid #E5E7EB', borderRadius: 6, textAlign: 'right' }}
-                    />
-                  </div>
-                  {change > 0 && (
-                    <div className="cart-summary-row">
-                      <span>ফেরত:</span>
-                      <span style={{ color: '#10B981' }}>{fmt(change)}</span>
-                    </div>
-                  )}
-                  {due > 0 && (
-                    <div className="cart-summary-row">
-                      <span>বাকি:</span>
-                      <span style={{ color: '#EF4444' }}>{fmt(due)}</span>
-                    </div>
-                  )}
                 </div>
 
-                <button
-                  className="btn btn-success btn-lg btn-block"
-                  onClick={handleCheckout}
-                  disabled={cart.length === 0}
-                >
-                  💰 পেমেন্ট করুন
-                </button>
+                {/* Right: Category dropdown */}
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    style={{ borderRadius: 7, padding: '6px 10px', fontSize: 14, height: 32, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none' }}
+                  >
+                    <option value="all">সব ক্যাটাগরি</option>
+                    {categories.map(cat => (
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
-            </aside>
+
+              {/* Product grid */}
+              <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
+                {filteredProducts.length === 0 ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
+                    <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                      <div style={{ fontSize: 28, fontWeight: 800, color: '#0F766E', marginBottom: 8 }}>🏪 আমার দোকান</div>
+                      <div style={{ fontSize: 14, color: '#9CA3AF' }}>📞 ০১৭০০-০০০০০০</div>
+                    </div>
+                    <svg width="200" height="120" viewBox="0 0 280 180" style={{ marginBottom: 16 }}>
+                      <rect x="20" y="50" width="240" height="110" rx="8" fill="#F0FDFA" stroke="#0F766E" strokeWidth="2"/>
+                      <rect x="50" y="70" width="60" height="60" rx="4" fill="#0F766E"/>
+                      <text x="80" y="105" textAnchor="middle" fill="white" fontSize="24">🏪</text>
+                      <rect x="130" y="65" width="100" height="50" rx="6" fill="#115E59"/>
+                      <circle cx="220" cy="90" r="25" fill="#22C55E"/>
+                      <path d="M208 90 L216 98 L232 82" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round"/>
+                    </svg>
+                    <div style={{ padding: '16px', textAlign: 'center' }}>
+                      <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 600 }}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
+                      <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>অথবা ক্যাটাগরি সিলেক্ট করুন</div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
+                    {filteredProducts.map(product => (
+                      <button
+                        key={product.id}
+                        onClick={() => addToCart(product)}
+                        disabled={product.stock <= 0}
+                        style={{
+                          background: product.stock <= 0 ? '#FEF2F2' : product.stock <= 10 ? '#FFF7ED' : '#FFFFFF',
+                          border: `1.5px solid ${product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#E5E7EB'}`,
+                          borderRadius: 10,
+                          padding: '12px 10px',
+                          cursor: product.stock > 0 ? 'pointer' : 'not-allowed',
+                          textAlign: 'left',
+                          transition: 'all 0.15s',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                          outline: 'none',
+                        }}
+                      >
+                        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4, color: '#4B5563', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{product.name}</div>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#0F766E' }}>{fmt(product.sellPrice)}</div>
+                        <div style={{ fontSize: 14, color: '#9CA3AF', marginTop: 2 }}>/{product.unit}</div>
+                        <div style={{ marginTop: 6, padding: '2px 6px', borderRadius: 8, fontSize: 14, fontWeight: 600, display: 'inline-block',
+                          background: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#F0FDFA',
+                          color: product.stock <= 0 ? '#fff' : product.stock <= 10 ? '#fff' : '#0F766E' }}>
+                          {product.stock}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* -- RIGHT: Cart -- */}
+            <div style={{ width: 360, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: '1px solid #e5e7eb' }}>
+              {/* Cart Header */}
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 কার্ট</h3>
+                  <span style={{ background: '#111827', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
+                </div>
+              </div>
+
+              {/* Cart Items */}
+              <div style={{ flex: 1, overflow: 'auto', background: '#fafbfc' }}>
+                {cart.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '30px 16px', background: '#FFFFFF', margin: 8, borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                    <div style={{ fontSize: 36, marginBottom: 8 }}>🛒</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#6B7280', marginBottom: 4 }}>কার্ট খালি</div>
+                    <div style={{ fontSize: 15, color: '#9CA3AF' }}>বাম দিক থেকে পণ্য যোগ করুন</div>
+                  </div>
+                ) : (
+                  <div style={{ padding: '8px 16px' }}>
+                    {cart.map(item => (
+                      <div key={item.id} style={{ display: 'flex', alignItems: 'center', padding: '6px 8px', background: '#FFFFFF', borderBottom: '1px dashed #e5e7eb', gap: 8 }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{item.name}</span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: '#0F766E', flexShrink: 0 }}>{fmt(item.sellPrice * item.quantity)}</span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
+                            <span style={{ fontSize: 14, color: '#6B7280' }}>{item.quantity} × {fmt(item.sellPrice)}</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <button onClick={() => updateQuantity(item.productId, -1)} style={{ width: 22, height: 22, border: 'none', borderRadius: 4, background: '#F3F4F6', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563' }}>−</button>
+                              <span style={{ fontSize: 14, fontWeight: 600, minWidth: 18, textAlign: 'center' }}>{item.quantity}</span>
+                              <button onClick={() => updateQuantity(item.productId, 1)} style={{ width: 22, height: 22, border: 'none', borderRadius: 4, background: '#F3F4F6', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563' }}>+</button>
+                              <button onClick={() => setCart(prev => prev.filter(i => i.productId !== item.productId))} style={{ width: 22, height: 22, border: 'none', borderRadius: 4, background: '#FEF2F2', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626', marginLeft: 4 }}>✕</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Totals */}
+              <div style={{ padding: '10px 12px', background: '#FFFFFF', borderTop: '1px solid #e5e7eb', flexShrink: 0 }}>
+                <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden', marginBottom: 8 }}>
+                  <div style={{ background: '#F3F4F6', padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db' }}>
+                    <span style={{ fontSize: 15, color: '#4B5563', fontWeight: 600 }}>সাবটোটাল ({cart.reduce((s, i) => s + i.quantity, 0)} আইটেম)</span>
+                    <span style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>{fmt(subtotal)}</span>
+                  </div>
+                  {(parseFloat(discount) || 0) > 0 && (
+                    <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db', background: '#F0FDF4' }}>
+                      <span style={{ fontSize: 15, color: '#16A34A' }}>ছাড়</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: '#16A34A' }}>−{fmt(parseFloat(discount) || 0)}</span>
+                    </div>
+                  )}
+                  {vatAmount > 0 && (
+                    <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db', background: '#FFFBEB' }}>
+                      <span style={{ fontSize: 15, color: '#D97706' }}>ভ্যাট ({vatPercent}%)</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: '#D97706' }}>+{fmt(vatAmount)}</span>
+                    </div>
+                  )}
+                  <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#111827' }}>
+                    <span style={{ fontSize: 14, color: '#fff', fontWeight: 700 }}>মোট দেনা</span>
+                    <span style={{ fontSize: 18, color: '#fff', fontWeight: 800 }}>{fmt(total)}</span>
+                  </div>
+                </div>
+
+                {/* Discount & VAT Inputs */}
+                <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+                  <input value={discount} onChange={(e) => setDiscount(e.target.value)} type="number" min="0"
+                    placeholder="ছাড়"
+                    style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#16A34A' }}/>
+                  <input value={vatPercent} onChange={(e) => setVatPercent(parseFloat(e.target.value) || 0)} type="number" min="0" max="100"
+                    placeholder="ভ্যাট"
+                    style={{ width: 55, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#D97706', textAlign: 'center' }}/>
+                </div>
+
+                {/* Payment Input */}
+                <input value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
+                  placeholder="পরিশোধ (৳)"
+                  style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 6, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#111827', outline: 'none' }}
+                />
+
+                {/* Due/Change Alert */}
+                {due > 0 && (
+                  <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#FEF2F2', color: '#DC2626', fontWeight: 600, textAlign: 'center' }}>
+                    ⚠️ বাকি: {fmt(due)}
+                  </div>
+                )}
+                {change > 0 && (
+                  <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#F0FDF4', color: '#16A34A', fontWeight: 600, textAlign: 'center' }}>
+                    💵 ফেরত: {fmt(change)}
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 6 }}>
+                  <button onClick={() => { setCart([]); setDiscount(''); setPaidAmount(''); }}
+                    style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', color: '#4B5563', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}>
+                    🗑️
+                  </button>
+                  <button onClick={handleCheckout}
+                    disabled={cart.length === 0}
+                    style={{
+                      padding: '12px 16px', borderRadius: 10, border: 'none',
+                      background: cart.length > 0 ? '#EA580C' : '#e5e7eb',
+                      color: '#fff', fontWeight: 700, fontSize: 15,
+                      cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
+                      boxShadow: cart.length > 0 ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
+                    }}>
+                    ✓ বিক্রয় সম্পন্ন
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
