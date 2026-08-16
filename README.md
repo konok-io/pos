@@ -1,61 +1,154 @@
-# Product Import System
+# POS Management System - Laravel Version
 
-A CSV-based product import system using sql.js (SQLite in the browser).
+একটি আধুনিক, দ্রুত এবং অফলাইন-সাপোর্টেড POS সিস্টেম।
 
-## Bug Fix
+## 🚀 বৈশিষ্ট্য
 
-### Issue
-Products were being incorrectly skipped during CSV import when the barcode existed in the database but belonged to a different company.
+- ✅ **দ্রুত** - লোকাল হোস্টে instant রেসপন্স
+- ✅ **PWA** - উইন্ডোজ/ম্যাক অ্যাপ হিসেবে ইনস্টল করুন
+- ✅ **অফলাইন** - ইন্টারনেট ছাড়া কাজ করে
+- ✅ **আধুনিক UI** - সুন্দর এবং রেসপন্সিভ
+- ✅ **বাংলায়** - সম্পূর্ণ বাংলা ইন্টারফেস
 
-**Previous behavior:**
+## 📦 ইনস্টলেশন (Laragon)
+
+### ধাপ ১: Laragon সেটআপ
 ```
-Skipped (barcode exists different company): Mini Rice 10kg
-Skipped (barcode exists different company): Suzi Chips
-Skipped (barcode exists different company): Suzi Biscuit
-Skipped (barcode exists different company): Al-Marwa Spice
-Final: items= 0 errors= 0 skipped= 5
+আপনার Laragon ইতিমধ্যে কনফিগ করা আছে:
+- Virtual Host: pos.test
+- Document Root: C:/laragon/www/pos
 ```
 
-### Solution
-Modified the import logic to only skip products when **both** barcode AND company match (true duplicates). If a barcode exists but belongs to a different company, the product is now imported as a new entry.
+### ধাপ ২: ক্লোন করুন
+```bash
+cd C:/laragon/www
+rm -rf pos
+git clone https://github.com/konok-io/pos.git
+cd pos
+```
 
-**New behavior:**
-- **Skip**: Barcode AND Company both match (duplicate entry)
-- **Import**: Barcode exists but Company is different (new product from different company)
-- **Import**: Barcode doesn't exist (new product)
+### ধাপ ৩: Composer ইনস্টল
+```bash
+composer install
+```
 
-## Installation
+### ধাপ ৪: এনভায়রনমেন্ট
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### ধাপ ৫: ডাটাবেস
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+### ধাপ ৬: চালান
+```
+ব্রাউজারে যান: http://pos.test
+```
+
+## 📱 ডেস্কটপ অ্যাপ হিসেবে ইনস্টল
+
+1. Chrome/Edge-এ pos.test খুলুন
+2. Address Bar-এ "ইনস্টল" বাটন দেখা যাবে
+3. ক্লিক করুন - অ্যাপ ইনস্টল হয়ে যাবে!
+4. Desktop থেকে চালান যাবে
+
+## 🖥️ স্ক্রিনশট
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  💼 POS          🔍 পণ্য খুঁজুন...         👤 অ্যাডমিন │
+├────────┬────────────────────────────┬───────────────────┤
+│ক্যাটাগরি│ পণ্য তালিকা                 │ 🛒 কার্ট          │
+│        │ ┌────┐ ┌────┐ ┌────┐ ┌────┐ │                   │
+│📦 সব   │ │🍚  │ │🍛  │ │🍗  │ │🍜  │ │  সাদা ভাত  ৳120  │
+│🍔 খাবার│ │৳120│ │৳150│ │৳200│ │৳130│ │                   │
+│🥤 পানীয়│ └────┘ └────┘ └────┘ └────┘ │  পোলাও     ৳150  │
+│🛒 প্রয়ো.│ ┌────┐ ┌────┐ ┌────┐ ┌────┐ │                   │
+│        │ │🥤  │ │🥤  │ │☕  │ │💧  │ │  ─────────────────│
+│        │ │৳30 │ │৳25 │ │৳15 │ │৳20 │ │  মোট: ৳270        │
+└────────┴────────────────────────────┴───────────────────┘
+```
+
+## 📂 প্রজেক্ট স্ট্রাকচার
+
+```
+pos/
+├── app/
+│   ├── Http/Controllers/Api/    # API Controllers
+│   └── Models/                  # Eloquent Models
+├── database/
+│   └── migrations/              # Database Migrations
+├── public/
+│   ├── assets/                  # CSS & JS
+│   ├── icons/                   # App Icons
+│   ├── manifest.json            # PWA Manifest
+│   ├── sw.js                    # Service Worker
+│   └── index.html               # Main App
+├── resources/views/             # Blade Templates
+├── routes/
+│   ├── api.php                  # API Routes
+│   └── web.php                  # Web Routes
+├── composer.json
+└── .env
+```
+
+## 🛠️ API Endpoints
+
+| Method | Endpoint | বিবরণ |
+|--------|----------|-------|
+| GET | /api/products | সব পণ্য |
+| POST | /api/products | নতুন পণ্য |
+| GET | /api/sales | সব বিক্রয় |
+| POST | /api/sales | নতুন বিক্রয় |
+| GET | /api/categories | ক্যাটাগরি |
+
+## 🔧 কমান্ড
 
 ```bash
-npm install
+# সার্ভার চালান
+php artisan serve
+
+# মাইগ্রেশন
+php artisan migrate
+
+# সিড ডাটা
+php artisan db:seed
+
+# ক্লিয়ার ক্যাশ
+php artisan cache:clear
+
+# কনফিগ ক্যাশ
+php artisan config:cache
 ```
 
-## Running
+## 📋 প্রয়োজনীয় প্যাকেজ
 
-```bash
-npm start
-```
+- Laravel 11
+- PHP 8.2+
+- SQLite/MySQL/PostgreSQL
 
-Then open http://localhost:3000 in your browser.
+## 🌐 অফলাইন ফিচার
 
-## Usage
+- Service Worker ক্যাশ করে static assets
+- API requests সার্ভারে না থাকলে cached data দেখায়
+- অফলাইন পেজ দেখায় যখন সার্ভার unreachable
 
-1. Upload a CSV file with the following columns:
-   - Product Name
-   - Company
-   - Category
-   - Barcode
-   - Unit
-   - PurchasePrice
-   - SalesPrice
-   - VAT%
-   - Stock
-   - MinStock
+## 🎯 ভবিষ্যতের পরিকল্পনা
 
-2. Click "Import Products" to import the products
+- [ ] Multi-store সাপোর্ট
+- [ ] Multi-currency সাপোর্ট
+- [ ] Real-time sync
+- [ ] Advanced reports
+- [ ] AI-based suggestions
 
-3. View the results and all imported products
+## 📄 লাইসেন্স
 
-## Sample Data
+MIT License
 
-A sample CSV file (`public/sample-products.csv`) is included for testing.
+---
+
+💼 **POS Management System** - বিক্রয়, স্টক ও হিসাব ব্যবস্থাপনা

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>অফলাইন - POS সিস্টেম</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            padding: 20px;
+        }
+        .offline-container {
+            text-align: center;
+            max-width: 500px;
+        }
+        .icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #e94560;
+        }
+        p {
+            font-size: 1.1rem;
+            color: #a0a0a0;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .status {
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(233, 69, 96, 0.2);
+            border: 2px solid #e94560;
+            border-radius: 50px;
+            margin-bottom: 20px;
+        }
+        .retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #e94560 0%, #0f3460 100%);
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .retry-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+        }
+        .tip {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            text-align: left;
+        }
+        .tip h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            color: #4ade80;
+        }
+        .tip ul {
+            list-style: none;
+            color: #a0a0a0;
+            font-size: 0.9rem;
+        }
+        .tip li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .tip li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4ade80;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="icon">📡</div>
+        <div class="status">⚠️ অফলাইনে আছেন</div>
+        <h1>ইন্টারনেট সংযোগ নেই</h1>
+        <p>আপনি বর্তমানে অফলাইনে আছেন। ইন্টারনেট সংযোগ পেলে স্বয়ংক্রিয়ভাবে চালু হয়ে যাবে।</p>
+        <button class="retry-btn" onclick="location.reload()">
+            🔄 পুনরায় চেষ্টা করুন
+        </button>
+        <div class="tip">
+            <h3>💡 জানুন</h3>
+            <ul>
+                <li>POS অ্যাপ ইনস্টল করলে দ্রুত কাজ করে</li>
+                <li>আগে থেকে দেখা পেজ অফলাইনে দেখা যায়</li>
+                <li>নতুন ডেটা সেভ করতে ইন্টারনেট দরকার</li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        // Auto retry when online
+        window.addEventListener('online', () => {
+            location.reload();
+        });
+    </script>
+</body>
+</html>

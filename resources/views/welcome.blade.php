@@ -2,12 +2,9 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a1a2e">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="POS Management System - Sales, Stock & Accounting">
-    
     <title>POS Management System</title>
     
     <!-- PWA -->
@@ -17,7 +14,7 @@
     <!-- Styles -->
     <link rel="stylesheet" href="/assets/app.css">
     
-    <!-- Preconnect -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -46,7 +43,7 @@
                 <button class="icon-btn" id="installBtn" title="অ্যাপ ইনস্টল করুন" style="display: none;">
                     📲
                 </button>
-                <button class="icon-btn" title="সেটিংস">
+                <button class="icon-btn" title="সেটিংস" onclick="window.location.href='/settings'">
                     ⚙️
                 </button>
                 <div class="user-menu">
@@ -65,21 +62,9 @@
                     <button class="category-btn active" data-category="all">
                         <span>📦</span> সব পণ্য
                     </button>
-                    <button class="category-btn" data-category="1">
-                        <span>🍔</span> খাবার
-                    </button>
-                    <button class="category-btn" data-category="2">
-                        <span>🥤</span> পানীয়
-                    </button>
-                    <button class="category-btn" data-category="3">
-                        <span>🛒</span> প্রয়োজনীয়
-                    </button>
-                    <button class="category-btn" data-category="4">
-                        <span>💊</span> ওষুধ
-                    </button>
                 </nav>
                 <div class="sidebar-actions">
-                    <button class="action-btn" id="addCategoryBtn">
+                    <button class="action-btn" onclick="showCategoryModal()">
                         <span>+</span> নতুন ক্যাটাগরি
                     </button>
                 </div>
@@ -96,11 +81,11 @@
                             <option value="price_high">দাম বেশি → কম</option>
                             <option value="stock">স্টক অনুযায়ী</option>
                         </select>
-                        <button class="filter-btn">🔄</button>
+                        <button class="filter-btn" onclick="renderProducts()">🔄</button>
                     </div>
                 </div>
                 <div class="products-grid" id="productsGrid">
-                    <!-- Products will be loaded here -->
+                    <!-- Products loaded dynamically -->
                 </div>
             </section>
 
@@ -109,10 +94,10 @@
                 <div class="cart-header">
                     <h3>🛒 কার্ট</h3>
                     <span class="cart-count" id="cartCount">0</span>
-                    <button class="clear-cart-btn" id="clearCartBtn">🗑️</button>
+                    <button class="clear-cart-btn" onclick="clearCart()">🗑️</button>
                 </div>
                 <div class="cart-items" id="cartItems">
-                    <!-- Cart items will be shown here -->
+                    <!-- Cart items -->
                 </div>
                 <div class="cart-empty" id="cartEmpty">
                     <span class="empty-icon">🛒</span>
@@ -132,7 +117,7 @@
                         <div class="summary-row discount">
                             <span>ছাড়:</span>
                             <span>
-                                <input type="number" id="discountInput" value="0" min="0" step="1">
+                                <input type="number" id="discountInput" value="0" min="0" step="1" onchange="updateCartTotals()">
                             </span>
                         </div>
                         <div class="summary-row vat">
@@ -146,22 +131,23 @@
                     </div>
                     <div class="payment-section">
                         <div class="payment-methods">
-                            <button class="payment-btn active" data-method="cash">
+                            <button class="payment-btn active" data-method="cash" onclick="setPaymentMethod('cash')">
                                 💵 নগদ
                             </button>
-                            <button class="payment-btn" data-method="card">
+                            <button class="payment-btn" data-method="card" onclick="setPaymentMethod('card')">
                                 💳 কার্ড
                             </button>
-                            <button class="payment-btn" data-method="mobile">
+                            <button class="payment-btn" data-method="mobile" onclick="setPaymentMethod('mobile')">
                                 📱 মোবাইল
                             </button>
                         </div>
                         <div class="customer-section">
                             <select id="customerSelect" class="customer-select">
                                 <option value="">-- গ্রাহক নির্বাচন --</option>
+                                <option value="walkin">প্রথম গ্রাহক (Walk-in)</option>
                             </select>
                         </div>
-                        <button class="checkout-btn" id="checkoutBtn">
+                        <button class="checkout-btn" onclick="processCheckout()">
                             💰 পেমেন্ট করুন
                         </button>
                     </div>
@@ -171,50 +157,33 @@
 
         <!-- Quick Actions Bar -->
         <div class="quick-actions">
-            <button class="quick-btn" onclick="showPage('dashboard')">
+            <button class="quick-btn" onclick="window.location.href='/dashboard'">
                 📊 ড্যাশবোর্ড
             </button>
-            <button class="quick-btn" onclick="showPage('sales')">
+            <button class="quick-btn" onclick="window.location.href='/pos'">
                 📝 বিক্রয়
             </button>
-            <button class="quick-btn" onclick="showPage('products')">
+            <button class="quick-btn" onclick="window.location.href='/products'">
                 📦 পণ্য
             </button>
-            <button class="quick-btn" onclick="showPage('purchases')">
+            <button class="quick-btn" onclick="window.location.href='/purchases'">
                 🛒 ক্রয়
             </button>
-            <button class="quick-btn" onclick="showPage('expenses')">
+            <button class="quick-btn" onclick="window.location.href='/expenses'">
                 💸 খরচ
             </button>
-            <button class="quick-btn" onclick="showPage('reports')">
+            <button class="quick-btn" onclick="window.location.href='/reports'">
                 📈 রিপোর্ট
             </button>
-            <button class="quick-btn" onclick="showPage('settings')">
+            <button class="quick-btn" onclick="window.location.href='/settings'">
                 ⚙️ সেটিংস
             </button>
         </div>
 
-        <!-- Toast Notification -->
+        <!-- Toast -->
         <div class="toast" id="toast">
             <span class="toast-icon">✓</span>
             <span class="toast-message">সফলভাবে যোগ হয়েছে</span>
-        </div>
-
-        <!-- Modal -->
-        <div class="modal" id="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modalTitle">Modal Title</h3>
-                    <button class="modal-close" onclick="closeModal()">&times;</button>
-                </div>
-                <div class="modal-body" id="modalBody">
-                    <!-- Modal content -->
-                </div>
-                <div class="modal-footer" id="modalFooter">
-                    <button class="btn btn-secondary" onclick="closeModal()">বাতিল</button>
-                    <button class="btn btn-primary" id="modalSaveBtn">সেভ করুন</button>
-                </div>
-            </div>
         </div>
 
         <!-- Receipt Modal -->
@@ -225,9 +194,7 @@
                     <p id="receiptDate"></p>
                     <p>Invoice: <span id="receiptInvoice"></span></p>
                 </div>
-                <div class="receipt-body" id="receiptBody">
-                    <!-- Receipt items -->
-                </div>
+                <div class="receipt-body" id="receiptBody"></div>
                 <div class="receipt-footer">
                     <div class="receipt-total">
                         <span>মোট:</span>
@@ -258,12 +225,8 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('SW registered:', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.log('SW registration failed:', error);
-                    });
+                    .then((reg) => console.log('SW registered:', reg.scope))
+                    .catch((err) => console.log('SW registration failed:', err));
             });
         }
 
@@ -281,26 +244,20 @@
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                console.log(`User response: ${outcome}`);
                 deferredPrompt = null;
                 installBtn.style.display = 'none';
             }
         });
 
         // Offline indicator
-        const offlineIndicator = document.getElementById('offlineIndicator');
-        
         function updateOnlineStatus() {
-            const dot = offlineIndicator.querySelector('.status-dot');
+            const dot = document.querySelector('#offlineIndicator .status-dot');
             if (navigator.onLine) {
                 dot.className = 'status-dot online';
-                dot.title = 'অনলাইন';
             } else {
                 dot.className = 'status-dot offline';
-                dot.title = 'অফলাইন';
             }
         }
-
         window.addEventListener('online', updateOnlineStatus);
         window.addEventListener('offline', updateOnlineStatus);
         updateOnlineStatus();
