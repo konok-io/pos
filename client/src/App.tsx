@@ -39,6 +39,12 @@ interface CartItem {
   maxStock: number;
 }
 
+interface HeldSale {
+  id: string;
+  items: CartItem[];
+  createdAt: string;
+}
+
 interface Category {
   id: string;
   name: string;
@@ -350,7 +356,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSupplier, setSelectedSupplier] = useState('all');
-  const [heldSales, setHeldSales] = useState<CartItem[]>([]);
+  const [heldSales, setHeldSales] = useState<HeldSale[]>([]);
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
@@ -754,7 +760,7 @@ export default function App() {
                               </button>
                             </div>
                             <div style={{ marginBottom: 8 }}>
-                              {sale.items.map((item: any, itemIdx: number) => (
+                              {sale.items.map((item, itemIdx) => (
                                 <div key={itemIdx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px dashed #E5E7EB' }}>
                                   <span style={{ fontSize: 13, color: '#4B5563' }}>{item.name}</span>
                                   <span style={{ fontSize: 13, color: '#6B7280' }}>×{item.quantity}</span>
@@ -764,11 +770,11 @@ export default function App() {
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, borderTop: '1px solid #E5E7EB' }}>
                               <div style={{ fontSize: 14, fontWeight: 600, color: '#0F766E' }}>
-                                মোট: {fmt(sale.items.reduce((sum: number, item: any) => sum + (item.sellPrice * item.quantity), 0))}
+                                মোট: {fmt(sale.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0))}
                               </div>
                               <button 
                                 onClick={() => {
-                                  sale.items.forEach((item: any) => {
+                                  sale.items.forEach((item) => {
                                     const product = products.find(p => p.id === item.productId);
                                     if (product) addToCart(product);
                                   });
@@ -1030,7 +1036,7 @@ export default function App() {
                   <button 
                     onClick={() => {
                       if (cart.length > 0) {
-                        setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], sellPrice: 0, costPrice: 0, quantity: 0, unit: '', maxStock: 0, productId: '' }]);
+                        setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], createdAt: new Date().toISOString() }]);
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
