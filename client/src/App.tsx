@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages } from './i18n';
+import TranslationSettings from './pages/TranslationSettings';
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
@@ -330,6 +331,7 @@ export default function App() {
     { id: 'lowstock', icon: '⚠️', label: t('stockLow') },
     { id: 'income', icon: '💰', label: t('expenses') },
     { id: 'reports', icon: '📊', label: t('reports') },
+    { id: 'translations', icon: '🌐', label: 'Translations' },
     { id: 'settings', icon: '⚙️', label: t('settings') },
   ];
 
@@ -1312,12 +1314,16 @@ export default function App() {
                 />
               </div>
               <div className="form-group">
-                <label className="label">ব্যবসায়ের নাম</label>
-                <input type="text" className="input" defaultValue="আমার দোকান" />
+                <label className="label">Business Name</label>
+                <input type="text" className="input" defaultValue="My Store" />
               </div>
-              <button className="btn btn-primary">সেভ করুন</button>
+              <button className="btn btn-primary">{t('save')}</button>
             </div>
           </div>
+        )}
+
+        {currentTab === 'translations' && (
+          <TranslationSettings />
         )}
 
         {currentTab === 'newproduct' && (

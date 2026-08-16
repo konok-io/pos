@@ -304,3 +304,19 @@ model Setting {
 
   @@map("settings")
 }
+
+// =====================
+// TRANSLATIONS (Dynamic i18n)
+// =====================
+model Translation {
+  id        String   @id @default(uuid())
+  lang      String   // en, bn, ar, hi
+  key       String   // translation key
+  value     String   // translated text
+  isCustom  Boolean  @default(false) // true if user added
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([lang, key])
+  @@map("translations")
+}

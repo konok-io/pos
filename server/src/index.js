@@ -17,6 +17,7 @@ import purchaseRoutes from './routes/purchases.js';
 import expenseRoutes from './routes/expenses.js';
 import syncRoutes from './routes/sync.js';
 import reportRoutes from './routes/reports.js';
+import translationRoutes from './routes/translations.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -47,6 +48,7 @@ app.use('/api/purchases', purchaseRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/translations', translationRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

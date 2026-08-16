@@ -1,6 +1,8 @@
 import { Router } from 'express';
+import { PrismaClient } from '@prisma/client';
 
 const router = Router();
+const prisma = new PrismaClient();
 
 // Simple auth (for demo - in production use proper JWT)
 router.post('/login', async (req, res) => {
