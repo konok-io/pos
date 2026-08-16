@@ -380,14 +380,14 @@ export default function App() {
 
     // Demo products
     const demoProducts: Product[] = [
-      { id: 'p1', name: 'সাদা ভাত', code: 'RICE001', costPrice: 80, sellPrice: 120, stock: 50, unit: 'প্লেট', categoryId: 'cat-food', image: '🍚' },
-      { id: 'p2', name: 'পোলাও', code: 'RICE002', costPrice: 100, sellPrice: 150, stock: 30, unit: 'প্লেট', categoryId: 'cat-food', image: '🍛' },
-      { id: 'p3', name: 'চিকেন কর্ন', code: 'CHK001', costPrice: 130, sellPrice: 200, stock: 25, unit: 'পিস', categoryId: 'cat-food', image: '🍗' },
-      { id: 'p4', name: 'কোকা কোলা', code: 'COKE001', costPrice: 20, sellPrice: 30, stock: 100, unit: 'বোতল', categoryId: 'cat-drinks', image: '🥤' },
-      { id: 'p5', name: 'পেপসি', code: 'PEP001', costPrice: 15, sellPrice: 25, stock: 80, unit: 'বোতল', categoryId: 'cat-drinks', image: '🥤' },
-      { id: 'p6', name: 'চা', code: 'TEA001', costPrice: 8, sellPrice: 15, stock: 200, unit: 'কাপ', categoryId: 'cat-drinks', image: '☕' },
-      { id: 'p7', name: 'সাবান', code: 'SOAP001', costPrice: 30, sellPrice: 45, stock: 50, unit: 'পিস', categoryId: 'cat-essentials', image: '🧼' },
-      { id: 'p8', name: 'শ্যাম্পু', code: 'SHAM001', costPrice: 100, sellPrice: 150, stock: 30, unit: 'বোতল', categoryId: 'cat-essentials', image: '🧴' },
+      { id: 'p1', name: 'সাদা ভাত', code: 'RICE001', costPrice: 80, sellPrice: 120, stock: 50, unit: 'প্লেট', categoryId: 'cat-food', supplier: 'খাবার সরবরাহকারী', image: '🍚' },
+      { id: 'p2', name: 'পোলাও', code: 'RICE002', costPrice: 100, sellPrice: 150, stock: 30, unit: 'প্লেট', categoryId: 'cat-food', supplier: 'খাবার সরবরাহকারী', image: '🍛' },
+      { id: 'p3', name: 'চিকেন কর্ন', code: 'CHK001', costPrice: 130, sellPrice: 200, stock: 25, unit: 'পিস', categoryId: 'cat-food', supplier: 'খাবার সরবরাহকারী', image: '🍗' },
+      { id: 'p4', name: 'কোকা কোলা', code: 'COKE001', costPrice: 20, sellPrice: 30, stock: 100, unit: 'বোতল', categoryId: 'cat-drinks', supplier: 'পানীয় সরবরাহকারী', image: '🥤' },
+      { id: 'p5', name: 'পেপসি', code: 'PEP001', costPrice: 15, sellPrice: 25, stock: 80, unit: 'বোতল', categoryId: 'cat-drinks', supplier: 'পানীয় সরবরাহকারী', image: '🥤' },
+      { id: 'p6', name: 'চা', code: 'TEA001', costPrice: 8, sellPrice: 15, stock: 200, unit: 'কাপ', categoryId: 'cat-drinks', supplier: 'চা সরবরাহকারী', image: '☕' },
+      { id: 'p7', name: 'সাবান', code: 'SOAP001', costPrice: 30, sellPrice: 45, stock: 50, unit: 'পিস', categoryId: 'cat-essentials', supplier: 'পণ্য সরবরাহকারী', image: '🧼' },
+      { id: 'p8', name: 'শ্যাম্পু', code: 'SHAM001', costPrice: 100, sellPrice: 150, stock: 30, unit: 'বোতল', categoryId: 'cat-essentials', supplier: 'পণ্য সরবরাহকারী', image: '🧴' },
     ];
     setProducts(demoProducts);
 
