@@ -2,7 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
-import { initFontDetection } from './utils/fontDetect.js';
+import { initFontDetection } from './utils/fontDetect';
 
 // Simple error boundary component
 interface ErrorBoundaryProps {
