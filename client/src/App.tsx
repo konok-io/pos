@@ -186,8 +186,8 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState('pos');
 
   // Tabs configuration - matching old design
-  const tabs = [
-    { id: 'pos', icon: '🛒', label: 'বিক্রয়' },
+  const firstItem = { id: 'pos', icon: '🛒', label: 'বিক্রয়' };
+  const otherTabs = [
     { id: 'products', icon: '📦', label: 'সকল পণ্য' },
     { id: 'newproduct', icon: '➕', label: 'নতুন পণ্য' },
     { id: 'barcode', icon: '📊', label: 'বারকোড' },
@@ -440,37 +440,64 @@ export default function App() {
           
           {/* Dynamic Menu - Scrollable */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 30, marginRight: 22, minWidth: 0, flex: 1 }}>
-            {/* Left Arrow */}
-            <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginRight: 4, flexShrink: 0 }}>◀</button>
-
-            {/* Scrollable Menu */}
-            <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E5E7EB', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1, minWidth: 0 }}>
-              {tabs.map((t) => (
-                <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
-                  padding: '7px 12px',
-                  border: 'none',
-                  background: currentTab === t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
-                  cursor: 'pointer',
-                  color: currentTab === t.id ? '#FFFFFF' : '#4B5563',
-                  fontWeight: currentTab === t.id ? 600 : 500,
-                  fontSize: 14,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  whiteSpace: 'nowrap',
-                  fontFamily: 'inherit',
-                  transition: 'all 0.2s',
-                  borderRadius: 6,
-                  boxShadow: currentTab === t.id ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
-                }}>
-                  <span style={{ fontSize: 16 }}>{t.icon}</span>
-                  <span>{t.label}</span>
-                </button>
-              ))}
+            {/* Fixed First Item (বিক্রয়) - Separate container */}
+            <div style={{ flexShrink: 0, padding: '4px 6px 4px 4px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E5E7EB', marginRight: 4, boxShadow: '2px 0 8px rgba(0,0,0,0.05)' }}>
+              <button onClick={() => setCurrentTab('pos')} style={{
+                padding: '7px 12px',
+                border: 'none',
+                background: currentTab === 'pos' ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                cursor: 'pointer',
+                color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563',
+                fontWeight: currentTab === 'pos' ? 600 : 500,
+                fontSize: 14,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                whiteSpace: 'nowrap',
+                fontFamily: 'inherit',
+                transition: 'all 0.2s',
+                borderRadius: 6,
+                boxShadow: currentTab === 'pos' ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
+              }}>
+                <span style={{ fontSize: 16 }}>🛒</span>
+                <span>বিক্রয়</span>
+              </button>
             </div>
 
-            {/* Right Arrow */}
-            <button onClick={() => scrollMenu('right')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginLeft: 4, flexShrink: 0 }}>▶</button>
+            {/* Scrollable Menu Container */}
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+              {/* Left Arrow */}
+              <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginRight: 4, flexShrink: 0 }}>◀</button>
+
+              {/* Scrollable Menu */}
+              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E5E7EB', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1, minWidth: 0 }}>
+                {otherTabs.map((t) => (
+                  <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
+                    padding: '7px 12px',
+                    border: 'none',
+                    background: currentTab === t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                    cursor: 'pointer',
+                    color: currentTab === t.id ? '#FFFFFF' : '#4B5563',
+                    fontWeight: currentTab === t.id ? 600 : 500,
+                    fontSize: 14,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    whiteSpace: 'nowrap',
+                    fontFamily: 'inherit',
+                    transition: 'all 0.2s',
+                    borderRadius: 6,
+                    boxShadow: currentTab === t.id ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
+                  }}>
+                    <span style={{ fontSize: 16 }}>{t.icon}</span>
+                    <span>{t.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Right Arrow */}
+              <button onClick={() => scrollMenu('right')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginLeft: 4, flexShrink: 0 }}>▶</button>
+            </div>
           </div>
 
           {/* Actions Section */}
