@@ -102,11 +102,9 @@ export const bn = {
   // Purchases
   purchaseList: 'ক্রয় তালিকা',
   addPurchase: 'ক্রয় যোগ করুন',
-  selectSupplier: 'সরবরাহকারী নির্বাচন',
   selectProduct: 'পণ্য নির্বাচন',
   quantity: 'পরিমাণ',
   unitPrice: 'ইউনিট মূল্য',
-  total: 'মোট',
   purchaseDate: 'ক্রয় তারিখ',
 
   // Expenses

@@ -102,11 +102,9 @@ export const ar = {
   // Purchases
   purchaseList: 'قائمة المشتريات',
   addPurchase: 'إضافة شراء',
-  selectSupplier: 'اختر المورد',
   selectProduct: 'اختر المنتج',
   quantity: 'الكمية',
   unitPrice: 'سعر الوحدة',
-  total: 'الإجمالي',
   purchaseDate: 'تاريخ الشراء',
 
   // Expenses

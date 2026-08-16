@@ -102,11 +102,9 @@ export const hi = {
   // Purchases
   purchaseList: 'खरीदारी सूची',
   addPurchase: 'खरीद जोड़ें',
-  selectSupplier: 'आपूर्तिकर्ता चुनें',
   selectProduct: 'उत्पाद चुनें',
   quantity: 'मात्रा',
   unitPrice: 'इकाई मूल्य',
-  total: 'कुल',
   purchaseDate: 'खरीद की तारीख',
 
   // Expenses

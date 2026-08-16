@@ -102,11 +102,9 @@ export const en = {
   // Purchases
   purchaseList: 'Purchase List',
   addPurchase: 'Add Purchase',
-  selectSupplier: 'Select Supplier',
   selectProduct: 'Select Product',
   quantity: 'Quantity',
   unitPrice: 'Unit Price',
-  total: 'Total',
   purchaseDate: 'Purchase Date',
 
   // Expenses
