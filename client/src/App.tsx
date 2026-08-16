@@ -792,7 +792,7 @@ export default function App() {
                   onClick={() => setShowHeldSales(!showHeldSales)}
                   style={{
                     marginLeft: 'auto',
-                    padding: '6px 14px', borderRadius: 8, border: 'none',
+                    padding: '6px 14px', borderRadius: 8,
                     background: showHeldSales ? '#0F766E' : heldSales.length > 0 ? '#F0FDF4' : '#F9FAFB',
                     color: showHeldSales ? '#fff' : heldSales.length > 0 ? '#0F766E' : '#9CA3AF',
                     fontWeight: 600, fontSize: 13, cursor: 'pointer',
