@@ -658,11 +658,11 @@ export default function App() {
               {/* Search Row - with Category & Supplier */}
               <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 {/* Barcode Scan */}
-                <div style={{ position: 'relative', flex: '0 0 120px' }}>
-                  <span style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 13 }}>📊</span>
+                <div style={{ position: 'relative', flex: '1 1 200px' }}>
+                  <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 14 }}>📊</span>
                   <input
-                    placeholder="বারকোড"
-                    style={{ width: '100%', paddingLeft: 28, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                    placeholder="বারকোড স্ক্যান করুন..."
+                    style={{ width: '100%', paddingLeft: 36, height: 38, fontSize: 14, borderRadius: 8, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 
