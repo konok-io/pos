@@ -769,10 +769,41 @@ export default function App() {
                           overflow: 'hidden',
                           border: `2px solid ${product.stock <= 0 ? '#fca5a5' : product.stock <= 10 ? '#fdba74' : '#99f6e4'}`,
                         }}>
-                          {product.image ? (
+                          {product.image && product.image.startsWith('http') ? (
                             <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                           ) : (
-                            <span style={{ fontSize: 36 }}>📦</span>
+                            <span style={{ fontSize: 36 }}>
+                              {/* Auto detect icon based on product name */}
+                              {product.name.includes('চা') ? '☕' :
+                               product.name.includes('কফি') || product.name.includes('কোকা') || product.name.includes('কোলা') ? '🥤' :
+                               product.name.includes('পানীয়') || product.name.includes('জুস') || product.name.includes('সফট') ? '🧃' :
+                               product.name.includes('ভাত') || product.name.includes('খাবার') || product.name.includes('খাওয়া') ? '🍚' :
+                               product.name.includes('পোলাও') || product.name.includes('বিরিয়ানি') || product.name.includes('খিচুড়ি') ? '🍛' :
+                               product.name.includes('চিকেন') || product.name.includes('মাংস') || product.name.includes('কারি') ? '🍗' :
+                               product.name.includes('ফল') || product.name.includes('আম') || product.name.includes('কলা') || product.name.includes('আঙ্গুর') ? '🍎' :
+                               product.name.includes('সবজি') || product.name.includes('আলু') || product.name.includes('পটল') ? '🥬' :
+                               product.name.includes('মাছ') || product.name.includes('ভাত') ? '🐟' :
+                               product.name.includes('রুটি') || product.name.includes('ব্রেড') || product.name.includes('পরোটা') ? '🫓' :
+                               product.name.includes('সাবান') ? '🧼' :
+                               product.name.includes('শ্যাম্পু') || product.name.includes('তেল') || product.name.includes('শ্যাম্পু') ? '🧴' :
+                               product.name.includes('টুথ') || product.name.includes('পেস্ট') ? '🪥' :
+                               product.name.includes('পাউডার') || product.name.includes('ক্রিম') ? '🧴' :
+                               product.name.includes('ওষুধ') || product.name.includes('ঔষধ') || product.name.includes('ট্যাবলেট') ? '💊' :
+                               product.name.includes('বিস্কুট') || product.name.includes('কুকি') || product.name.includes('চকলেট') ? '🍪' :
+                               product.name.includes('চিপস') || product.name.includes('নাস্তা') ? '🍿' :
+                               product.name.includes('আইসক্রিম') || product.name.includes('আইস') ? '🍦' :
+                               product.name.includes('সিগারেট') || product.name.includes('সিগারেট') ? '🚬' :
+                               product.name.includes('বই') || product.name.includes('কাগজ') ? '📚' :
+                               product.name.includes('কলম') || product.name.includes('পেন') ? '🖊️' :
+                               product.name.includes('ব্যাগ') ? '👜' :
+                               product.name.includes('জুতা') || product.name.includes('স্যান্ডেল') ? '👟' :
+                               product.name.includes('গেম') || product.name.includes('খেলনা') ? '🎮' :
+                               product.name.includes('ফোন') || product.name.includes('মোবাইল') ? '📱' :
+                               product.name.includes('ল্যাপটপ') || product.name.includes('কম্পিউটার') ? '💻' :
+                               product.name.includes('টাকা') || product.name.includes('কয়েন') ? '💰' :
+                               product.name.includes('স্ট্যাম্প') || product.name.includes('মার্ক') ? '📮' :
+                               product.image ? product.image : '📦'}
+                            </span>
                           )}
                         </div>
 
