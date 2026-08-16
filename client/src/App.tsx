@@ -375,7 +375,7 @@ export default function App() {
   // Data states
   const [products, setProducts] = useState<Product[]>(demoProducts);
   const [categories] = useState<Category[]>(demoCategories);
-  const [customers] = useState<Customer[]>(demoCustomers);
+  const [customers, setCustomers] = useState<Customer[]>(demoCustomers);
   const [sales, setSales] = useState<Sale[]>([]);
 
   // Cart state
