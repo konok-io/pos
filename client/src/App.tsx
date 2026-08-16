@@ -445,7 +445,7 @@ export default function App() {
 
             {/* Scrollable Menu */}
             <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E5E7EB', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1, minWidth: 0 }}>
-              {tabs.map((t, idx) => (
+              {tabs.map((t) => (
                 <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
                   padding: '7px 12px',
                   border: 'none',
