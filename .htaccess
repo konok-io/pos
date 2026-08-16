@@ -1,5 +1,1 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteRule ^$ public/ [L]
-    RewriteRule ^((?!public/).*)$ public/$1 [L,NC]
-</IfModule>
+# Empty - standalone POS doesn't need rewrite rules
