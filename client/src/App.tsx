@@ -705,6 +705,31 @@ export default function App() {
                 </select>
               </div>
 
+              {/* Stock Summary Row */}
+              <div style={{ padding: '6px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#F0FDFA', color: '#0F766E', border: '1.5px solid rgba(15,118,110,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
+                  📦 স্টক আছে <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0).length})</span>
+                </div>
+                <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#FFF7ED', color: '#EA580C', border: '1.5px solid rgba(234,88,12,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
+                  ⚠️ স্টক কম <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0 && p.stock <= 10).length})</span>
+                </div>
+                <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#FEF2F2', color: '#DC2626', border: '1.5px solid rgba(220,38,38,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
+                  ⚠️ স্টক শেষ <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock <= 0).length})</span>
+                </div>
+                <button 
+                  onClick={() => setShowHeldSales(!showHeldSales)}
+                  style={{
+                    marginLeft: 'auto',
+                    padding: '6px 14px', borderRadius: 8, border: 'none',
+                    background: showHeldSales ? '#0F766E' : heldSales.length > 0 ? '#F0FDF4' : '#F9FAFB',
+                    color: showHeldSales ? '#fff' : heldSales.length > 0 ? '#0F766E' : '#9CA3AF',
+                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
+                    border: '1px solid ' + (heldSales.length > 0 ? '#0F766E' : '#E5E7EB'),
+                  }}>
+                  📋 হোল্ড {heldSales.length > 0 && `(${heldSales.length})`}
+                </button>
+              </div>
+
               {/* Product grid */}
               <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
                 {/* Show Held Sales */}
@@ -929,30 +954,6 @@ export default function App() {
                     placeholder="কাস্টমার খুঁজুন..."
                     style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
-                </div>
-                {/* Stock Summary with Hold Button */}
-                <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-                  <div style={{ borderRadius: 6, background: '#F0FDFA', color: '#0F766E', padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>
-                    📦 স্টক আছে ({products.filter(p => p.stock > 0).length})
-                  </div>
-                  <div style={{ borderRadius: 6, background: '#FFF7ED', color: '#EA580C', padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>
-                    ⚠️ স্টক কম ({products.filter(p => p.stock > 0 && p.stock <= 10).length})
-                  </div>
-                  <div style={{ borderRadius: 6, background: '#FEF2F2', color: '#DC2626', padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>
-                    ⚠️ স্টক শেষ ({products.filter(p => p.stock <= 0).length})
-                  </div>
-                  <button 
-                    onClick={() => setShowHeldSales(!showHeldSales)}
-                    style={{
-                      marginLeft: 'auto',
-                      padding: '4px 10px', borderRadius: 6, border: 'none',
-                      background: showHeldSales ? '#0F766E' : heldSales.length > 0 ? '#F0FDF4' : '#F9FAFB',
-                      color: showHeldSales ? '#fff' : heldSales.length > 0 ? '#0F766E' : '#9CA3AF',
-                      fontWeight: 600, fontSize: 12, cursor: 'pointer',
-                      border: '1px solid ' + (heldSales.length > 0 ? '#0F766E' : '#E5E7EB'),
-                    }}>
-                    📋 হোল্ড {heldSales.length > 0 && `(${heldSales.length})`}
-                  </button>
                 </div>
               </div>
 
