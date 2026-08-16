@@ -1,0 +1,34 @@
+/* App specific styles - currently empty, styles are in App.jsx */
+
+/* Header icon - override global CSS */
+.header-icon {
+  font-size: 40px !important;
+  line-height: 1 !important;
+}
+
+/* Header logo icon - override global 14px */
+.header-logo-icon {
+  font-size: 28px !important;
+  line-height: 1 !important;
+}
+
+/* Header business name - override global 14px */
+.header-business-name {
+  font-size: 22px !important;
+}
+
+/* Store info section - home page */
+.store-info-name {
+  font-size: 36px !important;
+  font-weight: 700 !important;
+}
+
+.store-info-phone {
+  font-size: 22px !important;
+  font-weight: 600 !important;
+}
+
+.store-info-address {
+  font-size: 20px !important;
+  font-weight: 400 !important;
+}
