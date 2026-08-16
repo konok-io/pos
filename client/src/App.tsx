@@ -714,10 +714,10 @@ export default function App() {
               <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 {/* Barcode Scan */}
                 <div style={{ position: 'relative', flex: '1 1 200px' }}>
-                  <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 14 }}>📊</span>
+                  <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0F766E', fontSize: 14 }}>📊</span>
                   <input
                     placeholder={t('barcodePlaceholder')}
-                    style={{ width: '100%', paddingLeft: 36, height: 38, fontSize: 14, borderRadius: 8, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', paddingLeft: 36, height: 38, fontSize: 14, borderRadius: 8, border: '2px solid #0F766E', background: '#F0FDFA', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
                 
