@@ -414,8 +414,9 @@ export default function App() {
     window.location.reload();
   };
 
-  // Filter products
-  const filteredProducts = products.filter(p => {
+  // Filter products - only show when search, category, or supplier is selected
+  const hasFilter = searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all';
+  const filteredProducts = hasFilter ? products.filter(p => {
     const matchCategory = selectedCategory === 'all' || p.categoryId === selectedCategory;
     const matchSupplier = selectedSupplier === 'all' || (p.supplier || '') === selectedSupplier;
     const matchSearch = !searchQuery || 
@@ -423,7 +424,7 @@ export default function App() {
       p.code.toLowerCase().includes(searchQuery.toLowerCase());
     const hasStock = p.stock > 0;
     return matchCategory && matchSupplier && matchSearch && hasStock;
-  });
+  }) : [];
 
   // Add to cart
   const addToCart = (product: Product) => {
