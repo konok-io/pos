@@ -96,9 +96,10 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
 
   const currentYear = new Date().getFullYear();
-  const businessName = 'আমার দোকান';
+  const businessName = 'My Store';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

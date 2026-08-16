@@ -1,4 +1,4 @@
-export const hi = {
+export const hi: Record<string, string> = {
   // Header
   posSystem: 'पीओएस सिस्टम',
   posManagement: 'पीओएस मैनेजमेंट सिस्टम',
@@ -19,11 +19,16 @@ export const hi = {
   email: 'ईमेल',
   password: 'पासवर्ड',
   loginButton: 'साइन इन करें',
+  loginTitle: 'लॉगिन',
+  signIn: 'साइन इन करें',
+  invalidCredentials: 'ईमेल या पासवर्ड गलत!',
 
   // POS Screen
   barcode: 'बारकोड',
   barcodePlaceholder: 'बारकोड स्कैन करें...',
   searchProduct: 'उत्पाद खोजें...',
+  searchProductBarcode: 'उत्पाद का नाम या बारकोड द्वारा खोजें',
+  orSelectCategorySupplier: 'या श्रेणी/आपूर्तिकर्ता चुनें',
   allProducts: 'सभी उत्पाद',
   allCategories: 'सभी श्रेणियाँ',
   allSuppliers: 'सभी आपूर्तिकर्ता',
@@ -36,7 +41,7 @@ export const hi = {
   customerSearch: 'ग्राहक खोजें...',
   noCustomerFound: 'ग्राहक नहीं मिला',
   customerRequired: 'ग्राहक जोड़ें',
-  cartEmpty: 'कार्ट खाली है',
+  cartEmpty: 'कार्ट खाली है!',
   addProductsFromLeft: 'बाईं ओर से उत्पाद जोड़ें',
   addToCart: 'जोड़ें',
   subtotal: 'उप-योग',
@@ -67,14 +72,20 @@ export const hi = {
   sellPrice: 'बिक्री मूल्य',
   stock: 'स्टॉक',
   category: 'श्रेणी',
+  noProductsYet: 'अभी तक कोई उत्पाद नहीं',
+  addProductsToGetStarted: 'आरंभ करने के लिए उत्पाद जोड़ें',
+  addFirstProduct: 'पहला उत्पाद जोड़ें',
 
   // Add/Edit Product
   addProduct: 'उत्पाद जोड़ें',
   editProduct: 'उत्पाद संपादित करें',
   productName: 'उत्पाद का नाम',
   productCode: 'उत्पाद कोड',
+  enterProductName: 'उत्पाद का नाम दर्ज करें',
+  enterProductCode: 'उत्पाद कोड दर्ज करें',
   selectCategory: 'श्रेणी चुनें',
   selectSupplier: 'आपूर्तिकर्ता चुनें',
+  selectProduct: 'उत्पाद चुनें',
   unit: 'इकाई',
   save: 'सेव करें',
 
@@ -98,11 +109,11 @@ export const hi = {
   editCustomer: 'ग्राहक संपादित करें',
   credit: 'उधार',
   balance: 'शेष',
+  balanceDue: 'बकाया',
 
   // Purchases
   purchaseList: 'खरीदारी सूची',
   addPurchase: 'खरीद जोड़ें',
-  selectProduct: 'उत्पाद चुनें',
   quantity: 'मात्रा',
   unitPrice: 'इकाई मूल्य',
   purchaseDate: 'खरीद की तारीख',
@@ -118,6 +129,17 @@ export const hi = {
   income: 'आय',
   expense: 'खर्च',
 
+  // Sale List
+  salesList: 'बिक्री सूची',
+  noSalesYet: 'अभी तक कोई बिक्री नहीं',
+
+  // Reports
+  totalProducts: 'कुल उत्पाद',
+  totalCustomers: 'कुल ग्राहक',
+  totalSales: 'कुल बिक्री',
+  todaySales: 'आज की बिक्री',
+  lowStockProducts: 'कम स्टॉक वाले उत्पाद',
+
   // Settings
   storeSettings: 'स्टोर सेटिंग्स',
   invoicePrefix: 'इनवॉइस प्रीफिक्स',
@@ -131,62 +153,9 @@ export const hi = {
   deleteSuccess: 'सफलतापूर्वक हटाया गया',
   saveSuccess: 'सफलतापूर्वक सेव किया गया',
   error: 'त्रुटि',
-  invalidCredentials: 'ईमेल या पासवर्ड गलत!',
-
-  // Product Grid
-  searchProductBarcode: 'उत्पाद का नाम या बारकोड द्वारा खोजें',
-  orSelectCategorySupplier: 'या श्रेणी/आपूर्तिकर्ता चुनें',
-  stock: 'स्टॉक',
-  noProductsYet: 'अभी तक कोई उत्पाद नहीं',
-  addProductsToGetStarted: 'आरंभ करने के लिए उत्पाद जोड़ें',
-  addFirstProduct: 'पहला उत्पाद जोड़ें',
 
   // Alerts
   stockFinished: 'स्टॉक खत्म!',
   maxStock: 'अधिकतम स्टॉक',
-  cartEmpty: 'कार्ट खाली है!',
   selectCustomerOrPayFull: 'ग्राहक चुनें या पूर्ण राशि दें!',
-
-  // Product List
-  productList: 'उत्पाद सूची',
-  purchasePrice: 'खरीद मूल्य',
-  sellPrice: 'बिक्री मूल्य',
-  category: 'श्रेणी',
-  balance: 'शेष',
-  balanceDue: 'बकाया',
-
-  // Sale List
-  salesList: 'बिक्री सूची',
-  noSalesYet: 'अभी तक कोई बिक्री नहीं',
-
-  // Reports
-  reports: 'रिपोर्ट',
-  totalProducts: 'कुल उत्पाद',
-  totalCustomers: 'कुल ग्राहक',
-  totalSales: 'कुल बिक्री',
-  todaySales: 'आज की बिक्री',
-  totalDue: 'कुल बकाया',
-  lowStockProducts: 'कम स्टॉक वाले उत्पाद',
-
-  // Settings
-  settings: 'सेटिंग्स',
-  storeSettings: 'स्टोर सेटिंग्स',
-
-  // Add/Edit Product
-  addProduct: 'उत्पाद जोड़ें',
-  editProduct: 'उत्पाद संपादित करें',
-  productName: 'उत्पाद का नाम',
-  productCode: 'उत्पाद कोड',
-  enterProductName: 'उत्पाद का नाम दर्ज करें',
-  enterProductCode: 'उत्पाद कोड दर्ज करें',
-  unit: 'इकाई',
-  selectCategory: 'श्रेणी चुनें',
-  selectSupplier: 'आपूर्तिकर्ता चुनें',
-  save: 'सेव करें',
-
-  // Login
-  loginTitle: 'लॉगिन',
-  email: 'ईमेल',
-  password: 'पासवर्ड',
-  signIn: 'साइन इन करें',
 };
