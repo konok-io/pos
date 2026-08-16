@@ -109,7 +109,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       <div style={{ background: 'white', borderRadius: 20, padding: 32, width: '100%', maxWidth: 420, boxShadow: '0 25px 50px rgba(0,0,0,0.25)' }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>🏪</div>
-          <h2 style={{ color: '#0F766E', margin: 0, fontSize: 24, fontWeight: 700 }}>POS ম্যানেজমেন্ট</h2>
+          <h2 style={{ color: '#F97316', margin: 0, fontSize: 24, fontWeight: 700 }}>POS ম্যানেজমেন্ট</h2>
           <p style={{ color: '#6B7280', margin: '8px 0 0' }}>আপনার অ্যাকাউন্টে লগইন করুন</p>
         </div>
 
@@ -398,7 +398,7 @@ export default function App() {
   return (
     <div className="app-container">
       {/* Header */}
-      <header className="header">
+      <header className="header" style={{ background: '#0F3460' }}>
         <div className="header-left">
           <div className="header-logo">🏪</div>
           <div className="header-title">

@@ -35,7 +35,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           alignItems: 'center',
           justifyContent: 'center',
           height: '100vh',
-          background: '#0F766E',
+          background: '#0F3460',
           color: 'white',
           fontFamily: 'system-ui, sans-serif'
         }}>
@@ -47,8 +47,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
               style={{
                 marginTop: '16px',
                 padding: '12px 24px',
-                background: 'white',
-                color: '#0F766E',
+                background: '#F97316',
+                color: 'white',
                 border: 'none',
                 borderRadius: '8px',
                 cursor: 'pointer',
