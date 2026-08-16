@@ -321,14 +321,8 @@ export default function App() {
   const { language, setLanguage, t, currentLang } = useLanguage();
   const [showLangDropdown, setShowLangDropdown] = useState(false);
 
-  // Demo data
-  const demoCategories: Category[] = [
-    { id: 'cat-food', name: 'Food', icon: '🍔' },
-    { id: 'cat-drinks', name: 'Drinks', icon: '🥤' },
-    { id: 'cat-essentials', name: 'Essentials', icon: '🛒' },
-  ];
-
-  const demoProducts: Product[] = [
+  // Demo data - initialize directly in state
+  const [products, setProducts] = useState<Product[]>([
     { id: 'p1', name: 'White Rice', code: 'RICE001', costPrice: 80, sellPrice: 120, stock: 50, unit: 'Plate', categoryId: 'cat-food', supplier: 'Food Supplier', image: '🍚' },
     { id: 'p2', name: 'Polao', code: 'RICE002', costPrice: 100, sellPrice: 150, stock: 30, unit: 'Plate', categoryId: 'cat-food', supplier: 'Food Supplier', image: '🍛' },
     { id: 'p3', name: 'Chicken Curry', code: 'CHK001', costPrice: 130, sellPrice: 200, stock: 25, unit: 'Pieces', categoryId: 'cat-food', supplier: 'Food Supplier', image: '🍗' },
@@ -337,14 +331,19 @@ export default function App() {
     { id: 'p6', name: 'Tea', code: 'TEA001', costPrice: 8, sellPrice: 15, stock: 200, unit: 'Cup', categoryId: 'cat-drinks', supplier: 'Tea Supplier', image: '☕' },
     { id: 'p7', name: 'Soap', code: 'SOAP001', costPrice: 30, sellPrice: 45, stock: 50, unit: 'Pieces', categoryId: 'cat-essentials', supplier: 'Goods Supplier', image: '🧼' },
     { id: 'p8', name: 'Shampoo', code: 'SHAM001', costPrice: 100, sellPrice: 150, stock: 30, unit: 'Bottle', categoryId: 'cat-essentials', supplier: 'Goods Supplier', image: '🧴' },
-  ];
-
-  const demoCustomers: Customer[] = [
+  ]);
+  const [categories] = useState<Category[]>([
+    { id: 'cat-food', name: 'Food', icon: '🍔' },
+    { id: 'cat-drinks', name: 'Drinks', icon: '🥤' },
+    { id: 'cat-essentials', name: 'Essentials', icon: '🛒' },
+  ]);
+  const [customers, setCustomers] = useState<Customer[]>([
     { id: 'c1', name: 'Rahim', phone: '01712345678', address: 'Dhaka', balance: 0 },
     { id: 'c2', name: 'Karim', phone: '01812345678', address: 'Chittagong', balance: 500 },
-  ];
+  ]);
+  const [sales, setSales] = useState<Sale[]>([]);
 
-  // Tabs configuration - matching old design
+  // Tabs configuration
   const otherTabs = [
     { id: 'products', icon: '📦', label: t('products') },
     { id: 'newproduct', icon: '➕', label: t('addProduct') },
@@ -371,12 +370,6 @@ export default function App() {
       });
     }
   };
-
-  // Data states
-  const [products, setProducts] = useState<Product[]>(demoProducts);
-  const [categories] = useState<Category[]>(demoCategories);
-  const [customers, setCustomers] = useState<Customer[]>(demoCustomers);
-  const [sales, setSales] = useState<Sale[]>([]);
 
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
