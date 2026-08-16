@@ -1,6 +1,6 @@
 /* ==========================================
    POS Management System - Main JavaScript
-   Fast, Offline-First, Modern Architecture
+   Modern, Multi-Currency, Offline-First
    ========================================== */
 
 // State Management
@@ -9,14 +9,22 @@ const state = {
     cart: [],
     categories: [],
     customers: [],
+    currencies: [],
+    currentStore: null,
+    currentCurrency: null,
     currentCategory: 'all',
-    paymentMethod: 'cash',
+    paymentMethod: 'CASH',
     searchQuery: '',
-    isOnline: navigator.onLine
+    isOnline: navigator.onLine,
+    deviceId: null,
+    pendingSync: []
 };
 
 // API Base URL
 const API_URL = '/api';
+
+// Default Store ID (will be set from settings)
+const DEFAULT_STORE_ID = 1;
 
 // ==========================================
 // Initialization
@@ -26,11 +34,24 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initializeApp() {
+    // Generate device ID for sync
+    state.deviceId = localStorage.getItem('pos_device_id');
+    if (!state.deviceId) {
+        state.deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('pos_device_id', state.deviceId);
+    }
+
+    // Load pending sync from IndexedDB
+    await loadPendingSync();
+
     try {
         await loadInitialData();
         setupEventListeners();
+        setupOnlineStatus();
         renderProducts();
+        renderCurrencies();
         updateCartUI();
+        updateSyncStatus();
     } catch (error) {
         console.error('Initialization error:', error);
         showToast('ডেটা লোড করতে সমস্যা হয়েছে', 'error');
@@ -41,37 +62,151 @@ async function initializeApp() {
 // Data Loading
 // ==========================================
 async function loadInitialData() {
-    const [products, categories, customers] = await Promise.all([
+    const [products, categories, customers, currencies, syncData] = await Promise.all([
         fetchAPI('/products'),
         fetchAPI('/categories'),
-        fetchAPI('/customers')
+        fetchAPI('/customers'),
+        fetchAPI('/currencies'),
+        syncPull()
     ]);
+
+    state.products = products?.data || products || getSampleProducts();
+    state.categories = categories?.data || categories || getSampleCategories();
+    state.customers = customers?.data || customers || [];
+    state.currencies = currencies?.data || currencies || [{ id: 1, code: 'BDT', symbol: '৳', name: 'Bangladeshi Taka' }];
     
-    state.products = products || getSampleProducts();
-    state.categories = categories || getSampleCategories();
-    state.customers = customers || [];
-    
+    // Set default currency
+    if (state.currencies.length > 0) {
+        state.currentCurrency = state.currencies.find(c => c.is_default) || state.currencies[0];
+    }
+
     renderCategories();
     renderCustomerOptions();
 }
 
+async function syncPull() {
+    if (!navigator.onLine) return null;
+
+    try {
+        const response = await fetch(`${API_URL}/sync/pull/${DEFAULT_STORE_ID}`);
+        const data = await response.json();
+        if (data.success) {
+            // Update local cache
+            setCachedData('products', data.data.products);
+            setCachedData('categories', data.data.categories);
+            setCachedData('currencies', data.data.currencies);
+            localStorage.setItem('pos_last_sync', new Date().toISOString());
+            return data;
+        }
+    } catch (e) {
+        console.log('Sync pull failed:', e);
+    }
+    return null;
+}
+
+async function syncPush() {
+    if (!navigator.onLine || state.pendingSync.length === 0) return;
+
+    try {
+        const response = await fetch(`${API_URL}/sync/push/${DEFAULT_STORE_ID}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sales: state.pendingSync,
+                device_id: state.deviceId
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            // Clear synced sales
+            state.pendingSync = [];
+            localStorage.setItem('pos_pending_sync', JSON.stringify([]));
+            showToast(`${result.data.sales.synced}টি বিক্রয় সিঙ্ক হয়েছে!`);
+            updateSyncStatus();
+        }
+    } catch (e) {
+        console.log('Sync push failed:', e);
+    }
+}
+
+// IndexedDB for offline storage
+async function loadPendingSync() {
+    try {
+        const db = await openDB();
+        const tx = db.transaction('pendingSales', 'readonly');
+        const store = tx.objectStore('pendingSales');
+        const data = await getAllFromStore(store);
+        state.pendingSync = data.map(d => d.sale);
+    } catch (e) {
+        console.log('IndexedDB not available, using localStorage');
+        const saved = localStorage.getItem('pos_pending_sync');
+        state.pendingSync = saved ? JSON.parse(saved) : [];
+    }
+}
+
+function savePendingSync(sale) {
+    const offlineId = `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const saleWithId = { ...sale, offline_id: offlineId };
+    state.pendingSync.push(saleWithId);
+    
+    // Try IndexedDB first, fallback to localStorage
+    (async () => {
+        try {
+            const db = await openDB();
+            const tx = db.transaction('pendingSales', 'readwrite');
+            const store = tx.objectStore('pendingSales');
+            await store.add({ id: offlineId, sale: saleWithId, createdAt: new Date().toISOString() });
+        } catch (e) {
+            localStorage.setItem('pos_pending_sync', JSON.stringify(state.pendingSync));
+        }
+    })();
+
+    updateSyncStatus();
+}
+
+function openDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open('POSOfflineDB', 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('pendingSales')) {
+                db.createObjectStore('pendingSales', { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains('products')) {
+                db.createObjectStore('products', { keyPath: 'id' });
+            }
+        };
+    });
+}
+
+function getAllFromStore(store) {
+    return new Promise((resolve, reject) => {
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
 function getSampleProducts() {
     return [
-        { id: 1, name: 'সাদা ভাত', code: 'RICE001', price: 120, stock: 50, category_id: 1, unit: 'প্লেট', image: '🍚' },
-        { id: 2, name: 'পোলাও', code: 'RICE002', price: 150, stock: 30, category_id: 1, unit: 'প্লেট', image: '🍛' },
-        { id: 3, name: 'চিকেন কর্ন', code: 'CHK001', price: 200, stock: 25, category_id: 1, unit: 'পিস', image: '🍗' },
-        { id: 4, name: 'ফ্রাইড রাইস', code: 'FR001', price: 130, stock: 40, category_id: 1, unit: 'প্লেট', image: '🍜' },
-        { id: 5, name: 'সসেজ', code: 'SAG001', price: 80, stock: 60, category_id: 1, unit: 'পিস', image: '🌭' },
-        { id: 6, name: 'কোকা কোলা', code: 'COKE001', price: 30, stock: 100, category_id: 2, unit: 'বোতল', image: '🥤' },
-        { id: 7, name: 'পেপসি', code: 'PEP001', price: 25, stock: 80, category_id: 2, unit: 'বোতল', image: '🥤' },
-        { id: 8, name: 'স্প্রাইট', code: 'SPR001', price: 25, stock: 75, category_id: 2, unit: 'বোতল', image: '🥤' },
-        { id: 9, name: 'মিনারেল ওয়াটার', code: 'MIN001', price: 20, stock: 150, category_id: 2, unit: 'বোতল', image: '💧' },
-        { id: 10, name: 'চা', code: 'TEA001', price: 15, stock: 200, category_id: 2, unit: 'কাপ', image: '☕' },
-        { id: 11, name: 'সাবান', code: 'SOAP001', price: 45, stock: 50, category_id: 3, unit: 'পিস', image: '🧼' },
-        { id: 12, name: 'শ্যাম্পু', code: 'SHAM001', price: 150, stock: 30, category_id: 3, unit: 'বোতল', image: '🧴' },
-        { id: 13, name: 'টুথপেস্ট', code: 'TP001', price: 85, stock: 40, category_id: 3, unit: 'টিউব', image: '🪥' },
-        { id: 14, name: 'পারফিউম', code: 'PERF001', price: 350, stock: 15, category_id: 3, unit: 'বোতল', image: '🌸' },
-        { id: 15, name: 'স্মোকিং বিয়ার', code: 'SMO001', price: 10, stock: 200, category_id: 3, unit: 'পিস', image: '🧴' },
+        { id: 1, name: 'সাদা ভাত', code: 'RICE001', sell_price: 120, stock: 50, category_id: 1, unit: 'প্লেট', image: '🍚' },
+        { id: 2, name: 'পোলাও', code: 'RICE002', sell_price: 150, stock: 30, category_id: 1, unit: 'প্লেট', image: '🍛' },
+        { id: 3, name: 'চিকেন কর্ন', code: 'CHK001', sell_price: 200, stock: 25, category_id: 1, unit: 'পিস', image: '🍗' },
+        { id: 4, name: 'ফ্রাইড রাইস', code: 'FR001', sell_price: 130, stock: 40, category_id: 1, unit: 'প্লেট', image: '🍜' },
+        { id: 5, name: 'সসেজ', code: 'SAG001', sell_price: 80, stock: 60, category_id: 1, unit: 'পিস', image: '🌭' },
+        { id: 6, name: 'কোকা কোলা', code: 'COKE001', sell_price: 30, stock: 100, category_id: 2, unit: 'বোতল', image: '🥤' },
+        { id: 7, name: 'পেপসি', code: 'PEP001', sell_price: 25, stock: 80, category_id: 2, unit: 'বোতল', image: '🥤' },
+        { id: 8, name: 'স্প্রাইট', code: 'SPR001', sell_price: 25, stock: 75, category_id: 2, unit: 'বোতল', image: '🥤' },
+        { id: 9, name: 'মিনারেল ওয়াটার', code: 'MIN001', sell_price: 20, stock: 150, category_id: 2, unit: 'বোতল', image: '💧' },
+        { id: 10, name: 'চা', code: 'TEA001', sell_price: 15, stock: 200, category_id: 2, unit: 'কাপ', image: '☕' },
+        { id: 11, name: 'সাবান', code: 'SOAP001', sell_price: 45, stock: 50, category_id: 3, unit: 'পিস', image: '🧼' },
+        { id: 12, name: 'শ্যাম্পু', code: 'SHAM001', sell_price: 150, stock: 30, category_id: 3, unit: 'বোতল', image: '🧴' },
+        { id: 13, name: 'টুথপেস্ট', code: 'TP001', sell_price: 85, stock: 40, category_id: 3, unit: 'টিউব', image: '🪥' },
+        { id: 14, name: 'পারফিউম', code: 'PERF001', sell_price: 350, stock: 15, category_id: 3, unit: 'বোতল', image: '🌸' },
+        { id: 15, name: 'স্মোকিং বিয়ার', code: 'SMO001', sell_price: 10, stock: 200, category_id: 3, unit: 'পিস', image: '🧴' },
     ];
 }
 
@@ -106,7 +241,9 @@ async function fetchAPI(endpoint, options = {}) {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         
         const data = await response.json();
-        setCachedData(endpoint, data);
+        if (options.method !== 'POST') {
+            setCachedData(endpoint, data);
+        }
         return data;
     } catch (error) {
         console.log('API Error:', error);
@@ -126,7 +263,9 @@ async function postAPI(endpoint, data) {
 // ==========================================
 function setCachedData(key, data) {
     try {
-        localStorage.setItem(`pos_${key}`, JSON.stringify({
+        // Clean the key
+        const cleanKey = key.replace(/\//g, '_').replace(/^_/, '');
+        localStorage.setItem(`pos_${cleanKey}`, JSON.stringify({
             data,
             timestamp: Date.now()
         }));
@@ -137,7 +276,8 @@ function setCachedData(key, data) {
 
 function getCachedData(key) {
     try {
-        const cached = localStorage.getItem(`pos_${key}`);
+        const cleanKey = key.replace(/\//g, '_').replace(/^_/, '');
+        const cached = localStorage.getItem(`pos_${cleanKey}`);
         if (cached) {
             const { data, timestamp } = JSON.parse(cached);
             // Cache valid for 24 hours
@@ -149,6 +289,48 @@ function getCachedData(key) {
         console.log('Cache read error:', e);
     }
     return null;
+}
+
+// ==========================================
+// Online Status
+// ==========================================
+function setupOnlineStatus() {
+    window.addEventListener('online', async () => {
+        state.isOnline = true;
+        updateOnlineIndicator();
+        showToast('অনলাইন হয়েছে!');
+        // Sync pending sales
+        await syncPush();
+    });
+
+    window.addEventListener('offline', () => {
+        state.isOnline = false;
+        updateOnlineIndicator();
+        showToast('অফলাইন হয়েছে - কাজ চালিয়ে যান!', 'info');
+    });
+}
+
+function updateOnlineIndicator() {
+    const indicator = document.getElementById('offlineIndicator');
+    if (indicator) {
+        const dot = indicator.querySelector('.status-dot');
+        dot.className = `status-dot ${state.isOnline ? 'online' : 'offline'}`;
+        indicator.title = state.isOnline ? 'অনলাইন' : 'অফলাইন';
+    }
+}
+
+function updateSyncStatus() {
+    const indicator = document.getElementById('offlineIndicator');
+    if (indicator && state.pendingSync.length > 0) {
+        let badge = indicator.querySelector('.sync-badge');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'sync-badge';
+            indicator.appendChild(badge);
+        }
+        badge.textContent = state.pendingSync.length;
+        badge.style.display = 'inline';
+    }
 }
 
 // ==========================================
@@ -434,9 +616,10 @@ async function processCheckout() {
     
     const totals = updateCartTotals();
     const customerId = document.getElementById('customerSelect').value;
+    const symbol = getCurrencySymbol();
     
     // Show payment modal
-    const paid = prompt(`মোট: ৳${totals.total}\nপেমেন্ট করুন:`, totals.total);
+    const paid = prompt(`মোট: ${symbol}${totals.total}\nপেমেন্ট করুন:`, totals.total);
     
     if (paid === null) return;
     
@@ -448,11 +631,19 @@ async function processCheckout() {
         return;
     }
     
-    // Prepare sale data
+    // Prepare sale data with new format
     const saleData = {
+        store_id: DEFAULT_STORE_ID,
+        currency_id: state.currentCurrency?.id || 1,
         invoice_no: generateInvoiceNo(),
         customer_id: customerId || null,
-        items: state.cart,
+        items: state.cart.map(item => ({
+            product_id: item.id,
+            product_name: item.name,
+            quantity: item.quantity,
+            unit_price: item.price,
+            total: item.total
+        })),
         subtotal: totals.subtotal,
         discount: totals.discount,
         vat: totals.vat,
@@ -460,16 +651,23 @@ async function processCheckout() {
         paid: paidAmount,
         change: change,
         payment_method: state.paymentMethod,
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toISOString()
     };
     
     // Try to save to server
     if (navigator.onLine) {
         try {
             await postAPI('/sales', saleData);
+            showToast('বিক্রি সম্পন্ন!');
         } catch (e) {
-            console.log('Could not save to server, storing locally');
+            // Save offline
+            savePendingSync(saleData);
+            showToast('অফলাইনে সেভ হয়েছে! (সিঙ্ক হবে অনলাইনে)');
         }
+    } else {
+        // Save offline
+        savePendingSync(saleData);
+        showToast('অফলাইনে সেভ হয়েছে!');
     }
     
     // Update local stock
@@ -607,4 +805,86 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// ==========================================
+// Settings
+// ==========================================
+function showSettings() {
+    const lastSync = localStorage.getItem('pos_last_sync');
+    const content = `
+        <div class="settings-content">
+            <div class="settings-section">
+                <h4>🔄 সিঙ্ক স্ট্যাটাস</h4>
+                <div class="settings-item">
+                    <span class="settings-item-label">স্ট্যাটাস</span>
+                    <span class="settings-item-value">${navigator.onLine ? '🟢 অনলাইন' : '🔴 অফলাইন'}</span>
+                </div>
+                <div class="settings-item">
+                    <span class="settings-item-label">শেষ সিঙ্ক</span>
+                    <span class="settings-item-value">${lastSync ? new Date(lastSync).toLocaleString('bn-BD') : 'কখনো হয়নি'}</span>
+                </div>
+                <div class="settings-item">
+                    <span class="settings-item-label">পেন্ডিং সিঙ্ক</span>
+                    <span class="settings-item-value">${state.pendingSync.length}টি</span>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h4>🏪 স্টোর</h4>
+                <div class="settings-item">
+                    <span class="settings-item-label">স্টোর আইডি</span>
+                    <span class="settings-item-value">${DEFAULT_STORE_ID}</span>
+                </div>
+                <div class="settings-item">
+                    <span class="settings-item-label">ডিভাইস আইডি</span>
+                    <span class="settings-item-value" style="font-size: 10px; word-break: break-all;">${state.deviceId}</span>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h4>💱 মুদ্রা</h4>
+                ${state.currencies.map(c => `
+                    <div class="settings-item">
+                        <span class="settings-item-label">${c.symbol} ${c.code}</span>
+                        <span class="settings-item-value">${c.name}</span>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%;" onclick="syncPush(); closeModal();">
+                🔄 সিঙ্ক করুন
+            </button>
+        </div>
+    `;
+    
+    showModal('⚙️ সেটিংস', content, () => {});
+}
+
+// ==========================================
+// Currency Helper
+// ==========================================
+function getCurrencySymbol() {
+    return state.currentCurrency?.symbol || '৳';
+}
+
+// ==========================================
+// Currency Rendering
+// ==========================================
+function renderCurrencies() {
+    const container = document.getElementById('currencySelector');
+    if (!container || state.currencies.length === 0) return;
+    
+    container.innerHTML = state.currencies.map(c => `
+        <button class="currency-btn ${state.currentCurrency?.id === c.id ? 'active' : ''}" 
+                onclick="selectCurrency(${c.id})">
+            ${c.symbol} ${c.code}
+        </button>
+    `).join('');
+}
+
+function selectCurrency(currencyId) {
+    state.currentCurrency = state.currencies.find(c => c.id === currencyId);
+    renderCurrencies();
+    renderProducts();
 }

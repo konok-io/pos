@@ -1,149 +1,97 @@
-# POS Management System - Laravel Version
+# POS Management System v2.0
 
 একটি আধুনিক, দ্রুত এবং অফলাইন-সাপোর্টেড POS সিস্টেম।
 
-## 🚀 বৈশিষ্ট্য
+## ✨ বৈশিষ্ট্য
 
-- ✅ **দ্রুত** - লোকাল হোস্টে instant রেসপন্স
-- ✅ **PWA** - উইন্ডোজ/ম্যাক অ্যাপ হিসেবে ইনস্টল করুন
-- ✅ **অফলাইন** - ইন্টারনেট ছাড়া কাজ করে
-- ✅ **আধুনিক UI** - সুন্দর এবং রেসপন্সিভ
-- ✅ **বাংলায়** - সম্পূর্ণ বাংলা ইন্টারফেস
+| ফিচার | বিবরণ |
+|-------|--------|
+| 💱 Multi-Currency | BDT, USD, EUR সাপোর্ট |
+| 🏪 Multi-Store | একাধিক শাখা পরিচালনা |
+| 🔄 Online + Offline Sync | IndexedDB + স্বয়ংক্রিয় সিঙ্ক |
+| 📱 PWA | ওয়েব অ্যাপ হিসেবে ইনস্টল |
+| ⚡ Fast | React + TypeScript |
 
-## 📦 ইনস্টলেশন (Laragon)
-
-### ধাপ ১: Laragon সেটআপ
-```
-আপনার Laragon ইতিমধ্যে কনফিগ করা আছে:
-- Virtual Host: pos.test
-- Document Root: C:/laragon/www/pos
-```
-
-### ধাপ ২: ক্লোন করুন
-```bash
-cd C:/laragon/www
-rm -rf pos
-git clone https://github.com/konok-io/pos.git
-cd pos
-```
-
-### ধাপ ৩: Composer ইনস্টল
-```bash
-composer install
-```
-
-### ধাপ ৪: এনভায়রনমেন্ট
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-### ধাপ ৫: ডাটাবেস
-```bash
-php artisan migrate
-php artisan db:seed
-```
-
-### ধাপ ৬: চালান
-```
-ব্রাউজারে যান: http://pos.test
-```
-
-## 📱 ডেস্কটপ অ্যাপ হিসেবে ইনস্টল
-
-1. Chrome/Edge-এ pos.test খুলুন
-2. Address Bar-এ "ইনস্টল" বাটন দেখা যাবে
-3. ক্লিক করুন - অ্যাপ ইনস্টল হয়ে যাবে!
-4. Desktop থেকে চালান যাবে
-
-## 🖥️ স্ক্রিনশট
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  💼 POS          🔍 পণ্য খুঁজুন...         👤 অ্যাডমিন │
-├────────┬────────────────────────────┬───────────────────┤
-│ক্যাটাগরি│ পণ্য তালিকা                 │ 🛒 কার্ট          │
-│        │ ┌────┐ ┌────┐ ┌────┐ ┌────┐ │                   │
-│📦 সব   │ │🍚  │ │🍛  │ │🍗  │ │🍜  │ │  সাদা ভাত  ৳120  │
-│🍔 খাবার│ │৳120│ │৳150│ │৳200│ │৳130│ │                   │
-│🥤 পানীয়│ └────┘ └────┘ └────┘ └────┘ │  পোলাও     ৳150  │
-│🛒 প্রয়ো.│ ┌────┐ ┌────┐ ┌────┐ ┌────┐ │                   │
-│        │ │🥤  │ │🥤  │ │☕  │ │💧  │ │  ─────────────────│
-│        │ │৳30 │ │৳25 │ │৳15 │ │৳20 │ │  মোট: ৳270        │
-└────────┴────────────────────────────┴───────────────────┘
-```
-
-## 📂 প্রজেক্ট স্ট্রাকচার
+## 📂 প্রোজেক্ট স্ট্রাকচার
 
 ```
 pos/
-├── app/
-│   ├── Http/Controllers/Api/    # API Controllers
-│   └── Models/                  # Eloquent Models
-├── database/
-│   └── migrations/              # Database Migrations
-├── public/
-│   ├── assets/                  # CSS & JS
-│   ├── icons/                   # App Icons
-│   ├── manifest.json            # PWA Manifest
-│   ├── sw.js                    # Service Worker
-│   └── index.html               # Main App
-├── resources/views/             # Blade Templates
-├── routes/
-│   ├── api.php                  # API Routes
-│   └── web.php                  # Web Routes
-├── composer.json
-└── .env
+├── server/                 # Node.js/Express Backend
+│   ├── src/
+│   │   └── routes/       # API Routes
+│   ├── prisma/           # PostgreSQL Schema
+│   └── package.json
+├── client/                # React/TypeScript Frontend
+│   ├── src/
+│   │   ├── pages/        # POS, Dashboard
+│   │   ├── store/         # Zustand stores
+│   │   └── services/      # API & Offline sync
+│   ├── vite.config.ts     # PWA config
+│   └── package.json
+└── README.md
+```
+
+## 🚀 সেটআপ (Laragon + SQLite)
+
+**SQLite = কোনো ডাটাবেস সার্ভার লাগবে না! শুধু একটি ফাইল।**
+
+### ধাপ ১: Laragon Virtual Host
+```
+Menu → Apache/NGINX → Site Enabled → pos.test
+Document Root: C:/laragon/www/pos/client
+```
+
+### ধাপ ২: Backend সেটআপ
+```bash
+cd C:/laragon/www/pos/server
+npm install
+npx prisma generate
+npx prisma db push
+npm run db:seed
+npm run dev
+# চলবে http://localhost:3000
+```
+
+### ধাপ ৩: Frontend সেটআপ
+```bash
+cd C:/laragon/www/pos/client
+npm install
+npm run dev
+# চলবে http://localhost:5173
+```
+
+### ধাপ ৪: ব্রাউজারে খুলুন
+```
+http://pos.test
 ```
 
 ## 🛠️ API Endpoints
 
 | Method | Endpoint | বিবরণ |
 |--------|----------|-------|
-| GET | /api/products | সব পণ্য |
-| POST | /api/products | নতুন পণ্য |
-| GET | /api/sales | সব বিক্রয় |
+| GET | /api/products | পণ্য তালিকা |
 | POST | /api/sales | নতুন বিক্রয় |
-| GET | /api/categories | ক্যাটাগরি |
+| GET | /api/stores | স্টোর তালিকা |
+| GET | /api/currencies | মুদ্রা তালিকা |
+| POST | /api/currencies/convert | মুদ্রা কনভার্ট |
+| GET | /api/sync/pull/:storeId | পুল ডেটা |
+| POST | /api/sync/push/:storeId | পুশ সেলস |
+| GET | /api/reports/dashboard | ড্যাশবোর্ড |
 
-## 🔧 কমান্ড
+## 📋 প্রযুক্তিসমূহ
 
-```bash
-# সার্ভার চালান
-php artisan serve
+### Backend
+- Node.js + Express
+- Prisma ORM
+- **SQLite** (ফাইল-বেসড, কোনো সার্ভার লাগবে না!)
+- JWT Auth
 
-# মাইগ্রেশন
-php artisan migrate
-
-# সিড ডাটা
-php artisan db:seed
-
-# ক্লিয়ার ক্যাশ
-php artisan cache:clear
-
-# কনফিগ ক্যাশ
-php artisan config:cache
-```
-
-## 📋 প্রয়োজনীয় প্যাকেজ
-
-- Laravel 11
-- PHP 8.2+
-- SQLite/MySQL/PostgreSQL
-
-## 🌐 অফলাইন ফিচার
-
-- Service Worker ক্যাশ করে static assets
-- API requests সার্ভারে না থাকলে cached data দেখায়
-- অফলাইন পেজ দেখায় যখন সার্ভার unreachable
-
-## 🎯 ভবিষ্যতের পরিকল্পনা
-
-- [ ] Multi-store সাপোর্ট
-- [ ] Multi-currency সাপোর্ট
-- [ ] Real-time sync
-- [ ] Advanced reports
-- [ ] AI-based suggestions
+### Frontend
+- React 18
+- TypeScript
+- Zustand (State)
+- Vite + PWA
+- IndexedDB (Offline)
 
 ## 📄 লাইসেন্স
 
@@ -151,4 +99,4 @@ MIT License
 
 ---
 
-💼 **POS Management System** - বিক্রয়, স্টক ও হিসাব ব্যবস্থাপনা
+💼 **POS Management System v2.0** - আধুনিক POS সলিউশন

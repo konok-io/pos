@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #e94560;
+  --secondary: #0f3460;
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #ef4444;
+}
+
+body {
+  font-family: 'Hind Siliguri', sans-serif;
+  background: #1a1a2e;
+  color: #ffffff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #16213e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+
+/* Product card */
+.product-card {
+  @apply bg-slate-800 rounded-xl p-4 cursor-pointer transition-all duration-200;
+}
+
+.product-card:hover {
+  @apply bg-slate-700 transform -translate-y-1 shadow-lg;
+}
+
+.product-card.low-stock {
+  @apply border-2 border-red-500;
+}
+
+/* Cart item */
+.cart-item {
+  @apply flex items-center gap-3 p-3 bg-slate-800 rounded-lg;
+}
+
+/* Toast */
+.toast {
+  @apply fixed bottom-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full shadow-lg z-50;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Button styles */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.btn-primary {
+  @apply bg-pink-500 hover:bg-pink-600 text-white;
+}
+
+.btn-secondary {
+  @apply bg-slate-700 hover:bg-slate-600 text-white;
+}
+
+/* Modal */
+.modal-overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4;
+}
+
+/* Offline indicator */
+.status-dot {
+  @apply w-3 h-3 rounded-full;
+}
+
+.status-dot.online {
+  @apply bg-green-500;
+}
+
+.status-dot.offline {
+  @apply bg-red-500;
+}
+
+/* Currency selector */
+.currency-btn {
+  @apply px-3 py-1 rounded-full text-sm transition-all duration-200;
+}
+
+.currency-btn.active {
+  @apply bg-pink-500 text-white;
+}

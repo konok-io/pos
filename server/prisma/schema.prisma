@@ -1,0 +1,304 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// =====================
+// STORES (Multi-Tenant)
+// =====================
+model Store {
+  id            String   @id @default(uuid())
+  name          String
+  code          String   @unique
+  address       String?
+  phone         String?
+  email         String?
+  isActive      Boolean  @default(true)
+  settings      Json?
+  invoicePrefix String   @default("INV")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users         User[]
+  categories    Category[]
+  products      Product[]
+  customers     Customer[]
+  suppliers     Supplier[]
+  sales         Sale[]
+  purchases     Purchase[]
+  expenses      Expense[]
+  currencies    StoreCurrency[]
+
+  @@map("stores")
+}
+
+// =====================
+// CURRENCIES (Multi-Currency)
+// =====================
+model Currency {
+  id            String   @id @default(uuid())
+  code          String   @unique // BDT, USD, EUR
+  name          String
+  symbol        String
+  exchangeRate  Float    @default(1)
+  isBase        Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  decimalPlaces Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  storeCurrencies StoreCurrency[]
+
+  @@map("currencies")
+}
+
+// Store-specific currency rates
+model StoreCurrency {
+  id         String   @id @default(uuid())
+  storeId    String
+  currencyId String
+  rate       Float    @default(1)
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  store    Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  currency Currency @relation(fields: [currencyId], references: [id], onDelete: Cascade)
+
+  @@unique([storeId, currencyId])
+  @@map("store_currencies")
+}
+
+// =====================
+// USERS
+// =====================
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      String   @default("cashier") // admin, manager, cashier
+  storeId   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store Store? @relation(fields: [storeId], references: [id])
+  sales Sale[]
+
+  @@map("users")
+}
+
+// =====================
+// CATEGORIES
+// =====================
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  icon      String?
+  storeId   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@map("categories")
+}
+
+// =====================
+// PRODUCTS
+// =====================
+model Product {
+  id           String   @id @default(uuid())
+  name         String
+  code         String
+  barcode      String?
+  description  String?
+  categoryId   String?
+  storeId      String
+  costPrice    Float
+  sellPrice    Float
+  stock        Int      @default(0)
+  unit         String?
+  image        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  category  Category?    @relation(fields: [categoryId], references: [id])
+  store     Store        @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  saleItems SaleItem[]
+  purchaseItems PurchaseItem[]
+
+  @@unique([storeId, code])
+  @@map("products")
+}
+
+// =====================
+// CUSTOMERS
+// =====================
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  balance   Float    @default(0)
+  storeId   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  sales Sale[]
+
+  @@map("customers")
+}
+
+// =====================
+// SUPPLIERS
+// =====================
+model Supplier {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  balance   Float    @default(0)
+  storeId   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store     Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  purchases Purchase[]
+
+  @@map("suppliers")
+}
+
+// =====================
+// SALES
+// =====================
+model Sale {
+  id              String   @id @default(uuid())
+  invoiceNo       String   @unique
+  storeId         String
+  userId          String?
+  customerId      String?
+  currencyId      String?
+  subtotal        Float
+  discount        Float    @default(0)
+  vat             Float    @default(0)
+  total           Float
+  paid            Float
+  change          Float    @default(0)
+  paymentMethod   String   @default("CASH")
+  status          String   @default("COMPLETED")
+  offlineId       String?  @unique
+  deviceId        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  store    Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  user     User?      @relation(fields: [userId], references: [id])
+  customer Customer?  @relation(fields: [customerId], references: [id])
+  currency Currency?  @relation(fields: [currencyId], references: [id])
+  items    SaleItem[]
+
+  @@map("sales")
+}
+
+model SaleItem {
+  id          String  @id @default(uuid())
+  saleId      String
+  productId   String
+  productName String
+  quantity    Int
+  unitPrice   Float
+  total       Float
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("sale_items")
+}
+
+// =====================
+// PURCHASES
+// =====================
+model Purchase {
+  id              String   @id @default(uuid())
+  invoiceNo       String   @unique
+  storeId         String
+  supplierId      String?
+  currencyId      String?
+  subtotal        Float
+  discount        Float    @default(0)
+  total           Float
+  paid            Float    @default(0)
+  paymentMethod   String   @default("CASH")
+  status          String   @default("COMPLETED")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  store    Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  supplier Supplier?       @relation(fields: [supplierId], references: [id])
+  currency Currency?       @relation(fields: [currencyId], references: [id])
+  items    PurchaseItem[]
+
+  @@map("purchases")
+}
+
+model PurchaseItem {
+  id          String  @id @default(uuid())
+  purchaseId  String
+  productId   String
+  productName String
+  quantity    Int
+  unitPrice   Float
+  total       Float
+
+  purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id])
+
+  @@map("purchase_items")
+}
+
+// =====================
+// EXPENSES
+// =====================
+model Expense {
+  id        String   @id @default(uuid())
+  title     String
+  amount    Float
+  category  String?
+  storeId   String
+  note      String?
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  @@map("expenses")
+}
+
+// =====================
+// SETTINGS
+// =====================
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}

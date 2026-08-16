@@ -40,13 +40,16 @@
                 </div>
             </div>
             <div class="header-right">
+                <div class="currency-selector" id="currencySelector">
+                    <!-- Currency buttons will be rendered here -->
+                </div>
                 <button class="icon-btn" id="offlineIndicator" title="অনলাইন">
                     <span class="status-dot online"></span>
                 </button>
                 <button class="icon-btn" id="installBtn" title="অ্যাপ ইনস্টল করুন" style="display: none;">
                     📲
                 </button>
-                <button class="icon-btn" title="সেটিংস">
+                <button class="icon-btn" title="সেটিংস" onclick="showSettings()">
                     ⚙️
                 </button>
                 <div class="user-menu">
@@ -288,10 +291,10 @@
         });
 
         // Offline indicator
-        const offlineIndicator = document.getElementById('offlineIndicator');
-        
         function updateOnlineStatus() {
-            const dot = offlineIndicator.querySelector('.status-dot');
+            const indicator = document.getElementById('offlineIndicator');
+            if (!indicator) return;
+            const dot = indicator.querySelector('.status-dot');
             if (navigator.onLine) {
                 dot.className = 'status-dot online';
                 dot.title = 'অনলাইন';

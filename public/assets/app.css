@@ -987,3 +987,87 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--text-muted);
 }
+
+/* ==========================================
+   Currency Selector
+   ========================================== */
+.currency-selector {
+    display: flex;
+    gap: 6px;
+    padding: 4px;
+    background: var(--bg-card);
+    border-radius: 50px;
+}
+
+.currency-btn {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 50px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.currency-btn:hover {
+    background: var(--bg-darker);
+    color: var(--text-primary);
+}
+
+.currency-btn.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+}
+
+/* Sync Badge */
+.sync-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--warning);
+    color: #000;
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 10px;
+    font-weight: 600;
+    display: none;
+}
+
+/* Settings Modal */
+.settings-content {
+    padding: 20px;
+}
+
+.settings-section {
+    margin-bottom: 24px;
+}
+
+.settings-section h4 {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+}
+
+.settings-item-label {
+    font-size: 14px;
+}
+
+.settings-item-value {
+    color: var(--text-muted);
+    font-size: 13px;
+}
