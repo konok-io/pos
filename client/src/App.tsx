@@ -321,6 +321,29 @@ export default function App() {
   const { language, setLanguage, t, currentLang } = useLanguage();
   const [showLangDropdown, setShowLangDropdown] = useState(false);
 
+  // Demo data
+  const demoCategories: Category[] = [
+    { id: 'cat-food', name: 'Food', icon: '🍔' },
+    { id: 'cat-drinks', name: 'Drinks', icon: '🥤' },
+    { id: 'cat-essentials', name: 'Essentials', icon: '🛒' },
+  ];
+
+  const demoProducts: Product[] = [
+    { id: 'p1', name: 'White Rice', code: 'RICE001', costPrice: 80, sellPrice: 120, stock: 50, unit: 'Plate', categoryId: 'cat-food', supplier: 'Food Supplier', image: '🍚' },
+    { id: 'p2', name: 'Polao', code: 'RICE002', costPrice: 100, sellPrice: 150, stock: 30, unit: 'Plate', categoryId: 'cat-food', supplier: 'Food Supplier', image: '🍛' },
+    { id: 'p3', name: 'Chicken Curry', code: 'CHK001', costPrice: 130, sellPrice: 200, stock: 25, unit: 'Pieces', categoryId: 'cat-food', supplier: 'Food Supplier', image: '🍗' },
+    { id: 'p4', name: 'Coca Cola', code: 'COKE001', costPrice: 20, sellPrice: 30, stock: 100, unit: 'Bottle', categoryId: 'cat-drinks', supplier: 'Drinks Supplier', image: '🥤' },
+    { id: 'p5', name: 'Pepsi', code: 'PEP001', costPrice: 15, sellPrice: 25, stock: 80, unit: 'Bottle', categoryId: 'cat-drinks', supplier: 'Drinks Supplier', image: '🥤' },
+    { id: 'p6', name: 'Tea', code: 'TEA001', costPrice: 8, sellPrice: 15, stock: 200, unit: 'Cup', categoryId: 'cat-drinks', supplier: 'Tea Supplier', image: '☕' },
+    { id: 'p7', name: 'Soap', code: 'SOAP001', costPrice: 30, sellPrice: 45, stock: 50, unit: 'Pieces', categoryId: 'cat-essentials', supplier: 'Goods Supplier', image: '🧼' },
+    { id: 'p8', name: 'Shampoo', code: 'SHAM001', costPrice: 100, sellPrice: 150, stock: 30, unit: 'Bottle', categoryId: 'cat-essentials', supplier: 'Goods Supplier', image: '🧴' },
+  ];
+
+  const demoCustomers: Customer[] = [
+    { id: 'c1', name: 'Rahim', phone: '01712345678', address: 'Dhaka', balance: 0 },
+    { id: 'c2', name: 'Karim', phone: '01812345678', address: 'Chittagong', balance: 500 },
+  ];
+
   // Tabs configuration - matching old design
   const otherTabs = [
     { id: 'products', icon: '📦', label: t('products') },
@@ -350,9 +373,9 @@ export default function App() {
   };
 
   // Data states
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [products, setProducts] = useState<Product[]>(demoProducts);
+  const [categories, setCategories] = useState<Category[]>(demoCategories);
+  const [customers, setCustomers] = useState<Customer[]>(demoCustomers);
   const [sales, setSales] = useState<Sale[]>([]);
 
   // Cart state
@@ -377,43 +400,6 @@ export default function App() {
     }
     setIsLoading(false);
   }, []);
-
-  // Load demo data
-  useEffect(() => {
-    if (isLoggedIn) {
-      loadDemoData();
-    }
-  }, [isLoggedIn]);
-
-  const loadDemoData = () => {
-    // Demo categories
-    const demoCategories: Category[] = [
-      { id: 'cat-food', name: 'খাবার', icon: '🍔' },
-      { id: 'cat-drinks', name: 'পানীয়', icon: '🥤' },
-      { id: 'cat-essentials', name: 'প্রয়োজনীয়', icon: '🛒' },
-    ];
-    setCategories(demoCategories);
-
-    // Demo products
-    const demoProducts: Product[] = [
-      { id: 'p1', name: 'সাদা ভাত', code: 'RICE001', costPrice: 80, sellPrice: 120, stock: 50, unit: 'প্লেট', categoryId: 'cat-food', supplier: 'খাবার সরবরাহকারী', image: '🍚' },
-      { id: 'p2', name: 'পোলাও', code: 'RICE002', costPrice: 100, sellPrice: 150, stock: 30, unit: 'প্লেট', categoryId: 'cat-food', supplier: 'খাবার সরবরাহকারী', image: '🍛' },
-      { id: 'p3', name: 'চিকেন কর্ন', code: 'CHK001', costPrice: 130, sellPrice: 200, stock: 25, unit: 'পিস', categoryId: 'cat-food', supplier: 'খাবার সরবরাহকারী', image: '🍗' },
-      { id: 'p4', name: 'কোকা কোলা', code: 'COKE001', costPrice: 20, sellPrice: 30, stock: 100, unit: 'বোতল', categoryId: 'cat-drinks', supplier: 'পানীয় সরবরাহকারী', image: '🥤' },
-      { id: 'p5', name: 'পেপসি', code: 'PEP001', costPrice: 15, sellPrice: 25, stock: 80, unit: 'বোতল', categoryId: 'cat-drinks', supplier: 'পানীয় সরবরাহকারী', image: '🥤' },
-      { id: 'p6', name: 'চা', code: 'TEA001', costPrice: 8, sellPrice: 15, stock: 200, unit: 'কাপ', categoryId: 'cat-drinks', supplier: 'চা সরবরাহকারী', image: '☕' },
-      { id: 'p7', name: 'সাবান', code: 'SOAP001', costPrice: 30, sellPrice: 45, stock: 50, unit: 'পিস', categoryId: 'cat-essentials', supplier: 'পণ্য সরবরাহকারী', image: '🧼' },
-      { id: 'p8', name: 'শ্যাম্পু', code: 'SHAM001', costPrice: 100, sellPrice: 150, stock: 30, unit: 'বোতল', categoryId: 'cat-essentials', supplier: 'পণ্য সরবরাহকারী', image: '🧴' },
-    ];
-    setProducts(demoProducts);
-
-    // Demo customers
-    const demoCustomers: Customer[] = [
-      { id: 'c1', name: 'রহিম উদ্দিন', phone: '01712345678', address: 'ঢাকা', balance: 0 },
-      { id: 'c2', name: 'করিম শেখ', phone: '01812345678', address: 'চট্টগ্রাম', balance: 500 },
-    ];
-    setCustomers(demoCustomers);
-  };
 
   const handleLogin = () => setIsLoggedIn(true);
 
