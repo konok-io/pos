@@ -24,6 +24,7 @@ interface Product {
   stock: number;
   unit: string;
   categoryId: string;
+  supplier: string;
   image: string;
 }
 
@@ -348,6 +349,7 @@ export default function App() {
   const [paidAmount, setPaidAmount] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSupplier, setSelectedSupplier] = useState('all');
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
 
@@ -420,11 +422,12 @@ export default function App() {
   // Filter products
   const filteredProducts = products.filter(p => {
     const matchCategory = selectedCategory === 'all' || p.categoryId === selectedCategory;
+    const matchSupplier = selectedSupplier === 'all' || (p.supplier || '') === selectedSupplier;
     const matchSearch = !searchQuery || 
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.code.toLowerCase().includes(searchQuery.toLowerCase());
     const hasStock = p.stock > 0;
-    return matchCategory && matchSearch && hasStock;
+    return matchCategory && matchSupplier && matchSearch && hasStock;
   });
 
   // Add to cart
@@ -644,20 +647,30 @@ export default function App() {
           <div style={{ display: 'flex', height: '100%', overflow: 'hidden', width: '100%', background: '#F9FAFB' }}>
             {/* -- LEFT: Products -- */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-              {/* Product name search */}
+              {/* Search Row */}
               <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center' }}>
+                {/* Barcode Scan */}
+                <div style={{ position: 'relative', flex: '0 0 130px' }}>
+                  <span style={{ position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 13 }}>📊</span>
+                  <input
+                    placeholder="বারকোড স্ক্যান"
+                    style={{ width: '100%', paddingLeft: 28, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                
+                {/* Product Name Search */}
                 <div style={{ position: 'relative', flex: 1 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="পণ্যের নাম বা বারকোড..."
+                    placeholder="পণ্যের নাম লিখুন..."
                     style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 14, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
               </div>
 
-              {/* Filter row */}
+              {/* Filter Row */}
               <div style={{ padding: '6px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                 {/* Left: Stock summary */}
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -672,16 +685,29 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Right: Category dropdown */}
+                {/* Right: Category & Supplier dropdowns */}
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {/* Category */}
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    style={{ borderRadius: 7, padding: '6px 10px', fontSize: 14, height: 32, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none' }}
+                    style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 32, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 110 }}
                   >
-                    <option value="all">সব ক্যাটাগরি</option>
+                    <option value="all">📁 ক্যাটাগরি</option>
                     {categories.map(cat => (
                       <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))}
+                  </select>
+                  
+                  {/* Supplier */}
+                  <select
+                    value={selectedSupplier}
+                    onChange={(e) => setSelectedSupplier(e.target.value)}
+                    style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 32, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 110 }}
+                  >
+                    <option value="all">🏢 সরবরাহকারী</option>
+                    {[...new Set(products.map(p => p.supplier || 'অন্যান্য'))].map(s => (
+                      <option key={s} value={s}>{s}</option>
                     ))}
                   </select>
                 </div>
@@ -705,7 +731,7 @@ export default function App() {
                     </svg>
                     <div style={{ padding: '16px', textAlign: 'center' }}>
                       <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 600 }}>পণ্যের নাম বা বারকোড দিয়ে খুঁজুন</div>
-                      <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>অথবা ক্যাটাগরি সিলেক্ট করুন</div>
+                      <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>অথবা ক্যাটাগরি/সরবরাহকারী সিলেক্ট করুন</div>
                     </div>
                   </div>
                 ) : (
