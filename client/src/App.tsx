@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
+import { useLanguage, languages } from './i18n';
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
@@ -314,18 +315,22 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState('pos');
 
+  // Language state
+  const { language, setLanguage, t, currentLang } = useLanguage();
+  const [showLangDropdown, setShowLangDropdown] = useState(false);
+
   // Tabs configuration - matching old design
   const otherTabs = [
-    { id: 'products', icon: '📦', label: 'সকল পণ্য' },
-    { id: 'newproduct', icon: '➕', label: 'নতুন পণ্য' },
-    { id: 'barcode', icon: '📊', label: 'বারকোড' },
-    { id: 'suppliers', icon: '🏢', label: 'সরবরাহকারী' },
-    { id: 'customers', icon: '👥', label: 'কাস্টমার' },
-    { id: 'inventory', icon: '🏭', label: 'স্টক' },
-    { id: 'lowstock', icon: '⚠️', label: 'স্টক কম' },
-    { id: 'income', icon: '💰', label: 'আয়/ব্যয়' },
-    { id: 'reports', icon: '📊', label: 'রিপোর্ট' },
-    { id: 'settings', icon: '⚙️', label: 'সেটিংস' },
+    { id: 'products', icon: '📦', label: t('products') },
+    { id: 'newproduct', icon: '➕', label: t('addProduct') },
+    { id: 'barcode', icon: '📊', label: t('barcode') },
+    { id: 'suppliers', icon: '🏢', label: t('suppliers') },
+    { id: 'customers', icon: '👥', label: t('customers') },
+    { id: 'inventory', icon: '🏭', label: t('stock') },
+    { id: 'lowstock', icon: '⚠️', label: t('stockLow') },
+    { id: 'income', icon: '💰', label: t('expenses') },
+    { id: 'reports', icon: '📊', label: t('reports') },
+    { id: 'settings', icon: '⚙️', label: t('settings') },
   ];
 
   // Menu scroll ref
@@ -565,14 +570,14 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
             <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}>🏪</div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 22, color: '#111827', lineHeight: 1.2 }}>POS সিস্টেম</div>
-              <div style={{ fontSize: 14, color: '#9CA3AF' }}>POS ম্যানেজমেন্ট সিস্টেম</div>
+              <div style={{ fontWeight: 800, fontSize: 22, color: '#111827', lineHeight: 1.2 }}>{t('posSystem')}</div>
+              <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('posManagement')}</div>
             </div>
           </div>
           
           {/* Dynamic Menu - Scrollable */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 30, marginRight: 22, minWidth: 0, flex: 1 }}>
-            {/* Fixed First Item (বিক্রয়) - Separate container */}
+            {/* Fixed First Item (Sales) - Separate container */}
             <div style={{ flexShrink: 0, padding: '4px 6px 4px 4px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E5E7EB', marginRight: 4, boxShadow: '2px 0 8px rgba(0,0,0,0.05)' }}>
               <button onClick={() => setCurrentTab('pos')} style={{
                 padding: '7px 12px',
@@ -592,7 +597,7 @@ export default function App() {
                 boxShadow: currentTab === 'pos' ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
               }}>
                 <span style={{ fontSize: 16 }}>🛒</span>
-                <span>বিক্রয়</span>
+                <span>{t('sales')}</span>
               </button>
             </div>
 
@@ -640,6 +645,73 @@ export default function App() {
             {/* Fullscreen Button */}
             <button onClick={handleFullscreen} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="⛶ ফুল স্ক্রিন">⛶</button>
             
+            {/* Language Selector */}
+            <div style={{ position: 'relative' }}>
+              <button 
+                onClick={() => setShowLangDropdown(!showLangDropdown)}
+                style={{ 
+                  height: 34, 
+                  padding: '0 12px', 
+                  borderRadius: 8, 
+                  border: '1px solid #e5e7eb', 
+                  background: '#FFFFFF', 
+                  cursor: 'pointer', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 6, 
+                  fontSize: 14, 
+                  fontWeight: 600,
+                  transition: 'all 0.2s', 
+                  color: '#4B5563' 
+                }}
+              >
+                🌐 {currentLang.flag} {currentLang.nativeName}
+              </button>
+              {showLangDropdown && (
+                <div style={{ 
+                  position: 'absolute', 
+                  top: '100%', 
+                  right: 0, 
+                  marginTop: 4, 
+                  background: '#FFFFFF', 
+                  border: '1px solid #e5e7eb', 
+                  borderRadius: 8, 
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)', 
+                  zIndex: 100,
+                  minWidth: 140,
+                  overflow: 'hidden'
+                }}>
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        setLanguage(lang.code);
+                        setShowLangDropdown(false);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        border: 'none',
+                        background: language === lang.code ? '#F0FDFA' : '#FFFFFF',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        fontSize: 14,
+                        fontWeight: language === lang.code ? 600 : 400,
+                        color: language === lang.code ? '#0F766E' : '#4B5563',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.nativeName}</span>
+                      {language === lang.code && <span style={{ marginLeft: 'auto' }}>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
             {/* Logout Button */}
             <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="লগআউট">↩️</button>
 
@@ -661,7 +733,7 @@ export default function App() {
                 <div style={{ position: 'relative', flex: '1 1 200px' }}>
                   <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 14 }}>📊</span>
                   <input
-                    placeholder="বারকোড স্ক্যান করুন..."
+                    placeholder={t('barcodePlaceholder')}
                     style={{ width: '100%', paddingLeft: 36, height: 38, fontSize: 14, borderRadius: 8, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
@@ -672,7 +744,7 @@ export default function App() {
                   <input
                     value={showHeldSales ? '' : searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={showHeldSales ? 'হোল্ড সেল...' : 'পণ্যের নাম লিখুন...'}
+                    placeholder={showHeldSales ? t('holdSales') + '...' : t('searchProduct')}
                     disabled={showHeldSales}
                     style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
@@ -685,7 +757,7 @@ export default function App() {
                   disabled={showHeldSales}
                   style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer' }}
                 >
-                  <option value="all">📁 ক্যাটাগরি</option>
+                  <option value="all">📁 {t('allCategories')}</option>
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
@@ -698,8 +770,8 @@ export default function App() {
                   disabled={showHeldSales}
                   style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer' }}
                 >
-                  <option value="all">🏢 সরবরাহকারী</option>
-                  {[...new Set(products.map(p => p.supplier || 'অন্যান্য'))].map(s => (
+                  <option value="all">🏢 {t('allSuppliers')}</option>
+                  {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
                     <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
@@ -708,13 +780,13 @@ export default function App() {
               {/* Stock Summary Row */}
               <div style={{ padding: '6px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                 <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#F0FDFA', color: '#0F766E', border: '1.5px solid rgba(15,118,110,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
-                  📦 স্টক আছে <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0).length})</span>
+                  📦 {t('stockAvailable')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0).length})</span>
                 </div>
                 <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#FFF7ED', color: '#EA580C', border: '1.5px solid rgba(234,88,12,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
-                  ⚠️ স্টক কম <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0 && p.stock <= 10).length})</span>
+                  ⚠️ {t('stockLow')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0 && p.stock <= 10).length})</span>
                 </div>
                 <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#FEF2F2', color: '#DC2626', border: '1.5px solid rgba(220,38,38,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
-                  ⚠️ স্টক শেষ <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock <= 0).length})</span>
+                  ⚠️ {t('stockOut')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock <= 0).length})</span>
                 </div>
                 <button 
                   onClick={() => setShowHeldSales(!showHeldSales)}
@@ -726,7 +798,7 @@ export default function App() {
                     fontWeight: 600, fontSize: 13, cursor: 'pointer',
                     border: '1px solid ' + (heldSales.length > 0 ? '#0F766E' : '#E5E7EB'),
                   }}>
-                  📋 হোল্ড {heldSales.length > 0 && `(${heldSales.length})`}
+                  📋 {t('hold')} {heldSales.length > 0 && `(${heldSales.length})`}
                 </button>
               </div>
 
@@ -736,15 +808,15 @@ export default function App() {
                 {showHeldSales && (
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                      <h4 style={{ margin: 0, color: '#0F766E', fontSize: 15, fontWeight: 600 }}>📋 হোল্ড সেল ({heldSales.length})</h4>
+                      <h4 style={{ margin: 0, color: '#0F766E', fontSize: 15, fontWeight: 600 }}>📋 {t('holdSales')} ({heldSales.length})</h4>
                       <button onClick={() => setShowHeldSales(false)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #E5E7EB', background: '#fff', cursor: 'pointer', fontSize: 12, color: '#6B7280' }}>
-                        ✕ বন্ধ করুন
+                        ✕ {t('close')}
                       </button>
                     </div>
                     {heldSales.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: 40, background: '#fff', borderRadius: 12 }}>
                         <div style={{ fontSize: 48, marginBottom: 8 }}>📋</div>
-                        <div style={{ color: '#9CA3AF', fontSize: 14 }}>কোনো হোল্ড সেল নেই</div>
+                        <div style={{ color: '#9CA3AF', fontSize: 14 }}>{t('noHoldSales')}</div>
                       </div>
                     ) : (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
@@ -760,7 +832,7 @@ export default function App() {
                             }}
                           >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: '#1F2937' }}>📋 হোল্ড #{idx + 1}</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: '#1F2937' }}>📋 {t('hold')} #{idx + 1}</div>
                               <button 
                                 onClick={() => {
                                   const newHeld = [...heldSales];
@@ -782,7 +854,7 @@ export default function App() {
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, borderTop: '1px solid #E5E7EB' }}>
                               <div style={{ fontSize: 14, fontWeight: 600, color: '#0F766E' }}>
-                                মোট: {fmt(sale.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0))}
+                                {t('total')}: {fmt(sale.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0))}
                               </div>
                               <button 
                                 onClick={() => {
@@ -792,7 +864,7 @@ export default function App() {
                                   });
                                 }}
                                 style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#EA580C', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
-                                ➕ যোগ করুন
+                                ➕ {t('addItems')}
                               </button>
                             </div>
                           </div>
@@ -945,13 +1017,13 @@ export default function App() {
               {/* Cart Header */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 কার্ট</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 {t('cart')}</h3>
                   <span style={{ background: '#111827', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
                 </div>
                 {/* Customer Input */}
                 <div style={{ position: 'relative' }}>
                   <input
-                    placeholder="কাস্টমার খুঁজুন..."
+                    placeholder={t('customerSearch')}
                     style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
@@ -962,8 +1034,8 @@ export default function App() {
                 {cart.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '30px 16px', background: '#FFFFFF', margin: 8, borderRadius: 8, border: '1px solid #e5e7eb' }}>
                     <div style={{ fontSize: 36, marginBottom: 8 }}>🛒</div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#6B7280', marginBottom: 4 }}>কার্ট খালি</div>
-                    <div style={{ fontSize: 15, color: '#9CA3AF' }}>বাম দিক থেকে পণ্য যোগ করুন</div>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: '#6B7280', marginBottom: 4 }}>{t('cartEmpty')}</div>
+                    <div style={{ fontSize: 15, color: '#9CA3AF' }}>{t('addProductsFromLeft')}</div>
                   </div>
                 ) : (
                   <div style={{ padding: '8px 16px' }}>
@@ -994,23 +1066,23 @@ export default function App() {
               <div style={{ padding: '10px 12px', background: '#FFFFFF', borderTop: '1px solid #e5e7eb', flexShrink: 0 }}>
                 <div style={{ border: '1px solid #e5e7eb', borderRadius: 8, overflow: 'hidden', marginBottom: 8 }}>
                   <div style={{ background: '#F3F4F6', padding: '8px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db' }}>
-                    <span style={{ fontSize: 15, color: '#4B5563', fontWeight: 600 }}>সাবটোটাল ({cart.reduce((s, i) => s + i.quantity, 0)} আইটেম)</span>
+                    <span style={{ fontSize: 15, color: '#4B5563', fontWeight: 600 }}>{t('subtotal')} ({cart.reduce((s, i) => s + i.quantity, 0)})</span>
                     <span style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>{fmt(subtotal)}</span>
                   </div>
                   {(parseFloat(discount) || 0) > 0 && (
                     <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db', background: '#F0FDF4' }}>
-                      <span style={{ fontSize: 15, color: '#16A34A' }}>ছাড়</span>
+                      <span style={{ fontSize: 15, color: '#16A34A' }}>{t('discount')}</span>
                       <span style={{ fontSize: 15, fontWeight: 600, color: '#16A34A' }}>−{fmt(parseFloat(discount) || 0)}</span>
                     </div>
                   )}
                   {vatAmount > 0 && (
                     <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db', background: '#FFFBEB' }}>
-                      <span style={{ fontSize: 15, color: '#D97706' }}>ভ্যাট ({vatPercent}%)</span>
+                      <span style={{ fontSize: 15, color: '#D97706' }}>{t('vat')} ({vatPercent}%)</span>
                       <span style={{ fontSize: 15, fontWeight: 600, color: '#D97706' }}>+{fmt(vatAmount)}</span>
                     </div>
                   )}
                   <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#111827' }}>
-                    <span style={{ fontSize: 14, color: '#fff', fontWeight: 700 }}>মোট দেনা</span>
+                    <span style={{ fontSize: 14, color: '#fff', fontWeight: 700 }}>{t('totalDue')}</span>
                     <span style={{ fontSize: 18, color: '#fff', fontWeight: 800 }}>{fmt(total)}</span>
                   </div>
                 </div>
@@ -1018,28 +1090,28 @@ export default function App() {
                 {/* Discount & VAT Inputs */}
                 <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
                   <input value={discount} onChange={(e) => setDiscount(e.target.value)} type="number" min="0"
-                    placeholder="ছাড়"
+                    placeholder={t('discount')}
                     style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#16A34A' }}/>
                   <input value={vatPercent} onChange={(e) => setVatPercent(parseFloat(e.target.value) || 0)} type="number" min="0" max="100"
-                    placeholder="ভ্যাট"
+                    placeholder={t('vat')}
                     style={{ width: 55, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#D97706', textAlign: 'center' }}/>
                 </div>
 
                 {/* Payment Input */}
                 <input value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
-                  placeholder="পরিশোধ (৳)"
+                  placeholder={`${t('paid')} (৳)`}
                   style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 6, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#111827', outline: 'none' }}
                 />
 
                 {/* Due/Change Alert */}
                 {due > 0 && (
                   <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#FEF2F2', color: '#DC2626', fontWeight: 600, textAlign: 'center' }}>
-                    ⚠️ বাকি: {fmt(due)}
+                    ⚠️ {t('due')}: {fmt(due)}
                   </div>
                 )}
                 {change > 0 && (
                   <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#F0FDF4', color: '#16A34A', fontWeight: 600, textAlign: 'center' }}>
-                    💵 ফেরত: {fmt(change)}
+                    💵 {t('change')}: {fmt(change)}
                   </div>
                 )}
 
@@ -1061,7 +1133,7 @@ export default function App() {
                       color: cart.length > 0 ? '#0F766E' : '#9CA3AF',
                       fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
-                    📋 হোল্ড
+                    📋 {t('hold')}
                   </button>
                   <button onClick={handleCheckout}
                     disabled={cart.length === 0}
@@ -1072,7 +1144,7 @@ export default function App() {
                       cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                       boxShadow: cart.length > 0 ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
                     }}>
-                    ✓ বিক্রয় সম্পন্ন
+                    ✓ {t('completeSale')}
                   </button>
                 </div>
               </div>

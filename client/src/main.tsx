@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
+import { LanguageProvider } from './i18n';
 import { initFontDetection } from './utils/fontDetect';
 
 // Simple error boundary component
@@ -68,7 +69,9 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 const root = createRoot(document.getElementById('root')!);
 root.render(
   <ErrorBoundary>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </ErrorBoundary>
 );
 
