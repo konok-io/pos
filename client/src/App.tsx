@@ -1358,7 +1358,6 @@ export default function App() {
           </div>
         )}
       </div>
-    </div>
 
       {/* Receipt Modal */}
       {showReceiptModal && lastSale && (
