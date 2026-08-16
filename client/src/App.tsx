@@ -186,7 +186,6 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState('pos');
 
   // Tabs configuration - matching old design
-  const firstItem = { id: 'pos', icon: '🛒', label: 'বিক্রয়' };
   const otherTabs = [
     { id: 'products', icon: '📦', label: 'সকল পণ্য' },
     { id: 'newproduct', icon: '➕', label: 'নতুন পণ্য' },
