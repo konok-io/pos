@@ -2,96 +2,52 @@
 
 একটি আধুনিক, দ্রুত এবং অফলাইন-সাপোর্টেড POS সিস্টেম।
 
-## ✨ বৈশিষ্ট্য
+---
 
-| ফিচার | বিবরণ |
-|-------|--------|
-| 💱 Multi-Currency | BDT, USD, EUR সাপোর্ট |
-| 🏪 Multi-Store | একাধিক শাখা পরিচালনা |
-| 🔄 Online + Offline Sync | IndexedDB + স্বয়ংক্রিয় সিঙ্ক |
-| 📱 PWA | ওয়েব অ্যাপ হিসেবে ইনস্টল |
-| ⚡ Fast | React + TypeScript |
+## 🚀 সরাসরি চালান (কোনো ইনস্টল লাগবে না!)
 
-## 📂 প্রোজেক্ট স্ট্রাকচার
+**সিঙ্গেল HTML ফাইল - সরাসরি ব্রাউজারে খুলুন:**
+
+```
+public/pos.html
+```
+
+ব্যস! কোনো npm, node, server লাগবে না!
+
+---
+
+## 📱 Feature
+
+- ✅ **সরাসরি চলে** - কোনো ইনস্টল লাগবে না
+- ✅ **অফলাইন** - Internet ছাড়াই কাজ করে
+- ✅ **IndexedDB** - ডেটা সেভ হয়
+- ✅ **আধুনিক UI** - বাংলায়
+- ✅ **POS + ড্যাশবোর্ড** - দুইটি পেজ
+- ✅ **কার্ট সিস্টেম** - add/remove/update
+- ✅ **স্টক ট্র্যাকিং** - automatic
+- ✅ **রিসিট** - বিক্রয়ের পর
+
+---
+
+## 📂 ফাইল স্ট্রাকচার
 
 ```
 pos/
-├── server/                 # Node.js/Express Backend
-│   ├── src/
-│   │   └── routes/       # API Routes
-│   ├── prisma/           # PostgreSQL Schema
-│   └── package.json
-├── client/                # React/TypeScript Frontend
-│   ├── src/
-│   │   ├── pages/        # POS, Dashboard
-│   │   ├── store/         # Zustand stores
-│   │   └── services/      # API & Offline sync
-│   ├── vite.config.ts     # PWA config
-│   └── package.json
-└── README.md
+├── public/
+│   └── pos.html        ← সরাসরি খুলুন!
+├── server/             # (ঐচ্ছিক) Full Stack Version
+└── client/             # (ঐচ্ছিক) React Version
 ```
 
-## 🚀 সেটআপ (Laragon + SQLite)
+---
 
-**SQLite = কোনো ডাটাবেস সার্ভার লাগবে না! শুধু একটি ফাইল।**
+## 💾 ডেটা স্টোরেজ
 
-### ধাপ ১: Laragon Virtual Host
-```
-Menu → Apache/NGINX → Site Enabled → pos.test
-Document Root: C:/laragon/www/pos/client
-```
+- **IndexedDB** - ব্রাউজারে লোকাল স্টোরেজ
+- **Auto-save** - প্রতিটি বিক্রয়ে সেভ হয়
+- **Offline-first** - Internet ছাড়াই কাজ করে
 
-### ধাপ ২: Backend সেটআপ
-```bash
-cd C:/laragon/www/pos/server
-npm install
-npx prisma generate
-npx prisma db push
-npm run db:seed
-npm run dev
-# চলবে http://localhost:3000
-```
-
-### ধাপ ৩: Frontend সেটআপ
-```bash
-cd C:/laragon/www/pos/client
-npm install
-npm run dev
-# চলবে http://localhost:5173
-```
-
-### ধাপ ৪: ব্রাউজারে খুলুন
-```
-http://pos.test
-```
-
-## 🛠️ API Endpoints
-
-| Method | Endpoint | বিবরণ |
-|--------|----------|-------|
-| GET | /api/products | পণ্য তালিকা |
-| POST | /api/sales | নতুন বিক্রয় |
-| GET | /api/stores | স্টোর তালিকা |
-| GET | /api/currencies | মুদ্রা তালিকা |
-| POST | /api/currencies/convert | মুদ্রা কনভার্ট |
-| GET | /api/sync/pull/:storeId | পুল ডেটা |
-| POST | /api/sync/push/:storeId | পুশ সেলস |
-| GET | /api/reports/dashboard | ড্যাশবোর্ড |
-
-## 📋 প্রযুক্তিসমূহ
-
-### Backend
-- Node.js + Express
-- Prisma ORM
-- **SQLite** (ফাইল-বেসড, কোনো সার্ভার লাগবে না!)
-- JWT Auth
-
-### Frontend
-- React 18
-- TypeScript
-- Zustand (State)
-- Vite + PWA
-- IndexedDB (Offline)
+---
 
 ## 📄 লাইসেন্স
 
