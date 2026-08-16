@@ -426,8 +426,8 @@ export default function App() {
     return matchCategory && matchSupplier && matchSearch && hasStock;
   }) : [];
   
-  // Show products grid even when hold sales is open (if there's a filter)
-  const showProductsGrid = hasFilter;
+  // Show products section when: has filter AND cart is empty
+  const showProductsGrid = hasFilter && cart.length === 0;
 
   // Add to cart
   const addToCart = (product: Product) => {
@@ -787,15 +787,19 @@ export default function App() {
 
               {/* Product grid */}
               <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
-                {/* Show Held Sales (only when no filter is active) */}
+                {/* Show Held Sales Header (always when hold is open) */}
+                {showHeldSales && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ margin: 0, color: '#0F766E', fontSize: 15, fontWeight: 600 }}>📋 {t('holdSales')} ({heldSales.length})</h4>
+                    <button onClick={() => setShowHeldSales(false)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #FECACA', background: '#FEF2F2', cursor: 'pointer', fontSize: 12, color: '#DC2626' }}>
+                      ✕ {t('close')}
+                    </button>
+                  </div>
+                )}
+                
+                {/* Show Held Sales Content (only when no filter is active) */}
                 {showHeldSales && !showProductsGrid && (
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                      <h4 style={{ margin: 0, color: '#0F766E', fontSize: 15, fontWeight: 600 }}>📋 {t('holdSales')} ({heldSales.length})</h4>
-                      <button onClick={() => setShowHeldSales(false)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #E5E7EB', background: '#fff', cursor: 'pointer', fontSize: 12, color: '#6B7280' }}>
-                        ✕ {t('close')}
-                      </button>
-                    </div>
                     {heldSales.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: 40, background: '#fff', borderRadius: 12 }}>
                         <div style={{ fontSize: 48, marginBottom: 8 }}>📋</div>
