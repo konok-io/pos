@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './index.css';
 
 // Default admin credentials
@@ -72,10 +72,11 @@ interface Sale {
 // Loading Screen
 function LoadingScreen() {
   return (
-    <div className="loading">
-      <div className="loading-spinner"></div>
-      <h3>POS সিস্টেম</h3>
-      <p>লোড হচ্ছে...</p>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F766E', color: 'white', fontFamily: 'system-ui, sans-serif' }}>
+      <div style={{ width: 60, height: 60, border: '4px solid rgba(255,255,255,0.2)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+      <h3 style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>POS সিস্টেম</h3>
+      <p style={{ marginTop: 8, opacity: 0.8 }}>লোড হচ্ছে...</p>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
@@ -167,12 +168,12 @@ function TimeDisplay() {
   }, []);
 
   return (
-    <div className="time-display">
-      <div className="time">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px', background: 'rgba(15,118,110,0.05)', borderRadius: 10, border: '1px solid #E5E7EB' }}>
+      <div style={{ fontWeight: 700, fontSize: 15, color: '#0F766E' }}>
         {time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
       </div>
-      <div className="date">
-        {time.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
+      <div style={{ fontSize: 11, color: '#9CA3AF' }}>
+        {time.toLocaleDateString('bn-BD', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
       </div>
     </div>
   );
@@ -183,6 +184,34 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState('pos');
+
+  // Tabs configuration - matching old design
+  const tabs = [
+    { id: 'pos', icon: '🛒', label: 'বিক্রয়' },
+    { id: 'products', icon: '📦', label: 'সকল পণ্য' },
+    { id: 'newproduct', icon: '➕', label: 'নতুন পণ্য' },
+    { id: 'barcode', icon: '📊', label: 'বারকোড' },
+    { id: 'suppliers', icon: '🏢', label: 'সরবরাহকারী' },
+    { id: 'customers', icon: '👥', label: 'কাস্টমার' },
+    { id: 'inventory', icon: '🏭', label: 'স্টক' },
+    { id: 'lowstock', icon: '⚠️', label: 'স্টক কম' },
+    { id: 'income', icon: '💰', label: 'আয়/ব্যয়' },
+    { id: 'reports', icon: '📊', label: 'রিপোর্ট' },
+    { id: 'settings', icon: '⚙️', label: 'সেটিংস' },
+  ];
+
+  // Menu scroll ref
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const scrollMenu = (direction: 'left' | 'right') => {
+    if (menuRef.current) {
+      const scrollAmount = 150;
+      menuRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Data states
   const [products, setProducts] = useState<Product[]>([]);
@@ -397,46 +426,72 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Header */}
-      <header className="header" style={{ background: '#0F3460' }}>
-        <div className="header-left">
-          <div className="header-logo">🏪</div>
-          <div className="header-title">
-            <h1>POS ম্যানেজমেন্ট সিস্টেম</h1>
+      {/* Header - Modern Minimal Design */}
+      <div style={{ background: '#FFFFFF', padding: '0 24px', flexShrink: 0, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', borderBottom: '2px solid #0F766E' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
+          {/* Logo Section */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
+            <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}>🏪</div>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 22, color: '#111827', lineHeight: 1.2 }}>POS সিস্টেম</div>
+              <div style={{ fontSize: 14, color: '#9CA3AF' }}>POS ম্যানেজমেন্ট সিস্টেম</div>
+            </div>
+          </div>
+          
+          {/* Dynamic Menu - Scrollable */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 30, marginRight: 22, minWidth: 0, flex: 1 }}>
+            {/* Left Arrow */}
+            <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginRight: 4, flexShrink: 0 }}>◀</button>
+
+            {/* Scrollable Menu */}
+            <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E5E7EB', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1, minWidth: 0 }}>
+              {tabs.map((t, idx) => (
+                <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
+                  padding: '7px 12px',
+                  border: 'none',
+                  background: currentTab === t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                  cursor: 'pointer',
+                  color: currentTab === t.id ? '#FFFFFF' : '#4B5563',
+                  fontWeight: currentTab === t.id ? 600 : 500,
+                  fontSize: 14,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  whiteSpace: 'nowrap',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.2s',
+                  borderRadius: 6,
+                  boxShadow: currentTab === t.id ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
+                }}>
+                  <span style={{ fontSize: 16 }}>{t.icon}</span>
+                  <span>{t.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Right Arrow */}
+            <button onClick={() => scrollMenu('right')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginLeft: 4, flexShrink: 0 }}>▶</button>
+          </div>
+
+          {/* Actions Section */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0, marginLeft: 24 }}>
+            {/* Refresh Button */}
+            <button onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title="🔄 হার্ড রিফ্রেশ">🔄</button>
+            
+            {/* Fullscreen Button */}
+            <button onClick={handleFullscreen} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="⛶ ফুল স্ক্রিন">⛶</button>
+            
+            {/* Logout Button */}
+            <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="লগআউট">↩️</button>
+
+            {/* Date & Time */}
+            <TimeDisplay />
           </div>
         </div>
-        <div className="header-right">
-          <button className="header-btn" onClick={handleHardRefresh} title="হার্ড রিফ্রেশ">🔄</button>
-          <button className="header-btn" onClick={handleFullscreen} title="ফুল স্ক্রিন">⛶</button>
-          <button className="header-btn" onClick={handleLogout} title="লগআউট">↩️</button>
-          <TimeDisplay />
-        </div>
-      </header>
-
-      {/* Menu Bar */}
-      <nav className="menu-bar">
-        <button className={`menu-btn ${currentTab === 'pos' ? 'active' : ''}`} onClick={() => setCurrentTab('pos')}>
-          <span className="icon">🛒</span> POS
-        </button>
-        <button className={`menu-btn ${currentTab === 'products' ? 'active' : ''}`} onClick={() => setCurrentTab('products')}>
-          <span className="icon">📦</span> পণ্য
-        </button>
-        <button className={`menu-btn ${currentTab === 'customers' ? 'active' : ''}`} onClick={() => setCurrentTab('customers')}>
-          <span className="icon">👥</span> গ্রাহক
-        </button>
-        <button className={`menu-btn ${currentTab === 'sales' ? 'active' : ''}`} onClick={() => setCurrentTab('sales')}>
-          <span className="icon">💰</span> বিক্রয়
-        </button>
-        <button className={`menu-btn ${currentTab === 'reports' ? 'active' : ''}`} onClick={() => setCurrentTab('reports')}>
-          <span className="icon">📊</span> রিপোর্ট
-        </button>
-        <button className={`menu-btn ${currentTab === 'settings' ? 'active' : ''}`} onClick={() => setCurrentTab('settings')}>
-          <span className="icon">⚙️</span> সেটিংস
-        </button>
-      </nav>
+      </div>
 
       {/* Content */}
-      <div className="content">
+      <div style={{ flex: 1, overflow: 'auto', width: '100%', padding: 16, background: '#F9FAFB' }}>
         {currentTab === 'pos' && (
           <div className="pos-layout">
             {/* Category Sidebar */}
@@ -760,6 +815,134 @@ export default function App() {
               <div className="form-group">
                 <label className="label">ব্যবসায়ের নাম</label>
                 <input type="text" className="input" defaultValue="আমার দোকান" />
+              </div>
+              <button className="btn btn-primary">সেভ করুন</button>
+            </div>
+          </div>
+        )}
+
+        {currentTab === 'newproduct' && (
+          <div>
+            <h2 style={{ marginBottom: 16 }}>➕ নতুন পণ্য যোগ করুন</h2>
+            <div className="card" style={{ maxWidth: 600 }}>
+              <div className="form-group">
+                <label className="label">পণ্যের নাম</label>
+                <input type="text" className="input" placeholder="পণ্যের নাম লিখুন" />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group">
+                  <label className="label">ক্রয়মূল্য</label>
+                  <input type="number" className="input" placeholder="০" />
+                </div>
+                <div className="form-group">
+                  <label className="label">বিক্রয়মূল্য</label>
+                  <input type="number" className="input" placeholder="০" />
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="label">স্টক</label>
+                <input type="number" className="input" placeholder="০" />
+              </div>
+              <button className="btn btn-primary">পণ্য যোগ করুন</button>
+            </div>
+          </div>
+        )}
+
+        {currentTab === 'barcode' && (
+          <div>
+            <h2 style={{ marginBottom: 16 }}>📊 বারকোড জেনারেটর</h2>
+            <div className="card" style={{ maxWidth: 500 }}>
+              <div className="form-group">
+                <label className="label">পণ্য কোড</label>
+                <input type="text" className="input" placeholder="কোড লিখুন" />
+              </div>
+              <button className="btn btn-primary">বারকোড তৈরি করুন</button>
+              <div style={{ marginTop: 20, textAlign: 'center', padding: 20, background: '#F9FAFB', borderRadius: 8 }}>
+                <div style={{ fontSize: 48 }}>📊</div>
+                <p style={{ color: '#9CA3AF', marginTop: 8 }}>বারকোড এখানে দেখা যাবে</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentTab === 'suppliers' && (
+          <div>
+            <h2 style={{ marginBottom: 16 }}>🏢 সরবরাহকারী</h2>
+            <div className="card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <span style={{ color: '#6B7280' }}>মোট: ০ জন</span>
+                <button className="btn btn-primary">➕ নতুন যোগ করুন</button>
+              </div>
+              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>কোনো সরবরাহকারী নেই</p>
+            </div>
+          </div>
+        )}
+
+        {currentTab === 'inventory' && (
+          <div>
+            <h2 style={{ marginBottom: 16 }}>🏭 ইনভেন্টরি</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 20 }}>
+              <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>📦</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>০</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>মোট পণ্য</div>
+              </div>
+              <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#DC2626' }}>০</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>স্টক কম</div>
+              </div>
+              <div className="card" style={{ background: '#ECFDF5', border: '1px solid #A7F3D0' }}>
+                <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#059669' }}>০</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>স্টক আছে</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentTab === 'lowstock' && (
+          <div>
+            <h2 style={{ marginBottom: 16, color: '#DC2626' }}>⚠️ স্টক কম আছে</h2>
+            <div className="card">
+              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>কোনো পণ্য স্টক কম নেই</p>
+            </div>
+          </div>
+        )}
+
+        {currentTab === 'income' && (
+          <div>
+            <h2 style={{ marginBottom: 16 }}>💰 আয়/ব্যয়</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+              <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>📈</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>৳০</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>মোট আয়</div>
+              </div>
+              <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>📉</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>৳০</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>মোট ব্যয়</div>
+              </div>
+            </div>
+            <div className="card">
+              <h3 style={{ marginBottom: 12 }}>➕ নতুন লেনদেন</h3>
+              <div className="form-group">
+                <label className="label">বিবরণ</label>
+                <input type="text" className="input" placeholder="লেনদেনের বিবরণ" />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group">
+                  <label className="label">টাকা</label>
+                  <input type="number" className="input" placeholder="০" />
+                </div>
+                <div className="form-group">
+                  <label className="label">ধরন</label>
+                  <select className="input">
+                    <option value="income">আয়</option>
+                    <option value="expense">ব্যয়</option>
+                  </select>
+                </div>
               </div>
               <button className="btn btn-primary">সেভ করুন</button>
             </div>
