@@ -18,7 +18,7 @@ model Store {
   phone         String?
   email         String?
   isActive      Boolean  @default(true)
-  settings      Json?
+  settings      String?
   invoicePrefix String   @default("INV")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -52,6 +52,8 @@ model Currency {
   updatedAt     DateTime @updatedAt
 
   storeCurrencies StoreCurrency[]
+  sales           Sale[]
+  purchases       Purchase[]
 
   @@map("currencies")
 }
@@ -296,7 +298,7 @@ model Expense {
 model Setting {
   id        String   @id @default(uuid())
   key       String   @unique
-  value     Json
+  value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
