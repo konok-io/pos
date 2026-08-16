@@ -425,6 +425,9 @@ export default function App() {
     const hasStock = p.stock > 0;
     return matchCategory && matchSupplier && matchSearch && hasStock;
   }) : [];
+  
+  // Show products grid even when hold sales is open (if there's a filter)
+  const showProductsGrid = hasFilter;
 
   // Add to cart
   const addToCart = (product: Product) => {
@@ -725,10 +728,9 @@ export default function App() {
                 <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
                   <input
-                    value={showHeldSales ? '' : searchQuery}
+                    value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={showHeldSales ? t('holdSales') + '...' : t('searchProduct')}
-                    disabled={showHeldSales}
+                    placeholder={t('searchProduct')}
                     style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
@@ -737,7 +739,6 @@ export default function App() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  disabled={showHeldSales}
                   style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer' }}
                 >
                   <option value="all">📁 {t('allCategories')}</option>
@@ -750,7 +751,6 @@ export default function App() {
                 <select
                   value={selectedSupplier}
                   onChange={(e) => setSelectedSupplier(e.target.value)}
-                  disabled={showHeldSales}
                   style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer' }}
                 >
                   <option value="all">🏢 {t('allSuppliers')}</option>
@@ -787,8 +787,8 @@ export default function App() {
 
               {/* Product grid */}
               <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
-                {/* Show Held Sales */}
-                {showHeldSales && (
+                {/* Show Held Sales (only when no filter is active) */}
+                {showHeldSales && !showProductsGrid && (
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                       <h4 style={{ margin: 0, color: '#0F766E', fontSize: 15, fontWeight: 600 }}>📋 {t('holdSales')} ({heldSales.length})</h4>
@@ -857,8 +857,8 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Show Products when NOT showing held sales */}
-                {!showHeldSales && (
+                {/* Show Products when: no hold open, OR (hold open AND filter is active) */}
+                {(!showHeldSales || showProductsGrid) && (
                   filteredProducts.length === 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
                       <div style={{ textAlign: 'center', marginBottom: 20 }}>
