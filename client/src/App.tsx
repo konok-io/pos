@@ -719,27 +719,6 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
               {/* Search Row - with Category & Supplier */}
               <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                {/* Barcode Scan */}
-                <div style={{ position: 'relative', flex: '1 1 200px' }}>
-                  <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#0F766E', fontSize: 14 }}>📊</span>
-                  <input
-                    className="barcode-input"
-                    placeholder={t('barcodePlaceholder')}
-                    style={{ 
-                      width: '100%', 
-                      paddingLeft: 36, 
-                      height: 34, 
-                      fontSize: 14, 
-                      borderRadius: 8, 
-                      border: '1px solid #c9c9c9', 
-                      background: '#F0FDFA', 
-                      outline: 'none', 
-                      boxSizing: 'border-box',
-                      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hind Siliguri', sans-serif"
-                    }}
-                  />
-                </div>
-                
                 {/* Product Name Search */}
                 <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
@@ -1017,6 +996,29 @@ export default function App() {
 
             {/* -- RIGHT: Cart -- */}
             <div style={{ width: 360, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: '1px solid #e5e7eb' }}>
+              {/* Barcode Scan - Above Cart */}
+              <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#0F766E', fontSize: 14 }}>📊</span>
+                  <input
+                    className="barcode-input"
+                    placeholder={t('barcodePlaceholder')}
+                    style={{ 
+                      width: '100%', 
+                      paddingLeft: 32, 
+                      height: 34, 
+                      fontSize: 14, 
+                      borderRadius: 8, 
+                      border: '1px solid #c9c9c9', 
+                      background: '#F0FDFA', 
+                      outline: 'none', 
+                      boxSizing: 'border-box',
+                      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hind Siliguri', sans-serif"
+                    }}
+                  />
+                </div>
+              </div>
+
               {/* Cart Header */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
