@@ -999,7 +999,7 @@ export default function App() {
               {/* Barcode Scan - Above Cart */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
                 <div style={{ position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#0F766E', fontSize: 14 }}>📊</span>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 14 }}>🔍</span>
                   <input
                     className="barcode-input"
                     placeholder={t('barcodePlaceholder')}
@@ -1121,7 +1121,26 @@ export default function App() {
                 )}
 
                 {/* Action Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 6 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto auto 1fr', gap: 6 }}>
+                  {/* Clear Cart Button */}
+                  <button 
+                    onClick={() => {
+                      if (cart.length > 0 && confirm('কার্ট পরিষ্কার করবেন?')) {
+                        setCart([]);
+                        setDiscount('');
+                        setPaidAmount('');
+                      }
+                    }}
+                    disabled={cart.length === 0}
+                    style={{
+                      padding: '10px 12px', borderRadius: 8, border: '1px solid #e5e7eb',
+                      background: cart.length > 0 ? '#FEF2F2' : '#FFFFFF',
+                      color: cart.length > 0 ? '#DC2626' : '#9CA3AF',
+                      fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
+                    }}>
+                    🗑️ {t('clear') || 'Clear'}
+                  </button>
+                  {/* Hold Button */}
                   <button 
                     onClick={() => {
                       if (cart.length > 0) {
@@ -1140,6 +1159,7 @@ export default function App() {
                     }}>
                     📋 {t('hold')}
                   </button>
+                  {/* Complete Sale Button */}
                   <button onClick={handleCheckout}
                     disabled={cart.length === 0}
                     style={{
