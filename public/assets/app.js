@@ -1,6 +1,7 @@
 /* ==========================================
    POS Management System - Main JavaScript
    Modern, Multi-Currency, Offline-First
+   IndexedDB Storage - No localStorage
    ========================================== */
 
 // State Management
@@ -20,11 +21,105 @@ const state = {
     pendingSync: []
 };
 
-// API Base URL
+// API Base URL - removed for offline-first
 const API_URL = '/api';
 
-// Default Store ID (will be set from settings)
+// Default Store ID
 const DEFAULT_STORE_ID = 1;
+
+// IndexedDB Database
+const DB_NAME = 'pos_database';
+const DB_VERSION = 1;
+let db = null;
+
+// ==========================================
+// IndexedDB Functions
+// ==========================================
+async function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+            db = request.result;
+            resolve(db);
+        };
+        
+        request.onupgradeneeded = (event) => {
+            const database = event.target.result;
+            
+            // Create object stores
+            if (!database.objectStoreNames.contains('settings')) {
+                database.createObjectStore('settings', { keyPath: 'key' });
+            }
+            if (!database.objectStoreNames.contains('products')) {
+                database.createObjectStore('products', { keyPath: 'id' });
+            }
+            if (!database.objectStoreNames.contains('categories')) {
+                database.createObjectStore('categories', { keyPath: 'id' });
+            }
+            if (!database.objectStoreNames.contains('customers')) {
+                database.createObjectStore('customers', { keyPath: 'id' });
+            }
+            if (!database.objectStoreNames.contains('pendingSales')) {
+                database.createObjectStore('pendingSales', { keyPath: 'id' });
+            }
+            if (!database.objectStoreNames.contains('cart')) {
+                database.createObjectStore('cart', { keyPath: 'id' });
+            }
+        };
+    });
+}
+
+async function dbGet(storeName, key) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const request = store.get(key);
+        request.onsuccess = () => resolve(request.result?.value ?? null);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function dbPut(storeName, key, value) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.put({ key, value });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function dbGetAll(storeName) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const request = store.getAll();
+        request.onsuccess = () => resolve(request.result.map(item => item.value) || []);
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function dbDelete(storeName, key) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.delete(key);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
+
+async function dbClear(storeName) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+        const request = store.clear();
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+    });
+}
 
 // ==========================================
 // Initialization
@@ -34,15 +129,21 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initializeApp() {
-    // Generate device ID for sync
-    state.deviceId = localStorage.getItem('pos_device_id');
+    // Initialize IndexedDB first
+    await initDB();
+    
+    // Load device ID from IndexedDB
+    state.deviceId = await dbGet('settings', 'deviceId');
     if (!state.deviceId) {
         state.deviceId = `device_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('pos_device_id', state.deviceId);
+        await dbPut('settings', 'deviceId', state.deviceId);
     }
 
     // Load pending sync from IndexedDB
     await loadPendingSync();
+    
+    // Load cart from IndexedDB
+    await loadCart();
 
     try {
         await loadInitialData();
@@ -59,27 +160,51 @@ async function initializeApp() {
 }
 
 // ==========================================
+// Cart Management (IndexedDB)
+// ==========================================
+async function loadCart() {
+    const savedCart = await dbGetAll('cart');
+    state.cart = savedCart;
+}
+
+async function saveCart() {
+    await dbClear('cart');
+    for (const item of state.cart) {
+        await dbPut('cart', item.id, item);
+    }
+}
+
+// ==========================================
 // Data Loading
 // ==========================================
 async function loadInitialData() {
-    const [products, categories, customers, currencies, syncData] = await Promise.all([
-        fetchAPI('/products'),
-        fetchAPI('/categories'),
-        fetchAPI('/customers'),
-        fetchAPI('/currencies'),
-        syncPull()
-    ]);
-
-    state.products = products?.data || products || getSampleProducts();
-    state.categories = categories?.data || categories || getSampleCategories();
-    state.customers = customers?.data || customers || [];
-    state.currencies = currencies?.data || currencies || [{ id: 1, code: 'BDT', symbol: '৳', name: 'Bangladeshi Taka' }];
+    // Try to load from IndexedDB first
+    const cachedProducts = await dbGetAll('products');
+    const cachedCategories = await dbGetAll('categories');
+    const cachedCurrencies = await dbGetAll('currencies');
+    
+    state.products = cachedProducts.length > 0 ? cachedProducts : getSampleProducts();
+    state.categories = cachedCategories.length > 0 ? cachedCategories : getSampleCategories();
+    state.customers = [];
+    state.currencies = cachedCurrencies.length > 0 ? cachedCurrencies : [{ id: 1, code: 'BDT', symbol: '৳', name: 'Bangladeshi Taka' }];
     
     // Set default currency
     if (state.currencies.length > 0) {
         state.currentCurrency = state.currencies.find(c => c.is_default) || state.currencies[0];
     }
 
+    // Save sample data to IndexedDB if empty
+    if (cachedProducts.length === 0) {
+        for (const product of state.products) {
+            await dbPut('products', product.id, product);
+        }
+    }
+    if (cachedCategories.length === 0) {
+        for (const category of state.categories) {
+            await dbPut('categories', category.id, category);
+        }
+    }
+    
     renderCategories();
     renderCustomerOptions();
 }
@@ -91,11 +216,17 @@ async function syncPull() {
         const response = await fetch(`${API_URL}/sync/pull/${DEFAULT_STORE_ID}`);
         const data = await response.json();
         if (data.success) {
-            // Update local cache
-            setCachedData('products', data.data.products);
-            setCachedData('categories', data.data.categories);
-            setCachedData('currencies', data.data.currencies);
-            localStorage.setItem('pos_last_sync', new Date().toISOString());
+            // Update IndexedDB
+            for (const product of data.data.products) {
+                await dbPut('products', product.id, product);
+            }
+            for (const category of data.data.categories) {
+                await dbPut('categories', category.id, category);
+            }
+            for (const currency of data.data.currencies) {
+                await dbPut('currencies', currency.id, currency);
+            }
+            await dbPut('settings', 'lastSyncTime', new Date().toISOString());
             return data;
         }
     } catch (e) {
@@ -119,9 +250,10 @@ async function syncPush() {
 
         const result = await response.json();
         if (result.success) {
-            // Clear synced sales
+            // Clear synced sales from IndexedDB
             state.pendingSync = [];
-            localStorage.setItem('pos_pending_sync', JSON.stringify([]));
+            await dbClear('pendingSales');
+            await dbPut('settings', 'lastSyncTime', new Date().toISOString());
             showToast(`${result.data.sales.synced}টি বিক্রয় সিঙ্ক হয়েছে!`);
             updateSyncStatus();
         }
@@ -130,64 +262,21 @@ async function syncPush() {
     }
 }
 
-// IndexedDB for offline storage
+// Load pending sync from IndexedDB
 async function loadPendingSync() {
-    try {
-        const db = await openDB();
-        const tx = db.transaction('pendingSales', 'readonly');
-        const store = tx.objectStore('pendingSales');
-        const data = await getAllFromStore(store);
-        state.pendingSync = data.map(d => d.sale);
-    } catch (e) {
-        console.log('IndexedDB not available, using localStorage');
-        const saved = localStorage.getItem('pos_pending_sync');
-        state.pendingSync = saved ? JSON.parse(saved) : [];
-    }
+    const pendingSales = await dbGetAll('pendingSales');
+    state.pendingSync = pendingSales;
 }
 
-function savePendingSync(sale) {
+async function savePendingSync(sale) {
     const offlineId = `offline_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const saleWithId = { ...sale, offline_id: offlineId };
     state.pendingSync.push(saleWithId);
     
-    // Try IndexedDB first, fallback to localStorage
-    (async () => {
-        try {
-            const db = await openDB();
-            const tx = db.transaction('pendingSales', 'readwrite');
-            const store = tx.objectStore('pendingSales');
-            await store.add({ id: offlineId, sale: saleWithId, createdAt: new Date().toISOString() });
-        } catch (e) {
-            localStorage.setItem('pos_pending_sync', JSON.stringify(state.pendingSync));
-        }
-    })();
+    // Save to IndexedDB
+    await dbPut('pendingSales', offlineId, { id: offlineId, sale: saleWithId, createdAt: new Date().toISOString() });
 
     updateSyncStatus();
-}
-
-function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open('POSOfflineDB', 1);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains('pendingSales')) {
-                db.createObjectStore('pendingSales', { keyPath: 'id' });
-            }
-            if (!db.objectStoreNames.contains('products')) {
-                db.createObjectStore('products', { keyPath: 'id' });
-            }
-        };
-    });
-}
-
-function getAllFromStore(store) {
-    return new Promise((resolve, reject) => {
-        const request = store.getAll();
-        request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
-    });
 }
 
 function getSampleProducts() {
@@ -259,27 +348,24 @@ async function postAPI(endpoint, data) {
 }
 
 // ==========================================
-// Cache Management (for offline support)
+// Cache Management (IndexedDB)
 // ==========================================
-function setCachedData(key, data) {
+async function setCachedData(key, data) {
     try {
-        // Clean the key
-        const cleanKey = key.replace(/\//g, '_').replace(/^_/, '');
-        localStorage.setItem(`pos_${cleanKey}`, JSON.stringify({
+        await dbPut('settings', `cache_${key}`, {
             data,
             timestamp: Date.now()
-        }));
+        });
     } catch (e) {
         console.log('Cache error:', e);
     }
 }
 
-function getCachedData(key) {
+async function getCachedData(key) {
     try {
-        const cleanKey = key.replace(/\//g, '_').replace(/^_/, '');
-        const cached = localStorage.getItem(`pos_${cleanKey}`);
+        const cached = await dbGet('settings', `cache_${key}`);
         if (cached) {
-            const { data, timestamp } = JSON.parse(cached);
+            const { data, timestamp } = cached;
             // Cache valid for 24 hours
             if (Date.now() - timestamp < 24 * 60 * 60 * 1000) {
                 return data;
@@ -810,8 +896,8 @@ function debounce(func, wait) {
 // ==========================================
 // Settings
 // ==========================================
-function showSettings() {
-    const lastSync = localStorage.getItem('pos_last_sync');
+async function showSettings() {
+    const lastSync = await dbGet('settings', 'lastSyncTime');
     const content = `
         <div class="settings-content">
             <div class="settings-section">

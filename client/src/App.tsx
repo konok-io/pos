@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages } from './i18n';
 import TranslationSettings from './pages/TranslationSettings';
+import { db } from './utils/db';
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
@@ -110,7 +111,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     if ((username === 'admin' || username === 'admin@konok.io') && password === 'admin123') {
-      localStorage.setItem('pos_user', JSON.stringify(DEFAULT_ADMIN));
+      await db.put('users', 'current', DEFAULT_ADMIN);
       onLogin();
     } else {
       setError(t('invalidCredentials'));
@@ -385,19 +386,22 @@ export default function App() {
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
 
-  // Check auth on mount
+  // Check auth on mount from IndexedDB
   useEffect(() => {
-    const user = localStorage.getItem('pos_user');
-    if (user) {
-      setIsLoggedIn(true);
-    }
-    setIsLoading(false);
+    const checkAuth = async () => {
+      const user = await db.get('users', 'current');
+      if (user) {
+        setIsLoggedIn(true);
+      }
+      setIsLoading(false);
+    };
+    checkAuth();
   }, []);
 
   const handleLogin = () => setIsLoggedIn(true);
 
-  const handleLogout = () => {
-    localStorage.removeItem('pos_user');
+  const handleLogout = async () => {
+    await db.delete('users', 'current');
     setIsLoggedIn(false);
     setCart([]);
   };

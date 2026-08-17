@@ -1,7 +1,7 @@
-// IndexedDB Database Utility for POS
+// IndexedDB Database Utility for POS - Complete Solution
 
 const DB_NAME = 'pos_database';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 class Database {
   private db: IDBDatabase | null = null;
@@ -27,19 +27,14 @@ class Database {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
 
-        // Create object stores
-        if (!db.objectStoreNames.contains('translations')) {
-          db.createObjectStore('translations', { keyPath: 'lang' });
-        }
-        if (!db.objectStoreNames.contains('settings')) {
-          db.createObjectStore('settings', { keyPath: 'key' });
-        }
-        if (!db.objectStoreNames.contains('sales')) {
-          db.createObjectStore('sales', { keyPath: 'id' });
-        }
-        if (!db.objectStoreNames.contains('products')) {
-          db.createObjectStore('products', { keyPath: 'id' });
-        }
+        // Create all object stores
+        const stores = ['translations', 'settings', 'sales', 'products', 'categories', 'customers', 'sync', 'users', 'cart', 'heldSales'];
+        
+        stores.forEach(storeName => {
+          if (!db.objectStoreNames.contains(storeName)) {
+            db.createObjectStore(storeName, { keyPath: 'key' });
+          }
+        });
       };
     });
 
@@ -117,6 +112,22 @@ class Database {
 
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve();
+    });
+  }
+
+  async getAllKeys(storeName: string): Promise<IDBValidKey[]> {
+    await this.init();
+    if (!this.db) return [];
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction(storeName, 'readonly');
+      const store = transaction.objectStore(storeName);
+      const request = store.getAllKeys();
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        resolve(request.result ?? []);
+      };
     });
   }
 }
