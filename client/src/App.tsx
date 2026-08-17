@@ -914,7 +914,10 @@ export default function App() {
                                     const product = products.find(p => p.id === item.productId);
                                     if (product) addToCart(product);
                                   });
-                                  setShowHeldSales(false);
+                                  // Remove this hold sale from the list
+                                  const newHeld = [...heldSales];
+                                  newHeld.splice(idx, 1);
+                                  setHeldSales(newHeld);
                                 }}
                                 style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#EA580C', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, boxShadow: '0 2px 6px rgba(234,88,12,0.3)' }}>
                                 ➕ {t('addItems')}
