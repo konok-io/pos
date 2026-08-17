@@ -2,6 +2,8 @@ export const ar: Record<string, string> = {
   // Header
   posSystem: 'نظام نقاط البيع',
   posManagement: 'نظام إدارة نقاط البيع',
+  posManagementSystem: 'نظام إدارة نقاط البيع',
+  smartBusinessPartner: 'شريك ذكي للأعمال',
   sales: 'المبيعات',
   products: 'المنتجات',
   categories: 'الفئات',

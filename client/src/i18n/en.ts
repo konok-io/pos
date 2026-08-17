@@ -2,6 +2,8 @@ export const en: Record<string, string> = {
   // Header
   posSystem: 'POS System',
   posManagement: 'POS Management System',
+  posManagementSystem: 'POS Management System',
+  smartBusinessPartner: 'Smart Business Partner',
   sales: 'Sales',
   products: 'Products',
   categories: 'Categories',

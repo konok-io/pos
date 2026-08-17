@@ -80,11 +80,12 @@ interface Sale {
 
 // Loading Screen
 function LoadingScreen() {
+  const { t } = useLanguage();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#115E59', color: 'white', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ width: 60, height: 60, border: '4px solid rgba(255,255,255,0.2)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
-      <h3 style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>POS Management System</h3>
-      <p style={{ marginTop: 8, opacity: 0.8 }}>লোড হচ্ছে...</p>
+      <h3 style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>{t('posManagementSystem')}</h3>
+      <p style={{ marginTop: 8, opacity: 0.8 }}>{t('loading')}</p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
@@ -160,7 +161,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           justifyContent: 'center',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, width: '100%' }}>
-            <div style={{
+                          <div style={{
               width: 60, height: 60,
               background: 'linear-gradient(135deg, #115E59, #0F766E)',
               borderRadius: 16,
@@ -168,7 +169,9 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 4px 12px rgba(15,118,110,0.3)',
-            }}>🏪</div>
+            }}>
+              <span style={{ color: '#fff', fontSize: 28, fontWeight: 700 }}>P</span>
+            </div>
             <div style={{ flex: 1, textAlign: 'right' }}>
               <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#115E59' }}>
                 {businessName}
@@ -179,7 +182,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 fontWeight: 600,
                 marginTop: 4,
               }}>
-                💼 Smart Business Partner
+                {t('smartBusinessPartner')}
               </div>
             </div>
           </div>
@@ -348,7 +351,7 @@ export default function App() {
     { id: 'products', icon: '📦', label: t('products') },
     { id: 'newproduct', icon: '➕', label: t('addProduct') },
     { id: 'barcode', icon: '📊', label: t('barcode') },
-    { id: 'suppliers', icon: '🏢', label: t('suppliers') },
+    { id: 'suppliers', icon: '📋', label: t('suppliers') },
     { id: 'customers', icon: '👥', label: t('customers') },
     { id: 'inventory', icon: '🏭', label: t('stock') },
     { id: 'lowstock', icon: '⚠️', label: t('stockLow') },
@@ -583,7 +586,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           {/* Logo Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-            <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #115E59 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}>🏪</div>
+            <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #115E59 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}><span style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>P</span></div>
             <div>
               <div style={{ fontWeight: 800, fontSize: 22, color: '#115E59', lineHeight: 1.2 }}>{t('posSystem')}</div>
               <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('posManagement')}</div>
@@ -794,7 +797,7 @@ export default function App() {
                   onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
                   style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 120, cursor: 'pointer', flex: '2 1 100px' }}
                 >
-                  <option value="all">🏢 {t('allSuppliers')}</option>
+                  <option value="all">📋 {t('allSuppliers')}</option>
                   {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
                     <option key={s} value={s}>{s}</option>
                   ))}
@@ -1011,7 +1014,7 @@ export default function App() {
                         {/* Supplier Filter */}
                         {selectedSupplier !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#FEF3C7', borderRadius: 20, border: '1px solid #FDE68A' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>🏢 {selectedSupplier} ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>📋 {selectedSupplier} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
@@ -1078,13 +1081,13 @@ export default function App() {
                     {filteredProducts.length === 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
                       <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>🏪 {t('posSystem')}</div>
+                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}><span style={{ fontSize: 28, fontWeight: 700 }}>P</span> {t('posSystem')}</div>
                         <div style={{ fontSize: 14, color: '#9CA3AF' }}>📞 01700-000000</div>
                       </div>
                       <svg width="200" height="120" viewBox="0 0 280 180" style={{ marginBottom: 16 }}>
                         <rect x="20" y="50" width="240" height="110" rx="8" fill="#F0FDFA" stroke="#115E59" strokeWidth="2"/>
                         <rect x="50" y="70" width="60" height="60" rx="4" fill="#115E59"/>
-                        <text x="80" y="105" textAnchor="middle" fill="white" fontSize="24">🏪</text>
+                        <text x="80" y="105" textAnchor="middle" fill="white" fontSize="24">P</text>
                         <rect x="130" y="65" width="100" height="50" rx="6" fill="#115E59"/>
                         <circle cx="220" cy="90" r="25" fill="#22C55E"/>
                         <path d="M208 90 L216 98 L232 82" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round"/>
@@ -1650,7 +1653,7 @@ export default function App() {
 
         {currentTab === 'suppliers' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>🏢 {t('suppliers')}</h2>
+            <h2 style={{ marginBottom: 16 }}>📋 {t('suppliers')}</h2>
             <div className="card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <span style={{ color: '#6B7280' }}>{t('total')}: 0 {t('suppliers')}</span>
