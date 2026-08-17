@@ -827,12 +827,12 @@ export default function App() {
                 {/* Show Held Sales Only - When hold is open and no filter active */}
                 {showHeldSales && !showProductsGrid && (
                   <div>
-                    {/* Hold Sales Header - Same Style as Filter Header */}
+                    {/* Hold Sales Header - Same Style */}
                     <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
                       
                       {/* Hold Sales Pill - Left Side */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📋 {t('holdSales')}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📋 {t('holdSales')} ({heldSales.length})</span>
                       </div>
 
                       {/* Clear All Button - Right Side */}
@@ -842,11 +842,6 @@ export default function App() {
                           style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                           ✕ {t('close')}
                         </button>
-                        
-                        {/* Hold Count */}
-                        <div style={{ padding: '6px 14px', background: '#115E59', borderRadius: 20 }}>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{heldSales.length} {t('itemsFound')}</span>
-                        </div>
                       </div>
                     </div>
 
@@ -942,64 +937,58 @@ export default function App() {
                 {/* Show Products when: no hold open, OR (hold open AND filter is active) */}
                 {(!showHeldSales || showProductsGrid) && (
                   <>
-                    {/* Active Filters Header */}
+                    {/* Active Filters Header - Same Style as Hold Sales */}
                     {(selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all' || searchQuery) && (
                       <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
                         
                         {/* Filter Pills - Left Side */}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, flex: 1 }}>
-                          {/* Search Filter */}
-                          {searchQuery && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: '#EEF2FF', borderRadius: 20, border: '1px solid #C7D2FE' }}>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}"</span>
-                            </div>
-                          )}
-                          
-                          {/* Category Filter */}
-                          {selectedCategory !== 'all' && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📁 {categories.find(c => c.id === selectedCategory)?.name}</span>
-                            </div>
-                          )}
-                          
-                          {/* Supplier Filter */}
-                          {selectedSupplier !== 'all' && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: '#FEF3C7', borderRadius: 20, border: '1px solid #FDE68A' }}>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>🏢 {selectedSupplier}</span>
-                            </div>
-                          )}
-                          
-                          {/* Stock Filter */}
-                          {stockFilter !== 'all' && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
-                              <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
-                                {stockFilter === 'available' && '📦 ' + t('stockAvailable')}
-                                {stockFilter === 'low' && '⚠️ ' + t('stockLow')}
-                                {stockFilter === 'out' && '⚠️ ' + t('stockOut')}
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                        {searchQuery && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#EEF2FF', borderRadius: 20, border: '1px solid #C7D2FE' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}"</span>
+                          </div>
+                        )}
+                        
+                        {/* Category Filter */}
+                        {selectedCategory !== 'all' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📁 {categories.find(c => c.id === selectedCategory)?.name}</span>
+                          </div>
+                        )}
+                        
+                        {/* Supplier Filter */}
+                        {selectedSupplier !== 'all' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#FEF3C7', borderRadius: 20, border: '1px solid #FDE68A' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>🏢 {selectedSupplier}</span>
+                          </div>
+                        )}
+                        
+                        {/* Stock Filter */}
+                        {stockFilter !== 'all' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
+                              {stockFilter === 'available' && '📦 ' + t('stockAvailable')}
+                              {stockFilter === 'low' && '⚠️ ' + t('stockLow')}
+                              {stockFilter === 'out' && '⚠️ ' + t('stockOut')}
+                            </span>
+                          </div>
+                        )}
 
                         {/* Clear All Button - Right Side */}
-                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                          {/* Clear All Button */}
-                          {(searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all') && (
-                            <button 
-                              onClick={() => {
-                                setSearchQuery('');
-                                setSelectedCategory('all');
-                                setSelectedSupplier('all');
-                                setStockFilter('all');
-                                setShowHeldSales(false);
-                              }}
-                              style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              ✕ {t('close')}
-                            </button>
-                          )}
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
+                          <button 
+                            onClick={() => {
+                              setSearchQuery('');
+                              setSelectedCategory('all');
+                              setSelectedSupplier('all');
+                              setStockFilter('all');
+                              setShowHeldSales(false);
+                            }}
+                            style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                            ✕ {t('close')}
+                          </button>
                           
                           {/* Result Count */}
-                          <div style={{ padding: '6px 14px', background: '#115E59', borderRadius: 20, marginLeft: 4 }}>
+                          <div style={{ padding: '6px 14px', background: '#115E59', borderRadius: 20 }}>
                             <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} {t('itemsFound')}</span>
                           </div>
                         </div>
