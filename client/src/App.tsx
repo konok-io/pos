@@ -725,7 +725,18 @@ export default function App() {
                   <input
                     className="barcode-input"
                     placeholder={t('barcodePlaceholder')}
-                    style={{ width: '100%', paddingLeft: 36, height: 38, fontSize: 14, borderRadius: 8, border: '2px solid #0F766E', background: '#F0FDFA', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ 
+                      width: '100%', 
+                      paddingLeft: 36, 
+                      height: 34, 
+                      fontSize: 14, 
+                      borderRadius: 8, 
+                      border: '1px solid #c9c9c9', 
+                      background: '#F0FDFA', 
+                      outline: 'none', 
+                      boxSizing: 'border-box',
+                      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hind Siliguri', sans-serif"
+                    }}
                   />
                 </div>
                 
