@@ -565,7 +565,7 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
             <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}>🏪</div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 22, color: '#111827', lineHeight: 1.2 }}>{t('posSystem')}</div>
+              <div style={{ fontWeight: 800, fontSize: 22, color: '#0F766E', lineHeight: 1.2 }}>{t('posSystem')}</div>
               <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('posManagement')}</div>
             </div>
           </div>
@@ -948,7 +948,7 @@ export default function App() {
                         )}
                         
                         {/* Result Count */}
-                        <div style={{ marginLeft: 'auto', padding: '6px 14px', background: '#111827', borderRadius: 20 }}>
+                        <div style={{ marginLeft: 'auto', padding: '6px 14px', background: '#0F766E', borderRadius: 20 }}>
                           <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} টি পণ্য</span>
                         </div>
                       </div>
@@ -1119,8 +1119,8 @@ export default function App() {
               {/* Cart Header */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 {t('cart')}</h3>
-                  <span style={{ background: '#111827', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0F766E', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 {t('cart')}</h3>
+                  <span style={{ background: '#0F766E', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
                 </div>
                 {/* Customer Input with Add Button */}
                 <div style={{ display: 'flex', gap: 6 }}>
@@ -1165,7 +1165,7 @@ export default function App() {
                       <div key={item.id} style={{ display: 'flex', alignItems: 'center', padding: '6px 8px', background: '#FFFFFF', borderBottom: '1px dashed #e5e7eb', gap: 8 }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                            <span style={{ fontSize: 14, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{item.name}</span>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#0F766E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{item.name}</span>
                             <span style={{ fontSize: 14, fontWeight: 700, color: '#0F766E', flexShrink: 0 }}>{fmt(item.sellPrice * item.quantity)}</span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
@@ -1203,7 +1203,7 @@ export default function App() {
                       <span style={{ fontSize: 15, fontWeight: 600, color: '#D97706' }}>+{fmt(vatAmount)}</span>
                     </div>
                   )}
-                  <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#111827' }}>
+                  <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#0F766E' }}>
                     <span style={{ fontSize: 14, color: '#fff', fontWeight: 700 }}>{t('totalDue')}</span>
                     <span style={{ fontSize: 18, color: '#fff', fontWeight: 800 }}>{fmt(total)}</span>
                   </div>
@@ -1222,7 +1222,7 @@ export default function App() {
                 {/* Payment Input */}
                 <input value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
                   placeholder={`${t('paid')} (৳)`}
-                  style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 6, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#111827', outline: 'none' }}
+                  style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 6, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#0F766E', outline: 'none' }}
                 />
 
                 {/* Due/Change Alert */}
