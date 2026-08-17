@@ -796,7 +796,19 @@ export default function App() {
                   ⚠️ {t('stockOut')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock <= 0).length})</span>
                 </button>
                 <button 
-                  onClick={() => setShowHeldSales(!showHeldSales)}
+                  onClick={() => {
+                    if (showHeldSales) {
+                      // If already showing hold, close it
+                      setShowHeldSales(false);
+                    } else {
+                      // Show hold sales, clear all filters first
+                      setSearchQuery('');
+                      setSelectedCategory('all');
+                      setSelectedSupplier('all');
+                      setStockFilter('all');
+                      setShowHeldSales(true);
+                    }
+                  }}
                   style={{
                     marginLeft: 'auto',
                     padding: '6px 14px', borderRadius: 8,
@@ -811,21 +823,25 @@ export default function App() {
 
               {/* Product grid */}
               <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
-                {/* Show Held Sales Header (always when hold is open) */}
-                {showHeldSales && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h4 style={{ margin: 0, color: '#115E59', fontSize: 15, fontWeight: 600 }}>📋 {t('holdSales')} ({heldSales.length})</h4>
-                    <button onClick={() => setShowHeldSales(false)} style={{ padding: '4px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600 }}>
-                      ✕ {t('close')}
-                    </button>
-                  </div>
-                )}
                 
-                {/* Show Held Sales Content (only when no filter is active) */}
+                {/* Show Held Sales Only - When hold is open and no filter active */}
                 {showHeldSales && !showProductsGrid && (
                   <div>
+                    {/* Hold Sales Header with Filter Style */}
+                    <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#115E59' }}>📋 {t('holdSales')} ({heldSales.length})</span>
+                      </div>
+                      <button 
+                        onClick={() => setShowHeldSales(false)}
+                        style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600 }}>
+                        ✕ {t('close')}
+                      </button>
+                    </div>
+
+                    {/* Hold Sales Cards */}
                     {heldSales.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: 40, background: '#fff', borderRadius: 12 }}>
+                      <div style={{ textAlign: 'center', padding: 40, background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB' }}>
                         <div style={{ fontSize: 48, marginBottom: 8 }}>📋</div>
                         <div style={{ color: '#9CA3AF', fontSize: 14 }}>{t('noHoldSales')}</div>
                       </div>
@@ -836,36 +852,59 @@ export default function App() {
                             key={idx}
                             style={{
                               background: '#fff',
-                              border: '1.5px solid #E5E7EB',
+                              border: '1.5px solid #99F6E4',
                               borderRadius: 12,
-                              padding: 12,
-                              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                              padding: 0,
+                              boxShadow: '0 2px 8px rgba(15,118,110,0.1)',
+                              overflow: 'hidden',
                             }}
                           >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: '#1F2937' }}>📋 {t('hold')} #{idx + 1}</div>
+                            {/* Card Header */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F0FDFA', borderBottom: '1px solid #99F6E4' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ fontSize: 16 }}>📋</span>
+                                <span style={{ fontSize: 14, fontWeight: 700, color: '#115E59' }}>{t('hold')} #{idx + 1}</span>
+                                <span style={{ fontSize: 12, color: '#6B7280' }}>({sale.items.length} items)</span>
+                              </div>
                               <button 
                                 onClick={() => {
                                   const newHeld = [...heldSales];
                                   newHeld.splice(idx, 1);
                                   setHeldSales(newHeld);
                                 }}
-                                style={{ padding: '4px 8px', borderRadius: 4, border: 'none', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', fontSize: 12 }}>
+                                style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 🗑️
                               </button>
                             </div>
-                            <div style={{ marginBottom: 8 }}>
-                              {sale.items.map((item, itemIdx) => (
-                                <div key={itemIdx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px dashed #E5E7EB' }}>
-                                  <span style={{ fontSize: 13, color: '#4B5563' }}>{item.name}</span>
-                                  <span style={{ fontSize: 13, color: '#6B7280' }}>×{item.quantity}</span>
+                            
+                            {/* Card Body - Items Summary */}
+                            <div style={{ padding: '8px 12px' }}>
+                              {sale.items.slice(0, 3).map((item, itemIdx) => (
+                                <div key={itemIdx} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: itemIdx < Math.min(sale.items.length - 1, 2) ? '1px dashed #E5E7EB' : 'none' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <span style={{ fontSize: 16 }}>📦</span>
+                                    <div>
+                                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{item.name}</div>
+                                      <div style={{ fontSize: 11, color: '#6B7280' }}>×{item.quantity}</div>
+                                    </div>
+                                  </div>
                                   <span style={{ fontSize: 13, fontWeight: 600, color: '#115E59' }}>{fmt(item.sellPrice * item.quantity)}</span>
                                 </div>
                               ))}
+                              {sale.items.length > 3 && (
+                                <div style={{ fontSize: 12, color: '#6B7280', textAlign: 'center', padding: '4px 0' }}>
+                                  +{sale.items.length - 3} more items...
+                                </div>
+                              )}
                             </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, borderTop: '1px solid #E5E7EB' }}>
-                              <div style={{ fontSize: 14, fontWeight: 600, color: '#115E59' }}>
-                                {t('total')}: {fmt(sale.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0))}
+                            
+                            {/* Card Footer */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F0FDFA', borderTop: '1px solid #99F6E4' }}>
+                              <div>
+                                <span style={{ fontSize: 11, color: '#6B7280' }}>{t('total')}: </span>
+                                <span style={{ fontSize: 16, fontWeight: 700, color: '#115E59' }}>
+                                  {fmt(sale.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0))}
+                                </span>
                               </div>
                               <button 
                                 onClick={() => {
@@ -873,8 +912,9 @@ export default function App() {
                                     const product = products.find(p => p.id === item.productId);
                                     if (product) addToCart(product);
                                   });
+                                  setShowHeldSales(false);
                                 }}
-                                style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#EA580C', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+                                style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#EA580C', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, boxShadow: '0 2px 6px rgba(234,88,12,0.3)' }}>
                                 ➕ {t('addItems')}
                               </button>
                             </div>
