@@ -944,7 +944,7 @@ export default function App() {
                         {/* Filter Pills - Left Side */}
                         {searchQuery && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#EEF2FF', borderRadius: 20, border: '1px solid #C7D2FE' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}" ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}"</span>
                           </div>
                         )}
                         
@@ -972,9 +972,14 @@ export default function App() {
                             </span>
                           </div>
                         )}
-
-                        {/* Clear All Button - Right Side */}
+                        
+                        {/* Clear All Button & Count - Right Side */}
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
+                          {/* Result Count Pill */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#115E59', borderRadius: 20 }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>({filteredProducts.length}) {t('itemsFound')}</span>
+                          </div>
+                          
                           <button 
                             onClick={() => {
                               setSearchQuery('');
