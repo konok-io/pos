@@ -927,45 +927,19 @@ export default function App() {
                           )}
                         </div>
 
-                        {/* Close Buttons - Right Side */}
+                        {/* Clear All Button - Right Side */}
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                          {/* Search Close */}
-                          {searchQuery && (
+                          {/* Clear All Button */}
+                          {(searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all') && (
                             <button 
-                              onClick={() => setSearchQuery('')}
-                              title="সার্চ মুছুন"
-                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              ✕
-                            </button>
-                          )}
-                          
-                          {/* Category Close */}
-                          {selectedCategory !== 'all' && (
-                            <button 
-                              onClick={() => setSelectedCategory('all')}
-                              title="ক্যাটাগরি সরান"
-                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              ✕
-                            </button>
-                          )}
-                          
-                          {/* Supplier Close */}
-                          {selectedSupplier !== 'all' && (
-                            <button 
-                              onClick={() => setSelectedSupplier('all')}
-                              title="সরবরাহকারী সরান"
-                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              ✕
-                            </button>
-                          )}
-                          
-                          {/* Stock Close */}
-                          {stockFilter !== 'all' && (
-                            <button 
-                              onClick={() => setStockFilter('all')}
-                              title="স্টক ফিল্টার সরান"
-                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                              ✕
+                              onClick={() => {
+                                setSearchQuery('');
+                                setSelectedCategory('all');
+                                setSelectedSupplier('all');
+                                setStockFilter('all');
+                              }}
+                              style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              ✕ {t('close')} All
                             </button>
                           )}
                           
