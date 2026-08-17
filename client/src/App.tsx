@@ -744,8 +744,8 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
               {/* Search Row - with Supplier, Category & Customer */}
               <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                {/* Product Name Search - Largest */}
-                <div style={{ position: 'relative', flex: '2.5 1 280px', minWidth: 220 }}>
+                {/* Product Name Search */}
+                <div style={{ position: 'relative', flex: '2 1 200px', minWidth: 180 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
                   <input
                     value={searchQuery}
@@ -756,7 +756,7 @@ export default function App() {
                 </div>
 
                 {/* Customer Search */}
-                <div style={{ position: 'relative', flex: '1.5 1 180px', minWidth: 150 }}>
+                <div style={{ position: 'relative', flex: '2 1 160px', minWidth: 150 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>👤</span>
                   <input
                     value={customerSearch}
@@ -792,7 +792,7 @@ export default function App() {
                 <select
                   value={selectedSupplier}
                   onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 120, cursor: 'pointer', flex: '1.5 1 100px' }}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 120, cursor: 'pointer', flex: '2 1 100px' }}
                 >
                   <option value="all">🏢 {t('allSuppliers')}</option>
                   {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
@@ -804,7 +804,7 @@ export default function App() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer', flex: '1 1 80px' }}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer', flex: '2 1 80px' }}
                 >
                   <option value="all">📁 {t('allCategories')}</option>
                   {categories.map(cat => (
