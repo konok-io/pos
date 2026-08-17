@@ -1138,7 +1138,7 @@ export default function App() {
                       color: cart.length > 0 ? '#DC2626' : '#9CA3AF',
                       fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
-                    🗑️ {t('clear') || 'Clear'}
+                    🗑️
                   </button>
                   {/* Hold Button */}
                   <button 
