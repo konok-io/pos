@@ -375,6 +375,7 @@ export default function App() {
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [customerSearch, setCustomerSearch] = useState('');
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState(15);
   const [paidAmount, setPaidAmount] = useState('');
@@ -386,6 +387,24 @@ export default function App() {
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
+  
+  // Demo customers
+
+  // Filter customers for dropdown
+  const filteredCustomers = customers.filter(c => 
+    c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    c.phone.includes(customerSearch) ||
+    c.id.toLowerCase().includes(customerSearch.toLowerCase())
+  );
+  
+  // Search for customer profile display
+  const searchedCustomer = customerSearch.length > 0 
+    ? customers.find(c => 
+        c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
+        c.phone.includes(customerSearch) ||
+        c.id.toLowerCase().includes(customerSearch.toLowerCase())
+      )
+    : null;
 
   // Check auth on mount from IndexedDB
   useEffect(() => {
@@ -722,7 +741,7 @@ export default function App() {
           <div style={{ display: 'flex', height: '100%', overflow: 'hidden', width: '100%', background: '#F9FAFB' }}>
             {/* -- LEFT: Products -- */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-              {/* Search Row - with Supplier & Category */}
+              {/* Search Row - with Supplier, Category & Customer */}
               <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 {/* Product Name Search - Largest */}
                 <div style={{ position: 'relative', flex: '2 1 250px', minWidth: 200 }}>
@@ -733,6 +752,39 @@ export default function App() {
                     placeholder={t('searchProduct')}
                     style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
+                </div>
+
+                {/* Customer Search */}
+                <div style={{ position: 'relative', flex: '1 1 180px', minWidth: 160 }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>👤</span>
+                  <input
+                    value={customerSearch}
+                    onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); }}
+                    placeholder={t('customerSearch')}
+                    style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                  {/* Customer Dropdown */}
+                  {customerSearch.length > 0 && filteredCustomers.length > 0 && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 200, overflow: 'auto' }}>
+                      {filteredCustomers.map(c => (
+                        <div
+                          key={c.id}
+                          onClick={() => { setSelectedCustomer(c); setCustomerSearch(''); }}
+                          style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+                        >
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{c.name}</div>
+                            <div style={{ fontSize: 11, color: '#6B7280' }}>{c.phone}</div>
+                          </div>
+                          <div style={{ fontSize: 11, color: c.balance > 0 ? '#DC2626' : '#10B981' }}>
+                            {c.balance > 0 ? `৳${c.balance}` : '✓'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Supplier */}
@@ -986,6 +1038,38 @@ export default function App() {
                             style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                             ✕ {t('close')}
                           </button>
+                        </div>
+                      </div>
+                    )}
+                  
+                    {/* Customer Profile Card - Show when searched */}
+                    {searchedCustomer && (
+                      <div style={{ marginBottom: 12, padding: 16, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
+                          👤
+                        </div>
+                        <div style={{ flex: 1, color: '#fff' }}>
+                          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{searchedCustomer.name}</div>
+                          <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 2 }}>📱 {searchedCustomer.phone}</div>
+                          <div style={{ fontSize: 13, opacity: 0.9 }}>📍 {searchedCustomer.address}</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ padding: '8px 16px', background: searchedCustomer.balance > 0 ? 'rgba(220,38,38,0.3)' : 'rgba(34,197,94,0.3)', borderRadius: 8, marginBottom: 8 }}>
+                            <div style={{ fontSize: 11, color: '#fff', opacity: 0.9 }}>{t('balance')}</div>
+                            <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>৳{searchedCustomer.balance}</div>
+                          </div>
+                          <div style={{ display: 'flex', gap: 8 }}>
+                            <button 
+                              onClick={() => { setSelectedCustomer(searchedCustomer); setCustomerSearch(''); }}
+                              style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#fff', color: '#667eea', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
+                              ✓ {t('selectCustomer')}
+                            </button>
+                            <button 
+                              onClick={() => setCustomerSearch('')}
+                              style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', fontSize: 12 }}>
+                              ✕
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}

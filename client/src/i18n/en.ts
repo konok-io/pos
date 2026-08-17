@@ -41,6 +41,7 @@ export const en: Record<string, string> = {
   customerSearch: 'Search customer...',
   noCustomerFound: 'No customer found',
   customerRequired: 'Add customer',
+  selectCustomer: 'Select',
   cartEmpty: 'Cart is empty',
   addProductsFromLeft: 'Add products from left',
   addToCart: 'Add',

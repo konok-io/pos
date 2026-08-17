@@ -41,6 +41,7 @@ export const bn: Record<string, string> = {
   customerSearch: 'কাস্টমার খুঁজুন...',
   noCustomerFound: 'কাস্টমার পাওয়া যায়নি',
   customerRequired: 'কাস্টমার যোগ করুন',
+  selectCustomer: 'সিলেক্ট',
   cartEmpty: 'কার্টে কোনো পণ্য নেই!',
   addProductsFromLeft: 'বাম দিক থেকে পণ্য যোগ করুন',
   addToCart: 'যোগ করুন',
