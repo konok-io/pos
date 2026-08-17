@@ -386,7 +386,7 @@ export default function App() {
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
-  const [currency, setCurrency] = useState('﷼'); // Currency symbol
+  const [currency, setCurrency] = useState('⃁'); // Currency symbol
   const fmt = (n: number) => `${currency}${(+n || 0).toLocaleString('en-IN')}`;
   
   // Demo customers
@@ -1573,7 +1573,7 @@ export default function App() {
                   onChange={(e) => setCurrency(e.target.value)}
                   style={{ cursor: 'pointer' }}
                 >
-                  <option value="﷼">﷼ Riyal (SAR) - ডিফল্ট</option>
+                  <option value="⃁">⃁ Riyal (SAR) - ডিফল্ট</option>
                   <option value="৳">৳ Taka (BDT)</option>
                   <option value="$">$ Dollar (USD)</option>
                   <option value="€">€ Euro (EUR)</option>
