@@ -827,18 +827,27 @@ export default function App() {
                 {/* Show Held Sales Only - When hold is open and no filter active */}
                 {showHeldSales && !showProductsGrid && (
                   <div>
-                    {/* Hold Sales Header with Same Style as Filter Header */}
+                    {/* Hold Sales Header - Same Style as Filter Header */}
                     <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-                        <div style={{ padding: '6px 14px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📋 {t('holdSales')} ({heldSales.length})</span>
+                      
+                      {/* Hold Sales Pill - Left Side */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📋 {t('holdSales')}</span>
+                      </div>
+
+                      {/* Clear All Button - Right Side */}
+                      <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
+                        <button 
+                          onClick={() => setShowHeldSales(false)}
+                          style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
+                          ✕ {t('close')}
+                        </button>
+                        
+                        {/* Hold Count */}
+                        <div style={{ padding: '6px 14px', background: '#115E59', borderRadius: 20 }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{heldSales.length} {t('itemsFound')}</span>
                         </div>
                       </div>
-                      <button 
-                        onClick={() => setShowHeldSales(false)}
-                        style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600 }}>
-                        ✕ {t('close')}
-                      </button>
                     </div>
 
                     {/* Hold Sales Cards */}
