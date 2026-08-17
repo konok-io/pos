@@ -729,7 +729,7 @@ export default function App() {
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
                   <input
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => { setSearchQuery(e.target.value); setShowHeldSales(false); }}
                     placeholder={t('searchProduct')}
                     style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
@@ -738,7 +738,7 @@ export default function App() {
                 {/* Supplier */}
                 <select
                   value={selectedSupplier}
-                  onChange={(e) => setSelectedSupplier(e.target.value)}
+                  onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
                   style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 140, cursor: 'pointer', flex: '1 1 120px' }}
                 >
                   <option value="all">🏢 {t('allSuppliers')}</option>
@@ -750,7 +750,7 @@ export default function App() {
                 {/* Category */}
                 <select
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
                   style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 140, cursor: 'pointer', flex: '1 1 120px' }}
                 >
                   <option value="all">📁 {t('allCategories')}</option>
@@ -763,7 +763,7 @@ export default function App() {
               {/* Stock Summary Row */}
               <div style={{ padding: '6px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                 <button 
-                  onClick={() => setStockFilter(stockFilter === 'available' ? 'all' : 'available')}
+                  onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); }}
                   style={{ 
                     borderRadius: 8, whiteSpace: 'nowrap', 
                     background: stockFilter === 'available' ? '#115E59' : '#F0FDFA', 
@@ -774,7 +774,7 @@ export default function App() {
                   📦 {t('stockAvailable')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0).length})</span>
                 </button>
                 <button 
-                  onClick={() => setStockFilter(stockFilter === 'low' ? 'all' : 'low')}
+                  onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); }}
                   style={{ 
                     borderRadius: 8, whiteSpace: 'nowrap', 
                     background: stockFilter === 'low' ? '#EA580C' : '#FFF7ED', 
@@ -785,7 +785,7 @@ export default function App() {
                   ⚠️ {t('stockLow')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0 && p.stock <= 10).length})</span>
                 </button>
                 <button 
-                  onClick={() => setStockFilter(stockFilter === 'out' ? 'all' : 'out')}
+                  onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); }}
                   style={{ 
                     borderRadius: 8, whiteSpace: 'nowrap', 
                     background: stockFilter === 'out' ? '#DC2626' : '#FEF2F2', 
@@ -991,6 +991,7 @@ export default function App() {
                                 setSelectedCategory('all');
                                 setSelectedSupplier('all');
                                 setStockFilter('all');
+                                setShowHeldSales(false);
                               }}
                               style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                               ✕ {t('close')}
