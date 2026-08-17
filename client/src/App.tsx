@@ -944,21 +944,21 @@ export default function App() {
                         {/* Filter Pills - Left Side */}
                         {searchQuery && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#EEF2FF', borderRadius: 20, border: '1px solid #C7D2FE' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}"</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}" ({filteredProducts.length})</span>
                           </div>
                         )}
                         
                         {/* Category Filter */}
                         {selectedCategory !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📁 {categories.find(c => c.id === selectedCategory)?.name}</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📁 {categories.find(c => c.id === selectedCategory)?.name} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
                         {/* Supplier Filter */}
                         {selectedSupplier !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#FEF3C7', borderRadius: 20, border: '1px solid #FDE68A' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>🏢 {selectedSupplier}</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>🏢 {selectedSupplier} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
@@ -966,20 +966,15 @@ export default function App() {
                         {stockFilter !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
                             <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
-                              {stockFilter === 'available' && '📦 ' + t('stockAvailable')}
-                              {stockFilter === 'low' && '⚠️ ' + t('stockLow')}
-                              {stockFilter === 'out' && '⚠️ ' + t('stockOut')}
+                              {stockFilter === 'available' && '📦 ' + t('stockAvailable') + ` (${filteredProducts.length})`}
+                              {stockFilter === 'low' && '⚠️ ' + t('stockLow') + ` (${filteredProducts.length})`}
+                              {stockFilter === 'out' && '⚠️ ' + t('stockOut') + ` (${filteredProducts.length})`}
                             </span>
                           </div>
                         )}
                         
-                        {/* Clear All Button & Count - Right Side */}
+                        {/* Clear All Button - Right Side */}
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
-                          {/* Result Count Pill */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#115E59', borderRadius: 20 }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>({filteredProducts.length}) {t('itemsFound')}</span>
-                          </div>
-                          
                           <button 
                             onClick={() => {
                               setSearchQuery('');
