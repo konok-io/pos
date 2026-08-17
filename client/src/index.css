@@ -215,3 +215,6 @@ tr:hover { background: var(--gray-50); }
 .shadow { box-shadow: 0 1px 3px rgba(0,0,0,0.1); } .shadow-lg { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
 .overflow-auto { overflow: auto; } .overflow-hidden { overflow: hidden; }
 .cursor-pointer { cursor: pointer; }
+
+/* Select Dropdown Focus */
+select:focus { outline: 2px solid #115E59; outline-offset: 2px; }

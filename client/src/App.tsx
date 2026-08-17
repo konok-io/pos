@@ -806,7 +806,7 @@ export default function App() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #F3F4F6', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer', flex: '2 1 80px' }}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer', flex: '2 1 80px' }}
                 >
                   <option value="all">📁 {t('allCategories')}</option>
                   {categories.map(cat => (
