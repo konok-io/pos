@@ -722,10 +722,10 @@ export default function App() {
           <div style={{ display: 'flex', height: '100%', overflow: 'hidden', width: '100%', background: '#F9FAFB' }}>
             {/* -- LEFT: Products -- */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-              {/* Search Row - with Category & Supplier */}
+              {/* Search Row - with Supplier & Category */}
               <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                {/* Product Name Search */}
-                <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
+                {/* Product Name Search - Largest */}
+                <div style={{ position: 'relative', flex: '2 1 250px', minWidth: 200 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
                   <input
                     value={searchQuery}
@@ -735,27 +735,27 @@ export default function App() {
                   />
                 </div>
 
-                {/* Category */}
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer' }}
-                >
-                  <option value="all">📁 {t('allCategories')}</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-                
                 {/* Supplier */}
                 <select
                   value={selectedSupplier}
                   onChange={(e) => setSelectedSupplier(e.target.value)}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer' }}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 140, cursor: 'pointer', flex: '1 1 120px' }}
                 >
                   <option value="all">🏢 {t('allSuppliers')}</option>
                   {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
                     <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                
+                {/* Category */}
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 140, cursor: 'pointer', flex: '1 1 120px' }}
+                >
+                  <option value="all">📁 {t('allCategories')}</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
               </div>
@@ -934,7 +934,7 @@ export default function App() {
                             <button 
                               onClick={() => setSearchQuery('')}
                               title="সার্চ মুছুন"
-                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#4338CA', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
                           )}
@@ -944,7 +944,7 @@ export default function App() {
                             <button 
                               onClick={() => setSelectedCategory('all')}
                               title="ক্যাটাগরি সরান"
-                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#115E59', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
                           )}
@@ -954,7 +954,7 @@ export default function App() {
                             <button 
                               onClick={() => setSelectedSupplier('all')}
                               title="সরবরাহকারী সরান"
-                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#D97706', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
                           )}
@@ -964,7 +964,7 @@ export default function App() {
                             <button 
                               onClick={() => setStockFilter('all')}
                               title="স্টক ফিল্টার সরান"
-                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
                           )}
