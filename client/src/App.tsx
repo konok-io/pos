@@ -827,10 +827,12 @@ export default function App() {
                 {/* Show Held Sales Only - When hold is open and no filter active */}
                 {showHeldSales && !showProductsGrid && (
                   <div>
-                    {/* Hold Sales Header with Filter Style */}
+                    {/* Hold Sales Header with Same Style as Filter Header */}
                     <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-                        <span style={{ fontSize: 14, fontWeight: 600, color: '#115E59' }}>📋 {t('holdSales')} ({heldSales.length})</span>
+                      <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                        <div style={{ padding: '6px 14px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📋 {t('holdSales')} ({heldSales.length})</span>
+                        </div>
                       </div>
                       <button 
                         onClick={() => setShowHeldSales(false)}
