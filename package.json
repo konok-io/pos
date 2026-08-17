@@ -6,16 +6,49 @@
     "dev": "npm run dev:client",
     "dev:client": "cd client && npm run dev",
     "dev:server": "cd server && npm run dev",
+    "dev:electron": "npm run build:client && electron .",
     "build": "npm run build:client",
     "build:client": "cd client && npm run build",
     "build:server": "cd server && npm run build",
+    "build:electron": "npm run build:client && electron-builder",
     "start": "npm run start:server",
     "start:server": "cd server && npm start",
     "start:client": "cd client && npm run preview",
+    "start:electron": "electron .",
     "db:setup": "cd server && npm run db:setup",
     "db:seed": "cd server && npm run db:seed",
     "install:all": "npm install && cd client && npm install && cd ../server && npm install",
     "build:all": "npm run build:client && npm run build:server"
   },
-  "description": "POS Management System - Client & Server"
+  "description": "POS Management System - Client & Server",
+  "devDependencies": {
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.pos.management",
+    "productName": "POS Management",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "client/dist/**/*",
+      "client/public/**/*",
+      "!node_modules/**/*",
+      "!client/node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "client/public/Logo.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "client/public/Logo.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "client/public/Logo.png"
+    }
+  }
 }
