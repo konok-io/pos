@@ -1081,7 +1081,7 @@ export default function App() {
                     {filteredProducts.length === 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
                       <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}><span style={{ fontSize: 28, fontWeight: 700 }}>P</span> {t('posManagementSystem')}</div>
+                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>{t('posManagementSystem')}</div>
                         <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('smartBusinessPartner')}</div>
                       </div>
                       <svg width="200" height="120" viewBox="0 0 280 180" style={{ marginBottom: 16 }}>
