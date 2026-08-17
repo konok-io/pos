@@ -155,6 +155,7 @@ export default function TranslationSettings() {
                   {editingKey === key ? (
                     <div style={{ display: 'flex', gap: 8 }}>
                       <input
+                        id="translation-input"
                         type="text"
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
