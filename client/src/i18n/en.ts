@@ -145,6 +145,7 @@ export const en: Record<string, string> = {
   storeSettings: 'Store Settings',
   invoicePrefix: 'Invoice Prefix',
   defaultCurrency: 'Default Currency',
+  currency: 'Currency',
   taxRate: 'Tax Rate',
 
   // Messages

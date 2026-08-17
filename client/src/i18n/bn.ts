@@ -145,6 +145,7 @@ export const bn: Record<string, string> = {
   storeSettings: 'স্টোর সেটিংস',
   invoicePrefix: 'ইনভয়েস প্রিফিক্স',
   defaultCurrency: 'ডিফল্ট কারেন্সি',
+  currency: 'কারেন্সি',
   taxRate: 'ট্যাক্স রেট',
 
   // Messages

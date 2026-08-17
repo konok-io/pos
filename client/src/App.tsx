@@ -14,7 +14,6 @@ const DEFAULT_ADMIN = {
 
 // Helper functions
 const genId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
-const fmt = (n: number) => `৳${(+n || 0).toLocaleString('en-IN')}`;
 const now = () => new Date().toISOString();
 
 // Types
@@ -387,6 +386,8 @@ export default function App() {
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
+  const [currency, setCurrency] = useState('৳'); // Currency symbol
+  const fmt = (n: number) => `${currency}${(+n || 0).toLocaleString('en-IN')}`;
   
   // Demo customers
 
@@ -1564,6 +1565,22 @@ export default function App() {
           <div>
             <h2 style={{ marginBottom: 16 }}>⚙️ {t('settings')}</h2>
             <div className="card" style={{ maxWidth: 500 }}>
+              <div className="form-group">
+                <label className="label">{t('currency') || 'Currency'}</label>
+                <select
+                  className="input"
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <option value="৳">৳ Taka (BDT)</option>
+                  <option value="$">$ Dollar (USD)</option>
+                  <option value="€">€ Euro (EUR)</option>
+                  <option value="£">£ Pound (GBP)</option>
+                  <option value="¥">¥ Yen (JPY)</option>
+                  <option value="₹">₹ Rupee (INR)</option>
+                </select>
+              </div>
               <div className="form-group">
                 <label className="label">{t('vat')} (%)</label>
                 <input
