@@ -745,24 +745,24 @@ export default function App() {
               {/* Search Row - with Supplier, Category & Customer */}
               <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 {/* Product Name Search - Largest */}
-                <div style={{ position: 'relative', flex: '2 1 250px', minWidth: 200 }}>
+                <div style={{ position: 'relative', flex: '3 1 300px', minWidth: 250 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
                   <input
                     value={searchQuery}
                     onChange={(e) => { setSearchQuery(e.target.value); setShowHeldSales(false); }}
                     placeholder={t('searchProduct')}
-                    style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', paddingLeft: 32, height: 36, fontSize: 14, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
 
                 {/* Customer Search */}
-                <div style={{ position: 'relative', flex: '1 1 180px', minWidth: 160 }}>
+                <div style={{ position: 'relative', flex: '1.5 1 180px', minWidth: 150 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>👤</span>
                   <input
                     value={customerSearch}
                     onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); }}
                     placeholder={t('customerSearch')}
-                    style={{ width: '100%', paddingLeft: 32, height: 34, fontSize: 13, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                    style={{ width: '100%', paddingLeft: 32, height: 36, fontSize: 14, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                   />
                   {/* Customer Dropdown */}
                   {customerSearch.length > 0 && filteredCustomers.length > 0 && (
@@ -792,7 +792,7 @@ export default function App() {
                 <select
                   value={selectedSupplier}
                   onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 140, cursor: 'pointer', flex: '1 1 120px' }}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 130, cursor: 'pointer', flex: '1 1 100px' }}
                 >
                   <option value="all">🏢 {t('allSuppliers')}</option>
                   {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
@@ -804,7 +804,7 @@ export default function App() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 34, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 140, cursor: 'pointer', flex: '1 1 120px' }}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 130, cursor: 'pointer', flex: '1 1 100px' }}
                 >
                   <option value="all">📁 {t('allCategories')}</option>
                   {categories.map(cat => (
@@ -911,10 +911,10 @@ export default function App() {
                             key={idx}
                             style={{
                               background: '#fff',
-                              border: '1.5px solid #99F6E4',
+                              border: '1.5px solid #E5E7EB',
                               borderRadius: 12,
                               padding: 0,
-                              boxShadow: '0 2px 8px rgba(15,118,110,0.1)',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                               overflow: 'hidden',
                             }}
                           >
@@ -1127,7 +1127,7 @@ export default function App() {
                             justifyContent: 'center',
                             flexShrink: 0,
                             overflow: 'hidden',
-                            border: `2px solid ${product.stock <= 0 ? '#fca5a5' : product.stock <= 10 ? '#fdba74' : '#99f6e4'}`,
+                            border: `2px solid ${product.stock <= 0 ? '#fca5a5' : product.stock <= 10 ? '#fdba74' : '#E5E7EB'}`,
                           }}>
                             {product.image && product.image.startsWith('http') ? (
                               <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
