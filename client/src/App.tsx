@@ -786,7 +786,7 @@ export default function App() {
                 {showHeldSales && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                     <h4 style={{ margin: 0, color: '#0F766E', fontSize: 15, fontWeight: 600 }}>📋 {t('holdSales')} ({heldSales.length})</h4>
-                    <button onClick={() => setShowHeldSales(false)} style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #FECACA', background: '#FEF2F2', cursor: 'pointer', fontSize: 12, color: '#DC2626' }}>
+                    <button onClick={() => setShowHeldSales(false)} style={{ padding: '4px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600 }}>
                       ✕ {t('close')}
                     </button>
                   </div>
