@@ -975,6 +975,11 @@ export default function App() {
 
                         {/* Clear All Button - Right Side */}
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
+                          {/* Result Count - as pill */}
+                          <div style={{ padding: '4px 12px', background: '#115E59', borderRadius: 20 }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: 'white' }}>({filteredProducts.length}) {t('itemsFound')}</span>
+                          </div>
+                          
                           <button 
                             onClick={() => {
                               setSearchQuery('');
@@ -986,11 +991,6 @@ export default function App() {
                             style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                             ✕ {t('close')}
                           </button>
-                          
-                          {/* Result Count */}
-                          <div style={{ padding: '6px 14px', background: '#115E59', borderRadius: 20 }}>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} {t('itemsFound')}</span>
-                          </div>
                         </div>
                       </div>
                     )}
