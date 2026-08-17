@@ -890,66 +890,89 @@ export default function App() {
                   <>
                     {/* Active Filters Header */}
                     {(selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all' || searchQuery) && (
-                      <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-                        {/* Search Filter */}
-                        {searchQuery && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 4px 4px 12px', background: '#EEF2FF', borderRadius: 20, border: '1px solid #C7D2FE' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}"</span>
+                      <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                        
+                        {/* Filter Pills - Left Side */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, flex: 1 }}>
+                          {/* Search Filter */}
+                          {searchQuery && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: '#EEF2FF', borderRadius: 20, border: '1px solid #C7D2FE' }}>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}"</span>
+                            </div>
+                          )}
+                          
+                          {/* Category Filter */}
+                          {selectedCategory !== 'all' && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📁 {categories.find(c => c.id === selectedCategory)?.name}</span>
+                            </div>
+                          )}
+                          
+                          {/* Supplier Filter */}
+                          {selectedSupplier !== 'all' && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: '#FEF3C7', borderRadius: 20, border: '1px solid #FDE68A' }}>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>🏢 {selectedSupplier}</span>
+                            </div>
+                          )}
+                          
+                          {/* Stock Filter */}
+                          {stockFilter !== 'all' && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px 4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
+                              <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
+                                {stockFilter === 'available' && '📦 ' + t('stockAvailable')}
+                                {stockFilter === 'low' && '⚠️ ' + t('stockLow')}
+                                {stockFilter === 'out' && '⚠️ ' + t('stockOut')}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Close Buttons - Right Side */}
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          {/* Search Close */}
+                          {searchQuery && (
                             <button 
                               onClick={() => setSearchQuery('')}
                               title="সার্চ মুছুন"
-                              style={{ width: 22, height: 22, borderRadius: '50%', border: 'none', background: '#4338CA', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#4338CA', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
-                          </div>
-                        )}
-                        
-                        {/* Category Filter */}
-                        {selectedCategory !== 'all' && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 4px 4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📁 {categories.find(c => c.id === selectedCategory)?.name}</span>
+                          )}
+                          
+                          {/* Category Close */}
+                          {selectedCategory !== 'all' && (
                             <button 
                               onClick={() => setSelectedCategory('all')}
                               title="ক্যাটাগরি সরান"
-                              style={{ width: 22, height: 22, borderRadius: '50%', border: 'none', background: '#115E59', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#115E59', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
-                          </div>
-                        )}
-                        
-                        {/* Supplier Filter */}
-                        {selectedSupplier !== 'all' && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 4px 4px 12px', background: '#FEF3C7', borderRadius: 20, border: '1px solid #FDE68A' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>🏢 {selectedSupplier}</span>
+                          )}
+                          
+                          {/* Supplier Close */}
+                          {selectedSupplier !== 'all' && (
                             <button 
                               onClick={() => setSelectedSupplier('all')}
                               title="সরবরাহকারী সরান"
-                              style={{ width: 22, height: 22, borderRadius: '50%', border: 'none', background: '#D97706', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: '#D97706', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
-                          </div>
-                        )}
-                        
-                        {/* Stock Filter */}
-                        {stockFilter !== 'all' && (
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 4px 4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
-                              {stockFilter === 'available' && '📦 ' + t('stockAvailable')}
-                              {stockFilter === 'low' && '⚠️ ' + t('stockLow')}
-                              {stockFilter === 'out' && '⚠️ ' + t('stockOut')}
-                            </span>
+                          )}
+                          
+                          {/* Stock Close */}
+                          {stockFilter !== 'all' && (
                             <button 
                               onClick={() => setStockFilter('all')}
                               title="স্টক ফিল্টার সরান"
-                              style={{ width: 22, height: 22, borderRadius: '50%', border: 'none', background: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 24, height: 24, borderRadius: '50%', border: 'none', background: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
+                          )}
+                          
+                          {/* Result Count */}
+                          <div style={{ padding: '6px 14px', background: '#115E59', borderRadius: 20, marginLeft: 4 }}>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} টি পণ্য</span>
                           </div>
-                        )}
-                        
-                        {/* Result Count */}
-                        <div style={{ marginLeft: 'auto', padding: '6px 14px', background: '#115E59', borderRadius: 20 }}>
-                          <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} টি পণ্য</span>
                         </div>
                       </div>
                     )}
