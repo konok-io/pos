@@ -971,7 +971,7 @@ export default function App() {
                           
                           {/* Result Count */}
                           <div style={{ padding: '6px 14px', background: '#115E59', borderRadius: 20, marginLeft: 4 }}>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} টি পণ্য</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} {t('itemsFound')}</span>
                           </div>
                         </div>
                       </div>
@@ -980,8 +980,8 @@ export default function App() {
                     {filteredProducts.length === 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
                       <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>🏪 আমার দোকান</div>
-                        <div style={{ fontSize: 14, color: '#9CA3AF' }}>📞 ০১৭০০-০০০০০০</div>
+                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>🏪 {t('posSystem')}</div>
+                        <div style={{ fontSize: 14, color: '#9CA3AF' }}>📞 01700-000000</div>
                       </div>
                       <svg width="200" height="120" viewBox="0 0 280 180" style={{ marginBottom: 16 }}>
                         <rect x="20" y="50" width="240" height="110" rx="8" fill="#F0FDFA" stroke="#115E59" strokeWidth="2"/>
@@ -1535,35 +1535,35 @@ export default function App() {
 
         {currentTab === 'suppliers' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>🏢 সরবরাহকারী</h2>
+            <h2 style={{ marginBottom: 16 }}>🏢 {t('suppliers')}</h2>
             <div className="card">
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <span style={{ color: '#6B7280' }}>মোট: ০ জন</span>
-                <button className="btn btn-primary">➕ নতুন যোগ করুন</button>
+                <span style={{ color: '#6B7280' }}>{t('total')}: 0 {t('suppliers')}</span>
+                <button className="btn btn-primary">➕ {t('addSupplier')}</button>
               </div>
-              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>কোনো সরবরাহকারী নেই</p>
+              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>{t('noSuppliers')}</p>
             </div>
           </div>
         )}
 
         {currentTab === 'inventory' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>🏭 ইনভেন্টরি</h2>
+            <h2 style={{ marginBottom: 16 }}>🏭 {t('stock')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>📦</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>মোট পণ্য</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProductsCount')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#DC2626' }}>০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>স্টক কম</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockLow')}</div>
               </div>
               <div className="card" style={{ background: '#ECFDF5', border: '1px solid #A7F3D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#059669' }}>০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>স্টক আছে</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockAvailable')}</div>
               </div>
             </div>
           </div>
@@ -1571,48 +1571,48 @@ export default function App() {
 
         {currentTab === 'lowstock' && (
           <div>
-            <h2 style={{ marginBottom: 16, color: '#DC2626' }}>⚠️ স্টক কম আছে</h2>
+            <h2 style={{ marginBottom: 16, color: '#DC2626' }}>⚠️ {t('lowStockAlert')}</h2>
             <div className="card">
-              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>কোনো পণ্য স্টক কম নেই</p>
+              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>{t('noLowStockProducts')}</p>
             </div>
           </div>
         )}
 
         {currentTab === 'income' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>💰 আয়/ব্যয়</h2>
+            <h2 style={{ marginBottom: 16 }}>💰 {t('expenses')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📈</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>৳০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>মোট আয়</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalIncome')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📉</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>৳০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>মোট ব্যয়</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalExpense')}</div>
               </div>
             </div>
             <div className="card">
-              <h3 style={{ marginBottom: 12 }}>➕ নতুন লেনদেন</h3>
+              <h3 style={{ marginBottom: 12 }}>➕ {t('addExpense')}</h3>
               <div className="form-group">
-                <label className="label">বিবরণ</label>
-                <input type="text" className="input" placeholder="লেনদেনের বিবরণ" />
+                <label className="label">{t('description')}</label>
+                <input type="text" className="input" placeholder={t('description')} />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div className="form-group">
-                  <label className="label">টাকা</label>
-                  <input type="number" className="input" placeholder="০" />
+                  <label className="label">{t('amount')}</label>
+                  <input type="number" className="input" placeholder="0" />
                 </div>
                 <div className="form-group">
-                  <label className="label">ধরন</label>
+                  <label className="label">{t('expenseType')}</label>
                   <select className="input">
-                    <option value="income">আয়</option>
-                    <option value="expense">ব্যয়</option>
+                    <option value="income">{t('income')}</option>
+                    <option value="expense">{t('expense')}</option>
                   </select>
                 </div>
               </div>
-              <button className="btn btn-primary">সেভ করুন</button>
+              <button className="btn btn-primary">{t('save')}</button>
             </div>
           </div>
         )}
@@ -1623,16 +1623,16 @@ export default function App() {
         <div className="modal-overlay" onClick={() => setShowReceiptModal(false)}>
           <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>✅ বিক্রয় সম্পন্ন!</h3>
+              <h3>✅ {t('saleComplete')}</h3>
               <button className="modal-close" onClick={() => setShowReceiptModal(false)}>✕</button>
             </div>
             <div className="modal-body">
               <div style={{ textAlign: 'center', marginBottom: 20 }}>
                 <div style={{ fontSize: 48 }}>✅</div>
-                <p style={{ fontSize: 14, color: '#6B7280' }}>Invoice: {lastSale.invoiceNo}</p>
+                <p style={{ fontSize: 14, color: '#6B7280' }}>{t('invoice')}: {lastSale.invoiceNo}</p>
               </div>
               <div style={{ borderBottom: '1px dashed #E5E7EB', paddingBottom: 12, marginBottom: 12 }}>
-                <p style={{ margin: 0, fontWeight: 600 }}>গ্রাহক: {lastSale.customerName}</p>
+                <p style={{ margin: 0, fontWeight: 600 }}>{t('customer')}: {lastSale.customerName}</p>
               </div>
               {lastSale.items.map((item: any, i: number) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
@@ -1642,46 +1642,46 @@ export default function App() {
               ))}
               <div style={{ borderTop: '2px solid #E5E7EB', marginTop: 12, paddingTop: 12 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>সাবটোটাল:</span>
+                  <span>{t('subtotal')}:</span>
                   <span>{fmt(lastSale.subtotal)}</span>
                 </div>
                 {lastSale.discount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>ডিসকাউন্ট:</span>
+                    <span>{t('discount')}:</span>
                     <span>-{fmt(lastSale.discount)}</span>
                   </div>
                 )}
                 {lastSale.vatAmount > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>ভ্যাট ({lastSale.vatPercent}%):</span>
+                    <span>{t('vat')} ({lastSale.vatPercent}%):</span>
                     <span>{fmt(lastSale.vatAmount)}</span>
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 18, marginTop: 8 }}>
-                  <span>মোট:</span>
+                  <span>{t('total')}:</span>
                   <span style={{ color: '#115E59' }}>{fmt(lastSale.total)}</span>
                 </div>
                 {lastSale.paid > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>পরিশোধ:</span>
+                    <span>{t('paid')}:</span>
                     <span>{fmt(lastSale.paid)}</span>
                   </div>
                 )}
                 {lastSale.change > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#10B981' }}>
-                    <span>ফেরত:</span>
+                    <span>{t('change')}:</span>
                     <span>{fmt(lastSale.change)}</span>
                   </div>
                 )}
                 {lastSale.due > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#EF4444' }}>
-                    <span>বাকি:</span>
+                    <span>{t('due')}:</span>
                     <span>{fmt(lastSale.due)}</span>
                   </div>
                 )}
               </div>
               <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 20 }} onClick={() => setShowReceiptModal(false)}>
-                ✓ সম্পন্ন
+                ✓ {t('finish')}
               </button>
             </div>
           </div>

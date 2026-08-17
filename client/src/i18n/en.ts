@@ -158,4 +158,16 @@ export const en: Record<string, string> = {
   stockFinished: 'stock finished!',
   maxStock: 'Maximum stock',
   selectCustomerOrPayFull: 'Select customer or pay full amount!',
+
+  // Additional translations for filter counts and counts
+  itemsFound: 'items',
+  totalProductsCount: 'Total Products',
+  totalSuppliersCount: 'Total Suppliers',
+  totalCustomersCount: 'Total Customers',
+  totalIncome: 'Total Income',
+  totalExpense: 'Total Expense',
+  noSuppliers: 'No suppliers',
+  noLowStockProducts: 'No low stock products',
+  lowStockAlert: 'Low Stock Alert',
+  grandTotal: 'Grand Total',
 };

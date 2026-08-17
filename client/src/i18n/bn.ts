@@ -158,4 +158,16 @@ export const bn: Record<string, string> = {
   stockFinished: 'স্টক শেষ!',
   maxStock: 'সর্বোচ্চ স্টক',
   selectCustomerOrPayFull: 'গ্রাহক সিলেক্ট করুন অথবা পূর্ণ পরিশোধ করুন!',
+
+  // Additional translations for filter counts and counts
+  itemsFound: 'টি পণ্য',
+  totalProductsCount: 'মোট পণ্য',
+  totalSuppliersCount: 'মোট সরবরাহকারী',
+  totalCustomersCount: 'মোট কাস্টমার',
+  totalIncome: 'মোট আয়',
+  totalExpense: 'মোট ব্যয়',
+  noSuppliers: 'কোনো সরবরাহকারী নেই',
+  noLowStockProducts: 'কোনো পণ্য স্টক কম নেই',
+  lowStockAlert: 'স্টক কম আছে',
+  grandTotal: 'সর্বমোট',
 };
