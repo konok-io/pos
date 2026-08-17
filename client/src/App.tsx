@@ -794,7 +794,7 @@ export default function App() {
                 <select
                   value={selectedSupplier}
                   onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
-                  style={{ padding: '6px 10px', fontSize: 13, height: 36, minWidth: 120, cursor: 'pointer', flex: '2 1 100px' }}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 120, cursor: 'pointer', flex: '2 1 100px' }}
                 >
                   <option value="all">📋 {t('allSuppliers')}</option>
                   {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
@@ -806,7 +806,7 @@ export default function App() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
-                  style={{ padding: '6px 10px', fontSize: 13, height: 36, minWidth: 100, cursor: 'pointer', flex: '2 1 80px' }}
+                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer', flex: '2 1 80px' }}
                 >
                   <option value="all">📁 {t('allCategories')}</option>
                   {categories.map(cat => (
