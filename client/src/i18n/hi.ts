@@ -3,7 +3,7 @@ export const hi: Record<string, string> = {
   posSystem: 'पीओएस सिस्टम',
   posManagement: 'पीओएस मैनेजमेंट सिस्टम',
   posManagementSystem: 'पीओएस मैनेजमेंट सिस्टम',
-  smartBusinessPartner: 'स्मार्ट बिज़नेस पार्टनर',
+  smartBusinessPartner: 'आपका स्मार्ट बिज़नेस पार्टनर',
   sales: 'बिक्री',
   products: 'उत्पाद',
   categories: 'श्रेणियाँ',

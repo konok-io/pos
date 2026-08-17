@@ -3,7 +3,7 @@ export const bn: Record<string, string> = {
   posSystem: 'পিওএস সিস্টেম',
   posManagement: 'পিওএস ম্যানেজমেন্ট সিস্টেম',
   posManagementSystem: 'POS ম্যানেজমেন্ট সিস্টেম',
-  smartBusinessPartner: 'স্মার্ট বিজনেস পার্টনার',
+  smartBusinessPartner: 'আপনার স্মার্ট বিজনেস পার্টনার',
   sales: 'বিক্রয়',
   products: 'পণ্য',
   categories: 'ক্যাটাগরি',

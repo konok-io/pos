@@ -3,7 +3,7 @@ export const ar: Record<string, string> = {
   posSystem: 'نظام نقاط البيع',
   posManagement: 'نظام إدارة نقاط البيع',
   posManagementSystem: 'نظام إدارة نقاط البيع',
-  smartBusinessPartner: 'شريك ذكي للأعمال',
+  smartBusinessPartner: 'شريكك الذكي للأعمال',
   sales: 'المبيعات',
   products: 'المنتجات',
   categories: 'الفئات',

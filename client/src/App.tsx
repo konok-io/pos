@@ -588,8 +588,8 @@ export default function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
             <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #115E59 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}><span style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>P</span></div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 22, color: '#115E59', lineHeight: 1.2 }}>{t('posSystem')}</div>
-              <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('posManagement')}</div>
+              <div style={{ fontWeight: 800, fontSize: 22, color: '#115E59', lineHeight: 1.2 }}>{t('posManagementSystem')}</div>
+              <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('smartBusinessPartner')}</div>
             </div>
           </div>
           
@@ -1081,7 +1081,7 @@ export default function App() {
                     {filteredProducts.length === 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
                       <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}><span style={{ fontSize: 28, fontWeight: 700 }}>P</span> {t('posSystem')}</div>
+                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}><span style={{ fontSize: 28, fontWeight: 700 }}>P</span> {t('posManagementSystem')}</div>
                         <div style={{ fontSize: 14, color: '#9CA3AF' }}>📞 01700-000000</div>
                       </div>
                       <svg width="200" height="120" viewBox="0 0 280 180" style={{ marginBottom: 16 }}>
