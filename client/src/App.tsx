@@ -1025,12 +1025,32 @@ export default function App() {
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: '#111827', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 {t('cart')}</h3>
                   <span style={{ background: '#111827', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
                 </div>
-                {/* Customer Input */}
-                <div style={{ position: 'relative' }}>
-                  <input
-                    placeholder={t('customerSearch')}
-                    style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
-                  />
+                {/* Customer Input with Add Button */}
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <div style={{ position: 'relative', flex: 1 }}>
+                    <input
+                      placeholder={t('customerSearch')}
+                      style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <button 
+                    onClick={() => {
+                      // Future: Open add customer modal
+                      alert('কাস্টমার যোগ করার ফিচার শীঘ্রই আসছে!');
+                    }}
+                    style={{ 
+                      padding: '8px 12px', 
+                      borderRadius: 8, 
+                      border: 'none', 
+                      background: '#0F766E', 
+                      color: 'white', 
+                      fontSize: 12, 
+                      fontWeight: 600, 
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}>
+                    ➕ Add
+                  </button>
                 </div>
               </div>
 
