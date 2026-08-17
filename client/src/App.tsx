@@ -939,7 +939,7 @@ export default function App() {
                                 setStockFilter('all');
                               }}
                               style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                              ✕ {t('close')} All
+                              ✕ {t('close')}
                             </button>
                           )}
                           
