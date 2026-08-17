@@ -163,14 +163,13 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, width: '100%' }}>
                           <div style={{
               width: 60, height: 60,
-              background: 'linear-gradient(135deg, #115E59, #0F766E)',
               borderRadius: 16,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 4px 12px rgba(15,118,110,0.3)',
             }}>
-              <span style={{ color: '#fff', fontSize: 28, fontWeight: 700 }}>P</span>
+              <img src="/Logo.png" alt="Logo" style={{ width: 60, height: 60, objectFit: 'contain', borderRadius: 16 }} />
             </div>
             <div style={{ flex: 1, textAlign: 'right' }}>
               <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#115E59' }}>
@@ -586,7 +585,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           {/* Logo Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-            <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #115E59 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}><span style={{ color: '#fff', fontSize: 20, fontWeight: 700 }}>P</span></div>
+            <div style={{ width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}><img src="/Logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 12 }} /></div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
               <div style={{ fontSize: 14.5, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
@@ -1084,14 +1083,7 @@ export default function App() {
                         <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>{t('posManagementSystem')}</div>
                         <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('smartBusinessPartner')}</div>
                       </div>
-                      <svg width="200" height="120" viewBox="0 0 280 180" style={{ marginBottom: 16 }}>
-                        <rect x="20" y="50" width="240" height="110" rx="8" fill="#F0FDFA" stroke="#115E59" strokeWidth="2"/>
-                        <rect x="50" y="70" width="60" height="60" rx="4" fill="#115E59"/>
-                        <text x="80" y="105" textAnchor="middle" fill="white" fontSize="24">P</text>
-                        <rect x="130" y="65" width="100" height="50" rx="6" fill="#115E59"/>
-                        <circle cx="220" cy="90" r="25" fill="#22C55E"/>
-                        <path d="M208 90 L216 98 L232 82" stroke="white" strokeWidth="4" fill="none" strokeLinecap="round"/>
-                      </svg>
+                      <img src="/Logo.png" alt="Logo" style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: 16 }} />
                       <div style={{ padding: '16px', textAlign: 'center' }}>
                         <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 600 }}>{t('searchProductBarcode')}</div>
                         <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>{t('orSelectCategorySupplier')}</div>
