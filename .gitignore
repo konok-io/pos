@@ -5,3 +5,8 @@ node_modules/
 release/
 release/
 release/
+
+# Build output - don't commit
+client/dist/
+server/dist/
+server/node_modules/
