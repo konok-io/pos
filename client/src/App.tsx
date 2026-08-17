@@ -858,7 +858,22 @@ export default function App() {
 
                 {/* Show Products when: no hold open, OR (hold open AND filter is active) */}
                 {(!showHeldSales || showProductsGrid) && (
-                  filteredProducts.length === 0 ? (
+                  <>
+                    {/* Selected Category Header */}
+                    {selectedCategory !== 'all' && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '8px 12px', background: '#FFFFFF', borderRadius: 8, border: '1px solid #E5E7EB' }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: '#0F766E' }}>
+                          📁 {categories.find(c => c.id === selectedCategory)?.name || t('category')} ({filteredProducts.length})
+                        </div>
+                        <button 
+                          onClick={() => setSelectedCategory('all')}
+                          style={{ padding: '4px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600 }}>
+                          ✕ {t('close')}
+                        </button>
+                      </div>
+                    )}
+                  
+                    {filteredProducts.length === 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
                       <div style={{ textAlign: 'center', marginBottom: 20 }}>
                         <div style={{ fontSize: 28, fontWeight: 800, color: '#0F766E', marginBottom: 8 }}>🏪 আমার দোকান</div>
@@ -989,7 +1004,8 @@ export default function App() {
                         </button>
                       ))}
                     </div>
-                  )
+                  )}
+                  </>
                 )}
               </div>
             </div>
