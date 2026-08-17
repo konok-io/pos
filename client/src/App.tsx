@@ -381,6 +381,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSupplier, setSelectedSupplier] = useState('all');
+  const [stockFilter, setStockFilter] = useState<string>('all'); // 'all', 'available', 'low', 'out'
   const [heldSales, setHeldSales] = useState<HeldSale[]>([]);
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
@@ -418,16 +419,20 @@ export default function App() {
     window.location.reload();
   };
 
-  // Filter products - only show when search, category, or supplier is selected
-  const hasFilter = searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all';
+  // Filter products - only show when search, category, supplier, or stock filter is selected
+  const hasFilter = searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all';
   const filteredProducts = hasFilter ? products.filter(p => {
     const matchCategory = selectedCategory === 'all' || p.categoryId === selectedCategory;
     const matchSupplier = selectedSupplier === 'all' || (p.supplier || '') === selectedSupplier;
     const matchSearch = !searchQuery || 
       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.code.toLowerCase().includes(searchQuery.toLowerCase());
-    const hasStock = p.stock > 0;
-    return matchCategory && matchSupplier && matchSearch && hasStock;
+    const matchStock = 
+      stockFilter === 'all' ||
+      (stockFilter === 'available' && p.stock > 0) ||
+      (stockFilter === 'low' && p.stock > 0 && p.stock <= 10) ||
+      (stockFilter === 'out' && p.stock <= 0);
+    return matchCategory && matchSupplier && matchSearch && matchStock;
   }) : [];
   
   // Show products section when: has filter AND cart is empty
@@ -757,15 +762,39 @@ export default function App() {
 
               {/* Stock Summary Row */}
               <div style={{ padding: '6px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-                <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#F0FDFA', color: '#0F766E', border: '1.5px solid rgba(15,118,110,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
+                <button 
+                  onClick={() => setStockFilter(stockFilter === 'available' ? 'all' : 'available')}
+                  style={{ 
+                    borderRadius: 8, whiteSpace: 'nowrap', 
+                    background: stockFilter === 'available' ? '#0F766E' : '#F0FDFA', 
+                    color: stockFilter === 'available' ? '#fff' : '#0F766E', 
+                    border: '1.5px solid rgba(15,118,110,0.3)', 
+                    padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' 
+                  }}>
                   📦 {t('stockAvailable')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0).length})</span>
-                </div>
-                <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#FFF7ED', color: '#EA580C', border: '1.5px solid rgba(234,88,12,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
+                </button>
+                <button 
+                  onClick={() => setStockFilter(stockFilter === 'low' ? 'all' : 'low')}
+                  style={{ 
+                    borderRadius: 8, whiteSpace: 'nowrap', 
+                    background: stockFilter === 'low' ? '#EA580C' : '#FFF7ED', 
+                    color: stockFilter === 'low' ? '#fff' : '#EA580C', 
+                    border: '1.5px solid rgba(234,88,12,0.3)', 
+                    padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' 
+                  }}>
                   ⚠️ {t('stockLow')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0 && p.stock <= 10).length})</span>
-                </div>
-                <div style={{ borderRadius: 8, whiteSpace: 'nowrap', background: '#FEF2F2', color: '#DC2626', border: '1.5px solid rgba(220,38,38,0.3)', padding: '6px 14px', fontSize: 13, fontWeight: 600 }}>
+                </button>
+                <button 
+                  onClick={() => setStockFilter(stockFilter === 'out' ? 'all' : 'out')}
+                  style={{ 
+                    borderRadius: 8, whiteSpace: 'nowrap', 
+                    background: stockFilter === 'out' ? '#DC2626' : '#FEF2F2', 
+                    color: stockFilter === 'out' ? '#fff' : '#DC2626', 
+                    border: '1.5px solid rgba(220,38,38,0.3)', 
+                    padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' 
+                  }}>
                   ⚠️ {t('stockOut')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock <= 0).length})</span>
-                </div>
+                </button>
                 <button 
                   onClick={() => setShowHeldSales(!showHeldSales)}
                   style={{
@@ -859,17 +888,65 @@ export default function App() {
                 {/* Show Products when: no hold open, OR (hold open AND filter is active) */}
                 {(!showHeldSales || showProductsGrid) && (
                   <>
-                    {/* Selected Category Header */}
-                    {selectedCategory !== 'all' && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, padding: '8px 12px', background: '#FFFFFF', borderRadius: 8, border: '1px solid #E5E7EB' }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: '#0F766E' }}>
-                          📁 {categories.find(c => c.id === selectedCategory)?.name || t('category')} ({filteredProducts.length})
+                    {/* Active Filters Header */}
+                    {(selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all' || searchQuery) && (
+                      <div style={{ marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {/* Search Filter */}
+                        {searchQuery && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#EEF2FF', borderRadius: 8, border: '1px solid #C7D2FE' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}>🔍 "{searchQuery}"</span>
+                            <button 
+                              onClick={() => setSearchQuery('')}
+                              style={{ padding: '2px 8px', borderRadius: 4, border: 'none', background: '#4338CA', cursor: 'pointer', fontSize: 11, color: 'white', fontWeight: 600 }}>
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                        
+                        {/* Category Filter */}
+                        {selectedCategory !== 'all' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#F0FDFA', borderRadius: 8, border: '1px solid #99F6E4' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#0F766E' }}>📁 {categories.find(c => c.id === selectedCategory)?.name}</span>
+                            <button 
+                              onClick={() => setSelectedCategory('all')}
+                              style={{ padding: '2px 8px', borderRadius: 4, border: 'none', background: '#0F766E', cursor: 'pointer', fontSize: 11, color: 'white', fontWeight: 600 }}>
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                        
+                        {/* Supplier Filter */}
+                        {selectedSupplier !== 'all' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: '#FEF3C7', borderRadius: 8, border: '1px solid #FDE68A' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}>🏢 {selectedSupplier}</span>
+                            <button 
+                              onClick={() => setSelectedSupplier('all')}
+                              style={{ padding: '2px 8px', borderRadius: 4, border: 'none', background: '#D97706', cursor: 'pointer', fontSize: 11, color: 'white', fontWeight: 600 }}>
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                        
+                        {/* Stock Filter */}
+                        {stockFilter !== 'all' && (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 8, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#0F766E' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
+                              {stockFilter === 'available' && '📦 ' + t('stockAvailable')}
+                              {stockFilter === 'low' && '⚠️ ' + t('stockLow')}
+                              {stockFilter === 'out' && '⚠️ ' + t('stockOut')}
+                            </span>
+                            <button 
+                              onClick={() => setStockFilter('all')}
+                              style={{ padding: '2px 8px', borderRadius: 4, border: 'none', background: stockFilter === 'available' ? '#0F766E' : stockFilter === 'low' ? '#EA580C' : '#DC2626', cursor: 'pointer', fontSize: 11, color: 'white', fontWeight: 600 }}>
+                              ✕
+                            </button>
+                          </div>
+                        )}
+                        
+                        {/* Result Count */}
+                        <div style={{ marginLeft: 'auto', padding: '6px 12px', background: '#111827', borderRadius: 8 }}>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} টি পণ্য</span>
                         </div>
-                        <button 
-                          onClick={() => setSelectedCategory('all')}
-                          style={{ padding: '4px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600 }}>
-                          ✕ {t('close')}
-                        </button>
                       </div>
                     )}
                   
