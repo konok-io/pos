@@ -1114,7 +1114,7 @@ export default function App() {
                                 background: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#115E59',
                                 color: '#fff'
                               }}>
-                                স্টক: {product.stock}
+                                {t('stock')}: {product.stock}
                               </div>
                             </div>
                           </div>
