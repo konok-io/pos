@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { en } from './en';
+import { db } from '../utils/db';
 
 // Types
 export type Language = 'en' | 'bn' | 'ar' | 'hi';
@@ -31,9 +32,6 @@ const defaultTranslations: Record<Language, Record<string, string>> = {
   hi,
 };
 
-// API URL
-const API_URL = 'http://localhost:3000/api';
-
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -48,75 +46,74 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('pos-language');
-    return (saved as Language) || 'en';
-  });
-
-  // Custom translations from database
+  const [language, setLanguageState] = useState<Language>('en');
   const [customTranslations, setCustomTranslations] = useState<Record<Language, Record<string, string>>>({
     en: {},
     bn: {},
     ar: {},
     hi: {},
   });
+  const [isDbReady, setIsDbReady] = useState(false);
 
-  // Fetch custom translations from API
-  const fetchTranslations = async () => {
-    try {
-      const res = await fetch(`${API_URL}/translations`);
-      if (res.ok) {
-        const data = await res.json();
-        setCustomTranslations(data);
-      }
-    } catch (error) {
-      console.log('Using default translations');
-    }
-  };
-
+  // Initialize from IndexedDB
   useEffect(() => {
-    fetchTranslations();
+    const initLanguage = async () => {
+      try {
+        // Get saved language
+        const savedLang = await db.get<Language>('settings', 'language');
+        if (savedLang) {
+          setLanguageState(savedLang);
+        }
+
+        // Get custom translations
+        const savedTranslations = await db.get<Record<Language, Record<string, string>>>('translations', 'custom');
+        if (savedTranslations) {
+          setCustomTranslations(savedTranslations);
+        }
+      } catch (error) {
+        console.error('Failed to load language settings:', error);
+      } finally {
+        setIsDbReady(true);
+      }
+    };
+
+    initLanguage();
   }, []);
 
-  // Sync translations to server
+  // Save custom translations to IndexedDB
+  const saveCustomTranslationsToDb = async (translations: Record<Language, Record<string, string>>) => {
+    try {
+      await db.put('translations', 'custom', translations);
+    } catch (error) {
+      console.error('Failed to save translations:', error);
+    }
+  };
+
+  // Sync translations
   const syncTranslations = async () => {
-    try {
-      await fetch(`${API_URL}/translations/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ translations: defaultTranslations }),
-      });
-      await fetchTranslations();
-    } catch (error) {
-      console.error('Sync failed:', error);
-    }
+    // No-op since using IndexedDB
   };
 
-  // Save a custom translation
+  // Save a custom translation to IndexedDB
   const saveTranslation = async (lang: Language, key: string, value: string) => {
-    try {
-      await fetch(`${API_URL}/translations/${lang}/${key}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ value }),
-      });
-      
-      // Update local state
-      setCustomTranslations(prev => ({
-        ...prev,
-        [lang]: {
-          ...prev[lang],
-          [key]: value,
-        },
-      }));
-    } catch (error) {
-      console.error('Save failed:', error);
-    }
+    const newTranslations = {
+      ...customTranslations,
+      [lang]: {
+        ...customTranslations[lang],
+        [key]: value,
+      },
+    };
+    setCustomTranslations(newTranslations);
+    await saveCustomTranslationsToDb(newTranslations);
   };
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = async (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('pos-language', lang);
+    try {
+      await db.put('settings', 'language', lang);
+    } catch (error) {
+      console.error('Failed to save language:', error);
+    }
   };
 
   // Translation function - uses custom first, then default
@@ -147,6 +144,11 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
   }, [language, isRTL]);
+
+  // Don't render children until DB is ready
+  if (!isDbReady) {
+    return null;
+  }
 
   return (
     <LanguageContext.Provider value={{ 
