@@ -82,7 +82,7 @@ interface Sale {
 // Loading Screen
 function LoadingScreen() {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F766E', color: 'white', fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#115E59', color: 'white', fontFamily: 'system-ui, sans-serif' }}>
       <div style={{ width: 60, height: 60, border: '4px solid rgba(255,255,255,0.2)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
       <h3 style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>POS সিস্টেম</h3>
       <p style={{ marginTop: 8, opacity: 0.8 }}>লোড হচ্ছে...</p>
@@ -122,7 +122,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#0F766E',
+      background: '#115E59',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -163,7 +163,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, width: '100%' }}>
             <div style={{
               width: 60, height: 60,
-              background: 'linear-gradient(135deg, #0F766E, #14B8A6)',
+              background: 'linear-gradient(135deg, #115E59, #0F766E)',
               borderRadius: 16,
               display: 'flex',
               alignItems: 'center',
@@ -171,12 +171,12 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               boxShadow: '0 4px 12px rgba(15,118,110,0.3)',
             }}>🏪</div>
             <div style={{ flex: 1, textAlign: 'right' }}>
-              <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#0F766E' }}>
+              <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#115E59' }}>
                 {businessName}
               </h1>
               <div style={{
                 fontSize: 18,
-                color: '#0F766E',
+                color: '#115E59',
                 fontWeight: 600,
                 marginTop: 4,
               }}>
@@ -214,7 +214,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   boxSizing: 'border-box',
                   fontFamily: 'inherit',
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#0F766E'}
+                onFocus={(e) => e.target.style.borderColor = '#115E59'}
                 onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
               />
             </div>
@@ -240,7 +240,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   boxSizing: 'border-box',
                   fontFamily: 'inherit',
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#0F766E'}
+                onFocus={(e) => e.target.style.borderColor = '#115E59'}
                 onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
               />
             </div>
@@ -251,7 +251,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               disabled={loading}
               style={{
                 padding: '14px 24px',
-                background: loading ? '#9CA3AF' : '#0F766E',
+                background: loading ? '#9CA3AF' : '#115E59',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 12,
@@ -302,7 +302,7 @@ function TimeDisplay() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px', background: 'rgba(15,118,110,0.05)', borderRadius: 10, border: '1px solid #E5E7EB' }}>
-      <div style={{ fontWeight: 700, fontSize: 15, color: '#0F766E' }}>
+      <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59' }}>
         {time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
       </div>
       <div style={{ fontSize: 11, color: '#9CA3AF' }}>
@@ -559,13 +559,13 @@ export default function App() {
   return (
     <div className="app-container">
       {/* Header - Modern Minimal Design */}
-      <div style={{ background: '#FFFFFF', padding: '0 24px', flexShrink: 0, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', borderBottom: '2px solid #0F766E' }}>
+      <div style={{ background: '#FFFFFF', padding: '0 24px', flexShrink: 0, boxShadow: '0 4px 20px rgba(0,0,0,0.08)', borderBottom: '2px solid #115E59' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           {/* Logo Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-            <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}>🏪</div>
+            <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #115E59 0%, #115E59 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)' }}>🏪</div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 22, color: '#0F766E', lineHeight: 1.2 }}>{t('posSystem')}</div>
+              <div style={{ fontWeight: 800, fontSize: 22, color: '#115E59', lineHeight: 1.2 }}>{t('posSystem')}</div>
               <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('posManagement')}</div>
             </div>
           </div>
@@ -577,7 +577,7 @@ export default function App() {
               <button onClick={() => setCurrentTab('pos')} style={{
                 padding: '7px 12px',
                 border: 'none',
-                background: currentTab === 'pos' ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                background: currentTab === 'pos' ? 'linear-gradient(135deg, #115E59 0%, #115E59 100%)' : 'transparent',
                 cursor: 'pointer',
                 color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563',
                 fontWeight: currentTab === 'pos' ? 600 : 500,
@@ -607,7 +607,7 @@ export default function App() {
                   <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
                     padding: '7px 12px',
                     border: 'none',
-                    background: currentTab === t.id ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                    background: currentTab === t.id ? 'linear-gradient(135deg, #115E59 0%, #115E59 100%)' : 'transparent',
                     cursor: 'pointer',
                     color: currentTab === t.id ? '#FFFFFF' : '#4B5563',
                     fontWeight: currentTab === t.id ? 600 : 500,
@@ -694,7 +694,7 @@ export default function App() {
                         gap: 8,
                         fontSize: 14,
                         fontWeight: language === lang.code ? 600 : 400,
-                        color: language === lang.code ? '#0F766E' : '#4B5563',
+                        color: language === lang.code ? '#115E59' : '#4B5563',
                         textAlign: 'left',
                       }}
                     >
@@ -766,8 +766,8 @@ export default function App() {
                   onClick={() => setStockFilter(stockFilter === 'available' ? 'all' : 'available')}
                   style={{ 
                     borderRadius: 8, whiteSpace: 'nowrap', 
-                    background: stockFilter === 'available' ? '#0F766E' : '#F0FDFA', 
-                    color: stockFilter === 'available' ? '#fff' : '#0F766E', 
+                    background: stockFilter === 'available' ? '#115E59' : '#F0FDFA', 
+                    color: stockFilter === 'available' ? '#fff' : '#115E59', 
                     border: '1.5px solid rgba(15,118,110,0.3)', 
                     padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' 
                   }}>
@@ -800,10 +800,10 @@ export default function App() {
                   style={{
                     marginLeft: 'auto',
                     padding: '6px 14px', borderRadius: 8,
-                    background: showHeldSales ? '#0F766E' : heldSales.length > 0 ? '#F0FDF4' : '#F9FAFB',
-                    color: showHeldSales ? '#fff' : heldSales.length > 0 ? '#0F766E' : '#9CA3AF',
+                    background: showHeldSales ? '#115E59' : heldSales.length > 0 ? '#F0FDF4' : '#F9FAFB',
+                    color: showHeldSales ? '#fff' : heldSales.length > 0 ? '#115E59' : '#9CA3AF',
                     fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                    border: '1px solid ' + (heldSales.length > 0 ? '#0F766E' : '#E5E7EB'),
+                    border: '1px solid ' + (heldSales.length > 0 ? '#115E59' : '#E5E7EB'),
                   }}>
                   📋 {t('hold')} {heldSales.length > 0 && `(${heldSales.length})`}
                 </button>
@@ -814,7 +814,7 @@ export default function App() {
                 {/* Show Held Sales Header (always when hold is open) */}
                 {showHeldSales && (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h4 style={{ margin: 0, color: '#0F766E', fontSize: 15, fontWeight: 600 }}>📋 {t('holdSales')} ({heldSales.length})</h4>
+                    <h4 style={{ margin: 0, color: '#115E59', fontSize: 15, fontWeight: 600 }}>📋 {t('holdSales')} ({heldSales.length})</h4>
                     <button onClick={() => setShowHeldSales(false)} style={{ padding: '4px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600 }}>
                       ✕ {t('close')}
                     </button>
@@ -859,12 +859,12 @@ export default function App() {
                                 <div key={itemIdx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px dashed #E5E7EB' }}>
                                   <span style={{ fontSize: 13, color: '#4B5563' }}>{item.name}</span>
                                   <span style={{ fontSize: 13, color: '#6B7280' }}>×{item.quantity}</span>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: '#0F766E' }}>{fmt(item.sellPrice * item.quantity)}</span>
+                                  <span style={{ fontSize: 13, fontWeight: 600, color: '#115E59' }}>{fmt(item.sellPrice * item.quantity)}</span>
                                 </div>
                               ))}
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 8, borderTop: '1px solid #E5E7EB' }}>
-                              <div style={{ fontSize: 14, fontWeight: 600, color: '#0F766E' }}>
+                              <div style={{ fontSize: 14, fontWeight: 600, color: '#115E59' }}>
                                 {t('total')}: {fmt(sale.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0))}
                               </div>
                               <button 
@@ -907,11 +907,11 @@ export default function App() {
                         {/* Category Filter */}
                         {selectedCategory !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 4px 4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#0F766E' }}>📁 {categories.find(c => c.id === selectedCategory)?.name}</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}>📁 {categories.find(c => c.id === selectedCategory)?.name}</span>
                             <button 
                               onClick={() => setSelectedCategory('all')}
                               title="ক্যাটাগরি সরান"
-                              style={{ width: 22, height: 22, borderRadius: '50%', border: 'none', background: '#0F766E', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 22, height: 22, borderRadius: '50%', border: 'none', background: '#115E59', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
                           </div>
@@ -933,7 +933,7 @@ export default function App() {
                         {/* Stock Filter */}
                         {stockFilter !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 4px 4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#0F766E' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
                               {stockFilter === 'available' && '📦 ' + t('stockAvailable')}
                               {stockFilter === 'low' && '⚠️ ' + t('stockLow')}
                               {stockFilter === 'out' && '⚠️ ' + t('stockOut')}
@@ -941,14 +941,14 @@ export default function App() {
                             <button 
                               onClick={() => setStockFilter('all')}
                               title="স্টক ফিল্টার সরান"
-                              style={{ width: 22, height: 22, borderRadius: '50%', border: 'none', background: stockFilter === 'available' ? '#0F766E' : stockFilter === 'low' ? '#EA580C' : '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              style={{ width: 22, height: 22, borderRadius: '50%', border: 'none', background: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                               ✕
                             </button>
                           </div>
                         )}
                         
                         {/* Result Count */}
-                        <div style={{ marginLeft: 'auto', padding: '6px 14px', background: '#0F766E', borderRadius: 20 }}>
+                        <div style={{ marginLeft: 'auto', padding: '6px 14px', background: '#115E59', borderRadius: 20 }}>
                           <span style={{ fontSize: 12, fontWeight: 700, color: 'white' }}>{filteredProducts.length} টি পণ্য</span>
                         </div>
                       </div>
@@ -957,12 +957,12 @@ export default function App() {
                     {filteredProducts.length === 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
                       <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                        <div style={{ fontSize: 28, fontWeight: 800, color: '#0F766E', marginBottom: 8 }}>🏪 আমার দোকান</div>
+                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>🏪 আমার দোকান</div>
                         <div style={{ fontSize: 14, color: '#9CA3AF' }}>📞 ০১৭০০-০০০০০০</div>
                       </div>
                       <svg width="200" height="120" viewBox="0 0 280 180" style={{ marginBottom: 16 }}>
-                        <rect x="20" y="50" width="240" height="110" rx="8" fill="#F0FDFA" stroke="#0F766E" strokeWidth="2"/>
-                        <rect x="50" y="70" width="60" height="60" rx="4" fill="#0F766E"/>
+                        <rect x="20" y="50" width="240" height="110" rx="8" fill="#F0FDFA" stroke="#115E59" strokeWidth="2"/>
+                        <rect x="50" y="70" width="60" height="60" rx="4" fill="#115E59"/>
                         <text x="80" y="105" textAnchor="middle" fill="white" fontSize="24">🏪</text>
                         <rect x="130" y="65" width="100" height="50" rx="6" fill="#115E59"/>
                         <circle cx="220" cy="90" r="25" fill="#22C55E"/>
@@ -1067,7 +1067,7 @@ export default function App() {
 
                             {/* Bottom: Price & Stock */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                              <div style={{ fontSize: 18, fontWeight: 800, color: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#0F766E', lineHeight: 1 }}>
+                              <div style={{ fontSize: 18, fontWeight: 800, color: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#115E59', lineHeight: 1 }}>
                                 {fmt(product.sellPrice)}
                               </div>
                               <div style={{ 
@@ -1075,7 +1075,7 @@ export default function App() {
                                 borderRadius: 6,
                                 fontSize: 12,
                                 fontWeight: 700,
-                                background: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#0F766E',
+                                background: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#115E59',
                                 color: '#fff'
                               }}>
                                 স্টক: {product.stock}
@@ -1119,8 +1119,8 @@ export default function App() {
               {/* Cart Header */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#0F766E', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 {t('cart')}</h3>
-                  <span style={{ background: '#0F766E', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#115E59', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 {t('cart')}</h3>
+                  <span style={{ background: '#115E59', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
                 </div>
                 {/* Customer Input with Add Button */}
                 <div style={{ display: 'flex', gap: 6 }}>
@@ -1139,7 +1139,7 @@ export default function App() {
                       padding: '8px 12px', 
                       borderRadius: 8, 
                       border: 'none', 
-                      background: '#0F766E', 
+                      background: '#115E59', 
                       color: 'white', 
                       fontSize: 12, 
                       fontWeight: 600, 
@@ -1165,8 +1165,8 @@ export default function App() {
                       <div key={item.id} style={{ display: 'flex', alignItems: 'center', padding: '6px 8px', background: '#FFFFFF', borderBottom: '1px dashed #e5e7eb', gap: 8 }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                            <span style={{ fontSize: 14, fontWeight: 600, color: '#0F766E', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{item.name}</span>
-                            <span style={{ fontSize: 14, fontWeight: 700, color: '#0F766E', flexShrink: 0 }}>{fmt(item.sellPrice * item.quantity)}</span>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#115E59', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{item.name}</span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: '#115E59', flexShrink: 0 }}>{fmt(item.sellPrice * item.quantity)}</span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
                             <span style={{ fontSize: 14, color: '#6B7280' }}>{item.quantity} × {fmt(item.sellPrice)}</span>
@@ -1203,7 +1203,7 @@ export default function App() {
                       <span style={{ fontSize: 15, fontWeight: 600, color: '#D97706' }}>+{fmt(vatAmount)}</span>
                     </div>
                   )}
-                  <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#0F766E' }}>
+                  <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#115E59' }}>
                     <span style={{ fontSize: 14, color: '#fff', fontWeight: 700 }}>{t('totalDue')}</span>
                     <span style={{ fontSize: 18, color: '#fff', fontWeight: 800 }}>{fmt(total)}</span>
                   </div>
@@ -1222,7 +1222,7 @@ export default function App() {
                 {/* Payment Input */}
                 <input value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
                   placeholder={`${t('paid')} (৳)`}
-                  style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 6, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#0F766E', outline: 'none' }}
+                  style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 6, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#115E59', outline: 'none' }}
                 />
 
                 {/* Due/Change Alert */}
@@ -1271,7 +1271,7 @@ export default function App() {
                     style={{
                       padding: '10px 16px', borderRadius: 8, border: '1px solid #e5e7eb',
                       background: cart.length > 0 ? '#F0FDF4' : '#FFFFFF',
-                      color: cart.length > 0 ? '#0F766E' : '#9CA3AF',
+                      color: cart.length > 0 ? '#115E59' : '#9CA3AF',
                       fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
                     📋 {t('hold')}
@@ -1636,7 +1636,7 @@ export default function App() {
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 18, marginTop: 8 }}>
                   <span>মোট:</span>
-                  <span style={{ color: '#0F766E' }}>{fmt(lastSale.total)}</span>
+                  <span style={{ color: '#115E59' }}>{fmt(lastSale.total)}</span>
                 </div>
                 {lastSale.paid > 0 && (
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
