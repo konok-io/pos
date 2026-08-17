@@ -1083,7 +1083,7 @@ export default function App() {
                         <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>{t('posManagementSystem')}</div>
                         <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('smartBusinessPartner')}</div>
                       </div>
-                      <img src="/Logo.png" alt="Logo" style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: 16, borderRadius: 12 }} />
+                      <img src="/Logo.png" alt="Logo" style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: 16 }} />
                       <div style={{ padding: '16px', textAlign: 'center' }}>
                         <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 600 }}>{t('searchProductBarcode')}</div>
                         <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>{t('orSelectCategorySupplier')}</div>
