@@ -24,6 +24,9 @@ export const hi: Record<string, string> = {
   loginButton: 'साइन इन करें',
   loginTitle: 'लॉगिन',
   signIn: 'साइन इन करें',
+  signingIn: 'लॉगिन हो रहा है...',
+  username: 'यूज़रनेम',
+  usernamePlaceholder: 'यूज़रनेम दर्ज करें',
   invalidCredentials: 'ईमेल या पासवर्ड गलत!',
 
   // POS Screen

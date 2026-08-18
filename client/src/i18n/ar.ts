@@ -24,6 +24,9 @@ export const ar: Record<string, string> = {
   loginButton: 'دخول',
   loginTitle: 'تسجيل الدخول',
   signIn: 'دخول',
+  signingIn: 'جاري تسجيل الدخول...',
+  username: 'اسم المستخدم',
+  usernamePlaceholder: 'أدخل اسم المستخدم',
   invalidCredentials: 'البريد الإلكتروني أو كلمة المرور غير صحيحة!',
 
   // POS Screen

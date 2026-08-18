@@ -1119,7 +1119,6 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const { t } = useLanguage();
 
   const currentYear = new Date().getFullYear();
-  const businessName = 'My Store';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1170,17 +1169,19 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       }} />
 
       <div style={{ width: '100%', maxWidth: 560, position: 'relative', zIndex: 1 }}>
-        {/* Header - Icon left, text right */}
+        {/* Header - Icon left, text right - Same as main header */}
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '24px 28px 0',
+          padding: '24px 28px 20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          borderBottom: '2px solid #115E59',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, width: '100%' }}>
-                          <div style={{
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{
               width: 60, height: 60,
               borderRadius: 16,
               display: 'flex',
@@ -1190,15 +1191,15 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             }}>
               <img src="/Logo.png" alt="Logo" style={{ width: 60, height: 60, objectFit: 'contain', borderRadius: 16 }} />
             </div>
-            <div style={{ flex: 1, textAlign: 'right' }}>
-              <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#115E59' }}>
-                {businessName}
+            <div>
+              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#115E59', lineHeight: 1.2 }}>
+                {t('posManagementSystem')}
               </h1>
               <div style={{
-                fontSize: 18,
+                fontSize: 14,
                 color: '#115E59',
                 fontWeight: 600,
-                marginTop: 4,
+                marginTop: 2,
               }}>
                 {t('smartBusinessPartner')}
               </div>
@@ -1210,19 +1211,24 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <div style={{
           background: '#fff',
           borderRadius: '0 0 20px 20px',
-          padding: '24px 28px 28px',
+          padding: '28px 28px 28px',
+          boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
         }}>
-          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+          <h2 style={{ margin: '0 0 20px 0', fontSize: 18, fontWeight: 600, color: '#374151', textAlign: 'center' }}>
+            🔐 {t('loginTitle')}
+          </h2>
+
+          <form onSubmit={handleLogin}>
             {/* Username */}
-            <div style={{ flex: 1 }}>
-              <label style={{ fontSize: 15, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
-                👤 ইউজার নাম
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 14, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+                👤 {t('username')}
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="admin"
+                placeholder={t('usernamePlaceholder')}
                 required
                 style={{
                   width: '100%',
@@ -1240,15 +1246,15 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </div>
 
             {/* Password */}
-            <div style={{ width: 160 }}>
-              <label style={{ fontSize: 15, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ fontSize: 14, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
                 🔐 {t('password')}
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="******"
+                placeholder="••••••••"
                 required
                 style={{
                   width: '100%',
@@ -1270,6 +1276,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               type="submit"
               disabled={loading}
               style={{
+                width: '100%',
                 padding: '14px 24px',
                 background: loading ? '#9CA3AF' : '#115E59',
                 color: '#fff',
@@ -1278,32 +1285,33 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 fontSize: 16,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                whiteSpace: 'nowrap',
                 fontFamily: 'inherit',
+                boxShadow: loading ? 'none' : '0 4px 12px rgba(17,94,89,0.3)',
               }}
             >
-              {loading ? '⏳' : t('signIn')}
+              {loading ? '⏳ ' + t('signingIn') : '🔑 ' + t('signIn')}
             </button>
           </form>
 
           {/* Error */}
           {error && (
             <div style={{
-              marginTop: 14,
+              marginTop: 16,
               padding: '12px 14px',
               background: '#FEF2F2',
               borderRadius: 10,
               color: '#DC2626',
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: 500,
+              textAlign: 'center',
             }}>
               ⚠️ {error}
             </div>
           )}
 
           {/* Footer */}
-          <div style={{ textAlign: 'center', marginTop: 18, paddingTop: 14, borderTop: '1px dashed #E5E7EB', fontSize: 14, color: '#9CA3AF' }}>
-            © {currentYear} {businessName}
+          <div style={{ textAlign: 'center', marginTop: 20, paddingTop: 16, borderTop: '1px dashed #E5E7EB', fontSize: 13, color: '#9CA3AF' }}>
+            © {currentYear} {t('posManagementSystem')}
           </div>
         </div>
       </div>

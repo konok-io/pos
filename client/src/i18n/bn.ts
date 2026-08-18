@@ -24,6 +24,9 @@ export const bn: Record<string, string> = {
   loginButton: 'সাইন ইন করুন',
   loginTitle: 'লগইন',
   signIn: 'সাইন ইন করুন',
+  signingIn: 'লগইন হচ্ছে...',
+  username: 'ইউজার নাম',
+  usernamePlaceholder: 'ইউজার নাম লিখুন',
   invalidCredentials: 'ইমেইল বা পাসওয়ার্ড ভুল!',
 
   // POS Screen

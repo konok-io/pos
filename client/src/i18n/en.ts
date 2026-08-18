@@ -24,6 +24,9 @@ export const en: Record<string, string> = {
   loginButton: 'Sign In',
   loginTitle: 'Login',
   signIn: 'Sign In',
+  signingIn: 'Signing in...',
+  username: 'Username',
+  usernamePlaceholder: 'Enter username',
   invalidCredentials: 'Invalid email or password',
 
   // POS Screen
