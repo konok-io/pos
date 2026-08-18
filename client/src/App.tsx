@@ -2451,10 +2451,38 @@ export default function App() {
                   <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('selectPaymentMethod')}</div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {[
-                      { v: 'cash', t: t('cash') },
-                      { v: 'card', t: t('card') },
-                      { v: 'bank', t: t('bank') },
-                      { v: 'mobile', t: t('mobile') },
+                      { v: 'cash', t: t('cash'), icon: (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="2" y="6" width="20" height="12" rx="2"/>
+                          <circle cx="12" cy="12" r="2"/>
+                          <path d="M6 12h.01M18 12h.01"/>
+                        </svg>
+                      )},
+                      { v: 'card', t: t('card'), icon: (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="2" y="4" width="20" height="16" rx="2"/>
+                          <path d="M2 10h20"/>
+                        </svg>
+                      )},
+                      { v: 'bank', t: t('bank'), icon: (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M3 21h18"/>
+                          <path d="M3 7v14"/>
+                          <path d="M21 7v14"/>
+                          <path d="M6 21V10"/>
+                          <path d="M18 21V10"/>
+                          <path d="M12 21V14"/>
+                          <path d="M12 10l4-4"/>
+                          <path d="M8 10l-4-4"/>
+                          <path d="M16 10l4-4"/>
+                        </svg>
+                      )},
+                      { v: 'mobile', t: t('mobile'), icon: (
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <rect x="5" y="2" width="14" height="20" rx="2"/>
+                          <path d="M12 18h.01"/>
+                        </svg>
+                      )},
                     ].map(pm => (
                       <button
                         key={pm.v}
@@ -2470,8 +2498,12 @@ export default function App() {
                           fontWeight: 600,
                           cursor: 'pointer',
                           transition: 'all 0.2s',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
                         }}
                       >
+                        {pm.icon}
                         {pm.t}
                       </button>
                     ))}
