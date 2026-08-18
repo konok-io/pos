@@ -1905,36 +1905,32 @@ export default function App() {
           
           {/* Dynamic Menu - Scrollable */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 30, marginRight: 8, minWidth: 0, flex: 1 }}>
-            {/* Fixed First Item (Sales) - Separate container */}
-            <div style={{ flexShrink: 0, padding: '4px 6px 4px 4px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', marginRight: 4 }}>
-              <button onClick={() => setCurrentTab('pos')} style={{
-                padding: '5px 10px',
-                border: 'none',
-                background: currentTab === 'pos' ? '#E0E0E0' : 'transparent',
-                cursor: 'pointer',
-                color: '#000000',
-                fontWeight: 600,
-                fontSize: 13,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                whiteSpace: 'nowrap',
-                fontFamily: 'inherit',
-                transition: 'all 0.2s',
-                borderRadius: 6,
-              }}>
-                <span style={{ fontSize: 16 }}>🛒</span>
-                <span>{t('sales')}</span>
-              </button>
-            </div>
-
-            {/* Scrollable Menu Container */}
-            <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+            {/* Scrollable Menu - Centered */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 4 }}>
               {/* Left Arrow */}
-              <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginRight: 4, flexShrink: 0 }}>◀</button>
+              <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', flexShrink: 0 }}>◀</button>
 
-              {/* Scrollable Menu */}
-              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1, minWidth: 0 }}>
+              {/* Menu Items Container */}
+              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flexShrink: 0 }}>
+                <button onClick={() => setCurrentTab('pos')} style={{
+                  padding: '5px 10px',
+                  border: 'none',
+                  background: currentTab === 'pos' ? '#E0E0E0' : 'transparent',
+                  cursor: 'pointer',
+                  color: '#000000',
+                  fontWeight: 600,
+                  fontSize: 13,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  whiteSpace: 'nowrap',
+                  fontFamily: 'inherit',
+                  transition: 'all 0.2s',
+                  borderRadius: 6,
+                }}>
+                  <span style={{ fontSize: 16 }}>🛒</span>
+                  <span>{t('sales')}</span>
+                </button>
                 {otherTabs.map((t) => (
                   <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
                     padding: '5px 10px',
@@ -1959,7 +1955,7 @@ export default function App() {
               </div>
 
               {/* Right Arrow */}
-              <button onClick={() => scrollMenu('right')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginLeft: 4, flexShrink: 0 }}>▶</button>
+              <button onClick={() => scrollMenu('right')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', flexShrink: 0 }}>▶</button>
             </div>
           </div>
 
