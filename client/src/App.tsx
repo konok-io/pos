@@ -2813,7 +2813,7 @@ export default function App() {
                   position: 'relative', 
                   background: '#FFFFFF',
                   borderRadius: 10,
-                  border: '1px solid #E0E0E0', boxShadow: 'none',
+                  border: '1px solid #D1D5DB', boxShadow: 'none',
                   overflow: 'hidden'
                 }}>
                   <div style={{ 
