@@ -69,7 +69,10 @@ class Database {
 
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
-        resolve(request.result ?? []);
+        // Data is stored as { key, value }, extract just the values
+        const results = request.result ?? [];
+        const values = results.map((item: { key: string; value: T }) => item.value);
+        resolve(values);
       };
     });
   }

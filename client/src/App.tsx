@@ -1570,7 +1570,9 @@ export default function App() {
     if (!isInitialized) return;
     const saveProducts = async () => {
       for (const product of products) {
-        await db.put('products', product.id, product);
+        if (product?.id) {
+          await db.put('products', product.id, product);
+        }
       }
     };
     if (products.length > 0) saveProducts();
@@ -1581,7 +1583,9 @@ export default function App() {
     if (!isInitialized) return;
     const saveCategories = async () => {
       for (const category of categories) {
-        await db.put('categories', category.id, category);
+        if (category?.id) {
+          await db.put('categories', category.id, category);
+        }
       }
     };
     if (categories.length > 0) saveCategories();
@@ -1592,7 +1596,9 @@ export default function App() {
     if (!isInitialized) return;
     const saveCustomers = async () => {
       for (const customer of customers) {
-        await db.put('customers', customer.id, customer);
+        if (customer?.id) {
+          await db.put('customers', customer.id, customer);
+        }
       }
     };
     if (customers.length > 0) saveCustomers();
@@ -1603,7 +1609,9 @@ export default function App() {
     if (!isInitialized) return;
     const saveSales = async () => {
       for (const sale of sales) {
-        await db.put('sales', sale.id, sale);
+        if (sale?.id) {
+          await db.put('sales', sale.id, sale);
+        }
       }
     };
     if (sales.length > 0) saveSales();
