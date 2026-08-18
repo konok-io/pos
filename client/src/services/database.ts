@@ -96,6 +96,23 @@ let syncHandler: PouchDB.Replication.Sync<object> | null = null;
 // Server URL - User should set this
 let COUCHDB_URL = '';
 
+// Sync status listeners
+type SyncStatusCallback = (status: 'syncing' | 'synced' | 'error' | 'offline') => void;
+const syncStatusListeners: SyncStatusCallback[] = [];
+
+// Export sync status function
+export function onSyncStatusChange(callback: SyncStatusCallback): () => void {
+  syncStatusListeners.push(callback);
+  return () => {
+    const index = syncStatusListeners.indexOf(callback);
+    if (index > -1) syncStatusListeners.splice(index, 1);
+  };
+}
+
+function notifySyncStatus(status: 'syncing' | 'synced' | 'error' | 'offline') {
+  syncStatusListeners.forEach(cb => cb(status));
+}
+
 // Initialize database
 export async function initDatabase(): Promise<PouchDB.Database> {
   if (localDB) return localDB;
@@ -150,6 +167,8 @@ export function startSync(): void {
     syncHandler.cancel();
   }
   
+  notifySyncStatus('syncing');
+  
   syncHandler = localDB.sync(remoteDB, {
     live: true,
     retry: true
@@ -157,18 +176,31 @@ export function startSync(): void {
   
   syncHandler.on('change', (info) => {
     console.log('Sync change:', info);
+    notifySyncStatus('syncing');
   });
   
   syncHandler.on('paused', (err) => {
     if (err) {
       console.log('Sync paused:', err);
+      notifySyncStatus('error');
     } else {
       console.log('Sync paused (up to date)');
+      notifySyncStatus('synced');
     }
+  });
+  
+  syncHandler.on('active', () => {
+    notifySyncStatus('syncing');
   });
   
   syncHandler.on('error', (err) => {
     console.error('Sync error:', err);
+    notifySyncStatus('error');
+  });
+  
+  syncHandler.on('denied', (err) => {
+    console.error('Sync denied:', err);
+    notifySyncStatus('error');
   });
 }
 
@@ -185,6 +217,7 @@ export function disconnectFromServer(): void {
   stopSync();
   remoteDB = null;
   COUCHDB_URL = '';
+  notifySyncStatus('offline');
 }
 
 // Get connection status

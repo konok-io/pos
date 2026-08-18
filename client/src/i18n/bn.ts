@@ -215,4 +215,11 @@ export const bn: Record<string, string> = {
   info2: 'ক্লাউড ব্যাকআপের জন্য CouchDB সার্ভারে কানেক্ট করুন',
   info3: 'অনলাইন হলে ডাটা অটোমেটিক সিঙ্ক হয়',
   info4: 'ম্যানুয়াল ব্যাকআপের জন্য Export/Import ব্যবহার করুন',
+  syncStarted: 'সিঙ্ক শুরু হয়েছে',
+  syncError: 'সিঙ্ক এরর',
+  synced: 'সিঙ্ক হয়েছে',
+  syncing: 'সিঙ্ক হচ্ছে...',
+  offline: 'অফলাইন',
+  exporting: 'ডাটা এক্সপোর্ট হচ্ছে...',
+  importing: 'ডাটা ইমপোর্ট হচ্ছে...',
 };

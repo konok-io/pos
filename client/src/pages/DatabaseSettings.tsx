@@ -7,21 +7,34 @@ import {
   getConnectionStatus,
   exportAllData,
   importData,
-  getDatabaseInfo
+  getDatabaseInfo,
+  onSyncStatusChange
 } from '../services/database';
+
+type SyncStatus = 'syncing' | 'synced' | 'error' | 'offline';
 
 export default function DatabaseSettings() {
   const { t } = useLanguage();
   const [serverUrl, setServerUrl] = useState('');
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('offline');
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState<'success' | 'error'>('success');
+  const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
   const [dbInfo, setDbInfo] = useState<{ docCount: number; updateSeq: number | string } | null>(null);
   const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
 
   useEffect(() => {
     loadStatus();
+    
+    // Subscribe to sync status changes
+    const unsubscribe = onSyncStatusChange((status) => {
+      setSyncStatus(status);
+    });
+    
+    return () => unsubscribe();
   }, []);
 
   const loadStatus = async () => {
@@ -42,7 +55,8 @@ export default function DatabaseSettings() {
     }
 
     setConnecting(true);
-    setMessage('');
+    setMessage(t('connecting'));
+    setMessageType('info');
 
     try {
       await initDatabase();
@@ -50,15 +64,18 @@ export default function DatabaseSettings() {
       
       if (success) {
         setConnected(true);
-        setMessage(t('connectedSuccessfully'));
+        setMessage(t('connectedSuccessfully') + ' - ' + t('syncStarted'));
         setMessageType('success');
+        setSyncStatus('syncing');
       } else {
         setMessage(t('connectionFailed'));
         setMessageType('error');
+        setSyncStatus('error');
       }
     } catch (error) {
       setMessage(`${t('connectionFailed')}: ${error}`);
       setMessageType('error');
+      setSyncStatus('error');
     }
 
     setConnecting(false);
@@ -69,12 +86,16 @@ export default function DatabaseSettings() {
     disconnectFromServer();
     setConnected(false);
     setMessage(t('disconnected'));
-    setMessageType('success');
+    setMessageType('info');
+    setSyncStatus('offline');
     loadStatus();
   };
 
   const handleExport = async () => {
     try {
+      setMessage(t('exporting') || 'Exporting data...');
+      setMessageType('info');
+      
       const data = await exportAllData();
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -101,9 +122,22 @@ export default function DatabaseSettings() {
       return;
     }
 
+    setImporting(true);
+    setImportProgress(0);
+    setMessage(t('importing') || 'Importing data...');
+    setMessageType('info');
+
     try {
+      // Simulate progress
+      const progressInterval = setInterval(() => {
+        setImportProgress(prev => Math.min(prev + 10, 90));
+      }, 100);
+
       const text = await importFile.text();
       const result = await importData(text);
+      
+      clearInterval(progressInterval);
+      setImportProgress(100);
       
       if (result.success) {
         setMessage(result.message);
@@ -118,7 +152,25 @@ export default function DatabaseSettings() {
       setMessage(`${t('importFailed')}: ${error}`);
       setMessageType('error');
     }
+    
+    setImporting(false);
+    setImportProgress(0);
   };
+
+  const getSyncStatusDisplay = () => {
+    switch (syncStatus) {
+      case 'syncing':
+        return { color: '#3B82F6', text: t('syncing') || 'Syncing...', icon: '🔄' };
+      case 'synced':
+        return { color: '#10B981', text: t('synced') || 'Synced', icon: '✅' };
+      case 'error':
+        return { color: '#EF4444', text: t('syncError') || 'Sync Error', icon: '❌' };
+      default:
+        return { color: '#6B7280', text: t('offline') || 'Offline', icon: '📴' };
+    }
+  };
+
+  const syncDisplay = getSyncStatusDisplay();
 
   return (
     <div style={{ padding: 16, maxWidth: 600, margin: '0 auto' }}>
@@ -148,15 +200,31 @@ export default function DatabaseSettings() {
       <div className="card" style={{ marginBottom: 16 }}>
         <h3 style={{ marginBottom: 12 }}>☁️ {t('serverConnection')}</h3>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <span style={{
-            width: 12, height: 12,
-            borderRadius: '50%',
-            background: connected ? '#10B981' : '#EF4444'
-          }} />
-          <span style={{ fontWeight: 600 }}>
-            {connected ? t('connected') : t('disconnected')}
+        {/* Sync Status */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 8, 
+          marginBottom: 16,
+          padding: '10px 14px',
+          background: `${syncDisplay.color}15`,
+          borderRadius: 8,
+          border: `1px solid ${syncDisplay.color}30`
+        }}>
+          <span style={{ fontSize: 18 }}>{syncDisplay.icon}</span>
+          <span style={{ fontWeight: 600, color: syncDisplay.color }}>
+            {syncDisplay.text}
           </span>
+          {syncStatus === 'syncing' && (
+            <div style={{
+              marginLeft: 'auto',
+              width: 16, height: 16,
+              border: '2px solid #3B82F6',
+              borderTopColor: 'transparent',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite'
+            }} />
+          )}
         </div>
 
         <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
@@ -215,7 +283,7 @@ export default function DatabaseSettings() {
                 cursor: connecting ? 'not-allowed' : 'pointer',
               }}
             >
-              {connecting ? t('connecting') + '...' : t('connect')}
+              {connecting ? '...' : t('connect')}
             </button>
           )}
         </div>
@@ -225,8 +293,8 @@ export default function DatabaseSettings() {
             marginTop: 12,
             padding: '10px 14px',
             borderRadius: 8,
-            background: messageType === 'success' ? '#F0FDF4' : '#FEF2F2',
-            color: messageType === 'success' ? '#166534' : '#DC2626',
+            background: messageType === 'success' ? '#F0FDF4' : messageType === 'error' ? '#FEF2F2' : '#EFF6FF',
+            color: messageType === 'success' ? '#166534' : messageType === 'error' ? '#DC2626' : '#1D4ED8',
             fontSize: 14,
           }}>
             {message}
@@ -270,6 +338,26 @@ export default function DatabaseSettings() {
           <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 12 }}>
             {t('importDescription')}
           </p>
+          
+          {/* Progress Bar */}
+          {importing && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{
+                height: 6,
+                background: '#E5E7EB',
+                borderRadius: 3,
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: `${importProgress}%`,
+                  background: '#115E59',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
+            </div>
+          )}
+          
           <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <div style={{ flex: 1 }}>
               <input
@@ -278,39 +366,41 @@ export default function DatabaseSettings() {
                 onChange={(e) => setImportFile(e.target.files?.[0] || null)}
                 style={{ display: 'none' }}
                 id="import-file"
+                disabled={importing}
               />
               <label
                 htmlFor="import-file"
                 style={{
                   display: 'block',
                   padding: '12px 14px',
-                  background: '#F9FAFB',
-                  border: '2px dashed #D1D5DB',
+                  background: importing ? '#F3F4F6' : '#F9FAFB',
+                  border: `2px dashed ${importFile ? '#115E59' : '#D1D5DB'}`,
                   borderRadius: 10,
                   textAlign: 'center',
-                  cursor: 'pointer',
+                  cursor: importing ? 'not-allowed' : 'pointer',
                   fontSize: 14,
-                  color: '#6B7280',
+                  color: importFile ? '#115E59' : '#6B7280',
+                  fontWeight: importFile ? 600 : 400,
                 }}
               >
-                {importFile ? importFile.name : t('selectFile')}
+                {importFile ? `📄 ${importFile.name}` : t('selectFile')}
               </label>
             </div>
             <button
               onClick={handleImport}
-              disabled={!importFile}
+              disabled={!importFile || importing}
               style={{
                 padding: '12px 20px',
-                background: importFile ? '#0F3460' : '#9CA3AF',
+                background: importFile && !importing ? '#0F3460' : '#9CA3AF',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 10,
                 fontSize: 14,
                 fontWeight: 600,
-                cursor: importFile ? 'pointer' : 'not-allowed',
+                cursor: importFile && !importing ? 'pointer' : 'not-allowed',
               }}
             >
-              📥 {t('importData')}
+              {importing ? '...' : t('importData')}
             </button>
           </div>
         </div>
@@ -326,6 +416,14 @@ export default function DatabaseSettings() {
           <li>{t('info4')}</li>
         </ul>
       </div>
+      
+      {/* Animation keyframes */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

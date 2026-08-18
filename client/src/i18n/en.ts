@@ -215,4 +215,11 @@ export const en: Record<string, string> = {
   info2: 'Connect to CouchDB server for cloud backup',
   info3: 'Data syncs automatically when online',
   info4: 'Use Export/Import for manual backup',
+  syncStarted: 'Sync started',
+  syncError: 'Sync Error',
+  synced: 'Synced',
+  syncing: 'Syncing...',
+  offline: 'Offline',
+  exporting: 'Exporting data...',
+  importing: 'Importing data...',
 };

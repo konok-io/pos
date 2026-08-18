@@ -213,4 +213,11 @@ export const hi: Record<string, string> = {
   info2: 'क्लाउड बैकअप के लिए CouchDB सर्वर से कनेक्ट करें',
   info3: 'ऑनलाइन होने पर डेटा अपने आप सिंक होता है',
   info4: 'मैनुअल बैकअप के लिए Export/Import का उपयोग करें',
+  syncStarted: 'सिंक शुरू हुआ',
+  syncError: 'सिंक एरर',
+  synced: 'सिंक हो गया',
+  syncing: 'सिंक हो रहा है...',
+  offline: 'ऑफलाइन',
+  exporting: 'डेटा एक्सपोर्ट हो रहा है...',
+  importing: 'डेटा इम्पोर्ट हो रहा है...',
 };
