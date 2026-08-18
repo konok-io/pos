@@ -1334,7 +1334,7 @@ function TimeDisplay({ language }: { language: string }) {
   const dateStr = time.toLocaleDateString(locale, { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px', background: 'rgba(15,118,110,0.05)', border: '1px solid #E5E7EB' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px' }}>
       <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59' }}>
         {timeStr}
       </div>
