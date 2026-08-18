@@ -1948,7 +1948,7 @@ export default function App() {
         {currentTab === 'pos' && (
           <div style={{ display: 'flex', height: '100%', overflow: 'hidden', width: '100%', background: '#F9FAFB' }}>
             {/* -- LEFT: Products -- */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', minWidth: 0, position: 'relative' }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
                 background: '#115E59', border: '1px solid #115E59',
@@ -2675,8 +2675,10 @@ export default function App() {
                   flexShrink: 0,
                   position: 'sticky',
                   bottom: 0,
+                  left: 0,
+                  right: 0,
                   zIndex: 10,
-                  boxShadow: '0 -2px 10px rgba(0,0,0,0.05)'
+                  boxShadow: '0 -2px 10px rgba(0,0,0,0.08)'
                 }}>
                   {/* Stock Available Card */}
                   <div
