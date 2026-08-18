@@ -3046,8 +3046,8 @@ export default function App() {
                     }}
                     disabled={cart.length === 0}
                     style={{
-                      padding: '10px 12px', borderRadius: 8, border: '1px solid #e5e7eb',
-                      background: cart.length > 0 ? '#FEF2F2' : '#FFFFFF',
+                      padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB',
+                      background: '#F5F5F5',
                       color: cart.length > 0 ? '#DC2626' : '#9CA3AF',
                       fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
@@ -3067,8 +3067,8 @@ export default function App() {
                     }}
                     disabled={cart.length === 0}
                     style={{
-                      padding: '10px 16px', borderRadius: 8, border: '1px solid #e5e7eb',
-                      background: cart.length > 0 ? '#F0FDF4' : '#FFFFFF',
+                      padding: '10px 16px', borderRadius: 8, border: '1px solid #D1D5DB',
+                      background: '#F5F5F5',
                       color: cart.length > 0 ? '#115E59' : '#9CA3AF',
                       fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
