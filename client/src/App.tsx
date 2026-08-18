@@ -1182,14 +1182,14 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
             <div style={{
-              width: 40, height: 40,
+              width: 40, height: 34,
               borderRadius: 10,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 2px 8px rgba(15,118,110,0.3)',
             }}>
-              <img src="/Logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 10 }} />
+              <img src="/Logo.png" alt="Logo" style={{ width: 40, height: 34, objectFit: 'contain', borderRadius: 10 }} />
             </div>
             <div style={{ flex: 1, textAlign: 'right' }}>
               <h1 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#115E59' }}>
@@ -1787,7 +1787,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           {/* Logo Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-            <div style={{ width: 44, height: 40, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 44, height: 40, objectFit: 'contain', borderRadius: 12 }} /></div>
+            <div style={{ width: 44, height: 34, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 44, height: 34, objectFit: 'contain', borderRadius: 12 }} /></div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
               <div style={{ fontSize: 14.5, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
@@ -1859,10 +1859,10 @@ export default function App() {
           {/* Actions Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0, marginLeft: 24 }}>
             {/* Refresh Button */}
-            <button onClick={handleHardRefresh} style={{ width: 40, height: 40, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title="🔄 হার্ড রিফ্রেশ">🔄</button>
+            <button onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title="🔄 হার্ড রিফ্রেশ">🔄</button>
             
             {/* Fullscreen Button */}
-            <button onClick={handleFullscreen} style={{ width: 40, height: 40, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="⛶ ফুল স্ক্রিন">⛶</button>
+            <button onClick={handleFullscreen} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="⛶ ফুল স্ক্রিন">⛶</button>
             
             {/* Language Selector */}
             <div style={{ position: 'relative' }}>
@@ -1932,7 +1932,7 @@ export default function App() {
             </div>
             
             {/* Logout Button */}
-            <button onClick={handleLogout} style={{ width: 40, height: 40, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="লগআউট">↩️</button>
+            <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="লগআউট">↩️</button>
 
             {/* Date & Time */}
             <TimeDisplay language={language} />
@@ -1987,7 +1987,7 @@ export default function App() {
                         width: '100%', 
                         paddingLeft: 48, 
                         paddingRight: 12, 
-                        height: 40, 
+                        height: 34, 
                         fontSize: 14, 
                         borderRadius: 10, 
                         border: 'none', 
@@ -2027,7 +2027,7 @@ export default function App() {
                         width: '100%', 
                         paddingLeft: 48, 
                         paddingRight: 12, 
-                        height: 40, 
+                        height: 34, 
                         fontSize: 14, 
                         borderRadius: 10, 
                         border: 'none', 
@@ -2080,7 +2080,7 @@ export default function App() {
                       onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
                       style={{
                         width: '100%',
-                        height: 40,
+                        height: 34,
                         padding: '0 12px',
                         fontSize: 13,
                         borderRadius: 10,
@@ -2116,7 +2116,7 @@ export default function App() {
                       onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
                       style={{
                         width: '100%',
-                        height: 40,
+                        height: 34,
                         padding: '0 12px',
                         fontSize: 13,
                         borderRadius: 10,
@@ -2153,7 +2153,7 @@ export default function App() {
                       backdropFilter: 'blur(10px)',
                       borderRadius: 10,
                       padding: '6px 12px',
-                      height: 40,
+                      height: 34,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 6,
@@ -2821,7 +2821,7 @@ export default function App() {
                       width: '100%', 
                       paddingLeft: 48, 
                       paddingRight: 12,
-                      height: 40, 
+                      height: 34, 
                       fontSize: 14, 
                       borderRadius: 10, 
                       border: 'none', 
