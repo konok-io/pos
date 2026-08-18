@@ -1174,31 +1174,31 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '24px 28px 0',
+          padding: '16px 24px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%' }}>
             <div style={{
-              width: 60, height: 60,
-              borderRadius: 16,
+              width: 50, height: 50,
+              borderRadius: 12,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: '0 4px 12px rgba(15,118,110,0.3)',
             }}>
-              <img src="/Logo.png" alt="Logo" style={{ width: 60, height: 60, objectFit: 'contain', borderRadius: 16 }} />
+              <img src="/Logo.png" alt="Logo" style={{ width: 50, height: 50, objectFit: 'contain', borderRadius: 12 }} />
             </div>
             <div style={{ flex: 1, textAlign: 'right' }}>
-              <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#115E59' }}>
+              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#115E59' }}>
                 {t('posManagementSystem')}
               </h1>
               <div style={{
-                fontSize: 22,
+                fontSize: 16,
                 color: '#115E59',
                 fontWeight: 400,
-                marginTop: 4,
+                marginTop: 2,
               }}>
                 {t('smartBusinessPartner')}
               </div>
@@ -1210,12 +1210,12 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <div style={{
           background: '#fff',
           borderRadius: '0 0 20px 20px',
-          padding: '24px 28px 28px',
+          padding: '16px 24px 20px',
         }}>
-          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
             {/* Username */}
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: 15, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
                 👤 {t('username')}
               </label>
               <input
@@ -1226,8 +1226,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 required
                 style={{
                   width: '100%',
-                  padding: '14px 16px',
-                  fontSize: 16,
+                  padding: '10px 12px',
+                  fontSize: 14,
                   border: '2px solid #E5E7EB',
                   borderRadius: 12,
                   outline: 'none',
@@ -1240,8 +1240,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </div>
 
             {/* Password */}
-            <div style={{ width: 160 }}>
-              <label style={{ fontSize: 15, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+            <div style={{ width: 140 }}>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
                 🔐 {t('password')}
               </label>
               <input
@@ -1252,8 +1252,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 required
                 style={{
                   width: '100%',
-                  padding: '14px 16px',
-                  fontSize: 16,
+                  padding: '10px 12px',
+                  fontSize: 14,
                   border: '2px solid #E5E7EB',
                   borderRadius: 12,
                   outline: 'none',
@@ -1270,12 +1270,12 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               type="submit"
               disabled={loading}
               style={{
-                padding: '14px 24px',
+                padding: '10px 20px',
                 background: loading ? '#9CA3AF' : '#115E59',
                 color: '#fff',
                 border: 'none',
                 borderRadius: 12,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
@@ -1289,12 +1289,12 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           {/* Error */}
           {error && (
             <div style={{
-              marginTop: 14,
-              padding: '12px 14px',
+              marginTop: 10,
+              padding: '8px 12px',
               background: '#FEF2F2',
-              borderRadius: 10,
+              borderRadius: 8,
               color: '#DC2626',
-              fontSize: 15,
+              fontSize: 13,
               fontWeight: 500,
             }}>
               ⚠️ {error}
@@ -1302,7 +1302,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           )}
 
           {/* Footer */}
-          <div style={{ textAlign: 'center', marginTop: 18, paddingTop: 14, borderTop: '1px dashed #E5E7EB', fontSize: 14, color: '#9CA3AF' }}>
+          <div style={{ textAlign: 'center', marginTop: 14, paddingTop: 12, borderTop: '1px dashed #E5E7EB', fontSize: 12, color: '#9CA3AF' }}>
             © {currentYear} {t('posManagementSystem')} - {t('copyright')}
           </div>
         </div>
