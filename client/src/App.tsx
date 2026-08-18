@@ -460,10 +460,54 @@ export default function App() {
         setCurrency(savedSettings.currency);
       }
       
+      // Load cart state from localStorage
+      const savedCart = localStorage.getItem('pos_cart');
+      if (savedCart) {
+        try {
+          const cartData = JSON.parse(savedCart);
+          if (cartData.cart) setCart(cartData.cart);
+          if (cartData.selectedCustomer) setSelectedCustomer(cartData.selectedCustomer);
+          if (cartData.discount !== undefined) setDiscount(cartData.discount);
+          if (cartData.vatPercent !== undefined) setVatPercent(cartData.vatPercent);
+          if (cartData.paidAmount !== undefined) setPaidAmount(cartData.paidAmount);
+          if (cartData.paymentMethod) setPaymentMethod(cartData.paymentMethod);
+        } catch (e) {
+          console.log('Error loading cart from localStorage');
+        }
+      }
+      
+      // Load held sales from localStorage
+      const savedHeldSales = localStorage.getItem('pos_held_sales');
+      if (savedHeldSales) {
+        try {
+          setHeldSales(JSON.parse(savedHeldSales));
+        } catch (e) {
+          console.log('Error loading held sales from localStorage');
+        }
+      }
+      
       setIsLoading(false);
     };
     initApp();
   }, []);
+
+  // Save cart state to localStorage whenever it changes
+  useEffect(() => {
+    const cartData = {
+      cart,
+      selectedCustomer,
+      discount,
+      vatPercent,
+      paidAmount,
+      paymentMethod,
+    };
+    localStorage.setItem('pos_cart', JSON.stringify(cartData));
+  }, [cart, selectedCustomer, discount, vatPercent, paidAmount, paymentMethod]);
+
+  // Save held sales to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('pos_held_sales', JSON.stringify(heldSales));
+  }, [heldSales]);
 
   const handleLogin = () => setIsLoggedIn(true);
 
@@ -472,6 +516,9 @@ export default function App() {
     setIsLoggedIn(false);
     setCart([]);
     setVatPercent(defaultVatPercent);
+    // Clear cart data from localStorage
+    localStorage.removeItem('pos_cart');
+    localStorage.removeItem('pos_held_sales');
   };
 
   const handleFullscreen = () => {
