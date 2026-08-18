@@ -1169,7 +1169,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         borderRadius: '50%',
       }} />
 
-      <div style={{ width: '100%', maxWidth: 560, position: 'relative', zIndex: 1 }}>
+      <div style={{ width: '100%', maxWidth: 400, position: 'relative', zIndex: 1 }}>
         {/* Header - Icon left, text right */}
         <div style={{
           background: '#fff',
