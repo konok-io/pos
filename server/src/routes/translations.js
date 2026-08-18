@@ -1,14 +1,12 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
 
 const router = Router();
-const prisma = new PrismaClient();
 
 // Get all translations for a language
 router.get('/:lang', async (req, res) => {
   try {
     const { lang } = req.params;
-    const translations = await prisma.translation.findMany({
+    const translations = await req.prisma.translation.findMany({
       where: { lang },
       orderBy: { key: 'asc' }
     });
@@ -28,7 +26,7 @@ router.get('/:lang', async (req, res) => {
 // Get all translations for all languages
 router.get('/', async (req, res) => {
   try {
-    const translations = await prisma.translation.findMany({
+    const translations = await req.prisma.translation.findMany({
       orderBy: [{ lang: 'asc' }, { key: 'asc' }]
     });
     
@@ -57,14 +55,14 @@ router.post('/sync', async (req, res) => {
       for (const [key, value] of Object.entries(keys)) {
         try {
           // Upsert each translation
-          const existing = await prisma.translation.findUnique({
+          const existing = await req.prisma.translation.findUnique({
             where: { lang_key: { lang, key } }
           });
 
           if (existing) {
             // Update if not custom
             if (!existing.isCustom) {
-              await prisma.translation.update({
+              await req.prisma.translation.update({
                 where: { id: existing.id },
                 data: { value, isCustom: false }
               });
@@ -72,7 +70,7 @@ router.post('/sync', async (req, res) => {
             }
           } else {
             // Create new
-            await prisma.translation.create({
+            await req.prisma.translation.create({
               data: { lang, key, value, isCustom: false }
             });
             results.added++;
@@ -95,7 +93,7 @@ router.put('/:lang/:key', async (req, res) => {
     const { lang, key } = req.params;
     const { value } = req.body;
 
-    const translation = await prisma.translation.upsert({
+    const translation = await req.prisma.translation.upsert({
       where: { lang_key: { lang, key } },
       update: { value, isCustom: true },
       create: { lang, key, value, isCustom: true }
@@ -112,7 +110,7 @@ router.delete('/:lang/:key', async (req, res) => {
   try {
     const { lang, key } = req.params;
 
-    const translation = await prisma.translation.findUnique({
+    const translation = await req.prisma.translation.findUnique({
       where: { lang_key: { lang, key } }
     });
 
@@ -124,7 +122,7 @@ router.delete('/:lang/:key', async (req, res) => {
       return res.status(403).json({ error: 'Cannot delete system translation' });
     }
 
-    await prisma.translation.delete({
+    await req.prisma.translation.delete({
       where: { id: translation.id }
     });
 

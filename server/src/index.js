@@ -4,8 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import pkg from '@prisma/client';
 const { PrismaClient } = pkg;
-import { PrismaBetterSQLite } from '@prisma/adapter-better-sqlite3';
-import Database from 'better-sqlite3';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import path from 'path';
 
 // Routes
@@ -25,8 +24,7 @@ import translationRoutes from './routes/translations.js';
 
 const app = express();
 const dbPath = path.join(process.cwd(), 'prisma', 'dev.db');
-const sqlite = new Database(dbPath);
-const adapter = new PrismaBetterSQLite(sqlite);
+const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
 const prisma = new PrismaClient({ adapter });
 const PORT = process.env.PORT || 3000;
 
