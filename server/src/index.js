@@ -2,7 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { PrismaClient } from '@prisma/client';
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
+import { PrismaLibSQL } from '@prisma/adapter-libsql';
 
 // Routes
 import authRoutes from './routes/auth.js';
@@ -20,7 +22,8 @@ import reportRoutes from './routes/reports.js';
 import translationRoutes from './routes/translations.js';
 
 const app = express();
-const prisma = new PrismaClient();
+const libsql = new PrismaLibSQL({ url: 'file:./prisma/dev.db' });
+const prisma = new PrismaClient({ adapter: libsql });
 const PORT = process.env.PORT || 3000;
 
 // Middleware

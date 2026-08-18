@@ -1,7 +1,9 @@
 import pkg from '@prisma/client';
 const { PrismaClient } = pkg;
+import { PrismaLibSQL } from '@prisma/adapter-libsql';
 
-const prisma = new PrismaClient();
+const libsql = new PrismaLibSQL({ url: 'file:./prisma/dev.db' });
+const prisma = new PrismaClient({ adapter: libsql });
 
 async function main() {
   console.log('🌱 Seeding database...');
