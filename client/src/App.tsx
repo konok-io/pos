@@ -2661,8 +2661,7 @@ export default function App() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      height: '100%',
-                      minHeight: 200
+                      minHeight: 'calc(100vh - 280px)'
                     }}>
                       <div style={{ textAlign: 'center', padding: 40 }}>
                         <div style={{ fontSize: 64, marginBottom: 16 }}>📦</div>
