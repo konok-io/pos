@@ -1191,7 +1191,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               <img src="/Logo.png" alt="Logo" style={{ width: 50, height: 50, objectFit: 'contain', borderRadius: 12 }} />
             </div>
             <div style={{ flex: 1, textAlign: 'right' }}>
-              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#115E59' }}>
+              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#115E59' }}>
                 {t('posManagementSystem')}
               </h1>
               <div style={{
