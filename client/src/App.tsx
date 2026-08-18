@@ -2182,48 +2182,195 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Stock Summary Row */}
-              <div style={{ padding: '6px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-                <button 
-                  onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); }}
-                  style={{ 
-                    borderRadius: 8, whiteSpace: 'nowrap', 
-                    background: stockFilter === 'available' ? '#115E59' : '#F0FDFA', 
-                    color: stockFilter === 'available' ? '#fff' : '#115E59', 
-                    border: '1.5px solid rgba(15,118,110,0.3)', 
-                    padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' 
-                  }}>
-                  📦 {t('stockAvailable')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0).length})</span>
-                </button>
-                <button 
-                  onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); }}
-                  style={{ 
-                    borderRadius: 8, whiteSpace: 'nowrap', 
-                    background: stockFilter === 'low' ? '#EA580C' : '#FFF7ED', 
-                    color: stockFilter === 'low' ? '#fff' : '#EA580C', 
-                    border: '1.5px solid rgba(234,88,12,0.3)', 
-                    padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' 
-                  }}>
-                  ⚠️ {t('stockLow')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock > 0 && p.stock <= 10).length})</span>
-                </button>
-                <button 
-                  onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); }}
-                  style={{ 
-                    borderRadius: 8, whiteSpace: 'nowrap', 
-                    background: stockFilter === 'out' ? '#DC2626' : '#FEF2F2', 
-                    color: stockFilter === 'out' ? '#fff' : '#DC2626', 
-                    border: '1.5px solid rgba(220,38,38,0.3)', 
-                    padding: '6px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' 
-                  }}>
-                  ⚠️ {t('stockOut')} <span style={{ fontWeight: 700, marginLeft: 4 }}>({products.filter(p => p.stock <= 0).length})</span>
-                </button>
-                <button 
+              {/* Stock Summary Row - Professional Cards Design */}
+              <div style={{ 
+                padding: '12px 20px', 
+                background: '#FFFFFF', 
+                borderBottom: '1px solid #E5E7EB', 
+                display: 'flex', 
+                gap: 12, 
+                flexWrap: 'wrap', 
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                {/* Left Side - Stock Filter Cards */}
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+                  
+                  {/* Stock Available Card */}
+                  <div 
+                    onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); }}
+                    style={{ 
+                      cursor: 'pointer',
+                      borderRadius: 12,
+                      padding: '10px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      background: stockFilter === 'available' 
+                        ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)' 
+                        : '#F0FDF4',
+                      border: stockFilter === 'available' 
+                        ? 'none' 
+                        : '2px solid #D1FAE5',
+                      boxShadow: stockFilter === 'available' 
+                        ? '0 4px 14px rgba(16, 185, 129, 0.4)' 
+                        : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: stockFilter === 'available' ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
+                    <div style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      background: stockFilter === 'available' ? 'rgba(255,255,255,0.25)' : '#10B981',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 16
+                    }}>
+                      📦
+                    </div>
+                    <div>
+                      <div style={{ 
+                        fontSize: 11, 
+                        fontWeight: 600, 
+                        color: stockFilter === 'available' ? 'rgba(255,255,255,0.9)' : '#6B7280',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {t('stockAvailable')}
+                      </div>
+                      <div style={{ 
+                        fontSize: 18, 
+                        fontWeight: 800, 
+                        color: stockFilter === 'available' ? '#FFFFFF' : '#059669',
+                        lineHeight: 1
+                      }}>
+                        {products.filter(p => p.stock > 0).length}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Low Stock Card */}
+                  <div 
+                    onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); }}
+                    style={{ 
+                      cursor: 'pointer',
+                      borderRadius: 12,
+                      padding: '10px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      background: stockFilter === 'low' 
+                        ? 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)' 
+                        : '#FFF7ED',
+                      border: stockFilter === 'low' 
+                        ? 'none' 
+                        : '2px solid #FED7AA',
+                      boxShadow: stockFilter === 'low' 
+                        ? '0 4px 14px rgba(217, 119, 6, 0.4)' 
+                        : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: stockFilter === 'low' ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
+                    <div style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#F59E0B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 16
+                    }}>
+                      ⚠️
+                    </div>
+                    <div>
+                      <div style={{ 
+                        fontSize: 11, 
+                        fontWeight: 600, 
+                        color: stockFilter === 'low' ? 'rgba(255,255,255,0.9)' : '#6B7280',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {t('stockLow')}
+                      </div>
+                      <div style={{ 
+                        fontSize: 18, 
+                        fontWeight: 800, 
+                        color: stockFilter === 'low' ? '#FFFFFF' : '#D97706',
+                        lineHeight: 1
+                      }}>
+                        {products.filter(p => p.stock > 0 && p.stock <= 10).length}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stock Out Card */}
+                  <div 
+                    onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); }}
+                    style={{ 
+                      cursor: 'pointer',
+                      borderRadius: 12,
+                      padding: '10px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      background: stockFilter === 'out' 
+                        ? 'linear-gradient(135deg, #DC2626 0%, #EF4444 100%)' 
+                        : '#FEF2F2',
+                      border: stockFilter === 'out' 
+                        ? 'none' 
+                        : '2px solid #FECACA',
+                      boxShadow: stockFilter === 'out' 
+                        ? '0 4px 14px rgba(220, 38, 38, 0.4)' 
+                        : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: stockFilter === 'out' ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
+                    <div style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      background: stockFilter === 'out' ? 'rgba(255,255,255,0.25)' : '#EF4444',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 16
+                    }}>
+                      🚫
+                    </div>
+                    <div>
+                      <div style={{ 
+                        fontSize: 11, 
+                        fontWeight: 600, 
+                        color: stockFilter === 'out' ? 'rgba(255,255,255,0.9)' : '#6B7280',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {t('stockOut')}
+                      </div>
+                      <div style={{ 
+                        fontSize: 18, 
+                        fontWeight: 800, 
+                        color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626',
+                        lineHeight: 1
+                      }}>
+                        {products.filter(p => p.stock <= 0).length}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side - Hold Sales Button */}
+                <div 
                   onClick={() => {
                     if (showHeldSales) {
-                      // If already showing hold, close it
                       setShowHeldSales(false);
                     } else {
-                      // Show hold sales, clear all filters first
                       setSearchQuery('');
                       setSelectedCategory('all');
                       setSelectedSupplier('all');
@@ -2231,16 +2378,92 @@ export default function App() {
                       setShowHeldSales(true);
                     }
                   }}
-                  style={{
-                    marginLeft: 'auto',
-                    padding: '6px 14px', borderRadius: 8,
-                    background: showHeldSales ? '#115E59' : heldSales.length > 0 ? '#F0FDF4' : '#F9FAFB',
-                    color: showHeldSales ? '#fff' : heldSales.length > 0 ? '#115E59' : '#9CA3AF',
-                    fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                    border: '1px solid ' + (heldSales.length > 0 ? '#115E59' : '#E5E7EB'),
+                  style={{ 
+                    cursor: 'pointer',
+                    borderRadius: 12,
+                    padding: '10px 20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    background: showHeldSales 
+                      ? 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)' 
+                      : heldSales.length > 0 
+                        ? '#F0FDFA' 
+                        : '#F9FAFB',
+                    border: showHeldSales 
+                      ? 'none' 
+                      : '2px solid ' + (heldSales.length > 0 ? '#99F6E4' : '#E5E7EB'),
+                    boxShadow: showHeldSales 
+                      ? '0 4px 14px rgba(15, 118, 110, 0.4)' 
+                      : '0 2px 8px rgba(0,0,0,0.04)',
+                    transition: 'all 0.2s ease',
+                    transform: showHeldSales ? 'translateY(-1px)' : 'none'
+                  }}
+                >
+                  <div style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: showHeldSales 
+                      ? 'rgba(255,255,255,0.25)' 
+                      : heldSales.length > 0 
+                        ? '#14B8A6' 
+                        : '#9CA3AF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 16
                   }}>
-                  📋 {t('hold')} {heldSales.length > 0 && `(${heldSales.length})`}
-                </button>
+                    📋
+                  </div>
+                  <div>
+                    <div style={{ 
+                      fontSize: 11, 
+                      fontWeight: 600, 
+                      color: showHeldSales 
+                        ? 'rgba(255,255,255,0.9)' 
+                        : heldSales.length > 0 
+                          ? '#115E59' 
+                          : '#9CA3AF',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      {t('hold')}
+                    </div>
+                    <div style={{ 
+                      fontSize: 18, 
+                      fontWeight: 800, 
+                      color: showHeldSales 
+                        ? '#FFFFFF' 
+                        : heldSales.length > 0 
+                          ? '#115E59' 
+                          : '#9CA3AF',
+                      lineHeight: 1
+                    }}>
+                      {heldSales.length > 0 ? heldSales.length : '0'}
+                    </div>
+                  </div>
+                  {heldSales.length > 0 && (
+                    <div style={{
+                      position: 'absolute',
+                      top: -6,
+                      right: -6,
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: '#EF4444',
+                      color: '#fff',
+                      fontSize: 10,
+                      fontWeight: 700,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 6px rgba(239, 68, 68, 0.5)'
+                    }}>
+                      {heldSales.length}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Product grid */}
