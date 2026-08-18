@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages } from './i18n';
-import TranslationSettings from './pages/TranslationSettings';
-import DatabaseSettings from './pages/DatabaseSettings';
 import SettingsScreen from './pages/SettingsScreen';
 import { db } from './utils/db';
-import { getSetting as dbGetSetting, initDatabase } from './services/database';
+import { getSetting as dbGetSetting, setSetting as dbSetSetting, initDatabase } from './services/database';
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
@@ -31,6 +29,15 @@ interface Product {
   categoryId: string;
   supplier: string;
   image: string;
+  // Extended fields
+  barcode?: string;
+  description?: string;
+  category?: string;
+  storeId?: string;
+  company?: string;
+  cat?: string;
+  buyP?: number;
+  minStock?: number;
 }
 
 interface CartItem {
@@ -1705,30 +1712,54 @@ export default function App() {
         )}
 
         {currentTab === 'newproduct' && (
-          <div>
-            <h2 style={{ marginBottom: 16 }}>➕ New Product</h2>
-            <div className="card" style={{ maxWidth: 600 }}>
-              <div className="form-group">
-                <label className="label">{t('productName')}</label>
-                <input type="text" className="input" placeholder={t('enterProductName')} />
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                <div className="form-group">
-                  <label className="label">{t('purchasePrice')}</label>
-                  <input type="number" className="input" placeholder="0" />
-                </div>
-                <div className="form-group">
-                  <label className="label">{t('sellPrice')}</label>
-                  <input type="number" className="input" placeholder="0" />
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="label">{t('stock')}</label>
-                <input type="number" className="input" placeholder="0" />
-              </div>
-              <button className="btn btn-primary">{t('addProduct')}</button>
-            </div>
-          </div>
+          <NewProductTab 
+            products={products} 
+            suppliers={suppliers}
+            categories={categories}
+            onAddProducts={(newProducts) => {
+              const updatedProducts = [...products];
+              const newProductsToAdd: Product[] = [];
+              
+              for (const item of newProducts) {
+                const itemWithBarcode = item as any;
+                const existingIndex = updatedProducts.findIndex(
+                  p => p.barcode && itemWithBarcode.barcode && p.barcode === itemWithBarcode.barcode
+                );
+                
+                if (existingIndex !== -1) {
+                  const existing = updatedProducts[existingIndex];
+                  updatedProducts[existingIndex] = {
+                    ...existing,
+                    stock: (existing.stock || 0) + (item.stock || 0),
+                    costPrice: item.buyP || existing.costPrice,
+                    sellPrice: item.sellP || existing.sellPrice
+                  };
+                } else {
+                  const newProduct: Product = {
+                    id: genId(),
+                    name: item.name,
+                    code: item.barcode || genId(),
+                    costPrice: item.buyP,
+                    sellPrice: item.sellP,
+                    stock: item.stock,
+                    unit: item.unit,
+                    categoryId: '',
+                    supplier: item.company,
+                    image: '',
+                    barcode: item.barcode,
+                    company: item.company,
+                    cat: item.cat,
+                    minStock: item.minStock
+                  };
+                  newProductsToAdd.push(newProduct);
+                }
+              }
+              
+              setProducts([...updatedProducts, ...newProductsToAdd]);
+            }}
+            t={t}
+            fmt={fmt}
+          />
         )}
 
         {currentTab === 'barcode' && (
@@ -1902,3 +1933,450 @@ export default function App() {
     </div>
   );
 }
+
+// ===========================================
+// NEW PRODUCT TAB COMPONENT
+// ===========================================
+interface NewProductItem {
+  name: string;
+  barcode: string;
+  company: string;
+  cat: string;
+  unit: string;
+  buyP: number;
+  sellP: number;
+  stock: number;
+  minStock: number;
+}
+
+interface NewProductTabProps {
+  products: Product[];
+  suppliers: { id: string; name: string; phone?: string; address?: string }[];
+  categories: { id: string; name: string }[];
+  onAddProducts: (products: NewProductItem[]) => void;
+  t: (key: string) => string;
+  fmt: (value: number) => string;
+}
+
+const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, categories, onAddProducts, t, fmt }) => {
+  const [purchaseItems, setPurchaseItems] = useState<NewProductItem[]>([]);
+  const [supplierQ, setSupplierQ] = useState('');
+  const [showCompanyList, setShowCompanyList] = useState(false);
+  const [showCategoryList, setShowCategoryList] = useState(false);
+  const [barcodeVal, setBarcodeVal] = useState('');
+  const [form, setForm] = useState({
+    name: '',
+    barcode: '',
+    company: '',
+    cat: '',
+    unit: 'পিস',
+    buyP: '',
+    sellP: '',
+    stock: '',
+    minStock: '5'
+  });
+
+  // Get unique companies from suppliers and products
+  const uniqueCompanies = [...new Set([
+    ...suppliers.map(s => s.name).filter(Boolean),
+    ...products.map(p => p.company).filter(Boolean)
+  ])].sort();
+
+  // Get unique categories
+  const uniqueCategories = [...new Set([
+    ...categories.map(c => c.name),
+    ...products.map(p => p.cat).filter(Boolean)
+  ])].sort();
+
+  // Filter companies for dropdown
+  const filteredCompanies = uniqueCompanies.filter(c =>
+    !supplierQ || (c || '').toLowerCase().includes((supplierQ || '').toLowerCase())
+  );
+
+  // Filter categories for dropdown
+  const filteredCategories = uniqueCategories.filter(c =>
+    !form.cat || (c || '').toLowerCase().includes((form.cat || '').toLowerCase())
+  );
+
+  // Calculate profit
+  const profit = form.buyP && form.sellP ? (+form.sellP - +form.buyP).toFixed(0) : '--';
+  const profitPercent = form.buyP && form.sellP && +form.buyP > 0 ? (((+form.sellP - +form.buyP) / +form.buyP) * 100).toFixed(0) : '--';
+  const vatAmount = form.sellP ? (+form.sellP * 0.15).toFixed(2) : '--';
+  const totalSellPrice = form.sellP ? (+form.sellP * 1.15).toFixed(2) : '--';
+
+  // Add item to purchase list
+  const addItem = () => {
+    if (!form.name?.trim()) { alert(t('productNameRequired')); return; }
+    if (!form.company?.trim()) { alert(t('supplierRequired')); return; }
+
+    const item: NewProductItem = {
+      name: form.name,
+      barcode: form.barcode || '',
+      company: form.company,
+      cat: form.cat || '',
+      unit: form.unit || 'পিস',
+      buyP: +form.buyP || 0,
+      sellP: +form.sellP || 0,
+      stock: +form.stock || 0,
+      minStock: +form.minStock || 5
+    };
+    setPurchaseItems([...purchaseItems, item]);
+    setForm({ name: '', barcode: '', company: form.company, cat: '', unit: 'পিস', buyP: '', sellP: '', stock: '', minStock: '5' });
+    setBarcodeVal('');
+  };
+
+  // Remove item
+  const removeItem = (index: number) => {
+    setPurchaseItems(purchaseItems.filter((_, i) => i !== index));
+  };
+
+  // Save purchase
+  const savePurchase = () => {
+    if (purchaseItems.length === 0) { alert(t('addAtLeastOne')); return; }
+    onAddProducts(purchaseItems);
+    alert(`${purchaseItems.length}${t('productsSaved')}`);
+    setPurchaseItems([]);
+    setForm({ name: '', barcode: '', company: '', cat: '', unit: 'পিস', buyP: '', sellP: '', stock: '', minStock: '5' });
+    setSupplierQ('');
+  };
+
+  // Handle barcode Enter key
+  const handleBarcodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && barcodeVal) {
+      const found = products.find(p => p.barcode === barcodeVal);
+      if (found) {
+        const companyName = (found as any).company || '';
+        const catName = (found as any).cat || '';
+        const buyPrice = (found as any).buyP || found.costPrice || 0;
+        const sellPrice = (found as any).sellP || found.sellPrice || 0;
+        const minStock = (found as any).minStock || 5;
+        
+        setSupplierQ(companyName);
+        setForm({
+          name: found.name || '',
+          barcode: found.barcode || '',
+          company: companyName,
+          cat: catName,
+          unit: found.unit || 'পিস',
+          buyP: buyPrice.toString(),
+          sellP: sellPrice.toString(),
+          stock: '',
+          minStock: minStock.toString()
+        });
+        setShowCategoryList(false);
+      } else {
+        alert(t('productNotFound'));
+      }
+    }
+  };
+
+  // Download demo CSV
+  const downloadDemoCSV = () => {
+    const csv = `# পণ্যের তালিকা CSV
+পণ্যের নাম,বারকোড,সরবরাহকারী,ক্যাটাগরি,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক
+মিনিকেট চাল,001,${uniqueCompanies[0] || 'কোম্পানি নাম'},খাদ্যপণ্য,কেজি,55,65,100,10
+সুজি চিপস,002,${uniqueCompanies[0] || 'কোম্পানি নাম'},স্ন্যাকস,পিস,20,25,200,20`;
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'পণ্যের_তালিকা.csv';
+    a.click();
+  };
+
+  // Handle CSV Import
+  const handleCsvImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      const lines = text.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
+
+      if (lines.length < 2) {
+        alert('CSV ফাইলে কমপক্ষে হেডার ও একটি পণ্য থাকতে হবে');
+        return;
+      }
+
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const items: NewProductItem[] = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        const row: Record<string, string> = {};
+        headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
+
+        const item: NewProductItem = {
+          name: row['পণ্যের নাম'] || row['name'] || '',
+          barcode: row['বারকোড'] || row['barcode'] || '',
+          company: row['সরবরাহকারী'] || row['supplier'] || '',
+          cat: row['ক্যাটাগরি'] || row['category'] || '',
+          unit: row['একক'] || row['unit'] || 'পিস',
+          buyP: parseFloat(row['ক্রয়মূল্য'] || row['buyprice'] || row['buy'] || '0'),
+          sellP: parseFloat(row['বিক্রয়মূল্য'] || row['sellprice'] || row['sell'] || '0'),
+          stock: parseFloat(row['স্টক'] || row['stock'] || '0'),
+          minStock: parseFloat(row['মিনস্টক'] || row['minstock'] || '5')
+        };
+
+        if (item.name) items.push(item);
+      }
+
+      if (items.length > 0) {
+        setPurchaseItems([...purchaseItems, ...items]);
+        alert(`✅ ${items.length}টি পণ্য যোগ হয়েছে!`);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  return (
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F9FAFB' }}>
+      {/* Header */}
+      <div style={{ padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center', background: 'white', borderBottom: '1px solid #E5E7EB', flexWrap: 'wrap' }}>
+        <span style={{ fontWeight: 700, fontSize: 16 }}>📦 {t('newProductSave')}</span>
+        <span style={{ fontSize: 14, color: '#6B7280', marginLeft: 'auto' }}>{purchaseItems.length} {t('productsAdded')}</span>
+        {purchaseItems.length > 0 && (
+          <button onClick={savePurchase} style={{ padding: '8px 16px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+            💾 {t('saveAll')}
+          </button>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Left: Form */}
+        <div style={{ flex: 1, padding: 16, overflow: 'auto', borderRight: '1px solid #E5E7EB', background: 'white' }}>
+          {/* CSV Import */}
+          <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <input type="file" accept=".csv" onChange={handleCsvImport} id="newProductCsvInput" style={{ display: 'none' }} />
+            <label htmlFor="newProductCsvInput" style={{ padding: '8px 16px', background: '#0D9488', color: 'white', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>📁</span> {t('csvUpload')}
+            </label>
+            <button onClick={downloadDemoCSV} style={{ padding: '8px 16px', background: '#F3F4F6', color: '#374151', border: '1px solid #E5E7EB', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>📥</span> {t('demoCsv')}
+            </button>
+          </div>
+
+          {/* Form Card */}
+          <div style={{ background: 'white', borderRadius: 12, border: '1px solid #E5E7EB', padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: 16, color: '#0D9488', fontWeight: 700 }}>{t('addProduct')}</h3>
+
+            {/* Company + Category: 2 columns */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+              {/* Company */}
+              <div style={{ position: 'relative' }}>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>🏢 {t('companySupplier')} *</label>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <input
+                    value={supplierQ}
+                    onChange={e => { setSupplierQ(e.target.value); setForm(f => ({ ...f, company: e.target.value || '' })); setShowCompanyList(true); }}
+                    onFocus={() => setShowCompanyList(true)}
+                    onBlur={() => setTimeout(() => setShowCompanyList(false), 200)}
+                    placeholder={t('selectSupplier')}
+                    style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
+                  />
+                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ padding: '4px 8px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
+                </div>
+                {showCompanyList && (
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
+                    {filteredCompanies.map((c, i) => (
+                      <div key={i} onClick={() => { setSupplierQ(c || ''); setForm(f => ({ ...f, company: c || '' })); setShowCompanyList(false); }}
+                        style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6', fontSize: 14 }}>
+                        {c}
+                      </div>
+                    ))}
+                    {filteredCompanies.length === 0 && <div style={{ padding: '8px 12px', color: '#9CA3AF', fontSize: 14 }}>কোনো সরবরাহকারী নেই</div>}
+                  </div>
+                )}
+              </div>
+
+              {/* Category */}
+              <div style={{ position: 'relative' }}>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>📂 {t('category')}</label>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <input
+                    value={form.cat}
+                    onChange={e => setForm(f => ({ ...f, cat: e.target.value }))}
+                    onFocus={() => setShowCategoryList(true)}
+                    onBlur={() => setTimeout(() => setShowCategoryList(false), 200)}
+                    placeholder={t('selectCategory')}
+                    style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
+                  />
+                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ padding: '4px 8px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
+                </div>
+                {showCategoryList && (
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
+                    {filteredCategories.map((c, i) => (
+                      <div key={i} onClick={() => { setForm(f => ({ ...f, cat: c || '' })); setShowCategoryList(false); }}
+                        style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6', fontSize: 14 }}>
+                        {c}
+                      </div>
+                    ))}
+                    {filteredCategories.length === 0 && <div style={{ padding: '8px 12px', color: '#9CA3AF', fontSize: 14 }}>কোনো ক্যাটাগরি নেই</div>}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Product Name + Barcode: 2 columns */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>{t('productName')} *</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder={t('enterProductName')}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>🔢 {t('barcode')}</label>
+                <input
+                  type="text"
+                  value={barcodeVal}
+                  onChange={e => { setBarcodeVal(e.target.value); setForm(f => ({ ...f, barcode: e.target.value })); }}
+                  onKeyDown={handleBarcodeKeyDown}
+                  placeholder={t('barcodeEnter')}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
+
+            {/* Unit + Stock + MinStock: 3 columns */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>📥 {t('unit')}</label>
+                <select
+                  value={form.unit}
+                  onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box', cursor: 'pointer' }}
+                >
+                  <option value="পিস">পিস</option>
+                  <option value="কেজি">কেজি</option>
+                  <option value="লিটার">লিটার</option>
+                  <option value="বাক্স">বাক্স</option>
+                  <option value="গ্রাম">গ্রাম</option>
+                  <option value="মিটার">মিটার</option>
+                  <option value="ডজন">ডজন</option>
+                  <option value="বোতল">বোতল</option>
+                  <option value="সেট">সেট</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>📥 {t('stock')}</label>
+                <input
+                  type="number"
+                  value={form.stock}
+                  onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
+                  placeholder="0"
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>⚠️ {t('minStock')}</label>
+                <input
+                  type="number"
+                  value={form.minStock}
+                  onChange={e => setForm(f => ({ ...f, minStock: e.target.value }))}
+                  placeholder="5"
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
+
+            {/* Buy Price + Sell Price + Profit: 3 columns */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>💰 {t('purchasePrice')}</label>
+                <input
+                  type="number"
+                  value={form.buyP}
+                  onChange={e => setForm(f => ({ ...f, buyP: e.target.value }))}
+                  placeholder="0"
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>💵 {t('sellPrice')}</label>
+                <input
+                  type="number"
+                  value={form.sellP}
+                  onChange={e => setForm(f => ({ ...f, sellP: e.target.value }))}
+                  placeholder="0"
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>📊 {t('profit')}</label>
+                <div style={{ padding: '10px 12px', background: '#DCFCE7', borderRadius: 8, fontWeight: 700, color: '#166534', fontSize: 14, border: '1px solid #BBF7D0' }}>
+                  {typeof profit === 'number' ? profit : profit} {typeof profitPercent === 'number' ? `(${profitPercent}%)` : ''}
+                </div>
+              </div>
+            </div>
+
+            {/* VAT + VAT Amount + Total: 3 columns */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>🧾 {t('vatPercent')}</label>
+                <input
+                  type="number"
+                  value="15"
+                  readOnly
+                  style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, background: '#FFF7ED', color: '#C2410C', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>{t('vatAmount')}</label>
+                <div style={{ padding: '10px 12px', background: '#FFF7ED', borderRadius: 8, fontWeight: 700, color: '#C2410C', fontSize: 14, border: '1px solid #FDBA74' }}>
+                  {vatAmount}
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}>{t('totalSellPrice')}</label>
+                <div style={{ padding: '10px 12px', background: '#CCFBF1', borderRadius: 8, fontWeight: 700, color: '#0D9488', fontSize: 14, border: '1px solid #99F6E4' }}>
+                  {totalSellPrice}
+                </div>
+              </div>
+            </div>
+
+            {/* Add Button */}
+            <button onClick={addItem} style={{ width: '100%', padding: '12px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+              ➕ {t('addToProductList')}
+            </button>
+          </div>
+        </div>
+
+        {/* Right: Purchase List */}
+        <div style={{ width: 350, padding: 12, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 8, background: '#F9FAFB' }}>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>📋 {t('productList')} ({purchaseItems.length})</h3>
+
+          {purchaseItems.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF', background: 'white', borderRadius: 10, border: '1px solid #E5E7EB', fontSize: 14 }}>
+              {t('noProductsYet2')}<br />
+              <span style={{ fontSize: 13 }}>{t('fillFormAbove')}</span>
+            </div>
+          ) : (
+            purchaseItems.map((item, i) => (
+              <div key={i} style={{ background: 'white', borderRadius: 10, border: '1px solid #E5E7EB', padding: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{item.name}</div>
+                  <div style={{ fontSize: 13, color: '#6B7280' }}>
+                    🏢 {item.company} {item.cat ? `- 📂 ${item.cat}` : ''}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#6B7280', display: 'flex', gap: 8, marginTop: 4 }}>
+                    <span>📦 {item.stock} {item.unit}</span>
+                    <span>💰 {fmt(item.buyP)}</span>
+                    <span>💵 {fmt(item.sellP)}</span>
+                  </div>
+                  {item.barcode && <div style={{ fontSize: 12, color: '#9CA3AF', fontFamily: 'monospace', marginTop: 2 }}>🔢 {item.barcode}</div>}
+                </div>
+                <button onClick={() => removeItem(i)} style={{ padding: '6px 10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12, marginLeft: 8 }}>🗑️</button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};

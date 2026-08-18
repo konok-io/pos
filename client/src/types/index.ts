@@ -51,6 +51,11 @@ export interface Product {
   stock: number;
   unit?: string;
   image?: string;
+  // Extended fields for New Product form
+  company?: string;
+  cat?: string;
+  buyP?: number;
+  minStock?: number;
 }
 
 export interface Customer {
