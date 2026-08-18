@@ -356,11 +356,8 @@ export default function App() {
     { id: 'suppliers', icon: '📋', label: t('suppliers') },
     { id: 'customers', icon: '👥', label: t('customers') },
     { id: 'inventory', icon: '🏭', label: t('stock') },
-    { id: 'sales', icon: '🧾', label: t('salesList') },
     { id: 'income', icon: '💰', label: t('incomeExpenses') },
     { id: 'reports', icon: '📈', label: t('reports') },
-    { id: 'translations', icon: '🌐', label: 'Translations' },
-    { id: 'database', icon: '🗄️', label: t('database') },
     { id: 'settings', icon: '⚙️', label: t('settings') },
   ];
 
@@ -1618,49 +1615,9 @@ export default function App() {
           </div>
         )}
 
-        {currentTab === 'sales' && (
-          <div>
-            <h2 style={{ marginBottom: 16 }}>💰 {t('salesList')}</h2>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Invoice</th>
-                    <th>{t('date')}</th>
-                    <th>{t('customer')}</th>
-                    <th>{t('total')}</th>
-                    <th>{t('paid')}</th>
-                    <th>{t('due')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sales.length === 0 ? (
-                    <tr><td colSpan={6} style={{ textAlign: 'center', color: '#9CA3AF' }}>{t('noSalesYet')}</td></tr>
-                  ) : (
-                    sales.map(s => (
-                      <tr key={s.id}>
-                        <td>{s.invoiceNo}</td>
-                        <td>{new Date(s.date).toLocaleDateString('en-GB')}</td>
-                        <td>{s.customerName}</td>
-                        <td>{fmt(s.total)}</td>
-                        <td>{fmt(s.paid)}</td>
-                        <td>
-                          <span className={`badge ${s.due > 0 ? 'badge-danger' : 'badge-success'}`}>
-                            {fmt(s.due)}
-                          </span>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
         {currentTab === 'reports' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>📊 {t('reports')}</h2>
+            <h2 style={{ marginBottom: 16 }}>📈 {t('reports')}</h2>
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="label">{t('totalProducts')}</div>
@@ -1691,6 +1648,45 @@ export default function App() {
                 <div className="value" style={{ color: '#F59E0B' }}>
                   {products.filter(p => p.stock <= 10).length}
                 </div>
+              </div>
+            </div>
+            
+            {/* Sales List Section */}
+            <div className="card" style={{ marginTop: 20 }}>
+              <h3 style={{ marginBottom: 12 }}>🧾 {t('salesList')}</h3>
+              <div className="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Invoice</th>
+                      <th>{t('date')}</th>
+                      <th>{t('customer')}</th>
+                      <th>{t('total')}</th>
+                      <th>{t('paid')}</th>
+                      <th>{t('due')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sales.length === 0 ? (
+                      <tr><td colSpan={6} style={{ textAlign: 'center', color: '#9CA3AF' }}>{t('noSalesYet')}</td></tr>
+                    ) : (
+                      sales.map(s => (
+                        <tr key={s.id}>
+                          <td>{s.invoiceNo}</td>
+                          <td>{new Date(s.date).toLocaleDateString('en-GB')}</td>
+                          <td>{s.customerName}</td>
+                          <td>{fmt(s.total)}</td>
+                          <td>{fmt(s.paid)}</td>
+                          <td>
+                            <span className={`badge ${s.due > 0 ? 'badge-danger' : 'badge-success'}`}>
+                              {fmt(s.due)}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -1752,15 +1748,19 @@ export default function App() {
                 ✅ {t('saveSuccess') || 'Settings auto-saved!'}
               </div>
             </div>
+            
+            {/* Translations Section */}
+            <div className="card" style={{ marginTop: 20 }}>
+              <h3 style={{ marginBottom: 12 }}>🌐 Translations</h3>
+              <TranslationSettings />
+            </div>
+            
+            {/* Database Section */}
+            <div className="card" style={{ marginTop: 20 }}>
+              <h3 style={{ marginBottom: 12 }}>🗄️ {t('database')}</h3>
+              <DatabaseSettings />
+            </div>
           </div>
-        )}
-
-        {currentTab === 'translations' && (
-          <TranslationSettings />
-        )}
-
-        {currentTab === 'database' && (
-          <DatabaseSettings />
         )}
 
         {currentTab === 'newproduct' && (
