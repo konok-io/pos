@@ -1460,17 +1460,17 @@ export default function App() {
 
   // Filter customers for dropdown
   const filteredCustomers = customers.filter(c => 
-    c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
-    c.phone.includes(customerSearch) ||
-    c.id.toLowerCase().includes(customerSearch.toLowerCase())
+    (c.name || '').toLowerCase().includes(customerSearch.toLowerCase()) ||
+    (c.phone || '').includes(customerSearch) ||
+    (c.id || '').toLowerCase().includes(customerSearch.toLowerCase())
   );
   
   // Search for customer profile display
   const searchedCustomer = customerSearch.length > 0 
     ? customers.find(c => 
-        c.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
-        c.phone.includes(customerSearch) ||
-        c.id.toLowerCase().includes(customerSearch.toLowerCase())
+        (c.name || '').toLowerCase().includes(customerSearch.toLowerCase()) ||
+        (c.phone || '').includes(customerSearch) ||
+        (c.id || '').toLowerCase().includes(customerSearch.toLowerCase())
       )
     : null;
 
@@ -1649,8 +1649,8 @@ export default function App() {
     const matchCategory = selectedCategory === 'all' || p.categoryId === selectedCategory;
     const matchSupplier = selectedSupplier === 'all' || (p.supplier || '') === selectedSupplier;
     const matchSearch = !searchQuery || 
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.code.toLowerCase().includes(searchQuery.toLowerCase());
+      (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.code || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchStock = 
       stockFilter === 'all' ||
       (stockFilter === 'available' && p.stock > 0) ||
