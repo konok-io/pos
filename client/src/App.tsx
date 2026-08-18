@@ -76,6 +76,7 @@ interface Sale {
   paid: number;
   due: number;
   change: number;
+  paymentMethod: string;
 }
 
 // Loading Screen
@@ -380,6 +381,7 @@ export default function App() {
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState(15);
   const [paidAmount, setPaidAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSupplier, setSelectedSupplier] = useState('all');
@@ -551,6 +553,7 @@ export default function App() {
       paid,
       due,
       change,
+      paymentMethod,
     };
 
     // Update stock
@@ -573,6 +576,7 @@ export default function App() {
     setDiscount('');
     setPaidAmount('');
     setSelectedCustomer(null);
+    setPaymentMethod('cash');
   };
 
   if (isLoading) return <LoadingScreen />;
@@ -1338,8 +1342,46 @@ export default function App() {
                 {/* Payment Input */}
                 <input value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
                   placeholder={`${t('paid')} (৳)`}
-                  style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 6, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#115E59', outline: 'none' }}
+                  style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 8, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#115E59', outline: 'none' }}
                 />
+
+                {/* Payment Method Options */}
+                <div style={{ marginBottom: 8 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('selectPaymentMethod')}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                    {[
+                      { v: 'cash', l: '💵', t: t('cash') },
+                      { v: 'card', l: '💳', t: t('card') },
+                      { v: 'bank', l: '🏦', t: t('bank') },
+                      { v: 'mobile', l: '📱', t: t('mobile') },
+                    ].map(pm => (
+                      <button
+                        key={pm.v}
+                        type="button"
+                        onClick={() => setPaymentMethod(pm.v)}
+                        style={{
+                          padding: '8px 4px',
+                          background: paymentMethod === pm.v ? '#115E59' : '#F9FAFB',
+                          color: paymentMethod === pm.v ? '#FFFFFF' : '#6B7280',
+                          border: paymentMethod === pm.v ? 'none' : '1px solid #e5e7eb',
+                          borderRadius: 8,
+                          fontSize: 12,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: 2,
+                          transition: 'all 0.2s',
+                          boxShadow: paymentMethod === pm.v ? '0 2px 8px rgba(17,94,89,0.3)' : 'none',
+                        }}
+                      >
+                        <span style={{ fontSize: 18 }}>{pm.l}</span>
+                        <span>{pm.t}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Due/Change Alert */}
                 {due > 0 && (
@@ -1362,6 +1404,7 @@ export default function App() {
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
+                        setPaymentMethod('cash');
                       }
                     }}
                     disabled={cart.length === 0}
@@ -1381,6 +1424,7 @@ export default function App() {
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
+                        setPaymentMethod('cash');
                       }
                     }}
                     disabled={cart.length === 0}
