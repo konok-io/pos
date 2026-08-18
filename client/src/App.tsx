@@ -1196,7 +1196,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 {t('posManagementSystem')}
               </h1>
               <div style={{
-                fontSize: 15,
+                fontSize: 15.5,
                 color: '#115E59',
                 fontWeight: 400,
                 marginTop: 1,
@@ -1252,7 +1252,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 placeholder={t('passwordPlaceholder')}
                 required
                 style={{
-                  width: 100,
+                  width: 140,
                   padding: '8px 10px',
                   fontSize: 13,
                   border: '2px solid #E5E7EB',
