@@ -818,106 +818,206 @@ ${printFiltered.map(p => {
           </button>
         </div>
       </div>
-
-      {/* Filters */}
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
-        <button onClick={() => setStockFilter('স্টক আছে')} style={{
-          ...btn(stockFilter === 'স্টক আছে' ? 'primary' : 'ghost', 'sm'),
-          borderRadius: 7, whiteSpace: 'nowrap',
-          background: stockFilter === 'স্টক আছে' ? T.teal : T.gray100,
-          color: stockFilter === 'স্টক আছে' ? T.white : T.gray600,
-          border: 'none', padding: '8px 14px', fontSize: 15,
-        }}>📦 স্টক আছে ({stockCount})</button>
-
-        <button onClick={() => setStockFilter('স্টক শেষ')} style={{
-          ...btn(stockFilter === 'স্টক শেষ' ? 'primary' : 'ghost', 'sm'),
-          borderRadius: 7, whiteSpace: 'nowrap',
-          background: stockFilter === 'স্টক শেষ' ? T.red : T.redLight,
-          color: stockFilter === 'স্টক শেষ' ? T.white : T.red,
-          border: 'none', padding: '8px 14px', fontSize: 15,
-        }}>⚠️ স্টক শেষ ({outOfStockCount})</button>
-
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="পণ্য খুঁজুন..."
-            style={{ ...inputStyle, paddingLeft: 32 }}
-          />
-        </div>
-        <button style={btn('ghost')} onClick={printProductList}>🖨️ প্রিন্ট</button>
-        <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{filtered.length}টি পণ্য</span>
+      
+      {/* Product Sub-Menu */}
+      <div style={{ padding: '8px 16px', background: '#F5F5F5', borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <button
+          onClick={() => setProductTab('list')}
+          style={{
+            padding: '8px 14px', borderRadius: 8, border: 'none',
+            background: productTab === 'list' ? T.teal : T.white,
+            color: productTab === 'list' ? T.white : T.gray600,
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
+        >
+          📦 Products
+        </button>
+        <button
+          onClick={() => setShowAddForm(true)}
+          style={{
+            padding: '8px 14px', borderRadius: 8, border: 'none',
+            background: T.white, color: T.gray600,
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
+        >
+          ➕ New Product
+        </button>
+        <button
+          onClick={() => setProductTab('suppliers')}
+          style={{
+            padding: '8px 14px', borderRadius: 8, border: 'none',
+            background: productTab === 'suppliers' ? T.teal : T.white,
+            color: productTab === 'suppliers' ? T.white : T.gray600,
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
+        >
+          🏢 Suppliers
+        </button>
+        <button
+          onClick={() => setProductTab('barcode')}
+          style={{
+            padding: '8px 14px', borderRadius: 8, border: 'none',
+            background: productTab === 'barcode' ? T.teal : T.white,
+            color: productTab === 'barcode' ? T.white : T.gray600,
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
+        >
+          📊 Barcode
+        </button>
+        <button
+          onClick={() => setProductTab('inventory')}
+          style={{
+            padding: '8px 14px', borderRadius: 8, border: 'none',
+            background: productTab === 'inventory' ? T.teal : T.white,
+            color: productTab === 'inventory' ? T.white : T.gray600,
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
+        >
+          🏭 Stock
+        </button>
       </div>
 
-      {/* Product Table */}
-      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-        {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 16 }}>
-            <div style={{
-              width: 48, height: 48, border: '4px solid #E0E0E0', borderTop: '4px solid #00897b',
-              borderRadius: '50%', animation: 'spin 1s linear infinite'
-            }}></div>
-            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-            <div style={{ fontSize: 14, color: T.gray500 }}>পণ্যের তালিকা লোড হচ্ছে...</div>
+      {/* Filters - Only show for list tab */}
+      {productTab === 'list' && (
+        <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
+          <button onClick={() => setStockFilter('স্টক আছে')} style={{
+            ...btn(stockFilter === 'স্টক আছে' ? 'primary' : 'ghost', 'sm'),
+            borderRadius: 7, whiteSpace: 'nowrap',
+            background: stockFilter === 'স্টক আছে' ? T.teal : T.gray100,
+            color: stockFilter === 'স্টক আছে' ? T.white : T.gray600,
+            border: 'none', padding: '8px 14px', fontSize: 15,
+          }}>📦 স্টক আছে ({stockCount})</button>
+
+          <button onClick={() => setStockFilter('স্টক শেষ')} style={{
+            ...btn(stockFilter === 'স্টক শেষ' ? 'primary' : 'ghost', 'sm'),
+            borderRadius: 7, whiteSpace: 'nowrap',
+            background: stockFilter === 'স্টক শেষ' ? T.red : T.redLight,
+            color: stockFilter === 'স্টক শেষ' ? T.white : T.red,
+            border: 'none', padding: '8px 14px', fontSize: 15,
+          }}>⚠️ স্টক শেষ ({outOfStockCount})</button>
+
+          <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
+            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="পণ্য খুঁজুন..."
+              style={{ ...inputStyle, paddingLeft: 32 }}
+            />
           </div>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: `1px solid ${T.gray200}` }}>
-            <thead>
-              <tr style={{ background: T.tealLight }}>
-                <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>পণ্যের নাম</th>
-                <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>কোম্পানি</th>
-                <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>ক্যাটাগরি</th>
-                <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>ক্রয়মূল্য</th>
-                <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>বিক্রয়মূল্য</th>
-                <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>লাভ</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>স্টক</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>একক</th>
-                <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>একশন</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr><td colSpan={9} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>পণ্য পাওয়া যায়নি</td></tr>
-              ) : filtered.map((p, i) => {
-                const profitPct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
-                const isLowStock = p.stock <= (p as any).minStock;
-                return (
-                  <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
-                    <td style={{ padding: '10px 12px' }}>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>
-                      {p.code && <div style={{ fontSize: 14, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div>}
-                    </td>
-                    <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{(p as any).company || '-'}</td>
-                    <td style={{ padding: '10px 12px', fontSize: 15, color: T.gray600 }}>{(p as any).cat || '-'}</td>
-                    <td style={{ padding: '10px 12px', fontSize: 15 }}>{fmt(p.costPrice)}</td>
-                    <td style={{ padding: '10px 12px', fontWeight: 700, fontSize: 14 }}>{fmt(p.sellPrice)}</td>
-                    <td style={{ padding: '10px 12px' }}>
-                      <span style={{ fontSize: 14, fontWeight: 600, color: profitPct > 0 ? T.green : T.red }}>
-                        {fmt(p.sellPrice - p.costPrice)} ({profitPct}%)
-                      </span>
-                    </td>
-                    <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: 15, color: isLowStock ? T.red : T.gray900 }}>{fmtN(p.stock)}</span>
-                      {isLowStock && <span style={{ fontSize: 14, color: T.red, marginLeft: 4 }}>⚠️</span>}
-                    </td>
-                    <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400 }}>{p.unit}</td>
-                    <td style={{ padding: '10px 12px', display: 'flex', gap: 6, justifyContent: 'center' }}>
-                      <button style={{ ...btn('ghost', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => setViewProduct(p)} title="দেখুন">👁️</button>
-                      <button style={{ ...btn('primary', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => setEditProduct({ ...p, buyP: p.costPrice, sellP: p.sellPrice })} title="সম্পাদনা">✏️</button>
-                      {p.stock <= 0 ? (
-                        <button style={{ ...btn('danger', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => del(p.id)} title="মুছুন">🗑️</button>
-                      ) : (
-                        <button disabled style={{ ...btn('ghost', 'sm'), padding: '5px 8px', fontSize: 14, opacity: 0.4, cursor: 'not-allowed' }} title="স্টক থাকলে মুছা যাবে না">🔒</button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+          <button style={btn('ghost')} onClick={printProductList}>🖨️ প্রিন্ট</button>
+          <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{filtered.length}টি পণ্য</span>
+        </div>
+      )}
+
+      {/* Product Table - Only show for list tab */}
+      {productTab === 'list' && (
+        <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', gap: 16 }}>
+              <div style={{
+                width: 48, height: 48, border: '4px solid #E0E0E0', borderTop: '4px solid #00897b',
+                borderRadius: '50%', animation: 'spin 1s linear infinite'
+              }}></div>
+              <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+              <div style={{ fontSize: 14, color: T.gray500 }}>পণ্যের তালিকা লোড হচ্ছে...</div>
+            </div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: `1px solid ${T.gray200}` }}>
+              <thead>
+                <tr style={{ background: T.tealLight }}>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>পণ্যের নাম</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>কোম্পানি</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>ক্যাটাগরি</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>ক্রয়মূল্য</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>বিক্রয়মূল্য</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>লাভ</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>স্টক</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>একক</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>একশন</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr><td colSpan={9} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>পণ্য পাওয়া যায়নি</td></tr>
+                ) : filtered.map((p, i) => {
+                  const profitPct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
+                  const isLowStock = p.stock <= (p as any).minStock;
+                  return (
+                    <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                      <td style={{ padding: '10px 12px' }}>
+                        <div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>
+                        {p.code && <div style={{ fontSize: 14, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div>}
+                      </td>
+                      <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{(p as any).company || '-'}</td>
+                      <td style={{ padding: '10px 12px', fontSize: 15, color: T.gray600 }}>{(p as any).cat || '-'}</td>
+                      <td style={{ padding: '10px 12px', fontSize: 15 }}>{fmt(p.costPrice)}</td>
+                      <td style={{ padding: '10px 12px', fontWeight: 700, fontSize: 14 }}>{fmt(p.sellPrice)}</td>
+                      <td style={{ padding: '10px 12px' }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: profitPct > 0 ? T.green : T.red }}>
+                          {fmt(p.sellPrice - p.costPrice)} ({profitPct}%)
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                        <span style={{ fontWeight: 700, fontSize: 15, color: isLowStock ? T.red : T.gray900 }}>{fmtN(p.stock)}</span>
+                        {isLowStock && <span style={{ fontSize: 14, color: T.red, marginLeft: 4 }}>⚠️</span>}
+                      </td>
+                      <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400 }}>{p.unit}</td>
+                      <td style={{ padding: '10px 12px', display: 'flex', gap: 6, justifyContent: 'center' }}>
+                        <button style={{ ...btn('ghost', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => setViewProduct(p)} title="দেখুন">👁️</button>
+                        <button style={{ ...btn('primary', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => setEditProduct({ ...p, buyP: p.costPrice, sellP: p.sellPrice })} title="সম্পাদনা">✏️</button>
+                        {p.stock <= 0 ? (
+                          <button style={{ ...btn('danger', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => del(p.id)} title="মুছুন">🗑️</button>
+                        ) : (
+                          <button disabled style={{ ...btn('ghost', 'sm'), padding: '5px 8px', fontSize: 14, opacity: 0.4, cursor: 'not-allowed' }} title="স্টক থাকলে মুছা যাবে না">🔒</button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {/* Suppliers Tab Content */}
+      {productTab === 'suppliers' && (
+        <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🏢</div>
+            <h3 style={{ margin: '0 0 8px', color: T.teal }}>Suppliers</h3>
+            <p style={{ color: T.gray500 }}>সরবরাহকারীদের তালিকা এখানে দেখা যাবে</p>
+          </div>
+        </div>
+      )}
+
+      {/* Barcode Tab Content */}
+      {productTab === 'barcode' && (
+        <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
+            <h3 style={{ margin: '0 0 8px', color: T.teal }}>Barcode</h3>
+            <p style={{ color: T.gray500 }}>বারকোড জেনারেটর এখানে দেখা যাবে</p>
+          </div>
+        </div>
+      )}
+
+      {/* Inventory/Stock Tab Content */}
+      {productTab === 'inventory' && (
+        <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>🏭</div>
+            <h3 style={{ margin: '0 0 8px', color: T.teal }}>Stock</h3>
+            <p style={{ color: T.gray500 }}>স্টক ম্যানেজমেন্ট এখানে দেখা যাবে</p>
+          </div>
+        </div>
+      )}
 
       {/* Edit Product Modal */}
       {editProduct && (
@@ -1398,11 +1498,7 @@ export default function App() {
   // Tabs configuration
   const otherTabs = [
     { id: 'products', icon: '📦', label: t('products') },
-    { id: 'newproduct', icon: '➕', label: 'New Product' },
-    { id: 'suppliers', icon: '🏢', label: t('suppliers') },
     { id: 'customers', icon: '👥', label: t('customers') },
-    { id: 'barcode', icon: '📊', label: t('barcode') },
-    { id: 'inventory', icon: '🏭', label: t('stock') },
     { id: 'income', icon: '💰', label: t('incomeExpenses') },
     { id: 'reports', icon: '📊', label: t('reports') },
     { id: 'settings', icon: '⚙️', label: t('settings') },
