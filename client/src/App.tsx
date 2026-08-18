@@ -2795,22 +2795,7 @@ export default function App() {
                 <div style={{ position: 'absolute', top: '-15px', left: '-15px', width: '80px', height: '80px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
                 <div style={{ position: 'absolute', bottom: '-20px', right: '20%', width: '60px', height: '60px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
                 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  {/* Scanner Icon */}
-                  <div style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 10,
-                    background: 'rgba(255,255,255,0.2)',
-                    backdropFilter: 'blur(10px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0
-                  }}>
-                    <span style={{ fontSize: 20 }}>📱</span>
-                  </div>
-                  
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   {/* Barcode Input */}
                   <div style={{ 
                     position: 'relative', 
@@ -2827,7 +2812,7 @@ export default function App() {
                         width: '100%', 
                         paddingLeft: 12, 
                         paddingRight: 12,
-                        height: 38, 
+                        height: 44, 
                         fontSize: 14, 
                         borderRadius: 10, 
                         border: 'none', 
@@ -2843,8 +2828,8 @@ export default function App() {
                   
                   {/* Scan Button */}
                   <button style={{
-                    width: 38,
-                    height: 38,
+                    width: 44,
+                    height: 44,
                     borderRadius: 10,
                     background: 'rgba(255,255,255,0.2)',
                     backdropFilter: 'blur(10px)',
@@ -2856,7 +2841,7 @@ export default function App() {
                     flexShrink: 0,
                     transition: 'all 0.2s'
                   }}>
-                    <span style={{ fontSize: 16 }}>📷</span>
+                    <span style={{ fontSize: 18 }}>📷</span>
                   </button>
                 </div>
               </div>
