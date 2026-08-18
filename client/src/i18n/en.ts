@@ -21,6 +21,7 @@ export const en: Record<string, string> = {
   login: 'Login',
   email: 'Email',
   password: 'Password',
+  passwordPlaceholder: 'Enter password',
   loginButton: 'Sign In',
   loginTitle: 'Login',
   signIn: 'Sign In',

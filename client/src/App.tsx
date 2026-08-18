@@ -1257,7 +1257,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
                 required
                 style={{
                   width: '100%',

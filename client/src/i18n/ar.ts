@@ -21,6 +21,7 @@ export const ar: Record<string, string> = {
   login: 'تسجيل الدخول',
   email: 'البريد الإلكتروني',
   password: 'كلمة المرور',
+  passwordPlaceholder: 'أدخل كلمة المرور',
   loginButton: 'دخول',
   loginTitle: 'تسجيل الدخول',
   signIn: 'دخول',

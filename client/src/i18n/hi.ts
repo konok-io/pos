@@ -21,6 +21,7 @@ export const hi: Record<string, string> = {
   login: 'लॉगिन',
   email: 'ईमेल',
   password: 'पासवर्ड',
+  passwordPlaceholder: 'पासवर्ड दर्ज करें',
   loginButton: 'साइन इन करें',
   loginTitle: 'लॉगिन',
   signIn: 'साइन इन करें',

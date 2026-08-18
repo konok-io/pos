@@ -21,6 +21,7 @@ export const bn: Record<string, string> = {
   login: 'লগইন',
   email: 'ইমেইল',
   password: 'পাসওয়ার্ড',
+  passwordPlaceholder: 'পাসওয়ার্ড লিখুন',
   loginButton: 'সাইন ইন করুন',
   loginTitle: 'লগইন',
   signIn: 'সাইন ইন করুন',
