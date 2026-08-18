@@ -1944,9 +1944,9 @@ export default function App() {
       </div>
 
       {/* Content */}
-      <div style={{ flex: 1, overflow: 'visible', width: '100%' }}>
+      <div style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
         {currentTab === 'pos' && (
-          <div style={{ display: 'flex', height: '100%', overflow: 'visible', width: '100%', background: '#F9FAFB' }}>
+          <div style={{ display: 'flex', height: '100%', overflow: 'hidden', width: '100%', background: '#F9FAFB' }}>
             {/* -- LEFT: Products -- */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', minWidth: 0, position: 'relative' }}>
               {/* Search Section - Professional Modern Design */}
@@ -2171,7 +2171,7 @@ export default function App() {
               </div>
 
               {/* Product grid */}
-              <div style={{ flex: 1, overflow: 'auto', padding: 16, paddingBottom: 100, background: '#F9FAFB' }}>
+              <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
                 
                 {/* Show Held Sales Only - When hold is open and no filter active */}
                 {showHeldSales && !showProductsGrid && (
@@ -2662,7 +2662,7 @@ export default function App() {
                   </>
                 )}
 
-                {/* Stock Summary Footer - Fixed at bottom */}
+                {/* Stock Summary Footer */}
                 <div style={{
                   padding: '10px 20px',
                   background: '#FFFFFF',
@@ -2675,6 +2675,8 @@ export default function App() {
                   flexShrink: 0,
                   position: 'sticky',
                   bottom: 0,
+                  left: 0,
+                  right: 0,
                   zIndex: 10,
                   boxShadow: '0 -2px 10px rgba(0,0,0,0.08)'
                 }}>
