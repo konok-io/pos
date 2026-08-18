@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { defineConfig } from '@prisma/client/config';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaLibSql } from '@prisma/adapter-libsql';
 
 export default defineConfig({
   earlyAccess: true,
@@ -11,7 +11,7 @@ export default defineConfig({
   migrate: {
     adapter() {
       const dbPath = path.join(import.meta.dirname, 'dev.db');
-      return new PrismaBetterSqlite3({ url: `file:${dbPath}` });
+      return new PrismaLibSql({ url: `file:${dbPath}` });
     },
   },
 });
