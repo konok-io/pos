@@ -1,14 +1,19 @@
 import { localDb, Store, Currency, Category, Product, Customer, Sale, SaleItem, User, generateId, generateInvoiceNo } from './localDb';
+import { db } from '../utils/db';
 
 // Check if online
 export function isOnline(): boolean {
   return navigator.onLine;
 }
 
-// API Base URL - can be configured
-const getApiBase = () => {
-  // Try to use configured server URL, fallback to localhost
-  return localStorage.getItem('API_BASE_URL') || 'http://localhost:3000';
+// API Base URL - stored in IndexedDB instead of localStorage
+const getApiBase = async (): Promise<string> => {
+  try {
+    const stored = await db.get<string>('settings', 'apiBaseUrl');
+    return stored || 'http://localhost:3000';
+  } catch {
+    return 'http://localhost:3000';
+  }
 };
 
 interface ApiResponse<T> {
@@ -23,7 +28,8 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
   }
 
   try {
-    const response = await fetch(`${getApiBase()}${endpoint}`, {
+    const apiBase = await getApiBase();
+    const response = await fetch(`${apiBase}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
