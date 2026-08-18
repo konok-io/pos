@@ -224,6 +224,7 @@ export const ar: Record<string, string> = {
   noLowStockProducts: 'لا توجد منتجات مخزون منخفض',
   lowStockAlert: 'تنبيه مخزون منخفض',
   grandTotal: 'المجموع الكلي',
+  productExpiry: 'المنتهية (30 يوم)',
 
   // Payment Methods
   paymentMethod: 'الطريقة',

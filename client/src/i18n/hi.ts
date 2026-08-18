@@ -219,6 +219,7 @@ export const hi: Record<string, string> = {
   noLowStockProducts: 'कोई कम स्टॉक वाले उत्पाद नहीं',
   lowStockAlert: 'कम स्टॉक चेतावनी',
   grandTotal: 'कुल योग',
+  productExpiry: 'समाप्ति (30 दिन)',
 
   // Payment Methods
   paymentMethod: 'तरीका',

@@ -229,6 +229,7 @@ export const bn: Record<string, string> = {
   noLowStockProducts: 'কোনো পণ্য স্টক কম নেই',
   lowStockAlert: 'স্টক কম আছে',
   grandTotal: 'সর্বমোট',
+  productExpiry: 'মেয়াদ (৩০ দিন)',
 
   // Payment Methods
   paymentMethod: 'পদ্ধতি',

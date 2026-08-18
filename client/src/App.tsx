@@ -1048,6 +1048,7 @@ interface Product {
   cat?: string;
   buyP?: number;
   minStock?: number;
+  expiryDate?: string;
 }
 
 interface CartItem {
@@ -2348,7 +2349,85 @@ export default function App() {
                       </div>
                     </div>
                   </div>
-                </div>
+                                  </div>
+
+                  {/* Product Expiry Card */}
+                  <div style={{
+                    cursor: 'default',
+                    borderRadius: 12,
+                    padding: '10px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    background: '#FEF9C3',
+                    border: '2px solid #FDE047',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                  }}>
+                    <div style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      background: '#FACC15',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 16
+                    }}>📅</div>
+                    <div>
+                      <div style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: '#6B7280',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>{t('productExpiry')}</div>
+                      <div style={{
+                        fontSize: 18,
+                        fontWeight: 800,
+                        color: '#CA8A04',
+                        lineHeight: 1
+                      }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
+                    </div>
+                  </div>
+
+                  {/* Customer Card */}
+                  <div style={{
+                    cursor: 'default',
+                    borderRadius: 12,
+                    padding: '10px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    background: '#F0FDFA',
+                    border: '2px solid #CCFBF1',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                  }}>
+                    <div style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 8,
+                      background: '#14B8A6',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 16
+                    }}>👥</div>
+                    <div>
+                      <div style={{
+                        fontSize: 11,
+                        fontWeight: 600,
+                        color: '#6B7280',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>{t('customers')}</div>
+                      <div style={{
+                        fontSize: 18,
+                        fontWeight: 800,
+                        color: '#0D9488',
+                        lineHeight: 1
+                      }}>{customers.length}</div>
+                    </div>
+                  </div>
 
                 {/* Right Side - Hold Sales Button */}
                 <div 

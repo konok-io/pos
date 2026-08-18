@@ -259,6 +259,7 @@ export const en: Record<string, string> = {
   noLowStockProducts: 'No low stock products',
   lowStockAlert: 'Low Stock Alert',
   grandTotal: 'Grand Total',
+  productExpiry: 'Expiry (30 Days)',
 
   // Payment Methods
   paymentMethod: 'Method',
