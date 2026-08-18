@@ -1482,29 +1482,28 @@ export default function App() {
         setCurrency(savedCurrency);
       }
       
-      // Load cart state from localDB
-      const savedCart = await localDb.getSetting<string>('cartData');
+      // Load cart state from IndexedDB
+      const savedCart = await db.get<any>('cart', 'cartData');
       if (savedCart) {
         try {
-          const cartData = JSON.parse(savedCart);
-          if (cartData.cart) setCart(cartData.cart);
-          if (cartData.selectedCustomer) setSelectedCustomer(cartData.selectedCustomer);
-          if (cartData.discount !== undefined) setDiscount(cartData.discount);
-          if (cartData.vatPercent !== undefined) setVatPercent(String(cartData.vatPercent));
-          if (cartData.paidAmount !== undefined) setPaidAmount(cartData.paidAmount);
-          if (cartData.paymentMethod) setPaymentMethod(cartData.paymentMethod);
+          if (savedCart.cart) setCart(savedCart.cart);
+          if (savedCart.selectedCustomer) setSelectedCustomer(savedCart.selectedCustomer);
+          if (savedCart.discount !== undefined) setDiscount(savedCart.discount);
+          if (savedCart.vatPercent !== undefined) setVatPercent(String(savedCart.vatPercent));
+          if (savedCart.paidAmount !== undefined) setPaidAmount(savedCart.paidAmount);
+          if (savedCart.paymentMethod) setPaymentMethod(savedCart.paymentMethod);
         } catch (e) {
-          console.log('Error loading cart from localDB');
+          console.log('Error loading cart from IndexedDB');
         }
       }
       
-      // Load held sales from localDB
-      const savedHeldSales = await localDb.getSetting<string>('heldSales');
+      // Load held sales from IndexedDB
+      const savedHeldSales = await db.get<any>('heldSales', 'heldSales');
       if (savedHeldSales) {
         try {
-          setHeldSales(JSON.parse(savedHeldSales));
+          setHeldSales(savedHeldSales);
         } catch (e) {
-          console.log('Error loading held sales from localDB');
+          console.log('Error loading held sales from IndexedDB');
         }
       }
       
@@ -1513,7 +1512,7 @@ export default function App() {
     initApp();
   }, []);
 
-  // Save cart state to PouchDB whenever it changes
+  // Save cart state to IndexedDB whenever it changes
   useEffect(() => {
     const saveCartData = async () => {
       const cartData = {
@@ -1524,15 +1523,15 @@ export default function App() {
         paidAmount,
         paymentMethod,
       };
-      await db.put('settings', 'cartData', cartData);
+      await db.put('cart', 'cartData', cartData);
     };
     saveCartData();
   }, [cart, selectedCustomer, discount, vatPercent, paidAmount, paymentMethod]);
 
-  // Save held sales to PouchDB whenever it changes
+  // Save held sales to IndexedDB whenever it changes
   useEffect(() => {
     const saveHeldSales = async () => {
-      await db.put('settings', 'heldSales', heldSales);
+      await db.put('heldSales', 'heldSales', heldSales);
     };
     saveHeldSales();
   }, [heldSales]);
