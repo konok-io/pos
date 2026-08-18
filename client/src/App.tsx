@@ -1400,7 +1400,7 @@ export default function App() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerSearch, setCustomerSearch] = useState('');
   const [discount, setDiscount] = useState('');
-  const [vatPercent, setVatPercent] = useState(15);
+  const [vatPercent, setVatPercent] = useState<string>('15');
   const [defaultVatPercent, setDefaultVatPercent] = useState(15);
   const [paidAmount, setPaidAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
@@ -1423,7 +1423,7 @@ export default function App() {
         if (savedCurrency) setCurrency(savedCurrency);
         
         const savedVat = await localDb.getSetting<string>('vatPercent');
-        if (savedVat) setVatPercent(parseFloat(savedVat) || 15);
+        if (savedVat) setVatPercent(savedVat);
       } catch (e) {
         console.error('Failed to load settings:', e);
       }
@@ -1461,7 +1461,7 @@ export default function App() {
       const savedVat = await localDb.getSetting<string>('vatPercent');
       if (savedVat) {
         const vat = parseFloat(savedVat);
-        setVatPercent(vat);
+        setVatPercent(savedVat);
         setDefaultVatPercent(vat);
       }
       const savedCurrency = await localDb.getSetting<string>('currency');
@@ -1477,7 +1477,7 @@ export default function App() {
           if (cartData.cart) setCart(cartData.cart);
           if (cartData.selectedCustomer) setSelectedCustomer(cartData.selectedCustomer);
           if (cartData.discount !== undefined) setDiscount(cartData.discount);
-          if (cartData.vatPercent !== undefined) setVatPercent(cartData.vatPercent);
+          if (cartData.vatPercent !== undefined) setVatPercent(String(cartData.vatPercent));
           if (cartData.paidAmount !== undefined) setPaidAmount(cartData.paidAmount);
           if (cartData.paymentMethod) setPaymentMethod(cartData.paymentMethod);
         } catch (e) {
@@ -1615,7 +1615,8 @@ export default function App() {
   const subtotal = cart.reduce((sum, item) => sum + item.sellPrice * item.quantity, 0);
   const discountAmount = parseFloat(discount) || 0;
   const afterDiscount = Math.max(0, subtotal - discountAmount);
-  const vatAmount = parseFloat((afterDiscount * vatPercent / 100).toFixed(2));
+  const vatRate = parseFloat(vatPercent) || 0;
+  const vatAmount = parseFloat((afterDiscount * vatRate / 100).toFixed(2));
   const total = afterDiscount + vatAmount;
   const paid = parseFloat(paidAmount) || 0;
   const due = total - paid;
@@ -1647,7 +1648,7 @@ export default function App() {
       })),
       subtotal,
       discount: discountAmount,
-      vatPercent,
+      vatPercent: vatRate,
       vatAmount,
       total,
       paid,
@@ -1675,7 +1676,7 @@ export default function App() {
     setCart([]);
     setDiscount('');
     setPaidAmount('');
-    setVatPercent(defaultVatPercent);
+    setVatPercent(String(defaultVatPercent));
     setSelectedCustomer(null);
     setPaymentMethod('cash');
   };
@@ -2420,7 +2421,7 @@ export default function App() {
                   )}
                   {vatAmount > 0 && (
                     <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db', background: '#FFFBEB' }}>
-                      <span style={{ fontSize: 15, color: '#D97706' }}>{t('vat')} ({vatPercent}%)</span>
+                      <span style={{ fontSize: 15, color: '#D97706' }}>{t('vat')} ({vatRate}%)</span>
                       <span style={{ fontSize: 15, fontWeight: 600, color: '#D97706' }}>+{fmt(vatAmount)}</span>
                     </div>
                   )}
@@ -2436,7 +2437,7 @@ export default function App() {
                     placeholder={t('discount')}
                     style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#16A34A' }}/>
                   <div style={{ position: 'relative', width: 70 }}>
-                    <input value={vatPercent} onChange={(e) => setVatPercent(parseFloat(e.target.value) || 0)} type="number" min="0" max="100"
+                    <input value={vatPercent} onChange={(e) => setVatPercent(e.target.value)} type="number" min="0" max="100"
                       placeholder={`${defaultVatPercent}`}
                       style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 20px 5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#D97706', textAlign: 'center' }}/>
                     <span style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', color: '#D97706', fontSize: 12, pointerEvents: 'none' }}>%</span>
@@ -2535,7 +2536,7 @@ export default function App() {
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
-                        setVatPercent(defaultVatPercent);
+                        setVatPercent(String(defaultVatPercent));
                         setPaymentMethod('cash');
                       }
                     }}
@@ -2556,7 +2557,7 @@ export default function App() {
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
-                        setVatPercent(defaultVatPercent);
+                        setVatPercent(String(defaultVatPercent));
                         setPaymentMethod('cash');
                       }
                     }}
