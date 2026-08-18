@@ -1800,14 +1800,14 @@ export default function App() {
           {/* Dynamic Menu - Scrollable */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 30, marginRight: 22, minWidth: 0, flex: 1 }}>
             {/* Fixed First Item (Sales) - Separate container */}
-            <div style={{ flexShrink: 0, padding: '4px 6px 4px 4px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E5E7EB', marginRight: 4, boxShadow: '2px 0 8px rgba(0,0,0,0.05)' }}>
+            <div style={{ flexShrink: 0, padding: '4px 6px 4px 4px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', marginRight: 4 }}>
               <button onClick={() => setCurrentTab('pos')} style={{
                 padding: '7px 12px',
                 border: 'none',
-                background: currentTab === 'pos' ? 'linear-gradient(135deg, #115E59 0%, #115E59 100%)' : 'transparent',
+                background: currentTab === 'pos' ? '#E0E0E0' : 'transparent',
                 cursor: 'pointer',
-                color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563',
-                fontWeight: currentTab === 'pos' ? 600 : 500,
+                color: '#000000',
+                fontWeight: 600,
                 fontSize: 14,
                 display: 'flex',
                 alignItems: 'center',
@@ -1816,7 +1816,6 @@ export default function App() {
                 fontFamily: 'inherit',
                 transition: 'all 0.2s',
                 borderRadius: 6,
-                boxShadow: currentTab === 'pos' ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
               }}>
                 <span style={{ fontSize: 16 }}>🛒</span>
                 <span>{t('sales')}</span>
@@ -1829,15 +1828,15 @@ export default function App() {
               <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', marginRight: 4, flexShrink: 0 }}>◀</button>
 
               {/* Scrollable Menu */}
-              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E5E7EB', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1, minWidth: 0 }}>
+              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1, minWidth: 0 }}>
                 {otherTabs.map((t) => (
                   <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
                     padding: '7px 12px',
                     border: 'none',
-                    background: currentTab === t.id ? 'linear-gradient(135deg, #115E59 0%, #115E59 100%)' : 'transparent',
+                    background: currentTab === t.id ? '#E0E0E0' : 'transparent',
                     cursor: 'pointer',
-                    color: currentTab === t.id ? '#FFFFFF' : '#4B5563',
-                    fontWeight: currentTab === t.id ? 600 : 500,
+                    color: '#000000',
+                    fontWeight: 600,
                     fontSize: 14,
                     display: 'flex',
                     alignItems: 'center',
@@ -1846,7 +1845,6 @@ export default function App() {
                     fontFamily: 'inherit',
                     transition: 'all 0.2s',
                     borderRadius: 6,
-                    boxShadow: currentTab === t.id ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
                   }}>
                     <span style={{ fontSize: 16 }}>{t.icon}</span>
                     <span>{t.label}</span>
