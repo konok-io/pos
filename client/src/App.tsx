@@ -2297,8 +2297,7 @@ export default function App() {
                         ? '0 4px 14px rgba(16, 185, 129, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
-                      transform: showExpiryList ? 'translateY(-1px)' : 'none',
-                      position: 'relative'
+                      transform: showExpiryList ? 'translateY(-1px)' : 'none'
                     }}
                   >
                     <div style={{ width: 24, height: 24, borderRadius: 6, background: showExpiryList ? 'rgba(255,255,255,0.25)' : '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📅</div>
@@ -2306,27 +2305,6 @@ export default function App() {
                       <div style={{ fontSize: 9, fontWeight: 600, color: showExpiryList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('productExpiry')}</div>
                       <div style={{ fontSize: 14, fontWeight: 800, color: showExpiryList ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
                     </div>
-                    {showExpiryList && (
-                      <div
-                        onClick={(e) => { e.stopPropagation(); setShowExpiryList(false); }}
-                        style={{
-                          position: 'absolute',
-                          top: -6,
-                          right: -6,
-                          width: 20,
-                          height: 20,
-                          borderRadius: '50%',
-                          background: '#DC2626',
-                          color: '#fff',
-                          fontSize: 12,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-                        }}
-                      >✕</div>
-                    )}
                   </div>
 
                   {/* Customer Card */}
@@ -2349,8 +2327,7 @@ export default function App() {
                         ? '0 4px 14px rgba(16, 185, 129, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
-                      transform: showCustomerList ? 'translateY(-1px)' : 'none',
-                      position: 'relative'
+                      transform: showCustomerList ? 'translateY(-1px)' : 'none'
                     }}
                   >
                     <div style={{ width: 24, height: 24, borderRadius: 6, background: showCustomerList ? 'rgba(255,255,255,0.25)' : '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>👥</div>
@@ -2358,27 +2335,6 @@ export default function App() {
                       <div style={{ fontSize: 9, fontWeight: 600, color: showCustomerList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('customers')}</div>
                       <div style={{ fontSize: 14, fontWeight: 800, color: showCustomerList ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{customers.length}</div>
                     </div>
-                    {showCustomerList && (
-                      <div
-                        onClick={(e) => { e.stopPropagation(); setShowCustomerList(false); }}
-                        style={{
-                          position: 'absolute',
-                          top: -6,
-                          right: -6,
-                          width: 20,
-                          height: 20,
-                          borderRadius: '50%',
-                          background: '#DC2626',
-                          color: '#fff',
-                          fontSize: 12,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-                        }}
-                      >✕</div>
-                    )}
                   </div>
 
                   {/* Hold Card */}
@@ -2651,7 +2607,7 @@ export default function App() {
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>📅</div>
                             <h3 style={{ fontSize: 14, fontWeight: 700, color: '#115E59', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
                           </div>
-                          <button onClick={() => setShowExpiryList(false)} style={{ width: 28, height: 28, borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 14, cursor: 'pointer', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                          <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 14px', borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 12, cursor: 'pointer', color: '#DC2626', fontWeight: 600 }}>✕ Close</button>
                         </div>
                         {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
@@ -2687,7 +2643,7 @@ export default function App() {
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>👥</div>
                             <h3 style={{ fontSize: 14, fontWeight: 700, color: '#115E59', margin: 0 }}>{t('customers')} ({customers.length})</h3>
                           </div>
-                          <button onClick={() => setShowCustomerList(false)} style={{ width: 28, height: 28, borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 14, cursor: 'pointer', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                          <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 14px', borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 12, cursor: 'pointer', color: '#DC2626', fontWeight: 600 }}>✕ Close</button>
                         </div>
                         {customers.length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
