@@ -2804,7 +2804,7 @@ export default function App() {
                 padding: '0 20px',
                 background: '#F5F5F5',
                 borderBottom: '1px solid #E5E7EB',
-                height: 48,
+                height: 58,
                 display: 'flex',
                 alignItems: 'center',
               }}>
@@ -2814,7 +2814,7 @@ export default function App() {
                   style={{ 
                     width: '100%', 
                     padding: '8px 12px',
-                    height: 40, 
+                    height: 48, 
                     fontSize: 14, 
                     borderRadius: 10, 
                     border: '1px solid #D1D5DB', 
