@@ -1147,6 +1147,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       padding: 20,
       position: 'relative',
       overflow: 'hidden',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     }}>
       {/* Decorative Circle */}
       <div style={{
@@ -1179,6 +1180,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           justifyContent: 'center',
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
           borderBottom: '2px solid #115E59',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{
@@ -1213,6 +1215,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           borderRadius: '0 0 20px 20px',
           padding: '28px 28px 28px',
           boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}>
           <h2 style={{ margin: '0 0 20px 0', fontSize: 18, fontWeight: 600, color: '#374151', textAlign: 'center' }}>
             🔐 {t('loginTitle')}
@@ -1238,7 +1241,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   borderRadius: 12,
                   outline: 'none',
                   boxSizing: 'border-box',
-                  fontFamily: 'inherit',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#115E59'}
                 onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
@@ -1264,7 +1267,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   borderRadius: 12,
                   outline: 'none',
                   boxSizing: 'border-box',
-                  fontFamily: 'inherit',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#115E59'}
                 onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
@@ -1285,7 +1288,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 fontSize: 16,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                fontFamily: 'inherit',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 boxShadow: loading ? 'none' : '0 4px 12px rgba(17,94,89,0.3)',
               }}
             >
