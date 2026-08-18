@@ -1190,7 +1190,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               justifyContent: 'center',
               boxShadow: '0 2px 8px rgba(15,118,110,0.3)',
             }}>
-              <img src="/Logo.png" alt="Logo" style={{ width: 40, height: 34, objectFit: 'contain', borderRadius: 10 }} />
+              <img src="/Logo.png" alt="Logo" style={{ width: 36, height: 36, objectFit: 'contain', borderRadius: 8 }} />
             </div>
             <div style={{ flex: 1, textAlign: 'right' }}>
               <h1 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#115E59' }}>
@@ -1790,7 +1790,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           {/* Logo Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-            <div style={{ width: 44, height: 34, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 44, height: 34, objectFit: 'contain', borderRadius: 12 }} /></div>
+            <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 10 }} /></div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
               <div style={{ fontSize: 14.5, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
