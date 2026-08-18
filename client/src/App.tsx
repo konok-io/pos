@@ -2421,8 +2421,8 @@ export default function App() {
                   )}
                   {vatAmount > 0 && (
                     <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db', background: '#FFFBEB' }}>
-                      <span style={{ fontSize: 15, color: '#D97706' }}>{t('vat')} ({vatRate}%)</span>
-                      <span style={{ fontSize: 15, fontWeight: 600, color: '#D97706' }}>+{fmt(vatAmount)}</span>
+                      <span style={{ fontSize: 15, color: '#374151' }}>{t('vat')} ({vatRate}%)</span>
+                      <span style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>+{fmt(vatAmount)}</span>
                     </div>
                   )}
                   <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#115E59' }}>
@@ -2441,13 +2441,11 @@ export default function App() {
                       value={vatPercent}
                       onChange={(e) => {
                         const val = e.target.value;
-                        // Allow empty string or valid numbers
                         if (val === '' || /^\d*\.?\d*$/.test(val)) {
                           setVatPercent(val);
                         }
                       }}
                       onBlur={() => {
-                        // Convert to number on blur if valid
                         const num = parseFloat(vatPercent);
                         if (!isNaN(num) && vatPercent !== '') {
                           setVatPercent(String(num));
@@ -2457,9 +2455,9 @@ export default function App() {
                       }}
                       type="text" inputMode="decimal"
                       placeholder={`${defaultVatPercent}`}
-                      style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 20px 5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#D97706', textAlign: 'center' }}
+                      style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 20px 5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#374151', textAlign: 'center' }}
                     />
-                    <span style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', color: '#D97706', fontSize: 12, pointerEvents: 'none' }}>%</span>
+                    <span style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', color: '#6B7280', fontSize: 12, pointerEvents: 'none' }}>%</span>
                   </div>
                 </div>
 
