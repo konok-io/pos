@@ -1946,75 +1946,240 @@ export default function App() {
           <div style={{ display: 'flex', height: '100%', overflow: 'hidden', width: '100%', background: '#F9FAFB' }}>
             {/* -- LEFT: Products -- */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
-              {/* Search Row - with Supplier, Category & Customer */}
-              <div style={{ padding: '8px 14px', background: '#FFFFFF', borderBottom: '1px solid #E5E7EB', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                {/* Product Name Search */}
-                <div style={{ position: 'relative', flex: '2 1 200px', minWidth: 180 }}>
-                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>🔍</span>
-                  <input
-                    value={searchQuery}
-                    onChange={(e) => { setSearchQuery(e.target.value); setShowHeldSales(false); }}
-                    placeholder={t('searchProduct')}
-                    style={{ width: '100%', paddingLeft: 32, height: 36, fontSize: 14, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
-                  />
-                </div>
-
-                {/* Customer Search */}
-                <div style={{ position: 'relative', flex: '2 1 160px', minWidth: 150 }}>
-                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 15 }}>👤</span>
-                  <input
-                    value={customerSearch}
-                    onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); }}
-                    placeholder={t('customerSearch')}
-                    style={{ width: '100%', paddingLeft: 32, height: 36, fontSize: 14, borderRadius: 7, border: '1.5px solid #E5E7EB', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
-                  />
-                  {/* Customer Dropdown */}
-                  {customerSearch.length > 0 && filteredCustomers.length > 0 && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 200, overflow: 'auto' }}>
-                      {filteredCustomers.map(c => (
-                        <div
-                          key={c.id}
-                          onClick={() => { setSelectedCustomer(c); setCustomerSearch(''); }}
-                          style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#f9fafb'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
-                        >
-                          <div>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{c.name}</div>
-                            <div style={{ fontSize: 11, color: '#6B7280' }}>{c.phone}</div>
-                          </div>
-                          <div style={{ fontSize: 11, color: c.balance > 0 ? '#DC2626' : '#10B981' }}>
-                            {c.balance > 0 ? `৳${c.balance}` : '✓'}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Supplier */}
-                <select
-                  value={selectedSupplier}
-                  onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 120, cursor: 'pointer', flex: '2 1 100px' }}
-                >
-                  <option value="all">📋 {t('allSuppliers')}</option>
-                  {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
-                    <option key={s} value={s}>{s}</option>
-                  ))}
-                </select>
+              {/* Search Section - Professional Modern Design */}
+              <div style={{ 
+                background: 'linear-gradient(135deg, #115E59 0%, #0F766E 50%, #115E59 100%)',
+                padding: '16px 20px',
+                boxShadow: '0 4px 20px rgba(15,118,110,0.3)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                {/* Decorative background elements */}
+                <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '120px', height: '120px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
+                <div style={{ position: 'absolute', bottom: '-30px', left: '30%', width: '80px', height: '80px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
                 
-                {/* Category */}
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
-                  style={{ borderRadius: 7, padding: '6px 10px', fontSize: 13, height: 36, border: '1px solid #E5E7EB', background: '#FFFFFF', outline: 'none', minWidth: 100, cursor: 'pointer', flex: '2 1 80px' }}
-                >
-                  <option value="all">📁 {t('allCategories')}</option>
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
+                {/* Section Header */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                  <div style={{ 
+                    width: 36, height: 36, 
+                    background: 'rgba(255,255,255,0.2)', 
+                    borderRadius: 10, 
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    backdropFilter: 'blur(10px)'
+                  }}>
+                    <span style={{ fontSize: 18 }}>🔍</span>
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.3px' }}>{t('searchProductBarcode')}</h3>
+                    <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{t('orSelectCategorySupplier')}</p>
+                  </div>
+                </div>
+
+                {/* Search Inputs Row */}
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                  {/* Product Name Search - Enhanced Card */}
+                  <div style={{ 
+                    position: 'relative', 
+                    flex: '2 1 240px', 
+                    minWidth: 200,
+                    background: '#FFFFFF',
+                    borderRadius: 12,
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ 
+                      position: 'absolute', left: 0, top: 0, bottom: 0, 
+                      width: 44, 
+                      background: 'linear-gradient(135deg, #115E59 0%, #14B8A6 100%)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      borderRadius: '12px 0 0 12px'
+                    }}>
+                      <span style={{ fontSize: 18 }}>📦</span>
+                    </div>
+                    <input
+                      value={searchQuery}
+                      onChange={(e) => { setSearchQuery(e.target.value); setShowHeldSales(false); }}
+                      placeholder={t('searchProduct')}
+                      style={{ 
+                        width: '100%', 
+                        paddingLeft: 52, 
+                        paddingRight: 12, 
+                        height: 44, 
+                        fontSize: 14, 
+                        borderRadius: 12, 
+                        border: 'none', 
+                        background: 'transparent', 
+                        outline: 'none', 
+                        boxSizing: 'border-box',
+                        color: '#1F2937',
+                        fontWeight: 500
+                      }}
+                    />
+                  </div>
+
+                  {/* Customer Search - Enhanced Card */}
+                  <div style={{ 
+                    position: 'relative', 
+                    flex: '2 1 180px', 
+                    minWidth: 160,
+                    background: '#FFFFFF',
+                    borderRadius: 12,
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ 
+                      position: 'absolute', left: 0, top: 0, bottom: 0, 
+                      width: 44, 
+                      background: 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      borderRadius: '12px 0 0 12px'
+                    }}>
+                      <span style={{ fontSize: 18 }}>👤</span>
+                    </div>
+                    <input
+                      value={customerSearch}
+                      onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); }}
+                      placeholder={t('customerSearch')}
+                      style={{ 
+                        width: '100%', 
+                        paddingLeft: 52, 
+                        paddingRight: 12, 
+                        height: 44, 
+                        fontSize: 14, 
+                        borderRadius: 12, 
+                        border: 'none', 
+                        background: 'transparent', 
+                        outline: 'none', 
+                        boxSizing: 'border-box',
+                        color: '#1F2937',
+                        fontWeight: 500
+                      }}
+                    />
+                    {/* Customer Dropdown */}
+                    {customerSearch.length > 0 && filteredCustomers.length > 0 && (
+                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 220, overflow: 'auto', marginTop: 4 }}>
+                        {filteredCustomers.map(c => (
+                          <div
+                            key={c.id}
+                            onClick={() => { setSelectedCustomer(c); setCustomerSearch(''); }}
+                            style={{ padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'background 0.15s' }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = '#F0FDFA'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
+                          >
+                            <div>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{c.name}</div>
+                              <div style={{ fontSize: 11, color: '#6B7280' }}>{c.phone}</div>
+                            </div>
+                            <div style={{ 
+                              fontSize: 11, 
+                              fontWeight: 600,
+                              padding: '4px 8px',
+                              borderRadius: 6,
+                              background: c.balance > 0 ? '#FEE2E2' : '#D1FAE5',
+                              color: c.balance > 0 ? '#DC2626' : '#10B981'
+                            }}>
+                              {c.balance > 0 ? `৳${c.balance}` : '✓ Paid'}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Supplier - Enhanced Select */}
+                  <div style={{ 
+                    flex: '1 1 140px', 
+                    minWidth: 130,
+                    position: 'relative'
+                  }}>
+                    <select
+                      value={selectedSupplier}
+                      onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
+                      style={{
+                        width: '100%',
+                        height: 44,
+                        padding: '0 12px',
+                        fontSize: 13,
+                        borderRadius: 12,
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        background: 'rgba(255,255,255,0.95)',
+                        outline: 'none',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        color: '#1F2937',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                        appearance: 'none',
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23115E59' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 12px center',
+                        paddingRight: 32
+                      }}
+                    >
+                      <option value="all">📋 {t('allSuppliers')}</option>
+                      {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* Category - Enhanced Select */}
+                  <div style={{ 
+                    flex: '1 1 130px', 
+                    minWidth: 120,
+                    position: 'relative'
+                  }}>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
+                      style={{
+                        width: '100%',
+                        height: 44,
+                        padding: '0 12px',
+                        fontSize: 13,
+                        borderRadius: 12,
+                        border: '2px solid rgba(255,255,255,0.3)',
+                        background: 'rgba(255,255,255,0.95)',
+                        outline: 'none',
+                        cursor: 'pointer',
+                        fontWeight: 600,
+                        color: '#1F2937',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                        appearance: 'none',
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23115E59' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundPosition: 'right 12px center',
+                        paddingRight: 32
+                      }}
+                    >
+                      <option value="all">📁 {t('allCategories')}</option>
+                      {categories.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Quick Stats Badge */}
+                  <div style={{ 
+                    marginLeft: 'auto',
+                    display: 'flex', 
+                    gap: 8,
+                    flexShrink: 0
+                  }}>
+                    <div style={{ 
+                      background: 'rgba(255,255,255,0.2)',
+                      backdropFilter: 'blur(10px)',
+                      borderRadius: 10,
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6
+                    }}>
+                      <span style={{ fontSize: 14 }}>📦</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF' }}>{filteredProducts.length}</span>
+                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>পণ্য</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Stock Summary Row */}
