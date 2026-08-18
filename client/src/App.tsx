@@ -1174,31 +1174,31 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '16px 24px 0',
+          padding: '12px 20px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
             <div style={{
-              width: 50, height: 50,
-              borderRadius: 12,
+              width: 40, height: 40,
+              borderRadius: 10,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(15,118,110,0.3)',
+              boxShadow: '0 2px 8px rgba(15,118,110,0.3)',
             }}>
-              <img src="/Logo.png" alt="Logo" style={{ width: 50, height: 50, objectFit: 'contain', borderRadius: 12 }} />
+              <img src="/Logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 10 }} />
             </div>
             <div style={{ flex: 1, textAlign: 'right' }}>
-              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#115E59' }}>
+              <h1 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#115E59' }}>
                 {t('posManagementSystem')}
               </h1>
               <div style={{
-                fontSize: 16,
+                fontSize: 13,
                 color: '#115E59',
                 fontWeight: 400,
-                marginTop: 2,
+                marginTop: 1,
               }}>
                 {t('smartBusinessPartner')}
               </div>
@@ -1289,12 +1289,12 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           {/* Error */}
           {error && (
             <div style={{
-              marginTop: 10,
-              padding: '8px 12px',
+              marginTop: 8,
+              padding: '6px 10px',
               background: '#FEF2F2',
-              borderRadius: 8,
+              borderRadius: 6,
               color: '#DC2626',
-              fontSize: 13,
+              fontSize: 11,
               fontWeight: 500,
             }}>
               ⚠️ {error}
@@ -1302,7 +1302,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           )}
 
           {/* Footer */}
-          <div style={{ textAlign: 'center', marginTop: 14, paddingTop: 12, borderTop: '1px dashed #E5E7EB', fontSize: 12, color: '#9CA3AF' }}>
+          <div style={{ textAlign: 'center', marginTop: 10, paddingTop: 10, borderTop: '1px dashed #E5E7EB', fontSize: 11, color: '#9CA3AF' }}>
             © {currentYear} {t('posManagementSystem')} - {t('copyright')}
           </div>
         </div>
