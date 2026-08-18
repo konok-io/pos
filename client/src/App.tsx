@@ -1950,7 +1950,7 @@ export default function App() {
               <div style={{ 
                 background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.8)',
                 padding: '10px 20px',
-                boxShadow: '0 4px 20px rgba(30,58,95,0.3)',
+                boxShadow: 'none',
                 position: 'relative',
                 overflow: 'hidden'
               }}>
