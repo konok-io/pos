@@ -1985,7 +1985,7 @@ export default function App() {
                       placeholder={t('searchProduct')}
                       style={{ 
                         width: '100%', 
-                        paddingLeft: 40, 
+                        paddingLeft: 50, 
                         paddingRight: 12, 
                         height: 34, 
                         fontSize: 14, 
@@ -2025,7 +2025,7 @@ export default function App() {
                       placeholder={t('customerSearch')}
                       style={{ 
                         width: '100%', 
-                        paddingLeft: 40, 
+                        paddingLeft: 50, 
                         paddingRight: 12, 
                         height: 34, 
                         fontSize: 14, 
@@ -2819,7 +2819,7 @@ export default function App() {
                     placeholder={t('barcodePlaceholder')}
                     style={{ 
                       width: '100%', 
-                      paddingLeft: 40, 
+                      paddingLeft: 50, 
                       paddingRight: 12,
                       height: 34, 
                       fontSize: 14, 
