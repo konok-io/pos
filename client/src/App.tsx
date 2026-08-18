@@ -2386,7 +2386,7 @@ export default function App() {
                         fontWeight: 800,
                         color: '#CA8A04',
                         lineHeight: 1
-                      }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
+                      }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
                     </div>
                   </div>
 
