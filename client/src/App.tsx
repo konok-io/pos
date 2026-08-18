@@ -354,13 +354,13 @@ export default function App() {
   // Tabs configuration
   const otherTabs = [
     { id: 'products', icon: '📦', label: t('products') },
-    { id: 'newproduct', icon: '➕', label: t('addProduct') },
-    { id: 'barcode', icon: '📊', label: t('barcode') },
-    { id: 'suppliers', icon: '📋', label: t('suppliers') },
+    { id: 'newproduct', icon: '➕', label: 'New Product' },
+    { id: 'suppliers', icon: '🏢', label: t('suppliers') },
     { id: 'customers', icon: '👥', label: t('customers') },
+    { id: 'barcode', icon: '📊', label: t('barcode') },
     { id: 'inventory', icon: '🏭', label: t('stock') },
     { id: 'income', icon: '💰', label: t('incomeExpenses') },
-    { id: 'reports', icon: '📈', label: t('reports') },
+    { id: 'reports', icon: '📊', label: t('reports') },
     { id: 'settings', icon: '⚙️', label: t('settings') },
   ];
 
@@ -1706,7 +1706,7 @@ export default function App() {
 
         {currentTab === 'newproduct' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>➕ {t('addProduct')}</h2>
+            <h2 style={{ marginBottom: 16 }}>➕ New Product</h2>
             <div className="card" style={{ maxWidth: 600 }}>
               <div className="form-group">
                 <label className="label">{t('productName')}</label>
