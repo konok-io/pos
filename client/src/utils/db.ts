@@ -78,6 +78,17 @@ class Database {
     await this.init();
     if (!this.db) return;
 
+    // Validate key - IndexedDB keys must be valid types
+    if (key === undefined || key === null || (typeof key === 'string' && key.trim() === '')) {
+      console.error('Invalid IndexedDB key:', key);
+      return;
+    }
+
+    // Handle null/undefined values by deleting the key instead
+    if (value === null || value === undefined) {
+      return this.delete(storeName, key);
+    }
+
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction(storeName, 'readwrite');
       const store = transaction.objectStore(storeName);

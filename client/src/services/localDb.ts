@@ -477,8 +477,15 @@ export const localDb = {
     return setting?.value as T | undefined;
   },
   async saveSetting<T>(key: string, value: T): Promise<void> {
+    if (value === null || value === undefined) {
+      return this.deleteSetting(key);
+    }
     const database = await initDatabase();
     await database.put('settings', { key, value });
+  },
+  async deleteSetting(key: string): Promise<void> {
+    const database = await initDatabase();
+    await database.delete('settings', key);
   },
 
   // Sync Queue
