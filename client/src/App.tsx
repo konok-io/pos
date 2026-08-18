@@ -1951,16 +1951,12 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', minWidth: 0, position: 'relative' }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: '#115E59', border: '1px solid #115E59',
+                background: '#F5F5F5', border: '1px solid #E0E0E0',
                 padding: '10px 20px',
                 boxShadow: 'none',
                 position: 'relative',
                 overflow: 'hidden'
               }}>
-                {/* Decorative background elements */}
-                <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '120px', height: '120px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
-                <div style={{ position: 'absolute', bottom: '-30px', left: '30%', width: '80px', height: '80px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
-                
                 {/* Search Inputs Row - Compact Design */}
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                   {/* Product Name Search - Enhanced Card */}
@@ -1976,7 +1972,7 @@ export default function App() {
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: '#115E59', border: '1px solid #115E59',
+                      background: '#115E59',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
