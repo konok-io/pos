@@ -442,7 +442,7 @@ export default function App() {
       )
     : null;
 
-  // Check auth and load settings on mount from IndexedDB
+  // Check auth and load settings on mount from PouchDB
   useEffect(() => {
     const initApp = async () => {
       const user = await db.get('users', 'current');
@@ -451,41 +451,49 @@ export default function App() {
       }
       
       // Load VAT settings from database
-      const savedSettings = (await db.get('settings', 'app_settings') || {}) as { vatPercent?: number; currency?: string };
-      if (savedSettings.vatPercent !== undefined) {
-        setVatPercent(savedSettings.vatPercent);
-        setDefaultVatPercent(savedSettings.vatPercent);
+      const savedVat = await dbGetSetting('vatPercent');
+      if (savedVat) {
+        const vat = parseFloat(savedVat);
+        setVatPercent(vat);
+        setDefaultVatPercent(vat);
       }
-      if (savedSettings.currency) {
-        setCurrency(savedSettings.currency);
+      const savedCurrency = await dbGetSetting('currency');
+      if (savedCurrency) {
+        setCurrency(savedCurrency);
       }
       
-      // Load cart state from IndexedDB
-      const savedCart = (await db.get('cart', 'current') || {}) as {
-        cart?: CartItem[];
-        selectedCustomer?: Customer | null;
-        discount?: string;
-        vatPercent?: number;
-        paidAmount?: string;
-        paymentMethod?: string;
-      };
-      if (savedCart.cart) setCart(savedCart.cart);
-      if (savedCart.selectedCustomer) setSelectedCustomer(savedCart.selectedCustomer);
-      if (savedCart.discount !== undefined) setDiscount(savedCart.discount);
-      if (savedCart.vatPercent !== undefined) setVatPercent(savedCart.vatPercent);
-      if (savedCart.paidAmount !== undefined) setPaidAmount(savedCart.paidAmount);
-      if (savedCart.paymentMethod) setPaymentMethod(savedCart.paymentMethod);
+      // Load cart state from PouchDB
+      const savedCart = await dbGetSetting('cartData');
+      if (savedCart) {
+        try {
+          const cartData = JSON.parse(savedCart);
+          if (cartData.cart) setCart(cartData.cart);
+          if (cartData.selectedCustomer) setSelectedCustomer(cartData.selectedCustomer);
+          if (cartData.discount !== undefined) setDiscount(cartData.discount);
+          if (cartData.vatPercent !== undefined) setVatPercent(cartData.vatPercent);
+          if (cartData.paidAmount !== undefined) setPaidAmount(cartData.paidAmount);
+          if (cartData.paymentMethod) setPaymentMethod(cartData.paymentMethod);
+        } catch (e) {
+          console.log('Error loading cart from database');
+        }
+      }
       
-      // Load held sales from IndexedDB
-      const savedHeldSales = (await db.get('heldSales', 'all') || []) as HeldSale[];
-      if (savedHeldSales.length > 0) setHeldSales(savedHeldSales);
+      // Load held sales from PouchDB
+      const savedHeldSales = await dbGetSetting('heldSales');
+      if (savedHeldSales) {
+        try {
+          setHeldSales(JSON.parse(savedHeldSales));
+        } catch (e) {
+          console.log('Error loading held sales from database');
+        }
+      }
       
       setIsLoading(false);
     };
     initApp();
   }, []);
 
-  // Save cart state to IndexedDB whenever it changes
+  // Save cart state to PouchDB whenever it changes
   useEffect(() => {
     const saveCartData = async () => {
       const cartData = {
@@ -496,15 +504,15 @@ export default function App() {
         paidAmount,
         paymentMethod,
       };
-      await db.put('cart', 'current', cartData);
+      await dbSetSetting('cartData', JSON.stringify(cartData));
     };
     saveCartData();
   }, [cart, selectedCustomer, discount, vatPercent, paidAmount, paymentMethod]);
 
-  // Save held sales to IndexedDB whenever it changes
+  // Save held sales to PouchDB whenever it changes
   useEffect(() => {
     const saveHeldSales = async () => {
-      await db.put('heldSales', 'all', heldSales);
+      await dbSetSetting('heldSales', JSON.stringify(heldSales));
     };
     saveHeldSales();
   }, [heldSales]);
@@ -513,8 +521,9 @@ export default function App() {
 
   const handleLogout = async () => {
     await db.delete('users', 'current');
-    await db.delete('cart', 'current');
-    await db.delete('heldSales', 'all');
+    // Clear cart data from PouchDB
+    await setSetting('cartData', '');
+    await setSetting('heldSales', '');
     setIsLoggedIn(false);
     setCart([]);
     setVatPercent(defaultVatPercent);
