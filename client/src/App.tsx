@@ -2445,7 +2445,7 @@ export default function App() {
 
                 {/* Payment Input */}
                 <input value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
-                  placeholder={`${t('paid')} (৳)`}
+                  placeholder={`${t('paid')} (${currency})`}
                   style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 8, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#115E59', outline: 'none' }}
                 />
 
