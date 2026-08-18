@@ -2797,54 +2797,42 @@ export default function App() {
                 <div style={{ position: 'absolute', top: '-15px', left: '-15px', width: '80px', height: '80px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
                 <div style={{ position: 'absolute', bottom: '-20px', right: '20%', width: '60px', height: '60px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
                 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  {/* Barcode Input */}
+                {/* Barcode Input - With Icon */}
+                <div style={{ 
+                  position: 'relative', 
+                  background: '#FFFFFF',
+                  borderRadius: 10,
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
+                  overflow: 'hidden'
+                }}>
                   <div style={{ 
-                    position: 'relative', 
-                    flex: 1,
-                    background: '#FFFFFF',
-                    borderRadius: 10,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9)',
-                    overflow: 'hidden'
-                  }}>
-                    <input
-                      className="barcode-input"
-                      placeholder={t('barcodePlaceholder')}
-                      style={{ 
-                        width: '100%', 
-                        paddingLeft: 48, 
-                        paddingRight: 12,
-                        height: 40, 
-                        fontSize: 14, 
-                        borderRadius: 10, 
-                        border: 'none', 
-                        background: 'transparent', 
-                        outline: 'none', 
-                        boxSizing: 'border-box',
-                        fontFamily: "inherit",
-                        fontWeight: 500,
-                        color: '#1F2937'
-                      }}
-                    />
-                  </div>
-                  
-                  {/* Scan Button */}
-                  <button style={{
-                    width: 44,
-                    height: 40,
-                    borderRadius: 10,
-                    background: 'rgba(255,255,255,0.2)',
-                    backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                    transition: 'all 0.2s'
+                    position: 'absolute', left: 0, top: 0, bottom: 0, 
+                    width: 40, 
+                    background: '#115E59',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    borderRadius: '10px 0 0 10px'
                   }}>
                     <span style={{ fontSize: 16 }}>📷</span>
-                  </button>
+                  </div>
+                  <input
+                    className="barcode-input"
+                    placeholder={t('barcodePlaceholder')}
+                    style={{ 
+                      width: '100%', 
+                      paddingLeft: 48, 
+                      paddingRight: 12,
+                      height: 40, 
+                      fontSize: 14, 
+                      borderRadius: 10, 
+                      border: 'none', 
+                      background: 'transparent', 
+                      outline: 'none', 
+                      boxSizing: 'border-box',
+                      fontFamily: "inherit",
+                      fontWeight: 500,
+                      color: '#1F2937'
+                    }}
+                  />
                 </div>
               </div>
 
