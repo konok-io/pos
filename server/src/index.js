@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import pkg from '@prisma/client';
 const { PrismaClient } = pkg;
-import { PrismaLibSQL } from '@prisma/adapter-libsql';
+import { PrismaSQLite } from '@prisma/adapter-libsql';
 
 // Routes
 import authRoutes from './routes/auth.js';
@@ -22,8 +22,8 @@ import reportRoutes from './routes/reports.js';
 import translationRoutes from './routes/translations.js';
 
 const app = express();
-const libsql = new PrismaLibSQL({ url: 'file:./prisma/dev.db' });
-const prisma = new PrismaClient({ adapter: libsql });
+const adapter = new PrismaSQLite({ url: 'file:./prisma/dev.db' });
+const prisma = new PrismaClient({ adapter });
 const PORT = process.env.PORT || 3000;
 
 // Middleware

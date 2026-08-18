@@ -6,8 +6,8 @@ export default defineConfig({
   schema: path.join(import.meta.dirname, 'schema.prisma'),
   migrate: {
     async adapter() {
-      const { PrismaLibSQL } = await import('@prisma/adapter-libsql');
-      return new PrismaLibSQL({ url: 'file:./prisma/dev.db' });
+      const { PrismaSQLite } = await import('@prisma/adapter-libsql');
+      return new PrismaSQLite({ url: 'file:./prisma/dev.db' });
     },
   },
 });
