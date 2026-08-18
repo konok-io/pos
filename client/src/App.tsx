@@ -1212,10 +1212,10 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           borderRadius: '0 0 20px 20px',
           padding: '16px 24px 20px',
         }}>
-          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             {/* Username */}
             <div style={{ flex: 1 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 3 }}>
                 👤 {t('username')}
               </label>
               <input
@@ -1226,10 +1226,10 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 required
                 style={{
                   width: '100%',
-                  padding: '10px 12px',
-                  fontSize: 14,
+                  padding: '8px 10px',
+                  fontSize: 13,
                   border: '2px solid #E5E7EB',
-                  borderRadius: 12,
+                  borderRadius: 8,
                   outline: 'none',
                   boxSizing: 'border-box',
                   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -1240,8 +1240,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </div>
 
             {/* Password */}
-            <div style={{ width: 140 }}>
-              <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>
+            <div style={{ width: 120 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 3 }}>
                 🔐 {t('password')}
               </label>
               <input
@@ -1252,10 +1252,10 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 required
                 style={{
                   width: '100%',
-                  padding: '10px 12px',
-                  fontSize: 14,
+                  padding: '8px 10px',
+                  fontSize: 13,
                   border: '2px solid #E5E7EB',
-                  borderRadius: 12,
+                  borderRadius: 8,
                   outline: 'none',
                   boxSizing: 'border-box',
                   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -1270,12 +1270,12 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               type="submit"
               disabled={loading}
               style={{
-                padding: '10px 20px',
+                padding: '8px 16px',
                 background: loading ? '#9CA3AF' : '#115E59',
                 color: '#fff',
                 border: 'none',
-                borderRadius: 12,
-                fontSize: 14,
+                borderRadius: 8,
+                fontSize: 13,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
