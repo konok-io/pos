@@ -2804,7 +2804,13 @@ export default function App() {
                       </div>
                     )}
 
-                    {filteredProducts.length === 0 && !showExpiryList && !showCustomerList ? (
+                    {showExpiryList ? (
+                      /* Expiry list already shown above */
+                      null
+                    ) : showCustomerList ? (
+                      /* Customer list already shown above */
+                      null
+                    ) : filteredProducts.length === 0 ? (
                     <div style={{ 
                       height: '100%', 
                       background: 'linear-gradient(135deg, #F0FDFA 0%, #ECFDF5 50%, #F0F9FF 100%)',
@@ -2965,7 +2971,7 @@ export default function App() {
                         </div>
                       </div>
                     </div>
-                  ) : (
+                    ) : filteredProducts.length > 0 ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
                       {filteredProducts.map(product => (
                         <button
@@ -3077,7 +3083,7 @@ export default function App() {
                         </button>
                       ))}
                     </div>
-                  )}
+                    ) : null}
                   </>
                 )}
               </div>
