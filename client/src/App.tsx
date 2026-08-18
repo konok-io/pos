@@ -1312,7 +1312,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 }
 
 // Time Display Component
-function TimeDisplay() {
+function TimeDisplay({ language }: { language: string }) {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -1320,13 +1320,21 @@ function TimeDisplay() {
     return () => clearInterval(interval);
   }, []);
 
+  const isBangla = language === 'bn';
+  const timeStr = isBangla 
+    ? time.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    : time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const dateStr = isBangla
+    ? time.toLocaleDateString('bn-BD', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })
+    : time.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px', background: 'rgba(15,118,110,0.05)', borderRadius: 10, border: '1px solid #E5E7EB' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px', background: 'rgba(15,118,110,0.05)', border: '1px solid #E5E7EB' }}>
       <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59' }}>
-        {time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+        {timeStr}
       </div>
       <div style={{ fontSize: 11, color: '#9CA3AF' }}>
-        {time.toLocaleDateString('bn-BD', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
+        {dateStr}
       </div>
     </div>
   );
@@ -1839,7 +1847,7 @@ export default function App() {
             <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="লগআউট">↩️</button>
 
             {/* Date & Time */}
-            <TimeDisplay />
+            <TimeDisplay language={language} />
           </div>
         </div>
       </div>
