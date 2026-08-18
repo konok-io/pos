@@ -1015,7 +1015,7 @@ ${printFiltered.map(p => {
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
-  id: 'admin',
+  key: 'admin',
   email: 'admin@pos.test',
   password: 'admin123',
   role: 'admin',
@@ -1130,7 +1130,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     if ((username === 'admin' || username === 'admin@konok.io') && password === 'admin123') {
-      await db.put('users', DEFAULT_ADMIN);
+      await db.put('users', 'admin', DEFAULT_ADMIN);
       onLogin();
     } else {
       setError(t('invalidCredentials'));
