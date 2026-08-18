@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages } from './i18n';
-import TranslationSettings from './pages/TranslationSettings';
-import DatabaseSettings from './pages/DatabaseSettings';
 import SettingsScreen from './pages/SettingsScreen';
+import SuppliersScreen from './pages/SuppliersScreen';
 import { db } from './utils/db';
-import { getSetting as dbGetSetting, initDatabase } from './services/database';
+import { getSetting as dbGetSetting, setSetting as dbSetSetting, initDatabase } from './services/database';
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
@@ -53,7 +52,7 @@ interface HeldSale {
 interface Category {
   id: string;
   name: string;
-  icon: string;
+  icon?: string;
 }
 
 interface Customer {
@@ -338,7 +337,7 @@ export default function App() {
     { id: 'p7', name: 'Soap', code: 'SOAP001', costPrice: 30, sellPrice: 45, stock: 50, unit: 'Pieces', categoryId: 'cat-essentials', supplier: 'Goods Supplier', image: '🧼' },
     { id: 'p8', name: 'Shampoo', code: 'SHAM001', costPrice: 100, sellPrice: 150, stock: 30, unit: 'Bottle', categoryId: 'cat-essentials', supplier: 'Goods Supplier', image: '🧴' },
   ]);
-  const [categories] = useState<Category[]>([
+  const [categories, setCategories] = useState<Category[]>([
     { id: 'cat-food', name: 'Food', icon: '🍔' },
     { id: 'cat-drinks', name: 'Drinks', icon: '🥤' },
     { id: 'cat-essentials', name: 'Essentials', icon: '🛒' },
@@ -1749,16 +1748,15 @@ export default function App() {
         )}
 
         {currentTab === 'suppliers' && (
-          <div>
-            <h2 style={{ marginBottom: 16 }}>📋 {t('suppliers')}</h2>
-            <div className="card">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <span style={{ color: '#6B7280' }}>{t('total')}: 0 {t('suppliers')}</span>
-                <button className="btn btn-primary">➕ {t('addSupplier')}</button>
-              </div>
-              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>{t('noSuppliers')}</p>
-            </div>
-          </div>
+          <SuppliersScreen 
+            suppliers={suppliers}
+            setSuppliers={setSuppliers}
+            categories={categories}
+            setCategories={setCategories}
+            products={products}
+            setProducts={setProducts}
+            purchases={purchases}
+          />
         )}
 
         {currentTab === 'inventory' && (
