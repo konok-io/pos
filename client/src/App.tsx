@@ -1477,8 +1477,10 @@ export default function App() {
   // Check auth and load settings on mount
   useEffect(() => {
     const initApp = async () => {
+      // Check if user was logged in (check both users store and settings)
       const user = await db.get('users', 'current');
-      if (user) {
+      const isLoggedInSetting = await db.get<boolean>('settings', 'isLoggedIn');
+      if (user || isLoggedInSetting) {
         setIsLoggedIn(true);
       }
       
@@ -1618,10 +1620,14 @@ export default function App() {
     if (sales.length > 0) saveSales();
   }, [isInitialized, sales]);
 
-  const handleLogin = () => setIsLoggedIn(true);
+  const handleLogin = async () => {
+    await db.put('settings', 'isLoggedIn', true);
+    setIsLoggedIn(true);
+  };
 
   const handleLogout = async () => {
     await db.delete('users', 'current');
+    await db.delete('settings', 'isLoggedIn');
     setIsLoggedIn(false);
   };
 
