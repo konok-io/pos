@@ -2173,7 +2173,7 @@ export default function App() {
               {/* Product grid */}
               <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
 
-                {/* Stock Summary Cards - Top */}
+                {/* Stock Summary Cards - Fixed Top */}
                 <div style={{
                   padding: '10px 0',
                   display: 'flex',
@@ -2181,7 +2181,11 @@ export default function App() {
                   flexWrap: 'wrap',
                   alignItems: 'center',
                   justifyContent: 'space-around',
-                  marginBottom: 12
+                  marginBottom: 12,
+                  position: 'sticky',
+                  top: 0,
+                  zIndex: 10,
+                  background: '#F9FAFB'
                 }}>
                   {/* Stock Available Card */}
                   <div
