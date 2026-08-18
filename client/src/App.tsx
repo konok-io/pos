@@ -1488,6 +1488,7 @@ export default function App() {
         try {
           if (savedCart.cart) setCart(savedCart.cart);
           if (savedCart.selectedCustomer) setSelectedCustomer(savedCart.selectedCustomer);
+          if (savedCart.customerSearch !== undefined) setCustomerSearch(savedCart.customerSearch);
           if (savedCart.discount !== undefined) setDiscount(savedCart.discount);
           if (savedCart.vatPercent !== undefined) setVatPercent(String(savedCart.vatPercent));
           if (savedCart.paidAmount !== undefined) setPaidAmount(savedCart.paidAmount);
@@ -1507,6 +1508,27 @@ export default function App() {
         }
       }
       
+      // Load products, categories, customers, sales from IndexedDB
+      const savedProducts = await db.getAll<any>('products');
+      if (savedProducts && savedProducts.length > 0) {
+        setProducts(savedProducts);
+      }
+      
+      const savedCategories = await db.getAll<any>('categories');
+      if (savedCategories && savedCategories.length > 0) {
+        setCategories(savedCategories);
+      }
+      
+      const savedCustomers = await db.getAll<any>('customers');
+      if (savedCustomers && savedCustomers.length > 0) {
+        setCustomers(savedCustomers);
+      }
+      
+      const savedSales = await db.getAll<any>('sales');
+      if (savedSales && savedSales.length > 0) {
+        setSales(savedSales);
+      }
+      
       setIsLoading(false);
     };
     initApp();
@@ -1518,6 +1540,7 @@ export default function App() {
       const cartData = {
         cart,
         selectedCustomer,
+        customerSearch,
         discount,
         vatPercent,
         paidAmount,
@@ -1526,7 +1549,7 @@ export default function App() {
       await db.put('cart', 'cartData', cartData);
     };
     saveCartData();
-  }, [cart, selectedCustomer, discount, vatPercent, paidAmount, paymentMethod]);
+  }, [cart, selectedCustomer, customerSearch, discount, vatPercent, paidAmount, paymentMethod]);
 
   // Save held sales to IndexedDB whenever it changes
   useEffect(() => {
@@ -1535,6 +1558,46 @@ export default function App() {
     };
     saveHeldSales();
   }, [heldSales]);
+
+  // Save products to IndexedDB whenever it changes
+  useEffect(() => {
+    const saveProducts = async () => {
+      for (const product of products) {
+        await db.put('products', product.id, product);
+      }
+    };
+    if (products.length > 0) saveProducts();
+  }, [products]);
+
+  // Save categories to IndexedDB whenever it changes
+  useEffect(() => {
+    const saveCategories = async () => {
+      for (const category of categories) {
+        await db.put('categories', category.id, category);
+      }
+    };
+    if (categories.length > 0) saveCategories();
+  }, [categories]);
+
+  // Save customers to IndexedDB whenever it changes
+  useEffect(() => {
+    const saveCustomers = async () => {
+      for (const customer of customers) {
+        await db.put('customers', customer.id, customer);
+      }
+    };
+    if (customers.length > 0) saveCustomers();
+  }, [customers]);
+
+  // Save sales to IndexedDB whenever it changes
+  useEffect(() => {
+    const saveSales = async () => {
+      for (const sale of sales) {
+        await db.put('sales', sale.id, sale);
+      }
+    };
+    if (sales.length > 0) saveSales();
+  }, [sales]);
 
   const handleLogin = () => setIsLoggedIn(true);
 
