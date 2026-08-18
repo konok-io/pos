@@ -521,12 +521,7 @@ export default function App() {
 
   const handleLogout = async () => {
     await db.delete('users', 'current');
-    // Clear cart data from PouchDB
-    await setSetting('cartData', '');
-    await setSetting('heldSales', '');
     setIsLoggedIn(false);
-    setCart([]);
-    setVatPercent(defaultVatPercent);
   };
 
   const handleFullscreen = () => {
