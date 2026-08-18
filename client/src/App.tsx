@@ -2836,7 +2836,7 @@ export default function App() {
                       fontSize: 14, 
                       borderRadius: 10, 
                       border: 'none', 
-                      background: 'transparent', 
+                      background: '#FFFFFF', 
                       outline: 'none', 
                       boxSizing: 'border-box',
                       fontFamily: "inherit",
