@@ -2712,10 +2712,11 @@ export default function App() {
                     ) : !searchQuery && selectedCategory === 'all' && selectedSupplier === 'all' && stockFilter === 'all' && filteredProducts.length === 0 ? (
                     <div style={{ 
                       display: 'flex',
+                      flex: 1,
                       alignItems: 'center',
                       justifyContent: 'center',
-                      height: '100%',
-                      minHeight: 200
+                      overflow: 'hidden',
+                      minHeight: 0
                     }}>
                       <div style={{ textAlign: 'center', padding: 40 }}>
                         <div style={{ fontSize: 64, marginBottom: 16 }}>📦</div>
