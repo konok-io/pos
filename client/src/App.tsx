@@ -2811,7 +2811,7 @@ export default function App() {
                   style={{ 
                     width: '100%', 
                     padding: '8px 12px',
-                    height: 37, 
+                    height: 40, 
                     fontSize: 14, 
                     borderRadius: 10, 
                     border: '1px solid #D1D5DB', 
