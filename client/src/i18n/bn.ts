@@ -278,4 +278,15 @@ export const bn: Record<string, string> = {
   offline: 'অফলাইন',
   exporting: 'ডাটা এক্সপোর্ট হচ্ছে...',
   importing: 'ডাটা ইমপোর্ট হচ্ছে...',
+  
+  // Empty State
+  readyForNewSale: 'Ready for a New Sale',
+  scanBarcode: 'Scan a barcode or search for a product',
+  scanItem: 'Scan Item',
+  addProductEmpty: 'Add Product',
+  quickShortcuts: 'Quick Shortcuts',
+  f2Search: 'F2 Search',
+  f4Hold: 'F4 Hold',
+  f8Payment: 'F8 Payment',
+  escClear: 'ESC Clear',
 };

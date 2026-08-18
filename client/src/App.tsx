@@ -2801,7 +2801,7 @@ export default function App() {
                           marginBottom: 8,
                           letterSpacing: '-0.5px'
                         }}>
-                          Ready for a New Sale
+                          {t('readyForNewSale')}
                         </div>
                         <div style={{
                           fontSize: 14,
@@ -2809,7 +2809,7 @@ export default function App() {
                           marginBottom: 24,
                           lineHeight: 1.5
                         }}>
-                          Scan a barcode or search for a product
+                          {t('scanBarcode')}
                         </div>
                         <div style={{
                           display: 'flex',
@@ -2828,19 +2828,20 @@ export default function App() {
                             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                           }}>
                             <span style={{ fontSize: 16 }}>▣</span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>Scan Item</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('scanItem')}</span>
                           </div>
                           <div style={{
                             padding: '10px 16px',
-                            background: '#115E59',
+                            background: '#F3F4F6',
                             borderRadius: 8,
+                            border: '1px solid #E5E7EB',
                             display: 'flex',
                             alignItems: 'center',
                             gap: 8,
-                            boxShadow: '0 4px 12px rgba(17, 94, 89, 0.3)'
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                           }}>
                             <span style={{ fontSize: 16 }}>＋</span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF' }}>Add Product</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('addProductEmpty')}</span>
                           </div>
                         </div>
                         <div style={{
@@ -2858,7 +2859,7 @@ export default function App() {
                             letterSpacing: '1px',
                             marginBottom: 8
                           }}>
-                            Quick Shortcuts
+                            {t('quickShortcuts')}
                           </div>
                           <div style={{
                             display: 'flex',
@@ -2866,10 +2867,10 @@ export default function App() {
                             flexWrap: 'wrap',
                             justifyContent: 'center'
                           }}>
-                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F2</strong> Search</span>
-                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F4</strong> Hold</span>
-                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F8</strong> Payment</span>
-                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>ESC</strong> Clear</span>
+                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>{t('f2Search')}</strong></span>
+                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>{t('f4Hold')}</strong></span>
+                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>{t('f8Payment')}</strong></span>
+                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>{t('escClear')}</strong></span>
                           </div>
                         </div>
                       </div>
@@ -3092,7 +3093,7 @@ export default function App() {
                       marginBottom: 8,
                       letterSpacing: '-0.5px'
                     }}>
-                      Ready for a New Sale
+                      {t('readyForNewSale')}
                     </div>
                     <div style={{ 
                       fontSize: 14, 
@@ -3100,7 +3101,7 @@ export default function App() {
                       marginBottom: 24,
                       lineHeight: 1.5
                     }}>
-                      Scan a barcode or search for a product
+                      {t('scanBarcode')}
                     </div>
                     <div style={{
                       display: 'flex',
@@ -3119,19 +3120,20 @@ export default function App() {
                         boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                       }}>
                         <span style={{ fontSize: 16 }}>▣</span>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>Scan Item</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('scanItem')}</span>
                       </div>
                       <div style={{
                         padding: '10px 16px',
-                        background: '#115E59',
+                        background: '#F3F4F6',
                         borderRadius: 8,
+                        border: '1px solid #E5E7EB',
                         display: 'flex',
                         alignItems: 'center',
                         gap: 8,
-                        boxShadow: '0 4px 12px rgba(17, 94, 89, 0.3)'
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                       }}>
                         <span style={{ fontSize: 16 }}>＋</span>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF' }}>Add Product</span>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('addProductEmpty')}</span>
                       </div>
                     </div>
                     <div style={{
@@ -3149,7 +3151,7 @@ export default function App() {
                         letterSpacing: '1px',
                         marginBottom: 8
                       }}>
-                        Quick Shortcuts
+                        {t('quickShortcuts')}
                       </div>
                       <div style={{
                         display: 'flex',
@@ -3157,10 +3159,10 @@ export default function App() {
                         flexWrap: 'wrap',
                         justifyContent: 'center'
                       }}>
-                        <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F2</strong> Search</span>
-                        <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F4</strong> Hold</span>
-                        <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F8</strong> Payment</span>
-                        <span style={{ fontSize: 12, color: '#6B7280' }}><strong>ESC</strong> Clear</span>
+                        <span style={{ fontSize: 12, color: '#6B7280' }}><strong>{t('f2Search')}</strong></span>
+                        <span style={{ fontSize: 12, color: '#6B7280' }}><strong>{t('f4Hold')}</strong></span>
+                        <span style={{ fontSize: 12, color: '#6B7280' }}><strong>{t('f8Payment')}</strong></span>
+                        <span style={{ fontSize: 12, color: '#6B7280' }}><strong>{t('escClear')}</strong></span>
                       </div>
                     </div>
                   </div>

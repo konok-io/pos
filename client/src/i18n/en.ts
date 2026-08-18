@@ -308,4 +308,15 @@ export const en: Record<string, string> = {
   offline: 'Offline',
   exporting: 'Exporting data...',
   importing: 'Importing data...',
+  
+  // Empty State
+  readyForNewSale: 'Ready for a New Sale',
+  scanBarcode: 'Scan a barcode or search for a product',
+  scanItem: 'Scan Item',
+  addProductEmpty: 'Add Product',
+  quickShortcuts: 'Quick Shortcuts',
+  f2Search: 'F2 Search',
+  f4Hold: 'F4 Hold',
+  f8Payment: 'F8 Payment',
+  escClear: 'ESC Clear',
 };
