@@ -382,6 +382,7 @@ export default function App() {
   const [customerSearch, setCustomerSearch] = useState('');
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState(15);
+  const [defaultVatPercent, setDefaultVatPercent] = useState(15);
   const [paidAmount, setPaidAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [searchQuery, setSearchQuery] = useState('');
@@ -413,16 +414,27 @@ export default function App() {
       )
     : null;
 
-  // Check auth on mount from IndexedDB
+  // Check auth and load settings on mount from IndexedDB
   useEffect(() => {
-    const checkAuth = async () => {
+    const initApp = async () => {
       const user = await db.get('users', 'current');
       if (user) {
         setIsLoggedIn(true);
       }
+      
+      // Load VAT settings from database
+      const savedSettings = (await db.get('settings', 'app_settings') || {}) as { vatPercent?: number; currency?: string };
+      if (savedSettings.vatPercent !== undefined) {
+        setVatPercent(savedSettings.vatPercent);
+        setDefaultVatPercent(savedSettings.vatPercent);
+      }
+      if (savedSettings.currency) {
+        setCurrency(savedSettings.currency);
+      }
+      
       setIsLoading(false);
     };
-    checkAuth();
+    initApp();
   }, []);
 
   const handleLogin = () => setIsLoggedIn(true);
@@ -1337,7 +1349,7 @@ export default function App() {
                     placeholder={t('discount')}
                     style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#16A34A' }}/>
                   <input value={vatPercent} onChange={(e) => setVatPercent(parseFloat(e.target.value) || 0)} type="number" min="0" max="100"
-                    placeholder="%"
+                    placeholder={`${defaultVatPercent}%`}
                     style={{ width: 55, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#D97706', textAlign: 'center' }}/>
                 </div>
 
@@ -1611,7 +1623,12 @@ export default function App() {
                 <select
                   className="input"
                   value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
+                  onChange={async (e) => {
+                    const newCurrency = e.target.value;
+                    setCurrency(newCurrency);
+                    const current = (await db.get('settings', 'app_settings') || {}) as { vatPercent?: number; currency?: string };
+                    await db.put('settings', 'app_settings', { ...current, currency: newCurrency });
+                  }}
                   style={{ cursor: 'pointer' }}
                 >
                   <option value="SAR ">SAR Riyal (SAR) - ডিফল্ট</option>
@@ -1629,7 +1646,12 @@ export default function App() {
                   type="number"
                   className="input"
                   value={vatPercent}
-                  onChange={(e) => setVatPercent(parseFloat(e.target.value) || 0)}
+                  onChange={async (e) => {
+                    const newVat = parseFloat(e.target.value) || 0;
+                    setVatPercent(newVat);
+                    const current = (await db.get('settings', 'app_settings') || {}) as { vatPercent?: number; currency?: string };
+                    await db.put('settings', 'app_settings', { ...current, vatPercent: newVat });
+                  }}
                 />
               </div>
               <div className="form-group">
