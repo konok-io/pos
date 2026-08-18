@@ -2786,7 +2786,7 @@ export default function App() {
             <div style={{ width: 360, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: '1px solid #e5e7eb' }}>
               {/* Barcode Scan - Professional Design */}
               <div style={{ 
-                padding: '10px 14px', 
+                padding: '10px 20px', 
                 borderBottom: '1px solid #E5E7EB', 
                 background: '#115E59',
                 flexShrink: 0,
