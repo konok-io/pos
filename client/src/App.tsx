@@ -2732,19 +2732,15 @@ export default function App() {
                     )}
                   
                     {filteredProducts.length === 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: 'linear-gradient(180deg, #F0FDFA 0%, #FFFFFF 100%)', borderRadius: 12, overflow: 'hidden', padding: 32 }}>
-                      <img src="/Logo.png" alt="Logo" style={{ width: 120, height: 120, objectFit: 'contain', marginBottom: 24, filter: 'drop-shadow(0 4px 12px rgba(17, 94, 89, 0.15))' }} />
-                      <div style={{ textAlign: 'center', marginBottom: 32 }}>
-                        <h1 style={{ fontSize: 26, fontWeight: 800, color: '#115E59', marginBottom: 8, letterSpacing: '-0.5px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>{t('posManagementSystem')}</h1>
-                        <p style={{ fontSize: 16, color: '#6B7280', fontWeight: 500, margin: 0, fontStyle: 'italic' }}>{t('smartBusinessPartner')}</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
+                      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>{t('posManagementSystem')}</div>
+                        <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('smartBusinessPartner')}</div>
                       </div>
-                      <div style={{ background: '#FFFFFF', borderRadius: 16, padding: '24px 32px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)', border: '1px solid #E5E7EB', textAlign: 'center', maxWidth: 400 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
-                          <span style={{ fontSize: 24 }}>🔍</span>
-                          <span style={{ fontSize: 15, color: '#374151', fontWeight: 600 }}>{t('searchProductBarcode')}</span>
-                        </div>
-                        <div style={{ width: 60, height: 2, background: 'linear-gradient(90deg, transparent, #115E59, transparent)', margin: '12px auto' }}></div>
-                        <div style={{ fontSize: 13, color: '#9CA3AF', marginTop: 8 }}>{t('orSelectCategorySupplier')}</div>
+                      <img src="/Logo.png" alt="Logo" style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: 16 }} />
+                      <div style={{ padding: '16px', textAlign: 'center' }}>
+                        <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 600 }}>{t('searchProductBarcode')}</div>
+                        <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>{t('orSelectCategorySupplier')}</div>
                       </div>
                     </div>
                   ) : (
