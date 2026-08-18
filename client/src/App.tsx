@@ -2171,7 +2171,7 @@ export default function App() {
               </div>
 
               {/* Product grid */}
-              <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
+              <div style={{ flex: 1, overflow: 'auto', padding: 16, paddingBottom: 100, background: '#F9FAFB' }}>
                 
                 {/* Show Held Sales Only - When hold is open and no filter active */}
                 {showHeldSales && !showProductsGrid && (
@@ -2662,7 +2662,7 @@ export default function App() {
                   </>
                 )}
 
-                {/* Stock Summary Footer */}
+                {/* Stock Summary Footer - Fixed at bottom */}
                 <div style={{
                   padding: '10px 20px',
                   background: '#FFFFFF',
@@ -2673,7 +2673,7 @@ export default function App() {
                   alignItems: 'center',
                   justifyContent: 'space-around',
                   flexShrink: 0,
-                  position: 'sticky',
+                  position: 'fixed',
                   bottom: 0,
                   left: 0,
                   right: 0,
