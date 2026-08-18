@@ -1964,13 +1964,13 @@ export default function App() {
                     minWidth: 200,
                     background: '#FFFFFF',
                     borderRadius: 10,
-                    border: '1px solid #FFFFFF', boxShadow: 'none',
+                    border: '1px solid #D1D5DB', boxShadow: 'none',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: '#115E59',
+                      background: '#E0E0E0',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
@@ -2004,13 +2004,13 @@ export default function App() {
                     minWidth: 160,
                     background: '#FFFFFF',
                     borderRadius: 10,
-                    border: '1px solid #FFFFFF', boxShadow: 'none',
+                    border: '1px solid #D1D5DB', boxShadow: 'none',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: '#115E59',
+                      background: '#E0E0E0',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
@@ -2813,13 +2813,13 @@ export default function App() {
                   position: 'relative', 
                   background: '#FFFFFF',
                   borderRadius: 10,
-                  border: '1px solid #FFFFFF', boxShadow: 'none',
+                  border: '1px solid #E0E0E0', boxShadow: 'none',
                   overflow: 'hidden'
                 }}>
                   <div style={{ 
                     position: 'absolute', left: 0, top: 0, bottom: 0, 
                     width: 40, 
-                    background: '#115E59',
+                    background: '#E0E0E0',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     borderRadius: '10px 0 0 10px'
                   }}>
