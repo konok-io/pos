@@ -3020,8 +3020,8 @@ export default function App() {
                         style={{
                           flex: 1,
                           padding: '8px 4px',
-                          background: paymentMethod === pm.v ? '#E0E0E0' : 'transparent',
-                          color: paymentMethod === pm.v ? '#000000' : '#6B7280',
+                          background: paymentMethod === pm.v ? '#EA580C' : 'transparent',
+                          color: paymentMethod === pm.v ? '#FFFFFF' : '#6B7280',
                           border: paymentMethod === pm.v ? 'none' : '1px solid #e5e7eb',
                           borderRadius: 4,
                           fontSize: 12,
