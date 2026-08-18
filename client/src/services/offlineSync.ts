@@ -1,8 +1,9 @@
 import { openDB, IDBPDatabase } from 'idb';
 import type { Product, Category, Customer, Sale } from '../types';
 
-const DB_NAME = 'pos_offline_db';
-const DB_VERSION = 1;
+// Use the same database as localDb for consistency
+const DB_NAME = 'pos-offline-db';
+const DB_VERSION = 4;
 
 interface PendingSale {
   id: string;
