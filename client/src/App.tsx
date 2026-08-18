@@ -2283,17 +2283,23 @@ export default function App() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 8,
-                      background: showExpiryList ? '#99F6E4' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#F0FDFA' : '#F8FAFC',
-                      border: showExpiryList ? '2px solid #115E59' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '2px solid #CCFBF1' : 'none',
-                      boxShadow: showExpiryList ? '0 4px 14px rgba(17, 94, 89, 0.3)' : 'none',
+                      background: showExpiryList
+                        ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
+                        : '#F0FDF4',
+                      border: showExpiryList
+                        ? 'none'
+                        : '2px solid #D1FAE5',
+                      boxShadow: showExpiryList
+                        ? '0 4px 14px rgba(16, 185, 129, 0.4)'
+                        : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
                       transform: showExpiryList ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showExpiryList ? '#115E59' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#0D9488' : '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📅</div>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showExpiryList ? 'rgba(255,255,255,0.25)' : '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📅</div>
                     <div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF', textTransform: 'uppercase' }}>{t('productExpiry')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF', lineHeight: 1 }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: showExpiryList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('productExpiry')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: showExpiryList ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
                     </div>
                   </div>
 
@@ -2307,17 +2313,23 @@ export default function App() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 8,
-                      background: showCustomerList ? '#115E59' : '#F0FDFA',
-                      border: showCustomerList ? '2px solid #115E59' : '2px solid #CCFBF1',
-                      boxShadow: showCustomerList ? '0 4px 14px rgba(17, 94, 89, 0.4)' : '0 2px 8px rgba(0,0,0,0.04)',
+                      background: showCustomerList
+                        ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
+                        : '#F0FDF4',
+                      border: showCustomerList
+                        ? 'none'
+                        : '2px solid #D1FAE5',
+                      boxShadow: showCustomerList
+                        ? '0 4px 14px rgba(16, 185, 129, 0.4)'
+                        : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
                       transform: showCustomerList ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showCustomerList ? '#FFFFFF' : '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>👥</div>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showCustomerList ? 'rgba(255,255,255,0.25)' : '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>👥</div>
                     <div>
                       <div style={{ fontSize: 9, fontWeight: 600, color: showCustomerList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('customers')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: showCustomerList ? '#FFFFFF' : '#0D9488', lineHeight: 1 }}>{customers.length}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: showCustomerList ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{customers.length}</div>
                     </div>
                   </div>
 
@@ -2359,10 +2371,10 @@ export default function App() {
                       position: 'relative'
                     }}
                   >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showHeldSales ? 'rgba(255,255,255,0.25)' : heldSales.length > 0 ? '#14B8A6' : '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📋</div>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showHeldSales ? 'rgba(255,255,255,0.25)' : '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📋</div>
                     <div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: showHeldSales ? 'rgba(255,255,255,0.9)' : heldSales.length > 0 ? '#115E59' : '#9CA3AF', textTransform: 'uppercase' }}>{t('hold')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: showHeldSales ? '#FFFFFF' : heldSales.length > 0 ? '#115E59' : '#9CA3AF', lineHeight: 1 }}>{heldSales.length > 0 ? heldSales.length : '0'}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: showHeldSales ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('hold')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: showHeldSales ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{heldSales.length > 0 ? heldSales.length : '0'}</div>
                     </div>
                     {heldSales.length > 0 && (
                       <div style={{
