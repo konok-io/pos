@@ -2448,7 +2448,6 @@ export default function App() {
 
                 {/* Payment Method Options */}
                 <div style={{ marginBottom: 8 }}>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('selectPaymentMethod')}</div>
                   <div style={{ display: 'flex', gap: 4 }}>
                     {[
                       { v: 'cash', t: t('cash'), icon: (
