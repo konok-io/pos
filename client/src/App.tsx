@@ -1119,7 +1119,6 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const { t } = useLanguage();
 
   const currentYear = new Date().getFullYear();
-  const businessName = 'My Store';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1192,7 +1191,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </div>
             <div style={{ flex: 1, textAlign: 'right' }}>
               <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#115E59' }}>
-                {businessName}
+                {t('posManagementSystem')}
               </h1>
               <div style={{
                 fontSize: 18,
@@ -1300,7 +1299,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 
           {/* Footer */}
           <div style={{ textAlign: 'center', marginTop: 18, paddingTop: 14, borderTop: '1px dashed #E5E7EB', fontSize: 14, color: '#9CA3AF' }}>
-            © {currentYear} {businessName}
+            © {currentYear} {t('posManagementSystem')}
           </div>
         </div>
       </div>
