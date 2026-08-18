@@ -1216,7 +1216,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             {/* Username */}
             <div>
               <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 3 }}>
-                👤
+                {t('username')}
               </label>
               <input
                 type="text"
@@ -1242,7 +1242,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             {/* Password */}
             <div>
               <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 3 }}>
-                🔐
+                {t('password')}
               </label>
               <input
                 type="password"
