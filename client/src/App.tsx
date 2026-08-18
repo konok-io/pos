@@ -2811,169 +2811,171 @@ export default function App() {
                     )}
 
                     {showExpiryList ? (
-                      /* Expiry list already shown above */
                       null
                     ) : showCustomerList ? (
-                      /* Customer list already shown above */
                       null
                     ) : filteredProducts.length === 0 ? (
                     <div style={{ 
                       height: '100%', 
-                      background: 'linear-gradient(135deg, #F0FDFA 0%, #ECFDF5 50%, #F0F9FF 100%)',
+                      background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)',
                       borderRadius: 16, 
                       overflow: 'hidden',
                       display: 'flex',
                       flexDirection: 'column'
                     }}>
-                      {/* Header Section */}
+                      {/* Hero Section */}
                       <div style={{ 
-                        background: 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)',
-                        padding: '24px 28px',
+                        background: 'linear-gradient(135deg, #115E59 0%, #0F766E 50%, #0D9488 100%)',
+                        padding: '28px 32px',
                         position: 'relative',
                         overflow: 'hidden'
                       }}>
-                        {/* Background Pattern */}
-                        <div style={{
-                          position: 'absolute',
-                          top: -50,
-                          right: -50,
-                          width: 200,
-                          height: 200,
-                          borderRadius: '50%',
-                          background: 'rgba(255,255,255,0.1)'
-                        }}></div>
-                        <div style={{
-                          position: 'absolute',
-                          bottom: -30,
-                          left: -30,
-                          width: 150,
-                          height: 150,
-                          borderRadius: '50%',
-                          background: 'rgba(255,255,255,0.05)'
-                        }}></div>
+                        {/* Background Decoration */}
+                        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }}></div>
+                        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}></div>
+                        <div style={{ position: 'absolute', top: '50%', right: '20%', width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }}></div>
                         
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1 }}>
-                          <img src="/Logo.png" alt="Logo" style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 18, position: 'relative', zIndex: 1 }}>
+                          <img src="/Logo.png" alt="Logo" style={{ width: 70, height: 70, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }} />
                           <div>
-                            <h1 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', margin: 0, letterSpacing: '-0.5px' }}>{t('posManagementSystem')}</h1>
-                            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', margin: '4px 0 0 0' }}>{t('smartBusinessPartner')}</p>
+                            <h1 style={{ fontSize: 26, fontWeight: 800, color: '#FFFFFF', margin: 0, letterSpacing: '-0.5px' }}>{t('posManagementSystem')}</h1>
+                            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.9)', margin: '6px 0 0 0', fontWeight: 500 }}>{t('smartBusinessPartner')}</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Stats Cards */}
-                      <div style={{ padding: '20px 24px 0', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#DCFCE7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📦</div>
-                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>STOCK</span>
-                          </div>
-                          <div style={{ fontSize: 22, fontWeight: 800, color: '#15803D' }}>{products.filter(p => p.stock > 0).length}</div>
-                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Available</div>
-                        </div>
-                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>⚠️</div>
-                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>LOW</span>
-                          </div>
-                          <div style={{ fontSize: 22, fontWeight: 800, color: '#D97706' }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
-                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Stock Alert</div>
-                        </div>
-                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🚫</div>
-                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>OUT</span>
-                          </div>
-                          <div style={{ fontSize: 22, fontWeight: 800, color: '#DC2626' }}>{products.filter(p => p.stock <= 0).length}</div>
-                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Out of Stock</div>
-                        </div>
-                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#E0E7FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>👥</div>
-                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>CUSTOMER</span>
-                          </div>
-                          <div style={{ fontSize: 22, fontWeight: 800, color: '#4F46E5' }}>{customers.length}</div>
-                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Total</div>
+                      {/* What is POS Section */}
+                      <div style={{ padding: '24px 32px 0' }}>
+                        <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
+                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🏪</span>
+                            POS কি?
+                          </h2>
+                          <p style={{ fontSize: 13, color: '#64748B', margin: 0, lineHeight: 1.7 }}>
+                            <strong style={{ color: '#374151' }}>POS (Point of Sale)</strong> মানে হলো বিক্রয়ের পয়েন্ট - যেখানে আপনি পণ্য বিক্রি করেন এবং টাকা গ্রহণ করেন। আমাদের POS সিস্টেম আপনার দোকানের সব কাজ ডিজিটালাইজ করে - স্টক দেখা, বিক্রি করা, হিসাব রাখা সব এক জায়গায়।
+                          </p>
                         </div>
                       </div>
 
-                      {/* Sales Chart & Quick Actions */}
-                      <div style={{ padding: '16px 24px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flex: 1 }}>
-                        {/* Sales Overview */}
-                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
-                          <h3 style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: '0 0 12px 0' }}>📊 Sales Overview</h3>
-                          <div style={{ display: 'flex', alignItems: 'end', gap: 6, height: 80 }}>
-                            {[65, 45, 80, 55, 90, 70, 95, 60, 85, 75, 88, 72].map((h, i) => (
-                              <div key={i} style={{ 
-                                flex: 1, 
-                                height: `${h}%`, 
-                                background: i === 11 ? 'linear-gradient(180deg, #0D9488 0%, #115E59 100%)' : '#E5E7EB',
-                                borderRadius: 4,
-                                transition: 'all 0.3s'
-                              }}></div>
-                            ))}
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-                            <span style={{ fontSize: 10, color: '#9CA3AF' }}>Jan</span>
-                            <span style={{ fontSize: 10, color: '#9CA3AF' }}>Dec</span>
-                          </div>
-                          <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid #F3F4F6', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                            <div style={{ textAlign: 'center' }}>
-                              <div style={{ fontSize: 18, fontWeight: 700, color: '#059669' }}>৳১২,৫০০</div>
-                              <div style={{ fontSize: 10, color: '#9CA3AF' }}>Today</div>
+                      {/* How It Works */}
+                      <div style={{ padding: '0 32px 0' }}>
+                        <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
+                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>⚙️</span>
+                            কিভাবে কাজ করে?
+                          </h2>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                            <div style={{ textAlign: 'center', padding: '14px 10px', background: '#F0FDFA', borderRadius: 10 }}>
+                              <div style={{ fontSize: 28, marginBottom: 8 }}>📦</div>
+                              <div style={{ fontSize: 12, fontWeight: 600, color: '#0D9488', marginBottom: 4 }}>১. পণ্য যোগ করুন</div>
+                              <div style={{ fontSize: 11, color: '#64748B' }}>পণ্যের নাম, দাম, স্টক যোগ করুন</div>
                             </div>
-                            <div style={{ textAlign: 'center' }}>
-                              <div style={{ fontSize: 18, fontWeight: 700, color: '#4F46E5' }}>৳৮৫,০০০</div>
-                              <div style={{ fontSize: 10, color: '#9CA3AF' }}>This Month</div>
+                            <div style={{ textAlign: 'center', padding: '14px 10px', background: '#FEF3C7', borderRadius: 10 }}>
+                              <div style={{ fontSize: 28, marginBottom: 8 }}>🔍</div>
+                              <div style={{ fontSize: 12, fontWeight: 600, color: '#D97706', marginBottom: 4 }}>২. সার্চ করুন</div>
+                              <div style={{ fontSize: 11, color: '#64748B' }}>বারকোড বা নাম দিয়ে খুঁজুন</div>
+                            </div>
+                            <div style={{ textAlign: 'center', padding: '14px 10px', background: '#DCFCE7', borderRadius: 10 }}>
+                              <div style={{ fontSize: 28, marginBottom: 8 }}>💰</div>
+                              <div style={{ fontSize: 12, fontWeight: 600, color: '#15803D', marginBottom: 4 }}>৩. বিক্রি করুন</div>
+                              <div style={{ fontSize: 11, color: '#64748B' }}>কার্টে যোগ করে বিক্রি সম্পন্ন করুন</div>
                             </div>
                           </div>
                         </div>
+                      </div>
 
-                        {/* Category Distribution */}
-                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
-                          <h3 style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: '0 0 12px 0' }}>📁 Categories</h3>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                            {[
-                              { name: 'Food', icon: '🍔', count: 3, color: '#F97316', bg: '#FFF7ED' },
-                              { name: 'Drinks', icon: '🥤', count: 3, color: '#0EA5E9', bg: '#F0F9FF' },
-                              { name: 'Essentials', icon: '🛒', count: 2, color: '#8B5CF6', bg: '#F5F3FF' }
-                            ].map(cat => (
-                              <div key={cat.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', background: cat.bg, borderRadius: 8 }}>
-                                <div style={{ width: 32, height: 32, borderRadius: 8, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>{cat.icon}</div>
-                                <div style={{ flex: 1 }}>
-                                  <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{cat.name}</div>
-                                  <div style={{ fontSize: 10, color: '#9CA3AF' }}>{cat.count} products</div>
-                                </div>
-                                <div style={{ fontSize: 14, fontWeight: 700, color: cat.color }}>{Math.round(cat.count / products.length * 100)}%</div>
+                      {/* Benefits */}
+                      <div style={{ padding: '0 32px 0' }}>
+                        <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
+                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✨</span>
+                            আপনার ব্যবসায় উপকারিতা
+                          </h2>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px', background: '#F8FAFC', borderRadius: 10 }}>
+                              <span style={{ fontSize: 20 }}>⏰</span>
+                              <div>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 2 }}>সময় বাঁচায়</div>
+                                <div style={{ fontSize: 11, color: '#64748B' }}>হিসাব করতে ঘণ্টা নষ্ট নয়, ১ মিনিটে বিক্রি!</div>
                               </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px', background: '#F8FAFC', borderRadius: 10 }}>
+                              <span style={{ fontSize: 20 }}>📊</span>
+                              <div>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 2 }}>সঠিক হিসাব</div>
+                                <div style={{ fontSize: 11, color: '#64748B' }}>ভুল হিসাব নেই, সব ডিজিটাল ও নির্ভুল</div>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px', background: '#F8FAFC', borderRadius: 10 }}>
+                              <span style={{ fontSize: 20 }}>🔔</span>
+                              <div>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 2 }}>স্টক আলার্ট</div>
+                                <div style={{ fontSize: 11, color: '#64748B' }}>পণ্য শেষ হওয়ার আগেই জানাবে</div>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px', background: '#F8FAFC', borderRadius: 10 }}>
+                              <span style={{ fontSize: 20 }}>👥</span>
+                              <div>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 2 }}>কাস্টমার ম্যানেজমেন্ট</div>
+                                <div style={{ fontSize: 11, color: '#64748B' }}>কার কত বাকি, সহজে দেখুন</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Who Uses */}
+                      <div style={{ padding: '0 32px 0' }}>
+                        <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
+                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👨‍💼</span>
+                            কারা ব্যবহার করে?
+                          </h2>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                            {['🏪 কিরানা স্টোর', '🍔 খাবার দোকান', '🥤 পানীয় দোকান', '💊 ফার্মেসি', '🧴 কসমেটিক শপ', '📚 বইয়ের দোকান', '👕 কাপড়ের দোকান', '🔧 হার্ডওয়্যার শপ'].map(item => (
+                              <span key={item} style={{ padding: '8px 14px', background: '#F0FDFA', borderRadius: 20, fontSize: 12, color: '#0D9488', fontWeight: 500, border: '1px solid #CCFBF1' }}>{item}</span>
                             ))}
                           </div>
                         </div>
                       </div>
 
-                      {/* Featured Products */}
-                      <div style={{ padding: '16px 24px 20px' }}>
-                        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: '0 0 12px 0' }}>⭐ Featured Products</h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
-                          {products.slice(0, 4).map(p => (
-                            <div key={p.id} style={{ background: '#FFFFFF', borderRadius: 12, padding: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', textAlign: 'center' }}>
-                              <div style={{ width: 48, height: 48, borderRadius: 12, background: '#F0FDFA', margin: '0 auto 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>{p.image}</div>
-                              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: '#0D9488' }}>{fmt(p.sellPrice)}</div>
-                              <div style={{ fontSize: 10, color: p.stock > 10 ? '#059669' : '#D97706', marginTop: 4 }}>Stock: {p.stock}</div>
+                      {/* Stats */}
+                      <div style={{ padding: '0 32px 0' }}>
+                        <div style={{ background: 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)', borderRadius: 14, padding: 20, marginBottom: 16 }}>
+                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📈</span>
+                            আমাদের সিস্টেমের পরিসংখ্যান
+                          </h2>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 10px' }}>
+                              <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF' }}>১০০+</div>
+                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)' }}>ব্যবহারকারী</div>
                             </div>
-                          ))}
+                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 10px' }}>
+                              <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF' }}>৫০০০+</div>
+                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)' }}>দৈনিক লেনদেন</div>
+                            </div>
+                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 10px' }}>
+                              <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF' }}>৯৯.৯%</div>
+                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)' }}>Uptime</div>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Search Hint */}
-                      <div style={{ padding: '0 24px 24px' }}>
-                        <div style={{ background: 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-                          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🔍</div>
-                          <div>
-                            <div style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>{t('searchProductBarcode')}</div>
-                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>{t('orSelectCategorySupplier')}</div>
-                          </div>
+                      {/* Quick Start Guide */}
+                      <div style={{ padding: '0 32px 24px' }}>
+                        <div style={{ background: '#FEF9C3', borderRadius: 14, padding: 20, border: '2px solid #FDE047' }}>
+                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#CA8A04', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#FACC15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🚀</span>
+                            শুরু করুন
+                          </h2>
+                          <p style={{ fontSize: 13, color: '#92400E', margin: 0, lineHeight: 1.7 }}>
+                            <strong>১.</strong> উপরের <strong>পণ্য যোগ করুন</strong> বাটনে ক্লিক করে পণ্য তালিকা তৈরি করুন<br/>
+                            <strong>২.</strong> সার্চ বক্সে পণ্য খুঁজুন বা ক্যাটাগরি সিলেক্ট করুন<br/>
+                            <strong>৩.</strong> পণ্যে ক্লিক করে কার্টে যোগ করুন<br/>
+                            <strong>৪.</strong> পেমেন্ট করে বিক্রি সম্পন্ন করুন
+                          </p>
                         </div>
                       </div>
                     </div>
