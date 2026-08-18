@@ -2152,7 +2152,7 @@ export default function App() {
                     flexShrink: 0
                   }}>
                     <div style={{ 
-                      background: '#E0F2F1',
+                      background: '#F5F5F5',
                       borderRadius: 10,
                       padding: '6px 12px',
                       height: 34,
@@ -2160,11 +2160,11 @@ export default function App() {
                       alignItems: 'center',
                       gap: 6,
                       boxSizing: 'border-box',
-                      border: '1px solid #B2DFDB'
+                      border: '1px solid #E0E0E0'
                     }}>
                       <span style={{ fontSize: 14 }}>📦</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#00695C' }}>{filteredProducts.length}</span>
-                      <span style={{ fontSize: 11, color: '#4DB6AC' }}>পণ্য</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#424242' }}>{filteredProducts.length}</span>
+                      <span style={{ fontSize: 11, color: '#757575' }}>পণ্য</span>
                     </div>
                   </div>
                 </div>
