@@ -14,8 +14,6 @@
     "@capacitor/ios": "^8.5.0",
     "idb": "^8.0.3",
     "npm-check-updates": "^23.0.2",
-    "pouchdb": "^9.0.0",
-    "pouchdb-find": "^9.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",

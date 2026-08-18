@@ -1,5 +1,5 @@
 import { useState, useEffect, CSSProperties } from 'react';
-import { setSetting, getSetting, clearAllData } from '../services/database';
+import { setSetting, getSetting, clearAllData } from '../services';
 
 interface Settings {
   name: string;
