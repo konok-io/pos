@@ -1195,7 +1195,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 {t('posManagementSystem')}
               </h1>
               <div style={{
-                fontSize: 13,
+                fontSize: 15,
                 color: '#115E59',
                 fontWeight: 400,
                 marginTop: 1,
