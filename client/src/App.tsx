@@ -1909,7 +1909,7 @@ export default function App() {
                       }}
                       style={{
                         width: '100%',
-                        padding: '12px 14px',
+                        padding: '10px 14px',
                         border: 'none',
                         background: language === lang.code ? '#F0FDFA' : '#FFFFFF',
                         cursor: 'pointer',
@@ -2045,7 +2045,7 @@ export default function App() {
                           <div
                             key={c.id}
                             onClick={() => { setSelectedCustomer(c); setCustomerSearch(''); }}
-                            style={{ padding: '12px 14px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'background 0.15s' }}
+                            style={{ padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'background 0.15s' }}
                             onMouseEnter={(e) => e.currentTarget.style.background = '#F0FDFA'}
                             onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
                           >
@@ -2786,7 +2786,7 @@ export default function App() {
             <div style={{ width: 360, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: '1px solid #e5e7eb' }}>
               {/* Barcode Scan - Professional Design */}
               <div style={{ 
-                padding: '12px 14px', 
+                padding: '10px 14px', 
                 borderBottom: '1px solid #E5E7EB', 
                 background: 'linear-gradient(135deg, #1E3A5F 0%, #2D5A87 100%)',
                 flexShrink: 0,
@@ -2830,7 +2830,7 @@ export default function App() {
                   
                   {/* Scan Button */}
                   <button style={{
-                    width: 40,
+                    width: 44,
                     height: 40,
                     borderRadius: 10,
                     background: 'rgba(255,255,255,0.2)',
@@ -2974,7 +2974,7 @@ export default function App() {
                 {/* Payment Input */}
                 <input value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
                   placeholder={`${t('paid')} (${currency})`}
-                  style={{ padding: '12px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 8, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#115E59', outline: 'none' }}
+                  style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 8, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#115E59', outline: 'none' }}
                 />
 
                 {/* Payment Method Options */}
