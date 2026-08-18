@@ -2195,10 +2195,10 @@ export default function App() {
                       gap: 8,
                       background: stockFilter === 'available'
                         ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
-                        : '#F0FDF4',
+                        : '#F5F5F5',
                       border: stockFilter === 'available'
                         ? 'none'
-                        : '2px solid #D1FAE5',
+                        : '1px solid #E0E0E0',
                       boxShadow: stockFilter === 'available'
                         ? '0 4px 14px rgba(16, 185, 129, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
@@ -2225,10 +2225,10 @@ export default function App() {
                       gap: 8,
                       background: stockFilter === 'low'
                         ? 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)'
-                        : '#FFF7ED',
+                        : '#F5F5F5',
                       border: stockFilter === 'low'
                         ? 'none'
-                        : '2px solid #FED7AA',
+                        : '1px solid #E0E0E0',
                       boxShadow: stockFilter === 'low'
                         ? '0 4px 14px rgba(217, 119, 6, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
@@ -2255,10 +2255,10 @@ export default function App() {
                       gap: 8,
                       background: stockFilter === 'out'
                         ? 'linear-gradient(135deg, #DC2626 0%, #EF4444 100%)'
-                        : '#FEF2F2',
+                        : '#F5F5F5',
                       border: stockFilter === 'out'
                         ? 'none'
-                        : '2px solid #FECACA',
+                        : '1px solid #E0E0E0',
                       boxShadow: stockFilter === 'out'
                         ? '0 4px 14px rgba(220, 38, 38, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
@@ -2285,10 +2285,10 @@ export default function App() {
                       gap: 8,
                       background: showExpiryList
                         ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
-                        : '#F0FDF4',
+                        : '#F5F5F5',
                       border: showExpiryList
                         ? 'none'
-                        : '2px solid #D1FAE5',
+                        : '1px solid #E0E0E0',
                       boxShadow: showExpiryList
                         ? '0 4px 14px rgba(16, 185, 129, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
@@ -2315,10 +2315,10 @@ export default function App() {
                       gap: 8,
                       background: showCustomerList
                         ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
-                        : '#F0FDF4',
+                        : '#F5F5F5',
                       border: showCustomerList
                         ? 'none'
-                        : '2px solid #D1FAE5',
+                        : '1px solid #E0E0E0',
                       boxShadow: showCustomerList
                         ? '0 4px 14px rgba(16, 185, 129, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
@@ -2357,12 +2357,10 @@ export default function App() {
                       gap: 8,
                       background: showHeldSales
                         ? 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)'
-                        : heldSales.length > 0
-                          ? '#F0FDFA'
-                          : '#F9FAFB',
+                        : '#F5F5F5',
                       border: showHeldSales
                         ? 'none'
-                        : '2px solid ' + (heldSales.length > 0 ? '#99F6E4' : '#E5E7EB'),
+                        : '1px solid #E0E0E0',
                       boxShadow: showHeldSales
                         ? '0 4px 14px rgba(15, 118, 110, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
