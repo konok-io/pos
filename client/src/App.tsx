@@ -1195,9 +1195,9 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 {t('posManagementSystem')}
               </h1>
               <div style={{
-                fontSize: 18,
+                fontSize: 22,
                 color: '#115E59',
-                fontWeight: 600,
+                fontWeight: 400,
                 marginTop: 4,
               }}>
                 {t('smartBusinessPartner')}
