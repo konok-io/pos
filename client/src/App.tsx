@@ -1141,7 +1141,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.8)',
+      background: '#FFFFFF', border: '1px solid #D1D5DB',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -1948,7 +1948,7 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.8)',
+                background: '#FFFFFF', border: '1px solid #D1D5DB',
                 padding: '10px 20px',
                 boxShadow: 'none',
                 position: 'relative',
@@ -1967,13 +1967,13 @@ export default function App() {
                     minWidth: 200,
                     background: '#FFFFFF',
                     borderRadius: 10,
-                    border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'none',
+                    border: '1px solid #D1D5DB', boxShadow: 'none',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.8)',
+                      background: '#FFFFFF', border: '1px solid #D1D5DB',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
@@ -2007,7 +2007,7 @@ export default function App() {
                     minWidth: 160,
                     background: '#FFFFFF',
                     borderRadius: 10,
-                    border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'none',
+                    border: '1px solid #D1D5DB', boxShadow: 'none',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
@@ -2788,7 +2788,7 @@ export default function App() {
               <div style={{ 
                 padding: '10px 20px', 
                 borderBottom: '1px solid #E5E7EB', 
-                background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.8)',
+                background: '#FFFFFF', border: '1px solid #D1D5DB',
                 flexShrink: 0,
                 position: 'relative',
                 overflow: 'hidden'
@@ -2802,13 +2802,13 @@ export default function App() {
                   position: 'relative', 
                   background: '#FFFFFF',
                   borderRadius: 10,
-                  border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'none',
+                  border: '1px solid #D1D5DB', boxShadow: 'none',
                   overflow: 'hidden'
                 }}>
                   <div style={{ 
                     position: 'absolute', left: 0, top: 0, bottom: 0, 
                     width: 40, 
-                    background: '#FFFFFF', border: '1px solid rgba(255,255,255,0.8)',
+                    background: '#FFFFFF', border: '1px solid #D1D5DB',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     borderRadius: '10px 0 0 10px'
                   }}>
