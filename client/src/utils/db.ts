@@ -1,6 +1,7 @@
 // IndexedDB Database Utility for POS - Complete Solution
+// Uses the same database as localDb (pos-offline-db) for consistency
 
-const DB_NAME = 'pos_database';
+const DB_NAME = 'pos-offline-db';
 const DB_VERSION = 2;
 
 class Database {
@@ -27,7 +28,7 @@ class Database {
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
 
-        // Create all object stores
+        // Create all object stores with keyPath 'key' for settings-style storage
         const stores = ['translations', 'settings', 'sales', 'products', 'categories', 'customers', 'sync', 'users', 'cart', 'heldSales'];
         
         stores.forEach(storeName => {
@@ -68,7 +69,7 @@ class Database {
 
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
-        resolve(request.result?.map((item: any) => item.value) ?? []);
+        resolve(request.result ?? []);
       };
     });
   }
