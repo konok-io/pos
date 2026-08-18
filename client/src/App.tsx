@@ -2172,6 +2172,217 @@ export default function App() {
 
               {/* Product grid */}
               <div style={{ flex: 1, overflow: 'auto', padding: 16, background: '#F9FAFB' }}>
+
+                {/* Stock Summary Cards - Top */}
+                <div style={{
+                  padding: '10px 0',
+                  display: 'flex',
+                  gap: 10,
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  justifyContent: 'space-around',
+                  marginBottom: 12
+                }}>
+                  {/* Stock Available Card */}
+                  <div
+                    onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: 10,
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: stockFilter === 'available'
+                        ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
+                        : '#F0FDF4',
+                      border: stockFilter === 'available'
+                        ? 'none'
+                        : '2px solid #D1FAE5',
+                      boxShadow: stockFilter === 'available'
+                        ? '0 4px 14px rgba(16, 185, 129, 0.4)'
+                        : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: stockFilter === 'available' ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'available' ? 'rgba(255,255,255,0.25)' : '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📦</div>
+                    <div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'available' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockAvailable')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'available' ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.stock > 0).length}</div>
+                    </div>
+                  </div>
+
+                  {/* Low Stock Card */}
+                  <div
+                    onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: 10,
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: stockFilter === 'low'
+                        ? 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)'
+                        : '#FFF7ED',
+                      border: stockFilter === 'low'
+                        ? 'none'
+                        : '2px solid #FED7AA',
+                      boxShadow: stockFilter === 'low'
+                        ? '0 4px 14px rgba(217, 119, 6, 0.4)'
+                        : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: stockFilter === 'low' ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>⚠️</div>
+                    <div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'low' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockLow')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'low' ? '#FFFFFF' : '#D97706', lineHeight: 1 }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
+                    </div>
+                  </div>
+
+                  {/* Stock Out Card */}
+                  <div
+                    onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: 10,
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: stockFilter === 'out'
+                        ? 'linear-gradient(135deg, #DC2626 0%, #EF4444 100%)'
+                        : '#FEF2F2',
+                      border: stockFilter === 'out'
+                        ? 'none'
+                        : '2px solid #FECACA',
+                      boxShadow: stockFilter === 'out'
+                        ? '0 4px 14px rgba(220, 38, 38, 0.4)'
+                        : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: stockFilter === 'out' ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'out' ? 'rgba(255,255,255,0.25)' : '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>🚫</div>
+                    <div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'out' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockOut')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626', lineHeight: 1 }}>{products.filter(p => p.stock <= 0).length}</div>
+                    </div>
+                  </div>
+
+                  {/* Expiry Card */}
+                  <div
+                    onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); setShowHeldSales(false); setStockFilter('all'); }}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: 10,
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: showExpiryList ? '#99F6E4' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#F0FDFA' : '#F8FAFC',
+                      border: showExpiryList ? '2px solid #115E59' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '2px solid #CCFBF1' : 'none',
+                      boxShadow: showExpiryList ? '0 4px 14px rgba(17, 94, 89, 0.3)' : 'none',
+                      transition: 'all 0.2s ease',
+                      transform: showExpiryList ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showExpiryList ? '#115E59' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#0D9488' : '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📅</div>
+                    <div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF', textTransform: 'uppercase' }}>{t('productExpiry')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF', lineHeight: 1 }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
+                    </div>
+                  </div>
+
+                  {/* Customer Card */}
+                  <div
+                    onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); setShowHeldSales(false); setStockFilter('all'); }}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: 10,
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: showCustomerList ? '#115E59' : '#F0FDFA',
+                      border: showCustomerList ? '2px solid #115E59' : '2px solid #CCFBF1',
+                      boxShadow: showCustomerList ? '0 4px 14px rgba(17, 94, 89, 0.4)' : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: showCustomerList ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showCustomerList ? '#FFFFFF' : '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>👥</div>
+                    <div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: showCustomerList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('customers')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: showCustomerList ? '#FFFFFF' : '#0D9488', lineHeight: 1 }}>{customers.length}</div>
+                    </div>
+                  </div>
+
+                  {/* Hold Card */}
+                  <div
+                    onClick={() => {
+                      if (showHeldSales) {
+                        setShowHeldSales(false);
+                      } else {
+                        setSearchQuery('');
+                        setSelectedCategory('all');
+                        setSelectedSupplier('all');
+                        setStockFilter('all');
+                        setShowHeldSales(true);
+                        setShowExpiryList(false);
+                        setShowCustomerList(false);
+                      }
+                    }}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: 10,
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      background: showHeldSales
+                        ? 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)'
+                        : heldSales.length > 0
+                          ? '#F0FDFA'
+                          : '#F9FAFB',
+                      border: showHeldSales
+                        ? 'none'
+                        : '2px solid ' + (heldSales.length > 0 ? '#99F6E4' : '#E5E7EB'),
+                      boxShadow: showHeldSales
+                        ? '0 4px 14px rgba(15, 118, 110, 0.4)'
+                        : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: showHeldSales ? 'translateY(-1px)' : 'none',
+                      position: 'relative'
+                    }}
+                  >
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showHeldSales ? 'rgba(255,255,255,0.25)' : heldSales.length > 0 ? '#14B8A6' : '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📋</div>
+                    <div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: showHeldSales ? 'rgba(255,255,255,0.9)' : heldSales.length > 0 ? '#115E59' : '#9CA3AF', textTransform: 'uppercase' }}>{t('hold')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: showHeldSales ? '#FFFFFF' : heldSales.length > 0 ? '#115E59' : '#9CA3AF', lineHeight: 1 }}>{heldSales.length > 0 ? heldSales.length : '0'}</div>
+                    </div>
+                    {heldSales.length > 0 && (
+                      <div style={{
+                        position: 'absolute',
+                        top: -6,
+                        right: -6,
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        background: '#EF4444',
+                        color: '#fff',
+                        fontSize: 8,
+                        fontWeight: 700,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>{heldSales.length}</div>
+                    )}
+                  </div>
+                </div>
                 
                 {/* Show Held Sales Only - When hold is open and no filter active */}
                 {showHeldSales && !showProductsGrid && (
@@ -2572,224 +2783,6 @@ export default function App() {
                   </>
                 )}
 
-                {/* Stock Summary Footer */}
-                <div style={{
-                  padding: '10px 20px',
-                  background: '#FFFFFF',
-                  borderTop: '1px solid #E5E7EB',
-                  display: 'flex',
-                  gap: 10,
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  justifyContent: 'space-around',
-                  flexShrink: 0,
-                  position: 'sticky',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  zIndex: 10,
-                  boxShadow: '0 -2px 10px rgba(0,0,0,0.08)'
-                }}>
-                  {/* Stock Available Card */}
-                  <div
-                    onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
-                    style={{
-                      cursor: 'pointer',
-                      borderRadius: 10,
-                      padding: '8px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      background: stockFilter === 'available'
-                        ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
-                        : '#F0FDF4',
-                      border: stockFilter === 'available'
-                        ? 'none'
-                        : '2px solid #D1FAE5',
-                      boxShadow: stockFilter === 'available'
-                        ? '0 4px 14px rgba(16, 185, 129, 0.4)'
-                        : '0 2px 8px rgba(0,0,0,0.04)',
-                      transition: 'all 0.2s ease',
-                      transform: stockFilter === 'available' ? 'translateY(-1px)' : 'none'
-                    }}
-                  >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'available' ? 'rgba(255,255,255,0.25)' : '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📦</div>
-                    <div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'available' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockAvailable')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'available' ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.stock > 0).length}</div>
-                    </div>
-                  </div>
-
-                  {/* Low Stock Card */}
-                  <div
-                    onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
-                    style={{
-                      cursor: 'pointer',
-                      borderRadius: 10,
-                      padding: '8px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      background: stockFilter === 'low'
-                        ? 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)'
-                        : '#FFF7ED',
-                      border: stockFilter === 'low'
-                        ? 'none'
-                        : '2px solid #FED7AA',
-                      boxShadow: stockFilter === 'low'
-                        ? '0 4px 14px rgba(217, 119, 6, 0.4)'
-                        : '0 2px 8px rgba(0,0,0,0.04)',
-                      transition: 'all 0.2s ease',
-                      transform: stockFilter === 'low' ? 'translateY(-1px)' : 'none'
-                    }}
-                  >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>⚠️</div>
-                    <div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'low' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockLow')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'low' ? '#FFFFFF' : '#D97706', lineHeight: 1 }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
-                    </div>
-                  </div>
-
-                  {/* Stock Out Card */}
-                  <div
-                    onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
-                    style={{
-                      cursor: 'pointer',
-                      borderRadius: 10,
-                      padding: '8px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      background: stockFilter === 'out'
-                        ? 'linear-gradient(135deg, #DC2626 0%, #EF4444 100%)'
-                        : '#FEF2F2',
-                      border: stockFilter === 'out'
-                        ? 'none'
-                        : '2px solid #FECACA',
-                      boxShadow: stockFilter === 'out'
-                        ? '0 4px 14px rgba(220, 38, 38, 0.4)'
-                        : '0 2px 8px rgba(0,0,0,0.04)',
-                      transition: 'all 0.2s ease',
-                      transform: stockFilter === 'out' ? 'translateY(-1px)' : 'none'
-                    }}
-                  >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'out' ? 'rgba(255,255,255,0.25)' : '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>🚫</div>
-                    <div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'out' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockOut')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626', lineHeight: 1 }}>{products.filter(p => p.stock <= 0).length}</div>
-                    </div>
-                  </div>
-
-                  {/* Expiry Card */}
-                  <div
-                    onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); setShowHeldSales(false); setStockFilter('all'); }}
-                    style={{
-                      cursor: 'pointer',
-                      borderRadius: 10,
-                      padding: '8px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      background: showExpiryList ? '#99F6E4' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#F0FDFA' : '#F8FAFC',
-                      border: showExpiryList ? '2px solid #115E59' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '2px solid #CCFBF1' : 'none',
-                      boxShadow: showExpiryList ? '0 4px 14px rgba(17, 94, 89, 0.3)' : 'none',
-                      transition: 'all 0.2s ease',
-                      transform: showExpiryList ? 'translateY(-1px)' : 'none'
-                    }}
-                  >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showExpiryList ? '#115E59' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#0D9488' : '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📅</div>
-                    <div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF', textTransform: 'uppercase' }}>{t('productExpiry')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF', lineHeight: 1 }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
-                    </div>
-                  </div>
-
-                  {/* Customer Card */}
-                  <div
-                    onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); setShowHeldSales(false); setStockFilter('all'); }}
-                    style={{
-                      cursor: 'pointer',
-                      borderRadius: 10,
-                      padding: '8px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      background: showCustomerList ? '#115E59' : '#F0FDFA',
-                      border: showCustomerList ? '2px solid #115E59' : '2px solid #CCFBF1',
-                      boxShadow: showCustomerList ? '0 4px 14px rgba(17, 94, 89, 0.4)' : '0 2px 8px rgba(0,0,0,0.04)',
-                      transition: 'all 0.2s ease',
-                      transform: showCustomerList ? 'translateY(-1px)' : 'none'
-                    }}
-                  >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showCustomerList ? '#FFFFFF' : '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>👥</div>
-                    <div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: showCustomerList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('customers')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: showCustomerList ? '#FFFFFF' : '#0D9488', lineHeight: 1 }}>{customers.length}</div>
-                    </div>
-                  </div>
-
-                  {/* Hold Card */}
-                  <div
-                    onClick={() => {
-                      if (showHeldSales) {
-                        setShowHeldSales(false);
-                      } else {
-                        setSearchQuery('');
-                        setSelectedCategory('all');
-                        setSelectedSupplier('all');
-                        setStockFilter('all');
-                        setShowHeldSales(true);
-                        setShowExpiryList(false);
-                        setShowCustomerList(false);
-                      }
-                    }}
-                    style={{
-                      cursor: 'pointer',
-                      borderRadius: 10,
-                      padding: '8px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      background: showHeldSales
-                        ? 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)'
-                        : heldSales.length > 0
-                          ? '#F0FDFA'
-                          : '#F9FAFB',
-                      border: showHeldSales
-                        ? 'none'
-                        : '2px solid ' + (heldSales.length > 0 ? '#99F6E4' : '#E5E7EB'),
-                      boxShadow: showHeldSales
-                        ? '0 4px 14px rgba(15, 118, 110, 0.4)'
-                        : '0 2px 8px rgba(0,0,0,0.04)',
-                      transition: 'all 0.2s ease',
-                      transform: showHeldSales ? 'translateY(-1px)' : 'none',
-                      position: 'relative'
-                    }}
-                  >
-                    <div style={{ width: 24, height: 24, borderRadius: 6, background: showHeldSales ? 'rgba(255,255,255,0.25)' : heldSales.length > 0 ? '#14B8A6' : '#9CA3AF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📋</div>
-                    <div>
-                      <div style={{ fontSize: 9, fontWeight: 600, color: showHeldSales ? 'rgba(255,255,255,0.9)' : heldSales.length > 0 ? '#115E59' : '#9CA3AF', textTransform: 'uppercase' }}>{t('hold')}</div>
-                      <div style={{ fontSize: 14, fontWeight: 800, color: showHeldSales ? '#FFFFFF' : heldSales.length > 0 ? '#115E59' : '#9CA3AF', lineHeight: 1 }}>{heldSales.length > 0 ? heldSales.length : '0'}</div>
-                    </div>
-                    {heldSales.length > 0 && (
-                      <div style={{
-                        position: 'absolute',
-                        top: -6,
-                        right: -6,
-                        width: 16,
-                        height: 16,
-                        borderRadius: '50%',
-                        background: '#EF4444',
-                        color: '#fff',
-                        fontSize: 8,
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>{heldSales.length}</div>
-                    )}
-                  </div>
-                </div>
               </div>
             </div>
 
