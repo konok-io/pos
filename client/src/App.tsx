@@ -1802,16 +1802,16 @@ export default function App() {
             {/* Fixed First Item (Sales) - Separate container */}
             <div style={{ flexShrink: 0, padding: '4px 6px 4px 4px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', marginRight: 4 }}>
               <button onClick={() => setCurrentTab('pos')} style={{
-                padding: '7px 12px',
+                padding: '5px 10px',
                 border: 'none',
                 background: currentTab === 'pos' ? '#E0E0E0' : 'transparent',
                 cursor: 'pointer',
                 color: '#000000',
                 fontWeight: 600,
-                fontSize: 14,
+                fontSize: 13,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 5,
                 whiteSpace: 'nowrap',
                 fontFamily: 'inherit',
                 transition: 'all 0.2s',
@@ -1831,16 +1831,16 @@ export default function App() {
               <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1, minWidth: 0 }}>
                 {otherTabs.map((t) => (
                   <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
-                    padding: '7px 12px',
+                    padding: '5px 10px',
                     border: 'none',
                     background: currentTab === t.id ? '#E0E0E0' : 'transparent',
                     cursor: 'pointer',
                     color: '#000000',
                     fontWeight: 600,
-                    fontSize: 14,
+                    fontSize: 13,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 6,
+                    gap: 5,
                     whiteSpace: 'nowrap',
                     fontFamily: 'inherit',
                     transition: 'all 0.2s',
