@@ -11,6 +11,7 @@ export const hi: Record<string, string> = {
   customers: 'ग्राहक',
   purchases: 'खरीदारी',
   expenses: 'खर्च',
+  incomeExpenses: 'आय/खर्च',
   reports: 'रिपोर्ट',
   settings: 'सेटिंग्स',
   logout: 'लॉगआउट',

@@ -11,6 +11,7 @@ export const bn: Record<string, string> = {
   customers: 'কাস্টমার',
   purchases: 'ক্রয়',
   expenses: 'ব্যয়',
+  incomeExpenses: 'ইনকাম/এক্সপেন্স',
   reports: 'রিপোর্ট',
   settings: 'সেটিংস',
   logout: 'লগআউট',

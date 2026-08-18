@@ -11,6 +11,7 @@ export const ar: Record<string, string> = {
   customers: 'العملاء',
   purchases: 'المشتريات',
   expenses: 'المصروفات',
+  incomeExpenses: 'الدخل/المصروفات',
   reports: 'التقارير',
   settings: 'الإعدادات',
   logout: 'تسجيل الخروج',

@@ -356,9 +356,8 @@ export default function App() {
     { id: 'suppliers', icon: '📋', label: t('suppliers') },
     { id: 'customers', icon: '👥', label: t('customers') },
     { id: 'inventory', icon: '🏭', label: t('stock') },
-    { id: 'lowstock', icon: '⚠️', label: t('stockLow') },
     { id: 'sales', icon: '🧾', label: t('salesList') },
-    { id: 'income', icon: '💰', label: t('expenses') },
+    { id: 'income', icon: '💰', label: t('incomeExpenses') },
     { id: 'reports', icon: '📈', label: t('reports') },
     { id: 'translations', icon: '🌐', label: 'Translations' },
     { id: 'database', icon: '🗄️', label: t('database') },
@@ -1841,21 +1840,18 @@ export default function App() {
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockAvailable')}</div>
               </div>
             </div>
-          </div>
-        )}
-
-        {currentTab === 'lowstock' && (
-          <div>
-            <h2 style={{ marginBottom: 16, color: '#DC2626' }}>⚠️ {t('lowStockAlert')}</h2>
-            <div className="card">
-              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 40 }}>{t('noLowStockProducts')}</p>
+            
+            {/* Low Stock Alert Section */}
+            <div className="card" style={{ border: '1px solid #FECACA', background: '#FEF2F2' }}>
+              <h3 style={{ marginBottom: 12, color: '#DC2626' }}>⚠️ {t('lowStockAlert')}</h3>
+              <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 20 }}>{t('noLowStockProducts')}</p>
             </div>
           </div>
         )}
 
         {currentTab === 'income' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}>💰 {t('expenses')}</h2>
+            <h2 style={{ marginBottom: 16 }}>💰 {t('incomeExpenses')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📈</div>

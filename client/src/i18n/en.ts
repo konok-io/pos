@@ -11,6 +11,7 @@ export const en: Record<string, string> = {
   customers: 'Customers',
   purchases: 'Purchases',
   expenses: 'Expenses',
+  incomeExpenses: 'Income/Expenses',
   reports: 'Reports',
   settings: 'Settings',
   logout: 'Logout',
