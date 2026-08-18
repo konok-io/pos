@@ -1141,7 +1141,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#FFFFFF', border: '1px solid #D1D5DB',
+      background: '#115E59', border: '1px solid #115E59',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -1948,7 +1948,7 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: '#FFFFFF', border: '1px solid #D1D5DB',
+                background: '#115E59', border: '1px solid #115E59',
                 padding: '10px 20px',
                 boxShadow: 'none',
                 position: 'relative',
@@ -1973,7 +1973,7 @@ export default function App() {
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: '#FFFFFF', border: '1px solid #D1D5DB',
+                      background: '#115E59', border: '1px solid #115E59',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
@@ -2084,7 +2084,7 @@ export default function App() {
                         padding: '0 12px',
                         fontSize: 13,
                         borderRadius: 10,
-                        border: '2px solid rgba(255,255,255,0.3)',
+                        border: '1px solid #D1D5DB',
                         background: 'rgba(255,255,255,0.95)',
                         outline: 'none',
                         cursor: 'pointer',
@@ -2120,7 +2120,7 @@ export default function App() {
                         padding: '0 12px',
                         fontSize: 13,
                         borderRadius: 10,
-                        border: '2px solid rgba(255,255,255,0.3)',
+                        border: '1px solid #D1D5DB',
                         background: 'rgba(255,255,255,0.95)',
                         outline: 'none',
                         cursor: 'pointer',
@@ -2788,7 +2788,7 @@ export default function App() {
               <div style={{ 
                 padding: '10px 20px', 
                 borderBottom: '1px solid #E5E7EB', 
-                background: '#FFFFFF', border: '1px solid #D1D5DB',
+                background: '#115E59', border: '1px solid #115E59',
                 flexShrink: 0,
                 position: 'relative',
                 overflow: 'hidden'
@@ -2808,7 +2808,7 @@ export default function App() {
                   <div style={{ 
                     position: 'absolute', left: 0, top: 0, bottom: 0, 
                     width: 40, 
-                    background: '#FFFFFF', border: '1px solid #D1D5DB',
+                    background: '#115E59', border: '1px solid #115E59',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     borderRadius: '10px 0 0 10px'
                   }}>
