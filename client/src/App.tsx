@@ -2605,7 +2605,7 @@ export default function App() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F0FDFA', border: '2px solid #CCFBF1', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>📅</div>
-                            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#115E59', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
+                            <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
                           </div>
                           <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 14px', borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 12, cursor: 'pointer', color: '#DC2626', fontWeight: 600 }}>✕ Close</button>
                         </div>
@@ -2641,7 +2641,7 @@ export default function App() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F0FDFA', border: '2px solid #CCFBF1', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>👥</div>
-                            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#115E59', margin: 0 }}>{t('customers')} ({customers.length})</h3>
+                            <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('customers')} ({customers.length})</h3>
                           </div>
                           <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 14px', borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 12, cursor: 'pointer', color: '#DC2626', fontWeight: 600 }}>✕ Close</button>
                         </div>
