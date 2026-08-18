@@ -1949,7 +1949,7 @@ export default function App() {
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
                 background: 'linear-gradient(135deg, #115E59 0%, #0F766E 50%, #115E59 100%)',
-                padding: '16px 20px',
+                padding: '12px 20px',
                 boxShadow: '0 4px 20px rgba(15,118,110,0.3)',
                 position: 'relative',
                 overflow: 'hidden'
@@ -1958,24 +1958,7 @@ export default function App() {
                 <div style={{ position: 'absolute', top: '-20px', right: '-20px', width: '120px', height: '120px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
                 <div style={{ position: 'absolute', bottom: '-30px', left: '30%', width: '80px', height: '80px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
                 
-                {/* Section Header */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                  <div style={{ 
-                    width: 36, height: 36, 
-                    background: 'rgba(255,255,255,0.2)', 
-                    borderRadius: 10, 
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    backdropFilter: 'blur(10px)'
-                  }}>
-                    <span style={{ fontSize: 18 }}>🔍</span>
-                  </div>
-                  <div>
-                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: '0.3px' }}>{t('searchProductBarcode')}</h3>
-                    <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{t('orSelectCategorySupplier')}</p>
-                  </div>
-                </div>
-
-                {/* Search Inputs Row */}
+                {/* Search Inputs Row - Compact Design */}
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                   {/* Product Name Search - Enhanced Card */}
                   <div style={{ 
