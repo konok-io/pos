@@ -2449,36 +2449,30 @@ export default function App() {
                 {/* Payment Method Options */}
                 <div style={{ marginBottom: 8 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('selectPaymentMethod')}</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     {[
-                      { v: 'cash', l: '💵', t: t('cash') },
-                      { v: 'card', l: '💳', t: t('card') },
-                      { v: 'bank', l: '🏦', t: t('bank') },
-                      { v: 'mobile', l: '📱', t: t('mobile') },
+                      { v: 'cash', t: t('cash') },
+                      { v: 'card', t: t('card') },
+                      { v: 'bank', t: t('bank') },
+                      { v: 'mobile', t: t('mobile') },
                     ].map(pm => (
                       <button
                         key={pm.v}
                         type="button"
                         onClick={() => setPaymentMethod(pm.v)}
                         style={{
-                          padding: '8px 4px',
-                          background: paymentMethod === pm.v ? '#115E59' : '#F9FAFB',
+                          padding: '6px 12px',
+                          background: paymentMethod === pm.v ? '#115E59' : 'transparent',
                           color: paymentMethod === pm.v ? '#FFFFFF' : '#6B7280',
                           border: paymentMethod === pm.v ? 'none' : '1px solid #e5e7eb',
-                          borderRadius: 8,
+                          borderRadius: 4,
                           fontSize: 12,
                           fontWeight: 600,
                           cursor: 'pointer',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          gap: 2,
                           transition: 'all 0.2s',
-                          boxShadow: paymentMethod === pm.v ? '0 2px 8px rgba(17,94,89,0.3)' : 'none',
                         }}
                       >
-                        <span style={{ fontSize: 18 }}>{pm.l}</span>
-                        <span>{pm.t}</span>
+                        {pm.t}
                       </button>
                     ))}
                   </div>
