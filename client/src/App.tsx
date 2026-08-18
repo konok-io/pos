@@ -1349,6 +1349,7 @@ function TimeDisplay({ language }: { language: string }) {
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false); // Prevent save before initial load
   const [currentTab, setCurrentTab] = useState('pos');
 
   // Language state
@@ -1529,13 +1530,15 @@ export default function App() {
         setSales(savedSales);
       }
       
+      setIsInitialized(true); // Mark as initialized before enabling saves
       setIsLoading(false);
     };
     initApp();
   }, []);
 
-  // Save cart state to IndexedDB whenever it changes
+  // Save cart state to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
+    if (!isInitialized) return;
     const saveCartData = async () => {
       const cartData = {
         cart,
@@ -1549,55 +1552,60 @@ export default function App() {
       await db.put('cart', 'cartData', cartData);
     };
     saveCartData();
-  }, [cart, selectedCustomer, customerSearch, discount, vatPercent, paidAmount, paymentMethod]);
+  }, [isInitialized, cart, selectedCustomer, customerSearch, discount, vatPercent, paidAmount, paymentMethod]);
 
-  // Save held sales to IndexedDB whenever it changes
+  // Save held sales to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
+    if (!isInitialized) return;
     const saveHeldSales = async () => {
       await db.put('heldSales', 'heldSales', heldSales);
     };
     saveHeldSales();
-  }, [heldSales]);
+  }, [isInitialized, heldSales]);
 
-  // Save products to IndexedDB whenever it changes
+  // Save products to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
+    if (!isInitialized) return;
     const saveProducts = async () => {
       for (const product of products) {
         await db.put('products', product.id, product);
       }
     };
     if (products.length > 0) saveProducts();
-  }, [products]);
+  }, [isInitialized, products]);
 
-  // Save categories to IndexedDB whenever it changes
+  // Save categories to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
+    if (!isInitialized) return;
     const saveCategories = async () => {
       for (const category of categories) {
         await db.put('categories', category.id, category);
       }
     };
     if (categories.length > 0) saveCategories();
-  }, [categories]);
+  }, [isInitialized, categories]);
 
-  // Save customers to IndexedDB whenever it changes
+  // Save customers to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
+    if (!isInitialized) return;
     const saveCustomers = async () => {
       for (const customer of customers) {
         await db.put('customers', customer.id, customer);
       }
     };
     if (customers.length > 0) saveCustomers();
-  }, [customers]);
+  }, [isInitialized, customers]);
 
-  // Save sales to IndexedDB whenever it changes
+  // Save sales to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
+    if (!isInitialized) return;
     const saveSales = async () => {
       for (const sale of sales) {
         await db.put('sales', sale.id, sale);
       }
     };
     if (sales.length > 0) saveSales();
-  }, [sales]);
+  }, [isInitialized, sales]);
 
   const handleLogin = () => setIsLoggedIn(true);
 
