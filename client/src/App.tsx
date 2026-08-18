@@ -1210,13 +1210,13 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <div style={{
           background: '#fff',
           borderRadius: '0 0 20px 20px',
-          padding: '16px 24px 20px',
+          padding: '12px 20px 16px',
         }}>
           <form onSubmit={handleLogin} style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             {/* Username */}
-            <div style={{ flex: 1 }}>
+            <div>
               <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 3 }}>
-                👤 {t('username')}
+                👤
               </label>
               <input
                 type="text"
@@ -1225,7 +1225,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 placeholder={t('usernamePlaceholder')}
                 required
                 style={{
-                  width: '100%',
+                  width: 140,
                   padding: '8px 10px',
                   fontSize: 13,
                   border: '2px solid #E5E7EB',
@@ -1240,9 +1240,9 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </div>
 
             {/* Password */}
-            <div style={{ width: 120 }}>
+            <div>
               <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 3 }}>
-                🔐 {t('password')}
+                🔐
               </label>
               <input
                 type="password"
@@ -1251,7 +1251,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 placeholder={t('passwordPlaceholder')}
                 required
                 style={{
-                  width: '100%',
+                  width: 100,
                   padding: '8px 10px',
                   fontSize: 13,
                   border: '2px solid #E5E7EB',
