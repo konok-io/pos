@@ -2355,7 +2355,7 @@ export default function App() {
 
                   {/* Product Expiry Card */}
                   <div
-                    onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); }}
+                    onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); setShowHeldSales(false); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2399,7 +2399,7 @@ export default function App() {
 
                   {/* Customer Card */}
                   <div
-                    onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); }}
+                    onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); setShowHeldSales(false); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2452,6 +2452,8 @@ export default function App() {
                       setSelectedSupplier('all');
                       setStockFilter('all');
                       setShowHeldSales(true);
+                      setShowExpiryList(false);
+                      setShowCustomerList(false);
                     }
                   }}
                   style={{ 
