@@ -443,6 +443,7 @@ export default function App() {
     await db.delete('users', 'current');
     setIsLoggedIn(false);
     setCart([]);
+    setVatPercent(defaultVatPercent);
   };
 
   const handleFullscreen = () => {
@@ -589,6 +590,7 @@ export default function App() {
     setCart([]);
     setDiscount('');
     setPaidAmount('');
+    setVatPercent(defaultVatPercent);
     setSelectedCustomer(null);
     setPaymentMethod('cash');
   };
@@ -1418,6 +1420,7 @@ export default function App() {
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
+                        setVatPercent(defaultVatPercent);
                         setPaymentMethod('cash');
                       }
                     }}
@@ -1438,6 +1441,7 @@ export default function App() {
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
+                        setVatPercent(defaultVatPercent);
                         setPaymentMethod('cash');
                       }
                     }}
