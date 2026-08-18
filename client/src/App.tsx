@@ -2804,16 +2804,165 @@ export default function App() {
                       </div>
                     )}
 
-                    {filteredProducts.length === 0 ? (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
-                      <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                        <div style={{ fontSize: 28, fontWeight: 800, color: '#115E59', marginBottom: 8 }}>{t('posManagementSystem')}</div>
-                        <div style={{ fontSize: 14, color: '#9CA3AF' }}>{t('smartBusinessPartner')}</div>
+                    {filteredProducts.length === 0 && !showExpiryList && !showCustomerList ? (
+                    <div style={{ 
+                      height: '100%', 
+                      background: 'linear-gradient(135deg, #F0FDFA 0%, #ECFDF5 50%, #F0F9FF 100%)',
+                      borderRadius: 16, 
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }}>
+                      {/* Header Section */}
+                      <div style={{ 
+                        background: 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)',
+                        padding: '24px 28px',
+                        position: 'relative',
+                        overflow: 'hidden'
+                      }}>
+                        {/* Background Pattern */}
+                        <div style={{
+                          position: 'absolute',
+                          top: -50,
+                          right: -50,
+                          width: 200,
+                          height: 200,
+                          borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.1)'
+                        }}></div>
+                        <div style={{
+                          position: 'absolute',
+                          bottom: -30,
+                          left: -30,
+                          width: 150,
+                          height: 150,
+                          borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.05)'
+                        }}></div>
+                        
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16, position: 'relative', zIndex: 1 }}>
+                          <img src="/Logo.png" alt="Logo" style={{ width: 64, height: 64, objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.2))' }} />
+                          <div>
+                            <h1 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', margin: 0, letterSpacing: '-0.5px' }}>{t('posManagementSystem')}</h1>
+                            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', margin: '4px 0 0 0' }}>{t('smartBusinessPartner')}</p>
+                          </div>
+                        </div>
                       </div>
-                      <img src="/Logo.png" alt="Logo" style={{ width: 100, height: 100, objectFit: 'contain', marginBottom: 16 }} />
-                      <div style={{ padding: '16px', textAlign: 'center' }}>
-                        <div style={{ fontSize: 15, color: '#6B7280', fontWeight: 600 }}>{t('searchProductBarcode')}</div>
-                        <div style={{ fontSize: 14, marginTop: 8, color: '#9CA3AF' }}>{t('orSelectCategorySupplier')}</div>
+
+                      {/* Stats Cards */}
+                      <div style={{ padding: '20px 24px 0', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#DCFCE7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📦</div>
+                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>STOCK</span>
+                          </div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: '#15803D' }}>{products.filter(p => p.stock > 0).length}</div>
+                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Available</div>
+                        </div>
+                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>⚠️</div>
+                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>LOW</span>
+                          </div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: '#D97706' }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
+                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Stock Alert</div>
+                        </div>
+                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#FEE2E2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🚫</div>
+                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>OUT</span>
+                          </div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: '#DC2626' }}>{products.filter(p => p.stock <= 0).length}</div>
+                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Out of Stock</div>
+                        </div>
+                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: '14px 16px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                            <div style={{ width: 32, height: 32, borderRadius: 8, background: '#E0E7FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>👥</div>
+                            <span style={{ fontSize: 11, color: '#6B7280', fontWeight: 600 }}>CUSTOMER</span>
+                          </div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: '#4F46E5' }}>{customers.length}</div>
+                          <div style={{ fontSize: 10, color: '#9CA3AF' }}>Total</div>
+                        </div>
+                      </div>
+
+                      {/* Sales Chart & Quick Actions */}
+                      <div style={{ padding: '16px 24px 0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, flex: 1 }}>
+                        {/* Sales Overview */}
+                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                          <h3 style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: '0 0 12px 0' }}>📊 Sales Overview</h3>
+                          <div style={{ display: 'flex', alignItems: 'end', gap: 6, height: 80 }}>
+                            {[65, 45, 80, 55, 90, 70, 95, 60, 85, 75, 88, 72].map((h, i) => (
+                              <div key={i} style={{ 
+                                flex: 1, 
+                                height: `${h}%`, 
+                                background: i === 11 ? 'linear-gradient(180deg, #0D9488 0%, #115E59 100%)' : '#E5E7EB',
+                                borderRadius: 4,
+                                transition: 'all 0.3s'
+                              }}></div>
+                            ))}
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
+                            <span style={{ fontSize: 10, color: '#9CA3AF' }}>Jan</span>
+                            <span style={{ fontSize: 10, color: '#9CA3AF' }}>Dec</span>
+                          </div>
+                          <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid #F3F4F6', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ fontSize: 18, fontWeight: 700, color: '#059669' }}>৳১২,৫০০</div>
+                              <div style={{ fontSize: 10, color: '#9CA3AF' }}>Today</div>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                              <div style={{ fontSize: 18, fontWeight: 700, color: '#4F46E5' }}>৳৮৫,০০০</div>
+                              <div style={{ fontSize: 10, color: '#9CA3AF' }}>This Month</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Category Distribution */}
+                        <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                          <h3 style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: '0 0 12px 0' }}>📁 Categories</h3>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                            {[
+                              { name: 'Food', icon: '🍔', count: 3, color: '#F97316', bg: '#FFF7ED' },
+                              { name: 'Drinks', icon: '🥤', count: 3, color: '#0EA5E9', bg: '#F0F9FF' },
+                              { name: 'Essentials', icon: '🛒', count: 2, color: '#8B5CF6', bg: '#F5F3FF' }
+                            ].map(cat => (
+                              <div key={cat.name} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px', background: cat.bg, borderRadius: 8 }}>
+                                <div style={{ width: 32, height: 32, borderRadius: 8, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>{cat.icon}</div>
+                                <div style={{ flex: 1 }}>
+                                  <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{cat.name}</div>
+                                  <div style={{ fontSize: 10, color: '#9CA3AF' }}>{cat.count} products</div>
+                                </div>
+                                <div style={{ fontSize: 14, fontWeight: 700, color: cat.color }}>{Math.round(cat.count / products.length * 100)}%</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Featured Products */}
+                      <div style={{ padding: '16px 24px 20px' }}>
+                        <h3 style={{ fontSize: 13, fontWeight: 700, color: '#374151', margin: '0 0 12px 0' }}>⭐ Featured Products</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                          {products.slice(0, 4).map(p => (
+                            <div key={p.id} style={{ background: '#FFFFFF', borderRadius: 12, padding: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', textAlign: 'center' }}>
+                              <div style={{ width: 48, height: 48, borderRadius: 12, background: '#F0FDFA', margin: '0 auto 10px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24 }}>{p.image}</div>
+                              <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                              <div style={{ fontSize: 14, fontWeight: 700, color: '#0D9488' }}>{fmt(p.sellPrice)}</div>
+                              <div style={{ fontSize: 10, color: p.stock > 10 ? '#059669' : '#D97706', marginTop: 4 }}>Stock: {p.stock}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Search Hint */}
+                      <div style={{ padding: '0 24px 24px' }}>
+                        <div style={{ background: 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)', borderRadius: 12, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🔍</div>
+                          <div>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: '#FFFFFF' }}>{t('searchProductBarcode')}</div>
+                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>{t('orSelectCategorySupplier')}</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ) : (
