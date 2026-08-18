@@ -2920,45 +2920,6 @@ export default function App() {
                         </div>
                       </div>
 
-                      {/* Stats */}
-                      <div style={{ padding: '0 24px 0' }}>
-                        <div style={{ background: 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)', borderRadius: 14, padding: 16, marginBottom: 12 }}>
-                          <h2 style={{ fontSize: 14, fontWeight: 700, color: '#FFFFFF', margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ width: 26, height: 26, borderRadius: 8, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📈</span>
-                            আমাদের সিস্টেমের পরিসংখ্যান
-                          </h2>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '12px 8px' }}>
-                              <div style={{ fontSize: 22, fontWeight: 800, color: '#FFFFFF' }}>১০০+</div>
-                              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.85)' }}>ব্যবহারকারী</div>
-                            </div>
-                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '12px 8px' }}>
-                              <div style={{ fontSize: 22, fontWeight: 800, color: '#FFFFFF' }}>৫০০০+</div>
-                              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.85)' }}>দৈনিক লেনদেন</div>
-                            </div>
-                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '12px 8px' }}>
-                              <div style={{ fontSize: 22, fontWeight: 800, color: '#FFFFFF' }}>৯৯.৯%</div>
-                              <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.85)' }}>Uptime</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Quick Start Guide */}
-                      <div style={{ padding: '0 24px 16px' }}>
-                        <div style={{ background: '#FEF9C3', borderRadius: 14, padding: 16, border: '2px solid #FDE047' }}>
-                          <h2 style={{ fontSize: 14, fontWeight: 700, color: '#CA8A04', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ width: 26, height: 26, borderRadius: 8, background: '#FACC15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🚀</span>
-                            শুরু করুন
-                          </h2>
-                          <p style={{ fontSize: 12, color: '#92400E', margin: 0, lineHeight: 1.6 }}>
-                            <strong>১.</strong> উপরের <strong>পণ্য যোগ করুন</strong> বাটনে ক্লিক করে পণ্য তালিকা তৈরি করুন<br/>
-                            <strong>২.</strong> সার্চ বক্সে পণ্য খুঁজুন বা ক্যাটাগরি সিলেক্ট করুন<br/>
-                            <strong>৩.</strong> পণ্যে ক্লিক করে কার্টে যোগ করুন<br/>
-                            <strong>৪.</strong> পেমেন্ট করে বিক্রি সম্পন্ন করুন
-                          </p>
-                        </div>
-                      </div>
                     </div>
                     ) : (searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all') ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
