@@ -460,65 +460,64 @@ export default function App() {
         setCurrency(savedSettings.currency);
       }
       
-      // Load cart state from localStorage
-      const savedCart = localStorage.getItem('pos_cart');
-      if (savedCart) {
-        try {
-          const cartData = JSON.parse(savedCart);
-          if (cartData.cart) setCart(cartData.cart);
-          if (cartData.selectedCustomer) setSelectedCustomer(cartData.selectedCustomer);
-          if (cartData.discount !== undefined) setDiscount(cartData.discount);
-          if (cartData.vatPercent !== undefined) setVatPercent(cartData.vatPercent);
-          if (cartData.paidAmount !== undefined) setPaidAmount(cartData.paidAmount);
-          if (cartData.paymentMethod) setPaymentMethod(cartData.paymentMethod);
-        } catch (e) {
-          console.log('Error loading cart from localStorage');
-        }
-      }
+      // Load cart state from IndexedDB
+      const savedCart = (await db.get('cart', 'current') || {}) as {
+        cart?: CartItem[];
+        selectedCustomer?: Customer | null;
+        discount?: string;
+        vatPercent?: number;
+        paidAmount?: string;
+        paymentMethod?: string;
+      };
+      if (savedCart.cart) setCart(savedCart.cart);
+      if (savedCart.selectedCustomer) setSelectedCustomer(savedCart.selectedCustomer);
+      if (savedCart.discount !== undefined) setDiscount(savedCart.discount);
+      if (savedCart.vatPercent !== undefined) setVatPercent(savedCart.vatPercent);
+      if (savedCart.paidAmount !== undefined) setPaidAmount(savedCart.paidAmount);
+      if (savedCart.paymentMethod) setPaymentMethod(savedCart.paymentMethod);
       
-      // Load held sales from localStorage
-      const savedHeldSales = localStorage.getItem('pos_held_sales');
-      if (savedHeldSales) {
-        try {
-          setHeldSales(JSON.parse(savedHeldSales));
-        } catch (e) {
-          console.log('Error loading held sales from localStorage');
-        }
-      }
+      // Load held sales from IndexedDB
+      const savedHeldSales = (await db.get('heldSales', 'all') || []) as HeldSale[];
+      if (savedHeldSales.length > 0) setHeldSales(savedHeldSales);
       
       setIsLoading(false);
     };
     initApp();
   }, []);
 
-  // Save cart state to localStorage whenever it changes
+  // Save cart state to IndexedDB whenever it changes
   useEffect(() => {
-    const cartData = {
-      cart,
-      selectedCustomer,
-      discount,
-      vatPercent,
-      paidAmount,
-      paymentMethod,
+    const saveCartData = async () => {
+      const cartData = {
+        cart,
+        selectedCustomer,
+        discount,
+        vatPercent,
+        paidAmount,
+        paymentMethod,
+      };
+      await db.put('cart', 'current', cartData);
     };
-    localStorage.setItem('pos_cart', JSON.stringify(cartData));
+    saveCartData();
   }, [cart, selectedCustomer, discount, vatPercent, paidAmount, paymentMethod]);
 
-  // Save held sales to localStorage whenever it changes
+  // Save held sales to IndexedDB whenever it changes
   useEffect(() => {
-    localStorage.setItem('pos_held_sales', JSON.stringify(heldSales));
+    const saveHeldSales = async () => {
+      await db.put('heldSales', 'all', heldSales);
+    };
+    saveHeldSales();
   }, [heldSales]);
 
   const handleLogin = () => setIsLoggedIn(true);
 
   const handleLogout = async () => {
     await db.delete('users', 'current');
+    await db.delete('cart', 'current');
+    await db.delete('heldSales', 'all');
     setIsLoggedIn(false);
     setCart([]);
     setVatPercent(defaultVatPercent);
-    // Clear cart data from localStorage
-    localStorage.removeItem('pos_cart');
-    localStorage.removeItem('pos_held_sales');
   };
 
   const handleFullscreen = () => {
