@@ -2449,7 +2449,7 @@ export default function App() {
                 {/* Payment Method Options */}
                 <div style={{ marginBottom: 8 }}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: '#6B7280', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('selectPaymentMethod')}</div>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: 4 }}>
                     {[
                       { v: 'cash', t: t('cash'), icon: (
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -2489,7 +2489,8 @@ export default function App() {
                         type="button"
                         onClick={() => setPaymentMethod(pm.v)}
                         style={{
-                          padding: '6px 12px',
+                          flex: 1,
+                          padding: '8px 4px',
                           background: paymentMethod === pm.v ? '#115E59' : 'transparent',
                           color: paymentMethod === pm.v ? '#FFFFFF' : '#6B7280',
                           border: paymentMethod === pm.v ? 'none' : '1px solid #e5e7eb',
@@ -2500,6 +2501,7 @@ export default function App() {
                           transition: 'all 0.2s',
                           display: 'flex',
                           alignItems: 'center',
+                          justifyContent: 'center',
                           gap: 6,
                         }}
                       >
