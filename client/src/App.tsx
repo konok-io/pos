@@ -2013,7 +2013,7 @@ export default function App() {
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
+                      background: '#115E59',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
