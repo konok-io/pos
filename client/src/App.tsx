@@ -2384,14 +2384,14 @@ export default function App() {
                       <div style={{
                         fontSize: 11,
                         fontWeight: 600,
-                        color: showExpiryList ? '#FFFFFF' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#6B7280',
+                        color: products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#6B7280',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px'
                       }}>{t('productExpiry')}</div>
                       <div style={{
                         fontSize: 18,
                         fontWeight: 800,
-                        color: showExpiryList ? '#FFFFFF' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF',
+                        color: products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF',
                         lineHeight: 1
                       }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
                     </div>
