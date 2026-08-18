@@ -2912,10 +2912,9 @@ export default function App() {
                             <span style={{ width: 26, height: 26, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👨‍💼</span>
                             কারা ব্যবহার করে?
                           </h2>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                            {['🏪 সুপার শপ', '🍔 রেস্তোরাঁ', '🥤 কফি শপ', '💊 ফার্মেসি', '🧴 কসমেটিক', '📚 স্টেশনারি', '👕 কাপড়ের দোকান', '🔧 হার্ডওয়্যার', '🏠 গৃহস্থালি', '📱 ইলেকট্রনিক্স', '🎁 গিফট শপ', '🌿 নার্সারি', '🍳 বেকারি', '🥩 মাংসের দোকান', '🐟 মাছ বাজার', '🌾 চালের দোকান', '🎨 পেইন্ট শপ', '🚗 অটো পার্টস', '📦 কার্টন প্যাকেজিং', '🎰 টয়লেট', '🧵 ফেব্রিক শপ', '⚽ স্পোর্টস শপ', '🧸 টয় শপ', '🎧 মোবাইল এক্সেসরিজ', '🍱 হোম ডেলিভারি', '🏋️ জিম ফিটনেস', '💇 পার্লার সেলুন', '🔌 ইলেকট্রিক সামগ্রী', '🚿 স্যানিটারি'].map(item => (
-                              <span key={item} style={{ padding: '6px 12px', background: '#F0FDFA', borderRadius: 20, fontSize: 11, color: '#0D9488', fontWeight: 500, border: '1px solid #CCFBF1' }}>{item}</span>
-                            ))}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px', background: '#F0FDFA', borderRadius: 10 }}>
+                            <span style={{ fontSize: 20 }}>🌐</span>
+                            <span style={{ fontSize: 12, color: '#374151' }}>যেকোনো ব্যবসায় ব্যবহার করতে পারবেন</span>
                           </div>
                         </div>
                       </div>
