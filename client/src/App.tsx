@@ -2825,27 +2825,6 @@ export default function App() {
                       display: 'flex',
                       flexDirection: 'column'
                     }}>
-                      {/* Hero Section */}
-                      <div style={{ 
-                        background: 'linear-gradient(135deg, #115E59 0%, #0F766E 50%, #0D9488 100%)',
-                        padding: '28px 32px',
-                        position: 'relative',
-                        overflow: 'hidden'
-                      }}>
-                        {/* Background Decoration */}
-                        <div style={{ position: 'absolute', top: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }}></div>
-                        <div style={{ position: 'absolute', bottom: -20, left: -20, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }}></div>
-                        <div style={{ position: 'absolute', top: '50%', right: '20%', width: 60, height: 60, borderRadius: '50%', background: 'rgba(255,255,255,0.03)' }}></div>
-                        
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 18, position: 'relative', zIndex: 1 }}>
-                          <img src="/Logo.png" alt="Logo" style={{ width: 70, height: 70, objectFit: 'contain', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.25))' }} />
-                          <div>
-                            <h1 style={{ fontSize: 26, fontWeight: 800, color: '#FFFFFF', margin: 0, letterSpacing: '-0.5px' }}>{t('posManagementSystem')}</h1>
-                            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.9)', margin: '6px 0 0 0', fontWeight: 500 }}>{t('smartBusinessPartner')}</p>
-                          </div>
-                        </div>
-                      </div>
-
                       {/* What is POS Section */}
                       <div style={{ padding: '24px 32px 0' }}>
                         <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
