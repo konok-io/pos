@@ -2,7 +2,7 @@
 // Uses the same database as localDb (pos-offline-db) for consistency
 
 const DB_NAME = 'pos-offline-db';
-const DB_VERSION = 2;
+const DB_VERSION = 1;
 
 class Database {
   private db: IDBDatabase | null = null;
