@@ -1320,13 +1320,18 @@ function TimeDisplay({ language }: { language: string }) {
     return () => clearInterval(interval);
   }, []);
 
-  const isBangla = language === 'bn';
-  const timeStr = isBangla 
-    ? time.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-    : time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const dateStr = isBangla
-    ? time.toLocaleDateString('bn-BD', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })
-    : time.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
+  const getLocale = () => {
+    switch (language) {
+      case 'bn': return 'bn-BD';
+      case 'ar': return 'ar-SA';
+      case 'hi': return 'hi-IN';
+      default: return 'en-GB';
+    }
+  };
+
+  const locale = getLocale();
+  const timeStr = time.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const dateStr = time.toLocaleDateString(locale, { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px', background: 'rgba(15,118,110,0.05)', border: '1px solid #E5E7EB' }}>
