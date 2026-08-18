@@ -2355,7 +2355,7 @@ export default function App() {
 
                   {/* Product Expiry Card */}
                   <div
-                    onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); setShowHeldSales(false); }}
+                    onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); setShowHeldSales(false); setStockFilter('all'); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2363,9 +2363,9 @@ export default function App() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 10,
-                      background: showExpiryList ? '#FDE68A' : '#FEF9C3',
-                      border: showExpiryList ? '2px solid #FACC15' : '2px solid #FDE047',
-                      boxShadow: showExpiryList ? '0 4px 14px rgba(250, 204, 21, 0.4)' : '0 2px 8px rgba(0,0,0,0.04)',
+                      background: showExpiryList ? '#99F6E4' : '#F0FDFA',
+                      border: showExpiryList ? '2px solid #115E59' : '2px solid #CCFBF1',
+                      boxShadow: showExpiryList ? '0 4px 14px rgba(17, 94, 89, 0.3)' : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
                       transform: showExpiryList ? 'translateY(-1px)' : 'none'
                     }}
@@ -2374,7 +2374,7 @@ export default function App() {
                       width: 32,
                       height: 32,
                       borderRadius: 8,
-                      background: showExpiryList ? '#CA8A04' : '#FACC15',
+                      background: showExpiryList ? '#115E59' : '#0D9488',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2391,7 +2391,7 @@ export default function App() {
                       <div style={{
                         fontSize: 18,
                         fontWeight: 800,
-                        color: showExpiryList ? '#FFFFFF' : '#CA8A04',
+                        color: showExpiryList ? '#FFFFFF' : '#115E59',
                         lineHeight: 1
                       }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
                     </div>
@@ -2399,7 +2399,7 @@ export default function App() {
 
                   {/* Customer Card */}
                   <div
-                    onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); setShowHeldSales(false); }}
+                    onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); setShowHeldSales(false); setStockFilter('all'); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
