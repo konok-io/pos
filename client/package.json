@@ -14,12 +14,16 @@
     "@capacitor/ios": "^8.5.0",
     "idb": "^8.0.3",
     "npm-check-updates": "^23.0.2",
+    "pouchdb": "^9.0.0",
+    "pouchdb-find": "^9.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
+    "@types/pouchdb": "^6.4.2",
+    "@types/pouchdb-find": "^7.3.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.0.5",

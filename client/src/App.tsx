@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages } from './i18n';
 import TranslationSettings from './pages/TranslationSettings';
+import DatabaseSettings from './pages/DatabaseSettings';
 import { db } from './utils/db';
 
 // Default admin credentials
@@ -358,6 +359,7 @@ export default function App() {
     { id: 'income', icon: '💰', label: t('expenses') },
     { id: 'reports', icon: '📊', label: t('reports') },
     { id: 'translations', icon: '🌐', label: 'Translations' },
+    { id: 'database', icon: '🗄️', label: t('database') },
     { id: 'settings', icon: '⚙️', label: t('settings') },
   ];
 
@@ -1641,6 +1643,10 @@ export default function App() {
 
         {currentTab === 'translations' && (
           <TranslationSettings />
+        )}
+
+        {currentTab === 'database' && (
+          <DatabaseSettings />
         )}
 
         {currentTab === 'newproduct' && (
