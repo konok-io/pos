@@ -3720,7 +3720,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                   <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ padding: '4px 8px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
                 </div>
                 {showCompanyList && (
-                  <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: 'none', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
                     {filteredCompanies.map((c, i) => (
                       <div key={i} onClick={() => { setSupplierQ(c || ''); setForm(f => ({ ...f, company: c || '' })); setShowCompanyList(false); }}
                         style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6', fontSize: 14 }}>
@@ -3747,7 +3747,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                   <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ padding: '4px 8px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
                 </div>
                 {showCategoryList && (
-                  <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
+                  <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: 'none', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
                     {filteredCategories.map((c, i) => (
                       <div key={i} onClick={() => { setForm(f => ({ ...f, cat: c || '' })); setShowCategoryList(false); }}
                         style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6', fontSize: 14 }}>
