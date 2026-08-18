@@ -1147,6 +1147,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       padding: 20,
       position: 'relative',
       overflow: 'hidden',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     }}>
       {/* Decorative Circle */}
       <div style={{
@@ -1231,6 +1232,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   borderRadius: 12,
                   outline: 'none',
                   boxSizing: 'border-box',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#115E59'}
                 onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
@@ -1256,6 +1258,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   borderRadius: 12,
                   outline: 'none',
                   boxSizing: 'border-box',
+                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#115E59'}
                 onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
@@ -1276,6 +1279,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
               }}
             >
               {loading ? '⏳' : t('signIn')}
@@ -1299,7 +1303,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 
           {/* Footer */}
           <div style={{ textAlign: 'center', marginTop: 18, paddingTop: 14, borderTop: '1px dashed #E5E7EB', fontSize: 14, color: '#9CA3AF' }}>
-            © {currentYear} {t('posManagementSystem')}
+            © {currentYear} {t('posManagementSystem')} - {t('copyright')}
           </div>
         </div>
       </div>

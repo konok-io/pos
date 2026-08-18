@@ -29,6 +29,7 @@ export const bn: Record<string, string> = {
   username: 'ইউজার নাম',
   usernamePlaceholder: 'ইউজার নাম লিখুন',
   invalidCredentials: 'ইমেইল বা পাসওয়ার্ড ভুল!',
+  copyright: 'সর্বস্বত্ব সংরক্ষিত',
 
   // POS Screen
   barcode: 'বারকোড',

@@ -29,6 +29,7 @@ export const en: Record<string, string> = {
   username: 'Username',
   usernamePlaceholder: 'Enter username',
   invalidCredentials: 'Invalid email or password',
+  copyright: 'All rights reserved',
 
   // POS Screen
   barcode: 'Barcode',

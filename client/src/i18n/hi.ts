@@ -29,6 +29,7 @@ export const hi: Record<string, string> = {
   username: 'यूज़रनेम',
   usernamePlaceholder: 'यूज़रनेम दर्ज करें',
   invalidCredentials: 'ईमेल या पासवर्ड गलत!',
+  copyright: 'सर्वाधिकार सुरक्षित',
 
   // POS Screen
   barcode: 'बारकोड',

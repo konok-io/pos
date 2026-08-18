@@ -29,6 +29,7 @@ export const ar: Record<string, string> = {
   username: 'اسم المستخدم',
   usernamePlaceholder: 'أدخل اسم المستخدم',
   invalidCredentials: 'البريد الإلكتروني أو كلمة المرور غير صحيحة!',
+  copyright: 'جميع الحقوق محفوظة',
 
   // POS Screen
   barcode: 'الباركود',
