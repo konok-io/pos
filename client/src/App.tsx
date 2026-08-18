@@ -1967,7 +1967,7 @@ export default function App() {
                     minWidth: 200,
                     background: '#FFFFFF',
                     borderRadius: 10,
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
+                    border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'none',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
@@ -2007,7 +2007,7 @@ export default function App() {
                     minWidth: 160,
                     background: '#FFFFFF',
                     borderRadius: 10,
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
+                    border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'none',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
@@ -2802,7 +2802,7 @@ export default function App() {
                   position: 'relative', 
                   background: '#FFFFFF',
                   borderRadius: 10,
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
+                  border: '1px solid rgba(255,255,255,0.8)', boxShadow: 'none',
                   overflow: 'hidden'
                 }}>
                   <div style={{ 
