@@ -177,7 +177,7 @@ interface POSDatabase extends DBSchema {
 }
 
 const DB_NAME = 'pos-offline-db';
-const DB_VERSION = 1;
+const DB_VERSION = 4;
 
 let db: IDBPDatabase<POSDatabase> | null = null;
 
