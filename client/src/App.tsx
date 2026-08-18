@@ -1904,7 +1904,7 @@ export default function App() {
           </div>
           
           {/* Dynamic Menu - Scrollable */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 30, marginRight: 22, minWidth: 0, flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 30, marginRight: 8, minWidth: 0, flex: 1 }}>
             {/* Fixed First Item (Sales) - Separate container */}
             <div style={{ flexShrink: 0, padding: '4px 6px 4px 4px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', marginRight: 4 }}>
               <button onClick={() => setCurrentTab('pos')} style={{
@@ -1964,7 +1964,7 @@ export default function App() {
           </div>
 
           {/* Actions Section */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0, marginLeft: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 8 }}>
             {/* Refresh Button */}
             <button onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title="🔄 হার্ড রিফ্রেশ">🔄</button>
             
