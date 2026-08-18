@@ -2782,26 +2782,82 @@ export default function App() {
 
             {/* -- RIGHT: Cart -- */}
             <div style={{ width: 360, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: '1px solid #e5e7eb' }}>
-              {/* Barcode Scan - Above Cart */}
-              <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
-                <div style={{ position: 'relative' }}>
-                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', fontSize: 14 }}>🔍</span>
-                  <input
-                    className="barcode-input"
-                    placeholder={t('barcodePlaceholder')}
-                    style={{ 
-                      width: '100%', 
-                      paddingLeft: 32, 
-                      height: 34, 
-                      fontSize: 14, 
-                      borderRadius: 8, 
-                      border: '1px solid #c9c9c9', 
-                      background: '#F0FDFA', 
-                      outline: 'none', 
-                      boxSizing: 'border-box',
-                      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hind Siliguri', sans-serif"
-                    }}
-                  />
+              {/* Barcode Scan - Professional Design */}
+              <div style={{ 
+                padding: '10px 14px', 
+                borderBottom: '1px solid #E5E7EB', 
+                background: 'linear-gradient(135deg, #1E3A5F 0%, #2D5A87 100%)',
+                flexShrink: 0,
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                {/* Decorative elements */}
+                <div style={{ position: 'absolute', top: '-15px', left: '-15px', width: '80px', height: '80px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
+                <div style={{ position: 'absolute', bottom: '-20px', right: '20%', width: '60px', height: '60px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {/* Scanner Icon */}
+                  <div style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 10,
+                    background: 'rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <span style={{ fontSize: 20 }}>📱</span>
+                  </div>
+                  
+                  {/* Barcode Input */}
+                  <div style={{ 
+                    position: 'relative', 
+                    flex: 1,
+                    background: '#FFFFFF',
+                    borderRadius: 10,
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.9)',
+                    overflow: 'hidden'
+                  }}>
+                    <input
+                      className="barcode-input"
+                      placeholder={t('barcodePlaceholder')}
+                      style={{ 
+                        width: '100%', 
+                        paddingLeft: 12, 
+                        paddingRight: 12,
+                        height: 38, 
+                        fontSize: 14, 
+                        borderRadius: 10, 
+                        border: 'none', 
+                        background: 'transparent', 
+                        outline: 'none', 
+                        boxSizing: 'border-box',
+                        fontFamily: "inherit",
+                        fontWeight: 500,
+                        color: '#1F2937'
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Scan Button */}
+                  <button style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: 'rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(10px)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    transition: 'all 0.2s'
+                  }}>
+                    <span style={{ fontSize: 16 }}>📷</span>
+                  </button>
                 </div>
               </div>
 
