@@ -1984,7 +1984,7 @@ export default function App() {
                     </div>
                     <input
                       value={searchQuery}
-                      onChange={(e) => { setSearchQuery(e.target.value); setShowHeldSales(false); }}
+                      onChange={(e) => { setSearchQuery(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                       placeholder={t('searchProduct')}
                       style={{ 
                         width: '100%', 
@@ -2024,7 +2024,7 @@ export default function App() {
                     </div>
                     <input
                       value={customerSearch}
-                      onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); }}
+                      onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                       placeholder={t('customerSearch')}
                       style={{ 
                         width: '100%', 
@@ -2080,7 +2080,7 @@ export default function App() {
                   }}>
                     <select
                       value={selectedSupplier}
-                      onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
+                      onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                       style={{
                         width: '100%',
                         height: 34,
@@ -2116,7 +2116,7 @@ export default function App() {
                   }}>
                     <select
                       value={selectedCategory}
-                      onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
+                      onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                       style={{
                         width: '100%',
                         height: 34,
@@ -2186,7 +2186,7 @@ export default function App() {
                   
                   {/* Stock Available Card */}
                   <div 
-                    onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); }}
+                    onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{ 
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2242,7 +2242,7 @@ export default function App() {
 
                   {/* Low Stock Card */}
                   <div 
-                    onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); }}
+                    onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{ 
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2298,7 +2298,7 @@ export default function App() {
 
                   {/* Stock Out Card */}
                   <div 
-                    onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); }}
+                    onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{ 
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2816,7 +2816,7 @@ export default function App() {
                       null
                     ) : showCustomerList ? (
                       null
-                    ) : filteredProducts.length === 0 ? (
+                    ) : !searchQuery && selectedCategory === 'all' && selectedSupplier === 'all' && stockFilter === 'all' && filteredProducts.length === 0 ? (
                     <div style={{ 
                       height: '100%', 
                       background: 'linear-gradient(180deg, #F8FAFC 0%, #F1F5F9 100%)',
@@ -2960,7 +2960,7 @@ export default function App() {
                         </div>
                       </div>
                     </div>
-                    ) : filteredProducts.length > 0 ? (
+                    ) : (searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all') ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
                       {filteredProducts.map(product => (
                         <button
