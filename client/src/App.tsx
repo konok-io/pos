@@ -4,7 +4,7 @@ import { useLanguage, languages } from './i18n';
 import SettingsScreen from './pages/SettingsScreen';
 import SuppliersScreen from './pages/SuppliersScreen';
 import { db } from './utils/db';
-import { getSetting as dbGetSetting, initDatabase } from './services/database';
+import { localDb } from './services';
 
 // Design Tokens
 const T = {
@@ -1415,16 +1415,14 @@ export default function App() {
   const [currency, setCurrency] = useState('SAR '); // Currency symbol
   const fmt = (n: number) => `${currency}${(+n || 0).toLocaleString('en-IN')}`;
   
-  // Load settings from PouchDB on startup
+  // Load settings from localDB on startup
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        await initDatabase(); // Initialize PouchDB first
-        
-        const savedCurrency = await dbGetSetting('currency');
+        const savedCurrency = await localDb.getSetting<string>('currency');
         if (savedCurrency) setCurrency(savedCurrency);
         
-        const savedVat = await dbGetSetting('vatPercent');
+        const savedVat = await localDb.getSetting<string>('vatPercent');
         if (savedVat) setVatPercent(parseFloat(savedVat) || 15);
       } catch (e) {
         console.error('Failed to load settings:', e);
@@ -1451,7 +1449,7 @@ export default function App() {
       )
     : null;
 
-  // Check auth and load settings on mount from PouchDB
+  // Check auth and load settings on mount
   useEffect(() => {
     const initApp = async () => {
       const user = await db.get('users', 'current');
@@ -1459,20 +1457,20 @@ export default function App() {
         setIsLoggedIn(true);
       }
       
-      // Load VAT settings from database
-      const savedVat = await dbGetSetting('vatPercent');
+      // Load VAT settings from localDB
+      const savedVat = await localDb.getSetting<string>('vatPercent');
       if (savedVat) {
         const vat = parseFloat(savedVat);
         setVatPercent(vat);
         setDefaultVatPercent(vat);
       }
-      const savedCurrency = await dbGetSetting('currency');
+      const savedCurrency = await localDb.getSetting<string>('currency');
       if (savedCurrency) {
         setCurrency(savedCurrency);
       }
       
-      // Load cart state from PouchDB
-      const savedCart = await dbGetSetting('cartData');
+      // Load cart state from localDB
+      const savedCart = await localDb.getSetting<string>('cartData');
       if (savedCart) {
         try {
           const cartData = JSON.parse(savedCart);
@@ -1483,17 +1481,17 @@ export default function App() {
           if (cartData.paidAmount !== undefined) setPaidAmount(cartData.paidAmount);
           if (cartData.paymentMethod) setPaymentMethod(cartData.paymentMethod);
         } catch (e) {
-          console.log('Error loading cart from database');
+          console.log('Error loading cart from localDB');
         }
       }
       
-      // Load held sales from PouchDB
-      const savedHeldSales = await dbGetSetting('heldSales');
+      // Load held sales from localDB
+      const savedHeldSales = await localDb.getSetting<string>('heldSales');
       if (savedHeldSales) {
         try {
           setHeldSales(JSON.parse(savedHeldSales));
         } catch (e) {
-          console.log('Error loading held sales from database');
+          console.log('Error loading held sales from localDB');
         }
       }
       
