@@ -1141,7 +1141,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#115E59',
+      background: '#FFFFFF', border: '2px solid #115E59',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -1948,7 +1948,7 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: '#115E59',
+                background: '#FFFFFF', border: '2px solid #115E59',
                 padding: '10px 20px',
                 boxShadow: '0 4px 20px rgba(30,58,95,0.3)',
                 position: 'relative',
@@ -1973,7 +1973,7 @@ export default function App() {
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: '#115E59',
+                      background: '#FFFFFF', border: '2px solid #115E59',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
@@ -1985,7 +1985,7 @@ export default function App() {
                       placeholder={t('searchProduct')}
                       style={{ 
                         width: '100%', 
-                        paddingLeft: 48, 
+                        paddingLeft: 42, 
                         paddingRight: 12, 
                         height: 34, 
                         fontSize: 14, 
@@ -2025,7 +2025,7 @@ export default function App() {
                       placeholder={t('customerSearch')}
                       style={{ 
                         width: '100%', 
-                        paddingLeft: 48, 
+                        paddingLeft: 42, 
                         paddingRight: 12, 
                         height: 34, 
                         fontSize: 14, 
@@ -2788,7 +2788,7 @@ export default function App() {
               <div style={{ 
                 padding: '10px 20px', 
                 borderBottom: '1px solid #E5E7EB', 
-                background: '#115E59',
+                background: '#FFFFFF', border: '2px solid #115E59',
                 flexShrink: 0,
                 position: 'relative',
                 overflow: 'hidden'
@@ -2808,7 +2808,7 @@ export default function App() {
                   <div style={{ 
                     position: 'absolute', left: 0, top: 0, bottom: 0, 
                     width: 40, 
-                    background: '#115E59',
+                    background: '#FFFFFF', border: '2px solid #115E59',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     borderRadius: '10px 0 0 10px'
                   }}>
@@ -2819,7 +2819,7 @@ export default function App() {
                     placeholder={t('barcodePlaceholder')}
                     style={{ 
                       width: '100%', 
-                      paddingLeft: 48, 
+                      paddingLeft: 42, 
                       paddingRight: 12,
                       height: 34, 
                       fontSize: 14, 
