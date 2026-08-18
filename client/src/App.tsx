@@ -2798,53 +2798,31 @@ export default function App() {
 
             {/* -- RIGHT: Cart -- */}
             <div style={{ width: 360, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: '1px solid #e5e7eb' }}>
-              {/* Barcode Scan - Professional Design */}
+              
+              {/* Barcode Input - Simple */}
               <div style={{ 
-                padding: '10px 20px', 
-                borderBottom: '1px solid #E5E7EB', 
-                background: '#F5F5F5', border: '1px solid #E0E0E0',
-                flexShrink: 0,
-                position: 'relative',
-                overflow: 'hidden'
+                padding: '10px 20px',
+                background: '#F5F5F5',
+                borderBottom: '1px solid #E5E7EB',
               }}>
-                
-                {/* Barcode Input - With Icon */}
-                <div style={{ 
-                  position: 'relative', 
-                  background: '#FFFFFF',
-                  borderRadius: 10,
-                  border: '1px solid #D1D5DB', boxShadow: 'none',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{ 
-                    position: 'absolute', left: 0, top: 0, bottom: 0, 
-                    width: 40, 
-                    background: '#E0E0E0',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    borderRadius: '10px 0 0 10px'
-                  }}>
-                    <span style={{ fontSize: 16 }}>📷</span>
-                  </div>
-                  <input
-                    className="barcode-input"
-                    placeholder={t('barcodePlaceholder')}
-                    style={{ 
-                      width: '100%', 
-                      paddingLeft: 50, 
-                      paddingRight: 12,
-                      height: 34, 
-                      fontSize: 14, 
-                      borderRadius: 10, 
-                      border: 'none', 
-                      background: '#FFFFFF', 
-                      outline: 'none', 
-                      boxSizing: 'border-box',
-                      fontFamily: "inherit",
-                      fontWeight: 500,
-                      color: '#1F2937'
-                    }}
-                  />
-                </div>
+                <input
+                  className="barcode-input"
+                  placeholder={t('barcodePlaceholder')}
+                  style={{ 
+                    width: '100%', 
+                    padding: '8px 12px',
+                    height: 34, 
+                    fontSize: 14, 
+                    borderRadius: 10, 
+                    border: '1px solid #D1D5DB', 
+                    background: '#FFFFFF', 
+                    outline: 'none', 
+                    boxSizing: 'border-box',
+                    fontFamily: "inherit",
+                    fontWeight: 500,
+                    color: '#1F2937'
+                  }}
+                />
               </div>
 
               {/* Cart Header */}
