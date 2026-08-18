@@ -2438,16 +2438,24 @@ export default function App() {
                     style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#16A34A' }}/>
                   <div style={{ position: 'relative', width: 70 }}>
                     <input 
-                      defaultValue={vatPercent}
+                      value={vatPercent}
                       onChange={(e) => {
                         const val = e.target.value;
-                        if (val === '') {
-                          setVatPercent('');
-                        } else if (!isNaN(parseFloat(val))) {
+                        // Allow empty string or valid numbers
+                        if (val === '' || /^\d*\.?\d*$/.test(val)) {
                           setVatPercent(val);
                         }
                       }}
-                      type="number" min="0" max="100"
+                      onBlur={() => {
+                        // Convert to number on blur if valid
+                        const num = parseFloat(vatPercent);
+                        if (!isNaN(num) && vatPercent !== '') {
+                          setVatPercent(String(num));
+                        } else if (vatPercent === '' || isNaN(num)) {
+                          setVatPercent(String(defaultVatPercent));
+                        }
+                      }}
+                      type="text" inputMode="decimal"
                       placeholder={`${defaultVatPercent}`}
                       style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 20px 5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#D97706', textAlign: 'center' }}
                     />
