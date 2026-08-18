@@ -2773,10 +2773,105 @@ export default function App() {
                       flex: 1,
                       minHeight: 'calc(100vh - 380px)'
                     }}>
-                      <div style={{ textAlign: 'center', padding: 40 }}>
-                        <div style={{ fontSize: 64, marginBottom: 16 }}>📦</div>
-                        <div style={{ fontSize: 16, fontWeight: 600, color: '#6B7280', marginBottom: 8 }}>কোনো পণ্য নেই</div>
-                        <div style={{ fontSize: 13, color: '#9CA3AF' }}>পণ্য যোগ করতে উপরের "নতুন পণ্য" ট্যাবে যান</div>
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: 40,
+                        textAlign: 'center'
+                      }}>
+                        <div style={{
+                          width: 100,
+                          height: 100,
+                          borderRadius: 50,
+                          background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginBottom: 20,
+                          boxShadow: '0 8px 32px rgba(16, 185, 129, 0.15)'
+                        }}>
+                          <span style={{ fontSize: 48 }}>🛒</span>
+                        </div>
+                        <div style={{
+                          fontSize: 18,
+                          fontWeight: 700,
+                          color: '#374151',
+                          marginBottom: 8,
+                          letterSpacing: '-0.5px'
+                        }}>
+                          Ready for a New Sale
+                        </div>
+                        <div style={{
+                          fontSize: 14,
+                          color: '#9CA3AF',
+                          marginBottom: 24,
+                          lineHeight: 1.5
+                        }}>
+                          Scan a barcode or search for a product
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          gap: 12,
+                          flexWrap: 'wrap',
+                          justifyContent: 'center'
+                        }}>
+                          <div style={{
+                            padding: '10px 16px',
+                            background: '#FFFFFF',
+                            borderRadius: 8,
+                            border: '1px solid #E5E7EB',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                          }}>
+                            <span style={{ fontSize: 16 }}>▣</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>Scan Item</span>
+                          </div>
+                          <div style={{
+                            padding: '10px 16px',
+                            background: '#115E59',
+                            borderRadius: 8,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            boxShadow: '0 4px 12px rgba(17, 94, 89, 0.3)'
+                          }}>
+                            <span style={{ fontSize: 16 }}>＋</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#FFFFFF' }}>Add Product</span>
+                          </div>
+                        </div>
+                        <div style={{
+                          marginTop: 32,
+                          padding: '12px 24px',
+                          background: '#F9FAFB',
+                          borderRadius: 8,
+                          border: '1px dashed #E5E7EB'
+                        }}>
+                          <div style={{
+                            fontSize: 11,
+                            fontWeight: 600,
+                            color: '#9CA3AF',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            marginBottom: 8
+                          }}>
+                            Quick Shortcuts
+                          </div>
+                          <div style={{
+                            display: 'flex',
+                            gap: 16,
+                            flexWrap: 'wrap',
+                            justifyContent: 'center'
+                          }}>
+                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F2</strong> Search</span>
+                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F4</strong> Hold</span>
+                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>F8</strong> Payment</span>
+                            <span style={{ fontSize: 12, color: '#6B7280' }}><strong>ESC</strong> Clear</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     ) : (searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all') ? (
