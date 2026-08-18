@@ -1119,6 +1119,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const { t } = useLanguage();
 
   const currentYear = new Date().getFullYear();
+  const businessName = 'My Store';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -1147,7 +1148,6 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       padding: 20,
       position: 'relative',
       overflow: 'hidden',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     }}>
       {/* Decorative Circle */}
       <div style={{
@@ -1170,19 +1170,16 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       }} />
 
       <div style={{ width: '100%', maxWidth: 560, position: 'relative', zIndex: 1 }}>
-        {/* Header - Icon left, text right - Same as main header */}
+        {/* Header - Icon left, text right */}
         <div style={{
           background: '#fff',
           borderRadius: '20px 20px 0 0',
-          padding: '24px 28px 20px',
+          padding: '24px 28px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          borderBottom: '2px solid #115E59',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, width: '100%' }}>
             <div style={{
               width: 60, height: 60,
               borderRadius: 16,
@@ -1193,15 +1190,15 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             }}>
               <img src="/Logo.png" alt="Logo" style={{ width: 60, height: 60, objectFit: 'contain', borderRadius: 16 }} />
             </div>
-            <div>
-              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#115E59', lineHeight: 1.2 }}>
-                {t('posManagementSystem')}
+            <div style={{ flex: 1, textAlign: 'right' }}>
+              <h1 style={{ margin: 0, fontSize: 24, fontWeight: 700, color: '#115E59' }}>
+                {businessName}
               </h1>
               <div style={{
-                fontSize: 14,
+                fontSize: 18,
                 color: '#115E59',
                 fontWeight: 600,
-                marginTop: 2,
+                marginTop: 4,
               }}>
                 {t('smartBusinessPartner')}
               </div>
@@ -1213,18 +1210,12 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         <div style={{
           background: '#fff',
           borderRadius: '0 0 20px 20px',
-          padding: '28px 28px 28px',
-          boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          padding: '24px 28px 28px',
         }}>
-          <h2 style={{ margin: '0 0 20px 0', fontSize: 18, fontWeight: 600, color: '#374151', textAlign: 'center' }}>
-            🔐 {t('loginTitle')}
-          </h2>
-
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', gap: 12, alignItems: 'flex-end' }}>
             {/* Username */}
-            <div style={{ marginBottom: 16 }}>
-              <label style={{ fontSize: 14, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: 15, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
                 👤 {t('username')}
               </label>
               <input
@@ -1241,7 +1232,6 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   borderRadius: 12,
                   outline: 'none',
                   boxSizing: 'border-box',
-                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#115E59'}
                 onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
@@ -1249,8 +1239,8 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </div>
 
             {/* Password */}
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 14, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
+            <div style={{ width: 160 }}>
+              <label style={{ fontSize: 15, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>
                 🔐 {t('password')}
               </label>
               <input
@@ -1267,7 +1257,6 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   borderRadius: 12,
                   outline: 'none',
                   boxSizing: 'border-box',
-                  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 }}
                 onFocus={(e) => e.target.style.borderColor = '#115E59'}
                 onBlur={(e) => e.target.style.borderColor = '#E5E7EB'}
@@ -1279,7 +1268,6 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               type="submit"
               disabled={loading}
               style={{
-                width: '100%',
                 padding: '14px 24px',
                 background: loading ? '#9CA3AF' : '#115E59',
                 color: '#fff',
@@ -1288,33 +1276,31 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 fontSize: 16,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
-                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                boxShadow: loading ? 'none' : '0 4px 12px rgba(17,94,89,0.3)',
+                whiteSpace: 'nowrap',
               }}
             >
-              {loading ? '⏳ ' + t('signingIn') : '🔑 ' + t('signIn')}
+              {loading ? '⏳' : t('signIn')}
             </button>
           </form>
 
           {/* Error */}
           {error && (
             <div style={{
-              marginTop: 16,
+              marginTop: 14,
               padding: '12px 14px',
               background: '#FEF2F2',
               borderRadius: 10,
               color: '#DC2626',
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: 500,
-              textAlign: 'center',
             }}>
               ⚠️ {error}
             </div>
           )}
 
           {/* Footer */}
-          <div style={{ textAlign: 'center', marginTop: 20, paddingTop: 16, borderTop: '1px dashed #E5E7EB', fontSize: 13, color: '#9CA3AF' }}>
-            © {currentYear} {t('posManagementSystem')}
+          <div style={{ textAlign: 'center', marginTop: 18, paddingTop: 14, borderTop: '1px dashed #E5E7EB', fontSize: 14, color: '#9CA3AF' }}>
+            © {currentYear} {businessName}
           </div>
         </div>
       </div>
