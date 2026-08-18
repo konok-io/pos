@@ -2435,9 +2435,12 @@ export default function App() {
                   <input value={discount} onChange={(e) => setDiscount(e.target.value)} type="number" min="0"
                     placeholder={t('discount')}
                     style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#16A34A' }}/>
-                  <input value={vatPercent} onChange={(e) => setVatPercent(parseFloat(e.target.value) || 0)} type="number" min="0" max="100"
-                    placeholder={`${defaultVatPercent}%`}
-                    style={{ width: 55, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#D97706', textAlign: 'center' }}/>
+                  <div style={{ position: 'relative', width: 70 }}>
+                    <input value={vatPercent} onChange={(e) => setVatPercent(parseFloat(e.target.value) || 0)} type="number" min="0" max="100"
+                      placeholder={`${defaultVatPercent}`}
+                      style={{ width: '100%', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 20px 5px 6px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#D97706', textAlign: 'center' }}/>
+                    <span style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', color: '#D97706', fontSize: 12, pointerEvents: 'none' }}>%</span>
+                  </div>
                 </div>
 
                 {/* Payment Input */}
