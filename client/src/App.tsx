@@ -2602,12 +2602,12 @@ export default function App() {
                     {/* Expiry Products List */}
                     {showExpiryList && (
                       <div style={{ padding: '16px 0' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F0FDFA', border: '2px solid #CCFBF1', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '10px 14px', marginBottom: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>📅</div>
                             <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
                           </div>
-                          <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 14px', borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 12, cursor: 'pointer', color: '#DC2626', fontWeight: 600 }}>✕ Close</button>
+                          <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}>✕ {t('close')}</button>
                         </div>
                         {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
@@ -2638,12 +2638,12 @@ export default function App() {
                     {/* Customer List */}
                     {showCustomerList && (
                       <div style={{ padding: '16px 0' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F0FDFA', border: '2px solid #CCFBF1', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '10px 14px', marginBottom: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>👥</div>
                             <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('customers')} ({customers.length})</h3>
                           </div>
-                          <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 14px', borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 12, cursor: 'pointer', color: '#DC2626', fontWeight: 600 }}>✕ Close</button>
+                          <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}>✕ {t('close')}</button>
                         </div>
                         {customers.length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
