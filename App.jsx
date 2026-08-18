@@ -1229,6 +1229,7 @@ function POSScreen({products, customers, sales, settings, categories, upd, produ
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState(settings.vatPercent || 15);
   const [paid, setPaid] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const [showAddCust, setShowAddCust] = useState(false);
   const [newCustName, setNewCustName] = useState('');
   const [newCustPhone, setNewCustPhone] = useState('');
@@ -1384,7 +1385,9 @@ function POSScreen({products, customers, sales, settings, categories, upd, produ
     const vatText = vatAmount > 0 ? `\nভ্যাট (${vatPercent}%): ৳${vatAmount.toFixed(2)}` : '';
     const paidText = paidAmt > 0 ? `\nপরিশোধ: ৳${paidAmt.toFixed(2)}` : '';
     const changeText = change > 0 ? `\nফেরত: ৳${change.toFixed(2)}` : '';
-    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(2)}${vatText}${dueText}${paidText}${changeText}${dueCreditText}`;
+    const paymentMethods = { cash: '💵 নগদ', card: '💳 কার্ড', bank: '🏦 ব্যাংক', mobile: '📱 মোবাইল' };
+    const paymentText = `\nপদ্ধতি: ${paymentMethods[paymentMethod] || paymentMethod}`;
+    const confirmMsg = `বিক্রয় নিশ্চিত করুন?\nমোট: ৳${total.toFixed(2)}${vatText}${paymentText}${dueText}${paidText}${changeText}${dueCreditText}`;
 
     if (!window.confirm(confirmMsg)) return;
 
@@ -1394,6 +1397,7 @@ function POSScreen({products, customers, sales, settings, categories, upd, produ
       items:cart.map(i=>({...i,total:i.sellP*i.qty,profit:(i.sellP-i.buyP)*i.qty})),
       subtotal, discount:disc, vatPercent, vatAmount, total,
       paid:paidAmt, due:Math.max(0,due), change,
+      paymentMethod,
     };
 
     const newProds = products.map(p => {
@@ -1437,7 +1441,7 @@ function POSScreen({products, customers, sales, settings, categories, upd, produ
 
     // Auto print receipt and return to sales page
     printReceipt({sale, settings});
-    setCart([]); setDiscount(''); setPaid(''); setSelCust(null); setCustQ('');
+    setCart([]); setDiscount(''); setPaid(''); setSelCust(null); setCustQ(''); setPaymentMethod('cash');
     setTimeout(() => searchRef.current?.focus(), 100);
   };
 
@@ -1989,6 +1993,44 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
               }
             }}/>
           
+          {/* Payment Method Options */}
+          <div style={{marginBottom:8}}>
+            <div style={{fontSize:12,fontWeight:600,color:T.gray500,marginBottom:6,textTransform:'uppercase',letterSpacing:'0.5px'}}>পদ্ধতি নির্বাচন করুন</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(4, 1fr)',gap:6}}>
+              {[
+                { v:'cash', l:'💵', t:'নগদ' },
+                { v:'card', l:'💳', t:'কার্ড' },
+                { v:'bank', l:'🏦', t:'ব্যাংক' },
+                { v:'mobile', l:'📱', t:'মোবাইল' },
+              ].map(pm => (
+                <button
+                  key={pm.v}
+                  type="button"
+                  onClick={() => setPaymentMethod(pm.v)}
+                  style={{
+                    padding:'8px 4px',
+                    background: paymentMethod === pm.v ? T.teal : T.gray50,
+                    color: paymentMethod === pm.v ? T.white : T.gray600,
+                    border: paymentMethod === pm.v ? 'none' : `1px solid ${T.gray200}`,
+                    borderRadius:8,
+                    fontSize:13,
+                    fontWeight:600,
+                    cursor:'pointer',
+                    display:'flex',
+                    flexDirection:'column',
+                    alignItems:'center',
+                    gap:2,
+                    transition:'all 0.2s',
+                    boxShadow: paymentMethod === pm.v ? '0 2px 8px rgba(15,118,110,0.3)' : 'none',
+                  }}
+                >
+                  <span style={{fontSize:18}}>{pm.l}</span>
+                  <span>{pm.t}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          
           {/* Due/Change Alert */}
           {due > 0 && (
             <div style={{fontSize:14,marginBottom:6,padding:'5px 8px',borderRadius:6,
@@ -2005,7 +2047,7 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
           
           {/* Action Buttons */}
           <div style={{display:'grid',gridTemplateColumns:'auto 1fr',gap:6}}>
-            <button onClick={()=>{setCart([]);setDiscount('');setPaid('');setSelCust(null);setCustQ('');}}
+            <button onClick={()=>{setCart([]);setDiscount('');setPaid('');setSelCust(null);setCustQ('');setPaymentMethod('cash');}}
               style={{padding:'8px 10px',borderRadius:8,border:'1px solid #e5e7eb',background:T.white,color:T.gray600,fontWeight:600,fontSize:14,cursor:'pointer'}}>
               🗑️
             </button>

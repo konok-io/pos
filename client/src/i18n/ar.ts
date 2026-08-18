@@ -160,4 +160,24 @@ export const ar: Record<string, string> = {
   stockFinished: 'المخزون نفد!',
   maxStock: 'الحد الأقصى للمخزون',
   selectCustomerOrPayFull: 'اختر عميل أو ادفع المبلغ الكامل!',
+
+  // Additional translations for filter counts and counts
+  itemsFound: 'منتج',
+  totalProductsCount: 'إجمالي المنتجات',
+  totalSuppliersCount: 'إجمالي الموردين',
+  totalCustomersCount: 'إجمالي العملاء',
+  totalIncome: 'إجمالي الدخل',
+  totalExpense: 'إجمالي المصروفات',
+  noSuppliers: 'لا توجد موردين',
+  noLowStockProducts: 'لا توجد منتجات مخزون منخفض',
+  lowStockAlert: 'تنبيه مخزون منخفض',
+  grandTotal: 'المجموع الكلي',
+
+  // Payment Methods
+  paymentMethod: 'الطريقة',
+  selectPaymentMethod: 'اختر طريقة الدفع',
+  cash: 'نقدي',
+  card: 'بطاقة',
+  bank: 'بنك',
+  mobile: 'محفظة',
 };

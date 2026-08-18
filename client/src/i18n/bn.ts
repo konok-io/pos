@@ -174,4 +174,12 @@ export const bn: Record<string, string> = {
   noLowStockProducts: 'কোনো পণ্য স্টক কম নেই',
   lowStockAlert: 'স্টক কম আছে',
   grandTotal: 'সর্বমোট',
+
+  // Payment Methods
+  paymentMethod: 'পদ্ধতি',
+  selectPaymentMethod: 'পদ্ধতি নির্বাচন করুন',
+  cash: 'নগদ',
+  card: 'কার্ড',
+  bank: 'ব্যাংক',
+  mobile: 'মোবাইল',
 };

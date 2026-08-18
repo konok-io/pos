@@ -174,4 +174,12 @@ export const en: Record<string, string> = {
   noLowStockProducts: 'No low stock products',
   lowStockAlert: 'Low Stock Alert',
   grandTotal: 'Grand Total',
+
+  // Payment Methods
+  paymentMethod: 'Method',
+  selectPaymentMethod: 'Select Payment Method',
+  cash: 'Cash',
+  card: 'Card',
+  bank: 'Bank',
+  mobile: 'Mobile',
 };

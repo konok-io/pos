@@ -160,4 +160,24 @@ export const hi: Record<string, string> = {
   stockFinished: 'स्टॉक खत्म!',
   maxStock: 'अधिकतम स्टॉक',
   selectCustomerOrPayFull: 'ग्राहक चुनें या पूर्ण राशि दें!',
+
+  // Additional translations for filter counts and counts
+  itemsFound: 'आइटम',
+  totalProductsCount: 'कुल उत्पाद',
+  totalSuppliersCount: 'कुल आपूर्तिकर्ता',
+  totalCustomersCount: 'कुल ग्राहक',
+  totalIncome: 'कुल आय',
+  totalExpense: 'कुल खर्च',
+  noSuppliers: 'कोई आपूर्तिकर्ता नहीं',
+  noLowStockProducts: 'कोई कम स्टॉक वाले उत्पाद नहीं',
+  lowStockAlert: 'कम स्टॉक चेतावनी',
+  grandTotal: 'कुल योग',
+
+  // Payment Methods
+  paymentMethod: 'तरीका',
+  selectPaymentMethod: 'भुगतान तरीका चुनें',
+  cash: 'नकद',
+  card: 'कार्ड',
+  bank: 'बैंक',
+  mobile: 'मोबाइल',
 };
