@@ -1948,7 +1948,7 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: 'linear-gradient(135deg, #1E3A5F 0%, #2D5A87 100%)',
+                background: 'linear-gradient(135deg, #115E59 0%, #0F766E 100%)',
                 padding: '10px 20px',
                 boxShadow: '0 4px 20px rgba(30,58,95,0.3)',
                 position: 'relative',
@@ -1973,7 +1973,7 @@ export default function App() {
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: 'linear-gradient(135deg, #1E3A5F 0%, #2D5A87 100%)',
+                      background: 'linear-gradient(135deg, #115E59 0%, #0F766E 100%)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
@@ -2788,7 +2788,7 @@ export default function App() {
               <div style={{ 
                 padding: '10px 14px', 
                 borderBottom: '1px solid #E5E7EB', 
-                background: 'linear-gradient(135deg, #1E3A5F 0%, #2D5A87 100%)',
+                background: 'linear-gradient(135deg, #115E59 0%, #0F766E 100%)',
                 flexShrink: 0,
                 position: 'relative',
                 overflow: 'hidden'
@@ -2812,7 +2812,7 @@ export default function App() {
                       placeholder={t('barcodePlaceholder')}
                       style={{ 
                         width: '100%', 
-                        paddingLeft: 12, 
+                        paddingLeft: 48, 
                         paddingRight: 12,
                         height: 40, 
                         fontSize: 14, 
