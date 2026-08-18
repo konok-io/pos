@@ -1787,7 +1787,7 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           {/* Logo Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-            <div style={{ width: 44, height: 44, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 12 }} /></div>
+            <div style={{ width: 44, height: 40, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 44, height: 40, objectFit: 'contain', borderRadius: 12 }} /></div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
               <div style={{ fontSize: 14.5, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
@@ -1948,9 +1948,9 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: 'linear-gradient(135deg, #115E59 0%, #0F766E 50%, #115E59 100%)',
-                padding: '12px 20px',
-                boxShadow: '0 4px 20px rgba(15,118,110,0.3)',
+                background: 'linear-gradient(135deg, #1E3A5F 0%, #2D5A87 100%)',
+                padding: '10px 20px',
+                boxShadow: '0 4px 20px rgba(30,58,95,0.3)',
                 position: 'relative',
                 overflow: 'hidden'
               }}>
@@ -1966,18 +1966,18 @@ export default function App() {
                     flex: '2 1 240px', 
                     minWidth: 200,
                     background: '#FFFFFF',
-                    borderRadius: 12,
+                    borderRadius: 10,
                     boxShadow: '0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
-                      width: 44, 
-                      background: 'linear-gradient(135deg, #115E59 0%, #14B8A6 100%)',
+                      width: 40, 
+                      background: 'linear-gradient(135deg, #1E3A5F 0%, #2D5A87 100%)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      borderRadius: '12px 0 0 12px'
+                      borderRadius: '10px 0 0 10px'
                     }}>
-                      <span style={{ fontSize: 18 }}>📦</span>
+                      <span style={{ fontSize: 16 }}>📦</span>
                     </div>
                     <input
                       value={searchQuery}
@@ -1985,11 +1985,11 @@ export default function App() {
                       placeholder={t('searchProduct')}
                       style={{ 
                         width: '100%', 
-                        paddingLeft: 52, 
+                        paddingLeft: 48, 
                         paddingRight: 12, 
-                        height: 44, 
+                        height: 40, 
                         fontSize: 14, 
-                        borderRadius: 12, 
+                        borderRadius: 10, 
                         border: 'none', 
                         background: 'transparent', 
                         outline: 'none', 
@@ -2006,18 +2006,18 @@ export default function App() {
                     flex: '2 1 180px', 
                     minWidth: 160,
                     background: '#FFFFFF',
-                    borderRadius: 12,
+                    borderRadius: 10,
                     boxShadow: '0 4px 15px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
                     overflow: 'hidden'
                   }}>
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
-                      width: 44, 
+                      width: 40, 
                       background: 'linear-gradient(135deg, #7C3AED 0%, #A78BFA 100%)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      borderRadius: '12px 0 0 12px'
+                      borderRadius: '10px 0 0 10px'
                     }}>
-                      <span style={{ fontSize: 18 }}>👤</span>
+                      <span style={{ fontSize: 16 }}>👤</span>
                     </div>
                     <input
                       value={customerSearch}
@@ -2025,11 +2025,11 @@ export default function App() {
                       placeholder={t('customerSearch')}
                       style={{ 
                         width: '100%', 
-                        paddingLeft: 52, 
+                        paddingLeft: 48, 
                         paddingRight: 12, 
-                        height: 44, 
+                        height: 40, 
                         fontSize: 14, 
-                        borderRadius: 12, 
+                        borderRadius: 10, 
                         border: 'none', 
                         background: 'transparent', 
                         outline: 'none', 
@@ -2080,10 +2080,10 @@ export default function App() {
                       onChange={(e) => { setSelectedSupplier(e.target.value); setShowHeldSales(false); }}
                       style={{
                         width: '100%',
-                        height: 44,
+                        height: 40,
                         padding: '0 12px',
                         fontSize: 13,
-                        borderRadius: 12,
+                        borderRadius: 10,
                         border: '2px solid rgba(255,255,255,0.3)',
                         background: 'rgba(255,255,255,0.95)',
                         outline: 'none',
@@ -2092,7 +2092,7 @@ export default function App() {
                         color: '#1F2937',
                         boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
                         appearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23115E59' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231E3A5F' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'right 12px center',
                         paddingRight: 32
@@ -2116,10 +2116,10 @@ export default function App() {
                       onChange={(e) => { setSelectedCategory(e.target.value); setShowHeldSales(false); }}
                       style={{
                         width: '100%',
-                        height: 44,
+                        height: 40,
                         padding: '0 12px',
                         fontSize: 13,
-                        borderRadius: 12,
+                        borderRadius: 10,
                         border: '2px solid rgba(255,255,255,0.3)',
                         background: 'rgba(255,255,255,0.95)',
                         outline: 'none',
@@ -2128,7 +2128,7 @@ export default function App() {
                         color: '#1F2937',
                         boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
                         appearance: 'none',
-                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23115E59' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231E3A5F' d='M6 8L1 3h10z'/%3E%3C/svg%3E")`,
                         backgroundRepeat: 'no-repeat',
                         backgroundPosition: 'right 12px center',
                         paddingRight: 32
@@ -2152,10 +2152,12 @@ export default function App() {
                       background: 'rgba(255,255,255,0.2)',
                       backdropFilter: 'blur(10px)',
                       borderRadius: 10,
-                      padding: '8px 14px',
+                      padding: '6px 12px',
+                      height: 40,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 6
+                      gap: 6,
+                      boxSizing: 'border-box'
                     }}>
                       <span style={{ fontSize: 14 }}>📦</span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF' }}>{filteredProducts.length}</span>
@@ -2812,7 +2814,7 @@ export default function App() {
                         width: '100%', 
                         paddingLeft: 12, 
                         paddingRight: 12,
-                        height: 44, 
+                        height: 40, 
                         fontSize: 14, 
                         borderRadius: 10, 
                         border: 'none', 
@@ -2829,7 +2831,7 @@ export default function App() {
                   {/* Scan Button */}
                   <button style={{
                     width: 44,
-                    height: 44,
+                    height: 40,
                     borderRadius: 10,
                     background: 'rgba(255,255,255,0.2)',
                     backdropFilter: 'blur(10px)',
@@ -2841,7 +2843,7 @@ export default function App() {
                     flexShrink: 0,
                     transition: 'all 0.2s'
                   }}>
-                    <span style={{ fontSize: 18 }}>📷</span>
+                    <span style={{ fontSize: 16 }}>📷</span>
                   </button>
                 </div>
               </div>
