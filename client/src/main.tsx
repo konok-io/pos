@@ -68,7 +68,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           height: '100vh',
           background: '#0F766E',
           color: 'white',
-          fontFamily: 'system-ui, sans-serif'
+          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
         }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '48px' }}>⚠️</div>
@@ -83,7 +83,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 border: 'none',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
               }}
             >
               Try Again
