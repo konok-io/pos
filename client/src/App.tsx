@@ -2189,28 +2189,27 @@ export default function App() {
                     style={{
                       cursor: 'pointer',
                       borderRadius: 10,
-                      padding: '10px 16px',
+                      padding: '8px 14px',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 10,
+                      gap: 8,
                       background: stockFilter === 'available'
-                        ? 'linear-gradient(135deg, #0F766E 0%, #14B8A6 100%)'
-                        : '#FFFFFF',
+                        ? 'linear-gradient(135deg, #059669 0%, #10B981 100%)'
+                        : '#F0FDF4',
                       border: stockFilter === 'available'
                         ? 'none'
-                        : '1.5px solid #CCFBF1',
+                        : '2px solid #D1FAE5',
                       boxShadow: stockFilter === 'available'
-                        ? '0 4px 14px rgba(15, 118, 110, 0.35)'
+                        ? '0 4px 14px rgba(16, 185, 129, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
-                      transform: stockFilter === 'available' ? 'translateY(-2px)' : 'none',
-                      minWidth: 120
+                      transform: stockFilter === 'available' ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: stockFilter === 'available' ? 'rgba(255,255,255,0.25)' : '#0F766E', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>📦</div>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'available' ? 'rgba(255,255,255,0.25)' : '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📦</div>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: stockFilter === 'available' ? 'rgba(255,255,255,0.85)' : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('stockAvailable')}</div>
-                      <div style={{ fontSize: 20, fontWeight: 800, color: stockFilter === 'available' ? '#FFFFFF' : '#0F766E', lineHeight: 1.2, marginTop: 2 }}>{products.filter(p => p.stock > 0).length}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'available' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockAvailable')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'available' ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.stock > 0).length}</div>
                     </div>
                   </div>
 
@@ -2220,28 +2219,27 @@ export default function App() {
                     style={{
                       cursor: 'pointer',
                       borderRadius: 10,
-                      padding: '10px 16px',
+                      padding: '8px 14px',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 10,
+                      gap: 8,
                       background: stockFilter === 'low'
                         ? 'linear-gradient(135deg, #D97706 0%, #F59E0B 100%)'
-                        : '#FFFFFF',
+                        : '#FFF7ED',
                       border: stockFilter === 'low'
                         ? 'none'
-                        : '1.5px solid #FED7AA',
+                        : '2px solid #FED7AA',
                       boxShadow: stockFilter === 'low'
-                        ? '0 4px 14px rgba(217, 119, 6, 0.35)'
+                        ? '0 4px 14px rgba(217, 119, 6, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
-                      transform: stockFilter === 'low' ? 'translateY(-2px)' : 'none',
-                      minWidth: 120
+                      transform: stockFilter === 'low' ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>⚠️</div>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>⚠️</div>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: stockFilter === 'low' ? 'rgba(255,255,255,0.85)' : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('stockLow')}</div>
-                      <div style={{ fontSize: 20, fontWeight: 800, color: stockFilter === 'low' ? '#FFFFFF' : '#D97706', lineHeight: 1.2, marginTop: 2 }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'low' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockLow')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'low' ? '#FFFFFF' : '#D97706', lineHeight: 1 }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
                     </div>
                   </div>
 
@@ -2251,28 +2249,27 @@ export default function App() {
                     style={{
                       cursor: 'pointer',
                       borderRadius: 10,
-                      padding: '10px 16px',
+                      padding: '8px 14px',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 10,
+                      gap: 8,
                       background: stockFilter === 'out'
                         ? 'linear-gradient(135deg, #DC2626 0%, #EF4444 100%)'
-                        : '#FFFFFF',
+                        : '#FEF2F2',
                       border: stockFilter === 'out'
                         ? 'none'
-                        : '1.5px solid #FECACA',
+                        : '2px solid #FECACA',
                       boxShadow: stockFilter === 'out'
-                        ? '0 4px 14px rgba(220, 38, 38, 0.35)'
+                        ? '0 4px 14px rgba(220, 38, 38, 0.4)'
                         : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
-                      transform: stockFilter === 'out' ? 'translateY(-2px)' : 'none',
-                      minWidth: 120
+                      transform: stockFilter === 'out' ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 32, height: 32, borderRadius: 8, background: stockFilter === 'out' ? 'rgba(255,255,255,0.25)' : '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🚫</div>
+                    <div style={{ width: 24, height: 24, borderRadius: 6, background: stockFilter === 'out' ? 'rgba(255,255,255,0.25)' : '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>🚫</div>
                     <div>
-                      <div style={{ fontSize: 10, fontWeight: 600, color: stockFilter === 'out' ? 'rgba(255,255,255,0.85)' : '#9CA3AF', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{t('stockOut')}</div>
-                      <div style={{ fontSize: 20, fontWeight: 800, color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626', lineHeight: 1.2, marginTop: 2 }}>{products.filter(p => p.stock <= 0).length}</div>
+                      <div style={{ fontSize: 9, fontWeight: 600, color: stockFilter === 'out' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockOut')}</div>
+                      <div style={{ fontSize: 14, fontWeight: 800, color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626', lineHeight: 1 }}>{products.filter(p => p.stock <= 0).length}</div>
                     </div>
                   </div>
 
@@ -2661,7 +2658,8 @@ export default function App() {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      minHeight: 'calc(100vh - 280px)'
+                      height: '100%',
+                      minHeight: 200
                     }}>
                       <div style={{ textAlign: 'center', padding: 40 }}>
                         <div style={{ fontSize: 64, marginBottom: 16 }}>📦</div>
