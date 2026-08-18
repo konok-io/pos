@@ -2152,19 +2152,19 @@ export default function App() {
                     flexShrink: 0
                   }}>
                     <div style={{ 
-                      background: 'rgba(255,255,255,0.2)',
-                      backdropFilter: 'blur(10px)',
+                      background: '#E0F2F1',
                       borderRadius: 10,
                       padding: '6px 12px',
                       height: 34,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 6,
-                      boxSizing: 'border-box'
+                      boxSizing: 'border-box',
+                      border: '1px solid #B2DFDB'
                     }}>
                       <span style={{ fontSize: 14 }}>📦</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF' }}>{filteredProducts.length}</span>
-                      <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>পণ্য</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#00695C' }}>{filteredProducts.length}</span>
+                      <span style={{ fontSize: 11, color: '#4DB6AC' }}>পণ্য</span>
                     </div>
                   </div>
                 </div>
