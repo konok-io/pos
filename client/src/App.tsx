@@ -2806,14 +2806,11 @@ export default function App() {
               <div style={{ 
                 padding: '10px 20px', 
                 borderBottom: '1px solid #E5E7EB', 
-                background: '#115E59', border: '1px solid #115E59',
+                background: '#F5F5F5', border: '1px solid #E0E0E0',
                 flexShrink: 0,
                 position: 'relative',
                 overflow: 'hidden'
               }}>
-                {/* Decorative elements */}
-                <div style={{ position: 'absolute', top: '-15px', left: '-15px', width: '80px', height: '80px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
-                <div style={{ position: 'absolute', bottom: '-20px', right: '20%', width: '60px', height: '60px', background: 'rgba(255,255,255,0.03)', borderRadius: '50%' }}></div>
                 
                 {/* Barcode Input - With Icon */}
                 <div style={{ 
@@ -2826,7 +2823,7 @@ export default function App() {
                   <div style={{ 
                     position: 'absolute', left: 0, top: 0, bottom: 0, 
                     width: 40, 
-                    background: '#115E59', border: '1px solid #115E59',
+                    background: '#115E59',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     borderRadius: '10px 0 0 10px'
                   }}>
