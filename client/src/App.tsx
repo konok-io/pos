@@ -2363,8 +2363,8 @@ export default function App() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 10,
-                      background: showExpiryList ? '#99F6E4' : '#F0FDFA',
-                      border: showExpiryList ? '2px solid #115E59' : '2px solid #CCFBF1',
+                      background: showExpiryList ? '#99F6E4' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#F0FDFA' : '#F8FAFC',
+                      border: showExpiryList ? '2px solid #115E59' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '2px solid #CCFBF1' : '2px solid #E5E7EB',
                       boxShadow: showExpiryList ? '0 4px 14px rgba(17, 94, 89, 0.3)' : '0 2px 8px rgba(0,0,0,0.04)',
                       transition: 'all 0.2s ease',
                       transform: showExpiryList ? 'translateY(-1px)' : 'none'
@@ -2374,7 +2374,7 @@ export default function App() {
                       width: 32,
                       height: 32,
                       borderRadius: 8,
-                      background: showExpiryList ? '#115E59' : '#0D9488',
+                      background: showExpiryList ? '#115E59' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#0D9488' : '#9CA3AF',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2384,14 +2384,14 @@ export default function App() {
                       <div style={{
                         fontSize: 11,
                         fontWeight: 600,
-                        color: showExpiryList ? '#FFFFFF' : '#6B7280',
+                        color: showExpiryList ? '#FFFFFF' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#6B7280',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px'
                       }}>{t('productExpiry')}</div>
                       <div style={{
                         fontSize: 18,
                         fontWeight: 800,
-                        color: showExpiryList ? '#FFFFFF' : '#115E59',
+                        color: showExpiryList ? '#FFFFFF' : products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length > 0 ? '#115E59' : '#9CA3AF',
                         lineHeight: 1
                       }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
                     </div>
@@ -2749,15 +2749,15 @@ export default function App() {
                     {/* Expiry Products List */}
                     {showExpiryList && (
                       <div style={{ padding: '16px 0' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FEF9C3', border: '2px solid #FDE047', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#F0FDFA', border: '2px solid #CCFBF1', borderRadius: 10, padding: '10px 14px', marginBottom: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#FACC15', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>📅</div>
-                            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#CA8A04', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
+                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>📅</div>
+                            <h3 style={{ fontSize: 14, fontWeight: 700, color: '#115E59', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
                           </div>
                           <button onClick={() => setShowExpiryList(false)} style={{ width: 28, height: 28, borderRadius: 6, background: '#FEE2E2', border: 'none', fontSize: 14, cursor: 'pointer', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                         </div>
                         {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
-                          <div style={{ textAlign: 'center', padding: 24, background: '#FEF9C3', borderRadius: 12 }}>
+                          <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
                             <p style={{ color: '#9CA3AF', margin: 0 }}>No products expiring within 30 days</p>
                           </div>
                         ) : (
@@ -2765,12 +2765,12 @@ export default function App() {
                             {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).map(p => {
                               const daysLeft = Math.ceil((new Date(p.expiryDate!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
                               return (
-                                <div key={p.id} style={{ background: '#FFFFFF', border: '1px solid #FDE047', borderRadius: 10, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div key={p.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 10, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                   <div>
                                     <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{p.name}</div>
                                     <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📅 {p.expiryDate}</div>
                                   </div>
-                                  <div style={{ background: daysLeft <= 7 ? '#FEE2E2' : '#FEF9C3', color: daysLeft <= 7 ? '#DC2626' : '#CA8A04', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600 }}>
+                                  <div style={{ background: daysLeft <= 7 ? '#FEE2E2' : '#F0FDFA', color: daysLeft <= 7 ? '#DC2626' : '#115E59', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600 }}>
                                     {daysLeft} days
                                   </div>
                                 </div>
