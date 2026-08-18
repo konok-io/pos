@@ -122,6 +122,28 @@ export const ar: Record<string, string> = {
   editCategory: 'تعديل فئة',
   categoryName: 'اسم الفئة',
 
+  // Products Screen
+  addNewProduct: 'إضافة منتج جديد',
+  categoryNotInDB: 'الفئة غير موجودة في قاعدة البيانات',
+  purchaseHistory: 'سجل المشتريات',
+  goBack: 'العودة',
+  noPurchaseRecords: 'لا توجد سجلات شراء',
+  priceChangeHistory: 'سجل تغيير الأسعار',
+  noPriceChanges: 'لا توجد تغييرات في الأسعار',
+  dateTime: 'التاريخ والوقت',
+  productChangeType: 'نوع التغيير',
+  oldPrice: 'السعر القديم',
+  newPrice: 'السعر الجديد',
+  user: 'المستخدم',
+  buyPrice: 'سعر الشراء',
+  sellPriceType: 'سعر البيع',
+  deletedProducts: 'قائمة المحذوفات',
+  noProductsDeleted: 'لم يتم حذف أي منتجات',
+  stockAtDeletion: 'المخزون عند الحذف',
+  enterSupplierName: 'أدخل اسم المورد',
+  productsLoaded: 'جاري تحميل قائمة المنتجات...',
+  noProductsFound: 'لم يتم العثور على منتجات',
+
   // Suppliers
   supplierList: 'قائمة الموردين',
   addSupplier: 'إضافة مورد',
