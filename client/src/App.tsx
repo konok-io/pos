@@ -2801,9 +2801,12 @@ export default function App() {
               
               {/* Barcode Input - Simple */}
               <div style={{ 
-                padding: '10px 20px',
+                padding: '0 20px',
                 background: '#F5F5F5',
                 borderBottom: '1px solid #E5E7EB',
+                height: 48,
+                display: 'flex',
+                alignItems: 'center',
               }}>
                 <input
                   className="barcode-input"
