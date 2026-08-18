@@ -1424,6 +1424,8 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSupplier, setSelectedSupplier] = useState('all');
   const [stockFilter, setStockFilter] = useState<string>('all'); // 'all', 'available', 'low', 'out'
+  const [showExpiryList, setShowExpiryList] = useState(false);
+  const [showCustomerList, setShowCustomerList] = useState(false);
   const [heldSales, setHeldSales] = useState<HeldSale[]>([]);
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
@@ -2352,22 +2354,27 @@ export default function App() {
                                   </div>
 
                   {/* Product Expiry Card */}
-                  <div style={{
-                    cursor: 'default',
-                    borderRadius: 12,
-                    padding: '10px 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    background: '#FEF9C3',
-                    border: '2px solid #FDE047',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                  }}>
+                  <div
+                    onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); }}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: 12,
+                      padding: '10px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      background: showExpiryList ? '#FDE68A' : '#FEF9C3',
+                      border: showExpiryList ? '2px solid #FACC15' : '2px solid #FDE047',
+                      boxShadow: showExpiryList ? '0 4px 14px rgba(250, 204, 21, 0.4)' : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: showExpiryList ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
                     <div style={{
                       width: 32,
                       height: 32,
                       borderRadius: 8,
-                      background: '#FACC15',
+                      background: showExpiryList ? '#CA8A04' : '#FACC15',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2377,36 +2384,41 @@ export default function App() {
                       <div style={{
                         fontSize: 11,
                         fontWeight: 600,
-                        color: '#6B7280',
+                        color: showExpiryList ? '#FFFFFF' : '#6B7280',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px'
                       }}>{t('productExpiry')}</div>
                       <div style={{
                         fontSize: 18,
                         fontWeight: 800,
-                        color: '#CA8A04',
+                        color: showExpiryList ? '#FFFFFF' : '#CA8A04',
                         lineHeight: 1
                       }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
                     </div>
                   </div>
 
                   {/* Customer Card */}
-                  <div style={{
-                    cursor: 'default',
-                    borderRadius: 12,
-                    padding: '10px 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    background: '#F0FDFA',
-                    border: '2px solid #CCFBF1',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                  }}>
+                  <div
+                    onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); }}
+                    style={{
+                      cursor: 'pointer',
+                      borderRadius: 12,
+                      padding: '10px 16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      background: showCustomerList ? '#115E59' : '#F0FDFA',
+                      border: showCustomerList ? '2px solid #115E59' : '2px solid #CCFBF1',
+                      boxShadow: showCustomerList ? '0 4px 14px rgba(17, 94, 89, 0.4)' : '0 2px 8px rgba(0,0,0,0.04)',
+                      transition: 'all 0.2s ease',
+                      transform: showCustomerList ? 'translateY(-1px)' : 'none'
+                    }}
+                  >
                     <div style={{
                       width: 32,
                       height: 32,
                       borderRadius: 8,
-                      background: '#14B8A6',
+                      background: showCustomerList ? '#FFFFFF' : '#14B8A6',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -2416,14 +2428,14 @@ export default function App() {
                       <div style={{
                         fontSize: 11,
                         fontWeight: 600,
-                        color: '#6B7280',
+                        color: showCustomerList ? 'rgba(255,255,255,0.9)' : '#6B7280',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px'
                       }}>{t('customers')}</div>
                       <div style={{
                         fontSize: 18,
                         fontWeight: 800,
-                        color: '#0D9488',
+                        color: showCustomerList ? '#FFFFFF' : '#0D9488',
                         lineHeight: 1
                       }}>{customers.length}</div>
                     </div>
@@ -2731,6 +2743,67 @@ export default function App() {
                       </div>
                     )}
                   
+
+                    {/* Expiry Products List */}
+                    {showExpiryList && (
+                      <div style={{ padding: '16px 0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#CA8A04', margin: 0 }}>📅 {t('productExpiry')}</h3>
+                          <button onClick={() => setShowExpiryList(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9CA3AF' }}>✕</button>
+                        </div>
+                        {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
+                          <div style={{ textAlign: 'center', padding: 24, background: '#FEF9C3', borderRadius: 12 }}>
+                            <p style={{ color: '#9CA3AF', margin: 0 }}>No products expiring within 30 days</p>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 10 }}>
+                            {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).map(p => {
+                              const daysLeft = Math.ceil((new Date(p.expiryDate!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+                              return (
+                                <div key={p.id} style={{ background: '#FFFFFF', border: '1px solid #FDE047', borderRadius: 10, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                  <div>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{p.name}</div>
+                                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📅 {p.expiryDate}</div>
+                                  </div>
+                                  <div style={{ background: daysLeft <= 7 ? '#FEE2E2' : '#FEF9C3', color: daysLeft <= 7 ? '#DC2626' : '#CA8A04', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600 }}>
+                                    {daysLeft} days
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+
+                    {/* Customer List */}
+                    {showCustomerList && (
+                      <div style={{ padding: '16px 0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                          <h3 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: 0 }}>👥 {t('customers')}</h3>
+                          <button onClick={() => setShowCustomerList(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#9CA3AF' }}>✕</button>
+                        </div>
+                        {customers.length === 0 ? (
+                          <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
+                            <p style={{ color: '#9CA3AF', margin: 0 }}>{t('noCustomerFound')}</p>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
+                            {customers.map(c => (
+                              <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 10, padding: 12 }}>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
+                                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📱 {c.phone}</div>
+                                {c.balance > 0 && (
+                                  <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>বাকি: ৳{c.balance}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {filteredProducts.length === 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FFFFFF', borderRadius: 12, overflow: 'hidden' }}>
                       <div style={{ textAlign: 'center', marginBottom: 20 }}>
