@@ -2825,137 +2825,88 @@ export default function App() {
                       display: 'flex',
                       flexDirection: 'column'
                     }}>
-                      {/* What is POS Section */}
-                      <div style={{ padding: '24px 32px 0' }}>
-                        <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
-                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🏪</span>
-                            POS কি?
-                          </h2>
-                          <p style={{ fontSize: 13, color: '#64748B', margin: 0, lineHeight: 1.7 }}>
-                            <strong style={{ color: '#374151' }}>POS (Point of Sale)</strong> মানে হলো বিক্রয়ের পয়েন্ট - যেখানে আপনি পণ্য বিক্রি করেন এবং টাকা গ্রহণ করেন। আমাদের POS সিস্টেম আপনার দোকানের সব কাজ ডিজিটালাইজ করে - স্টক দেখা, বিক্রি করা, হিসাব রাখা সব এক জায়গায়।
-                          </p>
-                        </div>
-                      </div>
+                      {/* All Content in Compact Grid */}
+                      <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12, overflow: 'auto' }}>
+                        {/* Top Row - 3 Columns */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                          {/* What is POS */}
+                          <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                            <h3 style={{ fontSize: 12, fontWeight: 700, color: '#115E59', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ width: 22, height: 22, borderRadius: 6, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>🏪</span>
+                              POS কি?
+                            </h3>
+                            <p style={{ fontSize: 11, color: '#64748B', margin: 0, lineHeight: 1.5 }}>
+                              POS মানে <strong style={{ color: '#374151' }}>বিক্রয়ের পয়েন্ট</strong> - যেখানে পণ্য বিক্রি ও টাকা গ্রহণ করেন। আমাদের সিস্টেম দোকানের সব কাজ ডিজিটালাইজ করে।
+                            </p>
+                          </div>
 
-                      {/* How It Works */}
-                      <div style={{ padding: '0 32px 0' }}>
-                        <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
-                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>⚙️</span>
-                            কিভাবে কাজ করে?
-                          </h2>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                            <div style={{ textAlign: 'center', padding: '14px 10px', background: '#F0FDFA', borderRadius: 10 }}>
-                              <div style={{ fontSize: 28, marginBottom: 8 }}>📦</div>
-                              <div style={{ fontSize: 12, fontWeight: 600, color: '#0D9488', marginBottom: 4 }}>১. পণ্য যোগ করুন</div>
-                              <div style={{ fontSize: 11, color: '#64748B' }}>পণ্যের নাম, দাম, স্টক যোগ করুন</div>
+                          {/* How It Works */}
+                          <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                            <h3 style={{ fontSize: 12, fontWeight: 700, color: '#115E59', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ width: 22, height: 22, borderRadius: 6, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>⚙️</span>
+                              কিভাবে কাজ করে?
+                            </h3>
+                            <div style={{ display: 'flex', gap: 6, fontSize: 10, color: '#64748B' }}>
+                              <span>📦 যোগ</span>
+                              <span>→</span>
+                              <span>🔍 সার্চ</span>
+                              <span>→</span>
+                              <span>💰 বিক্রি</span>
                             </div>
-                            <div style={{ textAlign: 'center', padding: '14px 10px', background: '#FEF3C7', borderRadius: 10 }}>
-                              <div style={{ fontSize: 28, marginBottom: 8 }}>🔍</div>
-                              <div style={{ fontSize: 12, fontWeight: 600, color: '#D97706', marginBottom: 4 }}>২. সার্চ করুন</div>
-                              <div style={{ fontSize: 11, color: '#64748B' }}>বারকোড বা নাম দিয়ে খুঁজুন</div>
-                            </div>
-                            <div style={{ textAlign: 'center', padding: '14px 10px', background: '#DCFCE7', borderRadius: 10 }}>
-                              <div style={{ fontSize: 28, marginBottom: 8 }}>💰</div>
-                              <div style={{ fontSize: 12, fontWeight: 600, color: '#15803D', marginBottom: 4 }}>৩. বিক্রি করুন</div>
-                              <div style={{ fontSize: 11, color: '#64748B' }}>কার্টে যোগ করে বিক্রি সম্পন্ন করুন</div>
+                          </div>
+
+                          {/* Benefits */}
+                          <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                            <h3 style={{ fontSize: 12, fontWeight: 700, color: '#115E59', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ width: 22, height: 22, borderRadius: 6, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✨</span>
+                              উপকারিতা
+                            </h3>
+                            <div style={{ fontSize: 10, color: '#64748B', display: 'flex', gap: 8 }}>
+                              <span>⏰ সময়</span>
+                              <span>📊 হিসাব</span>
+                              <span>🔔 আলার্ট</span>
+                              <span>👥 কাস্টমার</span>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Benefits */}
-                      <div style={{ padding: '0 32px 0' }}>
-                        <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
-                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✨</span>
-                            আপনার ব্যবসায় উপকারিতা
-                          </h2>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px', background: '#F8FAFC', borderRadius: 10 }}>
-                              <span style={{ fontSize: 20 }}>⏰</span>
-                              <div>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 2 }}>সময় বাঁচায়</div>
-                                <div style={{ fontSize: 11, color: '#64748B' }}>হিসাব করতে ঘণ্টা নষ্ট নয়, ১ মিনিটে বিক্রি!</div>
-                              </div>
+                        {/* Second Row - 2 Columns */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                          {/* Who Uses */}
+                          <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 14, boxShadow: '0 1px 4px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB' }}>
+                            <h3 style={{ fontSize: 12, fontWeight: 700, color: '#115E59', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ width: 22, height: 22, borderRadius: 6, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>👨‍💼</span>
+                              কারা ব্যবহার করে?
+                            </h3>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, fontSize: 10 }}>
+                              {['🏪', '🍔', '🥤', '💊', '🧴', '📚', '👕', '🔧'].map((icon, i) => (
+                                <span key={i} style={{ padding: '4px 8px', background: '#F0FDFA', borderRadius: 12, color: '#0D9488' }}>{icon}</span>
+                              ))}
                             </div>
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px', background: '#F8FAFC', borderRadius: 10 }}>
-                              <span style={{ fontSize: 20 }}>📊</span>
-                              <div>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 2 }}>সঠিক হিসাব</div>
-                                <div style={{ fontSize: 11, color: '#64748B' }}>ভুল হিসাব নেই, সব ডিজিটাল ও নির্ভুল</div>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px', background: '#F8FAFC', borderRadius: 10 }}>
-                              <span style={{ fontSize: 20 }}>🔔</span>
-                              <div>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 2 }}>স্টক আলার্ট</div>
-                                <div style={{ fontSize: 11, color: '#64748B' }}>পণ্য শেষ হওয়ার আগেই জানাবে</div>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '12px', background: '#F8FAFC', borderRadius: 10 }}>
-                              <span style={{ fontSize: 20 }}>👥</span>
-                              <div>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', marginBottom: 2 }}>কাস্টমার ম্যানেজমেন্ট</div>
-                                <div style={{ fontSize: 11, color: '#64748B' }}>কার কত বাকি, সহজে দেখুন</div>
-                              </div>
+                          </div>
+
+                          {/* Stats */}
+                          <div style={{ background: 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)', borderRadius: 12, padding: 14 }}>
+                            <h3 style={{ fontSize: 12, fontWeight: 700, color: '#FFFFFF', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <span style={{ width: 22, height: 22, borderRadius: 6, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>📈</span>
+                              পরিসংখ্যান
+                            </h3>
+                            <div style={{ display: 'flex', gap: 12, fontSize: 11, color: '#FFFFFF' }}>
+                              <div><strong>১০০+</strong> ব্যবহারকারী</div>
+                              <div><strong>৫০০০+</strong> লেনদেন</div>
+                              <div><strong>৯৯.৯%</strong> Uptime</div>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Who Uses */}
-                      <div style={{ padding: '0 32px 0' }}>
-                        <div style={{ background: '#FFFFFF', borderRadius: 14, padding: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #E5E7EB', marginBottom: 16 }}>
-                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#115E59', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#F0FDFA', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>👨‍💼</span>
-                            কারা ব্যবহার করে?
-                          </h2>
-                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                            {['🏪 কিরানা স্টোর', '🍔 খাবার দোকান', '🥤 পানীয় দোকান', '💊 ফার্মেসি', '🧴 কসমেটিক শপ', '📚 বইয়ের দোকান', '👕 কাপড়ের দোকান', '🔧 হার্ডওয়্যার শপ'].map(item => (
-                              <span key={item} style={{ padding: '8px 14px', background: '#F0FDFA', borderRadius: 20, fontSize: 12, color: '#0D9488', fontWeight: 500, border: '1px solid #CCFBF1' }}>{item}</span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Stats */}
-                      <div style={{ padding: '0 32px 0' }}>
-                        <div style={{ background: 'linear-gradient(135deg, #115E59 0%, #0D9488 100%)', borderRadius: 14, padding: 20, marginBottom: 16 }}>
-                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF', margin: '0 0 14px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>📈</span>
-                            আমাদের সিস্টেমের পরিসংখ্যান
-                          </h2>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 10px' }}>
-                              <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF' }}>১০০+</div>
-                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)' }}>ব্যবহারকারী</div>
-                            </div>
-                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 10px' }}>
-                              <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF' }}>৫০০০+</div>
-                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)' }}>দৈনিক লেনদেন</div>
-                            </div>
-                            <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.15)', borderRadius: 10, padding: '14px 10px' }}>
-                              <div style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF' }}>৯৯.৯%</div>
-                              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.85)' }}>Uptime</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Quick Start Guide */}
-                      <div style={{ padding: '0 32px 24px' }}>
-                        <div style={{ background: '#FEF9C3', borderRadius: 14, padding: 20, border: '2px solid #FDE047' }}>
-                          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#CA8A04', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ width: 28, height: 28, borderRadius: 8, background: '#FACC15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>🚀</span>
+                        {/* Quick Start - Full Width */}
+                        <div style={{ background: '#FEF9C3', borderRadius: 12, padding: 12, border: '1px solid #FDE047' }}>
+                          <h3 style={{ fontSize: 12, fontWeight: 700, color: '#CA8A04', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ width: 22, height: 22, borderRadius: 6, background: '#FACC15', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>🚀</span>
                             শুরু করুন
-                          </h2>
-                          <p style={{ fontSize: 13, color: '#92400E', margin: 0, lineHeight: 1.7 }}>
-                            <strong>১.</strong> উপরের <strong>পণ্য যোগ করুন</strong> বাটনে ক্লিক করে পণ্য তালিকা তৈরি করুন<br/>
-                            <strong>২.</strong> সার্চ বক্সে পণ্য খুঁজুন বা ক্যাটাগরি সিলেক্ট করুন<br/>
-                            <strong>৩.</strong> পণ্যে ক্লিক করে কার্টে যোগ করুন<br/>
-                            <strong>৪.</strong> পেমেন্ট করে বিক্রি সম্পন্ন করুন
+                          </h3>
+                          <p style={{ fontSize: 10, color: '#92400E', margin: 0, lineHeight: 1.5 }}>
+                            <strong>১.</strong> পণ্য যোগ করুন <strong>→</strong> <strong>২.</strong> সার্চ করুন <strong>→</strong> <strong>৩.</strong> কার্টে যোগ করুন <strong>→</strong> <strong>৪.</strong> পেমেন্ট করুন
                           </p>
                         </div>
                       </div>
