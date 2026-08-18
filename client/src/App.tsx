@@ -1015,6 +1015,7 @@ ${printFiltered.map(p => {
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
+  id: 'admin',
   email: 'admin@pos.test',
   password: 'admin123',
   role: 'admin',
@@ -1129,7 +1130,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
     await new Promise(resolve => setTimeout(resolve, 500));
 
     if ((username === 'admin' || username === 'admin@konok.io') && password === 'admin123') {
-      await db.put('users', 'current', DEFAULT_ADMIN);
+      await db.put('users', DEFAULT_ADMIN);
       onLogin();
     } else {
       setError(t('invalidCredentials'));
@@ -1467,7 +1468,7 @@ export default function App() {
   useEffect(() => {
     const initApp = async () => {
       // Check if user was logged in (check both users store and settings)
-      const user = await db.get('users', 'current');
+      const user = await db.get('users', 'admin');
       const isLoggedInSetting = await db.get<boolean>('settings', 'isLoggedIn');
       if (user || isLoggedInSetting) {
         setIsLoggedIn(true);
@@ -1615,7 +1616,7 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    await db.delete('users', 'current');
+    await db.delete('users', 'admin');
     await db.delete('settings', 'isLoggedIn');
     setIsLoggedIn(false);
   };
