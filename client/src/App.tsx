@@ -3,8 +3,9 @@ import './index.css';
 import { useLanguage, languages } from './i18n';
 import TranslationSettings from './pages/TranslationSettings';
 import DatabaseSettings from './pages/DatabaseSettings';
+import SettingsScreen from './pages/SettingsScreen';
 import { db } from './utils/db';
-import { setSetting as dbSetSetting, getSetting as dbGetSetting, initDatabase } from './services/database';
+import { getSetting as dbGetSetting, initDatabase } from './services/database';
 
 // Default admin credentials
 const DEFAULT_ADMIN = {
@@ -347,6 +348,8 @@ export default function App() {
     { id: 'c2', name: 'Karim', phone: '01812345678', address: 'Chittagong', balance: 500 },
   ]);
   const [sales, setSales] = useState<Sale[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [purchases, setPurchases] = useState<any[]>([]);
 
   // Tabs configuration
   const otherTabs = [
@@ -393,15 +396,6 @@ export default function App() {
   const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [currency, setCurrency] = useState('SAR '); // Currency symbol
   const fmt = (n: number) => `${currency}${(+n || 0).toLocaleString('en-IN')}`;
-  
-  // Settings wrapper - saves to PouchDB
-  const setSetting = async (key: string, value: string) => {
-    try {
-      await dbSetSetting(key, value);
-    } catch (e) {
-      console.error('Failed to save setting:', e);
-    }
-  };
   
   // Load settings from PouchDB on startup
   useEffect(() => {
@@ -1693,74 +1687,21 @@ export default function App() {
         )}
 
         {currentTab === 'settings' && (
-          <div>
-            <h2 style={{ marginBottom: 16 }}>⚙️ {t('settings')}</h2>
-            <div className="card" style={{ maxWidth: 500 }}>
-              <div className="form-group">
-                <label className="label">{t('currency') || 'Currency'}</label>
-                <select
-                  className="input"
-                  value={currency}
-                  onChange={(e) => {
-                    setCurrency(e.target.value);
-                    setSetting('currency', e.target.value);
-                  }}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <option value="SAR ">SAR Riyal (SAR) - ডিফল্ট</option>
-                  <option value="৳">৳ Taka (BDT)</option>
-                  <option value="$">$ Dollar (USD)</option>
-                  <option value="€">€ Euro (EUR)</option>
-                  <option value="£">£ Pound (GBP)</option>
-                  <option value="¥">¥ Yen (JPY)</option>
-                  <option value="₹">₹ Rupee (INR)</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label className="label">{t('vat')} (%)</label>
-                <input
-                  type="number"
-                  className="input"
-                  value={vatPercent}
-                  onChange={(e) => {
-                    const val = parseFloat(e.target.value) || 0;
-                    setVatPercent(val);
-                    setSetting('vatPercent', val.toString());
-                  }}
-                />
-              </div>
-              <div className="form-group">
-                <label className="label">Business Name</label>
-                <input 
-                  type="text" 
-                  className="input" 
-                  defaultValue="My Store" 
-                  onBlur={(e) => setSetting('businessName', e.target.value)}
-                />
-              </div>
-              <div style={{ 
-                padding: '12px', 
-                background: '#F0FDF4', 
-                borderRadius: 8,
-                color: '#166534',
-                fontSize: 14
-              }}>
-                ✅ {t('saveSuccess') || 'Settings auto-saved!'}
-              </div>
-            </div>
-            
-            {/* Translations Section */}
-            <div className="card" style={{ marginTop: 20 }}>
-              <h3 style={{ marginBottom: 12 }}>🌐 Translations</h3>
-              <TranslationSettings />
-            </div>
-            
-            {/* Database Section */}
-            <div className="card" style={{ marginTop: 20 }}>
-              <h3 style={{ marginBottom: 12 }}>🗄️ {t('database')}</h3>
-              <DatabaseSettings />
-            </div>
-          </div>
+          <SettingsScreen 
+            products={products}
+            customers={customers}
+            sales={sales}
+            suppliers={suppliers}
+            categories={categories}
+            purchases={purchases}
+            onRefresh={() => {
+              setProducts([]);
+              setCustomers([]);
+              setSales([]);
+              setSuppliers([]);
+              setPurchases([]);
+            }}
+          />
         )}
 
         {currentTab === 'newproduct' && (
