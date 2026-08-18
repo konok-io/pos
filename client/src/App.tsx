@@ -1948,7 +1948,7 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minWidth: 0 }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: 'linear-gradient(135deg, #115E59 0%, #0F766E 100%)',
+                background: '#115E59',
                 padding: '10px 20px',
                 boxShadow: '0 4px 20px rgba(30,58,95,0.3)',
                 position: 'relative',
@@ -1973,7 +1973,7 @@ export default function App() {
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
                       width: 40, 
-                      background: 'linear-gradient(135deg, #115E59 0%, #0F766E 100%)',
+                      background: '#115E59',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
@@ -2788,7 +2788,7 @@ export default function App() {
               <div style={{ 
                 padding: '10px 14px', 
                 borderBottom: '1px solid #E5E7EB', 
-                background: 'linear-gradient(135deg, #115E59 0%, #0F766E 100%)',
+                background: '#115E59',
                 flexShrink: 0,
                 position: 'relative',
                 overflow: 'hidden'
