@@ -1629,8 +1629,11 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   if (view === 'regular' && selectedCustomer) {
     const customerSales = getCustomerSales(selectedCustomer);
     const customerTotal = customerSales.reduce((sum, s) => sum + s.total, 0);
-    const customerDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
-    const customerDeposit = selectedCustomer.deposit || 0;
+    const rawDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
+    const rawDeposit = selectedCustomer.deposit || 0;
+    // Calculate net due/deposit: offset deposit against due
+    const netDue = Math.max(0, rawDue - rawDeposit);
+    const netDeposit = Math.max(0, rawDeposit - rawDue);
 
     return (
       <div style={containerStyle}>
@@ -1759,16 +1762,16 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               <div style={{ fontSize: '22px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
             </div>
             
-            {/* Due/Deposit - Dynamic based on priority */}
-            {customerDue > 0 ? (
+            {/* Due/Deposit - Dynamic based on net balance */}
+            {netDue > 0 ? (
               <div style={{ flexShrink: 0 }}>
                 <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('due')}</div>
-                <div style={{ fontSize: '22px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
+                <div style={{ fontSize: '22px', color: T.red, fontWeight: 700 }}>{fmt(netDue)}</div>
               </div>
-            ) : customerDeposit > 0 ? (
+            ) : netDeposit > 0 ? (
               <div style={{ flexShrink: 0 }}>
                 <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('deposit')}</div>
-                <div style={{ fontSize: '22px', color: T.tealDark, fontWeight: 700 }}>{fmt(customerDeposit)}</div>
+                <div style={{ fontSize: '22px', color: T.tealDark, fontWeight: 700 }}>{fmt(netDeposit)}</div>
               </div>
             ) : null}
           </div>
@@ -1996,11 +1999,13 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
         }}>
           <span style={{ fontSize: '14px', fontWeight: 600, color: T.tealDark }}>
             {activeTab === 'all' ? t('totalBills').replace('0', customerSales.length.toString()) : 
-             activeTab === 'due' ? `${t('total')} (${(selectedCustomer.transactions || []).filter(t => t.type === 'due').length})` :
-             `${t('total')} (${(selectedCustomer.transactions || []).filter(t => t.type === 'deposit').length})`}
+             activeTab === 'due' ? `${t('total')} (${(selectedCustomer.transactions || []).filter(tx => tx.type === 'due').length})` :
+             `${t('total')} (${(selectedCustomer.transactions || []).filter(tx => tx.type === 'deposit').length})`}
           </span>
           <span style={{ fontSize: '16px', fontWeight: 700, color: T.teal }}>
-            {fmt(customerTotal)}
+            {activeTab === 'all' ? fmt(customerTotal) :
+             activeTab === 'due' ? fmt((selectedCustomer.transactions || []).filter(tx => tx.type === 'due').reduce((sum, tx) => sum + tx.amount, 0)) :
+             fmt((selectedCustomer.transactions || []).filter(tx => tx.type === 'deposit').reduce((sum, tx) => sum + tx.amount, 0))}
           </span>
         </div>
 
