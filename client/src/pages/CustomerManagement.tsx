@@ -1198,24 +1198,24 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
         <div style={{
           background: T.white,
           borderRadius: '14px',
-          padding: '20px',
+          padding: '16px',
           boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
           border: `1px solid ${T.gray200}`,
           marginBottom: '20px',
           display: 'flex',
-          gap: '20px',
+          gap: '16px',
           alignItems: 'flex-start',
         }}>
           {/* Avatar on the left */}
           <div style={{
-            width: '80px',
-            height: '80px',
+            width: '70px',
+            height: '70px',
             borderRadius: '50%',
             background: T.teal,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '32px',
+            fontSize: '28px',
             color: T.white,
             fontWeight: 700,
             flexShrink: 0,
@@ -1234,72 +1234,79 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
 
           {/* Info and Actions */}
           <div style={{ flex: 1 }}>
+            {/* Top Row - Basic Info */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-              gap: '16px',
-              marginBottom: '16px',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '12px',
+              marginBottom: '12px',
             }}>
               <div>
-                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('id')}</div>
-                <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.id}</div>
+                <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>{t('id')}</div>
+                <div style={{ fontSize: '13px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.id}</div>
               </div>
               <div>
-                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('name')}</div>
-                <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.name}</div>
+                <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>{t('name')}</div>
+                <div style={{ fontSize: '13px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.name}</div>
               </div>
               <div>
-                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('phone')}</div>
-                <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.phone || '-'}</div>
+                <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>{t('phone')}</div>
+                <div style={{ fontSize: '13px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.phone || '-'}</div>
               </div>
               <div>
-                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('address')}</div>
-                <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.address || '-'}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('totalPurchases')}</div>
-                <div style={{ fontSize: '14px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('due')}</div>
-                <div style={{ fontSize: '14px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
+                <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>{t('address')}</div>
+                <div style={{ fontSize: '13px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.address || '-'}</div>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button
-                style={{
-                  padding: '10px 20px',
-                  background: T.redSolid,
-                  color: T.white,
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                📋 {t('addDue')}
-              </button>
-              <button
-                style={{
-                  padding: '10px 20px',
-                  background: T.tealDark2,
-                  color: T.white,
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                }}
-              >
-                💰 {t('addDeposit')}
-              </button>
+            
+            {/* Bottom Row - Amounts and Buttons inline */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <div>
+                  <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>{t('totalPurchases')}</div>
+                  <div style={{ fontSize: '22px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>{t('due')}</div>
+                  <div style={{ fontSize: '22px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  style={{
+                    padding: '8px 14px',
+                    background: T.redSolid,
+                    color: T.white,
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  📋 {t('addDue')}
+                </button>
+                <button
+                  style={{
+                    padding: '8px 14px',
+                    background: T.tealDark2,
+                    color: T.white,
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  💰 {t('addDeposit')}
+                </button>
+              </div>
             </div>
           </div>
         </div>
