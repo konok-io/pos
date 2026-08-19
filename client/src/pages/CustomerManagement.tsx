@@ -679,14 +679,14 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
           <div style={{
             margin: '16px 20px',
             padding: '12px 16px',
-            background: T.greenLight,
+            background: T.tealLight,
             borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
           }}>
             <span style={{ fontSize: '20px' }}>💰</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: T.green }}>{t('addDepositAmount')}</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: T.tealDark }}>{t('addDepositAmount')}</span>
           </div>
 
           {/* Summary Bar */}
@@ -712,7 +712,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               )}
               <div>
                 <span style={{ fontSize: '12px', color: T.gray600 }}>{t('currentDeposit')}: </span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: T.green }}>{modalFmt(currentDeposit)}</span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{modalFmt(currentDeposit)}</span>
               </div>
             </div>
             {currentDue > 0 ? (
@@ -760,9 +760,9 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                   onClick={() => setSelectedPayment(method)}
                   style={{
                     padding: '10px 8px',
-                    background: selectedPayment === method ? T.greenLight : T.white,
-                    color: selectedPayment === method ? T.green : T.gray800,
-                    border: selectedPayment === method ? `2px solid ${T.green}` : `1px solid ${T.gray200}`,
+                    background: selectedPayment === method ? T.tealLight : T.white,
+                    color: selectedPayment === method ? T.tealDark : T.gray800,
+                    border: selectedPayment === method ? `2px solid ${T.tealDark}` : `1px solid ${T.gray200}`,
                     borderRadius: '8px',
                     fontSize: '12px',
                     fontWeight: 600,
@@ -832,7 +832,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               style={{
                 flex: 1,
                 padding: '12px',
-                background: T.green,
+                background: T.tealDark,
                 color: T.white,
                 border: 'none',
                 borderRadius: '8px',
@@ -1347,7 +1347,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                         <div style={{ fontSize: '10px', color: T.gray400 }}>{t('due')}: <span style={{ color: T.red, fontWeight: 600 }}>{fmt(customerDue)}</span></div>
                       )}
                       {(customer.deposit || 0) > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) && (
-                        <div style={{ fontSize: '10px', color: T.gray400 }}>{t('deposit')}: <span style={{ color: T.green, fontWeight: 600 }}>{fmt(customer.deposit || 0)}</span></div>
+                        <div style={{ fontSize: '10px', color: T.gray400 }}>{t('deposit')}: <span style={{ color: T.tealDark, fontWeight: 600 }}>{fmt(customer.deposit || 0)}</span></div>
                       )}
                       {customerDue === 0 && (customer.deposit || 0) === 0 && (
                         <>
@@ -1767,7 +1767,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             {/* Deposit - BIG */}
             <div style={{ flexShrink: 0 }}>
               <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('deposit')}</div>
-              <div style={{ fontSize: '22px', color: T.green, fontWeight: 700 }}>{fmt(customerDeposit)}</div>
+              <div style={{ fontSize: '22px', color: T.tealDark, fontWeight: 700 }}>{fmt(customerDeposit)}</div>
             </div>
           </div>
 
@@ -1975,7 +1975,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                       <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(tx.date).toLocaleString()}</td>
                       <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{tx.note || '-'}</td>
                       <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{tx.paymentMethod || '-'}</td>
-                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.green, textAlign: 'right', fontWeight: 600 }}>+{fmt(tx.amount)}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.tealDark, textAlign: 'right', fontWeight: 600 }}>+{fmt(tx.amount)}</td>
                     </tr>
                   ))}
                 </tbody>
