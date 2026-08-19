@@ -1312,7 +1312,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                   borderRadius: '14px',
                   padding: '16px',
                   boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  border: `1px solid ${T.gray200}`,
+                  border: '1px solid #e0e0e0',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
