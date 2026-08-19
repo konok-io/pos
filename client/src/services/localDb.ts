@@ -174,10 +174,25 @@ interface POSDatabase extends DBSchema {
     key: string;
     value: { key: string; value: any };
   };
+  transactions: {
+    key: string;
+    value: Transaction;
+    indexes: { 'by-customer': string; 'by-type': string };
+  };
+}
+
+interface Transaction {
+  id: string;
+  customerId: string;
+  type: 'due' | 'deposit';
+  amount: number;
+  date: string;
+  comment?: string;
+  paymentMethod?: string;
 }
 
 const DB_NAME = 'pos-offline-db';
-const DB_VERSION = 4;
+const DB_VERSION = 6;
 
 let db: IDBPDatabase<POSDatabase> | null = null;
 
@@ -253,6 +268,13 @@ export async function initDatabase(): Promise<IDBPDatabase<POSDatabase>> {
       // Settings
       if (!database.objectStoreNames.contains('settings')) {
         database.createObjectStore('settings', { keyPath: 'key' });
+      }
+
+      // Transactions (Due/Deposit history)
+      if (!database.objectStoreNames.contains('transactions')) {
+        const store = database.createObjectStore('transactions', { keyPath: 'id' });
+        store.createIndex('by-customer', 'customerId');
+        store.createIndex('by-type', 'type');
       }
     },
   });

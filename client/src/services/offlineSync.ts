@@ -3,7 +3,7 @@ import type { Product, Category, Customer, Sale } from '../types';
 
 // Use the same database as localDb for consistency
 const DB_NAME = 'pos-offline-db';
-const DB_VERSION = 4;
+const DB_VERSION = 6;
 
 interface PendingSale {
   id: string;
@@ -36,6 +36,10 @@ class OfflineSyncService {
         // Settings store
         if (!db.objectStoreNames.contains('settings')) {
           db.createObjectStore('settings', { keyPath: 'key' });
+        }
+        // Transactions store
+        if (!db.objectStoreNames.contains('transactions')) {
+          db.createObjectStore('transactions', { keyPath: 'id' });
         }
       },
     });
