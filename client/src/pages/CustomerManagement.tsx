@@ -1397,22 +1397,22 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                     {/* Delete Button */}
                     <button
                       onClick={() => {
-                        if (isGeneralCustomer(customer) || customer.balance > 0) return;
+                        if (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) return;
                         handleDeleteCustomer(customer);
                       }}
-                      disabled={isGeneralCustomer(customer) || customer.balance > 0}
+                      disabled={isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0}
                       style={{
                         padding: '10px 14px',
-                        background: (isGeneralCustomer(customer) || customer.balance > 0) ? T.gray100 : '#EF9A9A',
-                        color: (isGeneralCustomer(customer) || customer.balance > 0) ? T.gray400 : '#B71C1C',
+                        background: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? T.gray100 : '#EF9A9A',
+                        color: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? T.gray400 : '#B71C1C',
                         border: 'none',
                         borderRadius: '8px',
                         fontSize: '14px',
-                        cursor: (isGeneralCustomer(customer) || customer.balance > 0) ? 'not-allowed' : 'pointer',
+                        cursor: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? 'not-allowed' : 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        opacity: (isGeneralCustomer(customer) || customer.balance > 0) ? 0.5 : 1,
+                        opacity: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? 0.5 : 1,
                       }}
                     >
                       🗑️
