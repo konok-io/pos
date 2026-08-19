@@ -85,7 +85,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
         setName(customer.name);
         setPhone(customer.phone || '');
         setAddress(customer.address || '');
-        setAvatar(null);
+        setAvatar(customer.avatar || null);
       } else {
         setCustomerId('');
         setName('');
@@ -174,6 +174,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
       address: address.trim(),
       balance: isEditMode && customer ? customer.balance : 0,
       deposit: isEditMode && customer ? customer.deposit : 0,
+      avatar: avatar || undefined,
     };
 
     onSave(savedCustomer);
