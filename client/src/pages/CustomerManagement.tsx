@@ -1306,11 +1306,13 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             </div>
           ) : (
             filteredCustomers.map((customer) => {
-              const customerDue = customer.balance > 0 ? customer.balance : 0;
-              const customerDeposit = customer.deposit || 0;
-              // Priority: Due > Deposit
-              const hasDue = customerDue > 0;
-              const hasDeposit = !hasDue && customerDeposit > 0;
+              const rawDue = customer.balance > 0 ? customer.balance : 0;
+              const rawDeposit = customer.deposit || 0;
+              // Calculate net due/deposit: offset deposit against due
+              const netDue = Math.max(0, rawDue - rawDeposit);
+              const netDeposit = Math.max(0, rawDeposit - rawDue);
+              const hasDue = netDue > 0;
+              const hasDeposit = !hasDue && netDeposit > 0;
               
               return (
                 <div key={customer.id} style={{
@@ -1382,9 +1384,9 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                       }}
                     >
                       {hasDue ? (
-                        <><span>⚠️</span> {t('due')}: {fmt(customerDue)}</>
+                        <><span>⚠️</span> {t('due')}: {fmt(netDue)}</>
                       ) : hasDeposit ? (
-                        <><span>💰</span> Deposit: {fmt(customerDeposit)}</>
+                        <><span>💰</span> Deposit: {fmt(netDeposit)}</>
                       ) : isGeneralCustomer(customer) ? (
                         <><span>📋</span> {t('viewHistory')}</>
                       ) : (
