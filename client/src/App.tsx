@@ -1191,6 +1191,7 @@ interface Customer {
   phone: string;
   address: string;
   balance: number;
+  deposit: number;
 }
 
 interface Sale {
@@ -1647,6 +1648,7 @@ export default function App() {
           phone: '',
           address: '',
           balance: 0,
+          deposit: 0,
         };
         setCustomers([generalCustomer]);
         await db.put('customers', generalCustomer.id, generalCustomer);
