@@ -3070,7 +3070,7 @@ export default function App() {
                         border: '1.5px solid #10B981',
                       }}>
                         <span style={{ fontSize: 13, fontWeight: 600, color: '#065F46' }}>
-                          👤 {selectedCustomer.name} • {selectedCustomer.id} • {selectedCustomer.phone}
+                          👤 {selectedCustomer.name} • {selectedCustomer.phone}
                         </span>
                         <button 
                           onClick={() => { setSelectedCustomer(null); setCartCustomerInput(''); }}
