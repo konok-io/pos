@@ -729,21 +729,23 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
                 <span>📋</span> {t('viewHistory')}
               </button>
               {/* Delete Button - Always Disabled for General Customer */}
-              <button
-                disabled
+              <div
                 style={{
                   padding: '12px 16px',
                   background: T.gray100,
                   color: T.gray400,
-                  border: 'none',
                   borderRadius: '10px',
                   fontSize: '14px',
                   cursor: 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   opacity: 0.5,
+                  userSelect: 'none',
                 }}
               >
                 🗑️
-              </button>
+              </div>
             </div>
           </div>
         )}
