@@ -700,32 +700,51 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
                   {t('generalCustomerDefault')}
                 </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
                 <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray600, textTransform: 'uppercase' }}>{t('total')}</div>
                 <div style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{fmt(generalCustomer?.balance || 0)}</div>
               </div>
             </div>
-            {/* View History Button */}
-            <button
-              onClick={() => handleViewHistory(generalCustomer)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: T.teal,
-                color: T.white,
-                border: 'none',
-                borderRadius: '10px',
-                fontSize: '14px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-              }}
-            >
-              <span>📋</span> {t('viewHistory')}
-            </button>
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              {/* View History Button */}
+              <button
+                onClick={() => handleViewHistory(generalCustomer)}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  background: T.teal,
+                  color: T.white,
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                }}
+              >
+                <span>📋</span> {t('viewHistory')}
+              </button>
+              {/* Delete Button - Always Disabled for General Customer */}
+              <button
+                disabled
+                style={{
+                  padding: '12px 16px',
+                  background: T.gray100,
+                  color: T.gray400,
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '14px',
+                  cursor: 'not-allowed',
+                  opacity: 0.5,
+                }}
+              >
+                🗑️
+              </button>
+            </div>
           </div>
         )}
 
