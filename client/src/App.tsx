@@ -1638,8 +1638,15 @@ export default function App() {
       }
       
       const savedCustomers = await db.getAll<any>('customers');
+      const savedTransactions = await db.getAll<any>('transactions');
+      
       if (savedCustomers && savedCustomers.length > 0) {
-        setCustomers(savedCustomers);
+        // Attach transactions to customers
+        const customersWithTransactions = savedCustomers.map((customer: any) => ({
+          ...customer,
+          transactions: savedTransactions.filter((tx: any) => tx.customerId === customer.id)
+        }));
+        setCustomers(customersWithTransactions);
       } else {
         // Create General Customer (System) if no customers exist
         const generalCustomer: Customer = {
