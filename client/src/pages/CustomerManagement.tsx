@@ -812,9 +812,9 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
                       style={{
                         flex: 1,
                         padding: '10px 12px',
-                        background: (customerDue > 0 && customer.name !== t('generalCustomer')) ? '#D32F2F' : T.gray50,
-                        color: (customerDue > 0 && customer.name !== t('generalCustomer')) ? T.white : T.teal,
-                        border: (customerDue > 0 && customer.name !== t('generalCustomer')) ? 'none' : `1px solid ${T.teal}`,
+                        background: (customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer'))) ? '#D32F2F' : T.gray50,
+                        color: (customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer'))) ? T.white : T.teal,
+                        border: (customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer'))) ? 'none' : `1px solid ${T.teal}`,
                         borderRadius: '8px',
                         fontSize: '13px',
                         fontWeight: 700,
@@ -825,32 +825,37 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
                         gap: '6px',
                       }}
                     >
-                      {customerDue > 0 && customer.name !== t('generalCustomer') ? (
+                      {customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) ? (
                         <>
                           <span>⚠️</span> Due: {fmt(customerDue)}
                         </>
                       ) : (
                         <>
-                          <span>📋</span> {customer.name === t('generalCustomer') ? t('viewHistory') : t('history')}
+                          <span>📋</span> {(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) ? t('viewHistory') : t('history')}
                         </>
                       )}
                     </button>
                     {/* Delete Button */}
                     <button
-                      onClick={() => customer.id.startsWith('20') || customer.name === t('generalCustomer') ? null : handleDeleteCustomer(customer)}
-                      disabled={customer.id.startsWith('20') || customer.name === t('generalCustomer')}
+                      onClick={() => {
+                        const nameLower = customer.name.toLowerCase();
+                        const isGeneral = nameLower.includes('general') && nameLower.includes('customer');
+                        if (isGeneral || customer.id.startsWith('20')) return;
+                        handleDeleteCustomer(customer);
+                      }}
+                      disabled={(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')}
                       style={{
                         padding: '10px 14px',
-                        background: (customer.id.startsWith('20') || customer.name === t('generalCustomer')) ? T.gray100 : '#EF9A9A',
-                        color: (customer.id.startsWith('20') || customer.name === t('generalCustomer')) ? T.gray400 : '#B71C1C',
+                        background: ((customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')) ? T.gray100 : '#EF9A9A',
+                        color: ((customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')) ? T.gray400 : '#B71C1C',
                         border: 'none',
                         borderRadius: '8px',
                         fontSize: '14px',
-                        cursor: (customer.id.startsWith('20') || customer.name === t('generalCustomer')) ? 'not-allowed' : 'pointer',
+                        cursor: ((customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')) ? 'not-allowed' : 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        opacity: (customer.id.startsWith('20') || customer.name === t('generalCustomer')) ? 0.5 : 1,
+                        opacity: ((customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')) ? 0.5 : 1,
                       }}
                     >
                       🗑️
