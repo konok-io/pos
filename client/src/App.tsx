@@ -830,7 +830,7 @@ ${printFiltered.map(p => {
       </div>
       
       {/* Product Sub-Menu */}
-      <div style={{ padding: '8px 16px', background: 'rgba(15,118,110,0.03)', borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      <div style={{ padding: '8px 16px', background: '#F5F5F5', borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         <button
           onClick={() => setProductTab('list')}
           style={{
@@ -1922,7 +1922,7 @@ export default function App() {
               <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', flexShrink: 0 }}>◀</button>
 
               {/* Menu Items Container */}
-              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'auto', gap: 2, padding: '4px 5px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flexShrink: 0 }}>
+              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'auto', gap: 2, padding: '4px 5px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flexShrink: 0 }}>
                 <button onClick={() => setCurrentTab('pos')} style={{
                   padding: '5px 10px',
                   border: 'none',
@@ -2062,7 +2062,7 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', minWidth: 0, position: 'relative' }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: 'rgba(15,118,110,0.03)', border: '1px solid #E0E0E0',
+                background: '#F5F5F5', border: '1px solid #E0E0E0',
                 padding: '10px 20px',
                 boxShadow: 'none',
                 position: 'relative',
@@ -2259,7 +2259,7 @@ export default function App() {
                     flexShrink: 0
                   }}>
                     <div style={{ 
-                      background: 'rgba(15,118,110,0.03)',
+                      background: '#F5F5F5',
                       borderRadius: 14,
                       padding: '6px 12px',
                       height: 34,
@@ -3011,7 +3011,7 @@ export default function App() {
               {/* Barcode Input - Simple */}
               <div style={{ 
                 padding: '0 20px',
-                background: 'rgba(15,118,110,0.03)',
+                background: '#F5F5F5',
                 borderBottom: '1px solid #E5E7EB',
                 height: 58,
                 display: 'flex',
@@ -3259,7 +3259,7 @@ export default function App() {
                     disabled={cart.length === 0}
                     style={{
                       padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB',
-                      background: 'rgba(15,118,110,0.03)',
+                      background: '#F5F5F5',
                       color: cart.length > 0 ? '#DC2626' : '#9CA3AF',
                       fontWeight: 600, fontSize: 19, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
@@ -3280,7 +3280,7 @@ export default function App() {
                     disabled={cart.length === 0}
                     style={{
                       padding: '10px 16px', borderRadius: 8, border: '1px solid #D1D5DB',
-                      background: 'rgba(15,118,110,0.03)',
+                      background: '#F5F5F5',
                       color: cart.length > 0 ? '#115E59' : '#9CA3AF',
                       fontWeight: 600, fontSize: 19, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
