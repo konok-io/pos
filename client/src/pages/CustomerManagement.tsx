@@ -1312,8 +1312,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                   background: T.white,
                   borderRadius: '14px',
                   padding: '16px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  border: `1px solid ${T.gray200}`,
+                  border: `1px solid ${T.gray100}`,
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
@@ -1504,8 +1503,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
           background: T.white,
           borderRadius: '14px',
           padding: '20px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-          border: `1px solid ${T.gray200}`,
+          border: `1px solid ${T.gray100}`,
           marginBottom: '20px',
           display: 'flex',
           gap: '20px',
@@ -1586,8 +1584,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
         <div style={{
           background: T.white,
           borderRadius: '14px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-          border: `1px solid ${T.gray200}`,
+          border: `1px solid ${T.gray100}`,
           overflow: 'hidden',
           marginBottom: '16px',
         }}>
@@ -1901,8 +1898,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
         <div style={{
           background: T.white,
           borderRadius: '14px',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-          border: `1px solid ${T.gray200}`,
+          border: `1px solid ${T.gray100}`,
           overflow: 'hidden',
           marginBottom: '16px',
         }}>
