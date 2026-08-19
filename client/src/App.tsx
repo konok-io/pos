@@ -7117,7 +7117,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
           {/* Title Row */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 16, gap: 24 }}>
             <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
               ⚙️ সেটিংস
             </h1>
