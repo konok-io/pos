@@ -562,6 +562,8 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   // Handle edit customer
   const handleEditCustomer = (customer: Customer) => {
     setCustomers(prev => prev.map(c => c.id === customer.id ? customer : c));
+    // Update selectedCustomer to reflect changes
+    setSelectedCustomer(prev => prev && prev.id === customer.id ? customer : prev);
   };
 
   // Open edit modal
@@ -1294,21 +1296,21 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
           </div>
 
           {/* Buttons on the right */}
-          <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+          <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
             <button
               onClick={() => setIsAddDueModalOpen(true)}
               style={{
-                padding: '7px 12px',
+                padding: '10px 16px',
                 background: T.redSolid,
                 color: T.white,
                 border: 'none',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontWeight: 600,
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '6px',
               }}
             >
               📋 {t('addDue')}
@@ -1316,17 +1318,17 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             <button
               onClick={() => setIsAddDepositModalOpen(true)}
               style={{
-                padding: '7px 12px',
+                padding: '10px 16px',
                 background: T.tealDark2,
                 color: T.white,
                 border: 'none',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontWeight: 600,
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '6px',
               }}
             >
               💰 {t('addDeposit')}
