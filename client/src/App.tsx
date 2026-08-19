@@ -7109,7 +7109,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     }}>
       {/* Header with Tab Navigation */}
       <div style={{
-        background: '#f5f5f5',
+        background: '#FFFFFF',
         padding: '0 24px',
         display: 'flex',
         justifyContent: 'space-between',
