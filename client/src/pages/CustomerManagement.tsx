@@ -1055,7 +1055,11 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   // Handle view history
   const handleViewHistory = (customer: Customer | null) => {
     setSelectedCustomer(customer);
-    setView(customer === null ? 'general' : 'regular');
+    if (customer === null || isGeneralCustomer(customer)) {
+      setView('general');
+    } else {
+      setView('regular');
+    }
   };
 
   // Format currency
