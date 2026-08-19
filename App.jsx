@@ -299,15 +299,15 @@ function DynamicMenu({tab, onTabChange, tabs}) {
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
-      marginLeft: 30,
-      marginRight: 22,
+      marginLeft: 10,
+      marginRight: 10,
       minWidth: 0,
     }}>
       {/* Fixed First Item (বিক্রয়/POS) */}
       {firstItem && (
         <div style={{
           flexShrink: 0,
-          padding: '4px 6px 4px 4px',
+          padding: '4px 4px 4px 4px',
           background: 'rgba(15,118,110,0.03)',
           borderRadius: 12,
           border: `1px solid ${T.gray200}`,
