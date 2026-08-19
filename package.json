@@ -27,6 +27,7 @@
     "db:push": "cd server && npm run db:push",
     "db:seed": "cd server && npm run db:seed",
     "db:setup": "cd server && npm run setup",
+    "server:install": "cd server && rm -rf node_modules package-lock.json && npm install",
 
     "//": "=== ELECTRON SCRIPTS ===",
     "dev:electron": "npm run build && electron .",
