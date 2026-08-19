@@ -1342,9 +1342,19 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                         {customer.phone || t('phoneNotFound')}
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: T.teal }}>{fmt(getCustomerTotal(customer))}</div>
+                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) && (
+                        <div style={{ fontSize: '10px', color: T.gray400 }}>{t('due')}: <span style={{ color: T.red, fontWeight: 600 }}>{fmt(customerDue)}</span></div>
+                      )}
+                      {(customer.deposit || 0) > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) && (
+                        <div style={{ fontSize: '10px', color: T.gray400 }}>{t('deposit')}: <span style={{ color: T.green, fontWeight: 600 }}>{fmt(customer.deposit || 0)}</span></div>
+                      )}
+                      {customerDue === 0 && (customer.deposit || 0) === 0 && (
+                        <>
+                          <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
+                          <div style={{ fontSize: '14px', fontWeight: 700, color: T.teal }}>{fmt(getCustomerTotal(customer))}</div>
+                        </>
+                      )}
                     </div>
                   </div>
 
