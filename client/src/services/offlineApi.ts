@@ -456,68 +456,8 @@ export const syncService = {
 
 // Initialize with seed data if empty
 export async function initializeLocalData(): Promise<void> {
-  const products = await localDb.getProducts();
-  
-  if (products.length === 0) {
-    // Add demo store
-    const demoStore: Store = {
-      id: 'store-001',
-      name: 'মূল শাখা',
-      code: 'MAIN001',
-      address: 'ঢাকা, বাংলাদেশ',
-      phone: '+880 1XXX-XXXXXX',
-      email: 'main@pos.test',
-      isActive: true,
-      invoicePrefix: 'INV',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    await localDb.saveStore(demoStore);
-
-    // Add demo currencies
-    const currencies: Currency[] = [
-      { id: 'curr-bdt', code: 'BDT', name: 'Bangladeshi Taka', symbol: '৳', exchangeRate: 1, isBase: true, isActive: true, decimalPlaces: 0 },
-      { id: 'curr-usd', code: 'USD', name: 'US Dollar', symbol: '$', exchangeRate: 110, isBase: false, isActive: true, decimalPlaces: 2 },
-    ];
-    await localDb.saveCurrencies(currencies);
-
-    // Add demo categories
-    const categories: Category[] = [
-      { id: 'cat-food', name: 'খাবার', icon: '🍔', storeId: demoStore.id, isActive: true },
-      { id: 'cat-drinks', name: 'পানীয়', icon: '🥤', storeId: demoStore.id, isActive: true },
-      { id: 'cat-essentials', name: 'প্রয়োজনীয়', icon: '🛒', storeId: demoStore.id, isActive: true },
-    ];
-    await localDb.saveCategories(categories);
-
-    // Add demo products
-    const products: Product[] = [
-      { id: 'prod-1', name: 'সাদা ভাত', code: 'RICE001', sellPrice: 120, costPrice: 80, stock: 50, categoryId: 'cat-food', storeId: demoStore.id, isActive: true },
-      { id: 'prod-2', name: 'পোলাও', code: 'RICE002', sellPrice: 150, costPrice: 100, stock: 30, categoryId: 'cat-food', storeId: demoStore.id, isActive: true },
-      { id: 'prod-3', name: 'ফ্রাইড রাইস', code: 'FR001', sellPrice: 130, costPrice: 85, stock: 40, categoryId: 'cat-food', storeId: demoStore.id, isActive: true },
-      { id: 'prod-4', name: 'কোকা কোলা', code: 'COKE001', sellPrice: 30, costPrice: 20, stock: 100, categoryId: 'cat-drinks', storeId: demoStore.id, isActive: true },
-      { id: 'prod-5', name: 'পেপসি', code: 'PEP001', sellPrice: 25, costPrice: 15, stock: 80, categoryId: 'cat-drinks', storeId: demoStore.id, isActive: true },
-      { id: 'prod-6', name: 'চা', code: 'TEA001', sellPrice: 15, costPrice: 8, stock: 200, categoryId: 'cat-drinks', storeId: demoStore.id, isActive: true },
-      { id: 'prod-7', name: 'সাবান', code: 'SOAP001', sellPrice: 45, costPrice: 30, stock: 50, categoryId: 'cat-essentials', storeId: demoStore.id, isActive: true },
-      { id: 'prod-8', name: 'শ্যাম্পু', code: 'SHAM001', sellPrice: 150, costPrice: 100, stock: 30, categoryId: 'cat-essentials', storeId: demoStore.id, isActive: true },
-    ];
-    await localDb.saveProducts(products);
-
-    // Add demo admin user
-    const adminUser: User = {
-      id: 'user-admin',
-      name: 'Admin',
-      email: 'admin@pos.test',
-      password: 'admin123',
-      role: 'admin',
-      storeId: demoStore.id,
-      isActive: true,
-    };
-    await localDb.saveUser(adminUser);
-
-    // Set default store and user
-    await localDb.saveSetting('currentStore', demoStore);
-    await localDb.saveSetting('currentUser', adminUser);
-  }
+  // No demo data - app starts with empty database
+  // User will add products, categories manually when needed
 }
 
 // Listen for online/offline events
