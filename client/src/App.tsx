@@ -7114,13 +7114,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         overflow: 'hidden'
       }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
-          {/* Title */}
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 12 }}>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
-              ⚙️ সেটিংস
-            </h1>
-          </div>
-
           {/* Tab Navigation */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
             {tabs.map((tab, i) => (
