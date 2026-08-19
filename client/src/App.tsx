@@ -6926,7 +6926,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 
 // SettingsScreen Component - extracted from pages/SettingsScreen.tsx
 export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, onRefresh }: { products: any[]; customers: any[]; sales: any[]; suppliers: any[]; categories: any[]; purchases: any[]; onRefresh: () => void }) {
-  void onRefresh; // Reserved for future use
+  const { t } = useLanguage();
 
   const [form, setForm] = useState({
     name: '',
@@ -7013,28 +7013,28 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   };
 
   const clearAll = async () => {
-    if (confirmText !== 'মুছে ফেলুন') {
-      alert('নিশ্চিত করতে "মুছে ফেলুন" লিখুন');
+    if (confirmText !== 'Delete') {
+      alert(t('typeDeleteToConfirm'));
       return;
     }
 
     try {
       await localDb.clearAll();
-      alert('সব ডেটা মুছা হয়েছে। অ্যাপ রিলোড হচ্ছে...');
+      alert(t('dataDeletedSuccessfully'));
       window.location.reload();
     } catch (error) {
       console.error('Failed to clear data:', error);
-      alert('❌ ডেটা মুছতে ব্যর্থ হয়েছে!');
+      alert('❌ ' + t('error') + '!');
     }
   };
 
   const tabs = [
-    { icon: '⚙️', label: 'জেনারেল' },
-    { icon: '🎨', label: 'ডিজাইন' },
-    { icon: '🔄', label: 'ট্রান্সলেশন' },
-    { icon: '🗄️', label: 'ডেটাবেজ' },
-    { icon: '💾', label: 'ইউজার' },
-    { icon: '🔄', label: 'ডেটা রিসেট' },
+    { icon: '⚙️', label: t('settings') },
+    { icon: '🎨', label: t('design') || 'Design' },
+    { icon: '🔄', label: t('translation') || 'Translation' },
+    { icon: '🗄️', label: t('database') },
+    { icon: '💾', label: t('userData') },
+    { icon: '💥', label: t('dataReset') },
   ];
 
   return (
@@ -7523,8 +7523,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   color: '#fff'
                 }}>⚠️</div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ডেটা রিসেট</h3>
-                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ডেটা মুছে ফেলার জন্য সতর্ক ব্যবহার করুন</p>
+                  <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('dataReset')}</h3>
+                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('useCautionDeleting')}</p>
                 </div>
               </div>
 
@@ -7536,42 +7536,137 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 marginBottom: 20
               }}>
                 <p style={{ margin: 0, fontSize: 13, color: '#dc2626', lineHeight: 1.6 }}>
-                  ⚠️ সতর্কতা: নিচের অপশনগুলো ব্যবহারে ডেটা স্থায়ীভাবে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।
+                  ⚠️ {t('warningPermanentDelete')}
                 </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-                {[
-                  { label: '📦 পণ্য', count: products.length },
-                  { label: '👥 কাস্টমার', count: customers.length },
-                  { label: '📂 ক্যাটাগরি', count: categories.length },
-                  { label: '🛒 বিক্রয়', count: sales.length },
-                  { label: '🏢 সরবরাহকারী', count: suppliers.length },
-                  { label: '🛒 পারচেজ', count: purchases.length },
-                ].map((item, i) => (
-                  <div key={i} style={{
-                    padding: 16,
-                    background: '#fef2f2',
-                    borderRadius: 10,
-                    border: '1px solid #fecaca',
-                    textAlign: 'center'
-                  }}>
-                    <h4 style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: '#1e293b' }}>{item.label}</h4>
-                    <p style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#dc2626' }}>{item.count}টি</p>
+              {/* Individual Data Delete Options */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
+                {/* Products */}
+                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>📦 {t('productData')}</h4>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{products.length} {t('items')}</span>
                   </div>
-                ))}
+                  <button
+                    onClick={() => {
+                      if (confirm(t('warningPermanentDelete'))) {
+                        products.forEach(async (p: any) => { await db.delete('products', p.id).catch(() => {}); });
+                        onRefresh();
+                        alert(t('dataDeletedSuccessfully'));
+                      }
+                    }}
+                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    🗑️ {t('deleteAllProducts')}
+                  </button>
+                </div>
+
+                {/* Customers */}
+                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>👥 {t('customerData')}</h4>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{customers.length} {t('items')}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm(t('warningPermanentDelete'))) {
+                        customers.forEach(async (c: any) => { await db.delete('customers', c.id).catch(() => {}); });
+                        onRefresh();
+                        alert(t('dataDeletedSuccessfully'));
+                      }
+                    }}
+                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    🗑️ {t('deleteAllCustomers')}
+                  </button>
+                </div>
+
+                {/* Categories */}
+                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>📂 {t('categoryData')}</h4>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{categories.length} {t('items')}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm(t('warningPermanentDelete'))) {
+                        categories.forEach(async (c: any) => { await db.delete('categories', c.id).catch(() => {}); });
+                        onRefresh();
+                        alert(t('dataDeletedSuccessfully'));
+                      }
+                    }}
+                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    🗑️ {t('deleteAllCategories')}
+                  </button>
+                </div>
+
+                {/* Suppliers */}
+                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>🏢 {t('supplierData')}</h4>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{suppliers.length} {t('items')}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm(t('warningPermanentDelete'))) {
+                        suppliers.forEach(async (s: any) => { await db.delete('suppliers', s.id).catch(() => {}); });
+                        onRefresh();
+                        alert(t('dataDeletedSuccessfully'));
+                      }
+                    }}
+                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    🗑️ {t('deleteAllSuppliers')}
+                  </button>
+                </div>
+
+                {/* Sales */}
+                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>🛒 {t('salesData')}</h4>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{sales.length} {t('items')}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm(t('warningPermanentDelete'))) {
+                        sales.forEach(async (s: any) => { await db.delete('sales', s.id).catch(() => {}); });
+                        onRefresh();
+                        alert(t('dataDeletedSuccessfully'));
+                      }
+                    }}
+                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    🗑️ {t('deleteAllSales')}
+                  </button>
+                </div>
+
+                {/* Purchases */}
+                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>🛒 {t('purchaseHistory')}</h4>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{purchases.length} {t('items')}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm(t('warningPermanentDelete'))) {
+                        purchases.forEach(async (p: any) => { await db.delete('purchases', p.id).catch(() => {}); });
+                        onRefresh();
+                        alert(t('dataDeletedSuccessfully'));
+                      }
+                    }}
+                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                    🗑️ {t('deletePurchaseHistory')}
+                  </button>
+                </div>
               </div>
 
-              {/* Danger Zone */}
+              {/* Full Reset - Danger Zone */}
               <div style={{ marginTop: 24, padding: 20, background: '#fef2f2', borderRadius: 12, border: '2px solid #dc2626' }}>
-                <h4 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 700, color: '#dc2626' }}>☠️ সব ডেটা মুছে ফেলুন</h4>
+                <h4 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 700, color: '#dc2626' }}>💥 {t('fullReset')}</h4>
                 <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b' }}>
-                  "মুছে ফেলুন" লিখে নিশ্চিত করুন
+                  {t('fullResetDescription')}
                 </p>
                 <input
                   value={confirmText}
                   onChange={e => setConfirmText(e.target.value)}
-                  placeholder="মুছে ফেলুন"
+                  placeholder={t('typeDeleteToConfirm')}
                   style={{
                     width: '100%',
                     padding: '12px 14px',
@@ -7586,20 +7681,20 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 />
                 <button
                   onClick={clearAll}
-                  disabled={confirmText !== 'মুছে ফেলুন'}
+                  disabled={confirmText !== 'Delete'}
                   style={{
                     width: '100%',
                     padding: '12px 20px',
-                    background: confirmText === 'মুছে ফেলুন' ? '#991b1b' : '#9ca3af',
+                    background: confirmText === 'Delete' ? '#991b1b' : '#9ca3af',
                     color: '#fff',
                     border: 'none',
                     borderRadius: 8,
                     fontSize: 14,
                     fontWeight: 700,
-                    cursor: confirmText === 'মুছে ফেলুন' ? 'pointer' : 'not-allowed'
+                    cursor: confirmText === 'Delete' ? 'pointer' : 'not-allowed'
                   }}
                 >
-                  💥 সব ডেটা মুছুন
+                  💥 {t('deleteAllData')}
                 </button>
               </div>
             </div>
