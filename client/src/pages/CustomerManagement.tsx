@@ -265,26 +265,26 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
                   >
                     <span>📋</span> {t('history')}
                   </button>
-                  {!customer.id.startsWith('20') && (
-                    <button
-                      onClick={() => handleDeleteCustomer(customer)}
-                      style={{
-                        padding: '8px 12px',
-                        background: T.redLight,
-                        color: T.red,
-                        border: 'none',
-                        borderRadius: '8px',
-                        fontSize: '13px',
-                        fontWeight: 600,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  )}
+                  <button
+                    onClick={() => customer.id.startsWith('20') ? null : handleDeleteCustomer(customer)}
+                    disabled={customer.id.startsWith('20')}
+                    style={{
+                      padding: '8px 12px',
+                      background: customer.id.startsWith('20') ? T.gray100 : T.redLight,
+                      color: customer.id.startsWith('20') ? T.gray400 : T.red,
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: customer.id.startsWith('20') ? 'not-allowed' : 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: customer.id.startsWith('20') ? 0.5 : 1,
+                    }}
+                  >
+                    🗑️
+                  </button>
                 </div>
               </div>
             ))
