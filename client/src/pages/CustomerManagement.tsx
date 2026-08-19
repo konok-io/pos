@@ -1312,24 +1312,22 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                     {/* Delete Button */}
                     <button
                       onClick={() => {
-                        const nameLower = customer.name.toLowerCase();
-                        const isGeneral = nameLower.includes('general') && nameLower.includes('customer');
-                        if (isGeneral || customer.id.startsWith('20')) return;
+                        if (isGeneralCustomer(customer) || customer.balance > 0) return;
                         handleDeleteCustomer(customer);
                       }}
-                      disabled={(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')}
+                      disabled={isGeneralCustomer(customer) || customer.balance > 0}
                       style={{
                         padding: '10px 14px',
-                        background: ((customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')) ? T.gray100 : '#EF9A9A',
-                        color: ((customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')) ? T.gray400 : '#B71C1C',
+                        background: (isGeneralCustomer(customer) || customer.balance > 0) ? T.gray100 : '#EF9A9A',
+                        color: (isGeneralCustomer(customer) || customer.balance > 0) ? T.gray400 : '#B71C1C',
                         border: 'none',
                         borderRadius: '8px',
                         fontSize: '14px',
-                        cursor: ((customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')) ? 'not-allowed' : 'pointer',
+                        cursor: (isGeneralCustomer(customer) || customer.balance > 0) ? 'not-allowed' : 'pointer',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        opacity: ((customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) || customer.id.startsWith('20')) ? 0.5 : 1,
+                        opacity: (isGeneralCustomer(customer) || customer.balance > 0) ? 0.5 : 1,
                       }}
                     >
                       🗑️
