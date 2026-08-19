@@ -51,14 +51,14 @@ const btn = (type: string = 'default', size: string = 'md') => {
     fontWeight: 600,
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 5,
+    
     transition: 'all 0.15s',
   };
 };
 
 const cardStyle = {
   background: T.white,
-  borderRadius: 10,
+  borderRadius: 14,
   padding: 16,
   boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
   border: `1px solid ${T.gray200}`,
@@ -381,7 +381,7 @@ ${printFiltered.map(p => {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
           <button style={btn()} onClick={() => setShowPurchaseHistory(false)}>← ফিরে যান</button>
-          <span style={{ fontWeight: 700, fontSize: 15 }}>📦 ক্রয় হিস্ট্রি</span>
+          <span style={{ fontWeight: 800, fontSize: 24 }}>📦 ক্রয় হিস্ট্রি</span>
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
           {purchases.length === 0 ? (
@@ -392,7 +392,7 @@ ${printFiltered.map(p => {
                 const totalCost = p.items.reduce((s: number, i: any) => s + (i.stock || 0) * (i.costPrice || 0), 0);
                 return (
                   <div key={p.id} onClick={() => setViewPurchase(p)}
-                    style={{ padding: 14, background: T.white, borderRadius: 10, border: `1px solid ${T.gray200}`, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    style={{ padding: 14, background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontWeight: 700, color: T.teal, fontSize: 14 }}>{p.id}</div>
                       <div style={{ fontSize: 14, color: T.gray500, marginTop: 2 }}>{new Date(p.date).toLocaleDateString('bn-BD')} - {p.supplier}</div>
@@ -449,7 +449,7 @@ ${printFiltered.map(p => {
                 </tbody>
                 <tfoot>
                   <tr style={{ background: T.tealLight }}>
-                    <td colSpan={3} style={{ padding: 10, fontWeight: 700, fontSize: 15 }}>সর্বমোট</td>
+                    <td colSpan={3} style={{ padding: 10, fontWeight: 800, fontSize: 24 }}>সর্বমোট</td>
                     <td style={{ padding: 10, textAlign: 'right', fontWeight: 800, fontSize: 16, color: T.teal }}>
                       {fmt(viewPurchase.items.reduce((s: number, i: any) => s + (i.stock || 0) * (i.costPrice || 0), 0))}
                     </td>
@@ -470,7 +470,7 @@ ${printFiltered.map(p => {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
           <button style={btn()} onClick={() => { setShowAddForm(false); setPurchaseItems([]); setCsvData([]); }}>← ফিরে যান</button>
-          <span style={{ fontWeight: 700, fontSize: 15 }}>📦 নতুন পণ্য সংরক্ষণ</span>
+          <span style={{ fontWeight: 800, fontSize: 24 }}>📦 নতুন পণ্য সংরক্ষণ</span>
           <span style={{ fontSize: 14, color: T.gray500, marginLeft: 'auto' }}>{purchaseItems.length}টি পণ্য যোগ হয়েছে</span>
         </div>
 
@@ -514,7 +514,7 @@ ${printFiltered.map(p => {
                     placeholder="সরবরাহকারী নাম..."
                     style={{ ...inputStyle, flex: 1, fontSize: 15 }}
                   />
-                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ ...btn('ghost'), padding: '4px 8px', fontSize: 14 }}>▼</button>
+                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ ...btn('ghost'), padding: '4px 5px', fontSize: 14 }}>▼</button>
                 </div>
                 {showCompanyList && (
                   <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
@@ -542,7 +542,7 @@ ${printFiltered.map(p => {
                     placeholder="ক্যাটাগরি..."
                     style={{ ...inputStyle, flex: 1, fontSize: 15 }}
                   />
-                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ ...btn('ghost'), padding: '4px 8px', fontSize: 14 }}>▼</button>
+                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ ...btn('ghost'), padding: '4px 5px', fontSize: 14 }}>▼</button>
                 </div>
                 {showCategoryList && (
                   <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
@@ -652,7 +652,7 @@ ${printFiltered.map(p => {
           {/* Right: Items List */}
           <div style={{ width: 400, display: 'flex', flexDirection: 'column', background: T.gray50 }}>
             <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 700, fontSize: 15 }}>📋 পণ্যের তালিকা ({purchaseItems.length})</span>
+              <span style={{ fontWeight: 800, fontSize: 24 }}>📋 পণ্যের তালিকা ({purchaseItems.length})</span>
               {purchaseItems.length > 0 && (
                 <button
                   onClick={() => {
@@ -679,7 +679,7 @@ ${printFiltered.map(p => {
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: 600, fontSize: 14 }}>{item.name}</div>
                         <div style={{ fontSize: 12, color: T.gray500 }}>{item.company} - {item.cat || '-'}</div>
-                        <div style={{ fontSize: 13, marginTop: 4 }}>
+                        <div style={{ fontSize: 19, marginTop: 4 }}>
                           <span style={{ color: T.orange }}>ক্রয়: {fmt(item.costPrice)}</span>
                           <span style={{ margin: '0 8px', color: T.gray300 }}>|</span>
                           <span style={{ color: T.teal }}>বিক্রয়: {fmt(item.sellPrice)}</span>
@@ -688,7 +688,7 @@ ${printFiltered.map(p => {
                       </div>
                       <button
                         onClick={() => setPurchaseItems(prev => prev.filter(p => p.id !== item.id))}
-                        style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 14 }}
+                        style={{ ...btn('danger', 'sm'), padding: '4px 5px', fontSize: 14 }}
                       >
                         ✕
                       </button>
@@ -709,7 +709,7 @@ ${printFiltered.map(p => {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
           <button style={btn()} onClick={() => setProductTab('list')}>← ফিরে যান</button>
-          <span style={{ fontWeight: 700, fontSize: 15 }}>📜 পণ্যের দাম পরিবর্তনের ইতিহাস</span>
+          <span style={{ fontWeight: 800, fontSize: 24 }}>📜 পণ্যের দাম পরিবর্তনের ইতিহাস</span>
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
           <div style={{ ...cardStyle, overflow: 'hidden' }}>
@@ -763,7 +763,7 @@ ${printFiltered.map(p => {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
           <button style={btn()} onClick={() => setProductTab('list')}>← ফিরে যান</button>
-          <span style={{ fontWeight: 700, fontSize: 15 }}>🗑️ পণ্য ডিলিটের তালিকা</span>
+          <span style={{ fontWeight: 800, fontSize: 24 }}>🗑️ পণ্য ডিলিটের তালিকা</span>
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
           <div style={{ ...cardStyle, overflow: 'hidden' }}>
@@ -830,14 +830,14 @@ ${printFiltered.map(p => {
       </div>
       
       {/* Product Sub-Menu */}
-      <div style={{ padding: '8px 16px', background: '#F5F5F5', borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+      <div style={{ padding: '8px 16px', background: 'rgba(15,118,110,0.03)', borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         <button
           onClick={() => setProductTab('list')}
           style={{
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'list' ? T.teal : T.white,
             color: productTab === 'list' ? T.white : T.gray600,
-            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            fontWeight: 600, fontSize: 19, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -848,7 +848,7 @@ ${printFiltered.map(p => {
           style={{
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: T.white, color: T.gray600,
-            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            fontWeight: 600, fontSize: 19, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -860,7 +860,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'suppliers' ? T.teal : T.white,
             color: productTab === 'suppliers' ? T.white : T.gray600,
-            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            fontWeight: 600, fontSize: 19, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -872,7 +872,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'barcode' ? T.teal : T.white,
             color: productTab === 'barcode' ? T.white : T.gray600,
-            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            fontWeight: 600, fontSize: 19, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -884,7 +884,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'inventory' ? T.teal : T.white,
             color: productTab === 'inventory' ? T.white : T.gray600,
-            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            fontWeight: 600, fontSize: 19, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -938,7 +938,7 @@ ${printFiltered.map(p => {
               <div style={{ fontSize: 14, color: T.gray500 }}>পণ্যের তালিকা লোড হচ্ছে...</div>
             </div>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 10, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: `1px solid ${T.gray200}` }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: `1px solid ${T.gray200}` }}>
               <thead>
                 <tr style={{ background: T.tealLight }}>
                   <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>পণ্যের নাম</th>
@@ -974,7 +974,7 @@ ${printFiltered.map(p => {
                         </span>
                       </td>
                       <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-                        <span style={{ fontWeight: 700, fontSize: 15, color: isLowStock ? T.red : T.gray900 }}>{fmtN(p.stock)}</span>
+                        <span style={{ fontWeight: 800, fontSize: 24, color: isLowStock ? T.red : T.gray900 }}>{fmtN(p.stock)}</span>
                         {isLowStock && <span style={{ fontSize: 14, color: T.red, marginLeft: 4 }}>⚠️</span>}
                       </td>
                       <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400 }}>{p.unit}</td>
@@ -1294,7 +1294,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
             <div style={{
               width: 40, height: 34,
-              borderRadius: 10,
+              borderRadius: 14,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -1339,7 +1339,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 style={{
                   width: 140,
                   padding: '8px 10px',
-                  fontSize: 13,
+                  fontSize: 19,
                   border: '2px solid #E5E7EB',
                   borderRadius: 8,
                   outline: 'none',
@@ -1365,7 +1365,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 style={{
                   width: 140,
                   padding: '8px 10px',
-                  fontSize: 13,
+                  fontSize: 19,
                   border: '2px solid #E5E7EB',
                   borderRadius: 8,
                   outline: 'none',
@@ -1387,7 +1387,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 color: '#fff',
                 border: 'none',
                 borderRadius: 8,
-                fontSize: 13,
+                fontSize: 19,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
@@ -1447,7 +1447,7 @@ function TimeDisplay({ language }: { language: string }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px' }}>
-      <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59' }}>
+      <div style={{ fontWeight: 800, fontSize: 24, color: '#115E59' }}>
         {timeStr}
       </div>
       <div style={{ fontSize: 11, color: '#9CA3AF' }}>
@@ -1907,33 +1907,33 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           {/* Logo Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-            <div style={{ width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 10 }} /></div>
+            <div style={{ width: 60, height: 60, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 60, height: 60, objectFit: 'contain', borderRadius: 14 }} /></div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
-              <div style={{ fontSize: 14.5, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
+              <div style={{ fontWeight: 800, fontSize: 24, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
+              <div style={{ fontSize: 15, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
             </div>
           </div>
           
           {/* Dynamic Menu - Scrollable */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 30, marginRight: 8, minWidth: 0, flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: 10, marginRight: 10, minWidth: 0, flex: 1 }}>
             {/* Scrollable Menu - Centered */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 4 }}>
               {/* Left Arrow */}
               <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', flexShrink: 0 }}>◀</button>
 
               {/* Menu Items Container */}
-              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'auto', gap: 2, padding: '4px 8px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flexShrink: 0 }}>
+              <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'auto', gap: 2, padding: '4px 5px', background: 'rgba(15,118,110,0.03)', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flexShrink: 0 }}>
                 <button onClick={() => setCurrentTab('pos')} style={{
                   padding: '5px 10px',
                   border: 'none',
-                  background: currentTab === 'pos' ? '#E0E0E0' : 'transparent',
+                  background: currentTab === 'pos' ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
                   cursor: 'pointer',
-                  color: '#000000',
+                  color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563',
                   fontWeight: 600,
-                  fontSize: 13,
+                  fontSize: 19,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 5,
+                  
                   whiteSpace: 'nowrap',
                   fontFamily: 'inherit',
                   transition: 'all 0.2s',
@@ -1948,12 +1948,12 @@ export default function App() {
                     border: 'none',
                     background: currentTab === t.id ? '#E0E0E0' : 'transparent',
                     cursor: 'pointer',
-                    color: '#000000',
+                    color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563',
                     fontWeight: 600,
-                    fontSize: 13,
+                    fontSize: 19,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 5,
+                    
                     whiteSpace: 'nowrap',
                     fontFamily: 'inherit',
                     transition: 'all 0.2s',
@@ -2062,7 +2062,7 @@ export default function App() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', minWidth: 0, position: 'relative' }}>
               {/* Search Section - Professional Modern Design */}
               <div style={{ 
-                background: '#F5F5F5', border: '1px solid #E0E0E0',
+                background: 'rgba(15,118,110,0.03)', border: '1px solid #E0E0E0',
                 padding: '10px 20px',
                 boxShadow: 'none',
                 position: 'relative',
@@ -2076,7 +2076,7 @@ export default function App() {
                     flex: '2 1 240px', 
                     minWidth: 200,
                     background: '#FFFFFF',
-                    borderRadius: 10,
+                    borderRadius: 14,
                     border: '1px solid #D1D5DB', boxShadow: 'none',
                     overflow: 'hidden'
                   }}>
@@ -2099,7 +2099,7 @@ export default function App() {
                         paddingRight: 12, 
                         height: 34, 
                         fontSize: 14, 
-                        borderRadius: 10, 
+                        borderRadius: 14, 
                         border: 'none', 
                         background: '#FFFFFF', 
                         outline: 'none', 
@@ -2116,7 +2116,7 @@ export default function App() {
                     flex: '2 1 180px', 
                     minWidth: 160,
                     background: '#FFFFFF',
-                    borderRadius: 10,
+                    borderRadius: 14,
                     border: '1px solid #D1D5DB', boxShadow: 'none',
                     overflow: 'hidden'
                   }}>
@@ -2139,7 +2139,7 @@ export default function App() {
                         paddingRight: 12, 
                         height: 34, 
                         fontSize: 14, 
-                        borderRadius: 10, 
+                        borderRadius: 14, 
                         border: 'none', 
                         background: '#FFFFFF', 
                         outline: 'none', 
@@ -2160,13 +2160,13 @@ export default function App() {
                             onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
                           >
                             <div>
-                              <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{c.name}</div>
+                              <div style={{ fontSize: 19, fontWeight: 600, color: '#1F2937' }}>{c.name}</div>
                               <div style={{ fontSize: 11, color: '#6B7280' }}>{c.phone}</div>
                             </div>
                             <div style={{ 
                               fontSize: 11, 
                               fontWeight: 600,
-                              padding: '4px 8px',
+                              padding: '4px 5px',
                               borderRadius: 6,
                               background: c.balance > 0 ? '#FEE2E2' : '#D1FAE5',
                               color: c.balance > 0 ? '#DC2626' : '#10B981'
@@ -2192,8 +2192,8 @@ export default function App() {
                         width: '100%',
                         height: 34,
                         padding: '0 12px',
-                        fontSize: 13,
-                        borderRadius: 10,
+                        fontSize: 19,
+                        borderRadius: 14,
                         border: '1px solid #D1D5DB',
                         background: 'rgba(255,255,255,0.95)',
                         outline: 'none',
@@ -2228,8 +2228,8 @@ export default function App() {
                         width: '100%',
                         height: 34,
                         padding: '0 12px',
-                        fontSize: 13,
-                        borderRadius: 10,
+                        fontSize: 19,
+                        borderRadius: 14,
                         border: '1px solid #D1D5DB',
                         background: 'rgba(255,255,255,0.95)',
                         outline: 'none',
@@ -2259,8 +2259,8 @@ export default function App() {
                     flexShrink: 0
                   }}>
                     <div style={{ 
-                      background: '#F5F5F5',
-                      borderRadius: 10,
+                      background: 'rgba(15,118,110,0.03)',
+                      borderRadius: 14,
                       padding: '6px 12px',
                       height: 34,
                       display: 'flex',
@@ -2270,7 +2270,7 @@ export default function App() {
                       border: '1px solid #E0E0E0'
                     }}>
                       <span style={{ fontSize: 14 }}>📦</span>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: '#424242' }}>{filteredProducts.length}</span>
+                      <span style={{ fontSize: 19, fontWeight: 700, color: '#424242' }}>{filteredProducts.length}</span>
                       <span style={{ fontSize: 11, color: '#757575' }}>পণ্য</span>
                     </div>
                   </div>
@@ -2572,11 +2572,11 @@ export default function App() {
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <span style={{ fontSize: 16 }}>📦</span>
                                     <div>
-                                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{item.name}</div>
+                                      <div style={{ fontSize: 19, fontWeight: 600, color: '#1F2937' }}>{item.name}</div>
                                       <div style={{ fontSize: 11, color: '#6B7280' }}>×{item.quantity}</div>
                                     </div>
                                   </div>
-                                  <span style={{ fontSize: 13, fontWeight: 600, color: '#115E59' }}>{fmt(item.sellPrice * item.quantity)}</span>
+                                  <span style={{ fontSize: 19, fontWeight: 600, color: '#115E59' }}>{fmt(item.sellPrice * item.quantity)}</span>
                                 </div>
                               ))}
                               {sale.items.length > 3 && (
@@ -2680,8 +2680,8 @@ export default function App() {
                         </div>
                         <div style={{ flex: 1, color: '#fff' }}>
                           <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{searchedCustomer.name}</div>
-                          <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 2 }}>📱 {searchedCustomer.phone}</div>
-                          <div style={{ fontSize: 13, opacity: 0.9 }}>📍 {searchedCustomer.address}</div>
+                          <div style={{ fontSize: 19, opacity: 0.9, marginBottom: 2 }}>📱 {searchedCustomer.phone}</div>
+                          <div style={{ fontSize: 19, opacity: 0.9 }}>📍 {searchedCustomer.address}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ padding: '8px 16px', background: searchedCustomer.balance > 0 ? 'rgba(220,38,38,0.3)' : 'rgba(34,197,94,0.3)', borderRadius: 8, marginBottom: 8 }}>
@@ -2724,9 +2724,9 @@ export default function App() {
                             {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).map(p => {
                               const daysLeft = Math.ceil((new Date(p.expiryDate!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
                               return (
-                                <div key={p.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 10, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div key={p.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                   <div>
-                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{p.name}</div>
+                                    <div style={{ fontSize: 19, fontWeight: 600, color: '#374151' }}>{p.name}</div>
                                     <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📅 {p.expiryDate}</div>
                                   </div>
                                   <div style={{ background: daysLeft <= 7 ? '#FEE2E2' : '#F0FDFA', color: daysLeft <= 7 ? '#DC2626' : '#115E59', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600 }}>
@@ -2758,8 +2758,8 @@ export default function App() {
                         ) : (
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
                             {customers.map(c => (
-                              <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 10, padding: 12 }}>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
+                              <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12 }}>
+                                <div style={{ fontSize: 19, fontWeight: 600, color: '#374151' }}>{c.name}</div>
                                 <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📱 {c.phone}</div>
                                 {c.balance > 0 && (
                                   <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>বাকি: ৳{c.balance}</div>
@@ -2839,7 +2839,7 @@ export default function App() {
                             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                           }}>
                             <span style={{ fontSize: 16 }}>▣</span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('scanItem')}</span>
+                            <span style={{ fontSize: 19, fontWeight: 600, color: '#6B7280' }}>{t('scanItem')}</span>
                           </div>
                           <div style={{
                             padding: '10px 16px',
@@ -2852,7 +2852,7 @@ export default function App() {
                             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                           }}>
                             <span style={{ fontSize: 16 }}>＋</span>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('addProductEmpty')}</span>
+                            <span style={{ fontSize: 19, fontWeight: 600, color: '#6B7280' }}>{t('addProductEmpty')}</span>
                           </div>
                         </div>
                         <div style={{
@@ -2912,7 +2912,7 @@ export default function App() {
                           <div style={{
                             width: 80,
                             height: 80,
-                            borderRadius: 10,
+                            borderRadius: 14,
                             background: product.stock <= 0 ? '#fecaca' : product.stock <= 10 ? '#fed7aa' : '#F0FDFA',
                             display: 'flex',
                             alignItems: 'center',
@@ -3011,7 +3011,7 @@ export default function App() {
               {/* Barcode Input - Simple */}
               <div style={{ 
                 padding: '0 20px',
-                background: '#F5F5F5',
+                background: 'rgba(15,118,110,0.03)',
                 borderBottom: '1px solid #E5E7EB',
                 height: 58,
                 display: 'flex',
@@ -3025,7 +3025,7 @@ export default function App() {
                     padding: '8px 12px',
                     height: 48, 
                     fontSize: 14, 
-                    borderRadius: 10, 
+                    borderRadius: 14, 
                     border: '1px solid #D1D5DB', 
                     background: '#FFFFFF', 
                     outline: 'none', 
@@ -3061,7 +3061,7 @@ export default function App() {
                       borderRadius: 8, 
                       border: 'none', 
                       background: '#E0E0E0', 
-                      color: '#000000', 
+                      color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563', 
                       fontSize: 12, 
                       fontWeight: 600, 
                       cursor: 'pointer',
@@ -3259,9 +3259,9 @@ export default function App() {
                     disabled={cart.length === 0}
                     style={{
                       padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB',
-                      background: '#F5F5F5',
+                      background: 'rgba(15,118,110,0.03)',
                       color: cart.length > 0 ? '#DC2626' : '#9CA3AF',
-                      fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
+                      fontWeight: 600, fontSize: 19, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
                     🗑️
                   </button>
@@ -3280,9 +3280,9 @@ export default function App() {
                     disabled={cart.length === 0}
                     style={{
                       padding: '10px 16px', borderRadius: 8, border: '1px solid #D1D5DB',
-                      background: '#F5F5F5',
+                      background: 'rgba(15,118,110,0.03)',
                       color: cart.length > 0 ? '#115E59' : '#9CA3AF',
-                      fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
+                      fontWeight: 600, fontSize: 19, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
                     📋 {t('hold')}
                   </button>
@@ -3290,9 +3290,9 @@ export default function App() {
                   <button onClick={handleCheckout}
                     disabled={cart.length === 0}
                     style={{
-                      padding: '12px 16px', borderRadius: 10, border: 'none',
+                      padding: '12px 16px', borderRadius: 14, border: 'none',
                       background: cart.length > 0 ? '#EA580C' : '#e5e7eb',
-                      color: '#fff', fontWeight: 700, fontSize: 15,
+                      color: '#fff', fontWeight: 800, fontSize: 24,
                       cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                       boxShadow: cart.length > 0 ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
                     }}>
@@ -3531,17 +3531,17 @@ export default function App() {
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>📦</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProductsCount')}</div>
+                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('totalProductsCount')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#DC2626' }}>০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockLow')}</div>
+                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('stockLow')}</div>
               </div>
               <div className="card" style={{ background: '#ECFDF5', border: '1px solid #A7F3D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#059669' }}>০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockAvailable')}</div>
+                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('stockAvailable')}</div>
               </div>
             </div>
             
@@ -3560,12 +3560,12 @@ export default function App() {
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📈</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>৳০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalIncome')}</div>
+                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('totalIncome')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📉</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>৳০</div>
-                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalExpense')}</div>
+                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('totalExpense')}</div>
               </div>
             </div>
             <div className="card">
@@ -3907,7 +3907,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                     placeholder={t('selectSupplier')}
                     style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
                   />
-                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ padding: '4px 8px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
+                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ padding: '4px 5px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
                 </div>
                 {showCompanyList && (
                   <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
@@ -3934,7 +3934,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                     placeholder={t('selectCategory')}
                     style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
                   />
-                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ padding: '4px 8px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
+                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ padding: '4px 5px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
                 </div>
                 {showCategoryList && (
                   <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
@@ -4073,7 +4073,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
             </div>
 
             {/* Add Button */}
-            <button onClick={addItem} style={{ width: '100%', padding: '12px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+            <button onClick={addItem} style={{ width: '100%', padding: '12px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 14, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
               ➕ {t('addToProductList')}
             </button>
           </div>
@@ -4084,19 +4084,19 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
           <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>📋 {t('productList')} ({purchaseItems.length})</h3>
 
           {purchaseItems.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF', background: 'white', borderRadius: 10, border: '1px solid #E5E7EB', fontSize: 14 }}>
+            <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', fontSize: 14 }}>
               {t('noProductsYet2')}<br />
               <span style={{ fontSize: 13 }}>{t('fillFormAbove')}</span>
             </div>
           ) : (
             purchaseItems.map((item, i) => (
-              <div key={i} style={{ background: 'white', borderRadius: 10, border: '1px solid #E5E7EB', padding: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <div key={i} style={{ background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', padding: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{item.name}</div>
-                  <div style={{ fontSize: 13, color: '#6B7280' }}>
+                  <div style={{ fontSize: 19, color: '#6B7280' }}>
                     🏢 {item.company} {item.cat ? `- 📂 ${item.cat}` : ''}
                   </div>
-                  <div style={{ fontSize: 13, color: '#6B7280', display: 'flex', gap: 8, marginTop: 4 }}>
+                  <div style={{ fontSize: 19, color: '#6B7280', display: 'flex', gap: 8, marginTop: 4 }}>
                     <span>📦 {item.stock} {item.unit}</span>
                     <span>💰 {fmt(item.buyP)}</span>
                     <span>💵 {fmt(item.sellP)}</span>
