@@ -1759,17 +1759,18 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               <div style={{ fontSize: '22px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
             </div>
             
-            {/* Due - BIG */}
-            <div style={{ flexShrink: 0 }}>
-              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('due')}</div>
-              <div style={{ fontSize: '22px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
-            </div>
-            
-            {/* Deposit - BIG */}
-            <div style={{ flexShrink: 0 }}>
-              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('deposit')}</div>
-              <div style={{ fontSize: '22px', color: T.tealDark, fontWeight: 700 }}>{fmt(customerDeposit)}</div>
-            </div>
+            {/* Due/Deposit - Dynamic based on priority */}
+            {customerDue > 0 ? (
+              <div style={{ flexShrink: 0 }}>
+                <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('due')}</div>
+                <div style={{ fontSize: '22px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
+              </div>
+            ) : customerDeposit > 0 ? (
+              <div style={{ flexShrink: 0 }}>
+                <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('deposit')}</div>
+                <div style={{ fontSize: '22px', color: T.tealDark, fontWeight: 700 }}>{fmt(customerDeposit)}</div>
+              </div>
+            ) : null}
           </div>
 
           {/* Buttons on the right */}
