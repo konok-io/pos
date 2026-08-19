@@ -7642,44 +7642,44 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             {/* Full Reset */}
             <div style={{ 
               background: '#fff',
-              borderRadius: 10, 
+              borderRadius: 14, 
               border: '1px solid #fecaca',
               overflow: 'hidden',
             }}>
               <div style={{ 
                 background: '#fef2f2',
-                padding: '12px 16px',
+                padding: '16px 20px',
                 borderBottom: '1px solid #fecaca',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: '#dc2626' }}>💥 {t('fullReset')}</div>
-                  <div style={{ fontSize: 11, color: '#991b1b', marginTop: 2 }}>{t('fullResetDescription')}</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#dc2626' }}>💥 {t('fullReset')}</div>
+                  <div style={{ fontSize: 13, color: '#991b1b', marginTop: 2 }}>{t('fullResetDescription')}</div>
                 </div>
                 <div style={{ 
-                  padding: '3px 8px',
+                  padding: '4px 12px',
                   background: '#dc2626',
-                  borderRadius: 4,
-                  fontSize: 10,
-                  fontWeight: 600,
+                  borderRadius: 6,
+                  fontSize: 12,
+                  fontWeight: 700,
                   color: '#fff'
                 }}>DANGER</div>
               </div>
-              <div style={{ padding: 12 }}>
+              <div style={{ padding: 16 }}>
                 <input
                   value={confirmText}
                   onChange={e => setConfirmText(e.target.value)}
                   placeholder={t('typeDeleteToConfirm')}
                   style={{
                     width: '100%',
-                    padding: '10px 12px',
-                    fontSize: 13,
+                    padding: '14px 16px',
+                    fontSize: 15,
                     border: '1px solid #d1d5db',
-                    borderRadius: 6,
+                    borderRadius: 8,
                     outline: 'none',
-                    marginBottom: 10,
+                    marginBottom: 12,
                     boxSizing: 'border-box',
                   }}
                 />
@@ -7688,12 +7688,12 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   disabled={confirmText !== 'Delete'}
                   style={{
                     width: '100%',
-                    padding: '10px',
+                    padding: '14px',
                     background: confirmText === 'Delete' ? '#dc2626' : '#e5e7eb',
                     color: confirmText === 'Delete' ? '#fff' : '#9ca3af',
                     border: 'none',
-                    borderRadius: 6,
-                    fontSize: 13,
+                    borderRadius: 8,
+                    fontSize: 15,
                     fontWeight: 700,
                     cursor: confirmText === 'Delete' ? 'pointer' : 'not-allowed',
                   }}
