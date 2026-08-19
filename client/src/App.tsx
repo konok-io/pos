@@ -7108,72 +7108,65 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
       width: '100%'
     }}>
-      {/* Header */}
+      {/* Header with Tab Navigation */}
       <div style={{
         background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
-        padding: '32px 32px 24px',
+        padding: '20px 32px',
         position: 'relative',
         overflow: 'hidden'
       }}>
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          {/* Title Row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
               ⚙️ সেটিংস
             </h1>
-            <p style={{ margin: '8px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
-              আপনার POS সিস্টেম কনফিগার করুন
-            </p>
+
+            <button onClick={save} style={{
+              padding: '10px 20px',
+              background: saved ? '#059669' : 'rgba(255,255,255,0.95)',
+              color: saved ? '#fff' : '#0F766E',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+            }}>
+              {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ করুন'}
+            </button>
           </div>
 
-          <button onClick={save} style={{
-            padding: '12px 24px',
-            background: saved ? '#059669' : 'rgba(255,255,255,0.95)',
-            color: saved ? '#fff' : '#0F766E',
-            border: 'none',
-            borderRadius: 10,
-            fontSize: 14,
-            fontWeight: 700,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-          }}>
-            {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ করুন'}
-          </button>
-        </div>
-      </div>
-
-      {/* Tab Navigation */}
-      <div style={{
-        background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
-        padding: '0 32px 16px',
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, overflowX: 'auto' }}>
-          {tabs.map((tab, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveTab(i)}
-              style={{
-                padding: '10px 20px',
-                border: 'none',
-                borderRadius: 8,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: 14,
-                fontWeight: 600,
-                background: activeTab === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
-                color: activeTab === i ? '#0F766E' : '#fff',
-                whiteSpace: 'nowrap',
-                boxShadow: activeTab === i ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
-              }}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.label}</span>
-            </button>
-          ))}
+          {/* Tab Navigation */}
+          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+            {tabs.map((tab, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveTab(i)}
+                style={{
+                  padding: '8px 16px',
+                  border: 'none',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  background: activeTab === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
+                  color: activeTab === i ? '#0F766E' : '#fff',
+                  whiteSpace: 'nowrap',
+                  boxShadow: activeTab === i ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
+                }}
+              >
+                <span>{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
