@@ -584,7 +584,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
 
   // Filter customers for dashboard
   const filteredCustomers = customers.filter(c => {
-    if (c.id.startsWith('2')) return false; // Exclude general customer (ID starts with year)
+    if (c.id.startsWith('GC')) return false; // Exclude general customer
     const query = searchQuery.toLowerCase();
     return (
       c.name.toLowerCase().includes(query) ||
@@ -593,7 +593,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   });
 
   // General customer
-  const generalCustomer = customers.find(c => c.id.startsWith('2'));
+  const generalCustomer = customers.find(c => c.id.startsWith('GC'));
 
   // Get customer sales
   const getCustomerSales = (customer: Customer) => {
@@ -608,7 +608,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
 
   // Handle CSV Export
   const handleCsvExport = () => {
-    const regularCustomers = customers.filter(c => !c.id.startsWith('2'));
+    const regularCustomers = customers.filter(c => !c.id.startsWith('GC'));
     const csvContent = [
       ['ID', 'Name', 'Phone', 'Address', 'Balance'].join(','),
       ...regularCustomers.map(c => [c.id, c.name, c.phone || '', c.address || '', c.balance.toString()].join(','))

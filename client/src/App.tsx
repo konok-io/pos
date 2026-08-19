@@ -92,14 +92,9 @@ const labelStyle = {
 const fmt = (n: number) => `৳${(+n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtN = (n: number) => (+n || 0).toLocaleString('en-IN');
 
-// Generate Customer ID: YY + MM + DD + 7 random digits
+// Generate General Customer ID: GC + timestamp
 const generateGeneralCustomerId = () => {
-  const now = new Date();
-  const yy = String(now.getFullYear()).slice(-2);
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
-  const random = Math.floor(Math.random() * 10000000).toString().padStart(7, '0');
-  return `${yy}${mm}${dd}${random}`;
+  return 'GC' + Date.now();
 };
 
 // ProductsScreen Component - Complete replacement from old App.jsx
