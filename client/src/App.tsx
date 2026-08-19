@@ -7611,24 +7611,24 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   alignItems: 'center',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 20 }}>{item.icon}</span>
+                    <span style={{ fontSize: 18 }}>{item.icon}</span>
                     <div>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{item.label}</div>
-                      {item.info && <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>{item.info}</div>}
+                      <div style={{ fontSize: 11, fontWeight: 600, color: '#374151' }}>{item.label}</div>
+                      {item.info && <div style={{ fontSize: 9, color: '#6b7280', marginTop: 2 }}>{item.info}</div>}
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{item.count}</span>
                     <button
                       onClick={item.onClick}
                       disabled={item.disabled || item.count === 0}
                       style={{ 
-                        padding: '6px 14px', 
+                        padding: '5px 12px', 
                         background: (item.disabled || item.count === 0) ? '#f3f4f6' : '#ef4444', 
                         color: (item.disabled || item.count === 0) ? '#9ca3af' : '#fff', 
                         border: 'none', 
                         borderRadius: 8, 
-                        fontSize: 11, 
+                        fontSize: 10, 
                         fontWeight: 600, 
                         cursor: (item.disabled || item.count === 0) ? 'not-allowed' : 'pointer',
                       }}>
