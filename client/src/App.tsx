@@ -1482,9 +1482,7 @@ export default function App() {
   // Data - initialize directly in state
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([
-    { id: generateGeneralCustomerId(), name: 'General Customer', phone: '', address: '', balance: 0 },
-  ]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [sales, setSales] = useState<Sale[]>([]);
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
@@ -1630,6 +1628,17 @@ export default function App() {
       const savedCustomers = await db.getAll<any>('customers');
       if (savedCustomers && savedCustomers.length > 0) {
         setCustomers(savedCustomers);
+      } else {
+        // Create General Customer (System) if no customers exist
+        const generalCustomer: Customer = {
+          id: generateGeneralCustomerId(),
+          name: 'General Customer',
+          phone: '',
+          address: '',
+          balance: 0,
+        };
+        setCustomers([generalCustomer]);
+        await db.put('customers', generalCustomer.id, generalCustomer);
       }
       
       const savedSales = await db.getAll<any>('sales');
