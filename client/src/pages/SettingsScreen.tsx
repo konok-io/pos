@@ -41,6 +41,7 @@ interface Settings {
   purchaseShowStoreVat: boolean;
   purchaseFontSize: number;
   purchaseIcon: string;
+  dueSalesEnabled: boolean;
 }
 
 interface Props {
@@ -128,6 +129,7 @@ export default function SettingsScreen({ products, customers, sales, suppliers, 
     purchaseShowStoreVat: true,
     purchaseFontSize: 11,
     purchaseIcon: '',
+    dueSalesEnabled: true,
   });
 
   const [saved, setSaved] = useState(false);
@@ -461,6 +463,51 @@ export default function SettingsScreen({ products, customers, sales, suppliers, 
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Due Sales Settings */}
+            <div style={{
+              marginTop: 16,
+              padding: 20,
+              background: form.dueSalesEnabled ? '#ecfdf5' : '#fef2f2',
+              borderRadius: 12,
+              border: `2px solid ${form.dueSalesEnabled ? '#059669' : '#ef4444'}`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: form.dueSalesEnabled ? '#166534' : '#dc2626' }}>
+                    📋 ডিউ সেলস {form.dueSalesEnabled ? '✅' : '❌'}
+                  </h4>
+                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>
+                    {form.dueSalesEnabled ? 'কাস্টমার সিলেক্ট করলে ডিউ সেলস করা যাবে' : 'ডিউ সেলস বন্ধ আছে'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setForm(p => ({ ...p, dueSalesEnabled: !p.dueSalesEnabled }))}
+                  style={{
+                    width: 56,
+                    height: 30,
+                    borderRadius: 15,
+                    border: 'none',
+                    background: form.dueSalesEnabled ? '#059669' : '#94a3b8',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'background 0.2s'
+                  }}
+                >
+                  <div style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: 13,
+                    background: '#fff',
+                    position: 'absolute',
+                    top: 2,
+                    left: form.dueSalesEnabled ? 28 : 2,
+                    transition: 'left 0.2s',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }} />
+                </button>
+              </div>
             </div>
 
             {/* Banner Image */}

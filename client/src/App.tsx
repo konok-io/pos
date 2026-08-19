@@ -1595,6 +1595,10 @@ export default function App() {
       if (savedCurrency) {
         setCurrency(savedCurrency);
       }
+      const savedDueSales = await localDb.getSetting<string>('dueSalesEnabled');
+      if (savedDueSales !== null) {
+        _setSettings((prev: any) => ({ ...prev, dueSalesEnabled: savedDueSales === 'true' }));
+      }
       
       // Load cart state from IndexedDB
       const savedCart = await db.get<any>('cart', 'cartData');
@@ -1857,8 +1861,14 @@ export default function App() {
       return;
     }
 
+    // Check due sales permission
+    const dueSalesEnabled = settings.dueSalesEnabled !== false;
     if (due > 0 && !selectedCustomer) {
       alert('⚠️ ' + t('selectCustomerOrPayFull'));
+      return;
+    }
+    if (due > 0 && selectedCustomer && !dueSalesEnabled) {
+      alert('⚠️ ডিউ সেলস সক্রিয় নেই! সেটিংসে ডিউ সেলস চালু করুন।');
       return;
     }
 
