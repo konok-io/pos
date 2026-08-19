@@ -257,7 +257,7 @@ function DynamicMenu({tab, onTabChange, tabs}) {
     const isActive = tab === t.id;
     return (
       <button key={t.id} onClick={() => onTabChange(t.id)} style={{
-        padding: '7px 12px',
+        padding: '5px 10px',
         border: 'none',
         background: isActive 
           ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' 
@@ -268,7 +268,7 @@ function DynamicMenu({tab, onTabChange, tabs}) {
         fontSize: 19,
         display: 'flex', 
         alignItems: 'center', 
-        gap: 6,
+        gap: 5,
         whiteSpace: 'nowrap', 
         fontFamily: 'inherit',
         transition: 'all 0.2s',
@@ -287,7 +287,7 @@ function DynamicMenu({tab, onTabChange, tabs}) {
           e.currentTarget.style.color = T.gray600;
         }
       }}>
-        <span style={{fontSize: 17}}>{t.icon}</span>
+        <span style={{fontSize: 16}}>{t.icon}</span>
         <span>{t.label}</span>
       </button>
     );
