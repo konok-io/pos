@@ -7110,48 +7110,45 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       <div style={{
         background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
         padding: '16px 24px',
-        position: 'relative',
-        overflow: 'hidden'
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
       }}>
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          {/* Tab Navigation */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
-            {tabs.map((tab, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveTab(i)}
-                style={{
-                  padding: '8px 16px',
-                  border: 'none',
-                  borderRadius: 8,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  background: activeTab === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
-                  color: activeTab === i ? '#0F766E' : '#fff',
-                  whiteSpace: 'nowrap',
-                  boxShadow: activeTab === i ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
-                }}
-              >
-                <span>{tab.icon}</span>
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
+        {/* Tab Navigation - Left */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          {tabs.map((tab, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveTab(i)}
+              style={{
+                padding: '8px 16px',
+                border: 'none',
+                borderRadius: 8,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 13,
+                fontWeight: 600,
+                background: activeTab === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
+                color: activeTab === i ? '#0F766E' : '#fff',
+                whiteSpace: 'nowrap',
+                boxShadow: activeTab === i ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
+              }}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </div>
-      </div>
 
-      {/* Save Button */}
-      <div style={{ padding: '12px 24px', display: 'flex', justifyContent: 'flex-end', background: '#f1f5f9' }}>
+        {/* Save Button - Right */}
         <button onClick={save} style={{
-          padding: '10px 20px',
-          background: saved ? '#059669' : '#0F766E',
-          color: '#fff',
+          padding: '8px 16px',
+          background: saved ? '#059669' : 'rgba(255,255,255,0.95)',
+          color: saved ? '#fff' : '#0F766E',
           border: 'none',
-          borderRadius: 10,
+          borderRadius: 8,
           fontSize: 13,
           fontWeight: 700,
           cursor: 'pointer',
@@ -7160,7 +7157,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           gap: 6,
           boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
         }}>
-          {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ করুন'}
+          {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ'}
         </button>
       </div>
 
