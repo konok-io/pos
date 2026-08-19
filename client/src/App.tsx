@@ -7576,17 +7576,17 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           <div>
             {/* Warning */}
             <div style={{
-              padding: '12px 16px',
+              padding: '16px 20px',
               background: '#fef2f2',
-              borderRadius: 8,
+              borderRadius: 10,
               border: '1px solid #fecaca',
               marginBottom: 16,
               display: 'flex',
               alignItems: 'center',
-              gap: 10
+              gap: 12
             }}>
-              <span>⚠️</span>
-              <p style={{ margin: 0, fontSize: 13, color: '#dc2626' }}>
+              <span style={{ fontSize: 20 }}>⚠️</span>
+              <p style={{ margin: 0, fontSize: 15, color: '#dc2626' }}>
                 {t('warningPermanentDelete')}
               </p>
             </div>
