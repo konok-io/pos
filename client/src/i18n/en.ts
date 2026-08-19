@@ -346,4 +346,16 @@ export const en: Record<string, string> = {
   searchCustomers: 'Search customers...',
   systemUser: 'System User',
   customerDeleted: 'Customer deleted successfully',
+
+  // Add Customer Modal
+  newCustomer: 'New Customer',
+  camera: 'Camera',
+  browse: 'Browse',
+  customerIdOptional: 'ID (Auto-generated if empty)',
+  customerNameLabel: 'NAME *',
+  phoneNumber: 'Phone Number',
+  customerAddress: 'Address',
+  customerSaved: 'Customer saved successfully',
+  customerNameRequired: 'Customer name is required',
+  enterCustomerName: 'Enter customer name',
 };

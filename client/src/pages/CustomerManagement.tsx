@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../i18n';
 
 interface Customer {
@@ -35,12 +35,481 @@ const T = {
   white: '#FFFFFF',
 };
 
+// Generate 13-digit ID (YYMMDD + 7 random digits)
+const generateCustomerId = (): string => {
+  const now = new Date();
+  const yy = now.getFullYear().toString().slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const random7 = Math.floor(1000000 + Math.random() * 9000000).toString();
+  return `${yy}${mm}${dd}${random7}`;
+};
+
+// Add Customer Modal Component
+interface AddCustomerModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSave: (customer: Customer) => void;
+}
+
+function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
+  const { t } = useLanguage();
+  const [customerId, setCustomerId] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [nameError, setNameError] = useState('');
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setCustomerId('');
+      setName('');
+      setPhone('');
+      setAddress('');
+      setAvatar(null);
+      setNameError('');
+      setIsCameraOpen(false);
+      stopCamera();
+    }
+  }, [isOpen]);
+
+  // Cleanup camera on unmount
+  useEffect(() => {
+    return () => stopCamera();
+  }, []);
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  };
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setIsCameraOpen(true);
+    } catch (err) {
+      alert('Camera access denied or not available');
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        setAvatar(imageData);
+        stopCamera();
+        setIsCameraOpen(false);
+      }
+    }
+  };
+
+  const handleBrowse = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setAvatar(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSave = () => {
+    // Validate name
+    if (!name.trim()) {
+      setNameError(t('customerNameRequired'));
+      return;
+    }
+
+    // Generate ID if empty
+    const finalId = customerId.trim() || generateCustomerId();
+
+    // Create customer
+    const newCustomer: Customer = {
+      id: finalId,
+      name: name.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
+      balance: 0,
+    };
+
+    onSave(newCustomer);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+    }}>
+      <div style={{
+        background: T.white,
+        borderRadius: '16px',
+        width: '90%',
+        maxWidth: '480px',
+        maxHeight: '90vh',
+        overflow: 'auto',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '16px 20px',
+          borderBottom: `1px solid ${T.gray200}`,
+        }}>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: T.gray800 }}>
+            {t('newCustomer')}
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '24px',
+              cursor: 'pointer',
+              color: T.gray400,
+              padding: '4px',
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: '20px' }}>
+          {/* Profile Image Section */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            marginBottom: '20px',
+          }}>
+            {/* Avatar Preview */}
+            <div style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              background: T.gray100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              border: `2px dashed ${T.gray200}`,
+            }}>
+              {avatar ? (
+                <img src={avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontSize: '32px' }}>👤</span>
+              )}
+            </div>
+
+            {/* Camera Buttons */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {isCameraOpen ? (
+                <>
+                  <button
+                    onClick={capturePhoto}
+                    style={{
+                      padding: '8px 16px',
+                      background: T.teal,
+                      color: T.white,
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    📷 {t('camera')} - Capture
+                  </button>
+                  <button
+                    onClick={() => { stopCamera(); setIsCameraOpen(false); }}
+                    style={{
+                      padding: '8px 16px',
+                      background: T.gray100,
+                      color: T.gray600,
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={startCamera}
+                    style={{
+                      padding: '8px 16px',
+                      background: T.teal,
+                      color: T.white,
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    📷 {t('camera')}
+                  </button>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      padding: '8px 16px',
+                      background: T.gray100,
+                      color: T.gray800,
+                      border: `1px solid ${T.gray200}`,
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                    }}
+                  >
+                    📁 {t('browse')}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Hidden video and canvas for camera */}
+          <div style={{ display: 'none' }}>
+            <video ref={videoRef} autoPlay playsInline />
+            <canvas ref={canvasRef} />
+          </div>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleBrowse}
+            style={{ display: 'none' }}
+          />
+
+          {/* Form Fields */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* ID Field */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: T.gray600,
+                marginBottom: '6px',
+                textTransform: 'uppercase',
+              }}>
+                {t('customerIdOptional')}
+              </label>
+              <input
+                type="text"
+                value={customerId}
+                onChange={(e) => setCustomerId(e.target.value)}
+                placeholder="13-digit ID will be auto-generated"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: `1px solid ${T.gray200}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Name Field */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: T.gray600,
+                marginBottom: '6px',
+                textTransform: 'uppercase',
+              }}>
+                {t('customerNameLabel')}
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setNameError(''); }}
+                placeholder={t('enterCustomerName')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: `1px solid ${nameError ? T.red : T.gray200}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+              {nameError && (
+                <span style={{ fontSize: '12px', color: T.red, marginTop: '4px', display: 'block' }}>
+                  {nameError}
+                </span>
+              )}
+            </div>
+
+            {/* Phone Field */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: T.gray600,
+                marginBottom: '6px',
+                textTransform: 'uppercase',
+              }}>
+                {t('phoneNumber')}
+              </label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder={t('phoneNumber')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: `1px solid ${T.gray200}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Address Field */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: T.gray600,
+                marginBottom: '6px',
+                textTransform: 'uppercase',
+              }}>
+                {t('customerAddress')}
+              </label>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder={t('customerAddress')}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: `1px solid ${T.gray200}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          padding: '16px 20px',
+          borderTop: `1px solid ${T.gray200}`,
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              padding: '12px',
+              background: T.gray100,
+              color: T.gray800,
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {t('cancel')}
+          </button>
+          <button
+            onClick={handleSave}
+            style={{
+              flex: 1,
+              padding: '12px',
+              background: T.teal,
+              color: T.white,
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {t('save')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CustomerManagement({ customers, setCustomers, sales }: CustomerManagementProps) {
   const { t, isRTL } = useLanguage();
   const [view, setView] = useState<ViewType>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
+
+  // Handle add customer
+  const handleAddCustomer = (customer: Customer) => {
+    setCustomers(prev => [...prev, customer]);
+  };
 
   // Filter customers for dashboard
   const filteredCustomers = customers.filter(c => {
@@ -189,7 +658,7 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
               style={searchInputStyle}
             />
           </div>
-          <button style={buttonTealStyle}>
+          <button style={buttonTealStyle} onClick={() => setIsAddCustomerModalOpen(true)}>
             <span>+</span> {t('addCustomer')}
           </button>
           <button style={buttonGrayStyle} onClick={handleCsvExport}>
@@ -290,6 +759,13 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
             ))
           )}
         </div>
+
+        {/* Add Customer Modal */}
+        <AddCustomerModal
+          isOpen={isAddCustomerModalOpen}
+          onClose={() => setIsAddCustomerModalOpen(false)}
+          onSave={handleAddCustomer}
+        />
       </div>
     );
   }

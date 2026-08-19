@@ -307,4 +307,16 @@ export const hi: Record<string, string> = {
   searchCustomers: 'ग्राहक खोजें...',
   systemUser: 'सिस्टम यूज़र',
   customerDeleted: 'ग्राहक सफलतापूर्वक हटाया गया',
+
+  // Add Customer Modal
+  newCustomer: 'नया ग्राहक',
+  camera: 'कैमरा',
+  browse: 'ब्राउज़',
+  customerIdOptional: 'आईडी (खाली हो तो स्वतः)',
+  customerNameLabel: 'नाम *',
+  phoneNumber: 'फ़ोन नंबर',
+  customerAddress: 'पता',
+  customerSaved: 'ग्राहक सफलतापूर्वक सहेजा गया',
+  customerNameRequired: 'ग्राहक का नाम आवश्यक है',
+  enterCustomerName: 'ग्राहक का नाम दर्ज करें',
 };

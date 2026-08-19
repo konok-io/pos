@@ -312,4 +312,16 @@ export const ar: Record<string, string> = {
   searchCustomers: 'البحث عن عملاء...',
   systemUser: 'مستخدم النظام',
   customerDeleted: 'تم حذف العميل بنجاح',
+
+  // Add Customer Modal
+  newCustomer: 'عميل جديد',
+  camera: 'الكاميرا',
+  browse: 'تصفح',
+  customerIdOptional: 'المعرف (تلقائي إذا فارغ)',
+  customerNameLabel: 'الاسم *',
+  phoneNumber: 'رقم الهاتف',
+  customerAddress: 'العنوان',
+  customerSaved: 'تم حفظ العميل بنجاح',
+  customerNameRequired: 'اسم العميل مطلوب',
+  enterCustomerName: 'أدخل اسم العميل',
 };

@@ -316,4 +316,16 @@ export const bn: Record<string, string> = {
   searchCustomers: 'কাস্টমার খুঁজুন...',
   systemUser: 'সিস্টেম ইউজার',
   customerDeleted: 'কাস্টমার সফলভাবে মুছে ফেলা হয়েছে',
+
+  // Add Customer Modal
+  newCustomer: 'নতুন কাস্টমার',
+  camera: 'ক্যামেরা',
+  browse: 'ব্রাউজ',
+  customerIdOptional: 'আইডি (খালি থাকলে স্বয়ংক্রিয়)',
+  customerNameLabel: 'নাম *',
+  phoneNumber: 'ফোন নম্বর',
+  customerAddress: 'ঠিকানা',
+  customerSaved: 'কাস্টমার সফলভাবে সংরক্ষিত হয়েছে',
+  customerNameRequired: 'কাস্টমারের নাম প্রয়োজন',
+  enterCustomerName: 'কাস্টমারের নাম লিখুন',
 };
