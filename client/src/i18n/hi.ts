@@ -385,4 +385,8 @@ export const hi: Record<string, string> = {
   noCustomersToDelete: 'हटाने के लिए कोई ग्राहक नहीं',
   readyToDelete: 'सभी डेटा हटाने के लिए तैयार',
   typeToConfirm: 'सक्षम करने के लिए "Delete" टाइप करें',
+
+  // Settings Tabs
+  generalInfo: 'सामान्य जानकारी',
+  saveSettings: 'सेटिंग्स सहेजें',
 };

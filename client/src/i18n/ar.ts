@@ -390,4 +390,8 @@ export const ar: Record<string, string> = {
   noCustomersToDelete: 'لا يوجد عملاء لحذفهم',
   readyToDelete: 'جاهز لحذف جميع البيانات',
   typeToConfirm: 'اكتب "Delete" للتفعيل',
+
+  // Settings Tabs
+  generalInfo: 'معلومات عامة',
+  saveSettings: 'حفظ الإعدادات',
 };

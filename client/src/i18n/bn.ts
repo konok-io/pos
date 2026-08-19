@@ -394,4 +394,8 @@ export const bn: Record<string, string> = {
   noCustomersToDelete: 'মুছার জন্য কোনো কাস্টমার নেই',
   readyToDelete: 'সব ডেটা মুছার জন্য প্রস্তুত',
   typeToConfirm: 'সক্রিয় করতে "Delete" লিখুন',
+
+  // Settings Tabs
+  generalInfo: 'সাধারণ তথ্য',
+  saveSettings: 'সেটিংস সংরক্ষণ',
 };

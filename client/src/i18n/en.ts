@@ -423,4 +423,8 @@ export const en: Record<string, string> = {
   noCustomersToDelete: 'No customers to delete',
   readyToDelete: 'Ready to delete all data',
   typeToConfirm: 'Type "Delete" to enable',
+
+  // Settings Tabs
+  generalInfo: 'General Info',
+  saveSettings: 'Save Settings',
 };

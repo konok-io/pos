@@ -7094,7 +7094,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
   const tabs = [
     { icon: '⚙️', label: t('settings') },
-    { icon: '🎨', label: t('design') || 'Design' },
+    { icon: '🎨', label: t('design') },
     { icon: '💾', label: t('userData') },
     { icon: '💥', label: t('dataReset') },
   ];
