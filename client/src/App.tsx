@@ -1463,7 +1463,11 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false); // Prevent save before initial load
-  const [currentTab, setCurrentTab] = useState('pos');
+  const [currentTab, setCurrentTab] = useState(() => {
+    // Load saved tab from localStorage
+    const savedTab = localStorage.getItem('pos_current_tab');
+    return savedTab || 'pos';
+  });
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Listen for fullscreen changes
@@ -1474,6 +1478,13 @@ export default function App() {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
+
+  // Save current tab to localStorage when it changes
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem('pos_current_tab', currentTab);
+    }
+  }, [currentTab, isInitialized]);
 
   // Language state
   const { language, setLanguage, t, currentLang } = useLanguage();
