@@ -1306,13 +1306,13 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             </div>
           ) : (
             filteredCustomers.map((customer) => {
-              const customerDue = customer.balance > 0 ? customer.balance : 0;
               return (
                 <div key={customer.id} style={{
                   background: T.white,
                   borderRadius: '14px',
                   padding: '16px',
-                  border: `1px solid ${T.gray100}`,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  border: `1px solid ${T.gray200}`,
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
@@ -1348,33 +1348,23 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                         {customer.phone || t('phoneNotFound')}
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      {customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) && (
-                        <div style={{ fontSize: '10px', color: T.gray400 }}>{t('due')}: <span style={{ color: T.red, fontWeight: 600 }}>{fmt(customerDue)}</span></div>
-                      )}
-                      {(customer.deposit || 0) > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) && (
-                        <div style={{ fontSize: '10px', color: T.gray400 }}>{t('deposit')}: <span style={{ color: T.tealDark, fontWeight: 600 }}>{fmt(customer.deposit || 0)}</span></div>
-                      )}
-                      {customerDue === 0 && (customer.deposit || 0) === 0 && (
-                        <>
-                          <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
-                          <div style={{ fontSize: '14px', fontWeight: 700, color: T.teal }}>{fmt(getCustomerTotal(customer))}</div>
-                        </>
-                      )}
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: T.teal }}>{fmt(getCustomerTotal(customer))}</div>
                     </div>
                   </div>
 
-                  {/* Action Buttons - Due or Deposit */}
+                  {/* Action Buttons */}
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    {/* Due Button */}
+                    {/* History Button */}
                     <button
                       onClick={() => handleViewHistory(customer)}
                       style={{
                         flex: 1,
                         padding: '10px 12px',
-                        background: customerDue > 0 ? '#D32F2F' : T.gray50,
-                        color: customerDue > 0 ? T.white : T.gray600,
-                        border: customerDue > 0 ? 'none' : `1px solid ${T.gray200}`,
+                        background: T.gray50,
+                        color: T.teal,
+                        border: `1px solid ${T.teal}`,
                         borderRadius: '8px',
                         fontSize: '13px',
                         fontWeight: 700,
@@ -1385,29 +1375,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                         gap: '6px',
                       }}
                     >
-                      <span>📋</span> {t('due')}: {fmt(customerDue)}
-                    </button>
-                    
-                    {/* Deposit Button */}
-                    <button
-                      onClick={() => handleViewHistory(customer)}
-                      style={{
-                        flex: 1,
-                        padding: '10px 12px',
-                        background: (customer.deposit || 0) > 0 ? T.tealDark : T.gray50,
-                        color: (customer.deposit || 0) > 0 ? T.white : T.gray600,
-                        border: (customer.deposit || 0) > 0 ? 'none' : `1px solid ${T.gray200}`,
-                        borderRadius: '8px',
-                        fontSize: '13px',
-                        fontWeight: 700,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px',
-                      }}
-                    >
-                      <span>💰</span> Deposit: {fmt(customer.deposit || 0)}
+                      <span>📋</span> {isGeneralCustomer(customer) ? t('viewHistory') : t('history')}
                     </button>
                     
                     {/* Delete Button */}
