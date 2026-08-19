@@ -7604,31 +7604,31 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 <div key={i} style={{ 
                   background: '#fff', 
                   borderRadius: 14, 
-                  padding: 14, 
+                  padding: 16, 
                   border: '1px solid #e5e7eb',
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 20 }}>{item.icon}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 24 }}>{item.icon}</span>
                     <div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{item.label}</div>
-                      {item.info && <div style={{ fontSize: 11, color: '#6b7280', marginTop: 2 }}>{item.info}</div>}
+                      <div style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>{item.label}</div>
+                      {item.info && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{item.info}</div>}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontSize: 22, fontWeight: 700, color: '#374151' }}>{item.count}</span>
                     <button
                       onClick={item.onClick}
                       disabled={item.disabled || item.count === 0}
                       style={{ 
-                        padding: '6px 14px', 
+                        padding: '8px 16px', 
                         background: (item.disabled || item.count === 0) ? '#f3f4f6' : '#ef4444', 
                         color: (item.disabled || item.count === 0) ? '#9ca3af' : '#fff', 
                         border: 'none', 
                         borderRadius: 8, 
-                        fontSize: 11, 
+                        fontSize: 13, 
                         fontWeight: 600, 
                         cursor: (item.disabled || item.count === 0) ? 'not-allowed' : 'pointer',
                       }}>
