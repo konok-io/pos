@@ -3132,7 +3132,7 @@ export default function App() {
                             }
                           }
                         }}
-                        placeholder="কাস্টমার নম্বর দিন"
+                        placeholder={t('customerIdOrNumber')}
                         style={{ flex: 1, fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                       />
                     )}

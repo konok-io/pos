@@ -165,6 +165,7 @@ export const hi: Record<string, string> = {
   viewHistory: 'इतिहास देखें',
   selectCustomer: 'चुनें',
   customerId: 'ग्राहक आईडी',
+  customerIdOrNumber: 'ग्राहक आईडी या नंबर',
 
   // Purchases
   purchaseList: 'खरीदारी सूची',

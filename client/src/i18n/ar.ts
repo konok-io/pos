@@ -170,6 +170,7 @@ export const ar: Record<string, string> = {
   viewHistory: 'عرض السجل',
   selectCustomer: 'اختيار',
   customerId: 'رقم العميل',
+  customerIdOrNumber: 'معرف العميل أو الرقم',
 
   // Purchases
   purchaseList: 'قائمة المشتريات',

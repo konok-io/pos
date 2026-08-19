@@ -173,6 +173,7 @@ export const bn: Record<string, string> = {
   generalCustomerDefault: '(ডিফল্ট)',
   viewHistory: 'হিস্ট্রি দেখুন',
   customerId: 'কাস্টমার আইডি',
+  customerIdOrNumber: 'কাস্টমার আইডি বা নম্বর',
 
   // Purchases
   purchaseList: 'ক্রয় তালিকা',

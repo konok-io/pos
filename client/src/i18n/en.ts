@@ -202,6 +202,7 @@ export const en: Record<string, string> = {
   generalCustomerDefault: '(Default)',
   viewHistory: 'View History',
   customerId: 'Customer ID',
+  customerIdOrNumber: 'Customer ID or Number',
 
   // Purchases
   purchaseList: 'Purchase List',
