@@ -553,14 +553,17 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   // Add Due/Deposit Modal states
   const [isAddDueModalOpen, setIsAddDueModalOpen] = useState(false);
   const [isAddDepositModalOpen, setIsAddDepositModalOpen] = useState(false);
+  
+  // Modal form states (hooks must be at top level)
+  const [depositAmount, setDepositAmount] = useState('');
+  const [selectedPayment, setSelectedPayment] = useState('cash');
+  const [depositComment, setDepositComment] = useState('');
+  const [dueAmount, setDueAmount] = useState('');
+  const [dueComment, setDueComment] = useState('');
+  const modalFmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   // Add Deposit Modal - Render early to prevent issues
   if (isAddDepositModalOpen && selectedCustomer) {
-    const [depositAmount, setDepositAmount] = useState('');
-    const [selectedPayment, setSelectedPayment] = useState('cash');
-    const [comment, setComment] = useState('');
-    const modalFmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
     const handleAddDeposit = () => {
       const amount = parseFloat(depositAmount) || 0;
       if (amount <= 0) return;
@@ -577,7 +580,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
         balance: prev.balance - amount 
       } : null);
       setDepositAmount('');
-      setComment('');
+      setDepositComment('');
       setSelectedPayment('cash');
       setIsAddDepositModalOpen(false);
     };
@@ -726,8 +729,8 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               {t('comment')}
             </label>
             <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              value={depositComment}
+              onChange={(e) => setDepositComment(e.target.value)}
               placeholder={t('reasonForDeposit')}
               rows={2}
               style={{
@@ -793,10 +796,6 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
 
   // Add Due Modal - Render early to prevent issues
   if (isAddDueModalOpen && selectedCustomer) {
-    const [dueAmount, setDueAmount] = useState('');
-    const [comment, setComment] = useState('');
-    const modalFmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
     const handleAddDue = () => {
       const amount = parseFloat(dueAmount) || 0;
       if (amount <= 0) return;
@@ -809,7 +808,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
       // Update selectedCustomer to reflect changes
       setSelectedCustomer(prev => prev ? { ...prev, balance: prev.balance + amount } : null);
       setDueAmount('');
-      setComment('');
+      setDueComment('');
       setIsAddDueModalOpen(false);
     };
 
@@ -915,8 +914,8 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               {t('comment')}
             </label>
             <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              value={dueComment}
+              onChange={(e) => setDueComment(e.target.value)}
               placeholder={t('reasonForDue')}
               rows={2}
               style={{
