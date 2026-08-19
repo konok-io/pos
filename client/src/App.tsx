@@ -2143,6 +2143,17 @@ export default function App() {
                     <input
                       value={customerSearch}
                       onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          // Find customer by exact ID match
+                          const exactMatch = customers.find(c => c.id === customerSearch.trim());
+                          if (exactMatch) {
+                            setSelectedCustomer(exactMatch);
+                            setCustomerSearch('');
+                          }
+                        }
+                      }}
                       placeholder={t('customerSearch')}
                       style={{ 
                         width: '100%', 
