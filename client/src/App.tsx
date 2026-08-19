@@ -7102,9 +7102,10 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   return (
     <div style={{
       height: '100%',
-      overflow: 'auto',
-      background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
-      width: '100%'
+      overflow: 'hidden',
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       {/* Header with Tab Navigation */}
       <div style={{
@@ -7114,6 +7115,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         justifyContent: 'space-between',
         alignItems: 'center',
         height: 56,
+        flexShrink: 0,
         boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
       }}>
         {/* Tab Navigation - Left */}
@@ -7163,7 +7165,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       </div>
 
       {/* Content */}
-      <div style={{ padding: 24, background: '#f5f5f5', minHeight: '100%' }}>
+      <div style={{ padding: 24, background: '#f5f5f5', flex: 1, overflow: 'auto' }}>
         {/* General Tab */}
         {activeTab === 0 && (
           <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
