@@ -2,7 +2,7 @@
 // Uses the same database as localDb (pos-offline-db) for consistency
 
 const DB_NAME = 'pos-offline-db';
-const DB_VERSION = 4;
+const DB_VERSION = 6;
 
 class Database {
   private db: IDBDatabase | null = null;
@@ -29,7 +29,7 @@ class Database {
         const db = (event.target as IDBOpenDBRequest).result;
 
         // Create all object stores with keyPath 'key' for settings-style storage
-        const stores = ['translations', 'settings', 'sales', 'products', 'categories', 'customers', 'sync', 'users', 'cart', 'heldSales'];
+        const stores = ['translations', 'settings', 'sales', 'products', 'categories', 'customers', 'sync', 'users', 'cart', 'heldSales', 'transactions'];
         
         stores.forEach(storeName => {
           if (!db.objectStoreNames.contains(storeName)) {

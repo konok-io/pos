@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '../i18n';
+import { db } from '../utils/db';
 
 interface Customer {
   id: string;
@@ -587,7 +588,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
     const currentDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
     const currentDeposit = selectedCustomer.deposit || 0;
     
-    const handleAddDeposit = () => {
+    const handleAddDeposit = async () => {
       const amount = parseFloat(depositAmount) || 0;
       if (amount <= 0) return;
       
@@ -611,6 +612,9 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
       
       const newTransaction = createTransaction('deposit', amount, depositComment || undefined, selectedPayment);
       const newTransactions = [...(selectedCustomer.transactions || []), newTransaction];
+      
+      // Save transaction to DB
+      await db.put('transactions', newTransaction.id, { ...newTransaction, customerId: selectedCustomer.id });
       
       setCustomers(prev => prev.map(c => 
         c.id === selectedCustomer.id 
@@ -857,13 +861,16 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   if (isAddDueModalOpen && selectedCustomer) {
     const currentDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
     
-    const handleAddDue = () => {
+    const handleAddDue = async () => {
       const amount = parseFloat(dueAmount) || 0;
       if (amount <= 0) return;
       
       const newBalance = currentDue + amount;
       const newTransaction = createTransaction('due', amount, dueComment || undefined);
       const newTransactions = [...(selectedCustomer.transactions || []), newTransaction];
+      
+      // Save transaction to DB
+      await db.put('transactions', newTransaction.id, { ...newTransaction, customerId: selectedCustomer.id });
       
       setCustomers(prev => prev.map(c => 
         c.id === selectedCustomer.id 
@@ -1358,17 +1365,17 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons - Due or Deposit */}
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    {/* Due Alert / History Button */}
+                    {/* Due Button */}
                     <button
                       onClick={() => handleViewHistory(customer)}
                       style={{
                         flex: 1,
                         padding: '10px 12px',
-                        background: (customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer'))) ? '#D32F2F' : T.gray50,
-                        color: (customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer'))) ? T.white : T.teal,
-                        border: (customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer'))) ? 'none' : `1px solid ${T.teal}`,
+                        background: customerDue > 0 ? '#D32F2F' : T.gray50,
+                        color: customerDue > 0 ? T.white : T.gray600,
+                        border: customerDue > 0 ? 'none' : `1px solid ${T.gray200}`,
                         borderRadius: '8px',
                         fontSize: '13px',
                         fontWeight: 700,
@@ -1379,16 +1386,31 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                         gap: '6px',
                       }}
                     >
-                      {customerDue > 0 && !(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) ? (
-                        <>
-                          <span>⚠️</span> Due: {fmt(customerDue)}
-                        </>
-                      ) : (
-                        <>
-                          <span>📋</span> {(customer.name.toLowerCase().includes('general') && customer.name.toLowerCase().includes('customer')) ? t('viewHistory') : t('history')}
-                        </>
-                      )}
+                      <span>📋</span> {t('due')}: {fmt(customerDue)}
                     </button>
+                    
+                    {/* Deposit Button */}
+                    <button
+                      onClick={() => handleViewHistory(customer)}
+                      style={{
+                        flex: 1,
+                        padding: '10px 12px',
+                        background: (customer.deposit || 0) > 0 ? T.tealDark : T.gray50,
+                        color: (customer.deposit || 0) > 0 ? T.white : T.gray600,
+                        border: (customer.deposit || 0) > 0 ? 'none' : `1px solid ${T.gray200}`,
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <span>💰</span> Deposit: {fmt(customer.deposit || 0)}
+                    </button>
+                    
                     {/* Delete Button */}
                     <button
                       onClick={() => {
