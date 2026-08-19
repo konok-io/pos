@@ -3051,66 +3051,63 @@ export default function App() {
 
               {/* Cart Header */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
-                {/* Cart Title + Customer Chip Row */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 8 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, color: '#115E59', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 {t('cart')}</h3>
-                    <span style={{ background: '#115E59', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
-                    {selectedCustomer && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#115E59', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>🛒 {t('cart')}</h3>
+                  <span style={{ background: '#115E59', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
+                </div>
+                {/* Customer Input with Add Button */}
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+                    {selectedCustomer ? (
                       <div style={{ 
-                        display: 'inline-flex',
+                        flex: 1,
+                        display: 'flex',
                         alignItems: 'center',
-                        gap: 6,
-                        padding: '4px 10px',
-                        borderRadius: 16,
+                        justifyContent: 'space-between',
+                        padding: '8px 12px',
+                        borderRadius: 8,
                         background: '#D1FAE5',
-                        border: '1px solid #10B981',
-                        maxWidth: 280,
-                        overflow: 'hidden'
+                        border: '1.5px solid #10B981',
                       }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#065F46', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#065F46' }}>
                           👤 {selectedCustomer.name} • {selectedCustomer.id} • {selectedCustomer.phone}
                         </span>
                         <button 
                           onClick={() => { setSelectedCustomer(null); setCartCustomerInput(''); }}
                           style={{ 
-                            padding: '2px 5px', 
+                            padding: '2px 6px', 
                             borderRadius: 8, 
                             border: 'none', 
                             background: '#FEE2E2', 
                             color: '#DC2626', 
-                            fontSize: 10, 
+                            fontSize: 11, 
                             fontWeight: 600, 
                             cursor: 'pointer',
-                            flexShrink: 0
+                            marginLeft: 8
                           }}>
                           ✕
                         </button>
                       </div>
-                    )}
-                  </div>
-                </div>
-                {/* Customer Input with Add Button */}
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <div style={{ position: 'relative', flex: 1 }}>
-                    <input
-                      value={cartCustomerInput}
-                      onChange={(e) => setCartCustomerInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          const found = customers.find(c => 
-                            c.phone === cartCustomerInput.trim() || c.id === cartCustomerInput.trim()
-                          );
-                          if (found) {
-                            setSelectedCustomer(found);
-                            setCartCustomerInput('');
+                    ) : (
+                      <input
+                        value={cartCustomerInput}
+                        onChange={(e) => setCartCustomerInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const found = customers.find(c => 
+                              c.phone === cartCustomerInput.trim() || c.id === cartCustomerInput.trim()
+                            );
+                            if (found) {
+                              setSelectedCustomer(found);
+                              setCartCustomerInput('');
+                            }
                           }
-                        }
-                      }}
-                      placeholder="কাস্টমার নম্বর দিন"
-                      style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
-                    />
+                        }}
+                        placeholder="কাস্টমার নম্বর দিন"
+                        style={{ flex: 1, fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    )}
                   </div>
                   <button 
                     onClick={() => {
