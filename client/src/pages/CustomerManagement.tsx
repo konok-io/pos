@@ -554,6 +554,432 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   const [isAddDueModalOpen, setIsAddDueModalOpen] = useState(false);
   const [isAddDepositModalOpen, setIsAddDepositModalOpen] = useState(false);
 
+  // Add Deposit Modal - Render early to prevent issues
+  if (isAddDepositModalOpen && selectedCustomer) {
+    const [depositAmount, setDepositAmount] = useState('');
+    const [selectedPayment, setSelectedPayment] = useState('cash');
+    const [comment, setComment] = useState('');
+    const modalFmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    const handleAddDeposit = () => {
+      const amount = parseFloat(depositAmount) || 0;
+      if (amount <= 0) return;
+      
+      setCustomers(prev => prev.map(c => 
+        c.id === selectedCustomer.id 
+          ? { ...c, deposit: c.deposit + amount, balance: c.balance - amount } 
+          : c
+      ));
+      // Update selectedCustomer to reflect changes
+      setSelectedCustomer(prev => prev ? { 
+        ...prev, 
+        deposit: prev.deposit + amount, 
+        balance: prev.balance - amount 
+      } : null);
+      setDepositAmount('');
+      setComment('');
+      setSelectedPayment('cash');
+      setIsAddDepositModalOpen(false);
+    };
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        background: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+      }}>
+        <div style={{
+          background: T.white,
+          borderRadius: '16px',
+          width: '90%',
+          maxWidth: '420px',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+        }}>
+          {/* Header */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            borderBottom: `1px solid ${T.gray200}`,
+          }}>
+            <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: T.gray800 }}>
+              {selectedCustomer.name} – {t('addDeposit')}
+            </h2>
+            <button
+              onClick={() => setIsAddDepositModalOpen(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: T.gray400,
+                padding: '4px',
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Notice Banner */}
+          <div style={{
+            margin: '16px 20px',
+            padding: '12px 16px',
+            background: T.greenLight,
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <span style={{ fontSize: '20px' }}>💰</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: T.green }}>{t('addDepositAmount')}</span>
+          </div>
+
+          {/* Summary Bar */}
+          <div style={{
+            margin: '0 20px 16px',
+            padding: '12px 16px',
+            background: T.gray50,
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '16px',
+          }}>
+            <div>
+              <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDue')}: </span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: T.red }}>{modalFmt(selectedCustomer.balance)}</span>
+            </div>
+            <span style={{ color: T.gray400 }}>|</span>
+            <div>
+              <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDeposit')}: </span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: T.green }}>{modalFmt(selectedCustomer.deposit)}</span>
+            </div>
+          </div>
+
+          {/* Amount Input */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
+              {t('depositAmount')}
+            </label>
+            <input
+              type="number"
+              value={depositAmount}
+              onChange={(e) => setDepositAmount(e.target.value)}
+              placeholder="0.00"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                border: `1px solid ${T.gray200}`,
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 600,
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Payment Method */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '8px', textTransform: 'uppercase' }}>
+              {t('paymentMethod')}
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+              {['cash', 'card', 'bank', 'mobile'].map((method) => (
+                <button
+                  key={method}
+                  onClick={() => setSelectedPayment(method)}
+                  style={{
+                    padding: '10px 8px',
+                    background: selectedPayment === method ? T.greenLight : T.white,
+                    color: selectedPayment === method ? T.green : T.gray800,
+                    border: selectedPayment === method ? `2px solid ${T.green}` : `1px solid ${T.gray200}`,
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span style={{ fontSize: '18px' }}>
+                    {method === 'cash' ? '💵' : method === 'card' ? '💳' : method === 'bank' ? '🏦' : '📱'}
+                  </span>
+                  <span>{t(method)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Comment */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
+              {t('comment')}
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder={t('reasonForDeposit')}
+              rows={2}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: `1px solid ${T.gray200}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                resize: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Footer Buttons */}
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            padding: '16px 20px',
+            borderTop: `1px solid ${T.gray200}`,
+          }}>
+            <button
+              onClick={() => setIsAddDepositModalOpen(false)}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: T.gray100,
+                color: T.gray800,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {t('cancel')}
+            </button>
+            <button
+              onClick={handleAddDeposit}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: T.green,
+                color: T.white,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+              }}
+            >
+              ✓ {t('addDeposit')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Add Due Modal - Render early to prevent issues
+  if (isAddDueModalOpen && selectedCustomer) {
+    const [dueAmount, setDueAmount] = useState('');
+    const [comment, setComment] = useState('');
+    const modalFmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+    const handleAddDue = () => {
+      const amount = parseFloat(dueAmount) || 0;
+      if (amount <= 0) return;
+      
+      setCustomers(prev => prev.map(c => 
+        c.id === selectedCustomer.id 
+          ? { ...c, balance: c.balance + amount } 
+          : c
+      ));
+      // Update selectedCustomer to reflect changes
+      setSelectedCustomer(prev => prev ? { ...prev, balance: prev.balance + amount } : null);
+      setDueAmount('');
+      setComment('');
+      setIsAddDueModalOpen(false);
+    };
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        background: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+      }}>
+        <div style={{
+          background: T.white,
+          borderRadius: '16px',
+          width: '90%',
+          maxWidth: '420px',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+        }}>
+          {/* Header */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            borderBottom: `1px solid ${T.gray200}`,
+          }}>
+            <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: T.gray800 }}>
+              {selectedCustomer.name} – {t('addDue')}
+            </h2>
+            <button
+              onClick={() => setIsAddDueModalOpen(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: T.gray400,
+                padding: '4px',
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Notice Banner */}
+          <div style={{
+            margin: '16px 20px',
+            padding: '12px 16px',
+            background: T.redLight,
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <span style={{ fontSize: '20px' }}>📋</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: T.redSolid }}>{t('addDueAmount')}</span>
+          </div>
+
+          {/* Summary Bar */}
+          <div style={{
+            margin: '0 20px 16px',
+            padding: '12px 16px',
+            background: T.gray50,
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDue')}: </span>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: T.redSolid }}>{modalFmt(selectedCustomer.balance)}</span>
+          </div>
+
+          {/* Amount Input */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
+              {t('dueAmount')}
+            </label>
+            <input
+              type="number"
+              value={dueAmount}
+              onChange={(e) => setDueAmount(e.target.value)}
+              placeholder="0.00"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                border: `1px solid ${T.gray200}`,
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 600,
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Comment */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
+              {t('comment')}
+            </label>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder={t('reasonForDue')}
+              rows={2}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: `1px solid ${T.gray200}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                resize: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Footer Buttons */}
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            padding: '16px 20px',
+            borderTop: `1px solid ${T.gray200}`,
+          }}>
+            <button
+              onClick={() => setIsAddDueModalOpen(false)}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: T.gray100,
+                color: T.gray800,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {t('cancel')}
+            </button>
+            <button
+              onClick={handleAddDue}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: T.redSolid,
+                color: T.white,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+              }}
+            >
+              ✓ {t('addDue')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Handle add customer
   const handleAddCustomer = (customer: Customer) => {
     setCustomers(prev => [...prev, customer]);
@@ -1469,430 +1895,6 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
           onClose={() => { setIsEditCustomerModalOpen(false); setEditingCustomer(null); }}
           onSave={handleEditCustomer}
         />
-      </div>
-    );
-  }
-
-  // Add Deposit Modal
-  if (isAddDepositModalOpen && selectedCustomer) {
-    const [depositAmount, setDepositAmount] = useState('');
-    const [selectedPayment, setSelectedPayment] = useState('cash');
-    const [comment, setComment] = useState('');
-
-    const handleAddDeposit = () => {
-      const amount = parseFloat(depositAmount) || 0;
-      if (amount <= 0) return;
-      
-      setCustomers(prev => prev.map(c => 
-        c.id === selectedCustomer.id 
-          ? { ...c, deposit: c.deposit + amount, balance: c.balance - amount } 
-          : c
-      ));
-      // Update selectedCustomer to reflect changes
-      setSelectedCustomer(prev => prev ? { 
-        ...prev, 
-        deposit: prev.deposit + amount, 
-        balance: prev.balance - amount 
-      } : null);
-      setDepositAmount('');
-      setComment('');
-      setSelectedPayment('cash');
-      setIsAddDepositModalOpen(false);
-    };
-
-    return (
-      <div style={{
-        position: 'fixed',
-        top: 0, left: 0, right: 0, bottom: 0,
-        background: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-      }}>
-        <div style={{
-          background: T.white,
-          borderRadius: '16px',
-          width: '90%',
-          maxWidth: '420px',
-          maxHeight: '90vh',
-          overflow: 'auto',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-        }}>
-          {/* Header */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '16px 20px',
-            borderBottom: `1px solid ${T.gray200}`,
-          }}>
-            <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: T.gray800 }}>
-              {selectedCustomer.name} – {t('addDeposit')}
-            </h2>
-            <button
-              onClick={() => setIsAddDepositModalOpen(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: '24px',
-                cursor: 'pointer',
-                color: T.gray400,
-                padding: '4px',
-                lineHeight: 1,
-              }}
-            >
-              ×
-            </button>
-          </div>
-
-          {/* Notice Banner */}
-          <div style={{
-            margin: '16px 20px',
-            padding: '12px 16px',
-            background: T.greenLight,
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}>
-            <span style={{ fontSize: '20px' }}>💰</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: T.green }}>{t('addDepositAmount')}</span>
-          </div>
-
-          {/* Summary Bar */}
-          <div style={{
-            margin: '0 20px 16px',
-            padding: '12px 16px',
-            background: T.gray50,
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '16px',
-          }}>
-            <div>
-              <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDue')}: </span>
-              <span style={{ fontSize: '14px', fontWeight: 700, color: T.red }}>{fmt(selectedCustomer.balance)}</span>
-            </div>
-            <span style={{ color: T.gray400 }}>|</span>
-            <div>
-              <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDeposit')}: </span>
-              <span style={{ fontSize: '14px', fontWeight: 700, color: T.green }}>{fmt(selectedCustomer.deposit)}</span>
-            </div>
-          </div>
-
-          {/* Amount Input */}
-          <div style={{ padding: '0 20px 16px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
-              {t('depositAmount')}
-            </label>
-            <input
-              type="number"
-              value={depositAmount}
-              onChange={(e) => setDepositAmount(e.target.value)}
-              placeholder="0.00"
-              style={{
-                width: '100%',
-                padding: '12px 14px',
-                border: `1px solid ${T.gray200}`,
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: 600,
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          {/* Payment Method */}
-          <div style={{ padding: '0 20px 16px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '8px', textTransform: 'uppercase' }}>
-              {t('paymentMethod')}
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
-              {['cash', 'card', 'bank', 'mobile'].map((method) => (
-                <button
-                  key={method}
-                  onClick={() => setSelectedPayment(method)}
-                  style={{
-                    padding: '10px 8px',
-                    background: selectedPayment === method ? T.greenLight : T.white,
-                    color: selectedPayment === method ? T.green : T.gray800,
-                    border: selectedPayment === method ? `2px solid ${T.green}` : `1px solid ${T.gray200}`,
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <span style={{ fontSize: '18px' }}>
-                    {method === 'cash' ? '💵' : method === 'card' ? '💳' : method === 'bank' ? '🏦' : '📱'}
-                  </span>
-                  <span>{t(method)}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Comment */}
-          <div style={{ padding: '0 20px 16px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
-              {t('comment')}
-            </label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder={t('reasonForDeposit')}
-              rows={2}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                border: `1px solid ${T.gray200}`,
-                borderRadius: '8px',
-                fontSize: '14px',
-                resize: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          {/* Footer Buttons */}
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            padding: '16px 20px',
-            borderTop: `1px solid ${T.gray200}`,
-          }}>
-            <button
-              onClick={() => setIsAddDepositModalOpen(false)}
-              style={{
-                flex: 1,
-                padding: '12px',
-                background: T.gray100,
-                color: T.gray800,
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              {t('cancel')}
-            </button>
-            <button
-              onClick={handleAddDeposit}
-              style={{
-                flex: 1,
-                padding: '12px',
-                background: T.green,
-                color: T.white,
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-              }}
-            >
-              ✓ {t('addDeposit')}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Add Due Modal
-  if (isAddDueModalOpen && selectedCustomer) {
-    const [dueAmount, setDueAmount] = useState('');
-    const [comment, setComment] = useState('');
-
-    const handleAddDue = () => {
-      const amount = parseFloat(dueAmount) || 0;
-      if (amount <= 0) return;
-      
-      setCustomers(prev => prev.map(c => 
-        c.id === selectedCustomer.id 
-          ? { ...c, balance: c.balance + amount } 
-          : c
-      ));
-      // Update selectedCustomer to reflect changes
-      setSelectedCustomer(prev => prev ? { ...prev, balance: prev.balance + amount } : null);
-      setDueAmount('');
-      setComment('');
-      setIsAddDueModalOpen(false);
-    };
-
-    return (
-      <div style={{
-        position: 'fixed',
-        top: 0, left: 0, right: 0, bottom: 0,
-        background: 'rgba(0,0,0,0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 1000,
-      }}>
-        <div style={{
-          background: T.white,
-          borderRadius: '16px',
-          width: '90%',
-          maxWidth: '420px',
-          maxHeight: '90vh',
-          overflow: 'auto',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-        }}>
-          {/* Header */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '16px 20px',
-            borderBottom: `1px solid ${T.gray200}`,
-          }}>
-            <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: T.gray800 }}>
-              {selectedCustomer.name} – {t('addDue')}
-            </h2>
-            <button
-              onClick={() => setIsAddDueModalOpen(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: '24px',
-                cursor: 'pointer',
-                color: T.gray400,
-                padding: '4px',
-                lineHeight: 1,
-              }}
-            >
-              ×
-            </button>
-          </div>
-
-          {/* Notice Banner */}
-          <div style={{
-            margin: '16px 20px',
-            padding: '12px 16px',
-            background: T.redLight,
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-          }}>
-            <span style={{ fontSize: '20px' }}>📋</span>
-            <span style={{ fontSize: '14px', fontWeight: 600, color: T.redSolid }}>{t('addDueAmount')}</span>
-          </div>
-
-          {/* Summary Bar */}
-          <div style={{
-            margin: '0 20px 16px',
-            padding: '12px 16px',
-            background: T.gray50,
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDue')}: </span>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: T.redSolid }}>{fmt(selectedCustomer.balance)}</span>
-          </div>
-
-          {/* Amount Input */}
-          <div style={{ padding: '0 20px 16px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
-              {t('dueAmount')}
-            </label>
-            <input
-              type="number"
-              value={dueAmount}
-              onChange={(e) => setDueAmount(e.target.value)}
-              placeholder="0.00"
-              style={{
-                width: '100%',
-                padding: '12px 14px',
-                border: `1px solid ${T.gray200}`,
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: 600,
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          {/* Comment */}
-          <div style={{ padding: '0 20px 16px' }}>
-            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
-              {t('comment')}
-            </label>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder={t('reasonForDue')}
-              rows={2}
-              style={{
-                width: '100%',
-                padding: '10px 14px',
-                border: `1px solid ${T.gray200}`,
-                borderRadius: '8px',
-                fontSize: '14px',
-                resize: 'none',
-                boxSizing: 'border-box',
-              }}
-            />
-          </div>
-
-          {/* Footer Buttons */}
-          <div style={{
-            display: 'flex',
-            gap: '12px',
-            padding: '16px 20px',
-            borderTop: `1px solid ${T.gray200}`,
-          }}>
-            <button
-              onClick={() => setIsAddDueModalOpen(false)}
-              style={{
-                flex: 1,
-                padding: '12px',
-                background: T.gray100,
-                color: T.gray800,
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              {t('cancel')}
-            </button>
-            <button
-              onClick={handleAddDue}
-              style={{
-                flex: 1,
-                padding: '12px',
-                background: T.redSolid,
-                color: T.white,
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-              }}
-            >
-              ✓ {t('addDue')}
-            </button>
-          </div>
-        </div>
       </div>
     );
   }
