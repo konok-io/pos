@@ -21,7 +21,7 @@
     "db:setup": "cd server && npm run db:setup",
     "db:seed": "cd server && npm run db:seed",
     "install:all": "npm install && cd client && npm install && cd ../server && npm install",
-    "build:all": "npm run build:client && npm run build:server"
+    "build:all": "npm run build:client"
   },
   "description": "POS Management System - Client & Server",
   "devDependencies": {
