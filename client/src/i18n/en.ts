@@ -428,4 +428,5 @@ export const en: Record<string, string> = {
   generalInfo: 'General Info',
   design: 'Design',
   saveSettings: 'Save Settings',
+  saved: 'Saved',
 };

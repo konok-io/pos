@@ -389,5 +389,6 @@ export const hi: Record<string, string> = {
   // Settings Tabs
   generalInfo: 'सामान्य जानकारी',
   design: 'डिज़ाइन',
-  saveSettings: 'सेटिंग्स सहेजें',
+  saveSettings: 'सहेजें',
+  saved: 'सहेजा गया',
 };

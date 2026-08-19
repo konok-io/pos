@@ -398,5 +398,6 @@ export const bn: Record<string, string> = {
   // Settings Tabs
   generalInfo: 'সাধারণ তথ্য',
   design: 'ডিজাইন',
-  saveSettings: 'সেটিংস সংরক্ষণ',
+  saveSettings: 'সংরক্ষণ',
+  saved: 'সংরক্ষিত',
 };

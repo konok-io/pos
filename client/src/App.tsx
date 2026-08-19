@@ -7158,7 +7158,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           gap: 6,
           boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         }}>
-          {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ'}
+          {saved ? '✅ ' + t('saved') : '💾 ' + t('saveSettings')}
         </button>
       </div>
 
