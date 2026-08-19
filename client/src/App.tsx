@@ -7115,7 +7115,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         alignItems: 'center',
         height: 56,
         boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-        borderBottom: '2px solid #115E59',
       }}>
         {/* Tab Navigation - Left */}
         <div style={{ display: 'flex', gap: 6 }}>
