@@ -9,6 +9,16 @@ interface Customer {
   balance: number;
   deposit: number;
   avatar?: string;
+  transactions?: Transaction[];
+}
+
+interface Transaction {
+  id: string;
+  type: 'due' | 'deposit';
+  amount: number;
+  note?: string;
+  paymentMethod?: string;
+  date: string;
 }
 
 interface CustomerManagementProps {
@@ -562,23 +572,57 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   const [dueComment, setDueComment] = useState('');
   const modalFmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+  // Helper to create transaction
+  const createTransaction = (type: 'due' | 'deposit', amount: number, note?: string, paymentMethod?: string): Transaction => ({
+    id: Date.now().toString(),
+    type,
+    amount,
+    note,
+    paymentMethod,
+    date: new Date().toISOString(),
+  });
+
   // Add Deposit Modal - Render early to prevent issues
   if (isAddDepositModalOpen && selectedCustomer) {
+    const currentDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
+    const currentDeposit = selectedCustomer.deposit || 0;
+    
     const handleAddDeposit = () => {
       const amount = parseFloat(depositAmount) || 0;
       if (amount <= 0) return;
       
+      let newBalance = selectedCustomer.balance;
+      let newDeposit = selectedCustomer.deposit || 0;
+      
+      // If customer has due, pay it first
+      if (currentDue > 0) {
+        if (amount <= currentDue) {
+          // Full amount goes to pay due
+          newBalance = currentDue - amount;
+        } else {
+          // Amount exceeds due, pay due first, rest goes to deposit
+          newBalance = 0;
+          newDeposit = currentDeposit + (amount - currentDue);
+        }
+      } else {
+        // No due, full amount goes to deposit
+        newDeposit = currentDeposit + amount;
+      }
+      
+      const newTransaction = createTransaction('deposit', amount, depositComment || undefined, selectedPayment);
+      const newTransactions = [...(selectedCustomer.transactions || []), newTransaction];
+      
       setCustomers(prev => prev.map(c => 
         c.id === selectedCustomer.id 
-          ? { ...c, deposit: c.deposit + amount, balance: c.balance - amount } 
+          ? { ...c, balance: newBalance, deposit: newDeposit, transactions: newTransactions } 
           : c
       ));
-      // Update selectedCustomer to reflect changes
-      setSelectedCustomer(prev => prev ? { 
-        ...prev, 
-        deposit: prev.deposit + amount, 
-        balance: prev.balance - amount 
-      } : null);
+      setSelectedCustomer({ 
+        ...selectedCustomer, 
+        balance: newBalance, 
+        deposit: newDeposit,
+        transactions: newTransactions,
+      });
       setDepositAmount('');
       setDepositComment('');
       setSelectedPayment('cash');
@@ -652,19 +696,34 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             background: T.gray50,
             borderRadius: '8px',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            gap: '16px',
+            gap: '8px',
           }}>
-            <div>
-              <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDue')}: </span>
-              <span style={{ fontSize: '14px', fontWeight: 700, color: T.red }}>{modalFmt(selectedCustomer.balance)}</span>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              {currentDue > 0 && (
+                <>
+                  <div>
+                    <span style={{ fontSize: '12px', color: T.gray600 }}>{t('currentDue')}: </span>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: T.red }}>{modalFmt(currentDue)}</span>
+                  </div>
+                  <span style={{ color: T.gray400 }}>|</span>
+                </>
+              )}
+              <div>
+                <span style={{ fontSize: '12px', color: T.gray600 }}>{t('currentDeposit')}: </span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: T.green }}>{modalFmt(currentDeposit)}</span>
+              </div>
             </div>
-            <span style={{ color: T.gray400 }}>|</span>
-            <div>
-              <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDeposit')}: </span>
-              <span style={{ fontSize: '14px', fontWeight: 700, color: T.green }}>{modalFmt(selectedCustomer.deposit)}</span>
-            </div>
+            {currentDue > 0 ? (
+              <div style={{ fontSize: '12px', color: T.gray600, textAlign: 'center' }}>
+                {t('depositWillPayDue')}
+              </div>
+            ) : (
+              <div style={{ fontSize: '12px', color: T.gray600, textAlign: 'center' }}>
+                {t('depositAddedToAccount')}
+              </div>
+            )}
           </div>
 
           {/* Amount Input */}
@@ -796,17 +855,22 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
 
   // Add Due Modal - Render early to prevent issues
   if (isAddDueModalOpen && selectedCustomer) {
+    const currentDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
+    
     const handleAddDue = () => {
       const amount = parseFloat(dueAmount) || 0;
       if (amount <= 0) return;
       
+      const newBalance = currentDue + amount;
+      const newTransaction = createTransaction('due', amount, dueComment || undefined);
+      const newTransactions = [...(selectedCustomer.transactions || []), newTransaction];
+      
       setCustomers(prev => prev.map(c => 
         c.id === selectedCustomer.id 
-          ? { ...c, balance: c.balance + amount } 
+          ? { ...c, balance: newBalance, transactions: newTransactions } 
           : c
       ));
-      // Update selectedCustomer to reflect changes
-      setSelectedCustomer(prev => prev ? { ...prev, balance: prev.balance + amount } : null);
+      setSelectedCustomer({ ...selectedCustomer, balance: newBalance, transactions: newTransactions });
       setDueAmount('');
       setDueComment('');
       setIsAddDueModalOpen(false);
@@ -879,11 +943,17 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             background: T.gray50,
             borderRadius: '8px',
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
+            gap: '8px',
           }}>
-            <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDue')}: </span>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: T.redSolid }}>{modalFmt(selectedCustomer.balance)}</span>
+            <div>
+              <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDue')}: </span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: T.redSolid }}>{modalFmt(currentDue)}</span>
+            </div>
+            <div style={{ fontSize: '12px', color: T.gray600, textAlign: 'center' }}>
+              {t('dueWillBeAdded')}
+            </div>
           </div>
 
           {/* Amount Input */}
@@ -1229,7 +1299,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             </div>
           ) : (
             filteredCustomers.map((customer) => {
-              const customerDue = customer.balance < 0 ? Math.abs(customer.balance) : 0;
+              const customerDue = customer.balance > 0 ? customer.balance : 0;
               return (
                 <div key={customer.id} style={{
                   background: T.white,
@@ -1773,7 +1843,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               gap: '8px',
             }}
           >
-            <span>📋</span> {t('dueHistory')} (0)
+            <span>📋</span> {t('dueHistory')} ({(selectedCustomer.transactions || []).filter(t => t.type === 'due').length})
           </button>
           <button
             onClick={() => setActiveTab('deposit')}
@@ -1791,7 +1861,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               gap: '8px',
             }}
           >
-            <span>👜</span> {t('depositHistory')} (0)
+            <span>👜</span> {t('depositHistory')} ({(selectedCustomer.transactions || []).filter(t => t.type === 'deposit').length})
           </button>
         </div>
 
@@ -1804,7 +1874,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
           overflow: 'hidden',
           marginBottom: '16px',
         }}>
-          {customerSales.length === 0 ? (
+          {activeTab === 'all' && customerSales.length === 0 && (
             <div style={{
               padding: '60px 20px',
               textAlign: 'center',
@@ -1813,7 +1883,8 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               <div style={{ fontSize: '48px', marginBottom: '12px' }}>🛒</div>
               <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noPurchasesFound')}</div>
             </div>
-          ) : (
+          )}
+          {activeTab === 'all' && customerSales.length > 0 && (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: T.gray50 }}>
@@ -1837,6 +1908,70 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
               </tbody>
             </table>
           )}
+          {activeTab === 'due' && (
+            (selectedCustomer.transactions || []).filter(t => t.type === 'due').length === 0 ? (
+              <div style={{
+                padding: '60px 20px',
+                textAlign: 'center',
+                color: T.gray400,
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '12px' }}>📋</div>
+                <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noDueHistory')}</div>
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: T.gray50 }}>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('dateTime')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('note')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('amount')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(selectedCustomer.transactions || []).filter(t => t.type === 'due').map((tx, i) => (
+                    <tr key={tx.id} style={{ borderTop: i > 0 ? `1px solid ${T.gray100}` : 'none' }}>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(tx.date).toLocaleString()}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{tx.note || '-'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.red, textAlign: 'right', fontWeight: 600 }}>+{fmt(tx.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          )}
+          {activeTab === 'deposit' && (
+            (selectedCustomer.transactions || []).filter(t => t.type === 'deposit').length === 0 ? (
+              <div style={{
+                padding: '60px 20px',
+                textAlign: 'center',
+                color: T.gray400,
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '12px' }}>👜</div>
+                <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noDepositHistory')}</div>
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: T.gray50 }}>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('dateTime')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('note')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('payment')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('amount')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(selectedCustomer.transactions || []).filter(t => t.type === 'deposit').map((tx, i) => (
+                    <tr key={tx.id} style={{ borderTop: i > 0 ? `1px solid ${T.gray100}` : 'none' }}>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(tx.date).toLocaleString()}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{tx.note || '-'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{tx.paymentMethod || '-'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.green, textAlign: 'right', fontWeight: 600 }}>+{fmt(tx.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          )}
         </div>
 
         {/* Footer */}
@@ -1849,7 +1984,9 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
           alignItems: 'center',
         }}>
           <span style={{ fontSize: '14px', fontWeight: 600, color: T.tealDark }}>
-            {t('totalBills').replace('0', customerSales.length.toString())}
+            {activeTab === 'all' ? t('totalBills').replace('0', customerSales.length.toString()) : 
+             activeTab === 'due' ? `${t('total')} (${(selectedCustomer.transactions || []).filter(t => t.type === 'due').length})` :
+             `${t('total')} (${(selectedCustomer.transactions || []).filter(t => t.type === 'deposit').length})`}
           </span>
           <span style={{ fontSize: '16px', fontWeight: 700, color: T.teal }}>
             {fmt(customerTotal)}
