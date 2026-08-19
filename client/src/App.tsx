@@ -7595,7 +7595,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
               {[
                 { label: t('productData'), count: products.length, icon: '📦', onClick: () => deleteAllItems('products', products, setProducts, t) },
-                { label: t('customerData'), count: customers.length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.length <= 1, info: customers.length <= 1 ? t('generalCustomerCannotDelete') : null },
+                { label: t('customerData'), count: customers.length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.length <= 1 },
                 { label: t('categoryData'), count: categories.length, icon: '📂', onClick: () => deleteAllItems('categories', categories, setCategories, t) },
                 { label: t('supplierData'), count: suppliers.length, icon: '🏢', onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
                 { label: t('salesData'), count: sales.length, icon: '🛒', onClick: () => deleteAllItems('sales', sales, setSales, t) },
@@ -7612,10 +7612,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <span style={{ fontSize: 24 }}>{item.icon}</span>
-                    <div>
-                      <div style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>{item.label}</div>
-                      {item.info && <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>{item.info}</div>}
-                    </div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>{item.label}</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <span style={{ fontSize: 22, fontWeight: 700, color: '#374151' }}>{item.count}</span>
