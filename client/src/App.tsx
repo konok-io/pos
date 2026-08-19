@@ -7489,23 +7489,23 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           <div>
             {/* Warning */}
             <div style={{
-              padding: '16px 20px',
+              padding: '12px 16px',
               background: '#fef2f2',
-              borderRadius: 10,
+              borderRadius: 8,
               border: '1px solid #fecaca',
-              marginBottom: 16,
+              marginBottom: 12,
               display: 'flex',
               alignItems: 'center',
-              gap: 12
+              gap: 10
             }}>
-              <span style={{ fontSize: 20 }}>⚠️</span>
-              <p style={{ margin: 0, fontSize: 15, color: '#dc2626' }}>
+              <span style={{ fontSize: 16 }}>⚠️</span>
+              <p style={{ margin: 0, fontSize: 12, color: '#dc2626' }}>
                 {t('warningPermanentDelete')}
               </p>
             </div>
 
             {/* Data Items */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginBottom: 8 }}>
               {[
                 { label: t('productData'), count: products.length, icon: '📦', onClick: () => deleteAllItems('products', products, setProducts, t) },
                 { label: t('customerData'), count: customers.length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.length <= 1 },
@@ -7516,29 +7516,29 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               ].map((item, i) => (
                 <div key={i} style={{ 
                   background: '#fff', 
-                  borderRadius: 14, 
-                  padding: 16, 
+                  borderRadius: 10, 
+                  padding: 12, 
                   border: '1px solid #e5e7eb',
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 24 }}>{item.icon}</span>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>{item.label}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 18 }}>{item.icon}</span>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{item.label}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <span style={{ fontSize: 22, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{item.count}</span>
                     <button
                       onClick={item.onClick}
                       disabled={item.disabled || item.count === 0}
                       style={{ 
-                        padding: '8px 16px', 
+                        padding: '6px 12px', 
                         background: (item.disabled || item.count === 0) ? '#f3f4f6' : '#ef4444', 
                         color: (item.disabled || item.count === 0) ? '#9ca3af' : '#fff', 
                         border: 'none', 
-                        borderRadius: 8, 
-                        fontSize: 13, 
+                        borderRadius: 6, 
+                        fontSize: 11, 
                         fontWeight: 600, 
                         cursor: (item.disabled || item.count === 0) ? 'not-allowed' : 'pointer',
                       }}>
@@ -7552,44 +7552,44 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             {/* Full Reset */}
             <div style={{ 
               background: '#fff',
-              borderRadius: 14, 
+              borderRadius: 10, 
               border: '1px solid #fecaca',
               overflow: 'hidden',
             }}>
               <div style={{ 
                 background: '#fef2f2',
-                padding: '16px 20px',
+                padding: '12px 16px',
                 borderBottom: '1px solid #fecaca',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between'
               }}>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#dc2626' }}>💥 {t('fullReset')}</div>
-                  <div style={{ fontSize: 13, color: '#991b1b', marginTop: 2 }}>{t('fullResetDescription')}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#dc2626' }}>💥 {t('fullReset')}</div>
+                  <div style={{ fontSize: 11, color: '#991b1b', marginTop: 2 }}>{t('fullResetDescription')}</div>
                 </div>
                 <div style={{ 
-                  padding: '4px 12px',
+                  padding: '4px 10px',
                   background: '#dc2626',
                   borderRadius: 6,
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 700,
                   color: '#fff'
                 }}>DANGER</div>
               </div>
-              <div style={{ padding: 16 }}>
+              <div style={{ padding: 12 }}>
                 <input
                   value={confirmText}
                   onChange={e => setConfirmText(e.target.value)}
                   placeholder={t('typeDeleteToConfirm')}
                   style={{
                     width: '100%',
-                    padding: '14px 16px',
-                    fontSize: 15,
+                    padding: '10px 12px',
+                    fontSize: 13,
                     border: '1px solid #d1d5db',
-                    borderRadius: 8,
+                    borderRadius: 6,
                     outline: 'none',
-                    marginBottom: 12,
+                    marginBottom: 10,
                     boxSizing: 'border-box',
                   }}
                 />
@@ -7598,12 +7598,12 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   disabled={confirmText !== 'Delete'}
                   style={{
                     width: '100%',
-                    padding: '14px',
+                    padding: '10px',
                     background: confirmText === 'Delete' ? '#dc2626' : '#e5e7eb',
                     color: confirmText === 'Delete' ? '#fff' : '#9ca3af',
                     border: 'none',
-                    borderRadius: 8,
-                    fontSize: 15,
+                    borderRadius: 6,
+                    fontSize: 12,
                     fontWeight: 700,
                     cursor: confirmText === 'Delete' ? 'pointer' : 'not-allowed',
                   }}
