@@ -7111,37 +7111,20 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       {/* Header with Tab Navigation */}
       <div style={{
         background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
-        padding: '20px 32px',
+        padding: '16px 24px',
         position: 'relative',
         overflow: 'hidden'
       }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
-          {/* Title Row */}
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 16, gap: 24 }}>
-            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
+          {/* Title */}
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 12 }}>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
               ⚙️ সেটিংস
             </h1>
-
-            <button onClick={save} style={{
-              padding: '10px 20px',
-              background: saved ? '#059669' : 'rgba(255,255,255,0.95)',
-              color: saved ? '#fff' : '#0F766E',
-              border: 'none',
-              borderRadius: 10,
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
-            }}>
-              {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ করুন'}
-            </button>
           </div>
 
           {/* Tab Navigation */}
-          <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
             {tabs.map((tab, i) => (
               <button
                 key={i}
@@ -7168,6 +7151,26 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Save Button */}
+      <div style={{ padding: '12px 24px', display: 'flex', justifyContent: 'flex-end', background: '#f1f5f9' }}>
+        <button onClick={save} style={{
+          padding: '10px 20px',
+          background: saved ? '#059669' : '#0F766E',
+          color: '#fff',
+          border: 'none',
+          borderRadius: 10,
+          fontSize: 13,
+          fontWeight: 700,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+        }}>
+          {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ করুন'}
+        </button>
       </div>
 
       {/* Content */}
