@@ -7095,7 +7095,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   const tabs = [
     { icon: '⚙️', label: t('settings') },
     { icon: '🎨', label: t('design') },
-    { icon: '💾', label: t('userData') },
+    { icon: '👤', label: t('user') },
     { icon: '💥', label: t('dataReset') },
   ];
 
@@ -7448,80 +7448,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           </div>
         )}
 
-        {/* Translation Tab */}
-        {activeTab === 2 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-              <div style={{
-                width: 40, height: 40,
-                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 20,
-                color: '#fff'
-              }}>🔄</div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ট্রান্সলেশন</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ভাষা সেটিংস পরিবর্তন করুন</p>
-              </div>
-            </div>
-
-            <div style={{
-              padding: '24px',
-              background: '#f8fafc',
-              borderRadius: 12,
-              textAlign: 'center',
-              border: '2px dashed #e2e8f0'
-            }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🌐</div>
-              <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: '#374151' }}>ভাষা সেটিংস</h4>
-              <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
-                বর্তমানে উপলব্ধ: বাংলা, ইংরেজি, হিন্দি, আরবি
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Database Tab */}
-        {activeTab === 3 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-              <div style={{
-                width: 40, height: 40,
-                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 20,
-                color: '#fff'
-              }}>🗄️</div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ডেটাবেজ</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ডেটা ব্যাকআপ ও রিস্টোর</p>
-              </div>
-            </div>
-
-            <div style={{
-              padding: '24px',
-              background: '#f8fafc',
-              borderRadius: 12,
-              textAlign: 'center',
-              border: '2px dashed #e2e8f0'
-            }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>💾</div>
-              <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: '#374151' }}>ব্যাকআপ ও রিস্টোর</h4>
-              <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
-                আপনার ডেটা ব্যাকআপ করুন এবং প্রয়োজনে রিস্টোর করুন।
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Users Tab */}
-        {activeTab === 4 && (
+        {activeTab === 2 && (
           <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
               <div style={{
