@@ -1180,6 +1180,16 @@ interface Category {
   icon?: string;
 }
 
+interface Transaction {
+  id: string;
+  type: 'due' | 'deposit';
+  amount: number;
+  date: string;
+  note?: string;
+  paymentMethod?: string;
+  customerId?: string;
+}
+
 interface Customer {
   id: string;
   name: string;
@@ -1187,6 +1197,7 @@ interface Customer {
   address: string;
   balance: number;
   deposit: number;
+  transactions?: Transaction[];
 }
 
 interface Sale {
@@ -1642,10 +1653,13 @@ export default function App() {
       
       if (savedCustomers && savedCustomers.length > 0) {
         // Attach transactions to customers
-        const customersWithTransactions = savedCustomers.map((customer: any) => ({
-          ...customer,
-          transactions: savedTransactions.filter((tx: any) => tx.customerId === customer.id)
-        }));
+        const customersWithTransactions = savedCustomers.map((customer: any) => {
+          const customerTransactions = savedTransactions.filter((tx: any) => tx.customerId === customer.id);
+          return {
+            ...customer,
+            transactions: customerTransactions.length > 0 ? customerTransactions : (customer.transactions || [])
+          };
+        });
         setCustomers(customersWithTransactions);
       } else {
         // Create General Customer (System) if no customers exist
