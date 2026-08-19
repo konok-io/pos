@@ -974,7 +974,7 @@ ${printFiltered.map(p => {
                         </span>
                       </td>
                       <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-                        <span style={{ fontWeight: 800, fontSize: 24, color: isLowStock ? T.red : T.gray900 }}>{fmtN(p.stock)}</span>
+                        <span style={{ fontWeight: 700, fontSize: 15, color: isLowStock ? T.red : T.gray900 }}>{fmtN(p.stock)}</span>
                         {isLowStock && <span style={{ fontSize: 14, color: T.red, marginLeft: 4 }}>⚠️</span>}
                       </td>
                       <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400 }}>{p.unit}</td>
@@ -1215,7 +1215,7 @@ function LoadingScreen() {
   const { t } = useLanguage();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#115E59', color: 'white', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-      <div style={{ width: 60, height: 60, border: '4px solid rgba(255,255,255,0.2)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+      <div style={{ width: 50, height: 50, border: '4px solid rgba(255,255,255,0.2)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
       <h3 style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>{t('posManagementSystem')}</h3>
       <p style={{ marginTop: 8, opacity: 0.8 }}>{t('loading')}</p>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -1447,7 +1447,7 @@ function TimeDisplay({ language }: { language: string }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '4px 12px' }}>
-      <div style={{ fontWeight: 800, fontSize: 24, color: '#115E59' }}>
+      <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59' }}>
         {timeStr}
       </div>
       <div style={{ fontSize: 11, color: '#9CA3AF' }}>
@@ -1907,9 +1907,9 @@ export default function App() {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 64 }}>
           {/* Logo Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
-            <div style={{ width: 60, height: 60, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 60, height: 60, objectFit: 'contain', borderRadius: 14 }} /></div>
+            <div style={{ width: 50, height: 50, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 50, height: 50, objectFit: 'contain', borderRadius: 14 }} /></div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 24, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
+              <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
               <div style={{ fontSize: 15, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
             </div>
           </div>
@@ -2675,7 +2675,7 @@ export default function App() {
                     {/* Customer Profile Card - Show when searched */}
                     {searchedCustomer && (
                       <div style={{ marginBottom: 12, padding: 16, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
+                        <div style={{ width: 50, height: 50, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
                           👤
                         </div>
                         <div style={{ flex: 1, color: '#fff' }}>
