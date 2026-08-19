@@ -666,6 +666,69 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
           </button>
         </div>
 
+        {/* General Customer Card */}
+        {generalCustomer && (
+          <div style={{
+            border: `2px solid ${T.tealDark}`,
+            borderRadius: '14px',
+            padding: '16px',
+            background: '#E8F5E9',
+            marginBottom: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+          }}>
+            {/* Header Row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
+                background: T.tealDark,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '24px',
+              }}>
+                👤
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, color: T.tealDark, fontSize: '15px' }}>
+                  {t('generalCustomer')}
+                </div>
+                <div style={{ fontSize: '12px', color: T.gray600 }}>
+                  {t('generalCustomerDefault')}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray600, textTransform: 'uppercase' }}>{t('total')}</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{fmt(generalCustomer?.balance || 0)}</div>
+              </div>
+            </div>
+            {/* View History Button */}
+            <button
+              onClick={() => handleViewHistory(generalCustomer)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: T.teal,
+                color: T.white,
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+              }}
+            >
+              <span>📋</span> {t('viewHistory')}
+            </button>
+          </div>
+        )}
+
         {/* Regular Customer Cards */}
         <div style={cardGridStyle}>
           {filteredCustomers.length === 0 ? (
@@ -679,84 +742,102 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
               {t('noCustomersFound')}
             </div>
           ) : (
-            filteredCustomers.map((customer) => (
-              <div key={customer.id} style={{
-                background: T.white,
-                borderRadius: '14px',
-                padding: '16px',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-                border: `1px solid ${T.gray200}`,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '50%',
-                    background: T.gray100,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '24px',
-                  }}>
-                    {customer.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontWeight: 700, color: T.gray800 }}>{customer.name}</div>
-                    <div style={{ fontSize: '13px', color: T.gray400 }}>
-                      {customer.phone || t('phoneNotFound')}
+            filteredCustomers.map((customer) => {
+              const customerDue = customer.balance < 0 ? Math.abs(customer.balance) : 0;
+              return (
+                <div key={customer.id} style={{
+                  background: T.white,
+                  borderRadius: '14px',
+                  padding: '16px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  border: `1px solid ${T.gray200}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                }}>
+                  {/* Header Row: Avatar + Info + Total */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '50%',
+                      background: T.teal,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '22px',
+                      color: T.white,
+                      fontWeight: 700,
+                    }}>
+                      {customer.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, color: T.gray800, fontSize: '15px' }}>{customer.name}</div>
+                      <div style={{ fontSize: '12px', color: T.gray400 }}>
+                        {customer.phone || t('phoneNotFound')}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: T.teal }}>{fmt(getCustomerTotal(customer))}</div>
                     </div>
                   </div>
+
+                  {/* Action Buttons */}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {/* Due Alert / History Button */}
+                    <button
+                      onClick={() => handleViewHistory(customer)}
+                      style={{
+                        flex: 1,
+                        padding: '10px 12px',
+                        background: customerDue > 0 ? '#D32F2F' : T.gray50,
+                        color: customerDue > 0 ? T.white : T.teal,
+                        border: customerDue > 0 ? 'none' : `1px solid ${T.teal}`,
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      {customerDue > 0 ? (
+                        <>
+                          <span>⚠️</span> Due: {fmt(customerDue)}
+                        </>
+                      ) : (
+                        <>
+                          <span>📋</span> {t('history')}
+                        </>
+                      )}
+                    </button>
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => customer.id.startsWith('20') ? null : handleDeleteCustomer(customer)}
+                      disabled={customer.id.startsWith('20')}
+                      style={{
+                        padding: '10px 14px',
+                        background: customer.id.startsWith('20') ? T.gray100 : '#EF9A9A',
+                        color: customer.id.startsWith('20') ? T.gray400 : '#B71C1C',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        cursor: customer.id.startsWith('20') ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: customer.id.startsWith('20') ? 0.5 : 1,
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
-                <div style={{ fontSize: '14px', color: T.gray600 }}>
-                  {t('total')} {fmt(getCustomerTotal(customer))}
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <button
-                    onClick={() => handleViewHistory(customer)}
-                    style={{
-                      flex: 1,
-                      padding: '8px 12px',
-                      background: T.gray50,
-                      color: T.teal,
-                      border: `1px solid ${T.teal}`,
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                    }}
-                  >
-                    <span>📋</span> {t('history')}
-                  </button>
-                  <button
-                    onClick={() => customer.id.startsWith('20') ? null : handleDeleteCustomer(customer)}
-                    disabled={customer.id.startsWith('20')}
-                    style={{
-                      padding: '8px 12px',
-                      background: customer.id.startsWith('20') ? T.gray100 : T.redLight,
-                      color: customer.id.startsWith('20') ? T.gray400 : T.red,
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: customer.id.startsWith('20') ? 'not-allowed' : 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: customer.id.startsWith('20') ? 0.5 : 1,
-                    }}
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 
