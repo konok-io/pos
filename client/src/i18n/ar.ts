@@ -316,6 +316,8 @@ export const ar: Record<string, string> = {
 
   // Add Customer Modal
   newCustomer: 'عميل جديد',
+  customerEdit: 'تعديل العميل',
+  remove: 'إزالة',
   camera: 'الكاميرا',
   browse: 'تصفح',
   customerIdOptional: 'المعرف (تلقائي إذا فارغ)',

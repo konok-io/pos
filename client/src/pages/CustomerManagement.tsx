@@ -47,14 +47,16 @@ const generateCustomerId = (): string => {
   return `${yy}${mm}${dd}${random7}`;
 };
 
-// Add Customer Modal Component
-interface AddCustomerModalProps {
+// Unified Customer Modal Component (Add/Edit)
+interface CustomerModalProps {
   isOpen: boolean;
+  mode: 'add' | 'edit';
+  customer?: Customer | null;
   onClose: () => void;
   onSave: (customer: Customer) => void;
 }
 
-function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
+function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModalProps) {
   const { t } = useLanguage();
   const [customerId, setCustomerId] = useState('');
   const [name, setName] = useState('');
@@ -68,19 +70,29 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const streamRef = useRef<MediaStream | null>(null);
 
+  const isEditMode = mode === 'edit';
+
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      setCustomerId('');
-      setName('');
-      setPhone('');
-      setAddress('');
-      setAvatar(null);
+      if (isEditMode && customer) {
+        setCustomerId(customer.id);
+        setName(customer.name);
+        setPhone(customer.phone || '');
+        setAddress(customer.address || '');
+        setAvatar(null);
+      } else {
+        setCustomerId('');
+        setName('');
+        setPhone('');
+        setAddress('');
+        setAvatar(null);
+      }
       setNameError('');
       setIsCameraOpen(false);
       stopCamera();
     }
-  }, [isOpen]);
+  }, [isOpen, isEditMode, customer]);
 
   // Cleanup camera on unmount
   useEffect(() => {
@@ -135,6 +147,10 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
     }
   };
 
+  const handleRemovePhoto = () => {
+    setAvatar(null);
+  };
+
   const handleSave = () => {
     // Validate name
     if (!name.trim()) {
@@ -142,20 +158,19 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
       return;
     }
 
-    // Generate ID if empty
-    const finalId = customerId.trim() || generateCustomerId();
+    // Generate ID if empty (only in add mode)
+    const finalId = isEditMode ? customerId : (customerId.trim() || generateCustomerId());
 
-    // Create customer
-    const newCustomer: Customer = {
+    // Create/update customer
+    const savedCustomer: Customer = {
       id: finalId,
       name: name.trim(),
       phone: phone.trim(),
       address: address.trim(),
-      balance: 0,
-      avatar: avatar || undefined,
+      balance: isEditMode && customer ? customer.balance : 0,
     };
 
-    onSave(newCustomer);
+    onSave(savedCustomer);
     onClose();
   };
 
@@ -176,9 +191,9 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
     }}>
       <div style={{
         background: T.white,
-        borderRadius: '16px',
+        borderRadius: '12px',
         width: '90%',
-        maxWidth: '480px',
+        maxWidth: '400px',
         maxHeight: '90vh',
         overflow: 'auto',
         boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
@@ -188,21 +203,21 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '16px 20px',
+          padding: '12px 16px',
           borderBottom: `1px solid ${T.gray200}`,
         }}>
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: T.gray800 }}>
-            {t('newCustomer')}
+          <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: T.gray800 }}>
+            {isEditMode ? t('customerEdit') : t('newCustomer')}
           </h2>
           <button
             onClick={onClose}
             style={{
               background: 'none',
               border: 'none',
-              fontSize: '24px',
+              fontSize: '22px',
               cursor: 'pointer',
               color: T.gray400,
-              padding: '4px',
+              padding: '2px',
               lineHeight: 1,
             }}
           >
@@ -210,19 +225,19 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
           </button>
         </div>
 
-        {/* Body */}
-        <div style={{ padding: '20px' }}>
-          {/* Profile Image Section */}
+        {/* Body - Compact */}
+        <div style={{ padding: '12px 16px' }}>
+          {/* Profile Image Section - Compact */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
-            marginBottom: '20px',
+            gap: '12px',
+            marginBottom: '12px',
           }}>
-            {/* Avatar Preview */}
+            {/* Avatar Preview - Smaller */}
             <div style={{
-              width: '80px',
-              height: '80px',
+              width: '60px',
+              height: '60px',
               borderRadius: '50%',
               background: T.gray100,
               display: 'flex',
@@ -230,47 +245,48 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
               justifyContent: 'center',
               overflow: 'hidden',
               border: `2px dashed ${T.gray200}`,
+              flexShrink: 0,
             }}>
               {avatar ? (
                 <img src={avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ fontSize: '32px' }}>👤</span>
+                <span style={{ fontSize: '24px' }}>👤</span>
               )}
             </div>
 
-            {/* Camera Buttons */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {/* Action Buttons - Horizontal */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {isCameraOpen ? (
                 <>
                   <button
                     onClick={capturePhoto}
                     style={{
-                      padding: '8px 16px',
+                      padding: '6px 10px',
                       background: T.teal,
                       color: T.white,
                       border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '13px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
                   >
-                    📷 {t('camera')} - Capture
+                    📷 Capture
                   </button>
                   <button
                     onClick={() => { stopCamera(); setIsCameraOpen(false); }}
                     style={{
-                      padding: '8px 16px',
+                      padding: '6px 10px',
                       background: T.gray100,
                       color: T.gray600,
                       border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '13px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
                   >
-                    Cancel
+                    ✕
                   </button>
                 </>
               ) : (
@@ -278,17 +294,14 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
                   <button
                     onClick={startCamera}
                     style={{
-                      padding: '8px 16px',
+                      padding: '6px 10px',
                       background: T.teal,
                       color: T.white,
                       border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '13px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
                     }}
                   >
                     📷 {t('camera')}
@@ -296,21 +309,35 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     style={{
-                      padding: '8px 16px',
+                      padding: '6px 10px',
                       background: T.gray100,
                       color: T.gray800,
                       border: `1px solid ${T.gray200}`,
-                      borderRadius: '8px',
-                      fontSize: '13px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
                       fontWeight: 600,
                       cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
                     }}
                   >
                     📁 {t('browse')}
                   </button>
+                  {(avatar || isEditMode) && (
+                    <button
+                      onClick={handleRemovePhoto}
+                      style={{
+                        padding: '6px 10px',
+                        background: T.redLight,
+                        color: T.red,
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ❌ {t('remove')}
+                    </button>
+                  )}
                 </>
               )}
             </div>
@@ -331,16 +358,16 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
             style={{ display: 'none' }}
           />
 
-          {/* Form Fields */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* Form Fields - Compact */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {/* ID Field */}
             <div>
               <label style={{
                 display: 'block',
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: T.gray600,
-                marginBottom: '6px',
+                marginBottom: '4px',
                 textTransform: 'uppercase',
               }}>
                 {t('customerIdOptional')}
@@ -349,15 +376,20 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
                 type="text"
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
-                placeholder="13-digit ID will be auto-generated"
+                disabled={isEditMode}
+                placeholder={isEditMode ? '' : 'Auto-generated if empty'}
+                readOnly={isEditMode}
                 style={{
                   width: '100%',
-                  padding: '10px 14px',
+                  padding: '8px 12px',
                   border: `1px solid ${T.gray200}`,
-                  borderRadius: '8px',
-                  fontSize: '14px',
+                  borderRadius: '6px',
+                  fontSize: '13px',
                   outline: 'none',
                   boxSizing: 'border-box',
+                  background: isEditMode ? T.gray100 : T.white,
+                  color: isEditMode ? T.gray400 : T.gray800,
+                  cursor: isEditMode ? 'not-allowed' : 'text',
                 }}
               />
             </div>
@@ -366,10 +398,10 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
             <div>
               <label style={{
                 display: 'block',
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: T.gray600,
-                marginBottom: '6px',
+                marginBottom: '4px',
                 textTransform: 'uppercase',
               }}>
                 {t('customerNameLabel')}
@@ -381,16 +413,16 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
                 placeholder={t('enterCustomerName')}
                 style={{
                   width: '100%',
-                  padding: '10px 14px',
+                  padding: '8px 12px',
                   border: `1px solid ${nameError ? T.red : T.gray200}`,
-                  borderRadius: '8px',
-                  fontSize: '14px',
+                  borderRadius: '6px',
+                  fontSize: '13px',
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
               />
               {nameError && (
-                <span style={{ fontSize: '12px', color: T.red, marginTop: '4px', display: 'block' }}>
+                <span style={{ fontSize: '11px', color: T.red, marginTop: '2px', display: 'block' }}>
                   {nameError}
                 </span>
               )}
@@ -400,10 +432,10 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
             <div>
               <label style={{
                 display: 'block',
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: T.gray600,
-                marginBottom: '6px',
+                marginBottom: '4px',
                 textTransform: 'uppercase',
               }}>
                 {t('phoneNumber')}
@@ -415,10 +447,10 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
                 placeholder={t('phoneNumber')}
                 style={{
                   width: '100%',
-                  padding: '10px 14px',
+                  padding: '8px 12px',
                   border: `1px solid ${T.gray200}`,
-                  borderRadius: '8px',
-                  fontSize: '14px',
+                  borderRadius: '6px',
+                  fontSize: '13px',
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
@@ -429,10 +461,10 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
             <div>
               <label style={{
                 display: 'block',
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: 600,
                 color: T.gray600,
-                marginBottom: '6px',
+                marginBottom: '4px',
                 textTransform: 'uppercase',
               }}>
                 {t('customerAddress')}
@@ -444,10 +476,10 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
                 placeholder={t('customerAddress')}
                 style={{
                   width: '100%',
-                  padding: '10px 14px',
+                  padding: '8px 12px',
                   border: `1px solid ${T.gray200}`,
-                  borderRadius: '8px',
-                  fontSize: '14px',
+                  borderRadius: '6px',
+                  fontSize: '13px',
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
@@ -456,23 +488,23 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Footer - Compact */}
         <div style={{
           display: 'flex',
-          gap: '12px',
-          padding: '16px 20px',
+          gap: '8px',
+          padding: '12px 16px',
           borderTop: `1px solid ${T.gray200}`,
         }}>
           <button
             onClick={onClose}
             style={{
               flex: 1,
-              padding: '12px',
+              padding: '10px',
               background: T.gray100,
               color: T.gray800,
               border: 'none',
-              borderRadius: '10px',
-              fontSize: '14px',
+              borderRadius: '8px',
+              fontSize: '13px',
               fontWeight: 600,
               cursor: 'pointer',
             }}
@@ -483,17 +515,17 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
             onClick={handleSave}
             style={{
               flex: 1,
-              padding: '12px',
+              padding: '10px',
               background: T.teal,
               color: T.white,
               border: 'none',
-              borderRadius: '10px',
-              fontSize: '14px',
+              borderRadius: '8px',
+              fontSize: '13px',
               fontWeight: 600,
               cursor: 'pointer',
             }}
           >
-            {t('save')}
+            💾 {t('save')}
           </button>
         </div>
       </div>
@@ -504,14 +536,27 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
 export default function CustomerManagement({ customers, setCustomers, sales, onDeleteCustomer }: CustomerManagementProps) {
   const { t, isRTL } = useLanguage();
   const [view, setView] = useState<ViewType>('dashboard');
+  const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
+  const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<TabType>('all');
-  const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
 
   // Handle add customer
   const handleAddCustomer = (customer: Customer) => {
     setCustomers(prev => [...prev, customer]);
+  };
+
+  // Handle edit customer
+  const handleEditCustomer = (customer: Customer) => {
+    setCustomers(prev => prev.map(c => c.id === customer.id ? customer : c));
+  };
+
+  // Open edit modal
+  const openEditModal = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setIsEditCustomerModalOpen(true);
   };
 
   // Handle delete customer (with IndexedDB cleanup)
@@ -883,10 +928,20 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
         </div>
 
         {/* Add Customer Modal */}
-        <AddCustomerModal
+        <CustomerModal
           isOpen={isAddCustomerModalOpen}
+          mode="add"
           onClose={() => setIsAddCustomerModalOpen(false)}
           onSave={handleAddCustomer}
+        />
+
+        {/* Edit Customer Modal */}
+        <CustomerModal
+          isOpen={isEditCustomerModalOpen}
+          mode="edit"
+          customer={editingCustomer}
+          onClose={() => { setIsEditCustomerModalOpen(false); setEditingCustomer(null); }}
+          onSave={handleEditCustomer}
         />
       </div>
     );
@@ -1118,6 +1173,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             </h2>
           </div>
           <button
+            onClick={() => openEditModal(selectedCustomer)}
             style={{
               padding: '8px 16px',
               background: T.white,

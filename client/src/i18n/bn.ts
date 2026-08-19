@@ -320,6 +320,8 @@ export const bn: Record<string, string> = {
 
   // Add Customer Modal
   newCustomer: 'নতুন কাস্টমার',
+  customerEdit: 'কাস্টমার এডিট',
+  remove: 'মুছুন',
   camera: 'ক্যামেরা',
   browse: 'ব্রাউজ',
   customerIdOptional: 'আইডি (খালি থাকলে স্বয়ংক্রিয়)',

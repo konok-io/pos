@@ -311,6 +311,8 @@ export const hi: Record<string, string> = {
 
   // Add Customer Modal
   newCustomer: 'नया ग्राहक',
+  customerEdit: 'ग्राहक संपादित करें',
+  remove: 'हटाएं',
   camera: 'कैमरा',
   browse: 'ब्राउज़',
   customerIdOptional: 'आईडी (खाली हो तो स्वतः)',

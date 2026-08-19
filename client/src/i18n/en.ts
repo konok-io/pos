@@ -349,6 +349,8 @@ export const en: Record<string, string> = {
 
   // Add Customer Modal
   newCustomer: 'New Customer',
+  customerEdit: 'Customer Edit',
+  remove: 'Remove',
   camera: 'Camera',
   browse: 'Browse',
   customerIdOptional: 'ID (Auto-generated if empty)',
