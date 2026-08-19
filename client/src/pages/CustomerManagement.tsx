@@ -1161,7 +1161,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
         </div>
 
         {/* Customer Cards Grid */}
-        <div style={cardGridStyle}>
+        <div style={{ ...cardGridStyle, marginTop: '16px' }}>
           {/* General Customer Card - First */}
           {generalCustomer && (
             <div style={{
