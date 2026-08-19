@@ -679,7 +679,7 @@ ${printFiltered.map(p => {
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: 600, fontSize: 14 }}>{item.name}</div>
                         <div style={{ fontSize: 12, color: T.gray500 }}>{item.company} - {item.cat || '-'}</div>
-                        <div style={{ fontSize: 19, marginTop: 4 }}>
+                        <div style={{ fontSize: 13, marginTop: 4 }}>
                           <span style={{ color: T.orange }}>ক্রয়: {fmt(item.costPrice)}</span>
                           <span style={{ margin: '0 8px', color: T.gray300 }}>|</span>
                           <span style={{ color: T.teal }}>বিক্রয়: {fmt(item.sellPrice)}</span>
@@ -837,7 +837,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'list' ? T.teal : T.white,
             color: productTab === 'list' ? T.white : T.gray600,
-            fontWeight: 600, fontSize: 19, cursor: 'pointer',
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -848,7 +848,7 @@ ${printFiltered.map(p => {
           style={{
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: T.white, color: T.gray600,
-            fontWeight: 600, fontSize: 19, cursor: 'pointer',
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -860,7 +860,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'suppliers' ? T.teal : T.white,
             color: productTab === 'suppliers' ? T.white : T.gray600,
-            fontWeight: 600, fontSize: 19, cursor: 'pointer',
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -872,7 +872,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'barcode' ? T.teal : T.white,
             color: productTab === 'barcode' ? T.white : T.gray600,
-            fontWeight: 600, fontSize: 19, cursor: 'pointer',
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -884,7 +884,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'inventory' ? T.teal : T.white,
             color: productTab === 'inventory' ? T.white : T.gray600,
-            fontWeight: 600, fontSize: 19, cursor: 'pointer',
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
         >
@@ -1339,7 +1339,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 style={{
                   width: 140,
                   padding: '8px 10px',
-                  fontSize: 19,
+                  fontSize: 13,
                   border: '2px solid #E5E7EB',
                   borderRadius: 8,
                   outline: 'none',
@@ -1365,7 +1365,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 style={{
                   width: 140,
                   padding: '8px 10px',
-                  fontSize: 19,
+                  fontSize: 13,
                   border: '2px solid #E5E7EB',
                   borderRadius: 8,
                   outline: 'none',
@@ -1387,7 +1387,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                 color: '#fff',
                 border: 'none',
                 borderRadius: 8,
-                fontSize: 19,
+                fontSize: 13,
                 fontWeight: 700,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 whiteSpace: 'nowrap',
@@ -1926,11 +1926,11 @@ export default function App() {
                 <button onClick={() => setCurrentTab('pos')} style={{
                   padding: '5px 10px',
                   border: 'none',
-                  background: currentTab === 'pos' ? 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)' : 'transparent',
+                  background: currentTab === 'pos' ? '#E0E0E0' : 'transparent',
                   cursor: 'pointer',
-                  color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563',
+                  color: '#000000',
                   fontWeight: 600,
-                  fontSize: 19,
+                  fontSize: 13,
                   display: 'flex',
                   alignItems: 'center',
                   
@@ -1948,9 +1948,9 @@ export default function App() {
                     border: 'none',
                     background: currentTab === t.id ? '#E0E0E0' : 'transparent',
                     cursor: 'pointer',
-                    color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563',
+                    color: '#000000',
                     fontWeight: 600,
-                    fontSize: 19,
+                    fontSize: 13,
                     display: 'flex',
                     alignItems: 'center',
                     
@@ -2160,7 +2160,7 @@ export default function App() {
                             onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
                           >
                             <div>
-                              <div style={{ fontSize: 19, fontWeight: 600, color: '#1F2937' }}>{c.name}</div>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{c.name}</div>
                               <div style={{ fontSize: 11, color: '#6B7280' }}>{c.phone}</div>
                             </div>
                             <div style={{ 
@@ -2192,7 +2192,7 @@ export default function App() {
                         width: '100%',
                         height: 34,
                         padding: '0 12px',
-                        fontSize: 19,
+                        fontSize: 13,
                         borderRadius: 14,
                         border: '1px solid #D1D5DB',
                         background: 'rgba(255,255,255,0.95)',
@@ -2228,7 +2228,7 @@ export default function App() {
                         width: '100%',
                         height: 34,
                         padding: '0 12px',
-                        fontSize: 19,
+                        fontSize: 13,
                         borderRadius: 14,
                         border: '1px solid #D1D5DB',
                         background: 'rgba(255,255,255,0.95)',
@@ -2270,7 +2270,7 @@ export default function App() {
                       border: '1px solid #E0E0E0'
                     }}>
                       <span style={{ fontSize: 14 }}>📦</span>
-                      <span style={{ fontSize: 19, fontWeight: 700, color: '#424242' }}>{filteredProducts.length}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#424242' }}>{filteredProducts.length}</span>
                       <span style={{ fontSize: 11, color: '#757575' }}>পণ্য</span>
                     </div>
                   </div>
@@ -2572,11 +2572,11 @@ export default function App() {
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <span style={{ fontSize: 16 }}>📦</span>
                                     <div>
-                                      <div style={{ fontSize: 19, fontWeight: 600, color: '#1F2937' }}>{item.name}</div>
+                                      <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{item.name}</div>
                                       <div style={{ fontSize: 11, color: '#6B7280' }}>×{item.quantity}</div>
                                     </div>
                                   </div>
-                                  <span style={{ fontSize: 19, fontWeight: 600, color: '#115E59' }}>{fmt(item.sellPrice * item.quantity)}</span>
+                                  <span style={{ fontSize: 13, fontWeight: 600, color: '#115E59' }}>{fmt(item.sellPrice * item.quantity)}</span>
                                 </div>
                               ))}
                               {sale.items.length > 3 && (
@@ -2680,8 +2680,8 @@ export default function App() {
                         </div>
                         <div style={{ flex: 1, color: '#fff' }}>
                           <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{searchedCustomer.name}</div>
-                          <div style={{ fontSize: 19, opacity: 0.9, marginBottom: 2 }}>📱 {searchedCustomer.phone}</div>
-                          <div style={{ fontSize: 19, opacity: 0.9 }}>📍 {searchedCustomer.address}</div>
+                          <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 2 }}>📱 {searchedCustomer.phone}</div>
+                          <div style={{ fontSize: 13, opacity: 0.9 }}>📍 {searchedCustomer.address}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ padding: '8px 16px', background: searchedCustomer.balance > 0 ? 'rgba(220,38,38,0.3)' : 'rgba(34,197,94,0.3)', borderRadius: 8, marginBottom: 8 }}>
@@ -2726,7 +2726,7 @@ export default function App() {
                               return (
                                 <div key={p.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                   <div>
-                                    <div style={{ fontSize: 19, fontWeight: 600, color: '#374151' }}>{p.name}</div>
+                                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{p.name}</div>
                                     <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📅 {p.expiryDate}</div>
                                   </div>
                                   <div style={{ background: daysLeft <= 7 ? '#FEE2E2' : '#F0FDFA', color: daysLeft <= 7 ? '#DC2626' : '#115E59', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600 }}>
@@ -2759,7 +2759,7 @@ export default function App() {
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
                             {customers.map(c => (
                               <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12 }}>
-                                <div style={{ fontSize: 19, fontWeight: 600, color: '#374151' }}>{c.name}</div>
+                                <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
                                 <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📱 {c.phone}</div>
                                 {c.balance > 0 && (
                                   <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>বাকি: ৳{c.balance}</div>
@@ -2839,7 +2839,7 @@ export default function App() {
                             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                           }}>
                             <span style={{ fontSize: 16 }}>▣</span>
-                            <span style={{ fontSize: 19, fontWeight: 600, color: '#6B7280' }}>{t('scanItem')}</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('scanItem')}</span>
                           </div>
                           <div style={{
                             padding: '10px 16px',
@@ -2852,7 +2852,7 @@ export default function App() {
                             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                           }}>
                             <span style={{ fontSize: 16 }}>＋</span>
-                            <span style={{ fontSize: 19, fontWeight: 600, color: '#6B7280' }}>{t('addProductEmpty')}</span>
+                            <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('addProductEmpty')}</span>
                           </div>
                         </div>
                         <div style={{
@@ -3061,7 +3061,7 @@ export default function App() {
                       borderRadius: 8, 
                       border: 'none', 
                       background: '#E0E0E0', 
-                      color: currentTab === 'pos' ? '#FFFFFF' : '#4B5563', 
+                      color: '#000000', 
                       fontSize: 12, 
                       fontWeight: 600, 
                       cursor: 'pointer',
@@ -3261,7 +3261,7 @@ export default function App() {
                       padding: '10px 12px', borderRadius: 8, border: '1px solid #D1D5DB',
                       background: '#F5F5F5',
                       color: cart.length > 0 ? '#DC2626' : '#9CA3AF',
-                      fontWeight: 600, fontSize: 19, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
+                      fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
                     🗑️
                   </button>
@@ -3282,7 +3282,7 @@ export default function App() {
                       padding: '10px 16px', borderRadius: 8, border: '1px solid #D1D5DB',
                       background: '#F5F5F5',
                       color: cart.length > 0 ? '#115E59' : '#9CA3AF',
-                      fontWeight: 600, fontSize: 19, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
+                      fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
                     📋 {t('hold')}
                   </button>
@@ -3531,17 +3531,17 @@ export default function App() {
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>📦</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>০</div>
-                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('totalProductsCount')}</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProductsCount')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#DC2626' }}>০</div>
-                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('stockLow')}</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockLow')}</div>
               </div>
               <div className="card" style={{ background: '#ECFDF5', border: '1px solid #A7F3D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#059669' }}>০</div>
-                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('stockAvailable')}</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockAvailable')}</div>
               </div>
             </div>
             
@@ -3560,12 +3560,12 @@ export default function App() {
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📈</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>৳০</div>
-                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('totalIncome')}</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalIncome')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📉</div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>৳০</div>
-                <div style={{ fontSize: 19, color: '#6B7280' }}>{t('totalExpense')}</div>
+                <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalExpense')}</div>
               </div>
             </div>
             <div className="card">
@@ -4093,10 +4093,10 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
               <div key={i} style={{ background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', padding: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{item.name}</div>
-                  <div style={{ fontSize: 19, color: '#6B7280' }}>
+                  <div style={{ fontSize: 13, color: '#6B7280' }}>
                     🏢 {item.company} {item.cat ? `- 📂 ${item.cat}` : ''}
                   </div>
-                  <div style={{ fontSize: 19, color: '#6B7280', display: 'flex', gap: 8, marginTop: 4 }}>
+                  <div style={{ fontSize: 13, color: '#6B7280', display: 'flex', gap: 8, marginTop: 4 }}>
                     <span>📦 {item.stock} {item.unit}</span>
                     <span>💰 {fmt(item.buyP)}</span>
                     <span>💵 {fmt(item.sellP)}</span>
