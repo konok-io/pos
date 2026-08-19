@@ -580,9 +580,12 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
     }
   };
 
+  // Check if customer is General Customer (ID starts with year prefix 20-29)
+  const isGeneralCustomer = (c: Customer) => /^2[0-9]/.test(c.id) && c.name.toLowerCase().includes('general') && c.name.toLowerCase().includes('customer');
+
   // Filter customers for dashboard
   const filteredCustomers = customers.filter(c => {
-    if (c.id.startsWith('20')) return false; // Exclude general customer from regular list
+    if (isGeneralCustomer(c)) return false; // Exclude general customer from regular list
     const query = searchQuery.toLowerCase();
     return (
       c.name.toLowerCase().includes(query) ||
@@ -591,7 +594,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
   });
 
   // General customer
-  const generalCustomer = customers.find(c => c.id.startsWith('20'));
+  const generalCustomer = customers.find(c => isGeneralCustomer(c));
 
   // Get customer sales
   const getCustomerSales = (customer: Customer) => {
@@ -606,7 +609,7 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
 
   // Handle CSV Export
   const handleCsvExport = () => {
-    const regularCustomers = customers.filter(c => !c.id.startsWith('20'));
+    const regularCustomers = customers.filter(c => !isGeneralCustomer(c));
     const csvContent = [
       ['ID', 'Name', 'Phone', 'Address', 'Balance'].join(','),
       ...regularCustomers.map(c => [c.id, c.name, c.phone || '', c.address || '', c.balance.toString()].join(','))
