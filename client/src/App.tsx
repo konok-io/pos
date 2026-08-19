@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
-import { useLanguage, languages } from './i18n';
-import SettingsScreen from './pages/SettingsScreen';
-import SuppliersScreen from './pages/SuppliersScreen';
-import CustomerManagement from './pages/CustomerManagement';
+import { useLanguage, languages, defaultTranslations, Language } from './i18n';
 import { db } from './utils/db';
-import { localDb } from './services';
+import { localDb, initDatabase } from './services';
 
 // Design Tokens
 const T = {
@@ -4177,3 +4174,3958 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
     </div>
   );
 };
+
+// ===========================================
+// SUPPLIERS SCREEN COMPONENT
+// ===========================================
+interface Supplier {
+  id: string;
+  code: string;
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+  crNumber: string;
+  vatNumber: string;
+  company: string;
+  isAuto?: boolean;
+}
+
+interface SupplierCategory {
+  id: string;
+  name: string;
+  company?: string;
+}
+
+interface SuppliersScreenProps {
+  suppliers: Supplier[];
+  setSuppliers: React.Dispatch<React.SetStateAction<Supplier[]>>;
+  categories: SupplierCategory[];
+  setCategories: React.Dispatch<React.SetStateAction<SupplierCategory[]>>;
+  products: any[];
+  setProducts: React.Dispatch<React.SetStateAction<any[]>>;
+  purchases: any[];
+}
+function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, products, setProducts, purchases }: SuppliersScreenProps) {
+  const { t } = useLanguage();
+  
+  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'companies' | 'categories'>('companies');
+  const [viewSupplier, setViewSupplier] = useState<Supplier | null>(null);
+  const [viewCategory, setViewCategory] = useState<SupplierCategory | null>(null);
+  const [showPurchaseHistory, setShowPurchaseHistory] = useState<Supplier | null>(null);
+  
+  // Form states
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
+  const [supplierForm, setSupplierForm] = useState({
+    name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: ''
+  });
+  
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<SupplierCategory | null>(null);
+  const [categoryForm, setCategoryForm] = useState({ name: '' });
+  
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [productForm, setProductForm] = useState<{
+    company: string; cat: string; name: string; barcode: string; unit: string; buyP: string; sellP: string; stock: string; minStock: string
+  }>({
+    company: '', cat: '', name: '', barcode: '', unit: 'পিস', buyP: '', sellP: '', stock: '0', minStock: '5'
+  });
+  
+  const [showCompanyDrop, setShowCompanyDrop] = useState(false);
+  const [showCatDrop, setShowCatDrop] = useState(false);
+  const [catQ] = useState('');
+  
+  // All unique companies from products
+  const allCompanies = [...new Set(products.map(p => p.company).filter(Boolean))];
+  
+  // Combined list of suppliers + auto companies
+  const allSuppliers = [
+    ...suppliers,
+    ...allCompanies.filter(c => !suppliers.find(s => (s.name || '').toLowerCase() === (c || '').toLowerCase()))
+      .map(c => ({ id: `auto-${c}`, name: c, code: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', company: c, isAuto: true }))
+  ];
+  
+  // Get products count for a company
+  const getProductsCount = (company: string) => 
+    products.filter(p => (p.company || '').toLowerCase() === (company || '').toLowerCase()).length;
+  
+  // Get purchases for a supplier
+  const getSupplierPurchases = (name: string) => 
+    purchases.filter(p => (p.supplier || '').toLowerCase() === (name || '').toLowerCase());
+  
+  // Filter suppliers
+  const filteredSuppliers = allSuppliers
+    .filter(s => 
+      !search || 
+      (s.name || '').toLowerCase().includes(search.toLowerCase()) ||
+      (s.phone || '').includes(search) ||
+      (s.code || '').toLowerCase().includes(search.toLowerCase())
+    )
+    .sort((a, b) => getProductsCount(b.name) - getProductsCount(a.name));
+  
+  // Filter categories
+  const filteredCategories = categories
+    .filter(c => !search || (c.name || '').toLowerCase().includes(search.toLowerCase()));
+  
+  // Filter companies for dropdown
+  const filteredCompanies = suppliers;
+  
+  // Filter cats for dropdown
+  const companyCats = productForm.company 
+    ? categories.filter(c => !c.company || c.company.toLowerCase() === productForm.company.toLowerCase())
+    : categories;
+  const filteredCats = companyCats.filter(c => !catQ || (c.name || '').toLowerCase().includes(catQ.toLowerCase()));
+
+  // Save Supplier
+  const saveSupplier = async () => {
+    if (!supplierForm.name?.trim()) {
+      alert(t('enterSupplierName') || 'সরবরাহকারীর নাম লিখুন!');
+      return;
+    }
+    
+    const nameLower = supplierForm.name.trim().toLowerCase();
+    
+    // Check duplicate
+    const exists = suppliers.some(s => 
+      s.id !== editingSupplier?.id && (s.name || '').toLowerCase().trim() === nameLower
+    );
+    if (exists) {
+      alert('❌ এই সরবরাহকারীর নাম ইতিমধ্যে আছে!');
+      return;
+    }
+    
+    // Generate code if not provided
+    let codeToUse = supplierForm.code?.trim();
+    if (!codeToUse) {
+      const maxCode = suppliers.reduce((max, s) => {
+        const match = s.code?.match(/C-(\d+)/);
+        return match ? Math.max(max, parseInt(match[1])) : max;
+      }, 0);
+      codeToUse = `C-${String(maxCode + 1).padStart(5, '0')}`;
+    }
+    
+    try {
+      if (editingSupplier) {
+        const updated: Supplier = {
+          ...editingSupplier,
+          ...supplierForm,
+          code: codeToUse,
+          company: supplierForm.name.trim()
+        };
+        setSuppliers(prev => prev.map(s => s.id === editingSupplier.id ? updated : s));
+        alert('✅ সরবরাহকারী আপডেট করা হয়েছে!');
+      } else {
+        const newSupplier: Supplier = {
+          id: genId(),
+          code: codeToUse,
+          name: supplierForm.name.trim(),
+          phone: supplierForm.phone || '',
+          email: supplierForm.email || '',
+          address: supplierForm.address || '',
+          crNumber: supplierForm.crNumber || '',
+          vatNumber: supplierForm.vatNumber || '',
+          company: supplierForm.name.trim()
+        };
+        setSuppliers(prev => [...prev, newSupplier]);
+        alert(`✅ সরবরাহকারী যোগ করা হয়েছে!\nকোড: ${codeToUse}`);
+      }
+      
+      setShowSupplierModal(false);
+      setEditingSupplier(null);
+      setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' });
+    } catch (error) {
+      console.error('Failed to save supplier:', error);
+      alert('❌ সমস্যা হয়েছে!');
+    }
+  };
+  
+  // Delete Supplier
+  const deleteSupplier = async (supplier: Supplier) => {
+    const hasProducts = products.some(p => (p.company || '').toLowerCase() === (supplier.name || '').toLowerCase());
+    if (hasProducts) {
+      alert('❌ এই কোম্পানিতে পণ্য আছে বলে মুছা যাবে না!');
+      return;
+    }
+    
+    if (!confirm('এই কোম্পানি মুছে ফেলবেন?')) return;
+    
+    try {
+      setSuppliers(prev => prev.filter(s => s.id !== supplier.id));
+      setViewSupplier(null);
+    } catch (error) {
+      console.error('Delete failed:', error);
+      alert('❌ ডিলিট ব্যর্থ হয়েছে!');
+    }
+  };
+  
+  // Save Category
+  const saveCategory = async () => {
+    if (!categoryForm.name?.trim()) {
+      alert('ক্যাটাগরির নাম দিন');
+      return;
+    }
+    
+    try {
+      if (editingCategory) {
+        const updated: SupplierCategory = { ...editingCategory, name: categoryForm.name.trim() };
+        setCategories(prev => prev.map(c => c.id === editingCategory.id ? updated : c));
+        alert('✅ ক্যাটাগরি আপডেট হয়েছে!');
+      } else {
+        const newCategory: SupplierCategory = {
+          id: genId(),
+          name: categoryForm.name.trim()
+        };
+        setCategories(prev => [...prev, newCategory]);
+        alert('✅ ক্যাটাগরি যোগ হয়েছে!');
+      }
+      
+      setShowCategoryModal(false);
+      setEditingCategory(null);
+      setCategoryForm({ name: '' });
+    } catch (error) {
+      console.error('Failed to save category:', error);
+      alert('❌ সমস্যা হয়েছে!');
+    }
+  };
+  
+  // Delete Category
+  const deleteCategory = async (cat: SupplierCategory) => {
+    const hasProducts = products.some(p => (p.cat || '').toLowerCase() === (cat.name || '').toLowerCase());
+    if (hasProducts) {
+      alert('❌ এই ক্যাটাগরিতে পণ্য আছে!');
+      return;
+    }
+    
+    if (!confirm('এই ক্যাটাগরি মুছে ফেলবেন?')) return;
+    
+    try {
+      setCategories(prev => prev.filter(c => c.id !== cat.id));
+      setViewCategory(null);
+    } catch (error) {
+      console.error('Delete failed:', error);
+    }
+  };
+  
+  // Save Product
+  const saveProduct = async () => {
+    if (!productForm.name?.trim() || !productForm.company?.trim() || !productForm.cat?.trim()) {
+      alert('❌ কোম্পানি, ক্যাটাগরি এবং পণ্যের নাম দিন!');
+      return;
+    }
+    
+    try {
+      // Check if category exists, create if not
+      let catId = categories.find(c => (c.name || '').toLowerCase() === (productForm.cat || '').toLowerCase())?.id;
+      if (!catId) {
+        catId = genId();
+        setCategories(prev => [...prev, { id: catId!, name: productForm.cat.trim() }]);
+      }
+      
+      const newProduct = {
+        id: genId(),
+        name: productForm.name.trim(),
+        code: `P-${Date.now().toString().slice(-6)}`,
+        company: productForm.company.trim(),
+        cat: productForm.cat.trim(),
+        catId: catId!,
+        barcode: productForm.barcode || '',
+        unit: productForm.unit || 'পিস',
+        buyPrice: parseFloat(productForm.buyP) || 0,
+        sellPrice: parseFloat(productForm.sellP) || 0,
+        stock: parseInt(productForm.stock) || 0,
+        minStock: parseInt(productForm.minStock) || 5,
+        isActive: true,
+        createdAt: new Date().toISOString()
+      };
+      
+      setProducts(prev => [...prev, newProduct]);
+      
+      // Also add as supplier if not exists
+      const supplierExists = suppliers.some(s => (s.name || '').toLowerCase() === (productForm.company || '').toLowerCase());
+      if (!supplierExists) {
+        const newSupplier: Supplier = {
+          id: genId(),
+          code: `C-${Date.now().toString().slice(-5)}`,
+          name: productForm.company.trim(),
+          phone: '', email: '', address: '', crNumber: '', vatNumber: '', company: productForm.company.trim()
+        };
+        setSuppliers(prev => [...prev, newSupplier]);
+      }
+      
+      alert('✅ পণ্য যোগ করা হয়েছে!');
+      setShowProductModal(false);
+      setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'পিস', buyP: '', sellP: '', stock: '0', minStock: '5' });
+    } catch (error) {
+      console.error('Failed to save product:', error);
+      alert('❌ সমস্যা হয়েছে!');
+    }
+  };
+
+  return (
+    <div style={{ padding: 16 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1F2937' }}>
+          🏢 {t('suppliers') || 'সরবরাহকারী'}
+        </h2>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={() => { setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setEditingSupplier(null); setShowSupplierModal(true); }}
+            style={{ padding: '8px 14px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+            ➕ কোম্পানি
+          </button>
+          <button
+            onClick={() => { setCategoryForm({ name: '' }); setEditingCategory(null); setShowCategoryModal(true); }}
+            style={{ padding: '8px 14px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+            📂 ক্যাটাগরি
+          </button>
+          <button
+            onClick={() => setShowProductModal(true)}
+            style={{ padding: '8px 14px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
+            📦 পণ্য
+          </button>
+        </div>
+      </div>
+      
+      {/* Search */}
+      <div style={{ marginBottom: 16 }}>
+        <input
+          type="text"
+          placeholder="🔍 সরবরাহকারী বা ক্যাটাগরি খুঁজুন..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: '100%', padding: '10px 14px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14, boxSizing: 'border-box' }}
+        />
+      </div>
+      
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <button
+          onClick={() => setActiveTab('companies')}
+          style={{ padding: '8px 16px', background: activeTab === 'companies' ? '#115E59' : '#F3F4F6', color: activeTab === 'companies' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
+          🏢 কোম্পানি ({allSuppliers.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('categories')}
+          style={{ padding: '8px 16px', background: activeTab === 'categories' ? '#115E59' : '#F3F4F6', color: activeTab === 'categories' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
+          📂 ক্যাটাগরি ({categories.length})
+        </button>
+      </div>
+      
+      {/* Content */}
+      {activeTab === 'companies' && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
+          {filteredSuppliers.length === 0 ? (
+            <div style={{ gridColumn: '1/-1', padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
+              কোনো কোম্পানি পাওয়া যায়নি
+            </div>
+          ) : filteredSuppliers.map(s => (
+            <div
+              key={s.id}
+              onClick={() => setViewSupplier(s)}
+              style={{ background: '#fff', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB', cursor: 'pointer', transition: 'all 0.15s' }}
+              onMouseOver={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)')}
+              onMouseOut={e => (e.currentTarget.style.boxShadow = 'none')}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}>
+                    🏢 {s.name}
+                    {s.isAuto && <span style={{ fontSize: 10, background: '#FEF3C7', color: '#D97706', padding: '2px 6px', borderRadius: 4, marginLeft: 6 }}>Auto</span>}
+                  </div>
+                  {s.code && <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>কোড: {s.code}</div>}
+                  {s.phone && <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>📞 {s.phone}</div>}
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#115E59' }}>{getProductsCount(s.name)}</div>
+                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>পণ্য</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {activeTab === 'categories' && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
+          {filteredCategories.length === 0 ? (
+            <div style={{ gridColumn: '1/-1', padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
+              কোনো ক্যাটাগরি পাওয়া যায়নি
+            </div>
+          ) : filteredCategories.map(c => (
+            <div
+              key={c.id}
+              onClick={() => setViewCategory(c)}
+              style={{ background: '#fff', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB', cursor: 'pointer', transition: 'all 0.15s' }}
+              onMouseOver={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)')}
+              onMouseOut={e => (e.currentTarget.style.boxShadow = 'none')}
+            >
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}>📂 {c.name}</div>
+              <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>{products.filter(p => (p.cat || '').toLowerCase() === (c.name || '').toLowerCase()).length} পণ্য</div>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Supplier Detail Modal */}
+      {viewSupplier && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 500, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>🏢 {viewSupplier.name}</h3>
+              <button onClick={() => setViewSupplier(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
+            </div>
+            
+            {viewSupplier.code && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>কোড: <strong>{viewSupplier.code}</strong></div>}
+            {viewSupplier.phone && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>📞 {viewSupplier.phone}</div>}
+            {viewSupplier.email && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>✉️ {viewSupplier.email}</div>}
+            {viewSupplier.address && <div style={{ marginBottom: 16, fontSize: 14, color: '#6B7280' }}>📍 {viewSupplier.address}</div>}
+            
+            <div style={{ background: '#F0FDFA', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#115E59' }}>{getProductsCount(viewSupplier.name)}</div>
+              <div style={{ fontSize: 13, color: '#6B7280' }}>মোট পণ্য সংখ্যা</div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => { setShowPurchaseHistory(viewSupplier); setViewSupplier(null); }}
+                style={{ flex: 1, padding: '10px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
+                📜 ক্রয় ইতিহাস
+              </button>
+              {!viewSupplier.isAuto && (
+                <>
+                  <button
+                    onClick={() => { setSupplierForm(viewSupplier); setEditingSupplier(viewSupplier); setShowSupplierModal(true); setViewSupplier(null); }}
+                    style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
+                    ✏️ সম্পাদনা
+                  </button>
+                  <button
+                    onClick={() => deleteSupplier(viewSupplier)}
+                    style={{ flex: 1, padding: '10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
+                    🗑️ মুছুন
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Category Detail Modal */}
+      {viewCategory && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>📂 {viewCategory.name}</h3>
+              <button onClick={() => setViewCategory(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
+            </div>
+            
+            <div style={{ background: '#F0FDFA', borderRadius: 10, padding: 16, marginBottom: 16 }}>
+              <div style={{ fontSize: 24, fontWeight: 800, color: '#115E59' }}>{products.filter(p => (p.cat || '').toLowerCase() === (viewCategory.name || '').toLowerCase()).length}</div>
+              <div style={{ fontSize: 13, color: '#6B7280' }}>পণ্য সংখ্যা</div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => { setCategoryForm(viewCategory); setEditingCategory(viewCategory); setShowCategoryModal(true); setViewCategory(null); }}
+                style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
+                ✏️ সম্পাদনা
+              </button>
+              <button
+                onClick={() => deleteCategory(viewCategory)}
+                style={{ flex: 1, padding: '10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
+                🗑️ মুছুন
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Purchase History Modal */}
+      {showPurchaseHistory && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 600, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>📜 {showPurchaseHistory.name} - ক্রয় ইতিহাস</h3>
+              <button onClick={() => setShowPurchaseHistory(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
+            </div>
+            
+            {getSupplierPurchases(showPurchaseHistory.name).length === 0 ? (
+              <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>কোনো ক্রয় পাওয়া যায়নি</div>
+            ) : (
+              <div>
+                {getSupplierPurchases(showPurchaseHistory.name).map((p, i) => (
+                  <div key={i} style={{ padding: 12, borderBottom: '1px solid #E5E7EB' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ fontWeight: 600 }}>{new Date(p.date).toLocaleDateString()}</span>
+                      <span style={{ fontWeight: 700, color: '#115E59' }}>৳{p.total?.toLocaleString()}</span>
+                    </div>
+                    <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>আইটেম: {p.items?.length || 0}টি</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
+      {/* Supplier Modal */}
+      {showSupplierModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
+              {editingSupplier ? '✏️ সরবরাহকারী সম্পাদনা' : '➕ নতুন কোম্পানি'}
+            </h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>🏢 নাম *</label>
+                <input
+                  value={supplierForm.name}
+                  onChange={e => setSupplierForm(p => ({ ...p, name: e.target.value }))}
+                  placeholder="কোম্পানির নাম"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📞 ফোন</label>
+                <input
+                  value={supplierForm.phone}
+                  onChange={e => setSupplierForm(p => ({ ...p, phone: e.target.value }))}
+                  placeholder="ফোন নম্বর"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>✉️ ইমেইল</label>
+                <input
+                  value={supplierForm.email}
+                  onChange={e => setSupplierForm(p => ({ ...p, email: e.target.value }))}
+                  placeholder="ইমেইল"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📍 ঠিকানা</label>
+                <input
+                  value={supplierForm.address}
+                  onChange={e => setSupplierForm(p => ({ ...p, address: e.target.value }))}
+                  placeholder="ঠিকানা"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+              <button onClick={() => setShowSupplierModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
+                বাতিল
+              </button>
+              <button onClick={saveSupplier} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>
+                💾 সংরক্ষণ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Category Modal */}
+      {showCategoryModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
+              {editingCategory ? '✏️ ক্যাটাগরি সম্পাদনা' : '➕ নতুন ক্যাটাগরি'}
+            </h3>
+            
+            <div>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📂 নাম *</label>
+              <input
+                value={categoryForm.name}
+                onChange={e => setCategoryForm({ name: e.target.value })}
+                placeholder="ক্যাটাগরির নাম"
+                style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+              <button onClick={() => setShowCategoryModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
+                বাতিল
+              </button>
+              <button onClick={saveCategory} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>
+                💾 সংরক্ষণ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Product Modal */}
+      {showProductModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 450, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>📦 নতুন পণ্য যোগ করুন</h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Company Dropdown */}
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>🏢 কোম্পানি *</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    value={productForm.company}
+                    onChange={e => { setProductForm(p => ({ ...p, company: e.target.value, cat: '' })); setShowCompanyDrop(true); }}
+                    placeholder="সরবরাহকারী নির্বাচন করুন"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                  {showCompanyDrop && filteredCompanies.length > 0 && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 10, maxHeight: 150, overflow: 'auto' }}>
+                      {filteredCompanies.map(s => (
+                        <div key={s.id} onClick={() => { setProductForm(p => ({ ...p, company: s.name })); setShowCompanyDrop(false); }} style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }} onMouseOver={e => (e.currentTarget.style.background = '#F0FDFA')} onMouseOut={e => (e.currentTarget.style.background = '#fff')}>
+                          🏢 {s.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {/* Category Dropdown */}
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📂 ক্যাটাগরি *</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    value={productForm.cat}
+                    onChange={e => { setProductForm(p => ({ ...p, cat: e.target.value })); setShowCatDrop(true); }}
+                    placeholder="ক্যাটাগরি নির্বাচন করুন"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                  {showCatDrop && filteredCats.length > 0 && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 10, maxHeight: 150, overflow: 'auto' }}>
+                      {filteredCats.map(c => (
+                        <div key={c.id} onClick={() => { setProductForm(p => ({ ...p, cat: c.name })); setShowCatDrop(false); }} style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }} onMouseOver={e => (e.currentTarget.style.background = '#F0FDFA')} onMouseOut={e => (e.currentTarget.style.background = '#fff')}>
+                          📂 {c.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📦 পণ্যের নাম *</label>
+                <input
+                  value={productForm.name}
+                  onChange={e => setProductForm(p => ({ ...p, name: e.target.value }))}
+                  placeholder="পণ্যের নাম"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📊 বারকোড</label>
+                <input
+                  value={productForm.barcode}
+                  onChange={e => setProductForm(p => ({ ...p, barcode: e.target.value }))}
+                  placeholder="বারকোড (ঐচ্ছিক)"
+                  style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                />
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>💰 ক্রয়মূল্য</label>
+                  <input
+                    type="number"
+                    value={productForm.buyP}
+                    onChange={e => setProductForm(p => ({ ...p, buyP: e.target.value }))}
+                    placeholder="0"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>💵 বিক্রয়মূল্য</label>
+                  <input
+                    type="number"
+                    value={productForm.sellP}
+                    onChange={e => setProductForm(p => ({ ...p, sellP: e.target.value }))}
+                    placeholder="0"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📦 স্টক</label>
+                  <input
+                    type="number"
+                    value={productForm.stock}
+                    onChange={e => setProductForm(p => ({ ...p, stock: e.target.value }))}
+                    placeholder="0"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📏 একক</label>
+                  <input
+                    value={productForm.unit}
+                    onChange={e => setProductForm(p => ({ ...p, unit: e.target.value }))}
+                    placeholder="পিস"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>⚠️ মিন স্টক</label>
+                  <input
+                    type="number"
+                    value={productForm.minStock}
+                    onChange={e => setProductForm(p => ({ ...p, minStock: e.target.value }))}
+                    placeholder="5"
+                    style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+              <button onClick={() => setShowProductModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
+                বাতিল
+              </button>
+              <button onClick={saveProduct} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>
+                💾 সংরক্ষণ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface Customer {
+  id: string;
+  name: string;
+  phone: string;
+  address: string;
+  balance: number;
+  deposit: number;
+  avatar?: string;
+  transactions?: Transaction[];
+}
+
+interface Transaction {
+  id: string;
+  type: 'due' | 'deposit';
+  amount: number;
+  note?: string;
+  paymentMethod?: string;
+  date: string;
+}
+
+interface CustomerManagementProps {
+  customers: Customer[];
+  setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>;
+  sales: any[];
+  onDeleteCustomer?: (customer: Customer) => void;
+}
+
+type ViewType = 'dashboard' | 'general' | 'regular';
+type TabType = 'all' | 'due' | 'deposit';
+
+// Generate 13-digit ID (YYMMDD + 7 random digits)
+const generateCustomerId = (): string => {
+  const now = new Date();
+  const yy = now.getFullYear().toString().slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const random7 = Math.floor(1000000 + Math.random() * 9000000).toString();
+  return `${yy}${mm}${dd}${random7}`;
+};
+
+// Unified Customer Modal Component (Add/Edit)
+interface CustomerModalProps {
+  isOpen: boolean;
+  mode: 'add' | 'edit';
+  customer?: Customer | null;
+  onClose: () => void;
+  onSave: (customer: Customer) => void;
+}
+
+function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModalProps) {
+  const { t } = useLanguage();
+  const [customerId, setCustomerId] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [nameError, setNameError] = useState('');
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const isEditMode = mode === 'edit';
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      if (isEditMode && customer) {
+        setCustomerId(customer.id);
+        setName(customer.name);
+        setPhone(customer.phone || '');
+        setAddress(customer.address || '');
+        setAvatar(customer.avatar || null);
+      } else {
+        setCustomerId('');
+        setName('');
+        setPhone('');
+        setAddress('');
+        setAvatar(null);
+      }
+      setNameError('');
+      setIsCameraOpen(false);
+      stopCamera();
+    }
+  }, [isOpen, isEditMode, customer]);
+
+  // Cleanup camera on unmount
+  useEffect(() => {
+    return () => stopCamera();
+  }, []);
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  };
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setIsCameraOpen(true);
+    } catch (err) {
+      alert('Camera access denied or not available');
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        setAvatar(imageData);
+        stopCamera();
+        setIsCameraOpen(false);
+      }
+    }
+  };
+
+  const handleBrowse = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setAvatar(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setAvatar(null);
+  };
+
+  const handleSave = () => {
+    // Validate name
+    if (!name.trim()) {
+      setNameError(t('customerNameRequired'));
+      return;
+    }
+
+    // Generate ID if empty (only in add mode)
+    const finalId = isEditMode ? customerId : (customerId.trim() || generateCustomerId());
+
+    // Create/update customer
+    const savedCustomer: Customer = {
+      id: finalId,
+      name: name.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
+      balance: isEditMode && customer ? customer.balance : 0,
+      deposit: isEditMode && customer ? customer.deposit : 0,
+      avatar: avatar || undefined,
+    };
+
+    onSave(savedCustomer);
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+    }}>
+      <div style={{
+        background: T.white,
+        borderRadius: '12px',
+        width: '90%',
+        maxWidth: '400px',
+        maxHeight: '90vh',
+        overflow: 'auto',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+      }}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px',
+          borderBottom: `1px solid ${T.gray200}`,
+        }}>
+          <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: T.gray800 }}>
+            {isEditMode ? t('customerEdit') : t('newCustomer')}
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              fontSize: '22px',
+              cursor: 'pointer',
+              color: T.gray400,
+              padding: '2px',
+              lineHeight: 1,
+            }}
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Body - Compact */}
+        <div style={{ padding: '12px 16px' }}>
+          {/* Profile Image Section - Compact */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '12px',
+          }}>
+            {/* Avatar Preview - Smaller */}
+            <div style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: T.gray100,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              border: `2px dashed ${T.gray200}`,
+              flexShrink: 0,
+            }}>
+              {avatar ? (
+                <img src={avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontSize: '24px' }}>👤</span>
+              )}
+            </div>
+
+            {/* Action Buttons - Horizontal */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {isCameraOpen ? (
+                <>
+                  <button
+                    onClick={capturePhoto}
+                    style={{
+                      padding: '6px 10px',
+                      background: T.teal,
+                      color: T.white,
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    📷 Capture
+                  </button>
+                  <button
+                    onClick={() => { stopCamera(); setIsCameraOpen(false); }}
+                    style={{
+                      padding: '6px 10px',
+                      background: T.gray100,
+                      color: T.gray600,
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    ✕
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={startCamera}
+                    style={{
+                      padding: '6px 10px',
+                      background: T.teal,
+                      color: T.white,
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    📷 {t('camera')}
+                  </button>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    style={{
+                      padding: '6px 10px',
+                      background: T.gray100,
+                      color: T.gray800,
+                      border: `1px solid ${T.gray200}`,
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    📁 {t('browse')}
+                  </button>
+                  {avatar && (
+                    <button
+                      onClick={handleRemovePhoto}
+                      style={{
+                        padding: '6px 10px',
+                        background: T.redLight,
+                        color: T.red,
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      ❌ {t('remove')}
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Hidden video and canvas for camera */}
+          <div style={{ display: 'none' }}>
+            <video ref={videoRef} autoPlay playsInline />
+            <canvas ref={canvasRef} />
+          </div>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleBrowse}
+            style={{ display: 'none' }}
+          />
+
+          {/* Form Fields - Compact */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {/* ID Field */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: T.gray600,
+                marginBottom: '4px',
+                textTransform: 'uppercase',
+              }}>
+                {t('customerIdOptional')}
+              </label>
+              <input
+                type="text"
+                value={customerId}
+                onChange={(e) => setCustomerId(e.target.value)}
+                disabled={isEditMode}
+                placeholder={isEditMode ? '' : 'Auto-generated if empty'}
+                readOnly={isEditMode}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: `1px solid ${T.gray200}`,
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  background: isEditMode ? T.gray100 : T.white,
+                  color: isEditMode ? T.gray400 : T.gray800,
+                  cursor: isEditMode ? 'not-allowed' : 'text',
+                }}
+              />
+            </div>
+
+            {/* Name Field */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: T.gray600,
+                marginBottom: '4px',
+                textTransform: 'uppercase',
+              }}>
+                {t('customerNameLabel')}
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => { setName(e.target.value); setNameError(''); }}
+                placeholder={t('enterCustomerName')}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: `1px solid ${nameError ? T.red : T.gray200}`,
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+              {nameError && (
+                <span style={{ fontSize: '11px', color: T.red, marginTop: '2px', display: 'block' }}>
+                  {nameError}
+                </span>
+              )}
+            </div>
+
+            {/* Phone Field */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: T.gray600,
+                marginBottom: '4px',
+                textTransform: 'uppercase',
+              }}>
+                {t('phoneNumber')}
+              </label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder={t('phoneNumber')}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: `1px solid ${T.gray200}`,
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            {/* Address Field */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '11px',
+                fontWeight: 600,
+                color: T.gray600,
+                marginBottom: '4px',
+                textTransform: 'uppercase',
+              }}>
+                {t('customerAddress')}
+              </label>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder={t('customerAddress')}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: `1px solid ${T.gray200}`,
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer - Compact */}
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          padding: '12px 16px',
+          borderTop: `1px solid ${T.gray200}`,
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              padding: '10px',
+              background: T.gray100,
+              color: T.gray800,
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {t('cancel')}
+          </button>
+          <button
+            onClick={handleSave}
+            style={{
+              flex: 1,
+              padding: '10px',
+              background: T.teal,
+              color: T.white,
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '13px',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            💾 {t('save')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function CustomerManagement({ customers, setCustomers, sales, onDeleteCustomer }: CustomerManagementProps) {
+  const { t, isRTL } = useLanguage();
+  const [view, setView] = useState<ViewType>('dashboard');
+  const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
+  const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<TabType>('all');
+  
+  // Add Due/Deposit Modal states
+  const [isAddDueModalOpen, setIsAddDueModalOpen] = useState(false);
+  const [isAddDepositModalOpen, setIsAddDepositModalOpen] = useState(false);
+  
+  // Modal form states (hooks must be at top level)
+  const [depositAmount, setDepositAmount] = useState('');
+  const [selectedPayment, setSelectedPayment] = useState('cash');
+  const [depositComment, setDepositComment] = useState('');
+  const [dueAmount, setDueAmount] = useState('');
+  const [dueComment, setDueComment] = useState('');
+  const modalFmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  // Helper to create transaction
+  const createTransaction = (type: 'due' | 'deposit', amount: number, note?: string, paymentMethod?: string): Transaction => ({
+    id: Date.now().toString(),
+    type,
+    amount,
+    note,
+    paymentMethod,
+    date: new Date().toISOString(),
+  });
+
+  // Add Deposit Modal - Render early to prevent issues
+  if (isAddDepositModalOpen && selectedCustomer) {
+    const currentDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
+    const currentDeposit = selectedCustomer.deposit || 0;
+    
+    const handleAddDeposit = async () => {
+      const amount = parseFloat(depositAmount) || 0;
+      if (amount <= 0) return;
+      
+      let newBalance = selectedCustomer.balance;
+      let newDeposit = selectedCustomer.deposit || 0;
+      
+      // If customer has due, pay it first
+      if (currentDue > 0) {
+        if (amount <= currentDue) {
+          // Full amount goes to pay due
+          newBalance = currentDue - amount;
+        } else {
+          // Amount exceeds due, pay due first, rest goes to deposit
+          newBalance = 0;
+          newDeposit = currentDeposit + (amount - currentDue);
+        }
+      } else {
+        // No due, full amount goes to deposit
+        newDeposit = currentDeposit + amount;
+      }
+      
+      const newTransaction = createTransaction('deposit', amount, depositComment || undefined, selectedPayment);
+      const newTransactions = [...(selectedCustomer.transactions || []), newTransaction];
+      
+      // Save transaction to DB
+      await db.put('transactions', newTransaction.id, { ...newTransaction, customerId: selectedCustomer.id });
+      
+      setCustomers(prev => prev.map(c => 
+        c.id === selectedCustomer.id 
+          ? { ...c, balance: newBalance, deposit: newDeposit, transactions: newTransactions } 
+          : c
+      ));
+      setSelectedCustomer({ 
+        ...selectedCustomer, 
+        balance: newBalance, 
+        deposit: newDeposit,
+        transactions: newTransactions,
+      });
+      setDepositAmount('');
+      setDepositComment('');
+      setSelectedPayment('cash');
+      setIsAddDepositModalOpen(false);
+    };
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        background: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+      }}>
+        <div style={{
+          background: T.white,
+          borderRadius: '16px',
+          width: '90%',
+          maxWidth: '420px',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+        }}>
+          {/* Header */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            borderBottom: `1px solid ${T.gray200}`,
+          }}>
+            <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: T.gray800 }}>
+              {selectedCustomer.name} – {t('addDeposit')}
+            </h2>
+            <button
+              onClick={() => setIsAddDepositModalOpen(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: T.gray400,
+                padding: '4px',
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Notice Banner */}
+          <div style={{
+            margin: '16px 20px',
+            padding: '12px 16px',
+            background: T.tealLight,
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <span style={{ fontSize: '20px' }}>💰</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: T.tealDark }}>{t('addDepositAmount')}</span>
+          </div>
+
+          {/* Summary Bar */}
+          <div style={{
+            margin: '0 20px 16px',
+            padding: '12px 16px',
+            background: T.gray50,
+            borderRadius: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+              {currentDue > 0 && (
+                <>
+                  <div>
+                    <span style={{ fontSize: '12px', color: T.gray600 }}>{t('currentDue')}: </span>
+                    <span style={{ fontSize: '14px', fontWeight: 700, color: T.red }}>{modalFmt(currentDue)}</span>
+                  </div>
+                  <span style={{ color: T.gray400 }}>|</span>
+                </>
+              )}
+              <div>
+                <span style={{ fontSize: '12px', color: T.gray600 }}>{t('currentDeposit')}: </span>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{modalFmt(currentDeposit)}</span>
+              </div>
+            </div>
+            {currentDue > 0 ? (
+              <div style={{ fontSize: '12px', color: T.gray600, textAlign: 'center' }}>
+                {t('depositWillPayDue')}
+              </div>
+            ) : (
+              <div style={{ fontSize: '12px', color: T.gray600, textAlign: 'center' }}>
+                {t('depositAddedToAccount')}
+              </div>
+            )}
+          </div>
+
+          {/* Amount Input */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
+              {t('depositAmount')}
+            </label>
+            <input
+              type="number"
+              value={depositAmount}
+              onChange={(e) => setDepositAmount(e.target.value)}
+              placeholder="0.00"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                border: `1px solid ${T.gray200}`,
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 600,
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Payment Method */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '8px', textTransform: 'uppercase' }}>
+              {t('paymentMethod')}
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+              {['cash', 'card', 'bank', 'mobile'].map((method) => (
+                <button
+                  key={method}
+                  onClick={() => setSelectedPayment(method)}
+                  style={{
+                    padding: '10px 8px',
+                    background: selectedPayment === method ? T.tealLight : T.white,
+                    color: selectedPayment === method ? T.tealDark : T.gray800,
+                    border: selectedPayment === method ? `2px solid ${T.tealDark}` : `1px solid ${T.gray200}`,
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '4px',
+                  }}
+                >
+                  <span style={{ fontSize: '18px' }}>
+                    {method === 'cash' ? '💵' : method === 'card' ? '💳' : method === 'bank' ? '🏦' : '📱'}
+                  </span>
+                  <span>{t(method)}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Comment */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
+              {t('comment')}
+            </label>
+            <textarea
+              value={depositComment}
+              onChange={(e) => setDepositComment(e.target.value)}
+              placeholder={t('reasonForDeposit')}
+              rows={2}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: `1px solid ${T.gray200}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                resize: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Footer Buttons */}
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            padding: '16px 20px',
+            borderTop: `1px solid ${T.gray200}`,
+          }}>
+            <button
+              onClick={() => setIsAddDepositModalOpen(false)}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: T.gray100,
+                color: T.gray800,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {t('cancel')}
+            </button>
+            <button
+              onClick={handleAddDeposit}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: T.tealDark,
+                color: T.white,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+              }}
+            >
+              ✓ {t('addDeposit')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Add Due Modal - Render early to prevent issues
+  if (isAddDueModalOpen && selectedCustomer) {
+    const currentDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
+    
+    const handleAddDue = async () => {
+      const amount = parseFloat(dueAmount) || 0;
+      if (amount <= 0) return;
+      
+      const newBalance = currentDue + amount;
+      const newTransaction = createTransaction('due', amount, dueComment || undefined);
+      const newTransactions = [...(selectedCustomer.transactions || []), newTransaction];
+      
+      // Save transaction to DB
+      await db.put('transactions', newTransaction.id, { ...newTransaction, customerId: selectedCustomer.id });
+      
+      setCustomers(prev => prev.map(c => 
+        c.id === selectedCustomer.id 
+          ? { ...c, balance: newBalance, transactions: newTransactions } 
+          : c
+      ));
+      setSelectedCustomer({ ...selectedCustomer, balance: newBalance, transactions: newTransactions });
+      setDueAmount('');
+      setDueComment('');
+      setIsAddDueModalOpen(false);
+    };
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0, left: 0, right: 0, bottom: 0,
+        background: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+      }}>
+        <div style={{
+          background: T.white,
+          borderRadius: '16px',
+          width: '90%',
+          maxWidth: '420px',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+        }}>
+          {/* Header */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            borderBottom: `1px solid ${T.gray200}`,
+          }}>
+            <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: T.gray800 }}>
+              {selectedCustomer.name} – {t('addDue')}
+            </h2>
+            <button
+              onClick={() => setIsAddDueModalOpen(false)}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: T.gray400,
+                padding: '4px',
+                lineHeight: 1,
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {/* Notice Banner */}
+          <div style={{
+            margin: '16px 20px',
+            padding: '12px 16px',
+            background: T.redLight,
+            borderRadius: '8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <span style={{ fontSize: '20px' }}>📋</span>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: T.red }}>{t('addDueAmount')}</span>
+          </div>
+
+          {/* Summary Bar */}
+          <div style={{
+            margin: '0 20px 16px',
+            padding: '12px 16px',
+            background: T.gray50,
+            borderRadius: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <div>
+              <span style={{ fontSize: '12px', color: T.gray600, marginRight: '8px' }}>{t('currentDue')}: </span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: T.red }}>{modalFmt(currentDue)}</span>
+            </div>
+            <div style={{ fontSize: '12px', color: T.gray600, textAlign: 'center' }}>
+              {t('dueWillBeAdded')}
+            </div>
+          </div>
+
+          {/* Amount Input */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
+              {t('dueAmount')}
+            </label>
+            <input
+              type="number"
+              value={dueAmount}
+              onChange={(e) => setDueAmount(e.target.value)}
+              placeholder="0.00"
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                border: `1px solid ${T.gray200}`,
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 600,
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Comment */}
+          <div style={{ padding: '0 20px 16px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: T.gray600, marginBottom: '6px', textTransform: 'uppercase' }}>
+              {t('comment')}
+            </label>
+            <textarea
+              value={dueComment}
+              onChange={(e) => setDueComment(e.target.value)}
+              placeholder={t('reasonForDue')}
+              rows={2}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: `1px solid ${T.gray200}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                resize: 'none',
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+
+          {/* Footer Buttons */}
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            padding: '16px 20px',
+            borderTop: `1px solid ${T.gray200}`,
+          }}>
+            <button
+              onClick={() => setIsAddDueModalOpen(false)}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: T.gray100,
+                color: T.gray800,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              {t('cancel')}
+            </button>
+            <button
+              onClick={handleAddDue}
+              style={{
+                flex: 1,
+                padding: '12px',
+                background: T.red,
+                color: T.white,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+              }}
+            >
+              ✓ {t('addDue')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle add customer
+  const handleAddCustomer = (customer: Customer) => {
+    setCustomers(prev => [...prev, customer]);
+  };
+
+  // Handle edit customer
+  const handleEditCustomer = (customer: Customer) => {
+    setCustomers(prev => prev.map(c => c.id === customer.id ? customer : c));
+    // Update selectedCustomer to reflect changes
+    setSelectedCustomer(prev => prev && prev.id === customer.id ? customer : prev);
+  };
+
+  // Open edit modal
+  const openEditModal = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setIsEditCustomerModalOpen(true);
+  };
+
+  // Handle delete customer (with IndexedDB cleanup)
+  const handleDeleteCustomer = (customer: Customer) => {
+    if (window.confirm(t('confirmDelete'))) {
+      setCustomers(prev => prev.filter(c => c.id !== customer.id));
+      if (onDeleteCustomer) {
+        onDeleteCustomer(customer);
+      }
+    }
+  };
+
+  // Check if customer is General Customer by name
+  const isGeneralCustomer = (c: Customer) => 
+    c.name.toLowerCase() === 'general customer';
+
+  // Filter customers for dashboard
+  const filteredCustomers = customers.filter(c => {
+    if (isGeneralCustomer(c)) return false; // Exclude general customer
+    const query = searchQuery.toLowerCase();
+    return (
+      c.name.toLowerCase().includes(query) ||
+      (c.phone && c.phone.includes(query))
+    );
+  });
+
+  // General customer
+  const generalCustomer = customers.find(c => isGeneralCustomer(c));
+
+  // Get customer sales
+  const getCustomerSales = (customer: Customer) => {
+    return sales.filter(s => s.customerId === customer.id);
+  };
+
+  // Calculate customer total
+  const getCustomerTotal = (customer: Customer) => {
+    const customerSales = getCustomerSales(customer);
+    return customerSales.reduce((sum, s) => sum + s.total, 0);
+  };
+
+  // Handle CSV Export
+  const handleCsvExport = () => {
+    const regularCustomers = customers.filter(c => !isGeneralCustomer(c));
+    const csvContent = [
+      ['ID', 'Name', 'Phone', 'Address', 'Balance'].join(','),
+      ...regularCustomers.map(c => [c.id, c.name, c.phone || '', c.address || '', c.balance.toString()].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // Handle view history
+  const handleViewHistory = (customer: Customer | null) => {
+    setSelectedCustomer(customer);
+    if (customer === null || isGeneralCustomer(customer)) {
+      setView('general');
+    } else {
+      setView('regular');
+    }
+  };
+
+  // Format currency
+  const fmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+  // Styles
+  const containerStyle: React.CSSProperties = {
+    padding: '20px',
+    width: '100%',
+  };
+
+  const topBarStyle: React.CSSProperties = {
+    display: 'flex',
+    gap: '12px',
+    marginBottom: '24px',
+    flexWrap: 'wrap',
+  };
+
+  const searchInputStyle: React.CSSProperties = {
+    flex: 1,
+    minWidth: '250px',
+    padding: '10px 16px',
+    paddingLeft: '40px',
+    border: `1px solid ${T.gray200}`,
+    borderRadius: '10px',
+    fontSize: '14px',
+    outline: 'none',
+    background: T.white,
+    position: 'relative' as const,
+  };
+
+  const searchWrapperStyle: React.CSSProperties = {
+    position: 'relative' as const,
+    flex: 1,
+    minWidth: '250px',
+  };
+
+  const buttonTealStyle: React.CSSProperties = {
+    padding: '10px 20px',
+    background: T.teal,
+    color: T.white,
+    border: 'none',
+    borderRadius: '10px',
+    fontSize: '14px',
+    fontWeight: 700,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  };
+
+  const buttonGrayStyle: React.CSSProperties = {
+    padding: '10px 20px',
+    background: T.gray100,
+    color: T.gray800,
+    border: `1px solid ${T.gray200}`,
+    borderRadius: '10px',
+    fontSize: '14px',
+    fontWeight: 600,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  };
+
+  const cardGridStyle: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+    gap: '16px',
+  };
+
+  // Dashboard View
+  if (view === 'dashboard') {
+    return (
+      <div style={containerStyle}>
+        {/* Top Bar */}
+        <div style={topBarStyle}>
+          <div style={searchWrapperStyle}>
+            <span style={{
+              position: 'absolute',
+              left: isRTL ? 'auto' : '12px',
+              right: isRTL ? '12px' : 'auto',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              fontSize: '16px',
+              color: T.gray400,
+            }}>🔍</span>
+            <input
+              type="text"
+              placeholder={t('nameOrPhonePlaceholder')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={searchInputStyle}
+            />
+          </div>
+          <button style={buttonTealStyle} onClick={() => setIsAddCustomerModalOpen(true)}>
+            <span>+</span> {t('addCustomer')}
+          </button>
+          <button style={buttonGrayStyle} onClick={handleCsvExport}>
+            <span>📤</span> {t('csvExport')}
+          </button>
+        </div>
+
+        {/* Customer Cards Grid */}
+        <div style={{ ...cardGridStyle, marginTop: '16px' }}>
+          {/* General Customer Card - First */}
+          {generalCustomer && (
+            <div style={{
+              background: T.white,
+              borderRadius: '14px',
+              padding: '16px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `2px solid ${T.tealDark}`,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '50%',
+                  background: T.tealDark,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '22px',
+                  color: T.white,
+                  fontWeight: 700,
+                }}>
+                  👤
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: T.tealDark, fontSize: '15px' }}>{t('generalCustomer')}</div>
+                  <div style={{ fontSize: '12px', color: T.gray600 }}>{t('generalCustomerDefault')}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{fmt(generalCustomer.balance || 0)}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={() => handleViewHistory(generalCustomer)} style={{
+                  flex: 1, padding: '12px', background: T.teal, color: T.white, border: 'none',
+                  borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                }}>
+                  <span>📋</span> {t('viewHistory')}
+                </button>
+                <div style={{ padding: '12px 16px', background: T.gray100, color: T.gray400, borderRadius: '10px', fontSize: '14px', cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
+                  🗑️
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Regular Customers */}
+          {filteredCustomers.length === 0 && !generalCustomer ? (
+            <div style={{
+              ...cardGridStyle,
+              gridColumn: '1 / -1',
+              padding: '40px',
+              textAlign: 'center',
+              color: T.gray400,
+            }}>
+              {t('noCustomersFound')}
+            </div>
+          ) : (
+            filteredCustomers.map((customer) => {
+              const rawDue = customer.balance > 0 ? customer.balance : 0;
+              const rawDeposit = customer.deposit || 0;
+              // Calculate net due/deposit: offset deposit against due
+              const netDue = Math.max(0, rawDue - rawDeposit);
+              const netDeposit = Math.max(0, rawDeposit - rawDue);
+              const hasDue = netDue > 0;
+              const hasDeposit = !hasDue && netDeposit > 0;
+              
+              return (
+                <div key={customer.id} style={{
+                  background: T.white,
+                  borderRadius: '14px',
+                  padding: '16px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  border: '1px solid #e0e0e0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                }}>
+                  {/* Header Row: Avatar + Info + Total */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '52px',
+                      height: '52px',
+                      borderRadius: '50%',
+                      background: T.teal,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '22px',
+                      color: T.white,
+                      fontWeight: 700,
+                      overflow: 'hidden',
+                    }}>
+                      {customer.avatar ? (
+                        <img 
+                          src={customer.avatar} 
+                          alt={customer.name} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        />
+                      ) : (
+                        customer.name.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, color: T.gray800, fontSize: '15px' }}>{customer.name}</div>
+                      <div style={{ fontSize: '12px', color: T.gray400 }}>
+                        {customer.phone || t('phoneNotFound')}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: T.teal }}>{fmt(getCustomerTotal(customer))}</div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons - Dynamic Due/Deposit */}
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {/* Dynamic Button: Due or Deposit or History */}
+                    <button
+                      onClick={() => handleViewHistory(customer)}
+                      style={{
+                        flex: 1,
+                        padding: '10px 12px',
+                        background: hasDue ? '#D32F2F' : (hasDeposit ? T.tealDark : T.gray50),
+                        color: hasDue ? T.white : (hasDeposit ? T.white : T.teal),
+                        border: (hasDue || hasDeposit) ? 'none' : `1px solid ${T.teal}`,
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      {hasDue ? (
+                        <><span>⚠️</span> {t('due')}: {fmt(netDue)}</>
+                      ) : hasDeposit ? (
+                        <><span>💰</span> Deposit: {fmt(netDeposit)}</>
+                      ) : isGeneralCustomer(customer) ? (
+                        <><span>📋</span> {t('viewHistory')}</>
+                      ) : (
+                        <><span>📋</span> {t('history')}</>
+                      )}
+                    </button>
+                    
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => {
+                        if (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) return;
+                        handleDeleteCustomer(customer);
+                      }}
+                      disabled={isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0}
+                      style={{
+                        padding: '10px 14px',
+                        background: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? T.gray100 : '#EF9A9A',
+                        color: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? T.gray400 : '#B71C1C',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '14px',
+                        cursor: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? 'not-allowed' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? 0.5 : 1,
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Add Customer Modal */}
+        <CustomerModal
+          isOpen={isAddCustomerModalOpen}
+          mode="add"
+          onClose={() => setIsAddCustomerModalOpen(false)}
+          onSave={handleAddCustomer}
+        />
+
+        {/* Edit Customer Modal */}
+        <CustomerModal
+          isOpen={isEditCustomerModalOpen}
+          mode="edit"
+          customer={editingCustomer}
+          onClose={() => { setIsEditCustomerModalOpen(false); setEditingCustomer(null); }}
+          onSave={handleEditCustomer}
+        />
+      </div>
+    );
+  }
+
+  // General Customer Detail View
+  if (view === 'general') {
+    const generalCustomerData = generalCustomer || { id: '-', name: t('generalCustomer'), phone: '-', address: '-', balance: 0 };
+    const generalSales = sales.filter(s => !s.customerId || s.customerId === generalCustomerData.id);
+    const generalTotal = generalSales.reduce((sum, s) => sum + s.total, 0);
+
+    return (
+      <div style={containerStyle}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          marginBottom: '20px',
+        }}>
+          <button
+            onClick={() => setView('dashboard')}
+            style={{
+              padding: '8px 16px',
+              background: T.gray100,
+              color: T.gray800,
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            {isRTL ? '→' : '←'} {t('back')}
+          </button>
+          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: T.gray800 }}>
+            {t('generalCustomerSystem')}
+          </h2>
+        </div>
+
+        {/* Summary Card */}
+        <div style={{
+          background: T.white,
+          borderRadius: '14px',
+          padding: '20px',
+          border: `1px solid ${T.gray100}`,
+          marginBottom: '20px',
+          display: 'flex',
+          gap: '20px',
+          alignItems: 'flex-start',
+        }}>
+          {/* Avatar on the left */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: T.tealDark,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '36px',
+            flexShrink: 0,
+          }}>
+            👤
+          </div>
+
+          {/* Info Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: '16px',
+            flex: 1,
+          }}>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('id')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{generalCustomerData.id}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('name')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{t('generalCustomer')}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('phone')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>-</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('address')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>-</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('totalPurchases')}</div>
+              <div style={{ fontSize: '14px', color: T.teal, fontWeight: 700 }}>{fmt(generalTotal)}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '16px',
+          flexWrap: 'wrap',
+        }}>
+          <button
+            style={{
+              padding: '10px 16px',
+              background: T.teal,
+              color: T.white,
+              border: 'none',
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <span>📦</span> {t('allPurchases')} ({generalSales.length})
+          </button>
+        </div>
+
+        {/* Table */}
+        <div style={{
+          background: T.white,
+          borderRadius: '14px',
+          border: `1px solid ${T.gray100}`,
+          overflow: 'hidden',
+          marginBottom: '16px',
+        }}>
+          {generalSales.length === 0 ? (
+            <div style={{
+              padding: '60px 20px',
+              textAlign: 'center',
+              color: T.gray400,
+            }}>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>🛒</div>
+              <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noPurchasesFound')}</div>
+            </div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: T.gray50 }}>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('dateTime')}</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('invoiceId')}</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('type')}</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('user')}</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('total')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {generalSales.map((sale, i) => (
+                  <tr key={sale.id} style={{ borderTop: i > 0 ? `1px solid ${T.gray100}` : 'none' }}>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(sale.date).toLocaleString()}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.invoiceNo}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.paymentMethod || 'Sale'}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.user || 'POS'}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800, textAlign: 'right', fontWeight: 600 }}>{fmt(sale.total)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          background: T.tealLight,
+          borderRadius: '10px',
+          padding: '12px 16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <span style={{ fontSize: '14px', fontWeight: 600, color: T.tealDark }}>
+            {t('totalBills').replace('0', generalSales.length.toString())}
+          </span>
+          <span style={{ fontSize: '16px', fontWeight: 700, color: T.teal }}>
+            {fmt(generalTotal)}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Regular Customer Detail View
+  if (view === 'regular' && selectedCustomer) {
+    const customerSales = getCustomerSales(selectedCustomer);
+    const customerTotal = customerSales.reduce((sum, s) => sum + s.total, 0);
+    const rawDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
+    const rawDeposit = selectedCustomer.deposit || 0;
+    // Calculate net due/deposit: offset deposit against due
+    const netDue = Math.max(0, rawDue - rawDeposit);
+    const netDeposit = Math.max(0, rawDeposit - rawDue);
+
+    return (
+      <div style={containerStyle}>
+        {/* Header */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              onClick={() => setView('dashboard')}
+              style={{
+                padding: '8px 16px',
+                background: T.gray100,
+                color: T.gray800,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              {isRTL ? '→' : '←'} {t('back')}
+            </button>
+            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: T.gray800 }}>
+              {selectedCustomer.name}
+            </h2>
+          </div>
+          <button
+            onClick={() => openEditModal(selectedCustomer)}
+            style={{
+              padding: '8px 16px',
+              background: T.white,
+              color: T.teal,
+              border: `1px solid ${T.teal}`,
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            ✏️ {t('edit')}
+          </button>
+        </div>
+
+        {/* Summary Card - Single Line Layout */}
+        <div style={{
+          background: T.white,
+          borderRadius: '14px',
+          padding: '14px 16px',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
+          border: `1px solid ${T.gray200}`,
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '14px',
+        }}>
+          {/* Avatar on the left */}
+          <div style={{
+            width: '55px',
+            height: '55px',
+            borderRadius: '50%',
+            background: T.teal,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '22px',
+            color: T.white,
+            fontWeight: 700,
+            flexShrink: 0,
+            overflow: 'hidden',
+          }}>
+            {selectedCustomer.avatar ? (
+              <img 
+                src={selectedCustomer.avatar} 
+                alt={selectedCustomer.name} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              />
+            ) : (
+              selectedCustomer.name.charAt(0).toUpperCase()
+            )}
+          </div>
+
+          {/* All Info in Single Line */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1, overflow: 'hidden' }}>
+            {/* ID */}
+            <div style={{ flexShrink: 0 }}>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('id')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.id}</div>
+            </div>
+            
+            {/* Name */}
+            <div style={{ flexShrink: 0 }}>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('name')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.name}</div>
+            </div>
+            
+            {/* Phone */}
+            <div style={{ flexShrink: 0 }}>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('phone')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.phone || '-'}</div>
+            </div>
+            
+            {/* Address */}
+            <div style={{ flexShrink: 0, maxWidth: '120px' }}>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('address')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedCustomer.address || '-'}</div>
+            </div>
+            
+            {/* Divider */}
+            <div style={{ width: '1px', height: '35px', background: T.gray200, flexShrink: 0 }} />
+            
+            {/* Total Purchases - BIG */}
+            <div style={{ flexShrink: 0 }}>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('totalPurchases')}</div>
+              <div style={{ fontSize: '22px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
+            </div>
+            
+            {/* Due/Deposit - Dynamic based on net balance */}
+            {netDue > 0 ? (
+              <div style={{ flexShrink: 0 }}>
+                <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('due')}</div>
+                <div style={{ fontSize: '22px', color: T.red, fontWeight: 700 }}>{fmt(netDue)}</div>
+              </div>
+            ) : netDeposit > 0 ? (
+              <div style={{ flexShrink: 0 }}>
+                <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('deposit')}</div>
+                <div style={{ fontSize: '22px', color: T.tealDark, fontWeight: 700 }}>{fmt(netDeposit)}</div>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Buttons on the right */}
+          <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+            <button
+              onClick={() => setIsAddDueModalOpen(true)}
+              style={{
+                padding: '10px 16px',
+                background: T.red,
+                color: T.white,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              📋 {t('addDue')}
+            </button>
+            <button
+              onClick={() => setIsAddDepositModalOpen(true)}
+              style={{
+                padding: '10px 16px',
+                background: T.tealDark,
+                color: T.white,
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              💰 {t('addDeposit')}
+            </button>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '16px',
+          flexWrap: 'wrap',
+        }}>
+          <button
+            onClick={() => setActiveTab('all')}
+            style={{
+              padding: '10px 16px',
+              background: activeTab === 'all' ? T.teal : T.white,
+              color: activeTab === 'all' ? T.white : T.gray600,
+              border: activeTab === 'all' ? 'none' : `1px solid ${T.gray200}`,
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <span>📦</span> {t('allPurchases')} ({customerSales.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('due')}
+            style={{
+              padding: '10px 16px',
+              background: activeTab === 'due' ? T.teal : T.white,
+              color: activeTab === 'due' ? T.white : T.gray600,
+              border: activeTab === 'due' ? 'none' : `1px solid ${T.gray200}`,
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <span>📋</span> {t('dueHistory')} ({(selectedCustomer.transactions || []).filter(t => t.type === 'due').length})
+          </button>
+          <button
+            onClick={() => setActiveTab('deposit')}
+            style={{
+              padding: '10px 16px',
+              background: activeTab === 'deposit' ? T.teal : T.white,
+              color: activeTab === 'deposit' ? T.white : T.gray600,
+              border: activeTab === 'deposit' ? 'none' : `1px solid ${T.gray200}`,
+              borderRadius: '8px',
+              fontSize: '14px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            <span>👜</span> {t('depositHistory')} ({(selectedCustomer.transactions || []).filter(t => t.type === 'deposit').length})
+          </button>
+        </div>
+
+        {/* Table */}
+        <div style={{
+          background: T.white,
+          borderRadius: '14px',
+          border: `1px solid ${T.gray100}`,
+          overflow: 'hidden',
+          marginBottom: '16px',
+        }}>
+          {activeTab === 'all' && customerSales.length === 0 && (
+            <div style={{
+              padding: '60px 20px',
+              textAlign: 'center',
+              color: T.gray400,
+            }}>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}>🛒</div>
+              <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noPurchasesFound')}</div>
+            </div>
+          )}
+          {activeTab === 'all' && customerSales.length > 0 && (
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ background: T.gray50 }}>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('dateTime')}</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('invoiceId')}</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('type')}</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('user')}</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('total')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {customerSales.map((sale, i) => (
+                  <tr key={sale.id} style={{ borderTop: i > 0 ? `1px solid ${T.gray100}` : 'none' }}>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(sale.date).toLocaleString()}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.invoiceNo}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.paymentMethod || 'Sale'}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.user || 'POS'}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800, textAlign: 'right', fontWeight: 600 }}>{fmt(sale.total)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {activeTab === 'due' && (
+            (selectedCustomer.transactions || []).filter(t => t.type === 'due').length === 0 ? (
+              <div style={{
+                padding: '60px 20px',
+                textAlign: 'center',
+                color: T.gray400,
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '12px' }}>📋</div>
+                <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noDueHistory')}</div>
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: T.gray50 }}>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('dateTime')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('note')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('amount')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(selectedCustomer.transactions || []).filter(t => t.type === 'due').map((tx, i) => (
+                    <tr key={tx.id} style={{ borderTop: i > 0 ? `1px solid ${T.gray100}` : 'none' }}>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(tx.date).toLocaleString()}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{tx.note || '-'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.red, textAlign: 'right', fontWeight: 600 }}>+{fmt(tx.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          )}
+          {activeTab === 'deposit' && (
+            (selectedCustomer.transactions || []).filter(t => t.type === 'deposit').length === 0 ? (
+              <div style={{
+                padding: '60px 20px',
+                textAlign: 'center',
+                color: T.gray400,
+              }}>
+                <div style={{ fontSize: '48px', marginBottom: '12px' }}>👜</div>
+                <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noDepositHistory')}</div>
+              </div>
+            ) : (
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: T.gray50 }}>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('dateTime')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('note')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'left', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('payment')}</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'right', fontSize: '12px', fontWeight: 700, color: T.gray600, textTransform: 'uppercase' }}>{t('amount')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(selectedCustomer.transactions || []).filter(t => t.type === 'deposit').map((tx, i) => (
+                    <tr key={tx.id} style={{ borderTop: i > 0 ? `1px solid ${T.gray100}` : 'none' }}>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(tx.date).toLocaleString()}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{tx.note || '-'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{tx.paymentMethod || '-'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: '14px', color: T.tealDark, textAlign: 'right', fontWeight: 600 }}>+{fmt(tx.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          background: T.tealLight,
+          borderRadius: '10px',
+          padding: '12px 16px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          <span style={{ fontSize: '14px', fontWeight: 600, color: T.tealDark }}>
+            {activeTab === 'all' ? t('totalBills').replace('0', customerSales.length.toString()) : 
+             activeTab === 'due' ? `${t('total')} (${(selectedCustomer.transactions || []).filter(tx => tx.type === 'due').length})` :
+             `${t('total')} (${(selectedCustomer.transactions || []).filter(tx => tx.type === 'deposit').length})`}
+          </span>
+          <span style={{ fontSize: '16px', fontWeight: 700, color: T.teal }}>
+            {activeTab === 'all' ? fmt(customerTotal) :
+             activeTab === 'due' ? fmt((selectedCustomer.transactions || []).filter(tx => tx.type === 'due').reduce((sum, tx) => sum + tx.amount, 0)) :
+             fmt((selectedCustomer.transactions || []).filter(tx => tx.type === 'deposit').reduce((sum, tx) => sum + tx.amount, 0))}
+          </span>
+        </div>
+
+        {/* Edit Customer Modal - accessible from regular customer view */}
+        <CustomerModal
+          isOpen={isEditCustomerModalOpen}
+          mode="edit"
+          customer={editingCustomer}
+          onClose={() => { setIsEditCustomerModalOpen(false); setEditingCustomer(null); }}
+          onSave={handleEditCustomer}
+        />
+      </div>
+    );
+  }
+
+  // Fallback
+  return (
+    <div style={containerStyle}>
+      <button
+        onClick={() => setView('dashboard')}
+        style={{
+          padding: '8px 16px',
+          background: T.gray100,
+          color: T.gray800,
+          border: 'none',
+          borderRadius: '8px',
+          fontSize: '14px',
+          fontWeight: 600,
+          cursor: 'pointer',
+        }}
+      >
+        {t('back')}
+      </button>
+    </div>
+  );
+}
+
+// SettingsScreen Component - extracted from pages/SettingsScreen.tsx
+export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, onRefresh }: { products: any[]; customers: any[]; sales: any[]; suppliers: any[]; categories: any[]; purchases: any[]; onRefresh: () => void }) {
+  void onRefresh; // Reserved for future use
+
+  const [form, setForm] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    taxId: '',
+    crNumber: '',
+    zatkaEnabled: false,
+    zatkaApiUrl: '',
+    zatkaUsername: '',
+    zatkaPassword: '',
+    zatcaPhase: 'phase1',
+    zatcaOid: '',
+    zatcaCsid: '',
+    zatcaPrivateKey: '',
+    zatcaClientId: '',
+    zatcaClientSecret: '',
+    vatEnabled: true,
+    vatPercent: 15,
+    bannerImage: '',
+    receiptHeader: '🧾 বিক্রয় রিসিট',
+    receiptFooter: 'ধন্যবাদ',
+    receiptShowLogo: true,
+    receiptShowAddress: true,
+    receiptShowPhone: true,
+    receiptShowCustomer: true,
+    receiptShowVat: true,
+    receiptShowQr: true,
+    receiptFontSize: 11,
+    receiptLogo: '',
+    purchaseHeader: '🛒 পারচেজ ইনভয়েস',
+    purchaseFooter: 'ধন্যবাদ',
+    purchaseShowLogo: true,
+    purchaseShowAddress: true,
+    purchaseShowSupplier: true,
+    purchaseShowPhone: true,
+    purchaseShowVat: true,
+    purchaseShowStoreVat: true,
+    purchaseFontSize: 11,
+    purchaseIcon: '',
+    dueSalesEnabled: true,
+  });
+
+  const [saved, setSaved] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [confirmText, setConfirmText] = useState('');
+
+  // Load settings from PouchDB on mount
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    const keys = Object.keys(form);
+    const loaded: Record<string, any> = {};
+
+    for (const key of keys) {
+      const value = await localDb.getSetting(key);
+      if (value !== null) {
+        if (value === 'true') loaded[key] = true;
+        else if (value === 'false') loaded[key] = false;
+        else if (!isNaN(Number(value)) && value !== '') loaded[key] = Number(value);
+        else loaded[key] = value;
+      }
+    }
+
+    if (Object.keys(loaded).length > 0) {
+      setForm(prev => ({ ...prev, ...loaded }));
+    }
+  };
+
+  const save = async () => {
+    try {
+      for (const [key, value] of Object.entries(form)) {
+        await localDb.saveSetting(key, String(value));
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      alert('❌ সেটিংস সংরক্ষণ ব্যর্থ হয়েছে!');
+    }
+  };
+
+  const clearAll = async () => {
+    if (confirmText !== 'মুছে ফেলুন') {
+      alert('নিশ্চিত করতে "মুছে ফেলুন" লিখুন');
+      return;
+    }
+
+    try {
+      await localDb.clearAll();
+      alert('সব ডেটা মুছা হয়েছে। অ্যাপ রিলোড হচ্ছে...');
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to clear data:', error);
+      alert('❌ ডেটা মুছতে ব্যর্থ হয়েছে!');
+    }
+  };
+
+  const tabs = [
+    { icon: '⚙️', label: 'জেনারেল' },
+    { icon: '🎨', label: 'ডিজাইন' },
+    { icon: '🔄', label: 'ট্রান্সলেশন' },
+    { icon: '🗄️', label: 'ডেটাবেজ' },
+    { icon: '💾', label: 'ইউজার' },
+    { icon: '🔄', label: 'ডেটা রিসেট' },
+  ];
+
+  return (
+    <div style={{
+      height: '100%',
+      overflow: 'auto',
+      background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)',
+      width: '100%'
+    }}>
+      {/* Header */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
+        padding: '32px 32px 24px',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <div style={{ position: 'relative', zIndex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#fff', letterSpacing: '-0.5px' }}>
+              ⚙️ সেটিংস
+            </h1>
+            <p style={{ margin: '8px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.8)' }}>
+              আপনার POS সিস্টেম কনফিগার করুন
+            </p>
+          </div>
+
+          <button onClick={save} style={{
+            padding: '12px 24px',
+            background: saved ? '#059669' : 'rgba(255,255,255,0.95)',
+            color: saved ? '#fff' : '#0F766E',
+            border: 'none',
+            borderRadius: 10,
+            fontSize: 14,
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 4px 14px rgba(0,0,0,0.25)',
+          }}>
+            {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ করুন'}
+          </button>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
+        padding: '0 32px 16px',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, overflowX: 'auto' }}>
+          {tabs.map((tab, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveTab(i)}
+              style={{
+                padding: '10px 20px',
+                border: 'none',
+                borderRadius: 8,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                fontSize: 14,
+                fontWeight: 600,
+                background: activeTab === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
+                color: activeTab === i ? '#0F766E' : '#fff',
+                whiteSpace: 'nowrap',
+                boxShadow: activeTab === i ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
+              }}
+            >
+              <span>{tab.icon}</span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ padding: 24 }}>
+        {/* General Tab */}
+        {activeTab === 0 && (
+          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{
+                width: 40, height: 40,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20,
+                color: '#fff'
+              }}>⚙️</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>সাধারণ তথ্য</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>আপনার ব্যবসার মূল তথ্য</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  🏪 ব্যবসার নাম *
+                </label>
+                <input
+                  value={form.name}
+                  onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="আপনার ব্যবসার নাম লিখুন"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  📞 মোবাইল নম্বর
+                </label>
+                <input
+                  value={form.phone}
+                  onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="01XXXXXXXXX"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  📍 ঠিকানা
+                </label>
+                <input
+                  value={form.address}
+                  onChange={e => setForm(p => ({ ...p, address: e.target.value }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="আপনার ব্যবসার ঠিকানা"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  📧 ইমেইল
+                </label>
+                <input
+                  value={form.email}
+                  onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
+                  type="email"
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="email@example.com"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  🔢 VAT নম্বর (TIN)
+                </label>
+                <input
+                  value={form.taxId}
+                  onChange={e => setForm(p => ({ ...p, taxId: e.target.value }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="১৫ ডিজিটের VAT নম্বর"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  🏢 CR নম্বর
+                </label>
+                <input
+                  value={form.crNumber}
+                  onChange={e => setForm(p => ({ ...p, crNumber: e.target.value }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="CR নম্বর"
+                />
+              </div>
+            </div>
+
+            {/* VAT Settings */}
+            <div style={{ marginTop: 24 }}>
+              <h5 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>💰 ভ্যাট সেটিংস</h5>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px 20px',
+                background: form.vatEnabled ? '#ecfdf5' : '#fef2f2',
+                borderRadius: 10,
+                border: `2px solid ${form.vatEnabled ? '#059669' : '#ef4444'}`
+              }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>
+                    ভ্যাট সক্রিয় {form.vatEnabled ? '✅' : '❌'}
+                  </h4>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                    {form.vatEnabled ? 'সকল বিক্রয়ে ভ্যাট যোগ হবে' : 'ভ্যাট গণনা বন্ধ আছে'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setForm(p => ({ ...p, vatEnabled: !p.vatEnabled }))}
+                  style={{
+                    padding: '8px 16px',
+                    background: form.vatEnabled ? '#059669' : '#94a3b8',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {form.vatEnabled ? 'সক্রিয়' : 'নিষ্ক্রিয়'}
+                </button>
+              </div>
+
+              {form.vatEnabled && (
+                <div style={{
+                  marginTop: 12,
+                  padding: '16px 20px',
+                  background: '#f0fdf4',
+                  borderRadius: 10,
+                  border: '2px solid #86efac',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12
+                }}>
+                  <label style={{ fontSize: 14, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>
+                    ডিফল্ট ভ্যাট শতাংশ:
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input
+                      value={form.vatPercent}
+                      onChange={e => setForm(p => ({ ...p, vatPercent: parseFloat(e.target.value) || 0 }))}
+                      type="number"
+                      min="0"
+                      max="100"
+                      style={{ width: 80, padding: '8px 12px', fontSize: 14, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff' }}
+                    />
+                    <span style={{ fontSize: 14, color: '#166534' }}>%</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Design Tab */}
+        {activeTab === 1 && (
+          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{
+                width: 40, height: 40,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20,
+                color: '#fff'
+              }}>🎨</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ডিজাইন সেটিংস</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>রিসিট টেমপ্লেট কনফিগার করুন</p>
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  হেডার টাইটেল
+                </label>
+                <input
+                  value={form.receiptHeader}
+                  onChange={e => setForm(p => ({ ...p, receiptHeader: e.target.value }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="🧾 বিক্রয় রিসিট"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  ফুটার টেক্সট
+                </label>
+                <input
+                  value={form.receiptFooter}
+                  onChange={e => setForm(p => ({ ...p, receiptFooter: e.target.value }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="ধন্যবাদ"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  আইকন/লোগো
+                </label>
+                <input
+                  value={form.receiptLogo}
+                  onChange={e => setForm(p => ({ ...p, receiptLogo: e.target.value }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                  placeholder="🖼️"
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
+                  ফন্ট সাইজ
+                </label>
+                <select
+                  value={form.receiptFontSize}
+                  onChange={e => setForm(p => ({ ...p, receiptFontSize: parseInt(e.target.value) }))}
+                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
+                >
+                  <option value={9}>ছোট (৯px)</option>
+                  <option value={10}>মাঝারি ছোট (১০px)</option>
+                  <option value={11}>মাঝারি (১১px)</option>
+                  <option value={12}>বড় (১২px)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Receipt Options */}
+            <div style={{ marginTop: 20, padding: '14px 18px', background: '#f8fafc', borderRadius: 10, border: '2px solid #e2e8f0' }}>
+              <h5 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                {[
+                  { key: 'receiptShowLogo', label: 'লোগো/আইকন' },
+                  { key: 'receiptShowAddress', label: 'ঠিকানা' },
+                  { key: 'receiptShowPhone', label: 'ফোন নম্বর ও ভ্যাট' },
+                  { key: 'receiptShowCustomer', label: 'গ্রাহক তথ্য' },
+                  { key: 'receiptShowVat', label: 'ভ্যাট তথ্য' },
+                  { key: 'receiptShowQr', label: 'QR কোড' },
+                ].map(item => (
+                  <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={form[item.key as keyof typeof form] !== false}
+                      onChange={e => setForm(p => ({ ...p, [item.key]: e.target.checked }))}
+                      style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#0F766E' }}
+                    />
+                    <span style={{ fontSize: 13, color: '#475569' }}>{item.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div style={{ marginTop: 24 }}>
+              <h5 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#475569' }}>👁️ প্রিভিউ</h5>
+              <div style={{ background: '#f1f5f9', borderRadius: 10, padding: 16, textAlign: 'center' }}>
+                <div style={{
+                  background: '#fff',
+                  padding: `${form.receiptFontSize}px`,
+                  width: 200,
+                  margin: '0 auto',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  fontSize: `${form.receiptFontSize}px`,
+                  fontFamily: 'monospace',
+                  color: '#000',
+                  textAlign: 'left'
+                }}>
+                  <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 6, marginBottom: 6 }}>
+                    {form.receiptShowLogo && <div style={{ fontWeight: 'bold', fontSize: `${form.receiptFontSize + 3}px` }}>{form.receiptLogo || form.receiptHeader}</div>}
+                    {form.receiptShowAddress && form.name && <div style={{ fontSize: `${form.receiptFontSize - 1}px` }}>{form.name}</div>}
+                    {form.receiptShowPhone && form.taxId && <div style={{ fontSize: `${form.receiptFontSize - 2}px`, fontWeight: 'bold' }}>VAT: {form.taxId}</div>}
+                  </div>
+                  <div style={{ fontSize: `${form.receiptFontSize - 1}px`, marginBottom: 4 }}>পণ্য ১ x ১০০ = ১০০</div>
+                  <div style={{ fontSize: `${form.receiptFontSize - 1}px`, borderTop: '1px dashed #000', paddingTop: 6, marginTop: 6, fontWeight: 'bold' }}>
+                    মোট: ১০০
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Translation Tab */}
+        {activeTab === 2 && (
+          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{
+                width: 40, height: 40,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20,
+                color: '#fff'
+              }}>🔄</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ট্রান্সলেশন</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ভাষা সেটিংস পরিবর্তন করুন</p>
+              </div>
+            </div>
+
+            <div style={{
+              padding: '24px',
+              background: '#f8fafc',
+              borderRadius: 12,
+              textAlign: 'center',
+              border: '2px dashed #e2e8f0'
+            }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>🌐</div>
+              <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: '#374151' }}>ভাষা সেটিংস</h4>
+              <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
+                বর্তমানে উপলব্ধ: বাংলা, ইংরেজি, হিন্দি, আরবি
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Database Tab */}
+        {activeTab === 3 && (
+          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{
+                width: 40, height: 40,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20,
+                color: '#fff'
+              }}>🗄️</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ডেটাবেজ</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ডেটা ব্যাকআপ ও রিস্টোর</p>
+              </div>
+            </div>
+
+            <div style={{
+              padding: '24px',
+              background: '#f8fafc',
+              borderRadius: 12,
+              textAlign: 'center',
+              border: '2px dashed #e2e8f0'
+            }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>💾</div>
+              <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: '#374151' }}>ব্যাকআপ ও রিস্টোর</h4>
+              <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
+                আপনার ডেটা ব্যাকআপ করুন এবং প্রয়োজনে রিস্টোর করুন।
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 4 && (
+          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{
+                width: 40, height: 40,
+                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 20,
+                color: '#fff'
+              }}>👥</div>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ইউজার ম্যানেজমেন্ট</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>মাল্টি-ইউজার ফিচার শীঘ্রই আসছে</p>
+              </div>
+            </div>
+
+            <div style={{
+              padding: '24px',
+              background: '#f8fafc',
+              borderRadius: 12,
+              textAlign: 'center',
+              border: '2px dashed #e2e8f0'
+            }}>
+              <div style={{ fontSize: 48, marginBottom: 12 }}>🔐</div>
+              <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: '#374151' }}>মাল্টি-ইউজার আসছে</h4>
+              <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
+                প্রো ভার্সনে মাল্টি-ইউজার, অ্যাডমিন রোল এবং লগইন সিস্টেম পাবেন।
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Data Reset Tab */}
+        {activeTab === 5 && (
+          <div>
+            <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <div style={{
+                  width: 40, height: 40,
+                  background: '#dc2626',
+                  borderRadius: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 20,
+                  color: '#fff'
+                }}>⚠️</div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ডেটা রিসেট</h3>
+                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>ডেটা মুছে ফেলার জন্য সতর্ক ব্যবহার করুন</p>
+                </div>
+              </div>
+
+              <div style={{
+                padding: '14px 18px',
+                background: '#fef2f2',
+                borderRadius: 10,
+                border: '1px solid #fecaca',
+                marginBottom: 20
+              }}>
+                <p style={{ margin: 0, fontSize: 13, color: '#dc2626', lineHeight: 1.6 }}>
+                  ⚠️ সতর্কতা: নিচের অপশনগুলো ব্যবহারে ডেটা স্থায়ীভাবে মুছে যাবে। এই কাজ পূর্বাবস্থায় ফেরানো যাবে না।
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+                {[
+                  { label: '📦 পণ্য', count: products.length },
+                  { label: '👥 কাস্টমার', count: customers.length },
+                  { label: '📂 ক্যাটাগরি', count: categories.length },
+                  { label: '🛒 বিক্রয়', count: sales.length },
+                  { label: '🏢 সরবরাহকারী', count: suppliers.length },
+                  { label: '🛒 পারচেজ', count: purchases.length },
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    padding: 16,
+                    background: '#fef2f2',
+                    borderRadius: 10,
+                    border: '1px solid #fecaca',
+                    textAlign: 'center'
+                  }}>
+                    <h4 style={{ margin: '0 0 4px', fontSize: 13, fontWeight: 600, color: '#1e293b' }}>{item.label}</h4>
+                    <p style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#dc2626' }}>{item.count}টি</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Danger Zone */}
+              <div style={{ marginTop: 24, padding: 20, background: '#fef2f2', borderRadius: 12, border: '2px solid #dc2626' }}>
+                <h4 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 700, color: '#dc2626' }}>☠️ সব ডেটা মুছে ফেলুন</h4>
+                <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b' }}>
+                  "মুছে ফেলুন" লিখে নিশ্চিত করুন
+                </p>
+                <input
+                  value={confirmText}
+                  onChange={e => setConfirmText(e.target.value)}
+                  placeholder="মুছে ফেলুন"
+                  style={{
+                    width: '100%',
+                    padding: '12px 14px',
+                    fontSize: 14,
+                    border: '2px solid #dc2626',
+                    borderRadius: 8,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    marginBottom: 12,
+                    background: '#fff'
+                  }}
+                />
+                <button
+                  onClick={clearAll}
+                  disabled={confirmText !== 'মুছে ফেলুন'}
+                  style={{
+                    width: '100%',
+                    padding: '12px 20px',
+                    background: confirmText === 'মুছে ফেলুন' ? '#991b1b' : '#9ca3af',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    cursor: confirmText === 'মুছে ফেলুন' ? 'pointer' : 'not-allowed'
+                  }}
+                >
+                  💥 সব ডেটা মুছুন
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// TranslationSettings Component
+export function TranslationSettings() {
+  const { language, customTranslations, syncTranslations, saveTranslation } = useLanguage();
+  const [selectedLang, setSelectedLang] = useState<Language>(language);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingKey, setEditingKey] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string>('');
+
+  // Get all translation keys from default translations
+  const allKeys = Object.keys(defaultTranslations.en);
+
+  // Filter keys based on search
+  const filteredKeys = allKeys.filter(key => {
+    const defaultValue = defaultTranslations[selectedLang]?.[key] || '';
+    const customValue = customTranslations[selectedLang]?.[key] || '';
+    const query = searchQuery.toLowerCase();
+    return (
+      key.toLowerCase().includes(query) ||
+      defaultValue.toLowerCase().includes(query) ||
+      customValue.toLowerCase().includes(query)
+    );
+  });
+
+  const handleEdit = (key: string) => {
+    const currentValue = customTranslations[selectedLang]?.[key] || defaultTranslations[selectedLang]?.[key] || '';
+    setEditingKey(key);
+    setEditValue(currentValue);
+  };
+
+  const handleSave = async (key: string) => {
+    setSaving(true);
+    await saveTranslation(selectedLang, key, editValue);
+    setSaving(false);
+    setEditingKey(null);
+  };
+
+  const handleSync = async () => {
+    setSyncStatus('syncing');
+    await syncTranslations();
+    setSyncStatus('Synced!');
+    setTimeout(() => setSyncStatus(''), 2000);
+  };
+
+  // Get display value for a key
+  const getDisplayValue = (key: string) => {
+    return customTranslations[selectedLang]?.[key] || defaultTranslations[selectedLang]?.[key] || '';
+  };
+
+  // Check if a key has custom translation
+  const hasCustomTranslation = (key: string) => {
+    return customTranslations[selectedLang]?.[key] !== undefined;
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+        <h2 style={{ margin: 0 }}>🌐 Translation Settings</h2>
+        <button
+          onClick={handleSync}
+          disabled={syncStatus === 'syncing'}
+          style={{
+            padding: '8px 16px',
+            background: syncStatus ? '#22C55E' : '#0F766E',
+            color: 'white',
+            border: 'none',
+            borderRadius: 8,
+            cursor: syncStatus ? 'default' : 'pointer',
+            fontWeight: 600,
+          }}
+        >
+          {syncStatus === 'syncing' ? '⏳ Syncing...' : syncStatus || '🔄 Sync from Code'}
+        </button>
+      </div>
+
+      {/* Language Tabs */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, borderBottom: '1px solid #E5E7EB', paddingBottom: 12 }}>
+        {languages.map(lang => (
+          <button
+            key={lang.code}
+            onClick={() => setSelectedLang(lang.code)}
+            style={{
+              padding: '8px 16px',
+              background: selectedLang === lang.code ? '#0F766E' : '#F3F4F6',
+              color: selectedLang === lang.code ? 'white' : '#4B5563',
+              border: 'none',
+              borderRadius: 8,
+              cursor: 'pointer',
+              fontWeight: 600,
+            }}
+          >
+            {lang.flag} {lang.nativeName}
+          </button>
+        ))}
+      </div>
+
+      {/* Search */}
+      <div style={{ marginBottom: 16 }}>
+        <input
+          type="text"
+          placeholder="Search translations..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '10px 14px',
+            border: '1px solid #E5E7EB',
+            borderRadius: 8,
+            fontSize: 14,
+            boxSizing: 'border-box',
+          }}
+        />
+      </div>
+
+      {/* Translation List */}
+      <div style={{ 
+        background: 'white', 
+        borderRadius: 12, 
+        border: '1px solid #E5E7EB',
+        maxHeight: 'calc(100vh - 300px)',
+        overflow: 'auto',
+      }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead style={{ position: 'sticky', top: 0, background: '#F9FAFB' }}>
+            <tr>
+              <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 600, color: '#4B5563', borderBottom: '1px solid #E5E7EB' }}>Key</th>
+              <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 600, color: '#4B5563', borderBottom: '1px solid #E5E7EB' }}>Translation</th>
+              <th style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 600, color: '#4B5563', borderBottom: '1px solid #E5E7EB' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredKeys.map(key => (
+              <tr key={key} style={{ borderBottom: '1px solid #F3F4F6' }}>
+                <td style={{ padding: '10px 16px', fontFamily: 'monospace', fontSize: 13, color: '#0F766E' }}>
+                  {key}
+                  {hasCustomTranslation(key) && (
+                    <span style={{ 
+                      marginLeft: 8, 
+                      fontSize: 10, 
+                      background: '#FEF3C7', 
+                      color: '#D97706', 
+                      padding: '2px 6px', 
+                      borderRadius: 4 
+                    }}>
+                      Custom
+                    </span>
+                  )}
+                </td>
+                <td style={{ padding: '10px 16px', width: '60%' }}>
+                  {editingKey === key ? (
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        id="translation-input"
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        style={{
+                          flex: 1,
+                          padding: '6px 10px',
+                          border: '1px solid #0F766E',
+                          borderRadius: 6,
+                          fontSize: 14,
+                        }}
+                        autoFocus
+                      />
+                      <button
+                        onClick={() => handleSave(key)}
+                        disabled={saving}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#22C55E',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: 6,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {saving ? '...' : 'Save'}
+                      </button>
+                      <button
+                        onClick={() => setEditingKey(null)}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#F3F4F6',
+                          color: '#4B5563',
+                          border: 'none',
+                          borderRadius: 6,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: 14 }}>{getDisplayValue(key)}</span>
+                  )}
+                </td>
+                <td style={{ padding: '10px 16px' }}>
+                  {editingKey !== key && (
+                    <button
+                      onClick={() => handleEdit(key)}
+                      style={{
+                        padding: '4px 10px',
+                        background: '#F0FDFA',
+                        color: '#0F766E',
+                        border: '1px solid #0F766E',
+                        borderRadius: 6,
+                        cursor: 'pointer',
+                        fontSize: 12,
+                      }}
+                    >
+                      ✏️ Edit
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {filteredKeys.length === 0 && (
+          <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
+            No translations found
+          </div>
+        )}
+      </div>
+
+      {/* Stats */}
+      <div style={{ marginTop: 16, color: '#6B7280', fontSize: 13 }}>
+        Showing {filteredKeys.length} of {allKeys.length} translations
+      </div>
+    </div>
+  );
+}
+
+// DatabaseSettings Component
+export function DatabaseSettings() {
+  const { t } = useLanguage();
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState<'success' | 'error' | 'info'>('info');
+  const [docCount, setDocCount] = useState(0);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    loadDbInfo();
+    
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const loadDbInfo = async () => {
+    try {
+      await initDatabase();
+      const products = await localDb.getProducts();
+      const sales = await localDb.getSales();
+      const customers = await localDb.getCustomers();
+      const categories = await localDb.getCategories();
+      setDocCount(products.length + sales.length + customers.length + categories.length);
+    } catch (error) {
+      console.error('Error loading DB info:', error);
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      setMessage(t('exporting') || 'Exporting data...');
+      setMessageType('info');
+      
+      const data = {
+        exportedAt: new Date().toISOString(),
+        version: '2.0',
+        products: await localDb.getProducts(),
+        sales: await localDb.getSales(),
+        customers: await localDb.getCustomers(),
+        categories: await localDb.getCategories(),
+        currencies: await localDb.getCurrencies(),
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pos-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      setMessage(t('exportSuccess') || 'Export successful!');
+      setMessageType('success');
+    } catch (error) {
+      setMessage(`${t('exportFailed')}: ${error}`);
+      setMessageType('error');
+    }
+  };
+
+  const handleImport = async () => {
+    if (!importFile) {
+      setMessage(t('selectImportFile') || 'Please select a file');
+      setMessageType('error');
+      return;
+    }
+
+    setImporting(true);
+    setImportProgress(0);
+    setMessage(t('importing') || 'Importing data...');
+    setMessageType('info');
+
+    try {
+      const progressInterval = setInterval(() => {
+        setImportProgress(prev => Math.min(prev + 10, 90));
+      }, 100);
+
+      const text = await importFile.text();
+      const data = JSON.parse(text);
+      
+      if (data.products) {
+        for (const product of data.products) {
+          await localDb.saveProduct(product);
+        }
+      }
+      if (data.categories) {
+        for (const category of data.categories) {
+          await localDb.saveCategory(category);
+        }
+      }
+      if (data.customers) {
+        for (const customer of data.customers) {
+          await localDb.saveCustomer(customer);
+        }
+      }
+      
+      clearInterval(progressInterval);
+      setImportProgress(100);
+      
+      setMessage('Import successful!');
+      setMessageType('success');
+      setImportFile(null);
+      loadDbInfo();
+    } catch (error) {
+      setMessage(`${t('importFailed')}: ${error}`);
+      setMessageType('error');
+    }
+    
+    setImporting(false);
+    setImportProgress(0);
+  };
+
+  return (
+    <div style={{ padding: 16, maxWidth: 600, margin: '0 auto' }}>
+      <h2 style={{ marginBottom: 24 }}>🗄️ {t('databaseSettings')}</h2>
+
+      {/* Database Info */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginBottom: 12 }}>📊 {t('databaseInfo')}</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div style={{ background: '#F0FDF4', padding: 12, borderRadius: 8, textAlign: 'center' }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>
+              {docCount}
+            </div>
+            <div style={{ fontSize: 12, color: '#6B7280' }}>{t('totalDocuments')}</div>
+          </div>
+          <div style={{ background: '#F0FDFA', padding: 12, borderRadius: 8, textAlign: 'center' }}>
+            <div style={{ fontSize: 24, fontWeight: 700, color: '#115E59' }}>
+              IndexedDB
+            </div>
+            <div style={{ fontSize: 12, color: '#6B7280' }}>{t('localDatabase')}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Connection Status */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginBottom: 12 }}>🌐 {t('serverConnection')}</h3>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 8, 
+          padding: '10px 14px',
+          background: isOnline ? '#F0FDF4' : '#FEF2F2',
+          borderRadius: 8,
+        }}>
+          <span style={{ fontSize: 18 }}>{isOnline ? '🟢' : '🔴'}</span>
+          <span style={{ fontWeight: 600, color: isOnline ? '#166534' : '#DC2626' }}>
+            {isOnline ? t('online') || 'Online' : t('offline') || 'Offline'}
+          </span>
+        </div>
+        <p style={{ fontSize: 13, color: '#6B7280', marginTop: 12 }}>
+          {isOnline 
+            ? 'সার্ভারে সংযুক্ত। Sales automatically sync হবে।'
+            : 'অফলাইনে কাজ করছেন। সব data আপনার ডিভাইসে সংরক্ষিত।'}
+        </p>
+      </div>
+
+      {/* Export / Import */}
+      <div className="card" style={{ marginBottom: 16 }}>
+        <h3 style={{ marginBottom: 12 }}>💾 {t('backupRestore')}</h3>
+        
+        <div style={{ marginBottom: 16 }}>
+          <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 12 }}>
+            {t('exportDescription')}
+          </p>
+          <button
+            onClick={handleExport}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: '#115E59',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: 15,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            📤 {t('exportData') || 'Export Data'}
+          </button>
+        </div>
+
+        <div>
+          <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 12 }}>
+            {t('importDescription')}
+          </p>
+          
+          {importing && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${importProgress}%`, background: '#115E59', transition: 'width 0.3s ease' }} />
+              </div>
+            </div>
+          )}
+          
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+            <div style={{ flex: 1 }}>
+              <input
+                type="file"
+                accept=".json"
+                onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                style={{ display: 'none' }}
+                id="import-file"
+                disabled={importing}
+              />
+              <label
+                htmlFor="import-file"
+                style={{
+                  display: 'block',
+                  padding: '12px 14px',
+                  background: '#F9FAFB',
+                  border: `2px dashed ${importFile ? '#115E59' : '#D1D5DB'}`,
+                  borderRadius: 10,
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  color: importFile ? '#115E59' : '#6B7280',
+                }}
+              >
+                {importFile ? `📄 ${importFile.name}` : t('selectFile') || 'Select File'}
+              </label>
+            </div>
+            <button
+              onClick={handleImport}
+              disabled={!importFile || importing}
+              style={{
+                padding: '12px 20px',
+                background: importFile && !importing ? '#0F3460' : '#9CA3AF',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 10,
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: importFile && !importing ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {importing ? '...' : t('importData') || 'Import'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {message && (
+        <div style={{
+          marginTop: 12,
+          padding: '10px 14px',
+          borderRadius: 8,
+          background: messageType === 'success' ? '#F0FDF4' : messageType === 'error' ? '#FEF2F2' : '#EFF6FF',
+          color: messageType === 'success' ? '#166534' : messageType === 'error' ? '#DC2626' : '#1D4ED8',
+          fontSize: 14,
+        }}>
+          {message}
+        </div>
+      )}
+
+      {/* Info */}
+      <div className="card" style={{ background: '#F0FDFA', border: '1px solid #99F6E4' }}>
+        <h4 style={{ marginBottom: 8, color: '#115E59' }}>💡 {t('howItWorks')}</h4>
+        <ul style={{ fontSize: 13, color: '#374151', margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+          <li>ডাটা IndexedDB-তে লোকালি সেভ থাকে</li>
+          <li>অফলাইনেও সব কাজ করা যায়</li>
+          <li>Online হলে automatic sync হয়</li>
+          <li>Backup/Restore করা যায়</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
