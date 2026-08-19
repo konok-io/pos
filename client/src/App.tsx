@@ -3306,7 +3306,7 @@ export default function App() {
                     style={{
                       padding: '12px 16px', borderRadius: 14, border: 'none',
                       background: cart.length > 0 ? '#EA580C' : '#e5e7eb',
-                      color: '#fff', fontWeight: 800, fontSize: 24,
+                      color: '#fff', fontWeight: 700, fontSize: 16,
                       cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                       boxShadow: cart.length > 0 ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
                     }}>
