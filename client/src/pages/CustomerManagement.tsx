@@ -918,29 +918,52 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
           boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
           border: `1px solid ${T.gray200}`,
           marginBottom: '20px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-          gap: '16px',
+          display: 'flex',
+          gap: '20px',
+          alignItems: 'flex-start',
         }}>
-          <div>
-            <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('id')}</div>
-            <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{generalCustomerData.id}</div>
+          {/* Avatar on the left */}
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: T.tealDark,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '36px',
+            flexShrink: 0,
+          }}>
+            👤
           </div>
-          <div>
-            <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('name')}</div>
-            <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{t('generalCustomer')}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('phone')}</div>
-            <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>-</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('address')}</div>
-            <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>-</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('totalPurchases')}</div>
-            <div style={{ fontSize: '14px', color: T.teal, fontWeight: 700 }}>{fmt(generalTotal)}</div>
+
+          {/* Info Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: '16px',
+            flex: 1,
+          }}>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('id')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{generalCustomerData.id}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('name')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{t('generalCustomer')}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('phone')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>-</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('address')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>-</div>
+            </div>
+            <div>
+              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('totalPurchases')}</div>
+              <div style={{ fontSize: '14px', color: T.teal, fontWeight: 700 }}>{fmt(generalTotal)}</div>
+            </div>
           </div>
         </div>
 
@@ -1101,73 +1124,96 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
           boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
           border: `1px solid ${T.gray200}`,
           marginBottom: '20px',
+          display: 'flex',
+          gap: '20px',
+          alignItems: 'flex-start',
         }}>
+          {/* Avatar on the left */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-            gap: '16px',
-            marginBottom: '16px',
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: T.teal,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '32px',
+            color: T.white,
+            fontWeight: 700,
+            flexShrink: 0,
           }}>
-            <div>
-              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('id')}</div>
-              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.id}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('name')}</div>
-              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.name}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('phone')}</div>
-              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.phone || '-'}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('address')}</div>
-              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.address || '-'}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('totalPurchases')}</div>
-              <div style={{ fontSize: '14px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('due')}</div>
-              <div style={{ fontSize: '14px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
-            </div>
+            {selectedCustomer.name.charAt(0).toUpperCase()}
           </div>
-          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-            <button
-              style={{
-                padding: '8px 16px',
-                background: T.redLight,
-                color: T.red,
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              + {t('addDue')}
-            </button>
-            <button
-              style={{
-                padding: '8px 16px',
-                background: T.teal,
-                color: T.white,
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              + {t('addDeposit')}
-            </button>
+
+          {/* Info and Actions */}
+          <div style={{ flex: 1 }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+              gap: '16px',
+              marginBottom: '16px',
+            }}>
+              <div>
+                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('id')}</div>
+                <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.id}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('name')}</div>
+                <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.name}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('phone')}</div>
+                <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.phone || '-'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('address')}</div>
+                <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.address || '-'}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('totalPurchases')}</div>
+                <div style={{ fontSize: '14px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>{t('due')}</div>
+                <div style={{ fontSize: '14px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+              <button
+                style={{
+                  padding: '8px 16px',
+                  background: T.redLight,
+                  color: T.red,
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                + {t('addDue')}
+              </button>
+              <button
+                style={{
+                  padding: '8px 16px',
+                  background: T.teal,
+                  color: T.white,
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                + {t('addDeposit')}
+              </button>
+            </div>
           </div>
         </div>
 
