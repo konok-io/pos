@@ -3057,7 +3057,7 @@ export default function App() {
                 </div>
                 {/* Customer Input with Add Button */}
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center' }}>
+                  <div style={{ position: 'relative', flex: 1, display: 'flex', alignItems: 'center', marginRight: 6 }}>
                     {selectedCustomer ? (
                       <div style={{ 
                         flex: 1,
