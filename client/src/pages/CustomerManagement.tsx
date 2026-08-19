@@ -265,24 +265,26 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
                   >
                     <span>📋</span> {t('history')}
                   </button>
-                  <button
-                    onClick={() => handleDeleteCustomer(customer)}
-                    style={{
-                      padding: '8px 12px',
-                      background: T.redLight,
-                      color: T.red,
-                      border: 'none',
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    🗑️
-                  </button>
+                  {!customer.id.startsWith('20') && (
+                    <button
+                      onClick={() => handleDeleteCustomer(customer)}
+                      style={{
+                        padding: '8px 12px',
+                        background: T.redLight,
+                        color: T.red,
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  )}
                 </div>
               </div>
             ))
