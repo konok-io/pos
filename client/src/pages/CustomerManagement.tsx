@@ -323,7 +323,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                   >
                     📁 {t('browse')}
                   </button>
-                  {(avatar || isEditMode) && (
+                  {avatar && (
                     <button
                       onClick={handleRemovePhoto}
                       style={{
@@ -1434,6 +1434,15 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             {fmt(customerTotal)}
           </span>
         </div>
+
+        {/* Edit Customer Modal - accessible from regular customer view */}
+        <CustomerModal
+          isOpen={isEditCustomerModalOpen}
+          mode="edit"
+          customer={editingCustomer}
+          onClose={() => { setIsEditCustomerModalOpen(false); setEditingCustomer(null); }}
+          onSave={handleEditCustomer}
+        />
       </div>
     );
   }
