@@ -7557,7 +7557,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         )}
 
         {/* Data Reset Tab */}
-        {activeTab === 5 && (
+        {activeTab === 3 && (
           <div>
             {/* Warning */}
             <div style={{
