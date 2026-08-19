@@ -533,7 +533,7 @@ export const localDb = {
     const database = await initDatabase();
     const stores = ['stores', 'currencies', 'storeCurrencies', 'categories', 
                      'products', 'customers', 'sales', 'saleItems', 'users', 
-                     'syncQueue', 'settings'] as const;
+                     'syncQueue', 'settings', 'transactions'] as const;
     for (const storeName of stores) {
       await database.clear(storeName);
     }
