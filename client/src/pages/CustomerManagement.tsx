@@ -1306,6 +1306,12 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             </div>
           ) : (
             filteredCustomers.map((customer) => {
+              const customerDue = customer.balance > 0 ? customer.balance : 0;
+              const customerDeposit = customer.deposit || 0;
+              // Priority: Due > Deposit
+              const hasDue = customerDue > 0;
+              const hasDeposit = !hasDue && customerDeposit > 0;
+              
               return (
                 <div key={customer.id} style={{
                   background: T.white,
@@ -1354,17 +1360,17 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Action Buttons - Dynamic Due/Deposit */}
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    {/* History Button */}
+                    {/* Dynamic Button: Due or Deposit or History */}
                     <button
                       onClick={() => handleViewHistory(customer)}
                       style={{
                         flex: 1,
                         padding: '10px 12px',
-                        background: T.gray50,
-                        color: T.teal,
-                        border: `1px solid ${T.teal}`,
+                        background: hasDue ? '#D32F2F' : (hasDeposit ? T.tealDark : T.gray50),
+                        color: hasDue ? T.white : (hasDeposit ? T.white : T.teal),
+                        border: (hasDue || hasDeposit) ? 'none' : `1px solid ${T.teal}`,
                         borderRadius: '8px',
                         fontSize: '13px',
                         fontWeight: 700,
@@ -1375,7 +1381,15 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                         gap: '6px',
                       }}
                     >
-                      <span>📋</span> {isGeneralCustomer(customer) ? t('viewHistory') : t('history')}
+                      {hasDue ? (
+                        <><span>⚠️</span> {t('due')}: {fmt(customerDue)}</>
+                      ) : hasDeposit ? (
+                        <><span>💰</span> Deposit: {fmt(customerDeposit)}</>
+                      ) : isGeneralCustomer(customer) ? (
+                        <><span>📋</span> {t('viewHistory')}</>
+                      ) : (
+                        <><span>📋</span> {t('history')}</>
+                      )}
                     </button>
                     
                     {/* Delete Button */}
