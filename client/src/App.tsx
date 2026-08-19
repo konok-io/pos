@@ -3089,25 +3089,8 @@ export default function App() {
                       </div>
                     )}
                   </div>
-                  <button 
-                    onClick={() => {
-                      alert('কাস্টমার যোগ করার ফিচার শীঘ্রই আসছে!');
-                    }}
-                    style={{ 
-                      padding: '6px 10px', 
-                      borderRadius: 8, 
-                      border: 'none', 
-                      background: '#E0E0E0', 
-                      color: '#000000', 
-                      fontSize: 12, 
-                      fontWeight: 600, 
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap'
-                    }}>
-                    ➕ Add
-                  </button>
                 </div>
-                {/* Customer Input */}
+                {/* Customer Input with Add Button */}
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                   <div style={{ position: 'relative', flex: 1 }}>
                     <input
@@ -3129,6 +3112,23 @@ export default function App() {
                       style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                     />
                   </div>
+                  <button 
+                    onClick={() => {
+                      alert('কাস্টমার যোগ করার ফিচার শীঘ্রই আসছে!');
+                    }}
+                    style={{ 
+                      padding: '8px 12px', 
+                      borderRadius: 8, 
+                      border: 'none', 
+                      background: '#E0E0E0', 
+                      color: '#000000', 
+                      fontSize: 12, 
+                      fontWeight: 600, 
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}>
+                    ➕ Add
+                  </button>
                 </div>
               </div>
 
