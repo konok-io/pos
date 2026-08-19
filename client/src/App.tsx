@@ -1523,6 +1523,7 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerSearch, setCustomerSearch] = useState('');
+  const [cartCustomerInput, setCartCustomerInput] = useState('');
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState<string>('15');
   const [defaultVatPercent, setDefaultVatPercent] = useState(15);
@@ -2143,17 +2144,6 @@ export default function App() {
                     <input
                       value={customerSearch}
                       onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          // Find customer by exact ID match
-                          const exactMatch = customers.find(c => c.id === customerSearch.trim());
-                          if (exactMatch) {
-                            setSelectedCustomer(exactMatch);
-                            setCustomerSearch('');
-                          }
-                        }
-                      }}
                       placeholder={t('customerSearch')}
                       style={{ 
                         width: '100%', 
@@ -3066,12 +3056,58 @@ export default function App() {
                   <span style={{ background: '#115E59', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
                 </div>
                 {/* Customer Input with Add Button */}
-                <div style={{ display: 'flex', gap: 6 }}>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
                   <div style={{ position: 'relative', flex: 1 }}>
-                    <input
-                      placeholder={t('customerSearch')}
-                      style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
-                    />
+                    {selectedCustomer ? (
+                      <div style={{ 
+                        padding: '8px 12px', 
+                        borderRadius: 8, 
+                        border: '1.5px solid #10B981', 
+                        background: '#D1FAE5',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: '#065F46' }}>{selectedCustomer.name}</div>
+                          <div style={{ fontSize: 12, color: '#059669' }}>{selectedCustomer.phone}</div>
+                        </div>
+                        <button 
+                          onClick={() => { setSelectedCustomer(null); setCartCustomerInput(''); }}
+                          style={{ 
+                            padding: '4px 8px', 
+                            borderRadius: 6, 
+                            border: 'none', 
+                            background: '#FEE2E2', 
+                            color: '#DC2626', 
+                            fontSize: 12, 
+                            fontWeight: 600, 
+                            cursor: 'pointer'
+                          }}>
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <input
+                        value={cartCustomerInput}
+                        onChange={(e) => setCartCustomerInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            // Find customer by phone or ID
+                            const found = customers.find(c => 
+                              c.phone === cartCustomerInput.trim() || c.id === cartCustomerInput.trim()
+                            );
+                            if (found) {
+                              setSelectedCustomer(found);
+                              setCartCustomerInput('');
+                            }
+                          }
+                        }}
+                        placeholder="কাস্টমার নম্বর দিন"
+                        style={{ width: '100%', fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
+                      />
+                    )}
                   </div>
                   <button 
                     onClick={() => {
