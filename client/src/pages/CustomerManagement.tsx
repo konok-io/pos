@@ -197,66 +197,6 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
           </button>
         </div>
 
-        {/* General Customer Card */}
-        <div style={{
-          ...cardGridStyle,
-          marginBottom: '16px',
-        }}>
-          <div style={{
-            border: `2px solid ${T.teal}`,
-            borderRadius: '14px',
-            padding: '16px',
-            background: T.tealLight,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: T.teal,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '24px',
-              }}>
-                👤
-              </div>
-              <div>
-                <div style={{ fontWeight: 700, color: T.tealDark }}>{t('generalCustomer')}</div>
-                <div style={{ fontSize: '13px', color: T.gray600 }}>
-                  {t('generalCustomerDefault')}
-                </div>
-              </div>
-            </div>
-            <div style={{ fontSize: '14px', color: T.gray600 }}>
-              {t('total')} {fmt(generalCustomer?.balance || 0)}
-            </div>
-            <button
-              onClick={() => handleViewHistory(generalCustomer || null)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                background: T.teal,
-                color: T.white,
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-              }}
-            >
-              <span>📋</span> {t('viewHistory')}
-            </button>
-          </div>
-        </div>
-
         {/* Regular Customer Cards */}
         <div style={cardGridStyle}>
           {filteredCustomers.length === 0 ? (
