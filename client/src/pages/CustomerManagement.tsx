@@ -1243,50 +1243,50 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
           </div>
 
           {/* All Info in Single Line */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flex: 1, overflow: 'hidden' }}>
             {/* ID */}
             <div style={{ flexShrink: 0 }}>
-              <div style={{ fontSize: '9px', color: T.gray400, fontWeight: 600 }}>{t('id')}</div>
-              <div style={{ fontSize: '12px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.id}</div>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('id')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.id}</div>
             </div>
             
             {/* Name */}
             <div style={{ flexShrink: 0 }}>
-              <div style={{ fontSize: '9px', color: T.gray400, fontWeight: 600 }}>{t('name')}</div>
-              <div style={{ fontSize: '12px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.name}</div>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('name')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.name}</div>
             </div>
             
             {/* Phone */}
             <div style={{ flexShrink: 0 }}>
-              <div style={{ fontSize: '9px', color: T.gray400, fontWeight: 600 }}>{t('phone')}</div>
-              <div style={{ fontSize: '12px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.phone || '-'}</div>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('phone')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600 }}>{selectedCustomer.phone || '-'}</div>
             </div>
             
             {/* Address */}
-            <div style={{ flexShrink: 0, maxWidth: '100px' }}>
-              <div style={{ fontSize: '9px', color: T.gray400, fontWeight: 600 }}>{t('address')}</div>
-              <div style={{ fontSize: '12px', color: T.gray800, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedCustomer.address || '-'}</div>
+            <div style={{ flexShrink: 0, maxWidth: '120px' }}>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('address')}</div>
+              <div style={{ fontSize: '14px', color: T.gray800, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{selectedCustomer.address || '-'}</div>
             </div>
             
             {/* Divider */}
-            <div style={{ width: '1px', height: '30px', background: T.gray200, flexShrink: 0 }} />
+            <div style={{ width: '1px', height: '35px', background: T.gray200, flexShrink: 0 }} />
             
             {/* Total Purchases - BIG */}
             <div style={{ flexShrink: 0 }}>
-              <div style={{ fontSize: '9px', color: T.gray400, fontWeight: 600 }}>{t('totalPurchases')}</div>
-              <div style={{ fontSize: '20px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('totalPurchases')}</div>
+              <div style={{ fontSize: '22px', color: T.teal, fontWeight: 700 }}>{fmt(customerTotal)}</div>
             </div>
             
             {/* Due - BIG */}
             <div style={{ flexShrink: 0 }}>
-              <div style={{ fontSize: '9px', color: T.gray400, fontWeight: 600 }}>{t('due')}</div>
-              <div style={{ fontSize: '20px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('due')}</div>
+              <div style={{ fontSize: '22px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
             </div>
             
             {/* Deposit - BIG */}
             <div style={{ flexShrink: 0 }}>
-              <div style={{ fontSize: '9px', color: T.gray400, fontWeight: 600 }}>{t('deposit')}</div>
-              <div style={{ fontSize: '20px', color: T.green, fontWeight: 700 }}>{fmt(customerDeposit)}</div>
+              <div style={{ fontSize: '10px', color: T.gray400, fontWeight: 600 }}>{t('deposit')}</div>
+              <div style={{ fontSize: '22px', color: T.green, fontWeight: 700 }}>{fmt(customerDeposit)}</div>
             </div>
           </div>
 
