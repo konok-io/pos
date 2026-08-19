@@ -350,7 +350,7 @@ function DynamicMenu({tab, onTabChange, tabs}) {
           alignItems: 'center',
           overflowX: 'auto',
           gap: 2,
-          padding: '4px 4px',
+          padding: '4px 5px',
           background: 'rgba(15,118,110,0.03)',
           borderRadius: 12,
           border: `1px solid ${T.gray200}`,
