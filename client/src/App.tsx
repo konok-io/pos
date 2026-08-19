@@ -7108,32 +7108,34 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     }}>
       {/* Header with Tab Navigation */}
       <div style={{
-        background: 'linear-gradient(135deg, #0F766E 0%, #115E59 50%, #134E4A 100%)',
-        padding: '16px 24px',
+        background: '#FFFFFF',
+        padding: '0 24px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        height: 56,
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        borderBottom: '2px solid #115E59',
       }}>
         {/* Tab Navigation - Left */}
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 6 }}>
           {tabs.map((tab, i) => (
             <button
               key={i}
               onClick={() => setActiveTab(i)}
               style={{
-                padding: '8px 16px',
+                padding: '6px 14px',
                 border: 'none',
-                borderRadius: 8,
+                borderRadius: 6,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
                 fontSize: 13,
                 fontWeight: 600,
-                background: activeTab === i ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.15)',
-                color: activeTab === i ? '#0F766E' : '#fff',
+                background: activeTab === i ? '#115E59' : 'transparent',
+                color: activeTab === i ? '#fff' : '#374151',
                 whiteSpace: 'nowrap',
-                boxShadow: activeTab === i ? '0 4px 12px rgba(0,0,0,0.3)' : 'none',
               }}
             >
               <span>{tab.icon}</span>
@@ -7145,17 +7147,17 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         {/* Save Button - Right */}
         <button onClick={save} style={{
           padding: '8px 16px',
-          background: saved ? '#059669' : 'rgba(255,255,255,0.95)',
-          color: saved ? '#fff' : '#0F766E',
+          background: saved ? '#059669' : '#115E59',
+          color: '#fff',
           border: 'none',
-          borderRadius: 8,
+          borderRadius: 6,
           fontSize: 13,
-          fontWeight: 700,
+          fontWeight: 600,
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
           gap: 6,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         }}>
           {saved ? '✅ সংরক্ষিত' : '💾 সংরক্ষণ'}
         </button>
