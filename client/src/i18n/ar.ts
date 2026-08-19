@@ -129,6 +129,7 @@ export const ar: Record<string, string> = {
 
   // Products Screen
   addNewProduct: 'إضافة منتج جديد',
+  edit: 'تعديل',
   categoryNotInDB: 'الفئة غير موجودة في قاعدة البيانات',
   purchaseHistory: 'سجل المشتريات',
   goBack: 'العودة',

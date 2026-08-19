@@ -7,6 +7,7 @@ interface Customer {
   phone: string;
   address: string;
   balance: number;
+  avatar?: string;
 }
 
 interface CustomerManagementProps {
@@ -151,6 +152,7 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
       phone: phone.trim(),
       address: address.trim(),
       balance: 0,
+      avatar: avatar || undefined,
     };
 
     onSave(newCustomer);
@@ -793,8 +795,17 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                       fontSize: '22px',
                       color: T.white,
                       fontWeight: 700,
+                      overflow: 'hidden',
                     }}>
-                      {customer.name.charAt(0).toUpperCase()}
+                      {customer.avatar ? (
+                        <img 
+                          src={customer.avatar} 
+                          alt={customer.name} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        />
+                      ) : (
+                        customer.name.charAt(0).toUpperCase()
+                      )}
                     </div>
                     <div style={{ flex: 1 }}>
                       <div style={{ fontWeight: 700, color: T.gray800, fontSize: '15px' }}>{customer.name}</div>
@@ -1150,8 +1161,17 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
             color: T.white,
             fontWeight: 700,
             flexShrink: 0,
+            overflow: 'hidden',
           }}>
-            {selectedCustomer.name.charAt(0).toUpperCase()}
+            {selectedCustomer.avatar ? (
+              <img 
+                src={selectedCustomer.avatar} 
+                alt={selectedCustomer.name} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              />
+            ) : (
+              selectedCustomer.name.charAt(0).toUpperCase()
+            )}
           </div>
 
           {/* Info and Actions */}

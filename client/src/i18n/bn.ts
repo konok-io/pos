@@ -123,6 +123,7 @@ export const bn: Record<string, string> = {
 
   // Products Screen
   addNewProduct: 'নতুন পণ্য যোগ করুন',
+  edit: 'সম্পাদনা',
   uploadFailed: 'আপলোড ব্যর্থ!',
   productsNotFound: 'কোনো পণ্য পাওয়া যায়নি। CSV ফরম্যাট সঠিক নয়।',
   supplierNotInDB: 'সরবরাহকারী ডাটাবেজে নেই',

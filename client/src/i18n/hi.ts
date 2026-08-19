@@ -124,6 +124,7 @@ export const hi: Record<string, string> = {
 
   // Products Screen
   addNewProduct: 'नया उत्पाद जोड़ें',
+  edit: 'संपादित करें',
   purchaseHistory: 'खरीदारी इतिहास',
   goBack: 'वापस जाएं',
   noPurchaseRecords: 'कोई खरीद रिकॉर्ड नहीं',
