@@ -3496,6 +3496,12 @@ export default function App() {
             suppliers={suppliers}
             categories={categories}
             purchases={purchases}
+            setProducts={setProducts}
+            setCustomers={setCustomers}
+            setSales={setSales}
+            setSuppliers={setSuppliers}
+            setCategories={setCategories}
+            setPurchases={setPurchases}
             onRefresh={() => {
               setProducts([]);
               setCustomers([]);
@@ -6925,7 +6931,11 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 }
 
 // SettingsScreen Component - extracted from pages/SettingsScreen.tsx
-export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, onRefresh }: { products: any[]; customers: any[]; sales: any[]; suppliers: any[]; categories: any[]; purchases: any[]; onRefresh: () => void }) {
+export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, setProducts, setCustomers, setSales, setSuppliers, setCategories, setPurchases, onRefresh }: { 
+  products: any[]; customers: any[]; sales: any[]; suppliers: any[]; categories: any[]; purchases: any[];
+  setProducts: any; setCustomers: any; setSales: any; setSuppliers: any; setCategories: any; setPurchases: any;
+  onRefresh: () => void 
+}) {
   const { t } = useLanguage();
 
   const [form, setForm] = useState({
@@ -7025,6 +7035,30 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     } catch (error) {
       console.error('Failed to clear data:', error);
       alert('❌ ' + t('error') + '!');
+    }
+  };
+
+  // Helper function to delete all items of a type
+  const deleteAllItems = async (
+    storeName: string, 
+    items: any[], 
+    setItems: React.Dispatch<React.SetStateAction<any[]>>, 
+    translate: any
+  ) => {
+    if (items.length === 0) return;
+    
+    if (!confirm(translate('warningPermanentDelete'))) return;
+    
+    try {
+      for (const item of items) {
+        await db.delete(storeName, item.id).catch(() => {});
+      }
+      setItems([]);
+      onRefresh();
+      alert(translate('dataDeletedSuccessfully'));
+    } catch (error) {
+      console.error('Failed to delete items:', error);
+      alert('❌ ' + translate('error') + '!');
     }
   };
 
@@ -7509,189 +7543,357 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
         {/* Data Reset Tab */}
         {activeTab === 5 && (
-          <div>
-            <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+          <div style={{ maxWidth: 900, margin: '0 auto' }}>
+            {/* Header */}
+            <div style={{ 
+              background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+              borderRadius: 16, 
+              padding: 28, 
+              marginBottom: 24,
+              boxShadow: '0 10px 40px rgba(220, 38, 38, 0.3)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                 <div style={{
-                  width: 40, height: 40,
-                  background: '#dc2626',
-                  borderRadius: 10,
+                  width: 56, height: 56,
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: 14,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 20,
-                  color: '#fff'
+                  fontSize: 28,
                 }}>⚠️</div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('dataReset')}</h3>
-                  <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('useCautionDeleting')}</p>
+                  <h2 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: '#fff' }}>{t('dataReset')}</h2>
+                  <p style={{ margin: '6px 0 0', fontSize: 14, color: 'rgba(255,255,255,0.85)' }}>{t('useCautionDeleting')}</p>
                 </div>
               </div>
+            </div>
 
-              <div style={{
-                padding: '14px 18px',
-                background: '#fef2f2',
-                borderRadius: 10,
-                border: '1px solid #fecaca',
-                marginBottom: 20
+            {/* Warning Banner */}
+            <div style={{
+              padding: '16px 20px',
+              background: 'linear-gradient(90deg, #fef2f2 0%, #fee2e2 100%)',
+              borderRadius: 12,
+              border: '1px solid #fecaca',
+              marginBottom: 24,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12
+            }}>
+              <span style={{ fontSize: 24 }}>🔔</span>
+              <p style={{ margin: 0, fontSize: 14, color: '#991b1b', lineHeight: 1.5 }}>
+                {t('warningPermanentDelete')}
+              </p>
+            </div>
+
+            {/* Data Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
+              {/* Products */}
+              <div style={{ 
+                background: '#fff', 
+                borderRadius: 16, 
+                padding: 20, 
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s'
               }}>
-                <p style={{ margin: 0, fontSize: 13, color: '#dc2626', lineHeight: 1.6 }}>
-                  ⚠️ {t('warningPermanentDelete')}
-                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22
+                  }}>📦</div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{t('productData')}</h4>
+                    <span style={{ fontSize: 22, fontWeight: 800, color: '#3b82f6' }}>{products.length}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => deleteAllItems('products', products, setProducts, t)}
+                  disabled={products.length === 0}
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 16px', 
+                    background: products.length > 0 ? '#dc2626' : '#e5e7eb', 
+                    color: products.length > 0 ? '#fff' : '#9ca3af', 
+                    border: 'none', 
+                    borderRadius: 10, 
+                    fontSize: 13, 
+                    fontWeight: 600, 
+                    cursor: products.length > 0 ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s'
+                  }}>
+                  🗑️ {t('deleteAllProducts')}
+                </button>
               </div>
 
-              {/* Individual Data Delete Options */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
-                {/* Products */}
-                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>📦 {t('productData')}</h4>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{products.length} {t('items')}</span>
+              {/* Customers */}
+              <div style={{ 
+                background: '#fff', 
+                borderRadius: 16, 
+                padding: 20, 
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22
+                  }}>👥</div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{t('customerData')}</h4>
+                    <span style={{ fontSize: 22, fontWeight: 800, color: '#8b5cf6' }}>{customers.length}</span>
                   </div>
-                  <button
-                    onClick={() => {
-                      if (confirm(t('warningPermanentDelete'))) {
-                        products.forEach(async (p: any) => { await db.delete('products', p.id).catch(() => {}); });
-                        onRefresh();
-                        alert(t('dataDeletedSuccessfully'));
-                      }
-                    }}
-                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                    🗑️ {t('deleteAllProducts')}
-                  </button>
                 </div>
-
-                {/* Customers */}
-                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>👥 {t('customerData')}</h4>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{customers.length} {t('items')}</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (confirm(t('warningPermanentDelete'))) {
-                        customers.forEach(async (c: any) => { await db.delete('customers', c.id).catch(() => {}); });
-                        onRefresh();
-                        alert(t('dataDeletedSuccessfully'));
-                      }
-                    }}
-                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                    🗑️ {t('deleteAllCustomers')}
-                  </button>
-                </div>
-
-                {/* Categories */}
-                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>📂 {t('categoryData')}</h4>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{categories.length} {t('items')}</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (confirm(t('warningPermanentDelete'))) {
-                        categories.forEach(async (c: any) => { await db.delete('categories', c.id).catch(() => {}); });
-                        onRefresh();
-                        alert(t('dataDeletedSuccessfully'));
-                      }
-                    }}
-                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                    🗑️ {t('deleteAllCategories')}
-                  </button>
-                </div>
-
-                {/* Suppliers */}
-                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>🏢 {t('supplierData')}</h4>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{suppliers.length} {t('items')}</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (confirm(t('warningPermanentDelete'))) {
-                        suppliers.forEach(async (s: any) => { await db.delete('suppliers', s.id).catch(() => {}); });
-                        onRefresh();
-                        alert(t('dataDeletedSuccessfully'));
-                      }
-                    }}
-                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                    🗑️ {t('deleteAllSuppliers')}
-                  </button>
-                </div>
-
-                {/* Sales */}
-                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>🛒 {t('salesData')}</h4>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{sales.length} {t('items')}</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (confirm(t('warningPermanentDelete'))) {
-                        sales.forEach(async (s: any) => { await db.delete('sales', s.id).catch(() => {}); });
-                        onRefresh();
-                        alert(t('dataDeletedSuccessfully'));
-                      }
-                    }}
-                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                    🗑️ {t('deleteAllSales')}
-                  </button>
-                </div>
-
-                {/* Purchases */}
-                <div style={{ padding: 16, background: '#fef2f2', borderRadius: 10, border: '1px solid #fecaca' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                    <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>🛒 {t('purchaseHistory')}</h4>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#dc2626' }}>{purchases.length} {t('items')}</span>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (confirm(t('warningPermanentDelete'))) {
-                        purchases.forEach(async (p: any) => { await db.delete('purchases', p.id).catch(() => {}); });
-                        onRefresh();
-                        alert(t('dataDeletedSuccessfully'));
-                      }
-                    }}
-                    style={{ width: '100%', padding: '8px 12px', background: '#dc2626', color: '#fff', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-                    🗑️ {t('deletePurchaseHistory')}
-                  </button>
-                </div>
+                <button
+                  onClick={() => deleteAllItems('customers', customers, setCustomers, t)}
+                  disabled={customers.length === 0}
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 16px', 
+                    background: customers.length > 0 ? '#dc2626' : '#e5e7eb', 
+                    color: customers.length > 0 ? '#fff' : '#9ca3af', 
+                    border: 'none', 
+                    borderRadius: 10, 
+                    fontSize: 13, 
+                    fontWeight: 600, 
+                    cursor: customers.length > 0 ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s'
+                  }}>
+                  🗑️ {t('deleteAllCustomers')}
+                </button>
               </div>
 
-              {/* Full Reset - Danger Zone */}
-              <div style={{ marginTop: 24, padding: 20, background: '#fef2f2', borderRadius: 12, border: '2px solid #dc2626' }}>
-                <h4 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 700, color: '#dc2626' }}>💥 {t('fullReset')}</h4>
-                <p style={{ margin: '0 0 16px', fontSize: 13, color: '#64748b' }}>
-                  {t('fullResetDescription')}
-                </p>
+              {/* Categories */}
+              <div style={{ 
+                background: '#fff', 
+                borderRadius: 16, 
+                padding: 20, 
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22
+                  }}>📂</div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{t('categoryData')}</h4>
+                    <span style={{ fontSize: 22, fontWeight: 800, color: '#10b981' }}>{categories.length}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => deleteAllItems('categories', categories, setCategories, t)}
+                  disabled={categories.length === 0}
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 16px', 
+                    background: categories.length > 0 ? '#dc2626' : '#e5e7eb', 
+                    color: categories.length > 0 ? '#fff' : '#9ca3af', 
+                    border: 'none', 
+                    borderRadius: 10, 
+                    fontSize: 13, 
+                    fontWeight: 600, 
+                    cursor: categories.length > 0 ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s'
+                  }}>
+                  🗑️ {t('deleteAllCategories')}
+                </button>
+              </div>
+
+              {/* Suppliers */}
+              <div style={{ 
+                background: '#fff', 
+                borderRadius: 16, 
+                padding: 20, 
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22
+                  }}>🏢</div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{t('supplierData')}</h4>
+                    <span style={{ fontSize: 22, fontWeight: 800, color: '#f59e0b' }}>{suppliers.length}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => deleteAllItems('suppliers', suppliers, setSuppliers, t)}
+                  disabled={suppliers.length === 0}
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 16px', 
+                    background: suppliers.length > 0 ? '#dc2626' : '#e5e7eb', 
+                    color: suppliers.length > 0 ? '#fff' : '#9ca3af', 
+                    border: 'none', 
+                    borderRadius: 10, 
+                    fontSize: 13, 
+                    fontWeight: 600, 
+                    cursor: suppliers.length > 0 ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s'
+                  }}>
+                  🗑️ {t('deleteAllSuppliers')}
+                </button>
+              </div>
+
+              {/* Sales */}
+              <div style={{ 
+                background: '#fff', 
+                borderRadius: 16, 
+                padding: 20, 
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    background: 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22
+                  }}>🛒</div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{t('salesData')}</h4>
+                    <span style={{ fontSize: 22, fontWeight: 800, color: '#ec4899' }}>{sales.length}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => deleteAllItems('sales', sales, setSales, t)}
+                  disabled={sales.length === 0}
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 16px', 
+                    background: sales.length > 0 ? '#dc2626' : '#e5e7eb', 
+                    color: sales.length > 0 ? '#fff' : '#9ca3af', 
+                    border: 'none', 
+                    borderRadius: 10, 
+                    fontSize: 13, 
+                    fontWeight: 600, 
+                    cursor: sales.length > 0 ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s'
+                  }}>
+                  🗑️ {t('deleteAllSales')}
+                </button>
+              </div>
+
+              {/* Purchases */}
+              <div style={{ 
+                background: '#fff', 
+                borderRadius: 16, 
+                padding: 20, 
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                  <div style={{
+                    width: 44, height: 44,
+                    background: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 22
+                  }}>📥</div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#1e293b' }}>{t('purchaseHistoryDelete')}</h4>
+                    <span style={{ fontSize: 22, fontWeight: 800, color: '#06b6d4' }}>{purchases.length}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => deleteAllItems('purchases', purchases, setPurchases, t)}
+                  disabled={purchases.length === 0}
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px 16px', 
+                    background: purchases.length > 0 ? '#dc2626' : '#e5e7eb', 
+                    color: purchases.length > 0 ? '#fff' : '#9ca3af', 
+                    border: 'none', 
+                    borderRadius: 10, 
+                    fontSize: 13, 
+                    fontWeight: 600, 
+                    cursor: purchases.length > 0 ? 'pointer' : 'not-allowed',
+                    transition: 'all 0.2s'
+                  }}>
+                  🗑️ {t('deletePurchaseHistory')}
+                </button>
+              </div>
+            </div>
+
+            {/* Full Reset - Danger Zone */}
+            <div style={{ 
+              marginTop: 24, 
+              padding: 28, 
+              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)', 
+              borderRadius: 20, 
+              border: '2px solid #dc2626',
+              boxShadow: '0 8px 32px rgba(220, 38, 38, 0.15)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <span style={{ fontSize: 32 }}>💥</span>
+                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#dc2626' }}>{t('fullReset')}</h3>
+              </div>
+              <p style={{ margin: '0 0 20px', fontSize: 14, color: '#991b1b' }}>
+                {t('fullResetDescription')}
+              </p>
+              
+              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                 <input
                   value={confirmText}
                   onChange={e => setConfirmText(e.target.value)}
                   placeholder={t('typeDeleteToConfirm')}
                   style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    fontSize: 14,
-                    border: '2px solid #dc2626',
-                    borderRadius: 8,
+                    flex: 1,
+                    padding: '14px 18px',
+                    fontSize: 15,
+                    border: `2px solid ${confirmText === 'Delete' ? '#10b981' : '#dc2626'}`,
+                    borderRadius: 12,
                     outline: 'none',
-                    boxSizing: 'border-box',
-                    marginBottom: 12,
-                    background: '#fff'
+                    background: '#fff',
+                    transition: 'border-color 0.2s'
                   }}
                 />
                 <button
                   onClick={clearAll}
                   disabled={confirmText !== 'Delete'}
                   style={{
-                    width: '100%',
-                    padding: '12px 20px',
-                    background: confirmText === 'Delete' ? '#991b1b' : '#9ca3af',
-                    color: '#fff',
+                    padding: '14px 28px',
+                    background: confirmText === 'Delete' ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)' : '#e5e7eb',
+                    color: confirmText === 'Delete' ? '#fff' : '#9ca3af',
                     border: 'none',
-                    borderRadius: 8,
-                    fontSize: 14,
+                    borderRadius: 12,
+                    fontSize: 15,
                     fontWeight: 700,
-                    cursor: confirmText === 'Delete' ? 'pointer' : 'not-allowed'
+                    cursor: confirmText === 'Delete' ? 'pointer' : 'not-allowed',
+                    boxShadow: confirmText === 'Delete' ? '0 4px 16px rgba(220, 38, 38, 0.4)' : 'none',
+                    transition: 'all 0.2s'
                   }}
                 >
                   💥 {t('deleteAllData')}
