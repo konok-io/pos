@@ -383,4 +383,6 @@ export const hi: Record<string, string> = {
   deleting: 'हटाया जा रहा है...',
   generalCustomerCannotDelete: 'सामान्य ग्राहक को हटाया नहीं जा सकता',
   noCustomersToDelete: 'हटाने के लिए कोई ग्राहक नहीं',
+  readyToDelete: 'सभी डेटा हटाने के लिए तैयार',
+  typeToConfirm: 'सक्षम करने के लिए "Delete" टाइप करें',
 };

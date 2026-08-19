@@ -392,4 +392,6 @@ export const bn: Record<string, string> = {
   deleting: 'মুছা হচ্ছে...',
   generalCustomerCannotDelete: 'জেনারেল কাস্টমার মুছে ফেলা যাবে না',
   noCustomersToDelete: 'মুছার জন্য কোনো কাস্টমার নেই',
+  readyToDelete: 'সব ডেটা মুছার জন্য প্রস্তুত',
+  typeToConfirm: 'সক্রিয় করতে "Delete" লিখুন',
 };

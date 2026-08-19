@@ -7890,55 +7890,160 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
             {/* Full Reset - Danger Zone */}
             <div style={{ 
-              marginTop: 24, 
-              padding: 28, 
-              background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)', 
+              marginTop: 32, 
+              padding: 0, 
+              background: '#fff',
               borderRadius: 20, 
               border: '2px solid #dc2626',
+              overflow: 'hidden',
               boxShadow: '0 8px 32px rgba(220, 38, 38, 0.15)'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                <span style={{ fontSize: 32 }}>💥</span>
-                <h3 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: '#dc2626' }}>{t('fullReset')}</h3>
+              {/* Red Header */}
+              <div style={{ 
+                background: 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)',
+                padding: '24px 28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <div style={{
+                    width: 52, height: 52,
+                    background: 'rgba(255,255,255,0.2)',
+                    borderRadius: 14,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 26
+                  }}>💥</div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#fff' }}>{t('fullReset')}</h3>
+                    <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
+                      {t('fullResetDescription')}
+                    </p>
+                  </div>
+                </div>
+                <div style={{
+                  padding: '8px 16px',
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: 30,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8
+                }}>
+                  <span style={{ fontSize: 18 }}>⚠️</span>
+                  <span style={{ color: '#fff', fontWeight: 600, fontSize: 13 }}>DANGER</span>
+                </div>
               </div>
-              <p style={{ margin: '0 0 20px', fontSize: 14, color: '#991b1b' }}>
-                {t('fullResetDescription')}
-              </p>
-              
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <input
-                  value={confirmText}
-                  onChange={e => setConfirmText(e.target.value)}
-                  placeholder={t('typeDeleteToConfirm')}
-                  style={{
-                    flex: 1,
-                    padding: '14px 18px',
-                    fontSize: 15,
-                    border: `2px solid ${confirmText === 'Delete' ? '#10b981' : '#dc2626'}`,
-                    borderRadius: 12,
-                    outline: 'none',
-                    background: '#fff',
-                    transition: 'border-color 0.2s'
-                  }}
-                />
+
+              {/* Input Section */}
+              <div style={{ padding: '28px' }}>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: 10, 
+                    fontSize: 14, 
+                    fontWeight: 600, 
+                    color: '#64748b' 
+                  }}>
+                    🔑 {t('typeDeleteToConfirm')}
+                  </label>
+                  <input
+                    value={confirmText}
+                    onChange={e => setConfirmText(e.target.value)}
+                    placeholder={t('typeDeleteToConfirm')}
+                    style={{
+                      width: '100%',
+                      padding: '16px 20px',
+                      fontSize: 16,
+                      border: `2px solid ${confirmText === 'Delete' ? '#10b981' : '#e5e7eb'}`,
+                      borderRadius: 12,
+                      outline: 'none',
+                      background: '#f9fafb',
+                      transition: 'all 0.3s',
+                      boxSizing: 'border-box',
+                      textAlign: 'center',
+                      fontWeight: 600,
+                      letterSpacing: confirmText === 'Delete' ? '2px' : 'normal'
+                    }}
+                  />
+                </div>
+
+                {/* Status Indicator */}
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  gap: 8,
+                  marginBottom: 20,
+                  padding: '12px',
+                  background: confirmText === 'Delete' ? '#f0fdf4' : '#fef2f2',
+                  borderRadius: 10,
+                  transition: 'all 0.3s'
+                }}>
+                  {confirmText === 'Delete' ? (
+                    <>
+                      <span style={{ fontSize: 18 }}>✅</span>
+                      <span style={{ color: '#166534', fontWeight: 600, fontSize: 14 }}>
+                        {t('readyToDelete') || 'Ready to delete all data'}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span style={{ fontSize: 18 }}>⏳</span>
+                      <span style={{ color: '#991b1b', fontWeight: 600, fontSize: 14 }}>
+                        {t('typeToConfirm') || 'Type "Delete" to enable'}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {/* Delete Button */}
                 <button
                   onClick={clearAll}
                   disabled={confirmText !== 'Delete'}
                   style={{
-                    padding: '14px 28px',
-                    background: confirmText === 'Delete' ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)' : '#e5e7eb',
+                    width: '100%',
+                    padding: '18px 28px',
+                    background: confirmText === 'Delete' 
+                      ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 50%, #7f1d1d 100%)' 
+                      : '#e5e7eb',
                     color: confirmText === 'Delete' ? '#fff' : '#9ca3af',
                     border: 'none',
-                    borderRadius: 12,
-                    fontSize: 15,
+                    borderRadius: 14,
+                    fontSize: 17,
                     fontWeight: 700,
                     cursor: confirmText === 'Delete' ? 'pointer' : 'not-allowed',
-                    boxShadow: confirmText === 'Delete' ? '0 4px 16px rgba(220, 38, 38, 0.4)' : 'none',
-                    transition: 'all 0.2s'
+                    boxShadow: confirmText === 'Delete' 
+                      ? '0 8px 24px rgba(220, 38, 38, 0.5), inset 0 1px 0 rgba(255,255,255,0.2)' 
+                      : 'none',
+                    transition: 'all 0.3s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 12
                   }}
                 >
-                  💥 {t('deleteAllData')}
+                  <span style={{ fontSize: 22 }}>💥</span>
+                  <span>{t('deleteAllData')}</span>
                 </button>
+
+                {/* Warning Footer */}
+                <div style={{ 
+                  marginTop: 16, 
+                  padding: '12px 16px',
+                  background: '#fef2f2',
+                  borderRadius: 10,
+                  border: '1px solid #fecaca',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10
+                }}>
+                  <span style={{ fontSize: 16 }}>🔔</span>
+                  <p style={{ margin: 0, fontSize: 12, color: '#991b1b', lineHeight: 1.5 }}>
+                    {t('warningPermanentDelete')}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

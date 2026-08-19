@@ -388,4 +388,6 @@ export const ar: Record<string, string> = {
   deleting: 'جارٍ الحذف...',
   generalCustomerCannotDelete: 'لا يمكن حذف العميل العام',
   noCustomersToDelete: 'لا يوجد عملاء لحذفهم',
+  readyToDelete: 'جاهز لحذف جميع البيانات',
+  typeToConfirm: 'اكتب "Delete" للتفعيل',
 };

@@ -421,4 +421,6 @@ export const en: Record<string, string> = {
   deleting: 'Deleting...',
   generalCustomerCannotDelete: 'General customer cannot be deleted',
   noCustomersToDelete: 'No customers to delete',
+  readyToDelete: 'Ready to delete all data',
+  typeToConfirm: 'Type "Delete" to enable',
 };
