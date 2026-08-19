@@ -26,8 +26,10 @@ const T = {
   tealDark: '#115E59',
   tealLight: '#F0FDFA',
   tealMid: '#CCFBF1',
+  tealDark2: '#00796B',
   red: '#DC2626',
   redLight: '#FEF2F2',
+  redSolid: '#D32F2F',
   gray50: '#F9FAFB',
   gray100: '#F3F4F6',
   gray200: '#E5E7EB',
@@ -1263,28 +1265,11 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                 <div style={{ fontSize: '14px', color: T.red, fontWeight: 700 }}>{fmt(customerDue)}</div>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
               <button
                 style={{
-                  padding: '8px 16px',
-                  background: T.redLight,
-                  color: T.red,
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                }}
-              >
-                + {t('addDue')}
-              </button>
-              <button
-                style={{
-                  padding: '8px 16px',
-                  background: T.teal,
+                  padding: '10px 20px',
+                  background: T.redSolid,
                   color: T.white,
                   border: 'none',
                   borderRadius: '8px',
@@ -1293,10 +1278,27 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
+                  gap: '8px',
                 }}
               >
-                + {t('addDeposit')}
+                📋 {t('addDue')}
+              </button>
+              <button
+                style={{
+                  padding: '10px 20px',
+                  background: T.tealDark2,
+                  color: T.white,
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                }}
+              >
+                💰 {t('addDeposit')}
               </button>
             </div>
           </div>
