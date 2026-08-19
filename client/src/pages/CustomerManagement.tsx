@@ -1160,93 +1160,61 @@ export default function CustomerManagement({ customers, setCustomers, sales, onD
           </button>
         </div>
 
-        {/* General Customer Card */}
-        {generalCustomer && (
-          <div style={{
-            border: `2px solid ${T.tealDark}`,
-            borderRadius: '14px',
-            padding: '16px',
-            background: '#E8F5E9',
-            marginBottom: '16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '12px',
-          }}>
-            {/* Header Row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '52px',
-                height: '52px',
-                borderRadius: '50%',
-                background: T.tealDark,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '24px',
-              }}>
-                👤
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 700, color: T.tealDark, fontSize: '15px' }}>
-                  {t('generalCustomer')}
-                </div>
-                <div style={{ fontSize: '12px', color: T.gray600 }}>
-                  {t('generalCustomerDefault')}
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray600, textTransform: 'uppercase' }}>{t('total')}</div>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{fmt(generalCustomer?.balance || 0)}</div>
-              </div>
-            </div>
-            {/* Action Buttons */}
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {/* View History Button */}
-              <button
-                onClick={() => handleViewHistory(generalCustomer)}
-                style={{
-                  flex: 1,
-                  padding: '12px',
-                  background: T.teal,
-                  color: T.white,
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                }}
-              >
-                <span>📋</span> {t('viewHistory')}
-              </button>
-              {/* Delete Button - Always Disabled for General Customer */}
-              <div
-                style={{
-                  padding: '12px 16px',
-                  background: T.gray100,
-                  color: T.gray400,
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  cursor: 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: 0.5,
-                  userSelect: 'none',
-                }}
-              >
-                🗑️
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Regular Customer Cards */}
+        {/* Customer Cards Grid */}
         <div style={cardGridStyle}>
-          {filteredCustomers.length === 0 ? (
+          {/* General Customer Card - First */}
+          {generalCustomer && (
+            <div style={{
+              background: T.white,
+              borderRadius: '14px',
+              padding: '16px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              border: `2px solid ${T.tealDark}`,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '52px',
+                  height: '52px',
+                  borderRadius: '50%',
+                  background: T.tealDark,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '22px',
+                  color: T.white,
+                  fontWeight: 700,
+                }}>
+                  👤
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, color: T.tealDark, fontSize: '15px' }}>{t('generalCustomer')}</div>
+                  <div style={{ fontSize: '12px', color: T.gray600 }}>{t('generalCustomerDefault')}</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{fmt(generalCustomer.balance || 0)}</div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={() => handleViewHistory(generalCustomer)} style={{
+                  flex: 1, padding: '12px', background: T.teal, color: T.white, border: 'none',
+                  borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                }}>
+                  <span>📋</span> {t('viewHistory')}
+                </button>
+                <div style={{ padding: '12px 16px', background: T.gray100, color: T.gray400, borderRadius: '10px', fontSize: '14px', cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}>
+                  🗑️
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Regular Customers */}
+          {filteredCustomers.length === 0 && !generalCustomer ? (
             <div style={{
               ...cardGridStyle,
               gridColumn: '1 / -1',
