@@ -426,5 +426,6 @@ export const en: Record<string, string> = {
 
   // Settings Tabs
   generalInfo: 'General Info',
+  design: 'Design',
   saveSettings: 'Save Settings',
 };

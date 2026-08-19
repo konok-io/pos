@@ -393,5 +393,6 @@ export const ar: Record<string, string> = {
 
   // Settings Tabs
   generalInfo: 'معلومات عامة',
+  design: 'التصميم',
   saveSettings: 'حفظ الإعدادات',
 };
