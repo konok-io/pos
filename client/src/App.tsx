@@ -7062,6 +7062,36 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     }
   };
 
+  // Helper function to delete all customers except general customer
+  const deleteAllCustomers = async (
+    customers: any[], 
+    setCustomers: React.Dispatch<React.SetStateAction<any[]>>, 
+    translate: any
+  ) => {
+    const deletableCustomers = customers.filter(c => !c.isSystem);
+    
+    if (deletableCustomers.length === 0) {
+      alert(translate('noCustomersToDelete') || 'No customers to delete');
+      return;
+    }
+    
+    if (!confirm(translate('warningPermanentDelete'))) return;
+    
+    try {
+      for (const customer of deletableCustomers) {
+        await db.delete('customers', customer.id).catch(() => {});
+      }
+      // Keep only system customers (general customer)
+      const remainingCustomers = customers.filter(c => c.isSystem);
+      setCustomers(remainingCustomers);
+      onRefresh();
+      alert(translate('dataDeletedSuccessfully'));
+    } catch (error) {
+      console.error('Failed to delete customers:', error);
+      alert('❌ ' + translate('error') + '!');
+    }
+  };
+
   const tabs = [
     { icon: '⚙️', label: t('settings') },
     { icon: '🎨', label: t('design') || 'Design' },
@@ -7631,7 +7661,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 </button>
               </div>
 
-              {/* Customers */}
+                              {/* Customers */}
               <div style={{ 
                 background: '#fff', 
                 borderRadius: 16, 
@@ -7655,19 +7685,30 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     <span style={{ fontSize: 22, fontWeight: 800, color: '#8b5cf6' }}>{customers.length}</span>
                   </div>
                 </div>
+                <div style={{ 
+                  padding: '8px 12px', 
+                  background: '#f0fdf4', 
+                  borderRadius: 8, 
+                  border: '1px solid #bbf7d0',
+                  fontSize: 12,
+                  color: '#166534',
+                  marginBottom: 8
+                }}>
+                  ℹ️ {t('generalCustomerCannotDelete') || 'General customer cannot be deleted'}
+                </div>
                 <button
-                  onClick={() => deleteAllItems('customers', customers, setCustomers, t)}
-                  disabled={customers.length === 0}
+                  onClick={() => deleteAllCustomers(customers, setCustomers, t)}
+                  disabled={customers.length <= 1}
                   style={{ 
                     width: '100%', 
                     padding: '10px 16px', 
-                    background: customers.length > 0 ? '#dc2626' : '#e5e7eb', 
-                    color: customers.length > 0 ? '#fff' : '#9ca3af', 
+                    background: customers.length > 1 ? '#dc2626' : '#e5e7eb', 
+                    color: customers.length > 1 ? '#fff' : '#9ca3af', 
                     border: 'none', 
                     borderRadius: 10, 
                     fontSize: 13, 
                     fontWeight: 600, 
-                    cursor: customers.length > 0 ? 'pointer' : 'not-allowed',
+                    cursor: customers.length > 1 ? 'pointer' : 'not-allowed',
                     transition: 'all 0.2s'
                   }}>
                   🗑️ {t('deleteAllCustomers')}

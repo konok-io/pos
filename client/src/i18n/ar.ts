@@ -386,4 +386,6 @@ export const ar: Record<string, string> = {
   warning: 'تحذير',
   saving: 'جارٍ الحفظ...',
   deleting: 'جارٍ الحذف...',
+  generalCustomerCannotDelete: 'لا يمكن حذف العميل العام',
+  noCustomersToDelete: 'لا يوجد عملاء لحذفهم',
 };

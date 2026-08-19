@@ -381,4 +381,6 @@ export const hi: Record<string, string> = {
   warning: 'चेतावनी',
   saving: 'सहेजा जा रहा है...',
   deleting: 'हटाया जा रहा है...',
+  generalCustomerCannotDelete: 'सामान्य ग्राहक को हटाया नहीं जा सकता',
+  noCustomersToDelete: 'हटाने के लिए कोई ग्राहक नहीं',
 };

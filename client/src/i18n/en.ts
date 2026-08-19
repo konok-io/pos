@@ -419,4 +419,6 @@ export const en: Record<string, string> = {
   warning: 'Warning',
   saving: 'Saving...',
   deleting: 'Deleting...',
+  generalCustomerCannotDelete: 'General customer cannot be deleted',
+  noCustomersToDelete: 'No customers to delete',
 };

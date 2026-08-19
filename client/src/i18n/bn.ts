@@ -390,4 +390,6 @@ export const bn: Record<string, string> = {
   warning: 'সতর্কতা',
   saving: 'সংরক্ষণ হচ্ছে...',
   deleting: 'মুছা হচ্ছে...',
+  generalCustomerCannotDelete: 'জেনারেল কাস্টমার মুছে ফেলা যাবে না',
+  noCustomersToDelete: 'মুছার জন্য কোনো কাস্টমার নেই',
 };
