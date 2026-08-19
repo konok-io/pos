@@ -3,6 +3,7 @@ import './index.css';
 import { useLanguage, languages } from './i18n';
 import SettingsScreen from './pages/SettingsScreen';
 import SuppliersScreen from './pages/SuppliersScreen';
+import CustomerManagement from './pages/CustomerManagement';
 import { db } from './utils/db';
 import { localDb } from './services';
 
@@ -3318,35 +3319,11 @@ export default function App() {
         )}
 
         {currentTab === 'customers' && (
-          <div>
-            <h2 style={{ marginBottom: 16 }}>👥 {t('customerList')}</h2>
-            <div className="table-container">
-              <table>
-                <thead>
-                  <tr>
-                    <th>{t('name')}</th>
-                    <th>{t('phone')}</th>
-                    <th>{t('address')}</th>
-                    <th>{t('balance')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {customers.map(c => (
-                    <tr key={c.id}>
-                      <td>{c.name}</td>
-                      <td>{c.phone}</td>
-                      <td>{c.address}</td>
-                      <td>
-                        <span className={`badge ${c.balance > 0 ? 'badge-danger' : 'badge-success'}`}>
-                          {fmt(c.balance)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <CustomerManagement
+            customers={customers}
+            setCustomers={setCustomers}
+            sales={sales}
+          />
         )}
 
         {currentTab === 'reports' && (
