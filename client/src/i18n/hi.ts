@@ -159,6 +159,11 @@ export const hi: Record<string, string> = {
   credit: 'उधार',
   balance: 'शेष',
   balanceDue: 'बकाया',
+  generalCustomer: 'सामान्य ग्राहक',
+  generalCustomerDefault: '(डिफ़ॉल्ट)',
+  viewHistory: 'इतिहास देखें',
+  selectCustomer: 'चुनें',
+  customerId: 'ग्राहक आईडी',
 
   // Purchases
   purchaseList: 'खरीदारी सूची',
@@ -270,13 +275,13 @@ export const hi: Record<string, string> = {
   importing: 'डेटा इम्पोर्ट हो रहा है...',
   
   // Empty State
-  readyForNewSale: 'Ready for a New Sale',
-  scanBarcode: 'Scan a barcode or search for a product',
-  scanItem: 'Scan Item',
-  addProductEmpty: 'Add Product',
-  quickShortcuts: 'Quick Shortcuts',
-  f2Search: 'F2 Search',
-  f4Hold: 'F4 Hold',
-  f8Payment: 'F8 Payment',
-  escClear: 'ESC Clear',
+  readyForNewSale: 'नई बिक्री के लिए तैयार',
+  scanBarcode: 'बारकोड स्कैन करें या उत्पाद खोजें',
+  scanItem: 'आइटम स्कैन',
+  addProductEmpty: 'उत्पाद जोड़ें',
+  quickShortcuts: 'क्विक शॉर्टकट',
+  f2Search: 'F2 खोज',
+  f4Hold: 'F4 होल्ड',
+  f8Payment: 'F8 भुगतान',
+  escClear: 'ESC क्लियर',
 };

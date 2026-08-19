@@ -198,6 +198,10 @@ export const en: Record<string, string> = {
   credit: 'Credit',
   balance: 'Balance',
   balanceDue: 'Balance Due',
+  generalCustomer: 'General Customer',
+  generalCustomerDefault: '(Default)',
+  viewHistory: 'View History',
+  customerId: 'Customer ID',
 
   // Purchases
   purchaseList: 'Purchase List',

@@ -168,6 +168,10 @@ export const bn: Record<string, string> = {
   credit: 'বাকি',
   balance: 'ব্যালেন্স',
   balanceDue: 'বাকি',
+  generalCustomer: 'সাধারণ কাস্টমার',
+  generalCustomerDefault: '(ডিফল্ট)',
+  viewHistory: 'হিস্ট্রি দেখুন',
+  customerId: 'কাস্টমার আইডি',
 
   // Purchases
   purchaseList: 'ক্রয় তালিকা',
@@ -280,13 +284,13 @@ export const bn: Record<string, string> = {
   importing: 'ডাটা ইমপোর্ট হচ্ছে...',
   
   // Empty State
-  readyForNewSale: 'Ready for a New Sale',
-  scanBarcode: 'Scan a barcode or search for a product',
-  scanItem: 'Scan Item',
-  addProductEmpty: 'Add Product',
-  quickShortcuts: 'Quick Shortcuts',
-  f2Search: 'F2 Search',
-  f4Hold: 'F4 Hold',
-  f8Payment: 'F8 Payment',
-  escClear: 'ESC Clear',
+  readyForNewSale: 'নতুন বিক্রয়ের জন্য প্রস্তুত',
+  scanBarcode: 'বারকোড স্ক্যান করুন বা পণ্য খুঁজুন',
+  scanItem: 'আইটেম স্ক্যান',
+  addProductEmpty: 'পণ্য যোগ',
+  quickShortcuts: 'কুইক শর্টকাট',
+  f2Search: 'F2 সার্চ',
+  f4Hold: 'F4 হোল্ড',
+  f8Payment: 'F8 পেমেন্ট',
+  escClear: 'ESC ক্লিয়ার',
 };

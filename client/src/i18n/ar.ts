@@ -164,6 +164,11 @@ export const ar: Record<string, string> = {
   credit: 'الذمم المدينة',
   balance: 'الرصيد',
   balanceDue: 'المبلغ المستحق',
+  generalCustomer: 'عميل عام',
+  generalCustomerDefault: '(افتراضي)',
+  viewHistory: 'عرض السجل',
+  selectCustomer: 'اختيار',
+  customerId: 'رقم العميل',
 
   // Purchases
   purchaseList: 'قائمة المشتريات',
@@ -275,13 +280,13 @@ export const ar: Record<string, string> = {
   importing: 'جاري الاستيراد...',
   
   // Empty State
-  readyForNewSale: 'Ready for a New Sale',
-  scanBarcode: 'Scan a barcode or search for a product',
-  scanItem: 'Scan Item',
-  addProductEmpty: 'Add Product',
-  quickShortcuts: 'Quick Shortcuts',
-  f2Search: 'F2 Search',
-  f4Hold: 'F4 Hold',
-  f8Payment: 'F8 Payment',
-  escClear: 'ESC Clear',
+  readyForNewSale: 'جاهز لبيع جديد',
+  scanBarcode: 'امسح الباركود أو ابحث عن منتج',
+  scanItem: 'مسح العنصر',
+  addProductEmpty: 'إضافة منتج',
+  quickShortcuts: 'اختصارات سريعة',
+  f2Search: 'F2 بحث',
+  f4Hold: 'F4 تعليق',
+  f8Payment: 'F8 دفع',
+  escClear: 'ESC مسح',
 };

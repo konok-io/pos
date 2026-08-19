@@ -14,6 +14,16 @@ const fmtN = (n) => (+n||0).toLocaleString('en-IN');
 const today = () => new Date().toISOString().split('T')[0];
 const now = () => new Date().toISOString();
 
+// Generate Customer ID: YY + MM + DD + 7 random digits
+const generateGeneralCustomerId = () => {
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const random = Math.floor(Math.random() * 10000000).toString().padStart(7, '0');
+  return `${yy}${mm}${dd}${random}`;
+};
+
 /* --------------- BANNER IMAGE UPLOAD --------------- */
 function BannerImageUpload({ value, onChange }) {
   const [preview, setPreview] = useState('');
@@ -700,7 +710,18 @@ function MainApp({ currentUser, onLogout }) {
         
         // Ensure all data arrays are valid
         setProducts(Array.isArray(data.products) ? data.products : []);
-        setCustomers(Array.isArray(data.customers) ? data.customers : []);
+        
+        // Ensure default General Customer exists
+        let loadedCustomers = Array.isArray(data.customers) ? data.customers : [];
+        const generalCustomerId = generateGeneralCustomerId();
+        if (!loadedCustomers.find(c => c.id === generalCustomerId)) {
+          loadedCustomers = [
+            { id: generalCustomerId, name: 'General Customer', phone: '', address: '', credit: 0 },
+            ...loadedCustomers
+          ];
+        }
+        setCustomers(loadedCustomers);
+        
         setCategories(Array.isArray(data.categories) ? data.categories : []);
         setSuppliers(Array.isArray(data.suppliers) ? data.suppliers : []);
         setSales(Array.isArray(data.sales) ? data.sales : []);
@@ -708,9 +729,10 @@ function MainApp({ currentUser, onLogout }) {
         setReady(true);
       } catch (error) {
         console.error('Failed to load data from API:', error);
-        // API failed - use empty data, but still show UI
+        // API failed - use empty data with General Customer, but still show UI
         setProducts([]);
-        setCustomers([]);
+        const generalCustomerId = generateGeneralCustomerId();
+        setCustomers([{ id: generalCustomerId, name: 'General Customer', phone: '', address: '', credit: 0 }]);
         setCategories([]);
         setSuppliers([]);
         setSales([]);
@@ -1869,18 +1891,27 @@ ${showQr !== false ? '<div style="text-align:center;margin-top:8px;"><div style=
             )}
           </div>
           
-          {due > 0 && !selCust && cart.length > 0 && !custQ && (
-            <div style={{fontSize:14,color:T.red,marginTop:6,textAlign:'center',padding:'4px 8px',background:T.redLight,borderRadius:6}}>⚠️ কাস্টমার যোগ করুন</div>
-          )}
-          
-          {selCust && (
+          {selCust ? (
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',borderRadius:10,border:'1px solid #86efac'}}>
               <div style={{display:'flex',alignItems:'center',gap:6}}>
                 <span style={{color:T.green,fontSize:14}}>✓</span>
-                <span style={{fontSize:14,color:T.green,fontWeight:600}}>{selCust.name}</span>
-                {selCust.credit>0 && <span style={{color:T.red,fontSize:14,fontWeight:500}}>(বাকি: {fmt(selCust.credit)})</span>}
+                <div>
+                  <div style={{fontSize:14,color:T.green,fontWeight:600}}>{selCust.name}</div>
+                  {selCust.credit>0 && <div style={{fontSize:12,color:T.red,fontWeight:500}}>বাকি: {fmt(selCust.credit)}</div>}
+                </div>
               </div>
               <button onClick={()=>{setSelCust(null);setCustQ('');}} style={{fontSize:14,background:'none',border:'none',color:T.gray400,cursor:'pointer',padding:2}}>✕</button>
+            </div>
+          ) : (
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,padding:'8px 12px',background:T.gray50,borderRadius:10,border:'1px solid #e5e7eb'}}>
+              <div style={{display:'flex',alignItems:'center',gap:6}}>
+                <span style={{color:T.gray400,fontSize:14}}>👤</span>
+                <div>
+                  <div style={{fontSize:14,color:T.gray600,fontWeight:600}}>General Customer</div>
+                  <div style={{fontSize:11,color:T.gray400}}>(Default)</div>
+                </div>
+              </div>
+              <button onClick={() => { setSelCust(customers.find(c => c.name === 'General Customer')); setCustQ('General Customer'); }} style={{fontSize:12,background:T.teal,border:'none',borderRadius:6,color:'white',cursor:'pointer',padding:'4px 8px',fontWeight:600}}>সিলেক্ট</button>
             </div>
           )}
           
