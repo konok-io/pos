@@ -268,7 +268,6 @@ function DynamicMenu({tab, onTabChange, tabs}) {
         fontSize: 19,
         display: 'flex', 
         alignItems: 'center', 
-        gap: 5,
         whiteSpace: 'nowrap', 
         fontFamily: 'inherit',
         transition: 'all 0.2s',
