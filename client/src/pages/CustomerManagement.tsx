@@ -13,6 +13,7 @@ interface CustomerManagementProps {
   customers: Customer[];
   setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>;
   sales: any[];
+  onDeleteCustomer?: (customer: Customer) => void;
 }
 
 type ViewType = 'dashboard' | 'general' | 'regular';
@@ -498,7 +499,7 @@ function AddCustomerModal({ isOpen, onClose, onSave }: AddCustomerModalProps) {
   );
 }
 
-export default function CustomerManagement({ customers, setCustomers, sales }: CustomerManagementProps) {
+export default function CustomerManagement({ customers, setCustomers, sales, onDeleteCustomer }: CustomerManagementProps) {
   const { t, isRTL } = useLanguage();
   const [view, setView] = useState<ViewType>('dashboard');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -509,6 +510,16 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
   // Handle add customer
   const handleAddCustomer = (customer: Customer) => {
     setCustomers(prev => [...prev, customer]);
+  };
+
+  // Handle delete customer (with IndexedDB cleanup)
+  const handleDeleteCustomer = (customer: Customer) => {
+    if (window.confirm(t('confirmDelete'))) {
+      setCustomers(prev => prev.filter(c => c.id !== customer.id));
+      if (onDeleteCustomer) {
+        onDeleteCustomer(customer);
+      }
+    }
   };
 
   // Filter customers for dashboard
@@ -533,13 +544,6 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
   const getCustomerTotal = (customer: Customer) => {
     const customerSales = getCustomerSales(customer);
     return customerSales.reduce((sum, s) => sum + s.total, 0);
-  };
-
-  // Handle delete customer
-  const handleDeleteCustomer = (customer: Customer) => {
-    if (window.confirm(t('confirmDelete'))) {
-      setCustomers(prev => prev.filter(c => c.id !== customer.id));
-    }
   };
 
   // Handle CSV Export

@@ -1729,6 +1729,15 @@ export default function App() {
     if (customers.length > 0) saveCustomers();
   }, [isInitialized, customers]);
 
+  // Delete customer from IndexedDB
+  const handleDeleteCustomerFromDB = async (customer: Customer) => {
+    try {
+      await db.delete('customers', customer.id);
+    } catch (err) {
+      console.error('Failed to delete customer from IndexedDB:', err);
+    }
+  };
+
   // Save sales to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
     if (!isInitialized) return;
@@ -3327,6 +3336,7 @@ export default function App() {
             customers={customers}
             setCustomers={setCustomers}
             sales={sales}
+            onDeleteCustomer={handleDeleteCustomerFromDB}
           />
         )}
 
