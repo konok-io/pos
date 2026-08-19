@@ -372,4 +372,18 @@ export const ar: Record<string, string> = {
   appReloading: 'جارٍ إعادة تحميل التطبيق...',
   typeDeleteToConfirmMessage: 'اكتب "Delete" لتأكيد هذا الإجراء',
   items: 'عناصر',
+
+  // Common confirmations
+  deleteProductConfirm: 'هل أنت متأكد أنك تريد حذف هذا المنتج؟',
+  deleteCompanyConfirm: 'هل أنت متأكد أنك تريد حذف هذه الشركة؟',
+  deleteCategoryConfirm: 'هل أنت متأكد أنك تريد حذف هذا الفئة؟',
+  clearCartConfirm: 'مسح السلة؟',
+  yes: 'نعم',
+  no: 'لا',
+  ok: 'موافق',
+  confirm: 'تأكيد',
+  success: 'نجاح',
+  warning: 'تحذير',
+  saving: 'جارٍ الحفظ...',
+  deleting: 'جارٍ الحذف...',
 };

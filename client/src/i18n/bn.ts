@@ -376,4 +376,18 @@ export const bn: Record<string, string> = {
   appReloading: 'অ্যাপ রিলোড হচ্ছে...',
   typeDeleteToConfirmMessage: 'এই কাজ নিশ্চিত করতে "Delete" লিখুন',
   items: 'টি',
+
+  // Common confirmations
+  deleteProductConfirm: 'আপনি কি এই পণ্যটি মুছে ফেলতে চান?',
+  deleteCompanyConfirm: 'আপনি কি এই কোম্পানি মুছে ফেলতে চান?',
+  deleteCategoryConfirm: 'আপনি কি এই ক্যাটাগরি মুছে ফেলতে চান?',
+  clearCartConfirm: 'কার্ট পরিষ্কার করবেন?',
+  yes: 'হ্যাঁ',
+  no: 'না',
+  ok: 'ঠিক আছে',
+  confirm: 'নিশ্চিত করুন',
+  success: 'সফল',
+  warning: 'সতর্কতা',
+  saving: 'সংরক্ষণ হচ্ছে...',
+  deleting: 'মুছা হচ্ছে...',
 };

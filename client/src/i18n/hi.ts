@@ -367,4 +367,18 @@ export const hi: Record<string, string> = {
   appReloading: 'ऐप रीलोड हो रहा है...',
   typeDeleteToConfirmMessage: 'इस क्रिया की पुष्टि करने के लिए "Delete" टाइप करें',
   items: 'आइटम',
+
+  // Common confirmations
+  deleteProductConfirm: 'क्या आप वाकई इस उत्पाद को हटाना चाहते हैं?',
+  deleteCompanyConfirm: 'क्या आप वाकई इस कंपनी को हटाना चाहते हैं?',
+  deleteCategoryConfirm: 'क्या आप वाकई इस श्रेणी को हटाना चाहते हैं?',
+  clearCartConfirm: 'कार्ट साफ़ करें?',
+  yes: 'हाँ',
+  no: 'नहीं',
+  ok: 'ठीक है',
+  confirm: 'पुष्टि करें',
+  success: 'सफल',
+  warning: 'चेतावनी',
+  saving: 'सहेजा जा रहा है...',
+  deleting: 'हटाया जा रहा है...',
 };

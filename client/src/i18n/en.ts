@@ -405,4 +405,18 @@ export const en: Record<string, string> = {
   appReloading: 'App is reloading...',
   typeDeleteToConfirmMessage: 'Type "Delete" to confirm this action',
   items: 'items',
+  
+  // Common confirmations
+  deleteProductConfirm: 'Are you sure you want to delete this product?',
+  deleteCompanyConfirm: 'Are you sure you want to delete this company?',
+  deleteCategoryConfirm: 'Are you sure you want to delete this category?',
+  clearCartConfirm: 'Clear the cart?',
+  yes: 'Yes',
+  no: 'No',
+  ok: 'OK',
+  confirm: 'Confirm',
+  success: 'Success',
+  warning: 'Warning',
+  saving: 'Saving...',
+  deleting: 'Deleting...',
 };
