@@ -7592,7 +7592,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             </div>
 
             {/* Data Items */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 16 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
               {[
                 { label: t('productData'), count: products.length, icon: '📦', onClick: () => deleteAllItems('products', products, setProducts, t) },
                 { label: t('customerData'), count: customers.length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.length <= 1, info: customers.length <= 1 ? t('generalCustomerCannotDelete') : null },
@@ -7603,34 +7603,38 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               ].map((item, i) => (
                 <div key={i} style={{ 
                   background: '#fff', 
-                  borderRadius: 8, 
+                  borderRadius: 14, 
                   padding: 14, 
                   border: '1px solid #e5e7eb',
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <span style={{ fontSize: 16 }}>{item.icon}</span>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 20 }}>{item.icon}</span>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{item.label}</div>
+                      {item.info && <div style={{ fontSize: 10, color: '#6b7280', marginTop: 2 }}>{item.info}</div>}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: '#374151', marginBottom: 6 }}>{item.label}</div>
-                  {item.info && (
-                    <div style={{ fontSize: 10, color: '#6b7280', marginBottom: 6 }}>{item.info}</div>
-                  )}
-                  <button
-                    onClick={item.onClick}
-                    disabled={item.disabled || item.count === 0}
-                    style={{ 
-                      width: '100%', 
-                      padding: '6px', 
-                      background: (item.disabled || item.count === 0) ? '#f3f4f6' : '#ef4444', 
-                      color: (item.disabled || item.count === 0) ? '#9ca3af' : '#fff', 
-                      border: 'none', 
-                      borderRadius: 4, 
-                      fontSize: 11, 
-                      fontWeight: 600, 
-                      cursor: (item.disabled || item.count === 0) ? 'not-allowed' : 'pointer',
-                    }}>
-                    {t('delete')}
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 18, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                    <button
+                      onClick={item.onClick}
+                      disabled={item.disabled || item.count === 0}
+                      style={{ 
+                        padding: '6px 12px', 
+                        background: (item.disabled || item.count === 0) ? '#f3f4f6' : '#ef4444', 
+                        color: (item.disabled || item.count === 0) ? '#9ca3af' : '#fff', 
+                        border: 'none', 
+                        borderRadius: 8, 
+                        fontSize: 11, 
+                        fontWeight: 600, 
+                        cursor: (item.disabled || item.count === 0) ? 'not-allowed' : 'pointer',
+                      }}>
+                      {t('delete')}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
