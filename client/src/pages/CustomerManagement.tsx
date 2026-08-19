@@ -102,8 +102,7 @@ export default function CustomerManagement({ customers, setCustomers, sales }: C
   // Styles
   const containerStyle: React.CSSProperties = {
     padding: '20px',
-    maxWidth: '1200px',
-    margin: '0 auto',
+    width: '100%',
   };
 
   const topBarStyle: React.CSSProperties = {
