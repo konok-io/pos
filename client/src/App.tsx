@@ -7585,7 +7585,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 10 }}>
               {[
                 { label: t('productData'), count: products.length, icon: '📦', onClick: () => deleteAllItems('products', products, setProducts, t) },
-                { label: t('customerData'), count: customers.length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.length <= 1 },
+                { label: t('customerData'), count: customers.filter(c => !c.isSystem).length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.filter(c => !c.isSystem).length === 0 },
                 { label: t('categoryData'), count: categories.length, icon: '📂', onClick: () => deleteAllItems('categories', categories, setCategories, t) },
                 { label: t('supplierData'), count: suppliers.length, icon: '🏢', onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
                 { label: t('salesData'), count: sales.length, icon: '🛒', onClick: () => deleteAllItems('sales', sales, setSales, t) },
