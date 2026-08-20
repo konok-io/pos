@@ -97,6 +97,596 @@ const generateGeneralCustomerId = () => {
   return GENERAL_CUSTOMER_ID;
 };
 
+// User types
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  role: 'admin' | 'manager' | 'staff';
+  isActive: boolean;
+  createdAt: string;
+}
+
+// User Management Component
+interface UserManagementProps {
+  users: User[];
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+  t: (key: string) => string;
+}
+
+function UserManagement({ users, setUsers, t }: UserManagementProps) {
+  const [showModal, setShowModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'staff' as 'admin' | 'manager' | 'staff',
+    isActive: true
+  });
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  // Load users from localStorage on mount
+  useEffect(() => {
+    const savedUsers = localStorage.getItem('pos_users');
+    if (savedUsers) {
+      try {
+        const parsedUsers = JSON.parse(savedUsers);
+        if (parsedUsers.length > 0) {
+          setUsers(parsedUsers);
+        }
+      } catch (e) {
+        console.error('Failed to parse users:', e);
+      }
+    }
+  }, []);
+
+  // Save users to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem('pos_users', JSON.stringify(users));
+  }, [users]);
+
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleAddUser = () => {
+    setEditingUser(null);
+    setForm({ name: '', email: '', password: '', role: 'staff', isActive: true });
+    setShowModal(true);
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setForm({
+      name: user.name,
+      email: user.email,
+      password: '',
+      role: user.role,
+      isActive: user.isActive
+    });
+    setShowModal(true);
+  };
+
+  const handleDeleteUser = (user: User) => {
+    if (window.confirm(t('confirmDeleteUser'))) {
+      setUsers(prev => prev.filter(u => u.id !== user.id));
+      alert(t('userDeleted'));
+    }
+  };
+
+  const handleSaveUser = () => {
+    if (!form.name.trim()) {
+      alert(t('userNameRequired'));
+      return;
+    }
+    if (!form.email.trim()) {
+      alert(t('userEmailRequired'));
+      return;
+    }
+    if (!editingUser && !form.password.trim()) {
+      alert(t('passwordRequired'));
+      return;
+    }
+    if (form.password && form.password.length < 6) {
+      alert(t('passwordMinLength'));
+      return;
+    }
+
+    if (editingUser) {
+      // Update existing user
+      setUsers(prev => prev.map(u => 
+        u.id === editingUser.id 
+          ? { 
+              ...u, 
+              name: form.name, 
+              email: form.email, 
+              role: form.role, 
+              isActive: form.isActive,
+              ...(form.password ? { password: form.password } : {})
+            }
+          : u
+      ));
+      alert(t('userUpdated'));
+    } else {
+      // Add new user
+      const newUser: User = {
+        id: Date.now().toString(),
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        role: form.role,
+        isActive: form.isActive,
+        createdAt: new Date().toISOString()
+      };
+      setUsers(prev => [...prev, newUser]);
+      alert(t('userAdded'));
+    }
+    setShowModal(false);
+  };
+
+  const handleChangePassword = (user: User) => {
+    setSelectedUser(user);
+    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    setShowPasswordModal(true);
+  };
+
+  const handleSavePassword = () => {
+    if (!selectedUser) return;
+    
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert(t('passwordMismatch'));
+      return;
+    }
+    
+    if (passwordForm.newPassword.length < 6) {
+      alert(t('passwordMinLength'));
+      return;
+    }
+
+    setUsers(prev => prev.map(u => 
+      u.id === selectedUser.id 
+        ? { ...u, password: passwordForm.newPassword }
+        : u
+    ));
+    alert(t('passwordChanged'));
+    setShowPasswordModal(false);
+  };
+
+  const getRoleBadge = (role: string) => {
+    const colors: Record<string, { bg: string; text: string }> = {
+      admin: { bg: '#dc2626', text: '#fff' },
+      manager: { bg: '#f59e0b', text: '#fff' },
+      staff: { bg: '#10b981', text: '#fff' }
+    };
+    const c = colors[role] || colors.staff;
+    const labels: Record<string, string> = {
+      admin: t('roleAdmin'),
+      manager: t('roleManager'),
+      staff: t('roleStaff')
+    };
+    return (
+      <span style={{ 
+        padding: '2px 8px', 
+        borderRadius: 4, 
+        fontSize: 11, 
+        fontWeight: 600,
+        background: c.bg,
+        color: c.text
+      }}>
+        {labels[role] || role}
+      </span>
+    );
+  };
+
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '10px 12px',
+    border: '1px solid #e5e7eb',
+    borderRadius: 8,
+    fontSize: 14,
+    outline: 'none',
+    boxSizing: 'border-box'
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#374151',
+    marginBottom: 6
+  };
+
+  return (
+    <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{
+            width: 40, height: 40,
+            background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
+            borderRadius: 10,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 20,
+            color: '#fff'
+          }}>👥</div>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('userManagement')}</h3>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('totalUsers')}: {users.length}</p>
+          </div>
+        </div>
+        <button
+          onClick={handleAddUser}
+          style={{
+            padding: '10px 20px',
+            background: '#0F766E',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6
+          }}
+        >
+          ➕ {t('addUser')}
+        </button>
+      </div>
+
+      {/* Search */}
+      <div style={{ marginBottom: 16 }}>
+        <input
+          type="text"
+          placeholder={`${t('userName')} বা ${t('userEmail')}...`}
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          style={{ ...inputStyle, maxWidth: 300 }}
+        />
+      </div>
+
+      {/* User List */}
+      <div style={{ 
+        background: '#f8fafc', 
+        borderRadius: 12, 
+        overflow: 'hidden',
+        border: '1px solid #e2e8f0'
+      }}>
+        {/* Table Header */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '2fr 2fr 1fr 1fr 1.5fr', 
+          padding: '12px 16px',
+          background: '#f1f5f9',
+          fontSize: 12,
+          fontWeight: 700,
+          color: '#64748b',
+          textTransform: 'uppercase'
+        }}>
+          <div>{t('userName')}</div>
+          <div>{t('userEmail')}</div>
+          <div>{t('userRole')}</div>
+          <div>{t('status')}</div>
+          <div style={{ textAlign: 'right' }}>{t('actions')}</div>
+        </div>
+
+        {/* User Rows */}
+        {filteredUsers.length === 0 ? (
+          <div style={{ padding: 32, textAlign: 'center', color: '#64748b' }}>
+            <div style={{ fontSize: 32, marginBottom: 8 }}>👤</div>
+            <p style={{ margin: 0 }}>কোনো ইউজার পাওয়া যায়নি</p>
+          </div>
+        ) : (
+          filteredUsers.map(user => (
+            <div key={user.id} style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '2fr 2fr 1fr 1fr 1.5fr', 
+              padding: '14px 16px',
+              borderBottom: '1px solid #e2e8f0',
+              alignItems: 'center',
+              background: '#fff',
+              transition: 'background 0.2s'
+            }}>
+              <div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#1e293b' }}>{user.name}</div>
+              </div>
+              <div style={{ fontSize: 13, color: '#64748b' }}>{user.email}</div>
+              <div>{getRoleBadge(user.role)}</div>
+              <div>
+                <span style={{ 
+                  padding: '2px 8px', 
+                  borderRadius: 4, 
+                  fontSize: 11, 
+                  fontWeight: 600,
+                  background: user.isActive ? '#dcfce7' : '#fee2e2',
+                  color: user.isActive ? '#16a34a' : '#dc2626'
+                }}>
+                  {user.isActive ? t('active') : t('inactive')}
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => handleChangePassword(user)}
+                  style={{
+                    padding: '6px 12px',
+                    background: '#fef3c7',
+                    color: '#92400e',
+                    border: 'none',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                  title={t('changePassword')}
+                >
+                  🔑
+                </button>
+                <button
+                  onClick={() => handleEditUser(user)}
+                  style={{
+                    padding: '6px 12px',
+                    background: '#e0f2fe',
+                    color: '#0369a1',
+                    border: 'none',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={() => handleDeleteUser(user)}
+                  style={{
+                    padding: '6px 12px',
+                    background: '#fee2e2',
+                    color: '#dc2626',
+                    border: 'none',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Add/Edit User Modal */}
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            padding: 24,
+            width: '90%',
+            maxWidth: 450,
+            maxHeight: '90vh',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>
+                {editingUser ? t('editUser') : t('addUser')}
+              </h3>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}>✕</button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={labelStyle}>{t('userName')} *</label>
+                <input
+                  type="text"
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  style={inputStyle}
+                  placeholder="জন অপি"
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>{t('userEmail')} *</label>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  style={inputStyle}
+                  placeholder="john@example.com"
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>{t('password')} {editingUser && '(খালি রাখলে পরিবর্তন হবে না)'}</label>
+                <input
+                  type="password"
+                  value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
+                  style={inputStyle}
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>{t('userRole')}</label>
+                <select
+                  value={form.role}
+                  onChange={e => setForm({ ...form, role: e.target.value as any })}
+                  style={{ ...inputStyle, cursor: 'pointer' }}
+                >
+                  <option value="admin">{t('roleAdmin')}</option>
+                  <option value="manager">{t('roleManager')}</option>
+                  <option value="staff">{t('roleStaff')}</option>
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={form.isActive}
+                  onChange={e => setForm({ ...form, isActive: e.target.checked })}
+                  style={{ width: 18, height: 18, cursor: 'pointer' }}
+                />
+                <label htmlFor="isActive" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>{t('active')}</label>
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    background: '#f3f4f6',
+                    color: '#374151',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  onClick={handleSaveUser}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    background: '#0F766E',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('save')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Change Password Modal */}
+      {showPasswordModal && selectedUser && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: '#fff',
+            borderRadius: 16,
+            padding: 24,
+            width: '90%',
+            maxWidth: 400
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>
+                🔑 {t('changePassword')}
+              </h3>
+              <button onClick={() => setShowPasswordModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}>✕</button>
+            </div>
+
+            <p style={{ margin: '0 0 16px', fontSize: 14, color: '#64748b' }}>
+              {t('userName')}: <strong>{selectedUser.name}</strong>
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div>
+                <label style={labelStyle}>{t('newPassword')} *</label>
+                <input
+                  type="password"
+                  value={passwordForm.newPassword}
+                  onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                  style={inputStyle}
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div>
+                <label style={labelStyle}>{t('confirmPassword')} *</label>
+                <input
+                  type="password"
+                  value={passwordForm.confirmPassword}
+                  onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                  style={inputStyle}
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                <button
+                  onClick={() => setShowPasswordModal(false)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    background: '#f3f4f6',
+                    color: '#374151',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('cancel')}
+                </button>
+                <button
+                  onClick={handleSavePassword}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    background: '#f59e0b',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {t('changePassword')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ProductsScreen Component - Complete replacement from old App.jsx
 interface ProductsScreenProps {
   products: Product[];
@@ -1513,11 +2103,13 @@ export default function App() {
   const [productHistory, _setProductHistory] = useState<any[]>([]);
   const [settings, _setSettings] = useState<any>({ vatPercent: 15 });
   const [currentUser, _setCurrentUser] = useState<any>(DEFAULT_ADMIN);
+  const [users, setUsers] = useState<User[]>([]);
 
   // Tabs configuration
   const otherTabs = [
     { id: 'products', icon: '📦', label: t('products') },
     { id: 'customers', icon: '👥', label: t('customers') },
+    { id: 'users', icon: '👤', label: t('userManagement') },
     { id: 'income', icon: '💰', label: t('incomeExpenses') },
     { id: 'reports', icon: '📊', label: t('reports') },
     { id: 'settings', icon: '⚙️', label: t('settings') },
@@ -3419,6 +4011,10 @@ export default function App() {
             sales={sales}
             onDeleteCustomer={handleDeleteCustomerFromDB}
           />
+        )}
+
+        {currentTab === 'users' && (
+          <UserManagement users={users} setUsers={setUsers} t={t} />
         )}
 
         {currentTab === 'reports' && (
@@ -7170,7 +7766,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   const tabs = [
     { icon: '⚙️', label: t('settings') },
     { icon: '🎨', label: t('design') },
-    { icon: '👤', label: t('user') },
     { icon: '💥', label: t('dataReset') },
   ];
 
@@ -7525,44 +8120,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           </div>
         )}
 
-        {/* Users Tab */}
-        {activeTab === 2 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-              <div style={{
-                width: 40, height: 40,
-                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 20,
-                color: '#fff'
-              }}>👥</div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ইউজার ম্যানেজমেন্ট</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>মাল্টি-ইউজার ফিচার শীঘ্রই আসছে</p>
-              </div>
-            </div>
-
-            <div style={{
-              padding: '24px',
-              background: '#f8fafc',
-              borderRadius: 12,
-              textAlign: 'center',
-              border: '2px dashed #e2e8f0'
-            }}>
-              <div style={{ fontSize: 48, marginBottom: 12 }}>🔐</div>
-              <h4 style={{ margin: '0 0 8px', fontSize: 16, fontWeight: 600, color: '#374151' }}>মাল্টি-ইউজার আসছে</h4>
-              <p style={{ margin: 0, fontSize: 13, color: '#6b7280' }}>
-                প্রো ভার্সনে মাল্টি-ইউজার, অ্যাডমিন রোল এবং লগইন সিস্টেম পাবেন।
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Data Reset Tab */}
-        {activeTab === 3 && (
+        {activeTab === 2 && (
           <div>
             {/* Warning */}
             <div style={{
