@@ -426,4 +426,17 @@ export const hi: Record<string, string> = {
   actions: 'कार्य',
   passwordNoChange: '(वर्तमान रखने के लिए खाली छोड़ें)',
   searchUser: 'नाम या ईमेल से खोजें...',
+
+  // Design Tab
+  designSettings: 'डिज़ाइन सेटिंग्स',
+  receiptTemplateConfig: 'रसीद टेम्पलेट कॉन्फ़िगर करें',
+  salesInvoice: 'बिक्री रसीद',
+  purchaseInvoice: 'खरीद रसीद',
+  preview: 'पूर्वावलोकन',
+  thermalPrinter: 'थर्मल प्रिंटर',
+  vatRegNo: 'वैट रेज नं',
+  invoiceNo: 'चालान नं',
+  walkInCustomer: 'वॉक-इन ग्राहक',
+  cr: 'सीआर',
+  vatWith: 'वैट सहित',
 };

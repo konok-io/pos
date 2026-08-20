@@ -463,4 +463,17 @@ export const en: Record<string, string> = {
   status: 'Status',
   passwordNoChange: '(Leave empty to keep current)',
   searchUser: 'Search by name or email...',
+
+  // Design Tab
+  designSettings: 'Design Settings',
+  receiptTemplateConfig: 'Configure receipt template',
+  salesInvoice: 'Sales Invoice',
+  purchaseInvoice: 'Purchase Invoice',
+  preview: 'Preview',
+  thermalPrinter: 'Thermal Printer',
+  vatRegNo: 'VAT Reg No',
+  invoiceNo: 'Invoice No',
+  walkInCustomer: 'Walk-in Customer',
+  cr: 'CR',
+  vatWith: 'VAT With',
 };

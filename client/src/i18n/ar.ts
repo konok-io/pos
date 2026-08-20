@@ -431,4 +431,17 @@ export const ar: Record<string, string> = {
   actions: 'الإجراءات',
   passwordNoChange: '(اتركه فارغاً للاحتفاظ بالحالي)',
   searchUser: 'البحث بالاسم أو البريد الإلكتروني...',
+
+  // Design Tab
+  designSettings: 'إعدادات التصميم',
+  receiptTemplateConfig: 'تكوين قالب الإيصال',
+  salesInvoice: 'فاتورة البيع',
+  purchaseInvoice: 'فاتورة الشراء',
+  preview: 'معاينة',
+  thermalPrinter: 'طابعة حرارية',
+  vatRegNo: 'رقم تسجيل ضريبة القيمة المضافة',
+  invoiceNo: 'رقم الفاتورة',
+  walkInCustomer: 'عميل عابر',
+  cr: 'سجل تجاري',
+  vatWith: 'شامل الضريبة',
 };

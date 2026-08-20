@@ -435,4 +435,17 @@ export const bn: Record<string, string> = {
   actions: 'অ্যাকশন',
   passwordNoChange: '(বর্তমান রাখতে খালি রাখুন)',
   searchUser: 'নাম বা ইমেইল দিয়ে সার্চ করুন...',
+
+  // Design Tab
+  designSettings: 'ডিজাইন সেটিংস',
+  receiptTemplateConfig: 'রিসিট টেমপ্লেট কনফিগার করুন',
+  salesInvoice: 'বিক্রয় রিসিট',
+  purchaseInvoice: 'ক্রয় রিসিট',
+  preview: 'প্রিভিউ',
+  thermalPrinter: 'থার্মাল প্রিন্টার',
+  vatRegNo: 'ভ্যাট রেজি নং',
+  invoiceNo: 'ইনভয়েস নং',
+  walkInCustomer: 'ওয়াক-ইন গ্রাহক',
+  cr: 'সিআর',
+  vatWith: 'ভ্যাট সহ',
 };

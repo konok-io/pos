@@ -7560,6 +7560,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 }) {
   const { t } = useLanguage();
 
+  const [previewType, setPreviewType] = useState<'sales' | 'purchase'>('sales');
+
   const [form, setForm] = useState({
     name: '',
     address: '',
@@ -7993,10 +7995,10 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           </div>
         )}
 
-        {/* Design Tab */}
+        {/* Design Tab - 80mm Thermal Printer Receipt Layout */}
         {activeTab === 1 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
               <div style={{
                 width: 40, height: 40,
                 background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
@@ -8008,111 +8010,199 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 color: '#fff'
               }}>🎨</div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>ডিজাইন সেটিংস</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>রিসিট টেমপ্লেট কনফিগার করুন</p>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('designSettings')}</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('receiptTemplateConfig')}</p>
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  হেডার টাইটেল
-                </label>
-                <input
-                  value={form.receiptHeader}
-                  onChange={e => setForm(p => ({ ...p, receiptHeader: e.target.value }))}
-                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                  placeholder="🧾 বিক্রয় রিসিট"
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  ফুটার টেক্সট
-                </label>
-                <input
-                  value={form.receiptFooter}
-                  onChange={e => setForm(p => ({ ...p, receiptFooter: e.target.value }))}
-                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                  placeholder="ধন্যবাদ"
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  আইকন/লোগো
-                </label>
-                <input
-                  value={form.receiptLogo}
-                  onChange={e => setForm(p => ({ ...p, receiptLogo: e.target.value }))}
-                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                  placeholder="🖼️"
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  ফন্ট সাইজ
-                </label>
-                <select
-                  value={form.receiptFontSize}
-                  onChange={e => setForm(p => ({ ...p, receiptFontSize: parseInt(e.target.value) }))}
-                  style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                >
-                  <option value={9}>ছোট (৯px)</option>
-                  <option value={10}>মাঝারি ছোট (১০px)</option>
-                  <option value={11}>মাঝারি (১১px)</option>
-                  <option value={12}>বড় (১২px)</option>
-                </select>
-              </div>
+            {/* Preview Type Toggle */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              <button
+                onClick={() => setPreviewType('sales')}
+                style={{
+                  padding: '8px 16px',
+                  background: previewType === 'sales' ? '#115E59' : '#e0e0e0',
+                  color: previewType === 'sales' ? '#fff' : '#000',
+                  border: 'none',
+                  borderRadius: 6,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                🧾 {t('salesInvoice')}
+              </button>
+              <button
+                onClick={() => setPreviewType('purchase')}
+                style={{
+                  padding: '8px 16px',
+                  background: previewType === 'purchase' ? '#115E59' : '#e0e0e0',
+                  color: previewType === 'purchase' ? '#fff' : '#000',
+                  border: 'none',
+                  borderRadius: 6,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                🛒 {t('purchaseInvoice')}
+              </button>
             </div>
 
-            {/* Receipt Options */}
-            <div style={{ marginTop: 20, padding: '14px 18px', background: '#f8fafc', borderRadius: 10, border: '2px solid #e2e8f0' }}>
-              <h5 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#475569' }}>প্রদর্শন অপশন</h5>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-                {[
-                  { key: 'receiptShowLogo', label: 'লোগো/আইকন' },
-                  { key: 'receiptShowAddress', label: 'ঠিকানা' },
-                  { key: 'receiptShowPhone', label: 'ফোন নম্বর ও ভ্যাট' },
-                  { key: 'receiptShowCustomer', label: 'গ্রাহক তথ্য' },
-                  { key: 'receiptShowVat', label: 'ভ্যাট তথ্য' },
-                  { key: 'receiptShowQr', label: 'QR কোড' },
-                ].map(item => (
-                  <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
-                    <input
-                      type="checkbox"
-                      checked={form[item.key as keyof typeof form] !== false}
-                      onChange={e => setForm(p => ({ ...p, [item.key]: e.target.checked }))}
-                      style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#0F766E' }}
-                    />
-                    <span style={{ fontSize: 13, color: '#475569' }}>{item.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            {/* 80mm Receipt Preview */}
+            <div style={{ background: '#f1f5f9', borderRadius: 10, padding: 20, textAlign: 'center' }}>
+              <h4 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#475569' }}>👁️ {t('preview')} - 80mm {t('thermalPrinter')}</h4>
+              
+              {/* 80mm Thermal Receipt Paper */}
+              <div style={{
+                background: '#fff',
+                padding: '12px',
+                width: 220,
+                margin: '0 auto',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.15)',
+                fontSize: '11px',
+                fontFamily: 'monospace',
+                color: '#000',
+                textAlign: 'left',
+                borderRadius: 4
+              }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 8, marginBottom: 8 }}>
+                  {form.receiptLogo && <div style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 4 }}>{form.receiptLogo}</div>}
+                  {form.name && <div style={{ fontSize: 12, fontWeight: 'bold' }}>{form.name}</div>}
+                  {form.name && <div style={{ fontSize: 10 }}>Bangladesh</div>}
+                  {form.phone && <div style={{ fontSize: 10 }}>{form.phone}</div>}
+                  {form.taxId && <div style={{ fontSize: 10, fontWeight: 'bold' }}>{t('vatRegNo')}: {form.taxId}</div>}
+                </div>
 
-            {/* Preview */}
-            <div style={{ marginTop: 24 }}>
-              <h5 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#475569' }}>👁️ প্রিভিউ</h5>
-              <div style={{ background: '#f1f5f9', borderRadius: 10, padding: 16, textAlign: 'center' }}>
-                <div style={{
-                  background: '#fff',
-                  padding: `${form.receiptFontSize}px`,
-                  width: 200,
-                  margin: '0 auto',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  fontSize: `${form.receiptFontSize}px`,
-                  fontFamily: 'monospace',
-                  color: '#000',
-                  textAlign: 'left'
-                }}>
-                  <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 6, marginBottom: 6 }}>
-                    {form.receiptShowLogo && <div style={{ fontWeight: 'bold', fontSize: `${form.receiptFontSize + 3}px` }}>{form.receiptLogo || form.receiptHeader}</div>}
-                    {form.receiptShowAddress && form.name && <div style={{ fontSize: `${form.receiptFontSize - 1}px` }}>{form.name}</div>}
-                    {form.receiptShowPhone && form.taxId && <div style={{ fontSize: `${form.receiptFontSize - 2}px`, fontWeight: 'bold' }}>VAT: {form.taxId}</div>}
-                  </div>
-                  <div style={{ fontSize: `${form.receiptFontSize - 1}px`, marginBottom: 4 }}>পণ্য ১ x ১০০ = ১০০</div>
-                  <div style={{ fontSize: `${form.receiptFontSize - 1}px`, borderTop: '1px dashed #000', paddingTop: 6, marginTop: 6, fontWeight: 'bold' }}>
-                    মোট: ১০০
-                  </div>
+                {/* Invoice Title */}
+                <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 13, marginBottom: 8, padding: '4px 0', borderBottom: '1px solid #000' }}>
+                  {previewType === 'sales' ? (form.receiptHeader || t('salesInvoice')) : (form.purchaseHeader || t('purchaseInvoice'))}
+                </div>
+
+                {/* Invoice Info */}
+                <div style={{ fontSize: 10, marginBottom: 6 }}>
+                  <div><strong>{t('invoiceNo')}:</strong> 12345678</div>
+                  <div><strong>{t('date')}:</strong> {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })} | {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+
+                {previewType === 'sales' ? (
+                  <>
+                    {/* Customer Info */}
+                    <div style={{ fontSize: 10, padding: '6px 0', borderTop: '1px dashed #ccc', borderBottom: '1px dashed #ccc', marginBottom: 8 }}>
+                      <div><strong>{t('customer')}:</strong> {t('walkInCustomer')}</div>
+                      <div><strong>{t('phone')}:</strong> 017XXXXXXXX</div>
+                    </div>
+
+                    {/* Products Table Header */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, fontWeight: 'bold', borderBottom: '1px solid #000', paddingBottom: 4, marginBottom: 4 }}>
+                      <div>{t('product')}</div>
+                      <div style={{ textAlign: 'center' }}>{t('qty')}</div>
+                      <div style={{ textAlign: 'right' }}>{t('price')}</div>
+                      <div style={{ textAlign: 'right' }}>{t('total')}</div>
+                    </div>
+
+                    {/* Products */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0' }}>
+                      <div>{t('productName')} 1</div>
+                      <div style={{ textAlign: 'center' }}>2</div>
+                      <div style={{ textAlign: 'right' }}>৳50</div>
+                      <div style={{ textAlign: 'right' }}>৳100</div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0', borderBottom: '1px dashed #ccc' }}>
+                      <div>{t('productName')} 2</div>
+                      <div style={{ textAlign: 'center' }}>1</div>
+                      <div style={{ textAlign: 'right' }}>৳75</div>
+                      <div style={{ textAlign: 'right' }}>৳75</div>
+                    </div>
+
+                    {/* Totals */}
+                    <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #000' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                        <span>{t('subtotal')}:</span>
+                        <span>৳175</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                        <span>{t('vat')} (15%):</span>
+                        <span>৳26.25</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}>
+                        <span>{t('total')}:</span>
+                        <span>৳201.25</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                        <span>{t('paid')}:</span>
+                        <span>৳210</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                        <span>{t('change')}:</span>
+                        <span>৳8.75</span>
+                      </div>
+                    </div>
+
+                    {/* QR Code */}
+                    {form.receiptShowQr !== false && (
+                      <div style={{ textAlign: 'center', marginTop: 8, paddingTop: 8, borderTop: '1px dashed #ccc' }}>
+                        <div style={{ fontSize: 8, color: '#666' }}>[ZATCA QR]</div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* Supplier Info */}
+                    <div style={{ fontSize: 10, padding: '6px 0', borderTop: '1px dashed #ccc', borderBottom: '1px dashed #ccc', marginBottom: 8 }}>
+                      <div><strong>{t('supplier')}:</strong> ABC Supplier</div>
+                      <div><strong>{t('phone')}:</strong> 0123456789</div>
+                      <div><strong>{t('cr')}:</strong> 1234567890</div>
+                      <div><strong>{t('vat')} No:</strong> 123456789012345</div>
+                    </div>
+
+                    {/* Products Table Header */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, fontWeight: 'bold', borderBottom: '1px solid #000', paddingBottom: 4, marginBottom: 4 }}>
+                      <div>{t('product')}</div>
+                      <div style={{ textAlign: 'center' }}>{t('qty')}</div>
+                      <div style={{ textAlign: 'right' }}>{t('price')}</div>
+                      <div style={{ textAlign: 'right' }}>{t('total')}</div>
+                    </div>
+
+                    {/* Products */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0' }}>
+                      <div>{t('productName')} 1</div>
+                      <div style={{ textAlign: 'center' }}>10</div>
+                      <div style={{ textAlign: 'right' }}>৳50</div>
+                      <div style={{ textAlign: 'right' }}>৳500</div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0', borderBottom: '1px dashed #ccc' }}>
+                      <div>{t('productName')} 2</div>
+                      <div style={{ textAlign: 'center' }}>5</div>
+                      <div style={{ textAlign: 'right' }}>৳80</div>
+                      <div style={{ textAlign: 'right' }}>৳400</div>
+                    </div>
+
+                    {/* Totals */}
+                    <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #000' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                        <span>{t('subtotal')}:</span>
+                        <span>৳900</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
+                        <span>{t('vat')} (15%):</span>
+                        <span>৳135</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}>
+                        <span>{t('total')} ({t('vatWith')}):
+
+                        </span>
+                        <span>৳1,035</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Footer */}
+                <div style={{ textAlign: 'center', marginTop: 10, paddingTop: 8, borderTop: '1px dashed #000' }}>
+                  <div style={{ fontSize: 10, fontStyle: 'italic' }}>{form.receiptFooter || t('thanks')}</div>
+                  <div style={{ fontSize: 9, color: '#666', marginTop: 4 }}>{new Date().toLocaleDateString('en-GB')}</div>
                 </div>
               </div>
             </div>
