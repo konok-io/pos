@@ -2109,7 +2109,6 @@ export default function App() {
   const otherTabs = [
     { id: 'products', icon: '📦', label: t('products') },
     { id: 'customers', icon: '👥', label: t('customers') },
-    { id: 'users', icon: '👤', label: t('userManagement') },
     { id: 'income', icon: '💰', label: t('incomeExpenses') },
     { id: 'reports', icon: '📊', label: t('reports') },
     { id: 'settings', icon: '⚙️', label: t('settings') },
@@ -4013,10 +4012,6 @@ export default function App() {
           />
         )}
 
-        {currentTab === 'users' && (
-          <UserManagement users={users} setUsers={setUsers} t={t} />
-        )}
-
         {currentTab === 'reports' && (
           <div>
             <h2 style={{ marginBottom: 16 }}>📈 {t('reports')}</h2>
@@ -4108,6 +4103,8 @@ export default function App() {
             setSuppliers={setSuppliers}
             setCategories={setCategories}
             setPurchases={setPurchases}
+            users={users}
+            setUsers={setUsers}
             onRefresh={() => {
               setProducts([]);
               setCustomers([]);
@@ -7555,9 +7552,10 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 }
 
 // SettingsScreen Component - extracted from pages/SettingsScreen.tsx
-export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, setProducts, setCustomers, setSales, setSuppliers, setCategories, setPurchases, onRefresh }: { 
+export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, setProducts, setCustomers, setSales, setSuppliers, setCategories, setPurchases, users, setUsers, onRefresh }: { 
   products: any[]; customers: any[]; sales: any[]; suppliers: any[]; categories: any[]; purchases: any[];
   setProducts: any; setCustomers: any; setSales: any; setSuppliers: any; setCategories: any; setPurchases: any;
+  users: User[]; setUsers: React.Dispatch<React.SetStateAction<User[]>>;
   onRefresh: () => void 
 }) {
   const { t } = useLanguage();
@@ -7766,6 +7764,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   const tabs = [
     { icon: '⚙️', label: t('settings') },
     { icon: '🎨', label: t('design') },
+    { icon: '👤', label: t('user') },
     { icon: '💥', label: t('dataReset') },
   ];
 
@@ -8120,8 +8119,13 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           </div>
         )}
 
-        {/* Data Reset Tab */}
+        {/* Users Tab */}
         {activeTab === 2 && (
+          <UserManagement users={users} setUsers={setUsers} t={t} />
+        )}
+
+        {/* Data Reset Tab */}
+        {activeTab === 3 && (
           <div>
             {/* Warning */}
             <div style={{
