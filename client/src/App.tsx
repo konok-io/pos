@@ -127,9 +127,14 @@ function ProductsScreen({ products, suppliers, categories, purchases, productHis
   const [csvData, setCsvData] = useState<any[]>([]);
   const [stockFilter, setStockFilter] = useState('স্টক আছে');
   const [loading, setLoading] = useState(true);
-  const [productTab, setProductTab] = useState('list');
+  const [productTab, setProductTab] = useState(() => localStorage.getItem('pos_product_tab') || 'list');
   const [editProduct, setEditProduct] = useState<any>(null);
   const [viewProduct, setViewProduct] = useState<any>(null);
+
+  // Save productTab to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('pos_product_tab', productTab);
+  }, [productTab]);
 
   const overlay: React.CSSProperties = {
     position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
@@ -4221,10 +4226,17 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const { t } = useLanguage();
   
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState<'companies' | 'categories'>('companies');
+  const [activeTab, setActiveTab] = useState<'companies' | 'categories'>(() => 
+    (localStorage.getItem('pos_suppliers_tab') as 'companies' | 'categories') || 'companies'
+  );
   const [viewSupplier, setViewSupplier] = useState<Supplier | null>(null);
   const [viewCategory, setViewCategory] = useState<SupplierCategory | null>(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState<Supplier | null>(null);
+
+  // Save activeTab to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('pos_suppliers_tab', activeTab);
+  }, [activeTab]);
   
   // Form states
   const [showSupplierModal, setShowSupplierModal] = useState(false);
@@ -5444,13 +5456,23 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
 
 export function CustomerManagement({ customers, setCustomers, sales, onDeleteCustomer }: CustomerManagementProps) {
   const { t, isRTL } = useLanguage();
-  const [view, setView] = useState<ViewType>('dashboard');
+  const [view, setView] = useState<ViewType>(() => (localStorage.getItem('pos_customer_view') as ViewType) || 'dashboard');
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
   const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [activeTab, setActiveTab] = useState<TabType>(() => (localStorage.getItem('pos_customer_tab') as TabType) || 'all');
+  
+  // Save view to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('pos_customer_view', view);
+  }, [view]);
+
+  // Save activeTab to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('pos_customer_tab', activeTab);
+  }, [activeTab]);
   
   // Add Due/Deposit Modal states
   const [isAddDueModalOpen, setIsAddDueModalOpen] = useState(false);
