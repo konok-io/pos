@@ -428,4 +428,11 @@ export const bn: Record<string, string> = {
   selectRole: 'রোল নির্বাচন করুন',
   totalUsers: 'মোট ইউজার',
   confirmDeleteUser: 'এই ইউজার মুছে ফেলতে চান?',
+  noUsersFound: 'কোনো ইউজার পাওয়া যায়নি',
+  active: 'সক্রিয়',
+  inactive: 'নিষ্ক্রিয়',
+  status: 'স্ট্যাটাস',
+  actions: 'অ্যাকশন',
+  passwordNoChange: '(বর্তমান রাখতে খালি রাখুন)',
+  searchUser: 'নাম বা ইমেইল দিয়ে সার্চ করুন...',
 };

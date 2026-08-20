@@ -350,7 +350,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
       <div style={{ marginBottom: 16 }}>
         <input
           type="text"
-          placeholder={`${t('userName')} বা ${t('userEmail')}...`}
+          placeholder={t('searchUser')}
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           style={{ ...inputStyle, maxWidth: 300 }}
@@ -386,7 +386,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
         {filteredUsers.length === 0 ? (
           <div style={{ padding: 32, textAlign: 'center', color: '#64748b' }}>
             <div style={{ fontSize: 32, marginBottom: 8 }}>👤</div>
-            <p style={{ margin: 0 }}>কোনো ইউজার পাওয়া যায়নি</p>
+            <p style={{ margin: 0 }}>{t('noUsersFound')}</p>
           </div>
         ) : (
           filteredUsers.map(user => (
@@ -504,7 +504,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
                   style={inputStyle}
-                  placeholder="জন অপি"
+                  placeholder={t('userName')}
                 />
               </div>
 
@@ -515,12 +515,12 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
                   style={inputStyle}
-                  placeholder="john@example.com"
+                  placeholder={t('userEmail')}
                 />
               </div>
 
               <div>
-                <label style={labelStyle}>{t('password')} {editingUser && '(খালি রাখলে পরিবর্তন হবে না)'}</label>
+                <label style={labelStyle}>{t('password')} {editingUser && `(${t('passwordNoChange')})`}</label>
                 <input
                   type="password"
                   value={form.password}

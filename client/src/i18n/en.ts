@@ -457,4 +457,10 @@ export const en: Record<string, string> = {
   selectRole: 'Select Role',
   totalUsers: 'Total Users',
   confirmDeleteUser: 'Are you sure you want to delete this user?',
+  noUsersFound: 'No users found',
+  active: 'Active',
+  inactive: 'Inactive',
+  status: 'Status',
+  passwordNoChange: '(Leave empty to keep current)',
+  searchUser: 'Search by name or email...',
 };

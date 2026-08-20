@@ -424,4 +424,11 @@ export const ar: Record<string, string> = {
   selectRole: 'اختر الدور',
   totalUsers: 'إجمالي المستخدمين',
   confirmDeleteUser: 'هل أنت متأكد أنك تريد حذف هذا المستخدم؟',
+  noUsersFound: 'لم يتم العثور على مستخدمين',
+  active: 'نشط',
+  inactive: 'غير نشط',
+  status: 'الحالة',
+  actions: 'الإجراءات',
+  passwordNoChange: '(اتركه فارغاً للاحتفاظ بالحالي)',
+  searchUser: 'البحث بالاسم أو البريد الإلكتروني...',
 };

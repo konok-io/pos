@@ -419,4 +419,11 @@ export const hi: Record<string, string> = {
   selectRole: 'भूमिका चुनें',
   totalUsers: 'कुल उपयोगकर्ता',
   confirmDeleteUser: 'क्या आप वाकई इस उपयोगकर्ता को हटाना चाहते हैं?',
+  noUsersFound: 'कोई उपयोगकर्ता नहीं मिला',
+  active: 'सक्रिय',
+  inactive: 'निष्क्रिय',
+  status: 'स्थिति',
+  actions: 'कार्य',
+  passwordNoChange: '(वर्तमान रखने के लिए खाली छोड़ें)',
+  searchUser: 'नाम या ईमेल से खोजें...',
 };
