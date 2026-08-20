@@ -330,8 +330,8 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
           onClick={handleAddUser}
           style={{
             padding: '10px 20px',
-            background: '#0F766E',
-            color: '#fff',
+            background: '#e0e0e0',
+            color: '#000',
             border: 'none',
             borderRadius: 8,
             fontSize: 14,
