@@ -6989,7 +6989,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-  const [confirmText, setConfirmText] = useState('');
 
   // Load settings from PouchDB on mount
   useEffect(() => {
@@ -7029,8 +7028,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   };
 
   const clearAll = async () => {
-    if (confirmText !== 'Delete') {
-      alert(t('typeDeleteToConfirm'));
+    if (!window.confirm('সতর্কতা: সম্পূর্ণ ডাটা রিসেট হবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।\n\nআপনি কি নিশ্চিত?')) {
       return;
     }
 
@@ -7561,15 +7559,13 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               </p>
             </div>
 
-            {/* Data Items */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
+            {/* Row 1: 4 Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
               {[
                 { label: t('productData'), count: products.length, icon: '📦', onClick: () => deleteAllItems('products', products, setProducts, t) },
                 { label: t('customerData'), count: customers.length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.length <= 1 },
                 { label: t('categoryData'), count: categories.length, icon: '📂', onClick: () => deleteAllItems('categories', categories, setCategories, t) },
                 { label: t('supplierData'), count: suppliers.length, icon: '🏢', onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
-                { label: t('salesData'), count: sales.length, icon: '🛒', onClick: () => deleteAllItems('sales', sales, setSales, t) },
-                { label: t('purchaseHistoryDelete'), count: purchases.length, icon: '📥', onClick: () => deleteAllItems('purchases', purchases, setPurchases, t) },
               ].map((item, i) => (
                 <div key={i} style={{ 
                   background: '#fff', 
@@ -7580,22 +7576,22 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   justifyContent: 'space-between', 
                   alignItems: 'center',
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 22 }}>{item.icon}</span>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: '#374151' }}>{item.label}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 20 }}>{item.icon}</span>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{item.label}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontSize: 18, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{item.count}</span>
                     <button
                       onClick={item.onClick}
                       disabled={item.disabled || item.count === 0}
                       style={{ 
-                        padding: '8px 14px', 
+                        padding: '6px 12px', 
                         background: (item.disabled || item.count === 0) ? '#f3f4f6' : '#ef4444', 
                         color: (item.disabled || item.count === 0) ? '#9ca3af' : '#fff', 
                         border: 'none', 
-                        borderRadius: 8, 
-                        fontSize: 13, 
+                        borderRadius: 6, 
+                        fontSize: 12, 
                         fontWeight: 600, 
                         cursor: (item.disabled || item.count === 0) ? 'not-allowed' : 'pointer',
                       }}>
@@ -7606,65 +7602,74 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               ))}
             </div>
 
-            {/* Full Reset */}
-            <div style={{ 
-              background: '#fff',
-              borderRadius: 12, 
-              border: '1px solid #fecaca',
-              overflow: 'hidden',
-            }}>
-              <div style={{ 
-                background: '#fef2f2',
-                padding: '14px 18px',
-                borderBottom: '1px solid #fecaca',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: '#dc2626' }}>💥 {t('fullReset')}</div>
-                  <div style={{ fontSize: 13, color: '#991b1b', marginTop: 2 }}>{t('fullResetDescription')}</div>
-                </div>
-                <div style={{ 
-                  padding: '4px 12px',
-                  background: '#dc2626',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: '#fff'
-                }}>DANGER</div>
+            {/* Row 2: 2 Cards + Delete All Button */}
+            <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
+              {/* Left: 2 Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, flex: 1 }}>
+                {[
+                  { label: t('salesData'), count: sales.length, icon: '🛒', onClick: () => deleteAllItems('sales', sales, setSales, t) },
+                  { label: t('purchaseHistoryDelete'), count: purchases.length, icon: '📥', onClick: () => deleteAllItems('purchases', purchases, setPurchases, t) },
+                ].map((item, i) => (
+                  <div key={i} style={{ 
+                    background: '#fff', 
+                    borderRadius: 12, 
+                    padding: 14, 
+                    border: '1px solid #e5e7eb',
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 20 }}>{item.icon}</span>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{item.label}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                      <button
+                        onClick={item.onClick}
+                        disabled={item.count === 0}
+                        style={{ 
+                          padding: '6px 12px', 
+                          background: item.count === 0 ? '#f3f4f6' : '#ef4444', 
+                          color: item.count === 0 ? '#9ca3af' : '#fff', 
+                          border: 'none', 
+                          borderRadius: 6, 
+                          fontSize: 12, 
+                          fontWeight: 600, 
+                          cursor: item.count === 0 ? 'not-allowed' : 'pointer',
+                        }}>
+                        {t('delete')}
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div style={{ padding: 14 }}>
-                <input
-                  value={confirmText}
-                  onChange={e => setConfirmText(e.target.value)}
-                  placeholder={t('typeDeleteToConfirm')}
-                  style={{
-                    width: '100%',
-                    padding: '12px 14px',
-                    fontSize: 14,
-                    border: '1px solid #d1d5db',
-                    borderRadius: 8,
-                    outline: 'none',
-                    marginBottom: 12,
-                    boxSizing: 'border-box',
-                  }}
-                />
+
+              {/* Right: Delete All Button */}
+              <div style={{ 
+                background: '#dc2626',
+                borderRadius: 12, 
+                padding: 14,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: 120,
+              }}>
+                <div style={{ fontSize: 24, marginBottom: 8 }}>💥</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{t('fullReset')}</div>
                 <button
                   onClick={clearAll}
-                  disabled={confirmText !== 'Delete'}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    background: confirmText === 'Delete' ? '#dc2626' : '#e5e7eb',
-                    color: confirmText === 'Delete' ? '#fff' : '#9ca3af',
-                    border: 'none',
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontWeight: 700,
-                    cursor: confirmText === 'Delete' ? 'pointer' : 'not-allowed',
-                  }}
-                >
+                  style={{ 
+                    padding: '8px 16px', 
+                    background: '#fff', 
+                    color: '#dc2626', 
+                    border: 'none', 
+                    borderRadius: 6, 
+                    fontSize: 13, 
+                    fontWeight: 700, 
+                    cursor: 'pointer',
+                  }}>
                   {t('deleteAllData')}
                 </button>
               </div>
