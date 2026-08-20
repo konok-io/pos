@@ -7637,6 +7637,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   display: 'flex', 
                   justifyContent: 'space-between', 
                   alignItems: 'center',
+                  height: '100%',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 20 }}>📥</span>
@@ -7663,19 +7664,18 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 </div>
               </div>
 
-              {/* Right: Delete All Button */}
+              {/* Right: Delete All Button - Single Line */}
               <div style={{ 
                 background: '#dc2626',
                 borderRadius: 12, 
-                padding: 14,
+                padding: '14px 20px',
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                minWidth: 120,
+                gap: 10,
               }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}>💥</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 8 }}>{t('fullReset')}</div>
+                <span style={{ fontSize: 20 }}>💥</span>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t('fullReset')}</div>
                 <button
                   onClick={clearAll}
                   style={{ 
