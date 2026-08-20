@@ -529,10 +529,13 @@ export const localDb = {
     await database.clear('syncQueue');
   },
 
-  // Clear all data but preserve General Customer (with reset data)
+  // Clear all data including General Customer
   async clearAll(): Promise<void> {
     const database = await initDatabase();
     const generalCustomerId = '2000010112345';
+    
+    // Get General Customer data before clearing (to restore later)
+    const existingGeneralCustomer = await database.get('customers', generalCustomerId);
     
     // Clear all stores
     const stores = ['stores', 'currencies', 'storeCurrencies', 'categories', 
@@ -542,13 +545,13 @@ export const localDb = {
       await database.clear(storeName);
     }
     
-    // Clear customers store
+    // Clear customers store (completely)
     await database.clear('customers');
     
-    // Create fresh General Customer with reset data (only ID preserved)
+    // Recreate General Customer with fresh data (only ID preserved)
     const generalCustomer = {
       id: generalCustomerId,
-      name: 'General Customer',
+      name: existingGeneralCustomer?.name || 'General Customer',
       phone: '',
       email: '',
       address: '',

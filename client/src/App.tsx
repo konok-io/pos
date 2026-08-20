@@ -7068,7 +7068,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     }
   };
 
-  // Helper function to delete all customers and reset general customer data
+  // Helper function to delete all customers (reset General Customer data)
   const deleteAllCustomers = async (
     customers: any[], 
     setCustomers: React.Dispatch<React.SetStateAction<any[]>>, 
@@ -7077,7 +7077,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     const deletableCustomers = customers.filter(c => !c.isSystem);
     
     if (deletableCustomers.length === 0 && customers.filter(c => c.isSystem).length > 0) {
-      // Only General Customer exists - reset its data
+      // Only General Customer exists - reset its data completely
       if (!confirm(translate('warningPermanentDelete'))) return;
       
       try {
@@ -7086,7 +7086,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           await db.delete('customers', customer.id).catch(() => {});
         }
         
-        // Create fresh General Customer with reset data
+        // Recreate fresh General Customer with reset data
         const generalCustomer: Customer = {
           id: '2000010112345',
           name: 'General Customer',
@@ -7117,11 +7117,12 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     if (!confirm(translate('warningPermanentDelete'))) return;
     
     try {
+      // Delete all non-system customers
       for (const customer of deletableCustomers) {
         await db.delete('customers', customer.id).catch(() => {});
       }
       
-      // Reset General Customer data (keep only basic info with ID)
+      // Reset General Customer data completely (only ID preserved)
       const systemCustomer = customers.find(c => c.isSystem);
       if (systemCustomer) {
         const resetCustomer: Customer = {
