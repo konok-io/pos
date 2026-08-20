@@ -7581,13 +7581,14 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               </p>
             </div>
 
-            {/* Row 1: 4 Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
+            {/* Row 1: 5 Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 10 }}>
               {[
                 { label: t('productData'), count: products.length, icon: '📦', onClick: () => deleteAllItems('products', products, setProducts, t) },
                 { label: t('customerData'), count: customers.length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.length <= 1 },
                 { label: t('categoryData'), count: categories.length, icon: '📂', onClick: () => deleteAllItems('categories', categories, setCategories, t) },
                 { label: t('supplierData'), count: suppliers.length, icon: '🏢', onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
+                { label: t('salesData'), count: sales.length, icon: '🛒', onClick: () => deleteAllItems('sales', sales, setSales, t) },
               ].map((item, i) => (
                 <div key={i} style={{ 
                   background: '#fff', 
@@ -7598,22 +7599,22 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   justifyContent: 'space-between', 
                   alignItems: 'center',
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 20 }}>{item.icon}</span>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{item.label}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 18 }}>{item.icon}</span>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{item.label}</div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: '#374151' }}>{item.count}</span>
                     <button
                       onClick={item.onClick}
                       disabled={item.disabled || item.count === 0}
                       style={{ 
-                        padding: '6px 12px', 
+                        padding: '5px 10px', 
                         background: (item.disabled || item.count === 0) ? '#f3f4f6' : '#ef4444', 
                         color: (item.disabled || item.count === 0) ? '#9ca3af' : '#fff', 
                         border: 'none', 
                         borderRadius: 6, 
-                        fontSize: 12, 
+                        fontSize: 11, 
                         fontWeight: 600, 
                         cursor: (item.disabled || item.count === 0) ? 'not-allowed' : 'pointer',
                       }}>
@@ -7624,47 +7625,42 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               ))}
             </div>
 
-            {/* Row 2: 2 Cards + Delete All Button */}
+            {/* Row 2: 1 Card + Delete All Button */}
             <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
-              {/* Left: 2 Cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, flex: 1 }}>
-                {[
-                  { label: t('salesData'), count: sales.length, icon: '🛒', onClick: () => deleteAllItems('sales', sales, setSales, t) },
-                  { label: t('purchaseHistoryDelete'), count: purchases.length, icon: '📥', onClick: () => deleteAllItems('purchases', purchases, setPurchases, t) },
-                ].map((item, i) => (
-                  <div key={i} style={{ 
-                    background: '#fff', 
-                    borderRadius: 12, 
-                    padding: 14, 
-                    border: '1px solid #e5e7eb',
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 20 }}>{item.icon}</span>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{item.label}</div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{item.count}</span>
-                      <button
-                        onClick={item.onClick}
-                        disabled={item.count === 0}
-                        style={{ 
-                          padding: '6px 12px', 
-                          background: item.count === 0 ? '#f3f4f6' : '#ef4444', 
-                          color: item.count === 0 ? '#9ca3af' : '#fff', 
-                          border: 'none', 
-                          borderRadius: 6, 
-                          fontSize: 12, 
-                          fontWeight: 600, 
-                          cursor: item.count === 0 ? 'not-allowed' : 'pointer',
-                        }}>
-                        {t('delete')}
-                      </button>
-                    </div>
+              {/* Left: 1 Card */}
+              <div style={{ flex: 1 }}>
+                <div style={{ 
+                  background: '#fff', 
+                  borderRadius: 12, 
+                  padding: 14, 
+                  border: '1px solid #e5e7eb',
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 20 }}>📥</span>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t('purchaseHistoryDelete')}</div>
                   </div>
-                ))}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{purchases.length}</span>
+                    <button
+                      onClick={() => deleteAllItems('purchases', purchases, setPurchases, t)}
+                      disabled={purchases.length === 0}
+                      style={{ 
+                        padding: '6px 12px', 
+                        background: purchases.length === 0 ? '#f3f4f6' : '#ef4444', 
+                        color: purchases.length === 0 ? '#9ca3af' : '#fff', 
+                        border: 'none', 
+                        borderRadius: 6, 
+                        fontSize: 12, 
+                        fontWeight: 600, 
+                        cursor: purchases.length === 0 ? 'not-allowed' : 'pointer',
+                      }}>
+                      {t('delete')}
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Right: Delete All Button */}
