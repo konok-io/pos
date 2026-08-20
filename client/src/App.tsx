@@ -7817,8 +7817,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         {/* Save Button - Right */}
         <button onClick={save} style={{
           padding: '8px 16px',
-          background: saved ? '#059669' : '#115E59',
-          color: '#fff',
+          background: saved ? '#059669' : '#e0e0e0',
+          color: saved ? '#fff' : '#000',
           border: 'none',
           borderRadius: 6,
           fontSize: 13,
