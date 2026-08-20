@@ -533,11 +533,26 @@ export const localDb = {
   async clearAll(): Promise<void> {
     const database = await initDatabase();
     
-    // First, save the General Customer
+    // First, save the General Customer if it exists
     const generalCustomerId = '2000010112345';
-    const generalCustomer = await database.get('customers', generalCustomerId);
+    let generalCustomer = await database.get('customers', generalCustomerId);
     
-    // Clear all stores
+    // If no General Customer exists, create one
+    if (!generalCustomer) {
+      generalCustomer = {
+        id: generalCustomerId,
+        name: 'General Customer',
+        phone: '',
+        email: '',
+        address: '',
+        balance: 0,
+        storeId: '',
+        isActive: true,
+        isSystem: true,
+      };
+    }
+    
+    // Clear all stores except customers
     const stores = ['stores', 'currencies', 'storeCurrencies', 'categories', 
                      'products', 'sales', 'saleItems', 'users', 
                      'syncQueue', 'settings', 'transactions'] as const;
@@ -548,10 +563,8 @@ export const localDb = {
     // Clear customers store
     await database.clear('customers');
     
-    // Restore General Customer if it existed
-    if (generalCustomer) {
-      await database.put('customers', generalCustomer);
-    }
+    // Restore General Customer
+    await database.put('customers', generalCustomer);
   },
 };
 
