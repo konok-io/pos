@@ -89,9 +89,12 @@ const labelStyle = {
 const fmt = (n: number) => `৳${(+n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtN = (n: number) => (+n || 0).toLocaleString('en-IN');
 
-// Generate General Customer ID: GC + timestamp
+// Fixed General Customer ID
+const GENERAL_CUSTOMER_ID = '2000010112345';
+
+// Generate General Customer ID (kept for backward compatibility)
 const generateGeneralCustomerId = () => {
-  return 'GC' + Date.now();
+  return GENERAL_CUSTOMER_ID;
 };
 
 // ProductsScreen Component - Complete replacement from old App.jsx
@@ -1195,6 +1198,7 @@ interface Customer {
   balance: number;
   deposit: number;
   transactions?: Transaction[];
+  isSystem?: boolean;
 }
 
 interface Sale {
@@ -1667,6 +1671,7 @@ export default function App() {
           address: '',
           balance: 0,
           deposit: 0,
+          isSystem: true,
         };
         setCustomers([generalCustomer]);
         await db.put('customers', generalCustomer.id, generalCustomer);
@@ -4917,6 +4922,7 @@ interface Customer {
   deposit: number;
   avatar?: string;
   transactions?: Transaction[];
+  isSystem?: boolean;
 }
 
 interface Transaction {

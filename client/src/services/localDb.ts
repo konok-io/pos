@@ -66,6 +66,7 @@ export interface Customer {
   balance: number;
   storeId: string;
   isActive: boolean;
+  isSystem?: boolean;
 }
 
 export interface Sale {
@@ -528,14 +529,28 @@ export const localDb = {
     await database.clear('syncQueue');
   },
 
-  // Clear all data
+  // Clear all data but preserve General Customer
   async clearAll(): Promise<void> {
     const database = await initDatabase();
+    
+    // First, save the General Customer
+    const generalCustomerId = '2000010112345';
+    const generalCustomer = await database.get('customers', generalCustomerId);
+    
+    // Clear all stores
     const stores = ['stores', 'currencies', 'storeCurrencies', 'categories', 
-                     'products', 'customers', 'sales', 'saleItems', 'users', 
+                     'products', 'sales', 'saleItems', 'users', 
                      'syncQueue', 'settings', 'transactions'] as const;
     for (const storeName of stores) {
       await database.clear(storeName);
+    }
+    
+    // Clear customers store
+    await database.clear('customers');
+    
+    // Restore General Customer if it existed
+    if (generalCustomer) {
+      await database.put('customers', generalCustomer);
     }
   },
 };
