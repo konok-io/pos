@@ -939,7 +939,7 @@ td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
 tr:nth-child(even) { background:#fafafa; }
 </style></head><body>
 <div class="header"><h1><Icon e="📦" /> পণ্যের তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')} | ${printFiltered.length}{t('productsCount')}</p></div>
-<table><thead><tr><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>ক্রয়মূল্য</th><th>বিক্রয়মূল্য</th><th>স্টক</th><th>একক</th></tr></thead><tbody>
+<table><thead><tr><th>{t('productName')}</th><th>{t('company')}</th><th>{t('category')}</th><th>{t('buyPrice')}</th><th>{t('sellPrice')}</th><th>{t('stock')}</th><th>{t('unit')}</th></tr></thead><tbody>
 ${printFiltered.map(p => {
   return `<tr><td>${p.name}</td><td>${(p as any).company || '-'}</td><td>${(p as any).cat || '-'}</td><td>৳${p.costPrice.toLocaleString()}</td><td>৳${p.sellPrice.toLocaleString()}</td><td>${p.stock}</td><td>${p.unit}</td></tr>`;
 }).join('')}
@@ -1003,7 +1003,7 @@ ${printFiltered.map(p => {
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ background: T.gray50 }}>
-                    <th style={{ padding: 8, textAlign: 'left', fontSize: 14, color: T.gray600 }}>পণ্যের নাম</th>
+                    <th style={{ padding: 8, textAlign: 'left', fontSize: 14, color: T.gray600 }}>{t('productName')}</th>
                     <th style={{ padding: 8, textAlign: 'center', fontSize: 14, color: T.gray600 }}>পরিমাণ</th>
                     <th style={{ padding: 8, textAlign: 'right', fontSize: 14, color: T.gray600 }}>দাম</th>
                     <th style={{ padding: 8, textAlign: 'right', fontSize: 14, color: T.gray600 }}>মোট</th>
@@ -1113,7 +1113,7 @@ ${printFiltered.map(p => {
 
               {/* Category */}
               <div style={{ position: 'relative', marginBottom: 12 }}>
-                <label style={labelStyle}><Icon e="📂" /> ক্যাটাগরি</label>
+                <label style={labelStyle}><Icon e="📂" /> {t('category')}</label>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <input
                     value={form.cat}
@@ -1158,7 +1158,7 @@ ${printFiltered.map(p => {
 
               {/* Unit */}
               <div style={{ marginBottom: 12 }}>
-                <label style={labelStyle}><Icon e="📥" /> একক</label>
+                <label style={labelStyle}><Icon e="📥" /> {t('unit')}</label>
                 <select
                   value={form.unit}
                   onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
@@ -1179,15 +1179,15 @@ ${printFiltered.map(p => {
               {/* Price Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
                 <div>
-                  <label style={labelStyle}><Icon e="💰" /> ক্রয়মূল্য</label>
+                  <label style={labelStyle}><Icon e="💰" /> {t('buyPrice')}</label>
                   <input type="number" value={form.buyP} onChange={e => setForm(f => ({ ...f, buyP: e.target.value }))} placeholder="0" style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}><Icon e="💵" /> বিক্রয়মূল্য</label>
+                  <label style={labelStyle}><Icon e="💵" /> {t('sellPrice')}</label>
                   <input type="number" value={form.sellP} onChange={e => setForm(f => ({ ...f, sellP: e.target.value }))} placeholder="0" style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}><Icon e="📊" /> স্টক</label>
+                  <label style={labelStyle}><Icon e="📊" /> {t('stock')}</label>
                   <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))} placeholder="0" style={inputStyle} />
                 </div>
               </div>
@@ -1302,7 +1302,7 @@ ${printFiltered.map(p => {
                   <thead>
                     <tr style={{ background: T.tealLight }}>
                       <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>তারিখ ও সময়</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>পণ্যের নাম</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('productName')}</th>
                       <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>পরিবর্তনের ধরন</th>
                       <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>পুরাতন দাম</th>
                       <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>নতুন দাম</th>
@@ -1317,8 +1317,8 @@ ${printFiltered.map(p => {
                         </td>
                         <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 15 }}>{h.productName}</td>
                         <td style={{ padding: '10px 12px', fontSize: 14 }}>
-                          {h.type === 'price_buy' && <span style={{ background: T.orangeLight, color: T.orange, padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>ক্রয়মূল্য</span>}
-                          {h.type === 'price_sell' && <span style={{ background: T.tealLight, color: T.teal, padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>বিক্রয়মূল্য</span>}
+                          {h.type === 'price_buy' && <span style={{ background: T.orangeLight, color: T.orange, padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{t('buyPrice')}</span>}
+                          {h.type === 'price_sell' && <span style={{ background: T.tealLight, color: T.teal, padding: '3px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{t('sellPrice')}</span>}
                         </td>
                         <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 600, color: T.red }}>{fmt(h.oldValue)}</td>
                         <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, color: T.green }}>{fmt(h.newValue)}</td>
@@ -1356,8 +1356,8 @@ ${printFiltered.map(p => {
                   <thead>
                     <tr style={{ background: T.redLight }}>
                       <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>তারিখ ও সময়</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>পণ্যের নাম</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>কোম্পানি</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>{t('productName')}</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>{t('company')}</th>
                       <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.red }}>ডিলিটের সময় স্টক</th>
                       <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>ব্যবহারকারী</th>
                     </tr>
@@ -1521,15 +1521,15 @@ ${printFiltered.map(p => {
             <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: `1px solid ${T.gray200}` }}>
               <thead>
                 <tr style={{ background: T.tealLight }}>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>পণ্যের নাম</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>কোম্পানি</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>ক্যাটাগরি</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>ক্রয়মূল্য</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>বিক্রয়মূল্য</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>লাভ</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>স্টক</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>একক</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>একশন</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{t('productName')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('company')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('category')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('buyPrice')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('sellPrice')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('profit')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('stock')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('unit')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('action')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1662,7 +1662,7 @@ ${printFiltered.map(p => {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div>
-                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>পণ্যের নাম</div>
+                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>{t('productName')}</div>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{viewProduct.name}</div>
               </div>
               <div>
@@ -1670,23 +1670,23 @@ ${printFiltered.map(p => {
                 <div style={{ fontFamily: 'monospace', fontSize: 15 }}>{viewProduct.code || '-'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>কোম্পানি</div>
+                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>{t('company')}</div>
                 <div style={{ fontSize: 15 }}>{viewProduct.company || '-'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>ক্যাটাগরি</div>
+                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>{t('category')}</div>
                 <div style={{ fontSize: 15 }}>{viewProduct.cat || '-'}</div>
               </div>
               <div>
-                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>ক্রয়মূল্য</div>
+                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>{t('buyPrice')}</div>
                 <div style={{ fontWeight: 700, fontSize: 16, color: T.orange }}>{fmt(viewProduct.costPrice)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>বিক্রয়মূল্য</div>
+                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>{t('sellPrice')}</div>
                 <div style={{ fontWeight: 700, fontSize: 16, color: T.teal }}>{fmt(viewProduct.sellPrice)}</div>
               </div>
               <div>
-                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>স্টক</div>
+                <div style={{ fontSize: 14, color: T.gray400, marginBottom: 4 }}>{t('stock')}</div>
                 <div style={{ fontWeight: 700, fontSize: 16, color: viewProduct.stock <= (viewProduct.minStock || 5) ? T.red : T.green }}>{viewProduct.stock} {viewProduct.unit}</div>
               </div>
               <div>
@@ -5082,13 +5082,11 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           <button
             onClick={() => { setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setEditingSupplier(null); setShowSupplierModal(true); }}
             style={{ padding: '8px 14px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}><Icon e="➕" />
-             কোম্পানি
-          </button>
+             {t('company')}</button>
           <button
             onClick={() => { setCategoryForm({ name: '' }); setEditingCategory(null); setShowCategoryModal(true); }}
             style={{ padding: '8px 14px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}><Icon e="📂" />
-             ক্যাটাগরি
-          </button>
+             {t('category')}</button>
           <button
             onClick={() => setShowProductModal(true)}
             style={{ padding: '8px 14px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}><Icon e="📦" />
@@ -5441,7 +5439,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="💰" /> ক্রয়মূল্য</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="💰" /> {t('buyPrice')}</label>
                   <input
                     type="number"
                     value={productForm.buyP}
@@ -5451,7 +5449,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="💵" /> বিক্রয়মূল্য</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="💵" /> {t('sellPrice')}</label>
                   <input
                     type="number"
                     value={productForm.sellP}
@@ -5464,7 +5462,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📦" /> স্টক</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📦" /> {t('stock')}</label>
                   <input
                     type="number"
                     value={productForm.stock}
@@ -5474,7 +5472,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📏" /> একক</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📏" /> {t('unit')}</label>
                   <input
                     value={productForm.unit}
                     onChange={e => setProductForm(p => ({ ...p, unit: e.target.value }))}

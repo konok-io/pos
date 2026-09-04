@@ -485,4 +485,5 @@ export const en: Record<string, string> = {
   walkInCustomer: 'Walk-in Customer',
   cr: 'CR',
   vatWith: 'VAT With',
+  stockCount: 'Stock',
 };
