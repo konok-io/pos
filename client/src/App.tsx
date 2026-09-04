@@ -688,6 +688,7 @@ interface ProductsScreenProps {
 }
 
 function ProductsScreen({ products, suppliers, categories, purchases, productHistory, setProducts, settings: _settings, currentUser }: ProductsScreenProps) {
+  const { t } = useLanguage();
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState<any[]>([]);
@@ -703,7 +704,7 @@ function ProductsScreen({ products, suppliers, categories, purchases, productHis
   const [viewPurchase, setViewPurchase] = useState<any>(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
   const [csvData, setCsvData] = useState<any[]>([]);
-  const [stockFilter, setStockFilter] = useState('স্টক আছে');
+  const [stockFilter, setStockFilter] = useState<'in' | 'out'>('in');
   const [loading, setLoading] = useState(true);
   const [productTab, setProductTab] = useState('list');
   const [editProduct, setEditProduct] = useState<any>(null);
@@ -795,7 +796,7 @@ function ProductsScreen({ products, suppliers, categories, purchases, productHis
       const lines = text.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
 
       if (lines.length < 2) {
-        alert('CSV ফাইলে কমপক্ষে হেডার ও একটি পণ্য থাকতে হবে');
+        alert('CSV ফাইলে কমপক্ষে হেডার ও এক পণ্য থাকতে হবে');
         return;
       }
 
@@ -861,7 +862,7 @@ function ProductsScreen({ products, suppliers, categories, purchases, productHis
       if (items.length > 0) {
         setPurchaseItems(prevItems => [...prevItems, ...items]);
         setCsvData(items);
-        alert(`✅ ${items.length}টি পণ্য আপলোড হয়েছে!`);
+        alert(`✅ ${items.length}{t('productsCount')} আপলোড হয়েছে!`);
       } else {
         alert('কোনো পণ্য পাওয়া যায়নি। CSV ফরম্যাট সঠিক নয়।');
       }
@@ -900,8 +901,8 @@ C-00003,আল-মারওয়া ট্রেডিং,5678901234,4567890123
   // Filter and sort products
   const filtered = products
     .filter(p => {
-      if (stockFilter === 'স্টক আছে' && p.stock <= 0) return false;
-      if (stockFilter === 'স্টক শেষ' && p.stock > 0) return false;
+      if (stockFilter === 'in' && p.stock <= 0) return false;
+      if (stockFilter === 'out' && p.stock > 0) return false;
       return !search ||
         (p.name || '').toLowerCase().includes(search.toLowerCase()) ||
         ((p as any).company || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -937,7 +938,7 @@ th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:l
 td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
 tr:nth-child(even) { background:#fafafa; }
 </style></head><body>
-<div class="header"><h1><Icon e="📦" /> পণ্যের তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')} | ${printFiltered.length}টি পণ্য</p></div>
+<div class="header"><h1><Icon e="📦" /> পণ্যের তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')} | ${printFiltered.length}{t('productsCount')}</p></div>
 <table><thead><tr><th>পণ্যের নাম</th><th>কোম্পানি</th><th>ক্যাটাগরি</th><th>ক্রয়মূল্য</th><th>বিক্রয়মূল্য</th><th>স্টক</th><th>একক</th></tr></thead><tbody>
 ${printFiltered.map(p => {
   return `<tr><td>${p.name}</td><td>${(p as any).company || '-'}</td><td>${(p as any).cat || '-'}</td><td>৳${p.costPrice.toLocaleString()}</td><td>৳${p.sellPrice.toLocaleString()}</td><td>${p.stock}</td><td>${p.unit}</td></tr>`;
@@ -960,7 +961,7 @@ ${printFiltered.map(p => {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
           <button style={btn()} onClick={() => setShowPurchaseHistory(false)}><Icon e="←" /> ফিরে যান</button>
-          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="📦" /> ক্রয় হিস্ট্রি</span>
+          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="📦" /> {t('purchaseHistoryButton')}</span>
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
           {purchases.length === 0 ? (
@@ -978,7 +979,7 @@ ${printFiltered.map(p => {
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontWeight: 700, color: T.green }}>{fmt(totalCost)}</div>
-                      <div style={{ fontSize: 14, color: T.gray500 }}>{p.items.length}টি পণ্য - {p.items.reduce((s: number, i: any) => s + i.stock, 0)} একক</div>
+                      <div style={{ fontSize: 14, color: T.gray500 }}>{p.items.length}{t('productsCount')} - {p.items.reduce((s: number, i: any) => s + i.stock, 0)} একক</div>
                     </div>
                   </div>
                 );
@@ -1049,8 +1050,8 @@ ${printFiltered.map(p => {
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
           <button style={btn()} onClick={() => { setShowAddForm(false); setPurchaseItems([]); setCsvData([]); }}><Icon e="←" /> ফিরে যান</button>
-          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="📦" /> নতুন পণ্য সংরক্ষণ</span>
-          <span style={{ fontSize: 14, color: T.gray500, marginLeft: 'auto' }}>{purchaseItems.length}টি পণ্য যোগ হয়েছে</span>
+          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="📦" /> {t('newProductSave')}</span>
+          <span style={{ fontSize: 14, color: T.gray500, marginLeft: 'auto' }}>{purchaseItems.length}{t('productsCount')} যোগ হয়েছে</span>
         </div>
 
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
@@ -1074,7 +1075,7 @@ ${printFiltered.map(p => {
               </div>
               {csvData.length > 0 && (
                 <div style={{ marginTop: 8, fontSize: 14, color: T.teal, fontWeight: 600 }}><Icon e="✓" />
-                   {csvData.length}টি পণ্য আপলোড হয়েছে
+                   {csvData.length}{t('productsCount')} আপলোড হয়েছে
                 </div>
               )}
             </div>
@@ -1193,7 +1194,7 @@ ${printFiltered.map(p => {
 
               {/* Min Stock */}
               <div style={{ marginBottom: 16 }}>
-                <label style={labelStyle}><Icon e="⚠" /><Icon e="️" /> মিনিমাম স্টক</label>
+                <label style={labelStyle}><Icon e="⚠" /> মিনিমাম স্টক</label>
                 <input type="number" value={form.minStock} onChange={e => setForm(f => ({ ...f, minStock: e.target.value }))} placeholder="5" style={inputStyle} />
               </div>
 
@@ -1240,7 +1241,7 @@ ${printFiltered.map(p => {
                     setPurchaseItems([]);
                     setCsvData([]);
                     setShowAddForm(false);
-                    alert(`✅ ${purchaseItems.length}টি পণ্য সংরক্ষিত হয়েছে!`);
+                    alert(`✅ ${purchaseItems.length}{t('productsCount')} সংরক্ষিত হয়েছে!`);
                   }}
                   style={{ ...btn('success'), padding: '8px 16px', fontSize: 15 }}
                 ><Icon e="💾" />
@@ -1453,20 +1454,20 @@ ${printFiltered.map(p => {
 
       {/* Header */}
       <div style={{ padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <button style={btn('primary')} onClick={() => setShowAddForm(true)}><Icon e="➕" /> নতুন পণ্য</button>
-        <button style={btn('ghost')} onClick={() => setShowPurchaseHistory(true)}><Icon e="📦" /> ক্রয় হিস্ট্রি</button>
+        <button style={btn('primary')} onClick={() => setShowAddForm(true)}><Icon e="➕" /> {t('newProductButton')}</button>
+        <button style={btn('ghost')} onClick={() => setShowPurchaseHistory(true)}><Icon e="📦" /> {t('purchaseHistoryButton')}</button>
         <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
           <button
             onClick={() => setProductTab('history')}
             style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
           ><Icon e="📜" />
-             দামের ইতিহাস
+             {t('priceHistoryButton')}
           </button>
           <button
             onClick={() => setProductTab('deleted')}
             style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
           ><Icon e="🗑" />
-            ️ ডিলিট লিস্ট
+            ️ {t('deletedListButton')}
           </button>
         </div>
       </div>
@@ -1474,21 +1475,21 @@ ${printFiltered.map(p => {
       {/* Filters - Only show for list tab */}
       {productTab === 'list' && (
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
-          <button onClick={() => setStockFilter('স্টক আছে')} style={{
-            ...btn(stockFilter === 'স্টক আছে' ? 'primary' : 'ghost', 'sm'),
+          <button onClick={() => setStockFilter('in')} style={{
+            ...btn(stockFilter === 'in' ? 'primary' : 'ghost', 'sm'),
             borderRadius: 7, whiteSpace: 'nowrap',
-            background: stockFilter === 'স্টক আছে' ? T.teal : T.gray100,
-            color: stockFilter === 'স্টক আছে' ? T.white : T.gray600,
+            background: stockFilter === 'in' ? T.teal : T.gray100,
+            color: stockFilter === 'in' ? T.white : T.gray600,
             border: 'none', padding: '8px 14px', fontSize: 15,
-          }}><Icon e="📦" /> স্টক আছে ({stockCount})</button>
+          }}><Icon e="📦" /> {t('stockIn')} ({stockCount})</button>
 
-          <button onClick={() => setStockFilter('স্টক শেষ')} style={{
-            ...btn(stockFilter === 'স্টক শেষ' ? 'primary' : 'ghost', 'sm'),
+          <button onClick={() => setStockFilter('out')} style={{
+            ...btn(stockFilter === 'out' ? 'primary' : 'ghost', 'sm'),
             borderRadius: 7, whiteSpace: 'nowrap',
-            background: stockFilter === 'স্টক শেষ' ? T.red : T.redLight,
-            color: stockFilter === 'স্টক শেষ' ? T.white : T.red,
+            background: stockFilter === 'out' ? T.red : T.redLight,
+            color: stockFilter === 'out' ? T.white : T.red,
             border: 'none', padding: '8px 14px', fontSize: 15,
-          }}><Icon e="⚠" /><Icon e="️" /> স্টক শেষ ({outOfStockCount})</button>
+          }}><Icon e="⚠" /> {t('stockOutStatus')} ({outOfStockCount})</button>
 
           <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
             <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><Icon e="🔍" /></span>
@@ -1499,8 +1500,8 @@ ${printFiltered.map(p => {
               style={{ ...inputStyle, paddingLeft: 32 }}
             />
           </div>
-          <button style={btn('ghost')} onClick={printProductList}><Icon e="🖨" /><Icon e="️" /> প্রিন্ট</button>
-          <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{filtered.length}টি পণ্য</span>
+          <button style={btn('ghost')} onClick={printProductList}><Icon e="🖨" /><Icon e="️" /> {t('printButton')}</button>
+          <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{filtered.length}{t('productsCount')}</span>
         </div>
       )}
 
@@ -1554,7 +1555,7 @@ ${printFiltered.map(p => {
                       </td>
                       <td style={{ padding: '10px 12px', textAlign: 'center' }}>
                         <span style={{ fontWeight: 700, fontSize: 15, color: isLowStock ? T.red : T.gray900 }}>{fmtN(p.stock)}</span>
-                        {isLowStock && <span style={{ fontSize: 14, color: T.red, marginLeft: 4 }}><Icon e="⚠" /><Icon e="️" /></span>}
+                        {isLowStock && <span style={{ fontSize: 14, color: T.red, marginLeft: 4 }}><Icon e="⚠" /></span>}
                       </td>
                       <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400 }}>{p.unit}</td>
                       <td style={{ padding: '10px 12px', display: 'flex', gap: 6, justifyContent: 'center' }}>
@@ -2386,7 +2387,7 @@ const [currentTab, setCurrentTab] = useState('pos');
   };
 
   // Filter products - only show when search, category, supplier, or stock filter is selected
-  const hasFilter = searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all';
+  const hasFilter = searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'in';
   const filteredProducts = hasFilter ? products.filter(p => {
     const matchCategory = selectedCategory === 'all' || p.categoryId === selectedCategory;
     const matchSupplier = selectedSupplier === 'all' || (p.supplier || '') === selectedSupplier;
@@ -2394,7 +2395,7 @@ const [currentTab, setCurrentTab] = useState('pos');
       (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.code || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchStock = 
-      stockFilter === 'all' ||
+      stockFilter === 'in' ||
       (stockFilter === 'available' && p.stock > 0) ||
       (stockFilter === 'low' && p.stock > 0 && p.stock <= 10) ||
       (stockFilter === 'out' && p.stock <= 0);
@@ -2979,7 +2980,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       transform: stockFilter === 'low' ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="⚠" /><Icon e="️" /></div>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="⚠" /></div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: stockFilter === 'low' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockLow')}</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: stockFilter === 'low' ? '#FFFFFF' : '#D97706', lineHeight: 1 }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
@@ -3252,7 +3253,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                 {(!showHeldSales || showProductsGrid) && (
                   <>
                     {/* Active Filters Header - Same Style as Hold Sales */}
-                    {(selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all' || searchQuery) && (
+                    {(selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'in' || searchQuery) && (
                       <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
                         
                         {/* Filter Pills - Left Side */}
@@ -3277,7 +3278,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                         )}
                         
                         {/* Stock Filter */}
-                        {stockFilter !== 'all' && (
+                        {stockFilter !== 'in' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
                             <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
                               {stockFilter === 'available' && <><Icon e='📦' /> {t('stockAvailable')} </> + ` (${filteredProducts.length})`}
@@ -3407,7 +3408,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       null
                     ) : showCustomerList ? (
                       null
-                    ) : !searchQuery && selectedCategory === 'all' && selectedSupplier === 'all' && stockFilter === 'all' && filteredProducts.length === 0 ? (
+                    ) : !searchQuery && selectedCategory === 'all' && selectedSupplier === 'all' && stockFilter === 'in' && filteredProducts.length === 0 ? (
                     <div style={{ 
                       display: 'flex',
                       flexDirection: 'column',
@@ -3518,7 +3519,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                         </div>
                       </div>
                     </div>
-                    ) : (searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all') ? (
+                    ) : (searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'in') ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
                       {filteredProducts.map(product => (
                         <button
@@ -4196,7 +4197,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProductsCount')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="⚠" /><Icon e="️" /></div>
+                <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="⚠" /></div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#DC2626' }}>০</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockLow')}</div>
               </div>
@@ -4209,7 +4210,7 @@ const [currentTab, setCurrentTab] = useState('pos');
             
             {/* Low Stock Alert Section */}
             <div className="card" style={{ border: '1px solid #FECACA', background: '#FEF2F2' }}>
-              <h3 style={{ marginBottom: 12, color: '#DC2626' }}><Icon e="⚠" /><Icon e="️" /> {t('lowStockAlert')}</h3>
+              <h3 style={{ marginBottom: 12, color: '#DC2626' }}><Icon e="⚠" /> {t('lowStockAlert')}</h3>
               <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 20 }}>{t('noLowStockProducts')}</p>
             </div>
           </div>
@@ -4488,7 +4489,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
       const lines = text.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
 
       if (lines.length < 2) {
-        alert('CSV ফাইলে কমপক্ষে হেডার ও একটি পণ্য থাকতে হবে');
+        alert('CSV ফাইলে কমপক্ষে হেডার ও এক পণ্য থাকতে হবে');
         return;
       }
 
@@ -4517,7 +4518,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
 
       if (items.length > 0) {
         setPurchaseItems([...purchaseItems, ...items]);
-        alert(`✅ ${items.length}টি পণ্য যোগ হয়েছে!`);
+        alert(`✅ ${items.length}{t('productsCount')} যোগ হয়েছে!`);
       }
     };
     reader.readAsText(file);
@@ -4668,7 +4669,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="⚠" /><Icon e="️" /> {t('minStock')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="⚠" /> {t('minStock')}</label>
                 <input
                   type="number"
                   value={form.minStock}
@@ -5371,7 +5372,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       {showProductModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 450, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}><Icon e="📦" /> নতুন পণ্য যোগ করুন</h3>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}><Icon e="📦" /> {t('newProductButton')} যোগ করুন</h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {/* Company Dropdown */}
@@ -5482,7 +5483,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="⚠" /><Icon e="️" /> মিন স্টক</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="⚠" /> মিন স্টক</label>
                   <input
                     type="number"
                     value={productForm.minStock}
@@ -6881,7 +6882,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                       }}
                     >
                       {hasDue ? (
-                        <><span><Icon e="⚠" /><Icon e="️" /></span> {t('due')}: {fmt(netDue)}</>
+                        <><span><Icon e="⚠" /></span> {t('due')}: {fmt(netDue)}</>
                       ) : hasDeposit ? (
                         <><span><Icon e="💰" /></span> Deposit: {fmt(netDeposit)}</>
                       ) : isGeneralCustomer(customer) ? (
@@ -8219,7 +8220,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               alignItems: 'center',
               gap: 12
             }}>
-              <span style={{ fontSize: 18 }}><Icon e="⚠" /><Icon e="️" /></span>
+              <span style={{ fontSize: 18 }}><Icon e="⚠" /></span>
               <p style={{ margin: 0, fontSize: 14, color: '#dc2626' }}>
                 {t('warningPermanentDelete')}
               </p>
