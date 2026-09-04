@@ -1397,6 +1397,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'list' ? T.teal : T.white,
             color: productTab === 'list' ? T.white : T.gray600,
+            backgroundImage: productTab === 'list' ? 'linear-gradient(135deg, #115E59, #0F766E)' : 'none',
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
@@ -1420,6 +1421,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'suppliers' ? T.teal : T.white,
             color: productTab === 'suppliers' ? T.white : T.gray600,
+            backgroundImage: productTab === 'suppliers' ? 'linear-gradient(135deg, #115E59, #0F766E)' : 'none',
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
@@ -1432,6 +1434,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'barcode' ? T.teal : T.white,
             color: productTab === 'barcode' ? T.white : T.gray600,
+            backgroundImage: productTab === 'barcode' ? 'linear-gradient(135deg, #115E59, #0F766E)' : 'none',
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
@@ -1444,6 +1447,7 @@ ${printFiltered.map(p => {
             padding: '8px 14px', borderRadius: 8, border: 'none',
             background: productTab === 'inventory' ? T.teal : T.white,
             color: productTab === 'inventory' ? T.white : T.gray600,
+            backgroundImage: productTab === 'inventory' ? 'linear-gradient(135deg, #115E59, #0F766E)' : 'none',
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
