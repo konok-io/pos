@@ -1,6 +1,6 @@
 // HTTP Database Utility for POS - all data lives on the live server (MongoDB via /api).
-// getAll/get go through an in-memory promise cache, so sequential reads on
-// one collection share ONE HTTP request; put/delete/clear invalidate it.
+// getAll/get share ONE in-flight request per collection. put/delete/clear update the
+// cache OPTIMISTICALLY (instant UI) and sync to server in the background.
 
 const BASE = '/api';
 
@@ -31,29 +31,51 @@ class Database {
     } catch (e) { console.error('db.get failed', e); return null; }
   }
 
-  private evict(store: string) { this.cache.delete(store); }
+  // Update cached list without network (called after successful server op)
+  private patchCache(store: string, key: string, value: any, remove = false) {
+    const prev = this.cache.get(store);
+    if (!prev) return;
+    const apply = (list: any[]) => {
+      const body = remove ? null : ((value && typeof value === 'object') ? { ...value, id: key } : { id: key, value });
+      const filterOut = list.filter((d: any) => (d.id ?? d.key) !== key);
+      return body ? [...filterOut, body] : filterOut;
+    };
+    this.cache.set(store, prev.then(apply));
+  }
 
   async put(store: string, key: string, value: any): Promise<void> {
+    // Optimistically update cache so UI instant
+    this.patchCache(store, key, value, false);
+    // Save to server in the background
     try {
       const body = (value && typeof value === 'object') ? { ...value, id: key } : { id: key, value };
       await this.req(`/${encodeURIComponent(store)}/${encodeURIComponent(key)}`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-      }).then(() => this.evict(store));
-    } catch (e) { console.error('db.put failed', e); throw e; }
+      });
+    } catch (e) {
+      console.error('db.put failed', e);
+      this.cache.delete(store); // drop optimistic cache on failure
+    }
   }
 
   async delete(store: string, key: string): Promise<void> {
+    this.patchCache(store, key, null, true);
     try {
-      await this.req(`/${encodeURIComponent(store)}/${encodeURIComponent(key)}`, { method: 'DELETE' })
-        .then(() => this.evict(store));
-    } catch (e) { console.error('db.delete failed', e); throw e; }
+      await this.req(`/${encodeURIComponent(store)}/${encodeURIComponent(key)}`, { method: 'DELETE' });
+    } catch (e) {
+      console.error('db.delete failed', e);
+      this.cache.delete(store);
+    }
   }
 
   async clear(store: string): Promise<void> {
+    this.cache.set(store, Promise.resolve([]));
     try {
-      await this.req(`/${encodeURIComponent(store)}/clear`, { method: 'POST' })
-        .then(() => this.evict(store));
-    } catch (e) { console.error('db.clear failed', e); throw e; }
+      await this.req(`/${encodeURIComponent(store)}/clear`, { method: 'POST' });
+    } catch (e) {
+      console.error('db.clear failed', e);
+      this.cache.delete(store);
+    }
   }
 }
 

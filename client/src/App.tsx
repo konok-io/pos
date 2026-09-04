@@ -142,13 +142,6 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
     }).catch(() => {});
   }, []);
 
-  // Load users from server on mount
-  useEffect(() => {
-    db.getAll<any>('users').then((serverUsers: any) => {
-      if (serverUsers && serverUsers.length > 0) setUsers(serverUsers);
-    }).catch(() => {});
-  }, []);
-
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     user.email.toLowerCase().includes(searchQuery.toLowerCase())

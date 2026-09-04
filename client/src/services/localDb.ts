@@ -33,11 +33,29 @@ class LocalDb {
     }
     return this.cache.get(col) as Promise<any[]>;
   }
+
+  private patchCache(col: string, id: string, doc: any, remove = false) {
+    const prev = this.cache.get(col);
+    if (!prev) return;
+    const body = remove ? undefined : doc;
+    const apply = (list: any[]) => {
+      const filtered = list.filter((d: any) => (d.id ?? d.key) !== id);
+      return body === undefined ? filtered : [...filtered, body];
+    };
+    this.cache.set(col, prev.then(apply));
+  }
+
   private async save(col: string, doc: any): Promise<void> {
-    await this.req(`/${col}/${encodeURIComponent(doc.id)}`, {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc)
-    });
-    this.cache.delete(col);
+    // Optimistic update + background sync
+    this.patchCache(col, doc.id || doc.key, doc, false);
+    try {
+      await this.req(`/${col}/${encodeURIComponent(doc.id || doc.key)}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc)
+      });
+    } catch (e) {
+      console.error('localDb.save failed', e);
+      this.cache.delete(col);
+    }
   }
 
   async getStores() { return this.list('settings') as Promise<Store[]>; }
@@ -96,15 +114,15 @@ class LocalDb {
     await this.save('settings', { key, id: key, value });
   }
   async deleteSetting(key: string): Promise<void> {
-    await this.req(`/settings/${encodeURIComponent(key)}`, { method: 'DELETE' });
-    this.cache.delete('settings');
+    this.patchCache('settings', key, undefined, true);
+    await this.req(`/settings/${encodeURIComponent(key)}`, { method: 'DELETE' }).catch(() => { this.cache.delete('settings'); });
   }
 
   async clearAll(): Promise<void> {
     const cols = ['products','categories','customers','sales','suppliers','purchases','productHistory','settings','users','income','expenses','transactions','cart','heldSales','translations','sync'];
     for (const c of cols) {
-      await this.req(`/${c}/clear`, { method: 'POST' }).catch(() => {});
-      this.cache.delete(c);
+      this.cache.set(c, Promise.resolve([]));
+      await this.req(`/${c}/clear`, { method: 'POST' }).catch(() => { this.cache.delete(c); });
     }
   }
 
