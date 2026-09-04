@@ -1612,7 +1612,7 @@ ${printFiltered.map(p => {
             <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: T.teal }}> <Icon e="🏢" /> {t('suppliers')}</h3>
             <button
               onClick={() => setShowSupplierModal(true)}
-              style={{ padding: '8px 14px', background: T.teal, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+              style={{ padding: '8px 14px', background: '#000379', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
             > <Icon e="➕" /> {t('addNewSupplier') || 'New Supplier'}
             </button>
           </div>
@@ -1659,7 +1659,7 @@ ${printFiltered.map(p => {
               <button onClick={() => setShowSupplierModal(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
                 {t('cancel') || 'Cancel'}
               </button>
-              <button onClick={handleAddSupplier} style={{ flex: 1, padding: '10px', background: T.teal, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
+              <button onClick={handleAddSupplier} style={{ flex: 1, padding: '10px', background: '#000379', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
                 <Icon e="✅" /> {t('save') || 'Save'}
               </button>
             </div>
@@ -1887,7 +1887,7 @@ interface Sale {
 function LoadingScreen() {
   const { t } = useLanguage();
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#115E59', color: 'white', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#000379', color: 'white', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <div style={{ width: 50, height: 50, border: '4px solid rgba(255,255,255,0.2)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
       <h3 style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>{t('posManagementSystem')}</h3>
       <p style={{ marginTop: 8, opacity: 0.8 }}>{t('loading')}</p>
@@ -1925,7 +1925,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   return (
     <div style={{
       minHeight: '100vh',
-      background: '#115E59', border: '1px solid #115E59',
+      background: '#000379', border: '1px solid #115E59',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -3754,7 +3754,7 @@ const [currentTab, setCurrentTab] = useState('pos');
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                   <h3 style={{ fontSize: 15, fontWeight: 700, color: '#115E59', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}> <Icon e="🛒" /> {t('cart')}</h3>
-                  <span style={{ background: '#115E59', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
+                  <span style={{ background: '#000379', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
                 </div>
                 {/* Customer Input with Add Button */}
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -5161,7 +5161,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={() => { setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setEditingSupplier(null); setShowSupplierModal(true); }}
-            style={{ padding: '8px 14px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}> <Icon e="➕" />
+            style={{ padding: '8px 14px', background: '#000379', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}> <Icon e="➕" />
              {t('company')}</button>
           <button
             onClick={() => { setCategoryForm({ name: '' }); setEditingCategory(null); setShowCategoryModal(true); }}
@@ -5408,7 +5408,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <button onClick={() => setShowSupplierModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 বাতিল
               </button>
-              <button onClick={saveSupplier} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
+              <button onClick={saveSupplier} style={{ flex: 1, padding: '12px', background: '#000379', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
                  সংরক্ষণ
               </button>
             </div>
@@ -5438,7 +5438,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <button onClick={() => setShowCategoryModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 বাতিল
               </button>
-              <button onClick={saveCategory} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
+              <button onClick={saveCategory} style={{ flex: 1, padding: '12px', background: '#000379', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
                  সংরক্ষণ
               </button>
             </div>
@@ -5577,7 +5577,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <button onClick={() => setShowProductModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 বাতিল
               </button>
-              <button onClick={saveProduct} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
+              <button onClick={saveProduct} style={{ flex: 1, padding: '12px', background: '#000379', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
                  সংরক্ষণ
               </button>
             </div>
@@ -5846,7 +5846,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                     onClick={capturePhoto}
                     style={{
                       padding: '6px 10px',
-                      background: T.teal,
+                      background: '#000379',
                       color: T.white,
                       border: 'none',
                       borderRadius: '6px',
@@ -5879,7 +5879,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                     onClick={startCamera}
                     style={{
                       padding: '6px 10px',
-                      background: T.teal,
+                      background: '#000379',
                       color: T.white,
                       border: 'none',
                       borderRadius: '6px',
@@ -6100,7 +6100,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
             style={{
               flex: 1,
               padding: '10px',
-              background: T.teal,
+              background: '#000379',
               color: T.white,
               border: 'none',
               borderRadius: '8px',
@@ -6752,7 +6752,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 
   const buttonTealStyle: React.CSSProperties = {
     padding: '10px 20px',
-    background: T.teal,
+    background: '#000379',
     color: T.white,
     border: 'none',
     borderRadius: '10px',
@@ -6856,7 +6856,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button onClick={() => handleViewHistory(generalCustomer)} style={{
-                  flex: 1, padding: '12px', background: T.teal, color: T.white, border: 'none',
+                  flex: 1, padding: '12px', background: '#000379', color: T.white, border: 'none',
                   borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                 }}>
@@ -6907,7 +6907,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                       width: '52px',
                       height: '52px',
                       borderRadius: '50%',
-                      background: T.teal,
+                      background: '#000379',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -7124,7 +7124,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
           <button
             style={{
               padding: '10px 16px',
-              background: T.teal,
+              background: '#000379',
               color: T.white,
               border: 'none',
               borderRadius: '8px',
@@ -7284,7 +7284,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
             width: '55px',
             height: '55px',
             borderRadius: '50%',
-            background: T.teal,
+            background: '#000379',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -8842,7 +8842,7 @@ export function DatabaseSettings() {
             style={{
               width: '100%',
               padding: '14px',
-              background: '#115E59',
+              background: '#000379',
               color: '#fff',
               border: 'none',
               borderRadius: 10,
@@ -8863,7 +8863,7 @@ export function DatabaseSettings() {
           {importing && (
             <div style={{ marginBottom: 12 }}>
               <div style={{ height: 6, background: '#E5E7EB', borderRadius: 3, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${importProgress}%`, background: '#115E59', transition: 'width 0.3s ease' }} />
+                <div style={{ height: '100%', width: `${importProgress}%`, background: '#000379', transition: 'width 0.3s ease' }} />
               </div>
             </div>
           )}
