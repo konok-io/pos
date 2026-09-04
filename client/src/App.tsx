@@ -1485,9 +1485,6 @@ ${printFiltered.map(p => {
               style={{ ...inputStyle, paddingLeft: 32, fontSize: 13 }}
             />
           </div>
-          <button type="button" onClick={() => setShowAddForm(true)} style={{ ...btn('primary'), fontSize: 13 }}>
-            <Icon e="➕" /> {t('newProductButton')}
-          </button>
           <button style={{ ...btn('ghost'), fontSize: 13 }} onClick={() => setShowPurchaseHistory(true)}> <Icon e="📦" /> {t('purchaseHistoryButton')}</button>
           <button
             onClick={() => setProductTab('history')}
@@ -1502,7 +1499,10 @@ ${printFiltered.map(p => {
             ️ {t('deletedListButton')}
           </button>
           <button style={{ ...btn('ghost'), fontSize: 13 }} onClick={printProductList}><Icon e="🖨" /> {t('printButton')}</button>
-          <span style={{ fontSize: 13, color: T.gray400, marginLeft: 'auto' }}>{filtered.length} {t('productsCount')}</span>
+          <button type="button" onClick={() => setShowAddForm(true)} style={{ ...btn('primary'), fontSize: 13 }}>
+            <Icon e="➕" /> {t('newProductButton')}
+          </button>
+          <span style={{ fontSize: 13, color: T.gray400, marginLeft: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 6, padding: '4px 10px' }}>{filtered.length} {t('productsCount')}</span>
         </div>
       )}
 
