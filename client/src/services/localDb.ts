@@ -25,14 +25,19 @@ class LocalDb {
     if (!res.ok) throw new Error(`localDb ${init?.method || 'GET'} ${path} ${res.status}`);
     return res;
   }
-  private async list(col: string): Promise<any[]> {
-    const res = await this.req(`/${col}`);
-    return res.json();
+  private cache = new Map<string, Promise<any[]>>();
+
+  private list(col: string): Promise<any[]> {
+    if (!this.cache.has(col)) {
+      this.cache.set(col, this.req(`/${col}`).then(r => r.json()));
+    }
+    return this.cache.get(col) as Promise<any[]>;
   }
   private async save(col: string, doc: any): Promise<void> {
     await this.req(`/${col}/${encodeURIComponent(doc.id)}`, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(doc)
     });
+    this.cache.delete(col);
   }
 
   async getStores() { return this.list('settings') as Promise<Store[]>; }
@@ -92,11 +97,15 @@ class LocalDb {
   }
   async deleteSetting(key: string): Promise<void> {
     await this.req(`/settings/${encodeURIComponent(key)}`, { method: 'DELETE' });
+    this.cache.delete('settings');
   }
 
   async clearAll(): Promise<void> {
     const cols = ['products','categories','customers','sales','suppliers','purchases','productHistory','settings','users','income','expenses','transactions','cart','heldSales','translations','sync'];
-    for (const c of cols) await this.req(`/${c}/clear`, { method: 'POST' });
+    for (const c of cols) {
+      await this.req(`/${c}/clear`, { method: 'POST' }).catch(() => {});
+      this.cache.delete(c);
+    }
   }
 
   async getTransactions(__customerId?: string) { return this.list('transactions') as Promise<any[]>; }

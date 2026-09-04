@@ -2177,6 +2177,13 @@ const [currentTab, setCurrentTab] = useState('pos');
   // Check auth and load settings on mount
   useEffect(() => {
     const initApp = async () => {
+      // Kick off big collections in parallel while settings/vat/cart resolve below
+      const productsP = db.getAll<any>('products');
+      const categoriesP = db.getAll<any>('categories');
+      const customersP = db.getAll<any>('customers');
+      const transactionsP = db.getAll<any>('transactions');
+      const salesP = db.getAll<any>('sales');
+
       // Check if user was logged in
       const isLoggedInSetting = await db.get<boolean>('settings', 'isLoggedIn');
       if (isLoggedInSetting) {
@@ -2226,18 +2233,18 @@ const [currentTab, setCurrentTab] = useState('pos');
       }
       
       // Load products, categories, customers, sales from IndexedDB
-      const savedProducts = await db.getAll<any>('products');
+      const savedProducts = await productsP;
       if (savedProducts && savedProducts.length > 0) {
         setProducts(savedProducts);
       }
       
-      const savedCategories = await db.getAll<any>('categories');
+      const savedCategories = await categoriesP;
       if (savedCategories && savedCategories.length > 0) {
         setCategories(savedCategories);
       }
       
-      const savedCustomers = await db.getAll<any>('customers');
-      const savedTransactions = await db.getAll<any>('transactions');
+      const savedCustomers = await customersP;
+      const savedTransactions = await transactionsP;
       
       if (savedCustomers && savedCustomers.length > 0) {
         // Attach transactions to customers
@@ -2264,7 +2271,7 @@ const [currentTab, setCurrentTab] = useState('pos');
         await db.put('customers', generalCustomer.id, generalCustomer);
       }
       
-      const savedSales = await db.getAll<any>('sales');
+      const savedSales = await salesP;
       if (savedSales && savedSales.length > 0) {
         setSales(savedSales);
       }
