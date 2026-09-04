@@ -1455,8 +1455,7 @@ ${printFiltered.map(p => {
       {/* Header */}
       <div style={{ padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
         <button style={{ ...btn('primary'), fontSize: 13 }} onClick={() => setShowAddForm(true)}> <Icon e="➕" /> {t('newProductButton')}</button>
-        <button style={{ ...btn('ghost'), fontSize: 13 }} onClick={() => setShowPurchaseHistory(true)}> <Icon e="📦" /> {t('purchaseHistoryButton')}</button>
-        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', fontSize: 13 }}>
           <button
             onClick={() => setProductTab('history')}
             style={{ ...btn('ghost'), fontSize: 13, padding: '6px 12px' }}
@@ -1503,6 +1502,19 @@ ${printFiltered.map(p => {
           </div>
           <button type="button" onClick={() => setShowAddForm(true)} style={{ ...btn('primary'), fontSize: 13 }}>
             <Icon e="➕" /> {t('newProductButton')}
+          </button>
+          <button style={{ ...btn('ghost'), fontSize: 13 }} onClick={() => setShowPurchaseHistory(true)}> <Icon e="📦" /> {t('purchaseHistoryButton')}</button>
+          <button
+            onClick={() => setProductTab('history')}
+            style={{ ...btn('ghost'), fontSize: 13, padding: '6px 12px' }}
+          > <Icon e="📜" />
+            {t('priceHistoryButton')}
+          </button>
+          <button
+            onClick={() => setProductTab('deleted')}
+            style={{ ...btn('ghost'), fontSize: 13, padding: '6px 12px' }}
+          > <Icon e="🗑" />
+            ️ {t('deletedListButton')}
           </button>
           <button style={{ ...btn('ghost'), fontSize: 13 }} onClick={printProductList}><Icon e="🖨" /> {t('printButton')}</button>
           <span style={{ fontSize: 13, color: T.gray400, marginLeft: 'auto' }}>{filtered.length} {t('productsCount')}</span>
