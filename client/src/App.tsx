@@ -1528,7 +1528,7 @@ ${printFiltered.map(p => {
             ️ {t('deletedListButton')}
           </button>
 
-          <button type="button" onClick={() => setShowAddForm(true)} style={{ ...btn('primary'), fontSize: 13, background: '#E5E7EB', color: T.gray800 }}>
+          <button type="button" onClick={() => setShowAddForm(true)} style={{ ...btn('primary'), fontSize: 13, background: '#000379', color: '#FFFFFF' }}>
             <Icon e="➕" /> {t('newProductButton')}
           </button>
         </div>
