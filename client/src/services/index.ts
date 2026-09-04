@@ -1,6 +1,5 @@
 // Export localDb services
 export { localDb, initDatabase, generateId, generateInvoiceNo, type Store, type Currency, type User, type SyncQueue } from './localDb';
-export * from './offlineApi';
 
 // Legacy API wrapper for backward compatibility
 import { localDb } from './localDb';

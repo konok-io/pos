@@ -5,8 +5,6 @@ import App from './App.jsx';
 import { LanguageProvider } from './i18n';
 import { initFontDetection } from './utils/fontDetect';
 import { initDatabase } from './services/localDb';
-import { initializeLocalData } from './services/offlineApi';
-import { useAuthStore } from './store/authStore';
 
 // Loading screen component
 function LoadingScreen() {
@@ -100,19 +98,17 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 // App wrapper that handles initialization
 function AppWrapper() {
   const [isReady, setIsReady] = useState(false);
-  const checkAuth = useAuthStore(state => state.checkAuth);
 
   useEffect(() => {
     async function initialize() {
       try {
-        // Initialize IndexedDB
+        // Initialize data
         await initDatabase();
         
-        // Add demo data if empty
-        await initializeLocalData();
+
         
-        // Check for existing auth
-        await checkAuth();
+
+
         
         setIsReady(true);
       } catch (error) {
@@ -122,7 +118,7 @@ function AppWrapper() {
     }
     
     initialize();
-  }, [checkAuth]);
+  }, []);
 
   if (!isReady) {
     return <LoadingScreen />;

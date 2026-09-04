@@ -1,149 +1,49 @@
-// IndexedDB Database Utility for POS - Complete Solution
-// Uses the same database as localDb (pos-offline-db) for consistency
+// HTTP Database Utility for POS - all data lives on the live server (MongoDB via /api).
 
-const DB_NAME = 'pos-offline-db';
-const DB_VERSION = 6;
+const BASE = '/api';
 
 class Database {
-  private db: IDBDatabase | null = null;
-  private initPromise: Promise<void> | null = null;
-
-  async init(): Promise<void> {
-    if (this.db) return;
-    if (this.initPromise) return this.initPromise;
-
-    this.initPromise = new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-      request.onerror = () => {
-        console.error('IndexedDB error:', request.error);
-        reject(request.error);
-      };
-
-      request.onsuccess = () => {
-        this.db = request.result;
-        resolve();
-      };
-
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result;
-
-        // Create all object stores with keyPath 'key' for settings-style storage
-        const stores = ['translations', 'settings', 'sales', 'products', 'categories', 'customers', 'sync', 'users', 'cart', 'heldSales', 'transactions'];
-        
-        stores.forEach(storeName => {
-          if (!db.objectStoreNames.contains(storeName)) {
-            db.createObjectStore(storeName, { keyPath: 'key' });
-          }
-        });
-      };
-    });
-
-    return this.initPromise;
+  private async req(path: string, init?: RequestInit): Promise<Response> {
+    const res = await fetch(BASE + path, init);
+    if (!res.ok) throw new Error(`db ${init?.method || "GET"} ${path} ${res.status}`);
+    return res;
   }
 
-  async get<T>(storeName: string, key: string): Promise<T | null> {
-    await this.init();
-    if (!this.db) return null;
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.get(key);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        resolve(request.result?.value ?? null);
-      };
-    });
+  async get<T>(store: string, key: string): Promise<T | null> {
+    try {
+      const all = await this.getAll<any>(store);
+      const doc = (all || []).find((d: any) => (d.id ?? d.key) === key);
+      if (doc && doc.value !== undefined) return doc.value as T;
+      return doc as T;
+    } catch (e) { console.error('db.get failed', e); return null; }
   }
 
-  async getAll<T>(storeName: string): Promise<T[]> {
-    await this.init();
-    if (!this.db) return [];
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.getAll();
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        // Data is stored as { key, value }, extract just the values
-        const results = request.result ?? [];
-        const values = results.map((item: { key: string; value: T }) => item.value);
-        resolve(values);
-      };
-    });
+  async getAll<T>(store: string): Promise<T[]> {
+    try {
+      const res = await this.req(`/${encodeURIComponent(store)}`);
+      return (await res.json()) as T[];
+    } catch (e) { console.error('db.getAll failed', e); return []; }
   }
 
-  async put(storeName: string, key: string, value: any): Promise<void> {
-    await this.init();
-    if (!this.db) return;
-
-    // Validate key - IndexedDB keys must be valid types
-    if (key === undefined || key === null || (typeof key === 'string' && key.trim() === '')) {
-      console.error('Invalid IndexedDB key:', key);
-      return;
-    }
-
-    // Handle null/undefined values by deleting the key instead
-    if (value === null || value === undefined) {
-      return this.delete(storeName, key);
-    }
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.put({ key, value });
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
-    });
+  async put(store: string, key: string, value: any): Promise<void> {
+    try {
+      const body = (value && typeof value === 'object') ? { ...value, id: key } : { id: key, value };
+      await this.req(`/${encodeURIComponent(store)}/${encodeURIComponent(key)}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      });
+    } catch (e) { console.error('db.put failed', e); throw e; }
   }
 
-  async delete(storeName: string, key: string): Promise<void> {
-    await this.init();
-    if (!this.db) return;
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.delete(key);
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
-    });
+  async delete(store: string, key: string): Promise<void> {
+    try {
+      await this.req(`/${encodeURIComponent(store)}/${encodeURIComponent(key)}`, { method: 'DELETE' });
+    } catch (e) { console.error('db.delete failed', e); throw e; }
   }
 
-  async clear(storeName: string): Promise<void> {
-    await this.init();
-    if (!this.db) return;
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readwrite');
-      const store = transaction.objectStore(storeName);
-      const request = store.clear();
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => resolve();
-    });
-  }
-
-  async getAllKeys(storeName: string): Promise<IDBValidKey[]> {
-    await this.init();
-    if (!this.db) return [];
-
-    return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction(storeName, 'readonly');
-      const store = transaction.objectStore(storeName);
-      const request = store.getAllKeys();
-
-      request.onerror = () => reject(request.error);
-      request.onsuccess = () => {
-        resolve(request.result ?? []);
-      };
-    });
+  async clear(store: string): Promise<void> {
+    try {
+      await this.req(`/${encodeURIComponent(store)}/clear`, { method: 'POST' });
+    } catch (e) { console.error('db.clear failed', e); throw e; }
   }
 }
 
