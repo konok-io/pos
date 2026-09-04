@@ -1452,25 +1452,6 @@ ${printFiltered.map(p => {
         </button>
       </div>
 
-      {/* Header */}
-      <div style={{ padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
-        <button style={{ ...btn('primary'), fontSize: 13 }} onClick={() => setShowAddForm(true)}> <Icon e="➕" /> {t('newProductButton')}</button>
-        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto', fontSize: 13 }}>
-          <button
-            onClick={() => setProductTab('history')}
-            style={{ ...btn('ghost'), fontSize: 13, padding: '6px 12px' }}
-          > <Icon e="📜" />
-            {t('priceHistoryButton')}
-          </button>
-          <button
-            onClick={() => setProductTab('deleted')}
-            style={{ ...btn('ghost'), fontSize: 13, padding: '6px 12px' }}
-          > <Icon e="🗑" />
-            ️ {t('deletedListButton')}
-          </button>
-        </div>
-      </div>
-
       {/* Filters - Only show for list tab */}
       {productTab === 'list' && (
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap', fontSize: 13 }}>
