@@ -1400,26 +1400,6 @@ ${printFiltered.map(p => {
   // Main List Tab
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      {/* Header */}
-      <div style={{ padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <button style={btn('primary')} onClick={() => setShowAddForm(true)}>➕ নতুন পণ্য</button>
-        <button style={btn('ghost')} onClick={() => setShowPurchaseHistory(true)}>📦 ক্রয় হিস্ট্রি</button>
-        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
-          <button
-            onClick={() => setProductTab('history')}
-            style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
-          >
-            📜 দামের ইতিহাস
-          </button>
-          <button
-            onClick={() => setProductTab('deleted')}
-            style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
-          >
-            🗑️ ডিলিট লিস্ট
-          </button>
-        </div>
-      </div>
-      
       {/* Product Sub-Menu */}
       <div style={{ padding: '8px 16px', background: '#F5F5F5', borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         <button
@@ -1481,6 +1461,26 @@ ${printFiltered.map(p => {
         >
           🏭 Stock
         </button>
+      </div>
+
+      {/* Header */}
+      <div style={{ padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+        <button style={btn('primary')} onClick={() => setShowAddForm(true)}>➕ নতুন পণ্য</button>
+        <button style={btn('ghost')} onClick={() => setShowPurchaseHistory(true)}>📦 ক্রয় হিস্ট্রি</button>
+        <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+          <button
+            onClick={() => setProductTab('history')}
+            style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
+          >
+            📜 দামের ইতিহাস
+          </button>
+          <button
+            onClick={() => setProductTab('deleted')}
+            style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
+          >
+            🗑️ ডিলিট লিস্ট
+          </button>
+        </div>
       </div>
 
       {/* Filters - Only show for list tab */}
