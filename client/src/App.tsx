@@ -1405,17 +1405,6 @@ ${printFiltered.map(p => {
            Products
         </button>
         <button
-          onClick={() => setShowAddForm(true)}
-          style={{
-            padding: '8px 14px', borderRadius: 8, border: 'none',
-            background: T.white, color: T.gray600,
-            fontWeight: 600, fontSize: 13, cursor: 'pointer',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-          }}
-        > <Icon e="➕" />
-           New Product
-        </button>
-        <button
           onClick={() => setProductTab('suppliers')}
           style={{
             padding: '8px 14px', borderRadius: 8, border: 'none',
@@ -1427,6 +1416,19 @@ ${printFiltered.map(p => {
           }}
         > <Icon e="🏢" />
            Suppliers
+        </button>
+        <button
+          onClick={() => setProductTab('categories')}
+          style={{
+            padding: '8px 14px', borderRadius: 8, border: 'none',
+            background: productTab === 'categories' ? T.teal : T.white,
+            color: productTab === 'categories' ? T.white : T.gray600,
+            backgroundImage: productTab === 'categories' ? 'linear-gradient(135deg, #115E59, #0F766E)' : 'none',
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
+        > <Icon e="📂" />
+           Categories
         </button>
         <button
           onClick={() => setProductTab('barcode')}
