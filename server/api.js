@@ -5,7 +5,7 @@ const cors = require('cors');
 const MONGO_URL = 'mongodb://127.0.0.1:27017';
 const DB_NAME = 'pos_db';
 const PORT = 4000;
-const COLLECTIONS = ['products','categories','customers','sales','suppliers','purchases','productHistory','settings','users','income','expenses','transactions','cart','heldSales','translations','sync'];
+const COLLECTIONS = ['products','categories','customers','sales','suppliers','purchases','productHistory','settings','users','income','expenses','transactions','cart','heldSales','translations','sync','stores','currencies','storeCurrencies','saleItems','syncQueue'];
 
 let db;
 
