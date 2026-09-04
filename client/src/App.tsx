@@ -308,7 +308,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
             justifyContent: 'center',
             fontSize: 20,
             color: '#fff'
-          }}><Icon e="👥" /></div>
+          }}><Icon e="👥" /> </div>
           <div>
             <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('userManagement')}</h3>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('totalUsers')}: {users.length}</p>
@@ -329,7 +329,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
             alignItems: 'center',
             gap: 6
           }}
-        ><Icon e="➕" />
+        > <Icon e="➕" />
            {t('addUser')}
         </button>
       </div>
@@ -373,7 +373,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
         {/* User Rows */}
         {filteredUsers.length === 0 ? (
           <div style={{ padding: 32, textAlign: 'center', color: '#64748b' }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="👤" /></div>
+            <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="👤" /> </div>
             <p style={{ margin: 0 }}>{t('noUsersFound')}</p>
           </div>
         ) : (
@@ -433,7 +433,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
                     fontWeight: 600,
                     cursor: 'pointer'
                   }}
-                ><Icon e="✏" />
+                > <Icon e="✏" />
                   ️
                 </button>
                 <button
@@ -448,7 +448,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
                     fontWeight: 600,
                     cursor: 'pointer'
                   }}
-                ><Icon e="🗑" />
+                > <Icon e="🗑" />
                   ️
                 </button>
               </div>
@@ -481,7 +481,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
               <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>
                 {editingUser ? t('editUser') : t('addUser')}
               </h3>
-              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}><Icon e="✕" /></button>
+              <button onClick={() => setShowModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}><Icon e="✕" /> </button>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -600,10 +600,10 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
             maxWidth: 400
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}><Icon e="🔑" />
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}> <Icon e="🔑" />
                  {t('changePassword')}
               </h3>
-              <button onClick={() => setShowPasswordModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}><Icon e="✕" /></button>
+              <button onClick={() => setShowPasswordModal(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}><Icon e="✕" /> </button>
             </div>
 
             <p style={{ margin: '0 0 16px', fontSize: 14, color: '#64748b' }}>
@@ -862,9 +862,9 @@ function ProductsScreen({ products, suppliers, categories, purchases, productHis
       if (items.length > 0) {
         setPurchaseItems(prevItems => [...prevItems, ...items]);
         setCsvData(items);
-        alert(`✅ ${items.length}{t('productsCount')} আপলোড হয়েছে!`);
+        alert(`✅ ${items.length} ${t('productsCount')} আপলোড হয়েছে!`);
       } else {
-        alert('কোনো পণ্য পাওয়া যায়নি। CSV ফরম্যাট সঠিক নয়।');
+        alert(t('noProductsFound') + '। CSV ফরম্যাট সঠিক নয়।');
       }
     };
     reader.readAsText(file);
@@ -938,7 +938,7 @@ th { background:#e0f7f0; border:1px solid #b2dfdb; padding:6px 5px; text-align:l
 td { border:1px solid #e0e0e0; padding:6px 5px; font-size:11px; }
 tr:nth-child(even) { background:#fafafa; }
 </style></head><body>
-<div class="header"><h1><Icon e="📦" /> পণ্যের তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')} | ${printFiltered.length}{t('productsCount')}</p></div>
+<div class="header"><h1> <Icon e="📦" /> পণ্যের তালিকা</h1><p>${new Date().toLocaleDateString('bn-BD')} | ${printFiltered.length}{t('productsCount')}</p></div>
 <table><thead><tr><th>{t('productName')}</th><th>{t('company')}</th><th>{t('category')}</th><th>{t('buyPrice')}</th><th>{t('sellPrice')}</th><th>{t('stock')}</th><th>{t('unit')}</th></tr></thead><tbody>
 ${printFiltered.map(p => {
   return `<tr><td>${p.name}</td><td>${(p as any).company || '-'}</td><td>${(p as any).cat || '-'}</td><td>৳${p.costPrice.toLocaleString()}</td><td>৳${p.sellPrice.toLocaleString()}</td><td>${p.stock}</td><td>${p.unit}</td></tr>`;
@@ -960,8 +960,8 @@ ${printFiltered.map(p => {
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-          <button style={btn()} onClick={() => setShowPurchaseHistory(false)}><Icon e="←" /> ফিরে যান</button>
-          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="📦" /> {t('purchaseHistoryButton')}</span>
+          <button style={btn()} onClick={() => setShowPurchaseHistory(false)}> <Icon e="←" /> ফিরে যান</button>
+          <span style={{ fontWeight: 800, fontSize: 24 }}> <Icon e="📦" /> {t('purchaseHistoryButton')}</span>
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
           {purchases.length === 0 ? (
@@ -994,10 +994,10 @@ ${printFiltered.map(p => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <div style={{ fontWeight: 800, fontSize: 18, color: T.teal }}>{viewPurchase.id}</div>
-                    <div style={{ fontSize: 14, color: T.gray500, marginTop: 4 }}><Icon e="📅" /> {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
-                    <div style={{ fontSize: 15, marginTop: 4 }}><Icon e="🏢" /> সরবরাহকারী: {viewPurchase.supplier}</div>
+                    <div style={{ fontSize: 14, color: T.gray500, marginTop: 4 }}> <Icon e="📅" /> {new Date(viewPurchase.date).toLocaleDateString('bn-BD')}</div>
+                    <div style={{ fontSize: 15, marginTop: 4 }}> <Icon e="🏢" /> সরবরাহকারী: {viewPurchase.supplier}</div>
                   </div>
-                  <button onClick={() => setViewPurchase(null)} style={{ ...btn('ghost', 'sm'), padding: '6px 12px', fontSize: 14 }}><Icon e="✕" /></button>
+                  <button onClick={() => setViewPurchase(null)} style={{ ...btn('ghost', 'sm'), padding: '6px 12px', fontSize: 14 }}><Icon e="✕" /> </button>
                 </div>
               </div>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -1049,8 +1049,8 @@ ${printFiltered.map(p => {
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-          <button style={btn()} onClick={() => { setShowAddForm(false); setPurchaseItems([]); setCsvData([]); }}><Icon e="←" /> ফিরে যান</button>
-          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="📦" /> {t('newProductSave')}</span>
+          <button style={btn()} onClick={() => { setShowAddForm(false); setPurchaseItems([]); setCsvData([]); }}> <Icon e="←" /> ফিরে যান</button>
+          <span style={{ fontWeight: 800, fontSize: 24 }}> <Icon e="📦" /> {t('newProductSave')}</span>
           <span style={{ fontSize: 14, color: T.gray500, marginLeft: 'auto' }}>{purchaseItems.length}{t('productsCount')} যোগ হয়েছে</span>
         </div>
 
@@ -1060,21 +1060,21 @@ ${printFiltered.map(p => {
             {/* CSV Import Section */}
             <div style={{ ...cardStyle, padding: 16, marginBottom: 16, background: T.tealLight, border: `1px dashed ${T.teal}` }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <h3 style={{ margin: 0, fontSize: 14, color: T.teal }}><Icon e="📥" /> CSV ইম্পোর্ট করুন</h3>
+                <h3 style={{ margin: 0, fontSize: 14, color: T.teal }}> <Icon e="📥" /> CSV ইম্পোর্ট করুন</h3>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   <input type="file" accept=".csv" onChange={handleCsvImport} id="csvInput" style={{ display: 'none' }} />
-                  <label htmlFor="csvInput" style={{ ...btn('primary'), cursor: 'pointer', fontSize: 15, padding: '10px 20px' }}><Icon e="📁" />
+                  <label htmlFor="csvInput" style={{ ...btn('primary'), cursor: 'pointer', fontSize: 15, padding: '10px 20px' }}> <Icon e="📁" />
                      পণ্যের CSV আপলোড করুন
                   </label>
-                  <button onClick={downloadDemoCSV} style={{ ...btn('ghost'), fontSize: 14, padding: '8px 16px' }}><Icon e="📥" />
+                  <button onClick={downloadDemoCSV} style={{ ...btn('ghost'), fontSize: 14, padding: '8px 16px' }}> <Icon e="📥" />
                      ডেমো CSV ডাউনলোড
                   </button>
                 </div>
               </div>
               {csvData.length > 0 && (
-                <div style={{ marginTop: 8, fontSize: 14, color: T.teal, fontWeight: 600 }}><Icon e="✓" />
+                <div style={{ marginTop: 8, fontSize: 14, color: T.teal, fontWeight: 600 }}> <Icon e="✓" />
                    {csvData.length}{t('productsCount')} আপলোড হয়েছে
                 </div>
               )}
@@ -1085,7 +1085,7 @@ ${printFiltered.map(p => {
 
               {/* Supplier/Company */}
               <div style={{ marginBottom: 12, position: 'relative' }}>
-                <label style={labelStyle}><Icon e="🏢" /> সরবরাহকারী *</label>
+                <label style={labelStyle}> <Icon e="🏢" /> সরবরাহকারী *</label>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <input
                     value={supplierQ}
@@ -1094,7 +1094,7 @@ ${printFiltered.map(p => {
                     placeholder="সরবরাহকারী নাম..."
                     style={{ ...inputStyle, flex: 1, fontSize: 15 }}
                   />
-                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ ...btn('ghost'), padding: '4px 5px', fontSize: 14 }}><Icon e="▼" /></button>
+                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ ...btn('ghost'), padding: '4px 5px', fontSize: 14 }}><Icon e="▼" /> </button>
                 </div>
                 {showCompanyList && (
                   <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
@@ -1113,7 +1113,7 @@ ${printFiltered.map(p => {
 
               {/* Category */}
               <div style={{ position: 'relative', marginBottom: 12 }}>
-                <label style={labelStyle}><Icon e="📂" /> {t('category')}</label>
+                <label style={labelStyle}> <Icon e="📂" /> {t('category')}</label>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <input
                     value={form.cat}
@@ -1122,7 +1122,7 @@ ${printFiltered.map(p => {
                     placeholder="ক্যাটাগরি..."
                     style={{ ...inputStyle, flex: 1, fontSize: 15 }}
                   />
-                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ ...btn('ghost'), padding: '4px 5px', fontSize: 14 }}><Icon e="▼" /></button>
+                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ ...btn('ghost'), padding: '4px 5px', fontSize: 14 }}><Icon e="▼" /> </button>
                 </div>
                 {showCategoryList && (
                   <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
@@ -1136,7 +1136,7 @@ ${printFiltered.map(p => {
 
               {/* Product Name */}
               <div style={{ marginBottom: 12 }}>
-                <label style={labelStyle}><Icon e="📦" /> পণ্যের নাম *</label>
+                <label style={labelStyle}> <Icon e="📦" /> পণ্যের নাম *</label>
                 <input
                   value={form.name}
                   onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -1147,7 +1147,7 @@ ${printFiltered.map(p => {
 
               {/* Barcode */}
               <div style={{ marginBottom: 12 }}>
-                <label style={labelStyle}><Icon e="🔢" /> বারকোড</label>
+                <label style={labelStyle}> <Icon e="🔢" /> বারকোড</label>
                 <input
                   value={barcodeVal}
                   onChange={e => { setBarcodeVal(e.target.value); setForm(f => ({ ...f, code: e.target.value })); }}
@@ -1158,7 +1158,7 @@ ${printFiltered.map(p => {
 
               {/* Unit */}
               <div style={{ marginBottom: 12 }}>
-                <label style={labelStyle}><Icon e="📥" /> {t('unit')}</label>
+                <label style={labelStyle}> <Icon e="📥" /> {t('unit')}</label>
                 <select
                   value={form.unit}
                   onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
@@ -1179,22 +1179,22 @@ ${printFiltered.map(p => {
               {/* Price Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
                 <div>
-                  <label style={labelStyle}><Icon e="💰" /> {t('buyPrice')}</label>
+                  <label style={labelStyle}> <Icon e="💰" /> {t('buyPrice')}</label>
                   <input type="number" value={form.buyP} onChange={e => setForm(f => ({ ...f, buyP: e.target.value }))} placeholder="0" style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}><Icon e="💵" /> {t('sellPrice')}</label>
+                  <label style={labelStyle}> <Icon e="💵" /> {t('sellPrice')}</label>
                   <input type="number" value={form.sellP} onChange={e => setForm(f => ({ ...f, sellP: e.target.value }))} placeholder="0" style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}><Icon e="📊" /> {t('stock')}</label>
+                  <label style={labelStyle}> <Icon e="📊" /> {t('stock')}</label>
                   <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))} placeholder="0" style={inputStyle} />
                 </div>
               </div>
 
               {/* Min Stock */}
               <div style={{ marginBottom: 16 }}>
-                <label style={labelStyle}><Icon e="⚠" /> মিনিমাম স্টক</label>
+                <label style={labelStyle}> <Icon e="⚠" /> মিনিমাম স্টক</label>
                 <input type="number" value={form.minStock} onChange={e => setForm(f => ({ ...f, minStock: e.target.value }))} placeholder="5" style={inputStyle} />
               </div>
 
@@ -1223,7 +1223,7 @@ ${printFiltered.map(p => {
                   setBarcodeVal('');
                 }}
                 style={{ ...btn('primary'), width: '100%', padding: '12px', fontSize: 16 }}
-              ><Icon e="➕" />
+              > <Icon e="➕" />
                  পণ্য তালিকায় যোগ করুন
               </button>
             </div>
@@ -1232,7 +1232,7 @@ ${printFiltered.map(p => {
           {/* Right: Items List */}
           <div style={{ width: 400, display: 'flex', flexDirection: 'column', background: T.gray50 }}>
             <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="📋" /> পণ্যের তালিকা ({purchaseItems.length})</span>
+              <span style={{ fontWeight: 800, fontSize: 24 }}> <Icon e="📋" /> পণ্যের তালিকা ({purchaseItems.length})</span>
               {purchaseItems.length > 0 && (
                 <button
                   onClick={() => {
@@ -1244,7 +1244,7 @@ ${printFiltered.map(p => {
                     alert(`✅ ${purchaseItems.length}{t('productsCount')} সংরক্ষিত হয়েছে!`);
                   }}
                   style={{ ...btn('success'), padding: '8px 16px', fontSize: 15 }}
-                ><Icon e="💾" />
+                > <Icon e="💾" />
                    সব সংরক্ষণ
                 </button>
               )}
@@ -1288,8 +1288,8 @@ ${printFiltered.map(p => {
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-          <button style={btn()} onClick={() => setProductTab('list')}><Icon e="←" /> ফিরে যান</button>
-          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="📜" /> পণ্যের দাম পরিবর্তনের ইতিহাস</span>
+          <button style={btn()} onClick={() => setProductTab('list')}> <Icon e="←" /> ফিরে যান</button>
+          <span style={{ fontWeight: 800, fontSize: 24 }}> <Icon e="📜" /> পণ্যের দাম পরিবর্তনের ইতিহাস</span>
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
           <div style={{ ...cardStyle, overflow: 'hidden' }}>
@@ -1301,12 +1301,12 @@ ${printFiltered.map(p => {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: T.tealLight }}>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>তারিখ ও সময়</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('productName')}</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>পরিবর্তনের ধরন</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>পুরাতন দাম</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>নতুন দাম</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>ব্যবহারকারী</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.teal }}>তারিখ ও সময়</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('productName')}</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.teal }}>পরিবর্তনের ধরন</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 12, fontWeight: 700, color: T.teal }}>পুরাতন দাম</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 12, fontWeight: 700, color: T.teal }}>নতুন দাম</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.teal }}>ব্যবহারকারী</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1342,8 +1342,8 @@ ${printFiltered.map(p => {
     return (
       <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-          <button style={btn()} onClick={() => setProductTab('list')}><Icon e="←" /> ফিরে যান</button>
-          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="🗑" /><Icon e="️" /> পণ্য ডিলিটের তালিকা</span>
+          <button style={btn()} onClick={() => setProductTab('list')}> <Icon e="←" /> ফিরে যান</button>
+          <span style={{ fontWeight: 800, fontSize: 24 }}><Icon e="🗑" /> <Icon e="️" /> পণ্য ডিলিটের তালিকা</span>
         </div>
         <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
           <div style={{ ...cardStyle, overflow: 'hidden' }}>
@@ -1355,11 +1355,11 @@ ${printFiltered.map(p => {
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ background: T.redLight }}>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>তারিখ ও সময়</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>{t('productName')}</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>{t('company')}</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.red }}>ডিলিটের সময় স্টক</th>
-                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.red }}>ব্যবহারকারী</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.red }}>তারিখ ও সময়</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.red }}>{t('productName')}</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.red }}>{t('company')}</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 12, fontWeight: 700, color: T.red }}>ডিলিটের সময় স্টক</th>
+                      <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.red }}>ব্যবহারকারী</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1400,7 +1400,7 @@ ${printFiltered.map(p => {
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
-        ><Icon e="📦" />
+        > <Icon e="📦" />
            Products
         </button>
         <button
@@ -1411,7 +1411,7 @@ ${printFiltered.map(p => {
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
-        ><Icon e="➕" />
+        > <Icon e="➕" />
            New Product
         </button>
         <button
@@ -1423,7 +1423,7 @@ ${printFiltered.map(p => {
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
-        ><Icon e="🏢" />
+        > <Icon e="🏢" />
            Suppliers
         </button>
         <button
@@ -1435,7 +1435,7 @@ ${printFiltered.map(p => {
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
-        ><Icon e="📊" />
+        > <Icon e="📊" />
            Barcode
         </button>
         <button
@@ -1447,26 +1447,26 @@ ${printFiltered.map(p => {
             fontWeight: 600, fontSize: 13, cursor: 'pointer',
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
           }}
-        ><Icon e="🏭" />
+        > <Icon e="🏭" />
            Stock
         </button>
       </div>
 
       {/* Header */}
       <div style={{ padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <button style={btn('primary')} onClick={() => setShowAddForm(true)}><Icon e="➕" /> {t('newProductButton')}</button>
-        <button style={btn('ghost')} onClick={() => setShowPurchaseHistory(true)}><Icon e="📦" /> {t('purchaseHistoryButton')}</button>
+        <button style={btn('primary')} onClick={() => setShowAddForm(true)}> <Icon e="➕" /> {t('newProductButton')}</button>
+        <button style={btn('ghost')} onClick={() => setShowPurchaseHistory(true)}> <Icon e="📦" /> {t('purchaseHistoryButton')}</button>
         <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
           <button
             onClick={() => setProductTab('history')}
             style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
-          ><Icon e="📜" />
+          > <Icon e="📜" />
              {t('priceHistoryButton')}
           </button>
           <button
             onClick={() => setProductTab('deleted')}
             style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
-          ><Icon e="🗑" />
+          > <Icon e="🗑" />
             ️ {t('deletedListButton')}
           </button>
         </div>
@@ -1481,7 +1481,7 @@ ${printFiltered.map(p => {
             background: stockFilter === 'in' ? T.teal : T.gray100,
             color: stockFilter === 'in' ? T.white : T.gray600,
             border: 'none', padding: '8px 14px', fontSize: 15,
-          }}><Icon e="📦" /> {t('stockIn')} ({stockCount})</button>
+          }}> <Icon e="📦" /> {t('stockIn')} ({stockCount})</button>
 
           <button onClick={() => setStockFilter('out')} style={{
             ...btn(stockFilter === 'out' ? 'primary' : 'ghost', 'sm'),
@@ -1489,18 +1489,18 @@ ${printFiltered.map(p => {
             background: stockFilter === 'out' ? T.red : T.redLight,
             color: stockFilter === 'out' ? T.white : T.red,
             border: 'none', padding: '8px 14px', fontSize: 15,
-          }}><Icon e="⚠" /> {t('stockOutStatus')} ({outOfStockCount})</button>
+          }}> <Icon e="⚠" /> {t('stockOutStatus')} ({outOfStockCount})</button>
 
           <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
-            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><Icon e="🔍" /></span>
+            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><Icon e="🔍" /> </span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="পণ্য খুঁজুন..."
+              placeholder={t('searchProduct')}
               style={{ ...inputStyle, paddingLeft: 32 }}
             />
           </div>
-          <button style={btn('ghost')} onClick={printProductList}><Icon e="🖨" /><Icon e="️" /> {t('printButton')}</button>
+          <button style={btn('ghost')} onClick={printProductList}><Icon e="🖨" /> <Icon e="️" /> {t('printButton')}</button>
           <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{filtered.length}{t('productsCount')}</span>
         </div>
       )}
@@ -1515,26 +1515,26 @@ ${printFiltered.map(p => {
                 borderRadius: '50%', animation: 'spin 1s linear infinite'
               }}></div>
               <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-              <div style={{ fontSize: 14, color: T.gray500 }}>পণ্যের তালিকা লোড হচ্ছে...</div>
+              <div style={{ fontSize: 14, color: T.gray500 }}>{t('loadingProducts')}</div>
             </div>
           ) : (
             <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.08)', border: `1px solid ${T.gray200}` }}>
               <thead>
                 <tr style={{ background: T.tealLight }}>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{t('productName')}</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('company')}</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('category')}</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('buyPrice')}</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('sellPrice')}</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('profit')}</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('stock')}</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('unit')}</th>
-                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: T.teal }}>{t('action')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.teal, letterSpacing: '0.3px', whiteSpace: 'nowrap' }}>{t('productName')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('company')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'left', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('category')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('buyPrice')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('sellPrice')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'right', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('profit')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('stock')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('unit')}</th>
+                  <th style={{ padding: '10px 12px', textAlign: 'center', fontSize: 12, fontWeight: 700, color: T.teal }}>{t('action')}</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={9} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>পণ্য পাওয়া যায়নি</td></tr>
+                  <tr><td colSpan={9} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noProductsFound')}</td></tr>
                 ) : filtered.map((p, i) => {
                   const profitPct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
                   const isLowStock = p.stock <= (p as any).minStock;
@@ -1555,16 +1555,16 @@ ${printFiltered.map(p => {
                       </td>
                       <td style={{ padding: '10px 12px', textAlign: 'center' }}>
                         <span style={{ fontWeight: 700, fontSize: 15, color: isLowStock ? T.red : T.gray900 }}>{fmtN(p.stock)}</span>
-                        {isLowStock && <span style={{ fontSize: 14, color: T.red, marginLeft: 4 }}><Icon e="⚠" /></span>}
+                        {isLowStock && <span style={{ fontSize: 14, color: T.red, marginLeft: 4 }}><Icon e="⚠" /> </span>}
                       </td>
                       <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400 }}>{p.unit}</td>
                       <td style={{ padding: '10px 12px', display: 'flex', gap: 6, justifyContent: 'center' }}>
-                        <button style={{ ...btn('ghost', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => setViewProduct(p)} title="দেখুন"><Icon e="👁" /><Icon e="️" /></button>
-                        <button style={{ ...btn('primary', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => setEditProduct({ ...p, buyP: p.costPrice, sellP: p.sellPrice })} title="সম্পাদনা"><Icon e="✏" /><Icon e="️" /></button>
+                        <button style={{ ...btn('ghost', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => setViewProduct(p)} title="দেখুন"><Icon e="👁" /> <Icon e="️" /> </button>
+                        <button style={{ ...btn('primary', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => setEditProduct({ ...p, buyP: p.costPrice, sellP: p.sellPrice })} title="সম্পাদনা"><Icon e="✏" /> <Icon e="️" /> </button>
                         {p.stock <= 0 ? (
-                          <button style={{ ...btn('danger', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => del(p.id)} title="মুছুন"><Icon e="🗑" /><Icon e="️" /></button>
+                          <button style={{ ...btn('danger', 'sm'), padding: '5px 8px', fontSize: 14 }} onClick={() => del(p.id)} title="মুছুন"><Icon e="🗑" /> <Icon e="️" /> </button>
                         ) : (
-                          <button disabled style={{ ...btn('ghost', 'sm'), padding: '5px 8px', fontSize: 14, opacity: 0.4, cursor: 'not-allowed' }} title="স্টক থাকলে মুছা যাবে না"><Icon e="🔒" /></button>
+                          <button disabled style={{ ...btn('ghost', 'sm'), padding: '5px 8px', fontSize: 14, opacity: 0.4, cursor: 'not-allowed' }} title="স্টক থাকলে মুছা যাবে না"><Icon e="🔒" /> </button>
                         )}
                       </td>
                     </tr>
@@ -1580,7 +1580,7 @@ ${printFiltered.map(p => {
       {productTab === 'suppliers' && (
         <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}><Icon e="🏢" /></div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}><Icon e="🏢" /> </div>
             <h3 style={{ margin: '0 0 8px', color: T.teal }}>Suppliers</h3>
             <p style={{ color: T.gray500 }}>সরবরাহকারীদের তালিকা এখানে দেখা যাবে</p>
           </div>
@@ -1591,7 +1591,7 @@ ${printFiltered.map(p => {
       {productTab === 'barcode' && (
         <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}><Icon e="📊" /></div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}><Icon e="📊" /> </div>
             <h3 style={{ margin: '0 0 8px', color: T.teal }}>Barcode</h3>
             <p style={{ color: T.gray500 }}>বারকোড জেনারেটর এখানে দেখা যাবে</p>
           </div>
@@ -1602,7 +1602,7 @@ ${printFiltered.map(p => {
       {productTab === 'inventory' && (
         <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}><Icon e="🏭" /></div>
+            <div style={{ fontSize: 48, marginBottom: 16 }}><Icon e="🏭" /> </div>
             <h3 style={{ margin: '0 0 8px', color: T.teal }}>Stock</h3>
             <p style={{ color: T.gray500 }}>স্টক ম্যানেজমেন্ট এখানে দেখা যাবে</p>
           </div>
@@ -1614,8 +1614,8 @@ ${printFiltered.map(p => {
         <div style={overlay}>
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontSize: 16, color: T.teal }}><Icon e="✏" /><Icon e="️" /> পণ্যের দাম সম্পাদনা</h3>
-              <button onClick={() => setEditProduct(null)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: T.gray400 }}><Icon e="✕" /></button>
+              <h3 style={{ margin: 0, fontSize: 16, color: T.teal }}><Icon e="✏" /> <Icon e="️" /> পণ্যের দাম সম্পাদনা</h3>
+              <button onClick={() => setEditProduct(null)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: T.gray400 }}><Icon e="✕" /> </button>
             </div>
 
             <div style={{ marginBottom: 12 }}>
@@ -1645,7 +1645,7 @@ ${printFiltered.map(p => {
 
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setEditProduct(null)} style={{ ...btn('ghost'), flex: 1 }}>বাতিল</button>
-              <button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2 }}><Icon e="💾" /> সংরক্ষণ করুন</button>
+              <button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2 }}> <Icon e="💾" /> সংরক্ষণ করুন</button>
             </div>
           </div>
         </div>
@@ -1656,8 +1656,8 @@ ${printFiltered.map(p => {
         <div style={overlay}>
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontSize: 16, color: T.teal }}><Icon e="📋" /> পণ্যের বিবরণ</h3>
-              <button onClick={() => setViewProduct(null)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: T.gray400 }}><Icon e="✕" /></button>
+              <h3 style={{ margin: 0, fontSize: 16, color: T.teal }}> <Icon e="📋" /> পণ্যের বিবরণ</h3>
+              <button onClick={() => setViewProduct(null)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: T.gray400 }}><Icon e="✕" /> </button>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
@@ -2001,7 +2001,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               color: '#DC2626',
               fontSize: 11,
               fontWeight: 500,
-            }}><Icon e="⚠" />
+            }}> <Icon e="⚠" />
               ️ {error}
             </div>
           )}
@@ -2092,11 +2092,11 @@ const [currentTab, setCurrentTab] = useState('pos');
 
   // Tabs configuration
   const otherTabs = [
-    { id: 'products', icon: <Icon e="📦" />, label: t('products') },
-    { id: 'customers', icon: <Icon e="👥" />, label: t('customers') },
-    { id: 'income', icon: <Icon e="💰" />, label: t('incomeExpenses') },
-    { id: 'reports', icon: <Icon e="📊" />, label: t('reports') },
-    { id: 'settings', icon: <Icon e="⚙️" />, label: t('settings') },
+    { id: 'products', icon: <Icon e="📦" /> , label: t('products') },
+    { id: 'customers', icon: <Icon e="👥" /> , label: t('customers') },
+    { id: 'income', icon: <Icon e="💰" /> , label: t('incomeExpenses') },
+    { id: 'reports', icon: <Icon e="📊" /> , label: t('reports') },
+    { id: 'settings', icon: <Icon e="⚙️" /> , label: t('settings') },
   ];
 
   // Menu scroll ref
@@ -2552,7 +2552,7 @@ const [currentTab, setCurrentTab] = useState('pos');
             {/* Scrollable Menu - Centered */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 4 }}>
               {/* Left Arrow */}
-              <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', flexShrink: 0 }}><Icon e="◀" /></button>
+              <button onClick={() => scrollMenu('left')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', flexShrink: 0 }}><Icon e="◀" /> </button>
 
               {/* Menu Items Container */}
               <div ref={menuRef} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflowX: 'auto', gap: 2, padding: '4px 5px', background: '#F5F5F5', borderRadius: 12, border: '1px solid #E0E0E0', scrollbarWidth: 'none', msOverflowStyle: 'none', flexShrink: 0 }}>
@@ -2572,7 +2572,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                   transition: 'all 0.2s',
                   borderRadius: 6,
                 }}>
-                  <span style={{ fontSize: 16 }}><Icon e="🛒" /></span>
+                  <span style={{ fontSize: 16 }}><Icon e="🛒" /> </span>
                   <span>{t('sales')}</span>
                 </button>
                 {otherTabs.map((t) => (
@@ -2599,14 +2599,14 @@ const [currentTab, setCurrentTab] = useState('pos');
               </div>
 
               {/* Right Arrow */}
-              <button onClick={() => scrollMenu('right')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', flexShrink: 0 }}><Icon e="▶" /></button>
+              <button onClick={() => scrollMenu('right')} style={{ width: 28, height: 28, border: 'none', background: '#F3F4F6', borderRadius: 6, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#4B5563', flexShrink: 0 }}><Icon e="▶" /> </button>
             </div>
           </div>
 
           {/* Actions Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 8 }}>
             {/* Refresh Button */}
-            <button onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title="🔄 হার্ড রিফ্রেশ"><Icon e="🔄" /></button>
+            <button onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title="🔄 হার্ড রিফ্রেশ"><Icon e="🔄" /> </button>
             
             {/* Fullscreen Button */}
             <button onClick={handleFullscreen} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title={isFullscreen ? '✕ বের হতে চাপুন' : '⛶ ফুল স্ক্রিন'}>{isFullscreen ? '✕' : '⛶'}</button>
@@ -2630,7 +2630,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                   transition: 'all 0.2s', 
                   color: '#4B5563' 
                 }}
-              ><Icon e="🌐" />
+              > <Icon e="🌐" />
                  {currentLang.flag} {currentLang.nativeName}
               </button>
               {showLangDropdown && (
@@ -2671,7 +2671,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                     >
                       <span>{lang.flag}</span>
                       <span>{lang.nativeName}</span>
-                      {language === lang.code && <span style={{ marginLeft: 'auto' }}><Icon e="✓" /></span>}
+                      {language === lang.code && <span style={{ marginLeft: 'auto' }}><Icon e="✓" /> </span>}
                     </button>
                   ))}
                 </div>
@@ -2679,7 +2679,7 @@ const [currentTab, setCurrentTab] = useState('pos');
             </div>
             
             {/* Logout Button */}
-            <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="লগআউট"><Icon e="↩" /><Icon e="️" /></button>
+            <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="লগআউট"><Icon e="↩" /> <Icon e="️" /> </button>
 
             {/* Date & Time */}
             <TimeDisplay language={language} />
@@ -2720,7 +2720,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
-                      <span style={{ fontSize: 16 }}><Icon e="📦" /></span>
+                      <span style={{ fontSize: 16 }}><Icon e="📦" /> </span>
                     </div>
                     <input
                       value={searchQuery}
@@ -2760,7 +2760,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       borderRadius: '10px 0 0 10px'
                     }}>
-                      <span style={{ fontSize: 16 }}><Icon e="👤" /></span>
+                      <span style={{ fontSize: 16 }}><Icon e="👤" /> </span>
                     </div>
                     <input
                       value={customerSearch}
@@ -2841,7 +2841,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                         paddingRight: 32
                       }}
                     >
-                      <option value="all"><Icon e="📋" /> {t('allSuppliers')}</option>
+                      <option value="all"> <Icon e="📋" /> {t('allSuppliers')}</option>
                       {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
                         <option key={s} value={s}>{s}</option>
                       ))}
@@ -2877,7 +2877,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                         paddingRight: 32
                       }}
                     >
-                      <option value="all"><Icon e="📁" /> {t('allCategories')}</option>
+                      <option value="all"> <Icon e="📁" /> {t('allCategories')}</option>
                       {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
@@ -2902,7 +2902,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       boxSizing: 'border-box',
                       border: '1px solid #E0E0E0'
                     }}>
-                      <span style={{ fontSize: 14 }}><Icon e="📦" /></span>
+                      <span style={{ fontSize: 14 }}><Icon e="📦" /> </span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: '#424242' }}>{filteredProducts.length}</span>
                       <span style={{ fontSize: 11, color: '#757575' }}>পণ্য</span>
                     </div>
@@ -2950,7 +2950,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       transform: stockFilter === 'available' ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'available' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="📦" /></div>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'available' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="📦" /> </div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: stockFilter === 'available' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockAvailable')}</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: stockFilter === 'available' ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.stock > 0).length}</div>
@@ -2980,7 +2980,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       transform: stockFilter === 'low' ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="⚠" /></div>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="⚠" /> </div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: stockFilter === 'low' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockLow')}</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: stockFilter === 'low' ? '#FFFFFF' : '#D97706', lineHeight: 1 }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
@@ -3010,7 +3010,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       transform: stockFilter === 'out' ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'out' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="🚫" /></div>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'out' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="🚫" /> </div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: stockFilter === 'out' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockOut')}</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: stockFilter === 'out' ? '#FFFFFF' : '#DC2626', lineHeight: 1 }}>{products.filter(p => p.stock <= 0).length}</div>
@@ -3040,7 +3040,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       transform: showExpiryList ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: showExpiryList ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="📅" /></div>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: showExpiryList ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="📅" /> </div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: showExpiryList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('productExpiry')}</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: showExpiryList ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
@@ -3070,7 +3070,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       transform: showCustomerList ? 'translateY(-1px)' : 'none'
                     }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: showCustomerList ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="👥" /></div>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: showCustomerList ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="👥" /> </div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: showCustomerList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('customers')}</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: showCustomerList ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{customers.length}</div>
@@ -3114,7 +3114,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       marginLeft: 'auto'
                     }}
                   >
-                    <div style={{ width: 28, height: 28, borderRadius: 7, background: showHeldSales ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="📋" /></div>
+                    <div style={{ width: 28, height: 28, borderRadius: 7, background: showHeldSales ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="📋" /> </div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: showHeldSales ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('hold')}</div>
                       <div style={{ fontSize: 18, fontWeight: 800, color: showHeldSales ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{heldSales.length > 0 ? heldSales.length : '0'}</div>
@@ -3147,14 +3147,14 @@ const [currentTab, setCurrentTab] = useState('pos');
                       
                       {/* Hold Sales Pill - Left Side */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><Icon e="📋" /> {t('holdSales')} ({heldSales.length})</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}> <Icon e="📋" /> {t('holdSales')} ({heldSales.length})</span>
                       </div>
 
                       {/* Clear All Button - Right Side */}
                       <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
                         <button 
                           onClick={() => setShowHeldSales(false)}
-                          style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}><Icon e="✕" />
+                          style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}> <Icon e="✕" />
                            {t('close')}
                         </button>
                       </div>
@@ -3163,7 +3163,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                     {/* Hold Sales Cards */}
                     {heldSales.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: 40, background: '#fff', borderRadius: 12, border: '1px solid #E5E7EB' }}>
-                        <div style={{ fontSize: 48, marginBottom: 8 }}><Icon e="📋" /></div>
+                        <div style={{ fontSize: 48, marginBottom: 8 }}><Icon e="📋" /> </div>
                         <div style={{ color: '#9CA3AF', fontSize: 14 }}>{t('noHoldSales')}</div>
                       </div>
                     ) : (
@@ -3183,8 +3183,8 @@ const [currentTab, setCurrentTab] = useState('pos');
                             {/* Card Header */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#F0FDFA', borderBottom: '1px solid #99F6E4' }}>
                               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <span style={{ fontSize: 16 }}><Icon e="📋" /></span>
-                                <span style={{ fontSize: 14, fontWeight: 700, color: '#115E59' }}>{t('hold')} #{idx + 1}</span>
+                                <span style={{ fontSize: 16 }}><Icon e="📋" /> </span>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: '#115E59' }}>{t('hold')} #{idx + 1}</span>
                                 <span style={{ fontSize: 12, color: '#6B7280' }}>({sale.items.length} items)</span>
                               </div>
                               <button 
@@ -3193,7 +3193,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                                   newHeld.splice(idx, 1);
                                   setHeldSales(newHeld);
                                 }}
-                                style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Icon e="🗑" />
+                                style={{ width: 28, height: 28, borderRadius: '50%', border: 'none', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}> <Icon e="🗑" />
                                 ️
                               </button>
                             </div>
@@ -3203,7 +3203,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                               {sale.items.slice(0, 3).map((item, itemIdx) => (
                                 <div key={itemIdx} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: itemIdx < Math.min(sale.items.length - 1, 2) ? '1px dashed #E5E7EB' : 'none' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <span style={{ fontSize: 16 }}><Icon e="📦" /></span>
+                                    <span style={{ fontSize: 16 }}><Icon e="📦" /> </span>
                                     <div>
                                       <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{item.name}</div>
                                       <div style={{ fontSize: 11, color: '#6B7280' }}>×{item.quantity}</div>
@@ -3238,7 +3238,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                                   newHeld.splice(idx, 1);
                                   setHeldSales(newHeld);
                                 }}
-                                style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#EA580C', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, boxShadow: '0 2px 6px rgba(234,88,12,0.3)' }}><Icon e="➕" />
+                                style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: '#EA580C', color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 600, boxShadow: '0 2px 6px rgba(234,88,12,0.3)' }}> <Icon e="➕" />
                                  {t('addItems')}
                               </button>
                             </div>
@@ -3259,21 +3259,21 @@ const [currentTab, setCurrentTab] = useState('pos');
                         {/* Filter Pills - Left Side */}
                         {searchQuery && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#EEF2FF', borderRadius: 20, border: '1px solid #C7D2FE' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}><Icon e="🔍" /> "{searchQuery}" ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}> <Icon e="🔍" /> "{searchQuery}" ({filteredProducts.length})</span>
                           </div>
                         )}
                         
                         {/* Category Filter */}
                         {selectedCategory !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><Icon e="📁" /> {categories.find(c => c.id === selectedCategory)?.name} ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}> <Icon e="📁" /> {categories.find(c => c.id === selectedCategory)?.name} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
                         {/* Supplier Filter */}
                         {selectedSupplier !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#FEF3C7', borderRadius: 20, border: '1px solid #FDE68A' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}><Icon e="📋" /> {selectedSupplier} ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}> <Icon e="📋" /> {selectedSupplier} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
@@ -3281,7 +3281,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                         {stockFilter !== 'in' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
                             <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
-                              {stockFilter === 'available' && <><Icon e='📦' /> {t('stockAvailable')} </> + ` (${filteredProducts.length})`}
+                              {stockFilter === 'available' && <> <Icon e='📦' /> {t('stockAvailable')} </> + ` (${filteredProducts.length})`}
                               {stockFilter === 'low' && '⚠️ ' + t('stockLow') + ` (${filteredProducts.length})`}
                               {stockFilter === 'out' && '⚠️ ' + t('stockOut') + ` (${filteredProducts.length})`}
                             </span>
@@ -3298,7 +3298,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                               setStockFilter('all');
                               setShowHeldSales(false);
                             }}
-                            style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}><Icon e="✕" />
+                            style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}> <Icon e="✕" />
                              {t('close')}
                           </button>
                         </div>
@@ -3313,8 +3313,8 @@ const [currentTab, setCurrentTab] = useState('pos');
                         </div>
                         <div style={{ flex: 1, color: '#fff' }}>
                           <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{searchedCustomer.name}</div>
-                          <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 2 }}><Icon e="📱" /> {searchedCustomer.phone}</div>
-                          <div style={{ fontSize: 13, opacity: 0.9 }}><Icon e="📍" /> {searchedCustomer.address}</div>
+                          <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 2 }}> <Icon e="📱" /> {searchedCustomer.phone}</div>
+                          <div style={{ fontSize: 13, opacity: 0.9 }}> <Icon e="📍" /> {searchedCustomer.address}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ padding: '8px 16px', background: searchedCustomer.balance > 0 ? 'rgba(220,38,38,0.3)' : 'rgba(34,197,94,0.3)', borderRadius: 8, marginBottom: 8 }}>
@@ -3324,7 +3324,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                           <div style={{ display: 'flex', gap: 8 }}>
                             <button 
                               onClick={() => { setSelectedCustomer(searchedCustomer); setCustomerSearch(''); }}
-                              style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#fff', color: '#667eea', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}><Icon e="✓" />
+                              style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#fff', color: '#667eea', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}> <Icon e="✓" />
                                {t('selectCustomer')}
                             </button>
                             <button 
@@ -3343,10 +3343,10 @@ const [currentTab, setCurrentTab] = useState('pos');
                       <div style={{ padding: '16px 0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '10px 14px', marginBottom: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="📅" /></div>
+                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="📅" /> </div>
                             <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
                           </div>
-                          <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><Icon e="✕" /> {t('close')}</button>
+                          <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}> <Icon e="✕" /> {t('close')}</button>
                         </div>
                         {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
@@ -3360,7 +3360,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                                 <div key={p.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                   <div>
                                     <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{p.name}</div>
-                                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><Icon e="📅" /> {p.expiryDate}</div>
+                                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}> <Icon e="📅" /> {p.expiryDate}</div>
                                   </div>
                                   <div style={{ background: daysLeft <= 7 ? '#FEE2E2' : '#F0FDFA', color: daysLeft <= 7 ? '#DC2626' : '#115E59', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600 }}>
                                     {daysLeft} days
@@ -3379,10 +3379,10 @@ const [currentTab, setCurrentTab] = useState('pos');
                       <div style={{ padding: '16px 0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '10px 14px', marginBottom: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="👥" /></div>
+                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><Icon e="👥" /> </div>
                             <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('customers')} ({customers.length})</h3>
                           </div>
-                          <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><Icon e="✕" /> {t('close')}</button>
+                          <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}> <Icon e="✕" /> {t('close')}</button>
                         </div>
                         {customers.length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
@@ -3393,7 +3393,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                             {customers.map(c => (
                               <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12 }}>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
-                                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><Icon e="📱" /> {c.phone}</div>
+                                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}> <Icon e="📱" /> {c.phone}</div>
                                 {c.balance > 0 && (
                                   <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>বাকি: ৳{c.balance}</div>
                                 )}
@@ -3436,7 +3436,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                           marginBottom: 20,
                           boxShadow: '0 8px 32px rgba(16, 185, 129, 0.15)'
                         }}>
-                          <span style={{ fontSize: 48 }}><Icon e="🛒" /></span>
+                          <span style={{ fontSize: 48 }}><Icon e="🛒" /> </span>
                         </div>
                         <div style={{
                           fontSize: 18,
@@ -3471,7 +3471,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                             gap: 8,
                             boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                           }}>
-                            <span style={{ fontSize: 16 }}><Icon e="▣" /></span>
+                            <span style={{ fontSize: 16 }}><Icon e="▣" /> </span>
                             <span style={{ fontSize: 13, fontWeight: 600, color: '#6B7280' }}>{t('scanItem')}</span>
                           </div>
                           <div style={{
@@ -3587,7 +3587,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                                  product.name.includes('ল্যাপটপ') || product.name.includes('কম্পিউটার') ? '💻' :
                                  product.name.includes('টাকা') || product.name.includes('কয়েন') ? '💰' :
                                  product.name.includes('স্ট্যাম্প') || product.name.includes('মার্ক') ? '📮' :
-                                 product.image ? product.image : <Icon e='📦' />}
+                                 product.image ? product.image : <Icon e='📦' /> }
                               </span>
                             )}
                           </div>
@@ -3596,14 +3596,14 @@ const [currentTab, setCurrentTab] = useState('pos');
                           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                             {/* Top: Name */}
                             <div style={{ marginBottom: 4 }}>
-                              <div style={{ fontSize: 14, fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', lineHeight: 1.3 }}>
                                 {product.name}
                               </div>
                             </div>
 
                             {/* Middle: Barcode & Unit */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                              <div style={{ fontSize: 11, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><Icon e="📊" />
+                              <div style={{ fontSize: 11, color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}> <Icon e="📊" />
                                  {product.code || 'N/A'}
                               </div>
                               <div style={{ fontSize: 11, color: '#9CA3AF' }}>
@@ -3673,7 +3673,7 @@ const [currentTab, setCurrentTab] = useState('pos');
               {/* Cart Header */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#115E59', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}><Icon e="🛒" /> {t('cart')}</h3>
+                  <h3 style={{ fontSize: 15, fontWeight: 700, color: '#115E59', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}> <Icon e="🛒" /> {t('cart')}</h3>
                   <span style={{ background: '#115E59', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 14, fontWeight: 600 }}>{cart.length}</span>
                 </div>
                 {/* Customer Input with Add Button */}
@@ -3690,7 +3690,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                         background: '#D1FAE5',
                         border: '1.5px solid #10B981',
                       }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#065F46' }}><Icon e="👤" />
+                        <span style={{ fontSize: 13, fontWeight: 600, color: '#065F46' }}> <Icon e="👤" />
                            {selectedCustomer.name} • {selectedCustomer.phone}
                         </span>
                         <button 
@@ -3744,7 +3744,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       fontWeight: 600, 
                       cursor: 'pointer',
                       whiteSpace: 'nowrap'
-                    }}><Icon e="➕" />
+                    }}> <Icon e="➕" />
                      Add
                   </button>
                 </div>
@@ -3754,7 +3754,7 @@ const [currentTab, setCurrentTab] = useState('pos');
               <div style={{ flex: 1, overflow: 'auto', background: '#fafbfc' }}>
                 {cart.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '30px 16px', background: '#FFFFFF', margin: 8, borderRadius: 8, border: '1px solid #e5e7eb' }}>
-                    <div style={{ fontSize: 36, marginBottom: 8 }}><Icon e="🛒" /></div>
+                    <div style={{ fontSize: 36, marginBottom: 8 }}><Icon e="🛒" /> </div>
                     <div style={{ fontSize: 14, fontWeight: 600, color: '#6B7280', marginBottom: 4 }}>{t('cartEmpty')}</div>
                     <div style={{ fontSize: 15, color: '#9CA3AF' }}>{t('addProductsFromLeft')}</div>
                   </div>
@@ -3765,7 +3765,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                             <span style={{ fontSize: 14, fontWeight: 600, color: '#115E59', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{item.name}</span>
-                            <span style={{ fontSize: 14, fontWeight: 700, color: '#115E59', flexShrink: 0 }}>{fmt(item.sellPrice * item.quantity)}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#115E59', flexShrink: 0 }}>{fmt(item.sellPrice * item.quantity)}</span>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 2 }}>
                             <span style={{ fontSize: 14, color: '#6B7280' }}>{item.quantity} × {fmt(item.sellPrice)}</span>
@@ -3773,7 +3773,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                               <button onClick={() => updateQuantity(item.productId, -1)} style={{ width: 22, height: 22, border: 'none', borderRadius: 4, background: '#F3F4F6', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563' }}>−</button>
                               <span style={{ fontSize: 14, fontWeight: 600, minWidth: 18, textAlign: 'center' }}>{item.quantity}</span>
                               <button onClick={() => updateQuantity(item.productId, 1)} style={{ width: 22, height: 22, border: 'none', borderRadius: 4, background: '#F3F4F6', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4B5563' }}>+</button>
-                              <button onClick={() => setCart(prev => prev.filter(i => i.productId !== item.productId))} style={{ width: 22, height: 22, border: 'none', borderRadius: 4, background: '#FEF2F2', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626', marginLeft: 4 }}><Icon e="✕" /></button>
+                              <button onClick={() => setCart(prev => prev.filter(i => i.productId !== item.productId))} style={{ width: 22, height: 22, border: 'none', borderRadius: 4, background: '#FEF2F2', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626', marginLeft: 4 }}><Icon e="✕" /> </button>
                             </div>
                           </div>
                         </div>
@@ -3911,12 +3911,12 @@ const [currentTab, setCurrentTab] = useState('pos');
 
                 {/* Due/Change Alert */}
                 {due > 0 && (
-                  <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#FEF2F2', color: '#DC2626', fontWeight: 600, textAlign: 'center' }}><Icon e="⚠" />
+                  <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#FEF2F2', color: '#DC2626', fontWeight: 600, textAlign: 'center' }}> <Icon e="⚠" />
                     ️ {t('due')}: {fmt(due)}
                   </div>
                 )}
                 {change > 0 && (
-                  <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#F0FDF4', color: '#16A34A', fontWeight: 600, textAlign: 'center' }}><Icon e="💵" />
+                  <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#F0FDF4', color: '#16A34A', fontWeight: 600, textAlign: 'center' }}> <Icon e="💵" />
                      {t('change')}: {fmt(change)}
                   </div>
                 )}
@@ -3940,7 +3940,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       background: '#F5F5F5',
                       color: cart.length > 0 ? '#DC2626' : '#9CA3AF',
                       fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
-                    }}><Icon e="🗑" />
+                    }}> <Icon e="🗑" />
                     ️
                   </button>
                   {/* Hold Button */}
@@ -3973,7 +3973,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                       color: '#fff', fontWeight: 700, fontSize: 16,
                       cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                       boxShadow: cart.length > 0 ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
-                    }}><Icon e="✓" />
+                    }}> <Icon e="✓" />
                      {t('completeSale')}
                   </button>
                 </div>
@@ -4006,7 +4006,7 @@ const [currentTab, setCurrentTab] = useState('pos');
 
         {currentTab === 'reports' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}><Icon e="📈" /> {t('reports')}</h2>
+            <h2 style={{ marginBottom: 16 }}> <Icon e="📈" /> {t('reports')}</h2>
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="label">{t('totalProducts')}</div>
@@ -4042,7 +4042,7 @@ const [currentTab, setCurrentTab] = useState('pos');
             
             {/* Sales List Section */}
             <div className="card" style={{ marginTop: 20 }}>
-              <h3 style={{ marginBottom: 12 }}><Icon e="🧾" /> {t('salesList')}</h3>
+              <h3 style={{ marginBottom: 12 }}> <Icon e="🧾" /> {t('salesList')}</h3>
               <div className="table-container">
                 <table>
                   <thead>
@@ -4160,7 +4160,7 @@ const [currentTab, setCurrentTab] = useState('pos');
 
         {currentTab === 'barcode' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}><Icon e="📊" /> {t('barcode')}</h2>
+            <h2 style={{ marginBottom: 16 }}> <Icon e="📊" /> {t('barcode')}</h2>
             <div className="card" style={{ maxWidth: 500 }}>
               <div className="form-group">
                 <label className="label">{t('code')}</label>
@@ -4168,7 +4168,7 @@ const [currentTab, setCurrentTab] = useState('pos');
               </div>
               <button className="btn btn-primary">{t('barcode')}</button>
               <div style={{ marginTop: 20, textAlign: 'center', padding: 20, background: '#F9FAFB', borderRadius: 8 }}>
-                <div style={{ fontSize: 48 }}><Icon e="📊" /></div>
+                <div style={{ fontSize: 48 }}><Icon e="📊" /> </div>
                 <p style={{ color: '#9CA3AF', marginTop: 8 }}>{t('barcode')} preview</p>
               </div>
             </div>
@@ -4189,20 +4189,20 @@ const [currentTab, setCurrentTab] = useState('pos');
 
         {currentTab === 'inventory' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}><Icon e="🏭" /> {t('stock')}</h2>
+            <h2 style={{ marginBottom: 16 }}> <Icon e="🏭" /> {t('stock')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="📦" /></div>
+                <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="📦" /> </div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>০</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProductsCount')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="⚠" /></div>
+                <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="⚠" /> </div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#DC2626' }}>০</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockLow')}</div>
               </div>
               <div className="card" style={{ background: '#ECFDF5', border: '1px solid #A7F3D0' }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="✅" /></div>
+                <div style={{ fontSize: 32, marginBottom: 8 }}><Icon e="✅" /> </div>
                 <div style={{ fontSize: 24, fontWeight: 700, color: '#059669' }}>০</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockAvailable')}</div>
               </div>
@@ -4210,7 +4210,7 @@ const [currentTab, setCurrentTab] = useState('pos');
             
             {/* Low Stock Alert Section */}
             <div className="card" style={{ border: '1px solid #FECACA', background: '#FEF2F2' }}>
-              <h3 style={{ marginBottom: 12, color: '#DC2626' }}><Icon e="⚠" /> {t('lowStockAlert')}</h3>
+              <h3 style={{ marginBottom: 12, color: '#DC2626' }}> <Icon e="⚠" /> {t('lowStockAlert')}</h3>
               <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 20 }}>{t('noLowStockProducts')}</p>
             </div>
           </div>
@@ -4218,21 +4218,21 @@ const [currentTab, setCurrentTab] = useState('pos');
 
         {currentTab === 'income' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}><Icon e="💰" /> {t('incomeExpenses')}</h2>
+            <h2 style={{ marginBottom: 16 }}> <Icon e="💰" /> {t('incomeExpenses')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}><Icon e="📈" /></div>
+                <div style={{ fontSize: 24, marginBottom: 8 }}><Icon e="📈" /> </div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>৳০</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalIncome')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
-                <div style={{ fontSize: 24, marginBottom: 8 }}><Icon e="📉" /></div>
+                <div style={{ fontSize: 24, marginBottom: 8 }}><Icon e="📉" /> </div>
                 <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>৳০</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalExpense')}</div>
               </div>
             </div>
             <div className="card">
-              <h3 style={{ marginBottom: 12 }}><Icon e="➕" /> {t('addExpense')}</h3>
+              <h3 style={{ marginBottom: 12 }}> <Icon e="➕" /> {t('addExpense')}</h3>
               <div className="form-group">
                 <label className="label">{t('description')}</label>
                 <input type="text" className="input" placeholder={t('description')} />
@@ -4261,12 +4261,12 @@ const [currentTab, setCurrentTab] = useState('pos');
         <div className="modal-overlay" onClick={() => setShowReceiptModal(false)}>
           <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3><Icon e="✅" /> {t('saleComplete')}</h3>
-              <button className="modal-close" onClick={() => setShowReceiptModal(false)}><Icon e="✕" /></button>
+              <h3> <Icon e="✅" /> {t('saleComplete')}</h3>
+              <button className="modal-close" onClick={() => setShowReceiptModal(false)}><Icon e="✕" /> </button>
             </div>
             <div className="modal-body">
               <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <div style={{ fontSize: 48 }}><Icon e="✅" /></div>
+                <div style={{ fontSize: 48 }}><Icon e="✅" /> </div>
                 <p style={{ fontSize: 14, color: '#6B7280' }}>{t('invoice')}: {lastSale.invoiceNo}</p>
               </div>
               <div style={{ borderBottom: '1px dashed #E5E7EB', paddingBottom: 12, marginBottom: 12 }}>
@@ -4318,7 +4318,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                   </div>
                 )}
               </div>
-              <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 20 }} onClick={() => setShowReceiptModal(false)}><Icon e="✓" />
+              <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 20 }} onClick={() => setShowReceiptModal(false)}> <Icon e="✓" />
                  {t('finish')}
               </button>
             </div>
@@ -4529,10 +4529,10 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F9FAFB' }}>
       {/* Header */}
       <div style={{ padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center', background: 'white', borderBottom: '1px solid #E5E7EB', flexWrap: 'wrap' }}>
-        <span style={{ fontWeight: 700, fontSize: 16 }}><Icon e="📦" /> {t('newProductSave')}</span>
+        <span style={{ fontWeight: 700, fontSize: 16 }}> <Icon e="📦" /> {t('newProductSave')}</span>
         <span style={{ fontSize: 14, color: '#6B7280', marginLeft: 'auto' }}>{purchaseItems.length} {t('productsAdded')}</span>
         {purchaseItems.length > 0 && (
-          <button onClick={savePurchase} style={{ padding: '8px 16px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}><Icon e="💾" />
+          <button onClick={savePurchase} style={{ padding: '8px 16px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}> <Icon e="💾" />
              {t('saveAll')}
           </button>
         )}
@@ -4545,10 +4545,10 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
           <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
             <input type="file" accept=".csv" onChange={handleCsvImport} id="newProductCsvInput" style={{ display: 'none' }} />
             <label htmlFor="newProductCsvInput" style={{ padding: '8px 16px', background: '#0D9488', color: 'white', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span><Icon e="📁" /></span> {t('csvUpload')}
+              <span><Icon e="📁" /> </span> {t('csvUpload')}
             </label>
             <button onClick={downloadDemoCSV} style={{ padding: '8px 16px', background: '#F3F4F6', color: '#374151', border: '1px solid #E5E7EB', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span><Icon e="📥" /></span> {t('demoCsv')}
+              <span><Icon e="📥" /> </span> {t('demoCsv')}
             </button>
           </div>
 
@@ -4560,7 +4560,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
               {/* Company */}
               <div style={{ position: 'relative' }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="🏢" /> {t('companySupplier')} *</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="🏢" /> {t('companySupplier')} *</label>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <input
                     value={supplierQ}
@@ -4570,7 +4570,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                     placeholder={t('selectSupplier')}
                     style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
                   />
-                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ padding: '4px 5px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}><Icon e="▼" /></button>
+                  <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ padding: '4px 5px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}><Icon e="▼" /> </button>
                 </div>
                 {showCompanyList && (
                   <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
@@ -4587,7 +4587,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
 
               {/* Category */}
               <div style={{ position: 'relative' }}>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="📂" /> {t('category')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="📂" /> {t('category')}</label>
                 <div style={{ display: 'flex', gap: 4 }}>
                   <input
                     value={form.cat}
@@ -4597,7 +4597,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                     placeholder={t('selectCategory')}
                     style={{ flex: 1, padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box' }}
                   />
-                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ padding: '4px 5px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}><Icon e="▼" /></button>
+                  <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ padding: '4px 5px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}><Icon e="▼" /> </button>
                 </div>
                 {showCategoryList && (
                   <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
@@ -4626,7 +4626,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="🔢" /> {t('barcode')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="🔢" /> {t('barcode')}</label>
                 <input
                   type="text"
                   value={barcodeVal}
@@ -4641,7 +4641,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
             {/* Unit + Stock + MinStock: 3 columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="📥" /> {t('unit')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="📥" /> {t('unit')}</label>
                 <select
                   value={form.unit}
                   onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
@@ -4659,7 +4659,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="📥" /> {t('stock')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="📥" /> {t('stock')}</label>
                 <input
                   type="number"
                   value={form.stock}
@@ -4669,7 +4669,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="⚠" /> {t('minStock')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="⚠" /> {t('minStock')}</label>
                 <input
                   type="number"
                   value={form.minStock}
@@ -4683,7 +4683,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
             {/* Buy Price + Sell Price + Profit: 3 columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="💰" /> {t('purchasePrice')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="💰" /> {t('purchasePrice')}</label>
                 <input
                   type="number"
                   value={form.buyP}
@@ -4693,7 +4693,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="💵" /> {t('sellPrice')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="💵" /> {t('sellPrice')}</label>
                 <input
                   type="number"
                   value={form.sellP}
@@ -4703,7 +4703,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="📊" /> {t('profit')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="📊" /> {t('profit')}</label>
                 <div style={{ padding: '10px 12px', background: '#DCFCE7', borderRadius: 8, fontWeight: 700, color: '#166534', fontSize: 14, border: '1px solid #BBF7D0' }}>
                   {typeof profit === 'number' ? profit : profit} {typeof profitPercent === 'number' ? `(${profitPercent}%)` : ''}
                 </div>
@@ -4713,7 +4713,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
             {/* VAT + VAT Amount + Total: 3 columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 16 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><Icon e="🧾" /> {t('vatPercent')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}> <Icon e="🧾" /> {t('vatPercent')}</label>
                 <input
                   type="number"
                   value="15"
@@ -4736,7 +4736,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
             </div>
 
             {/* Add Button */}
-            <button onClick={addItem} style={{ width: '100%', padding: '12px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 14, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}><Icon e="➕" />
+            <button onClick={addItem} style={{ width: '100%', padding: '12px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 14, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}> <Icon e="➕" />
                {t('addToProductList')}
             </button>
           </div>
@@ -4744,7 +4744,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
 
         {/* Right: Purchase List */}
         <div style={{ width: 350, padding: 12, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 8, background: '#F9FAFB' }}>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}><Icon e="📋" /> {t('productList')} ({purchaseItems.length})</h3>
+          <h3 style={{ margin: 0, fontSize: 12, fontWeight: 700 }}> <Icon e="📋" /> {t('productList')} ({purchaseItems.length})</h3>
 
           {purchaseItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', fontSize: 14 }}>
@@ -4756,17 +4756,17 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
               <div key={i} style={{ background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', padding: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4 }}>{item.name}</div>
-                  <div style={{ fontSize: 13, color: '#6B7280' }}><Icon e="🏢" />
+                  <div style={{ fontSize: 13, color: '#6B7280' }}> <Icon e="🏢" />
                      {item.company} {item.cat ? `- 📂 ${item.cat}` : ''}
                   </div>
                   <div style={{ fontSize: 13, color: '#6B7280', display: 'flex', gap: 8, marginTop: 4 }}>
-                    <span><Icon e="📦" /> {item.stock} {item.unit}</span>
-                    <span><Icon e="💰" /> {fmt(item.buyP)}</span>
-                    <span><Icon e="💵" /> {fmt(item.sellP)}</span>
+                    <span> <Icon e="📦" /> {item.stock} {item.unit}</span>
+                    <span> <Icon e="💰" /> {fmt(item.buyP)}</span>
+                    <span> <Icon e="💵" /> {fmt(item.sellP)}</span>
                   </div>
-                  {item.barcode && <div style={{ fontSize: 12, color: '#9CA3AF', fontFamily: 'monospace', marginTop: 2 }}><Icon e="🔢" /> {item.barcode}</div>}
+                  {item.barcode && <div style={{ fontSize: 12, color: '#9CA3AF', fontFamily: 'monospace', marginTop: 2 }}> <Icon e="🔢" /> {item.barcode}</div>}
                 </div>
-                <button onClick={() => removeItem(i)} style={{ padding: '6px 10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12, marginLeft: 8 }}><Icon e="🗑" /><Icon e="️" /></button>
+                <button onClick={() => removeItem(i)} style={{ padding: '6px 10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12, marginLeft: 8 }}><Icon e="🗑" /> <Icon e="️" /> </button>
               </div>
             ))
           )}
@@ -5075,21 +5075,21 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     <div style={{ padding: 16 }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1F2937' }}><Icon e="🏢" />
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1F2937' }}> <Icon e="🏢" />
            {t('suppliers') || 'সরবরাহকারী'}
         </h2>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={() => { setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setEditingSupplier(null); setShowSupplierModal(true); }}
-            style={{ padding: '8px 14px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}><Icon e="➕" />
+            style={{ padding: '8px 14px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}> <Icon e="➕" />
              {t('company')}</button>
           <button
             onClick={() => { setCategoryForm({ name: '' }); setEditingCategory(null); setShowCategoryModal(true); }}
-            style={{ padding: '8px 14px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}><Icon e="📂" />
+            style={{ padding: '8px 14px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}> <Icon e="📂" />
              {t('category')}</button>
           <button
             onClick={() => setShowProductModal(true)}
-            style={{ padding: '8px 14px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}><Icon e="📦" />
+            style={{ padding: '8px 14px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}> <Icon e="📦" />
              পণ্য
           </button>
         </div>
@@ -5110,12 +5110,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         <button
           onClick={() => setActiveTab('companies')}
-          style={{ padding: '8px 16px', background: activeTab === 'companies' ? '#115E59' : '#F3F4F6', color: activeTab === 'companies' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}><Icon e="🏢" />
+          style={{ padding: '8px 16px', background: activeTab === 'companies' ? '#115E59' : '#F3F4F6', color: activeTab === 'companies' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}> <Icon e="🏢" />
            কোম্পানি ({allSuppliers.length})
         </button>
         <button
           onClick={() => setActiveTab('categories')}
-          style={{ padding: '8px 16px', background: activeTab === 'categories' ? '#115E59' : '#F3F4F6', color: activeTab === 'categories' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}><Icon e="📂" />
+          style={{ padding: '8px 16px', background: activeTab === 'categories' ? '#115E59' : '#F3F4F6', color: activeTab === 'categories' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}> <Icon e="📂" />
            ক্যাটাগরি ({categories.length})
         </button>
       </div>
@@ -5137,12 +5137,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}><Icon e="🏢" />
+                  <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}> <Icon e="🏢" />
                      {s.name}
                     {s.isAuto && <span style={{ fontSize: 10, background: '#FEF3C7', color: '#D97706', padding: '2px 6px', borderRadius: 4, marginLeft: 6 }}>Auto</span>}
                   </div>
                   {s.code && <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>কোড: {s.code}</div>}
-                  {s.phone && <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}><Icon e="📞" /> {s.phone}</div>}
+                  {s.phone && <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}> <Icon e="📞" /> {s.phone}</div>}
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 20, fontWeight: 800, color: '#115E59' }}>{getProductsCount(s.name)}</div>
@@ -5168,7 +5168,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               onMouseOver={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)')}
               onMouseOut={e => (e.currentTarget.style.boxShadow = 'none')}
             >
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}><Icon e="📂" /> {c.name}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}> <Icon e="📂" /> {c.name}</div>
               <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>{products.filter(p => (p.cat || '').toLowerCase() === (c.name || '').toLowerCase()).length} পণ্য</div>
             </div>
           ))}
@@ -5180,14 +5180,14 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 500, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}><Icon e="🏢" /> {viewSupplier.name}</h3>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}> <Icon e="🏢" /> {viewSupplier.name}</h3>
               <button onClick={() => setViewSupplier(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
             </div>
             
             {viewSupplier.code && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>কোড: <strong>{viewSupplier.code}</strong></div>}
-            {viewSupplier.phone && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}><Icon e="📞" /> {viewSupplier.phone}</div>}
-            {viewSupplier.email && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}><Icon e="✉" /><Icon e="️" /> {viewSupplier.email}</div>}
-            {viewSupplier.address && <div style={{ marginBottom: 16, fontSize: 14, color: '#6B7280' }}><Icon e="📍" /> {viewSupplier.address}</div>}
+            {viewSupplier.phone && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}> <Icon e="📞" /> {viewSupplier.phone}</div>}
+            {viewSupplier.email && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}><Icon e="✉" /> <Icon e="️" /> {viewSupplier.email}</div>}
+            {viewSupplier.address && <div style={{ marginBottom: 16, fontSize: 14, color: '#6B7280' }}> <Icon e="📍" /> {viewSupplier.address}</div>}
             
             <div style={{ background: '#F0FDFA', borderRadius: 10, padding: 16, marginBottom: 16 }}>
               <div style={{ fontSize: 24, fontWeight: 800, color: '#115E59' }}>{getProductsCount(viewSupplier.name)}</div>
@@ -5197,19 +5197,19 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
             <div style={{ display: 'flex', gap: 8 }}>
               <button
                 onClick={() => { setShowPurchaseHistory(viewSupplier); setViewSupplier(null); }}
-                style={{ flex: 1, padding: '10px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}><Icon e="📜" />
+                style={{ flex: 1, padding: '10px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}> <Icon e="📜" />
                  ক্রয় ইতিহাস
               </button>
               {!viewSupplier.isAuto && (
                 <>
                   <button
                     onClick={() => { setSupplierForm(viewSupplier); setEditingSupplier(viewSupplier); setShowSupplierModal(true); setViewSupplier(null); }}
-                    style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}><Icon e="✏" />
+                    style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}> <Icon e="✏" />
                     ️ সম্পাদনা
                   </button>
                   <button
                     onClick={() => deleteSupplier(viewSupplier)}
-                    style={{ flex: 1, padding: '10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}><Icon e="🗑" />
+                    style={{ flex: 1, padding: '10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}> <Icon e="🗑" />
                     ️ মুছুন
                   </button>
                 </>
@@ -5224,7 +5224,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}><Icon e="📂" /> {viewCategory.name}</h3>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}> <Icon e="📂" /> {viewCategory.name}</h3>
               <button onClick={() => setViewCategory(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
             </div>
             
@@ -5236,12 +5236,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
             <div style={{ display: 'flex', gap: 8 }}>
               <button
                 onClick={() => { setCategoryForm(viewCategory); setEditingCategory(viewCategory); setShowCategoryModal(true); setViewCategory(null); }}
-                style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}><Icon e="✏" />
+                style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}> <Icon e="✏" />
                 ️ সম্পাদনা
               </button>
               <button
                 onClick={() => deleteCategory(viewCategory)}
-                style={{ flex: 1, padding: '10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}><Icon e="🗑" />
+                style={{ flex: 1, padding: '10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}> <Icon e="🗑" />
                 ️ মুছুন
               </button>
             </div>
@@ -5254,7 +5254,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 600, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}><Icon e="📜" /> {showPurchaseHistory.name} - ক্রয় ইতিহাস</h3>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}> <Icon e="📜" /> {showPurchaseHistory.name} - ক্রয় ইতিহাস</h3>
               <button onClick={() => setShowPurchaseHistory(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
             </div>
             
@@ -5282,12 +5282,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
-              <><Icon e={editingSupplier ? '✏' : '➕'} /> {editingSupplier ? 'সরবরাহকারী সম্পাদনা' : 'নতুন কোম্পানি'}</>
+              <> <Icon e={editingSupplier ? '✏' : '➕'} /> {editingSupplier ? 'সরবরাহকারী সম্পাদনা' : 'নতুন কোম্পানি'}</>
             </h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="🏢" /> নাম *</label>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="🏢" /> নাম *</label>
                 <input
                   value={supplierForm.name}
                   onChange={e => setSupplierForm(p => ({ ...p, name: e.target.value }))}
@@ -5296,7 +5296,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📞" /> ফোন</label>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="📞" /> ফোন</label>
                 <input
                   value={supplierForm.phone}
                   onChange={e => setSupplierForm(p => ({ ...p, phone: e.target.value }))}
@@ -5305,7 +5305,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="✉" /><Icon e="️" /> ইমেইল</label>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="✉" /> <Icon e="️" /> ইমেইল</label>
                 <input
                   value={supplierForm.email}
                   onChange={e => setSupplierForm(p => ({ ...p, email: e.target.value }))}
@@ -5314,7 +5314,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📍" /> ঠিকানা</label>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="📍" /> ঠিকানা</label>
                 <input
                   value={supplierForm.address}
                   onChange={e => setSupplierForm(p => ({ ...p, address: e.target.value }))}
@@ -5328,7 +5328,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <button onClick={() => setShowSupplierModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 বাতিল
               </button>
-              <button onClick={saveSupplier} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}><Icon e="💾" />
+              <button onClick={saveSupplier} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
                  সংরক্ষণ
               </button>
             </div>
@@ -5341,11 +5341,11 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
-              <><Icon e={editingCategory ? '✏' : '➕'} /> {editingCategory ? 'ক্যাটাগরি সম্পাদনা' : 'নতুন ক্যাটাগরি'}</>
+              <> <Icon e={editingCategory ? '✏' : '➕'} /> {editingCategory ? 'ক্যাটাগরি সম্পাদনা' : 'নতুন ক্যাটাগরি'}</>
             </h3>
             
             <div>
-              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📂" /> নাম *</label>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="📂" /> নাম *</label>
               <input
                 value={categoryForm.name}
                 onChange={e => setCategoryForm({ name: e.target.value })}
@@ -5358,7 +5358,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <button onClick={() => setShowCategoryModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 বাতিল
               </button>
-              <button onClick={saveCategory} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}><Icon e="💾" />
+              <button onClick={saveCategory} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
                  সংরক্ষণ
               </button>
             </div>
@@ -5370,12 +5370,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       {showProductModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 450, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}><Icon e="📦" /> {t('newProductButton')} যোগ করুন</h3>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}> <Icon e="📦" /> {t('newProductButton')} যোগ করুন</h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {/* Company Dropdown */}
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="🏢" /> কোম্পানি *</label>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="🏢" /> কোম্পানি *</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     value={productForm.company}
@@ -5386,7 +5386,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   {showCompanyDrop && filteredCompanies.length > 0 && (
                     <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 10, maxHeight: 150, overflow: 'auto' }}>
                       {filteredCompanies.map(s => (
-                        <div key={s.id} onClick={() => { setProductForm(p => ({ ...p, company: s.name })); setShowCompanyDrop(false); }} style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }} onMouseOver={e => (e.currentTarget.style.background = '#F0FDFA')} onMouseOut={e => (e.currentTarget.style.background = '#fff')}><Icon e="🏢" />
+                        <div key={s.id} onClick={() => { setProductForm(p => ({ ...p, company: s.name })); setShowCompanyDrop(false); }} style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }} onMouseOver={e => (e.currentTarget.style.background = '#F0FDFA')} onMouseOut={e => (e.currentTarget.style.background = '#fff')}> <Icon e="🏢" />
                            {s.name}
                         </div>
                       ))}
@@ -5397,7 +5397,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               
               {/* Category Dropdown */}
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📂" /> ক্যাটাগরি *</label>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="📂" /> ক্যাটাগরি *</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     value={productForm.cat}
@@ -5408,7 +5408,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   {showCatDrop && filteredCats.length > 0 && (
                     <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 10, maxHeight: 150, overflow: 'auto' }}>
                       {filteredCats.map(c => (
-                        <div key={c.id} onClick={() => { setProductForm(p => ({ ...p, cat: c.name })); setShowCatDrop(false); }} style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }} onMouseOver={e => (e.currentTarget.style.background = '#F0FDFA')} onMouseOut={e => (e.currentTarget.style.background = '#fff')}><Icon e="📂" />
+                        <div key={c.id} onClick={() => { setProductForm(p => ({ ...p, cat: c.name })); setShowCatDrop(false); }} style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }} onMouseOver={e => (e.currentTarget.style.background = '#F0FDFA')} onMouseOut={e => (e.currentTarget.style.background = '#fff')}> <Icon e="📂" />
                            {c.name}
                         </div>
                       ))}
@@ -5418,7 +5418,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📦" /> পণ্যের নাম *</label>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="📦" /> পণ্যের নাম *</label>
                 <input
                   value={productForm.name}
                   onChange={e => setProductForm(p => ({ ...p, name: e.target.value }))}
@@ -5428,7 +5428,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📊" /> বারকোড</label>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="📊" /> বারকোড</label>
                 <input
                   value={productForm.barcode}
                   onChange={e => setProductForm(p => ({ ...p, barcode: e.target.value }))}
@@ -5439,7 +5439,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="💰" /> {t('buyPrice')}</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="💰" /> {t('buyPrice')}</label>
                   <input
                     type="number"
                     value={productForm.buyP}
@@ -5449,7 +5449,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="💵" /> {t('sellPrice')}</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="💵" /> {t('sellPrice')}</label>
                   <input
                     type="number"
                     value={productForm.sellP}
@@ -5462,7 +5462,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📦" /> {t('stock')}</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="📦" /> {t('stock')}</label>
                   <input
                     type="number"
                     value={productForm.stock}
@@ -5472,7 +5472,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="📏" /> {t('unit')}</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="📏" /> {t('unit')}</label>
                   <input
                     value={productForm.unit}
                     onChange={e => setProductForm(p => ({ ...p, unit: e.target.value }))}
@@ -5481,7 +5481,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}><Icon e="⚠" /> মিন স্টক</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}> <Icon e="⚠" /> মিন স্টক</label>
                   <input
                     type="number"
                     value={productForm.minStock}
@@ -5497,7 +5497,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <button onClick={() => setShowProductModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 বাতিল
               </button>
-              <button onClick={saveProduct} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}><Icon e="💾" />
+              <button onClick={saveProduct} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}> <Icon e="💾" />
                  সংরক্ষণ
               </button>
             </div>
@@ -5754,7 +5754,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
               {avatar ? (
                 <img src={avatar} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ fontSize: '24px' }}><Icon e="👤" /></span>
+                <span style={{ fontSize: '24px' }}><Icon e="👤" /> </span>
               )}
             </div>
 
@@ -5774,7 +5774,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
-                  ><Icon e="📷" />
+                  > <Icon e="📷" />
                      Capture
                   </button>
                   <button
@@ -5807,7 +5807,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
-                  ><Icon e="📷" />
+                  > <Icon e="📷" />
                      {t('camera')}
                   </button>
                   <button
@@ -5822,7 +5822,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                       fontWeight: 600,
                       cursor: 'pointer',
                     }}
-                  ><Icon e="📁" />
+                  > <Icon e="📁" />
                      {t('browse')}
                   </button>
                   {avatar && (
@@ -5838,7 +5838,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                         fontWeight: 600,
                         cursor: 'pointer',
                       }}
-                    ><Icon e="❌" />
+                    > <Icon e="❌" />
                        {t('remove')}
                     </button>
                   )}
@@ -6028,7 +6028,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
               fontWeight: 600,
               cursor: 'pointer',
             }}
-          ><Icon e="💾" />
+          > <Icon e="💾" />
              {t('save')}
           </button>
         </div>
@@ -6185,7 +6185,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
             alignItems: 'center',
             gap: '8px',
           }}>
-            <span style={{ fontSize: '20px' }}><Icon e="💰" /></span>
+            <span style={{ fontSize: '20px' }}><Icon e="💰" /> </span>
             <span style={{ fontSize: '14px', fontWeight: 600, color: T.tealDark }}>{t('addDepositAmount')}</span>
           </div>
 
@@ -6344,7 +6344,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 justifyContent: 'center',
                 gap: '6px',
               }}
-            ><Icon e="✓" />
+            > <Icon e="✓" />
                {t('addDeposit')}
             </button>
           </div>
@@ -6435,7 +6435,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
             alignItems: 'center',
             gap: '8px',
           }}>
-            <span style={{ fontSize: '20px' }}><Icon e="📋" /></span>
+            <span style={{ fontSize: '20px' }}><Icon e="📋" /> </span>
             <span style={{ fontSize: '14px', fontWeight: 600, color: T.red }}>{t('addDueAmount')}</span>
           </div>
 
@@ -6543,7 +6543,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 justifyContent: 'center',
                 gap: '6px',
               }}
-            ><Icon e="✓" />
+            > <Icon e="✓" />
                {t('addDue')}
             </button>
           </div>
@@ -6719,7 +6719,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               transform: 'translateY(-50%)',
               fontSize: '16px',
               color: T.gray400,
-            }}><Icon e="🔍" /></span>
+            }}><Icon e="🔍" /> </span>
             <input
               type="text"
               placeholder={t('nameOrPhonePlaceholder')}
@@ -6732,7 +6732,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
             <span>+</span> {t('addCustomer')}
           </button>
           <button style={buttonGrayStyle} onClick={handleCsvExport}>
-            <span><Icon e="📤" /></span> {t('csvExport')}
+            <span><Icon e="📤" /> </span> {t('csvExport')}
           </button>
         </div>
 
@@ -6780,9 +6780,9 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                   borderRadius: '10px', fontSize: '14px', fontWeight: 700, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                 }}>
-                  <span><Icon e="📋" /></span> {t('viewHistory')}
+                  <span><Icon e="📋" /> </span> {t('viewHistory')}
                 </button>
-                <div style={{ padding: '12px 16px', background: T.gray100, color: T.gray400, borderRadius: '10px', fontSize: '14px', cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}><Icon e="🗑" />
+                <div style={{ padding: '12px 16px', background: T.gray100, color: T.gray400, borderRadius: '10px', fontSize: '14px', cursor: 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.5 }}> <Icon e="🗑" />
                   ️
                 </div>
               </div>
@@ -6880,13 +6880,13 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                       }}
                     >
                       {hasDue ? (
-                        <><span><Icon e="⚠" /></span> {t('due')}: {fmt(netDue)}</>
+                        <><span><Icon e="⚠" /> </span> {t('due')}: {fmt(netDue)}</>
                       ) : hasDeposit ? (
-                        <><span><Icon e="💰" /></span> Deposit: {fmt(netDeposit)}</>
+                        <><span><Icon e="💰" /> </span> Deposit: {fmt(netDeposit)}</>
                       ) : isGeneralCustomer(customer) ? (
-                        <><span><Icon e="📋" /></span> {t('viewHistory')}</>
+                        <><span><Icon e="📋" /> </span> {t('viewHistory')}</>
                       ) : (
-                        <><span><Icon e="📋" /></span> {t('history')}</>
+                        <><span><Icon e="📋" /> </span> {t('history')}</>
                       )}
                     </button>
                     
@@ -6910,7 +6910,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                         justifyContent: 'center',
                         opacity: (isGeneralCustomer(customer) || netDue > 0 || netDeposit > 0) ? 0.5 : 1,
                       }}
-                    ><Icon e="🗑" />
+                    > <Icon e="🗑" />
                       ️
                     </button>
                   </div>
@@ -7056,7 +7056,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               gap: '8px',
             }}
           >
-            <span><Icon e="📦" /></span> {t('allPurchases')} ({generalSales.length})
+            <span><Icon e="📦" /> </span> {t('allPurchases')} ({generalSales.length})
           </button>
         </div>
 
@@ -7074,7 +7074,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               textAlign: 'center',
               color: T.gray400,
             }}>
-              <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon e="🛒" /></div>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon e="🛒" /> </div>
               <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noPurchasesFound')}</div>
             </div>
           ) : (
@@ -7182,7 +7182,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               alignItems: 'center',
               gap: '6px',
             }}
-          ><Icon e="✏" />
+          > <Icon e="✏" />
             ️ {t('edit')}
           </button>
         </div>
@@ -7309,7 +7309,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 alignItems: 'center',
                 gap: '6px',
               }}
-            ><Icon e="💰" />
+            > <Icon e="💰" />
                {t('addDeposit')}
             </button>
           </div>
@@ -7338,7 +7338,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               gap: '8px',
             }}
           >
-            <span><Icon e="📦" /></span> {t('allPurchases')} ({customerSales.length})
+            <span><Icon e="📦" /> </span> {t('allPurchases')} ({customerSales.length})
           </button>
           <button
             onClick={() => setActiveTab('due')}
@@ -7356,7 +7356,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               gap: '8px',
             }}
           >
-            <span><Icon e="📋" /></span> {t('dueHistory')} ({(selectedCustomer.transactions || []).filter(t => t.type === 'due').length})
+            <span><Icon e="📋" /> </span> {t('dueHistory')} ({(selectedCustomer.transactions || []).filter(t => t.type === 'due').length})
           </button>
           <button
             onClick={() => setActiveTab('deposit')}
@@ -7374,7 +7374,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               gap: '8px',
             }}
           >
-            <span><Icon e="👜" /></span> {t('depositHistory')} ({(selectedCustomer.transactions || []).filter(t => t.type === 'deposit').length})
+            <span><Icon e="👜" /> </span> {t('depositHistory')} ({(selectedCustomer.transactions || []).filter(t => t.type === 'deposit').length})
           </button>
         </div>
 
@@ -7392,7 +7392,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               textAlign: 'center',
               color: T.gray400,
             }}>
-              <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon e="🛒" /></div>
+              <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon e="🛒" /> </div>
               <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noPurchasesFound')}</div>
             </div>
           )}
@@ -7427,7 +7427,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 textAlign: 'center',
                 color: T.gray400,
               }}>
-                <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon e="📋" /></div>
+                <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon e="📋" /> </div>
                 <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noDueHistory')}</div>
               </div>
             ) : (
@@ -7458,7 +7458,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 textAlign: 'center',
                 color: T.gray400,
               }}>
-                <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon e="👜" /></div>
+                <div style={{ fontSize: '48px', marginBottom: '12px' }}><Icon e="👜" /> </div>
                 <div style={{ fontSize: '16px', fontWeight: 600 }}>{t('noDepositHistory')}</div>
               </div>
             ) : (
@@ -7754,10 +7754,10 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   };
 
   const tabs = [
-    { icon: <Icon e="⚙️" />, label: t('settings') },
-    { icon: <Icon e="🎨" />, label: t('design') },
-    { icon: <Icon e="👤" />, label: t('user') },
-    { icon: <Icon e="💥" />, label: t('dataReset') },
+    { icon: <Icon e="⚙️" /> , label: t('settings') },
+    { icon: <Icon e="🎨" /> , label: t('design') },
+    { icon: <Icon e="👤" /> , label: t('user') },
+    { icon: <Icon e="💥" /> , label: t('dataReset') },
   ];
 
   return (
@@ -7840,7 +7840,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 justifyContent: 'center',
                 fontSize: 20,
                 color: '#fff'
-              }}><Icon e="⚙" /><Icon e="️" /></div>
+              }}><Icon e="⚙" /> <Icon e="️" /> </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>সাধারণ তথ্য</h3>
                 <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>আপনার ব্যবসার মূল তথ্য</p>
@@ -7849,7 +7849,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}><Icon e="🏪" />
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}> <Icon e="🏪" />
                    ব্যবসার নাম *
                 </label>
                 <input
@@ -7860,7 +7860,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}><Icon e="📞" />
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}> <Icon e="📞" />
                    মোবাইল নম্বর
                 </label>
                 <input
@@ -7871,7 +7871,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}><Icon e="📍" />
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}> <Icon e="📍" />
                    ঠিকানা
                 </label>
                 <input
@@ -7882,7 +7882,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}><Icon e="📧" />
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}> <Icon e="📧" />
                    ইমেইল
                 </label>
                 <input
@@ -7894,7 +7894,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}><Icon e="🔢" />
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}> <Icon e="🔢" />
                    VAT নম্বর (TIN)
                 </label>
                 <input
@@ -7905,7 +7905,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}><Icon e="🏢" />
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}> <Icon e="🏢" />
                    CR নম্বর
                 </label>
                 <input
@@ -7919,7 +7919,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
             {/* VAT Settings */}
             <div style={{ marginTop: 24 }}>
-              <h5 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}><Icon e="💰" /> ভ্যাট সেটিংস</h5>
+              <h5 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}> <Icon e="💰" /> ভ্যাট সেটিংস</h5>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -7998,7 +7998,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 justifyContent: 'center',
                 fontSize: 20,
                 color: '#fff'
-              }}><Icon e="🎨" /></div>
+              }}><Icon e="🎨" /> </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('designSettings')}</h3>
                 <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('receiptTemplateConfig')}</p>
@@ -8019,7 +8019,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   fontWeight: 600,
                   cursor: 'pointer'
                 }}
-              ><Icon e="🧾" />
+              > <Icon e="🧾" />
                  {t('salesInvoice')}
               </button>
               <button
@@ -8034,14 +8034,14 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   fontWeight: 600,
                   cursor: 'pointer'
                 }}
-              ><Icon e="🛒" />
+              > <Icon e="🛒" />
                  {t('purchaseInvoice')}
               </button>
             </div>
 
             {/* 80mm Receipt Preview */}
             <div style={{ background: '#f1f5f9', borderRadius: 10, padding: 20, textAlign: 'center' }}>
-              <h4 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#475569' }}><Icon e="👁" /><Icon e="️" /> {t('preview')} - 80mm {t('thermalPrinter')}</h4>
+              <h4 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 600, color: '#475569' }}><Icon e="👁" /> <Icon e="️" /> {t('preview')} - 80mm {t('thermalPrinter')}</h4>
               
               {/* 80mm Thermal Receipt Paper */}
               <div style={{
@@ -8218,7 +8218,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               alignItems: 'center',
               gap: 12
             }}>
-              <span style={{ fontSize: 18 }}><Icon e="⚠" /></span>
+              <span style={{ fontSize: 18 }}><Icon e="⚠" /> </span>
               <p style={{ margin: 0, fontSize: 14, color: '#dc2626' }}>
                 {t('warningPermanentDelete')}
               </p>
@@ -8227,11 +8227,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             {/* Row 1: 5 Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 10 }}>
               {[
-                { label: t('productData'), count: products.length, icon: <Icon e="📦" />, onClick: () => deleteAllItems('products', products, setProducts, t) },
-                { label: t('customerData'), count: customers.filter(c => !c.isSystem).length, icon: <Icon e="👥" />, onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.filter(c => !c.isSystem).length === 0 },
-                { label: t('categoryData'), count: categories.length, icon: <Icon e="📂" />, onClick: () => deleteAllItems('categories', categories, setCategories, t) },
-                { label: t('supplierData'), count: suppliers.length, icon: <Icon e="🏢" />, onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
-                { label: t('salesData'), count: sales.length, icon: <Icon e="🛒" />, onClick: () => deleteAllItems('sales', sales, setSales, t) },
+                { label: t('productData'), count: products.length, icon: <Icon e="📦" /> , onClick: () => deleteAllItems('products', products, setProducts, t) },
+                { label: t('customerData'), count: customers.filter(c => !c.isSystem).length, icon: <Icon e="👥" /> , onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.filter(c => !c.isSystem).length === 0 },
+                { label: t('categoryData'), count: categories.length, icon: <Icon e="📂" /> , onClick: () => deleteAllItems('categories', categories, setCategories, t) },
+                { label: t('supplierData'), count: suppliers.length, icon: <Icon e="🏢" /> , onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
+                { label: t('salesData'), count: sales.length, icon: <Icon e="🛒" /> , onClick: () => deleteAllItems('sales', sales, setSales, t) },
               ].map((item, i) => (
                 <div key={i} style={{ 
                   background: '#fff', 
@@ -8283,7 +8283,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   height: '100%',
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 20 }}><Icon e="📥" /></span>
+                    <span style={{ fontSize: 20 }}><Icon e="📥" /> </span>
                     <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t('purchaseHistoryDelete')}</div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -8317,8 +8317,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 justifyContent: 'center',
                 gap: 10,
               }}>
-                <span style={{ fontSize: 20 }}><Icon e="💥" /></span>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t('fullReset')}</div>
+                <span style={{ fontSize: 20 }}><Icon e="💥" /> </span>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{t('fullReset')}</div>
                 <button
                   onClick={clearAll}
                   style={{ 
@@ -8401,7 +8401,7 @@ export function TranslationSettings() {
     <div style={{ padding: 20 }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ margin: 0 }}><Icon e="🌐" /> Translation Settings</h2>
+        <h2 style={{ margin: 0 }}> <Icon e="🌐" /> Translation Settings</h2>
         <button
           onClick={handleSync}
           disabled={syncStatus === 'syncing'}
@@ -8554,7 +8554,7 @@ export function TranslationSettings() {
                         cursor: 'pointer',
                         fontSize: 12,
                       }}
-                    ><Icon e="✏" />
+                    > <Icon e="✏" />
                       ️ Edit
                     </button>
                   )}
@@ -8705,11 +8705,11 @@ export function DatabaseSettings() {
 
   return (
     <div style={{ padding: 16, maxWidth: 600, margin: '0 auto' }}>
-      <h2 style={{ marginBottom: 24 }}><Icon e="🗄" /><Icon e="️" /> {t('databaseSettings')}</h2>
+      <h2 style={{ marginBottom: 24 }}><Icon e="🗄" /> <Icon e="️" /> {t('databaseSettings')}</h2>
 
       {/* Database Info */}
       <div className="card" style={{ marginBottom: 16 }}>
-        <h3 style={{ marginBottom: 12 }}><Icon e="📊" /> {t('databaseInfo')}</h3>
+        <h3 style={{ marginBottom: 12 }}> <Icon e="📊" /> {t('databaseInfo')}</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <div style={{ background: '#F0FDF4', padding: 12, borderRadius: 8, textAlign: 'center' }}>
             <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>
@@ -8728,7 +8728,7 @@ export function DatabaseSettings() {
 
       {/* Connection Status */}
       <div className="card" style={{ marginBottom: 16 }}>
-        <h3 style={{ marginBottom: 12 }}><Icon e="🌐" /> {t('serverConnection')}</h3>
+        <h3 style={{ marginBottom: 12 }}> <Icon e="🌐" /> {t('serverConnection')}</h3>
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
@@ -8751,7 +8751,7 @@ export function DatabaseSettings() {
 
       {/* Export / Import */}
       <div className="card" style={{ marginBottom: 16 }}>
-        <h3 style={{ marginBottom: 12 }}><Icon e="💾" /> {t('backupRestore')}</h3>
+        <h3 style={{ marginBottom: 12 }}> <Icon e="💾" /> {t('backupRestore')}</h3>
         
         <div style={{ marginBottom: 16 }}>
           <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 12 }}>
@@ -8770,7 +8770,7 @@ export function DatabaseSettings() {
               fontWeight: 600,
               cursor: 'pointer',
             }}
-          ><Icon e="📤" />
+          > <Icon e="📤" />
              {t('exportData') || 'Export Data'}
           </button>
         </div>
@@ -8850,7 +8850,7 @@ export function DatabaseSettings() {
 
       {/* Info */}
       <div className="card" style={{ background: '#F0FDFA', border: '1px solid #99F6E4' }}>
-        <h4 style={{ marginBottom: 8, color: '#115E59' }}><Icon e="💡" /> {t('howItWorks')}</h4>
+        <h4 style={{ marginBottom: 8, color: '#115E59' }}> <Icon e="💡" /> {t('howItWorks')}</h4>
         <ul style={{ fontSize: 13, color: '#374151', margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
           <li>ডাটা IndexedDB-তে লোকালি সেভ থাকে</li>
           <li>অফলাইনেও সব কাজ করা যায়</li>

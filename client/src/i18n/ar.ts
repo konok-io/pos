@@ -159,6 +159,7 @@ export const ar: Record<string, string> = {
   enterSupplierName: 'أدخل اسم المورد',
   productsLoaded: 'جاري تحميل قائمة المنتجات...',
   noProductsFound: 'لم يتم العثور على منتجات',
+  loadingProducts: 'جارٍ تحميل المنتجات...',
 
   // Suppliers
   supplierList: 'قائمة الموردين',

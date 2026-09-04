@@ -191,6 +191,7 @@ export const en: Record<string, string> = {
   enterSupplierName: 'Enter supplier name',
   productsLoaded: 'Loading product list...',
   noProductsFound: 'No products found',
+  loadingProducts: 'Loading products...',
 
   // Suppliers
   supplierList: 'Supplier List',

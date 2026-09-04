@@ -154,6 +154,7 @@ export const hi: Record<string, string> = {
   enterSupplierName: 'आपूर्तिकर्ता का नाम दर्ज करें',
   productsLoaded: 'उत्पाद सूची लोड हो रही है...',
   noProductsFound: 'कोई उत्पाद नहीं मिला',
+  loadingProducts: 'उत्पाद लोड हो रहे हैं...',
 
   // Suppliers
   supplierList: 'आपूर्तिकर्ता सूची',

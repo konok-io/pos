@@ -156,6 +156,7 @@ export const bn: Record<string, string> = {
   enterSupplierName: 'সরবরাহকারীর নাম দিন',
   productsLoaded: 'পণ্যের তালিকা লোড হচ্ছে...',
   noProductsFound: 'পণ্য পাওয়া যায়নি',
+  loadingProducts: 'পণ্য লোড হচ্ছে...',
 
   // Categories
   categoryList: 'ক্যাটাগরি তালিকা',
