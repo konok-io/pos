@@ -4,6 +4,9 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   base: './',
+  preview: {
+    allowedHosts: ['work-1-ywqxzupahmqpcmbc.prod-runtime.all-hands.dev'],
+  },
   plugins: [
     react(),
     VitePWA({
