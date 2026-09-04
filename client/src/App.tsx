@@ -1488,6 +1488,8 @@ ${printFiltered.map(p => {
             border: 'none', padding: '8px 14px', fontSize: 13,
           }}> <Icon e="⚠" /> {t('stockOutStatus')} ({outOfStockCount})</button>
 
+          <span style={{ fontSize: 13, color: T.gray400, border: `1px solid ${T.gray200}`, borderRadius: 7, padding: '8px 14px', display: 'inline-flex', alignItems: 'center' }}>{filtered.length} {t('productsCount')}</span>
+
           <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150, fontSize: 13 }}>
             <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><Icon e="🔍" /> </span>
             <input
@@ -1515,7 +1517,6 @@ ${printFiltered.map(p => {
           <button type="button" onClick={() => setShowAddForm(true)} style={{ ...btn('primary'), fontSize: 13 }}>
             <Icon e="➕" /> {t('newProductButton')}
           </button>
-          <span style={{ fontSize: 13, color: T.gray400, marginLeft: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 7, padding: '8px 14px', display: 'inline-flex', alignItems: 'center' }}>{filtered.length} {t('productsCount')}</span>
         </div>
       )}
 
