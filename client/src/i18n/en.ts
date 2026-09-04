@@ -98,6 +98,13 @@ export const en: Record<string, string> = {
   save: 'Save',
   selectProduct: 'Select Product',
   newProductSave: 'Save New Product',
+  supplierNameRequired: 'Supplier name is required',
+  supplierExists: 'Supplier already exists',
+  supplierAdded: 'Supplier added successfully!',
+  addNewSupplier: 'New Supplier',
+  crNumber: 'CR Number',
+  vatNumber: 'VAT Number',
+
   newProductAction: 'New Product',
   newProductButton: 'New Product',
   purchaseHistoryButton: 'Purchase History',

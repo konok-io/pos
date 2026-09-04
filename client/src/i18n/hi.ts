@@ -97,6 +97,13 @@ export const hi: Record<string, string> = {
   unit: 'इकाई',
   save: 'सेव करें',
   newProductSave: 'नया उत्पाद सेव करें',
+  supplierNameRequired: 'आपूर्तिकर्ता का नाम आवश्यक है',
+  supplierExists: 'आपूर्तिकर्ता पहले से मौजूद है',
+  supplierAdded: 'आपूर्तिकर्ता सफलतापूर्वक जोड़ा गया!',
+  addNewSupplier: 'नया आपूर्तिकर्ता',
+  crNumber: 'CR नंबर',
+  vatNumber: 'VAT नंबर',
+
   newProductAction: 'नया उत्पाद',
   newProductButton: 'नया उत्पाद',
   purchaseHistoryButton: 'खरीद इतिहास',

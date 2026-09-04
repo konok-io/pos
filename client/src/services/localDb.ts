@@ -45,6 +45,7 @@ class LocalDb {
     this.cache.set(col, prev.then(apply));
   }
 
+  async saveDoc(col: string, doc: any): Promise<void> { await this.save(col, doc); }
   private async save(col: string, doc: any): Promise<void> {
     // Optimistic update + background sync
     this.patchCache(col, doc.id || doc.key, doc, false);

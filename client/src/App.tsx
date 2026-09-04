@@ -693,6 +693,22 @@ function ProductsScreen({ products, suppliers, categories, purchases, productHis
   const [showAddForm, setShowAddForm] = useState(false);
   const [purchaseItems, setPurchaseItems] = useState<any[]>([]);
   const [supplierQ, setSupplierQ] = useState('');
+
+  // Suppliers tab state
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [supplierForm, setSupplierForm] = useState({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' });
+  const handleAddSupplier = async () => {
+    const name = supplierForm.name.trim();
+    if (!name) return alert(t('supplierNameRequired') || 'Supplier name is required');
+    if (suppliers.find(s => (s.name || '').toLowerCase() === name.toLowerCase())) return alert(t('supplierExists') || 'Supplier already exists');
+    const newSupplier = { id: `sup-${Date.now()}`, name, phone: supplierForm.phone.trim(), email: supplierForm.email.trim(), address: supplierForm.address.trim(), crNumber: supplierForm.crNumber.trim(), vatNumber: supplierForm.vatNumber.trim(), code: supplierForm.code.trim() };
+    await localDb.saveDoc('suppliers', newSupplier);
+    // ProductsScreen receives setSuppliers via a custom event to avoid prop drilling
+    (window as any).__posAddSupplier?.(newSupplier);
+    setShowSupplierModal(false);
+    setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' });
+    alert(t('supplierAdded') || 'Supplier added successfully!');
+  };
   const [showCompanyList, setShowCompanyList] = useState(false);
   const [showCategoryList, setShowCategoryList] = useState(false);
   const [barcodeVal, setBarcodeVal] = useState('');
@@ -1591,11 +1607,62 @@ ${printFiltered.map(p => {
 
       {/* Suppliers Tab Content */}
       {productTab === 'suppliers' && (
-        <div style={{ flex: 1, overflow: 'auto', padding: 20 }}>
-          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}><Icon e="🏢" /> </div>
-            <h3 style={{ margin: '0 0 8px', color: T.teal }}>Suppliers</h3>
-            <p style={{ color: T.gray500 }}>সরবরাহকারীদের তালিকা এখানে দেখা যাবে</p>
+        <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: T.teal }}> <Icon e="🏢" /> {t('suppliers')}</h3>
+            <button
+              onClick={() => setShowSupplierModal(true)}
+              style={{ padding: '8px 14px', background: T.teal, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}
+            > <Icon e="➕" /> {t('addNewSupplier') || 'New Supplier'}
+            </button>
+          </div>
+          {suppliers.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}><Icon e="🏢" /> </div>
+              <p>{t('noSuppliers') || 'No suppliers yet'}</p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gap: 12 }}>
+              {suppliers.map((s: any) => (
+                <div key={s.id} style={{ background: T.white, borderRadius: 12, padding: 14, boxShadow: '0 1px 3px rgba(0,0,0,0.08)', border: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 15 }}>{s.name}</div>
+                    <div style={{ fontSize: 13, color: T.gray500 }}>
+                      {s.phone || ''} {s.email ? `• ${s.email}` : ''}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 13, color: T.gray400 }}>{s.code || ''}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Supplier Modal */}
+      {showSupplierModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
+              <Icon e="🏢" /> {t('addNewSupplier') || 'New Supplier'}
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <input placeholder={t('supplierName') || 'Supplier name'} value={supplierForm.name} onChange={e => setSupplierForm(f => ({ ...f, name: e.target.value }))} style={inputStyle} />
+              <input placeholder={t('phone') || 'Phone'} value={supplierForm.phone} onChange={e => setSupplierForm(f => ({ ...f, phone: e.target.value }))} style={inputStyle} />
+              <input placeholder={t('email') || 'Email'} value={supplierForm.email} onChange={e => setSupplierForm(f => ({ ...f, email: e.target.value }))} style={inputStyle} />
+              <input placeholder={t('address') || 'Address'} value={supplierForm.address} onChange={e => setSupplierForm(f => ({ ...f, address: e.target.value }))} style={inputStyle} />
+              <input placeholder={t('crNumber') || 'CR Number'} value={supplierForm.crNumber} onChange={e => setSupplierForm(f => ({ ...f, crNumber: e.target.value }))} style={inputStyle} />
+              <input placeholder={t('vatNumber') || 'VAT Number'} value={supplierForm.vatNumber} onChange={e => setSupplierForm(f => ({ ...f, vatNumber: e.target.value }))} style={inputStyle} />
+              <input placeholder={t('code') || 'Code'} value={supplierForm.code} onChange={e => setSupplierForm(f => ({ ...f, code: e.target.value }))} style={inputStyle} />
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+              <button onClick={() => setShowSupplierModal(false)} style={{ flex: 1, padding: '10px', background: '#F3F4F6', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
+                {t('cancel') || 'Cancel'}
+              </button>
+              <button onClick={handleAddSupplier} style={{ flex: 1, padding: '10px', background: T.teal, color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
+                <Icon e="✅" /> {t('save') || 'Save'}
+              </button>
+            </div>
           </div>
         </div>
       )}

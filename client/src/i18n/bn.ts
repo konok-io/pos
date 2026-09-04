@@ -99,6 +99,13 @@ export const bn: Record<string, string> = {
   save: 'সেভ করুন',
   newProduct: 'নতুন পণ্য',
   newProductSave: 'নতুন পণ্য সংরক্ষণ',
+  supplierNameRequired: 'সরবরাহকারী নাম প্রয়োজন',
+  supplierExists: 'সরবরাহকারী আগে থেকেই আছে',
+  supplierAdded: 'সরবরাহকারী যোগ হয়েছে!',
+  addNewSupplier: 'নতুন সরবরাহকারী',
+  crNumber: 'সিআর নম্বর',
+  vatNumber: 'ভ্যাট নম্বর',
+
   newProductAction: 'নতুন পণ্য',
   newProductButton: 'নতুন পণ্য',
   purchaseHistoryButton: 'ক্রয় হিস্ট্রি',

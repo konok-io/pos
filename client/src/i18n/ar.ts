@@ -98,6 +98,13 @@ export const ar: Record<string, string> = {
   save: 'حفظ',
   newProduct: 'منتج جديد',
   newProductSave: 'حفظ منتج جديد',
+  supplierNameRequired: 'اسم المورد مطلوب',
+  supplierExists: 'المورد موجود بالفعل',
+  supplierAdded: 'تم إضافة المورد بنجاح!',
+  addNewSupplier: 'مورد جديد',
+  crNumber: 'رقم السجل التجاري',
+  vatNumber: 'رقم الضريبة',
+
   newProductAction: 'منتج جديد',
   newProductButton: 'منتج جديد',
   purchaseHistoryButton: 'سجل الشراء',
