@@ -1500,8 +1500,11 @@ ${printFiltered.map(p => {
               style={{ ...inputStyle, paddingLeft: 32 }}
             />
           </div>
-          <button style={btn('ghost')} onClick={printProductList}><Icon e="🖨" /> <Icon e="️" /> {t('printButton')}</button>
-          <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{filtered.length}{t('productsCount')}</span>
+          <button type="button" onClick={() => setShowAddForm(true)} style={btn('primary')}>
+            <Icon e="➕" /> {t('newProductButton')}
+          </button>
+          <button style={btn('ghost')} onClick={printProductList}><Icon e="🖨" /> {t('printButton')}</button>
+          <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{filtered.length} {t('productsCount')}</span>
         </div>
       )}
 
