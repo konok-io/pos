@@ -1454,6 +1454,17 @@ ${printFiltered.map(p => {
         > <Icon e="🏭" />
            Stock
         </button>
+        <div style={{ flex: 1 }} />
+        <button
+          onClick={printProductList}
+          style={{
+            padding: '8px 14px', borderRadius: 8, border: 'none',
+            background: T.white, color: T.gray600,
+            fontWeight: 600, fontSize: 13, cursor: 'pointer',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
+        > <Icon e="🖨" /> {t('printButton')}
+        </button>
       </div>
 
       {/* Filters - Only show for list tab */}
@@ -1498,7 +1509,7 @@ ${printFiltered.map(p => {
           > <Icon e="🗑" />
             ️ {t('deletedListButton')}
           </button>
-          <button style={{ ...btn('ghost'), fontSize: 13 }} onClick={printProductList}><Icon e="🖨" /> {t('printButton')}</button>
+
           <button type="button" onClick={() => setShowAddForm(true)} style={{ ...btn('primary'), fontSize: 13 }}>
             <Icon e="➕" /> {t('newProductButton')}
           </button>
