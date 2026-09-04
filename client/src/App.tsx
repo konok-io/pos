@@ -2560,7 +2560,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                 <button onClick={() => setCurrentTab('pos')} style={{
                   padding: '5px 10px',
                   border: 'none',
-                  background: currentTab === 'pos' ? '#E0E0E0' : 'transparent',
+                  background: currentTab === 'pos' ? '#ea580c' : 'transparent',
                   cursor: 'pointer',
                   color: '#000000',
                   fontWeight: 600,
@@ -2580,7 +2580,7 @@ const [currentTab, setCurrentTab] = useState('pos');
                   <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
                     padding: '5px 10px',
                     border: 'none',
-                    background: currentTab === t.id ? '#E0E0E0' : 'transparent',
+                    background: currentTab === t.id ? '#ea580c' : 'transparent',
                     cursor: 'pointer',
                     color: '#000000',
                     fontWeight: 600,
