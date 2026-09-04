@@ -1473,16 +1473,16 @@ ${printFiltered.map(p => {
           <button onClick={() => setStockFilter('in')} style={{
             ...btn(stockFilter === 'in' ? 'primary' : 'ghost', 'sm'),
             borderRadius: 7, whiteSpace: 'nowrap',
-            background: stockFilter === 'in' ? T.teal : T.gray100,
-            color: stockFilter === 'in' ? T.white : T.gray600,
+            background: stockFilter === 'in' ? '#E5E7EB' : T.gray100,
+            color: stockFilter === 'in' ? T.gray800 : T.gray600,
             border: 'none', padding: '8px 14px', fontSize: 13,
           }}> <Icon e="📦" /> {t('stockIn')} ({stockCount})</button>
 
           <button onClick={() => setStockFilter('out')} style={{
             ...btn(stockFilter === 'out' ? 'primary' : 'ghost', 'sm'),
             borderRadius: 7, whiteSpace: 'nowrap',
-            background: stockFilter === 'out' ? T.red : T.redLight,
-            color: stockFilter === 'out' ? T.white : T.red,
+            background: stockFilter === 'out' ? '#E5E7EB' : T.redLight,
+            color: stockFilter === 'out' ? T.gray800 : T.red,
             border: 'none', padding: '8px 14px', fontSize: 13,
           }}> <Icon e="⚠" /> {t('stockOutStatus')} ({outOfStockCount})</button>
 
