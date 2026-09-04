@@ -1453,19 +1453,19 @@ ${printFiltered.map(p => {
       </div>
 
       {/* Header */}
-      <div style={{ padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-        <button style={btn('primary')} onClick={() => setShowAddForm(true)}> <Icon e="➕" /> {t('newProductButton')}</button>
-        <button style={btn('ghost')} onClick={() => setShowPurchaseHistory(true)}> <Icon e="📦" /> {t('purchaseHistoryButton')}</button>
+      <div style={{ padding: '12px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
+        <button style={{ ...btn('primary'), fontSize: 13 }} onClick={() => setShowAddForm(true)}> <Icon e="➕" /> {t('newProductButton')}</button>
+        <button style={{ ...btn('ghost'), fontSize: 13 }} onClick={() => setShowPurchaseHistory(true)}> <Icon e="📦" /> {t('purchaseHistoryButton')}</button>
         <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
           <button
             onClick={() => setProductTab('history')}
-            style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
+            style={{ ...btn('ghost'), fontSize: 13, padding: '6px 12px' }}
           > <Icon e="📜" />
-             {t('priceHistoryButton')}
+            {t('priceHistoryButton')}
           </button>
           <button
             onClick={() => setProductTab('deleted')}
-            style={{ ...btn('ghost'), fontSize: 14, padding: '6px 12px' }}
+            style={{ ...btn('ghost'), fontSize: 13, padding: '6px 12px' }}
           > <Icon e="🗑" />
             ️ {t('deletedListButton')}
           </button>
@@ -1474,13 +1474,13 @@ ${printFiltered.map(p => {
 
       {/* Filters - Only show for list tab */}
       {productTab === 'list' && (
-        <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
+        <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap', fontSize: 13 }}>
           <button onClick={() => setStockFilter('in')} style={{
             ...btn(stockFilter === 'in' ? 'primary' : 'ghost', 'sm'),
             borderRadius: 7, whiteSpace: 'nowrap',
             background: stockFilter === 'in' ? T.teal : T.gray100,
             color: stockFilter === 'in' ? T.white : T.gray600,
-            border: 'none', padding: '8px 14px', fontSize: 15,
+            border: 'none', padding: '8px 14px', fontSize: 13,
           }}> <Icon e="📦" /> {t('stockIn')} ({stockCount})</button>
 
           <button onClick={() => setStockFilter('out')} style={{
@@ -1488,23 +1488,24 @@ ${printFiltered.map(p => {
             borderRadius: 7, whiteSpace: 'nowrap',
             background: stockFilter === 'out' ? T.red : T.redLight,
             color: stockFilter === 'out' ? T.white : T.red,
-            border: 'none', padding: '8px 14px', fontSize: 15,
+            border: 'none', padding: '8px 14px', fontSize: 13,
           }}> <Icon e="⚠" /> {t('stockOutStatus')} ({outOfStockCount})</button>
 
-          <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
+          <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150, fontSize: 13 }}>
             <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><Icon e="🔍" /> </span>
             <input
+              type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t('searchProduct')}
-              style={{ ...inputStyle, paddingLeft: 32 }}
+              style={{ ...inputStyle, paddingLeft: 32, fontSize: 13 }}
             />
           </div>
-          <button type="button" onClick={() => setShowAddForm(true)} style={btn('primary')}>
+          <button type="button" onClick={() => setShowAddForm(true)} style={{ ...btn('primary'), fontSize: 13 }}>
             <Icon e="➕" /> {t('newProductButton')}
           </button>
-          <button style={btn('ghost')} onClick={printProductList}><Icon e="🖨" /> {t('printButton')}</button>
-          <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{filtered.length} {t('productsCount')}</span>
+          <button style={{ ...btn('ghost'), fontSize: 13 }} onClick={printProductList}><Icon e="🖨" /> {t('printButton')}</button>
+          <span style={{ fontSize: 13, color: T.gray400, marginLeft: 'auto' }}>{filtered.length} {t('productsCount')}</span>
         </div>
       )}
 
