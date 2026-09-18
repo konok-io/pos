@@ -193,7 +193,7 @@ interface Transaction {
 }
 
 const DB_NAME = 'pos-offline-db';
-const DB_VERSION = 6;
+const DB_VERSION = 7;
 
 let db: IDBPDatabase<POSDatabase> | null = null;
 
