@@ -10,3 +10,4 @@ release/
 client/dist/
 server/dist/
 server/node_modules/
+client/src/App.tsx.bak
