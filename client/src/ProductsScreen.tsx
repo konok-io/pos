@@ -47,7 +47,7 @@ interface ProductsScreenProps {
   currentUser?: any;
 }
 
-export default function ProductsScreen({ products: _initProducts, suppliers: _initSuppliers, categories: _initCategories, purchases, productHistory, setProducts: setProductsParent, setSuppliers: setSuppliersParent, setCategories: setCategoriesParent, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
+export default function ProductsScreen({ products: _initProducts, suppliers: _initSuppliers, categories: _initCategories, purchases, productHistory: _productHistory, setProducts: setProductsParent, setSuppliers: setSuppliersParent, setCategories: setCategoriesParent, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
   const { t } = useLanguage();
   const [products, setProducts] = useState<any[]>([]);
   const [suppliers, setSuppliers] = useState<any[]>([]);
@@ -93,6 +93,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const [showStockHistoryModal, setShowStockHistoryModal] = useState(false);
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'profit'>('name');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [stockHistory, setStockHistory] = useState<any[]>([]);
 
   useEffect(() => { }, [productTab]);
 
@@ -105,10 +106,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           const res = await api.login('admin@pos.test', 'admin123');
           setToken(res.token);
         }
-        const [prods, cats, sups] = await Promise.all([api.getProducts(), api.getCategories(), api.getSuppliers()]);
+        const [prods, cats, sups, hist] = await Promise.all([api.getProducts(), api.getCategories(), api.getSuppliers(), api.getStockHistory()]);
         setProducts(prods);
         setCategories(cats);
         setSuppliers(sups);
+        setStockHistory(hist);
         setProductsParent(prods);
         setCategoriesParent(cats);
         setSuppliersParent(sups);
@@ -149,7 +151,10 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const handleEditProduct = () => {
     if (!editProduct) return;
-    setProducts(products.map((p: any) => p.id === editProduct.id ? { ...p, costPrice: editProduct.buyP, sellPrice: editProduct.sellP } : p));
+    const updated = products.map((p: any) => p.id === editProduct.id ? { ...p, costPrice: editProduct.costPrice, sellPrice: editProduct.sellPrice } : p);
+    setProducts(updated);
+    setProductsParent(updated);
+    api.updateProduct(editProduct.id, { ...editProduct, costPrice: editProduct.costPrice, sellPrice: editProduct.sellPrice }).catch(() => {});
     setEditProduct(null);
   };
 
@@ -332,7 +337,13 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         items.push({ id: genId(), name: row['name'] || '', code: row['barcode'] || '', company: row['company'] || '', cat: row['category'] || '', unit: row['unit'] || 'pcs', costPrice: parseFloat(row['buyprice'] || '0'), sellPrice: parseFloat(row['sellprice'] || '0'), stock: parseFloat(row['stock'] || '0'), minStock: parseFloat(row['minstock'] || '5'), image: '', supplier: row['company'] || '', categoryId: '' });
       }
       const valid = items.filter(i => i.name);
-      if (valid.length > 0) { setProducts((prev: any[]) => [...prev, ...valid]); alert(`${valid.length} ${t('productsAdded')}`); }
+      if (valid.length > 0) {
+        const updated = [...products, ...valid];
+        setProducts(updated);
+        setProductsParent(updated);
+        valid.forEach((p: any) => api.addProduct(p).catch(() => {}));
+        alert(`${valid.length} ${t('productsAdded')}`);
+      }
     };
     reader.readAsText(file);
     e.target.value = '';
@@ -355,6 +366,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       oldStock,
       newStock,
       reason: stockAdjustReason,
+    }).then((res: any) => {
+      setStockHistory(prev => [{ id: res.id, productId: stockAdjustProduct.id, productName: stockAdjustProduct.name, type: stockAdjustType === 'add' ? 'add' : 'remove', quantity: qty, oldStock, newStock, reason: stockAdjustReason, created_at: new Date().toISOString() }, ...prev]);
     }).catch(() => {});
     alert(`${stockAdjustProduct.name}: ${stockAdjustType === 'add' ? '+' : '-'}${qty} = ${newStock}`);
     setStockAdjustProduct(null); setStockAdjustQty(''); setStockAdjustReason('');
@@ -767,8 +780,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 16px', color: T.teal }}>✏️ {t('editProductPrice')}</h3>
             <div style={{ marginBottom: 12 }}><div style={{ fontWeight: 600, fontSize: 15 }}>{editProduct.name}</div><div style={{ fontSize: 13, color: T.gray400 }}>{editProduct.company} - {editProduct.cat || '-'}</div></div>
-            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('purchasePrice')} ($)</label><input type="number" value={editProduct.buyP} onChange={e => setEditProduct({ ...editProduct, buyP: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
-            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('sellPrice')} ($)</label><input type="number" value={editProduct.sellP} onChange={e => setEditProduct({ ...editProduct, sellP: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('purchasePrice')} ($)</label><input type="number" value={editProduct.costPrice} onChange={e => setEditProduct({ ...editProduct, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('sellPrice')} ($)</label><input type="number" value={editProduct.sellPrice} onChange={e => setEditProduct({ ...editProduct, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
             <div style={{ display: 'flex', gap: 10 }}><button onClick={() => setEditProduct(null)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button><button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2 }}>💾 {t('saveChanges')}</button></div>
           </div>
         </div>
@@ -789,8 +802,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       )}
 
       {showPriceHistory && overlayModal(`📜 ${t('priceHistory')}`, () => setShowPriceHistory(false), (
-        <div>{productHistory.length === 0 ? <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noPriceHistory')}</p> : productHistory.map((h: any, i: number) => (
-          <div key={i} style={{ padding: 10, background: T.gray50, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}><div><strong>{h.productName || h.name}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.timestamp || h.date).toLocaleString()}</div></div><div style={{ textAlign: 'right' }}>{h.oldPrice && <div style={{ textDecoration: 'line-through', color: T.red }}>{fmt(h.oldPrice)}</div>}{h.newPrice && <div style={{ color: T.green, fontWeight: 700 }}>{fmt(h.newPrice)}</div>}</div></div>
+        <div>{stockHistory.length === 0 ? <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noPriceHistory')}</p> : stockHistory.filter((h: any) => h.type === 'price').map((h: any, i: number) => (
+          <div key={i} style={{ padding: 10, background: T.gray50, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}><div><strong>{h.productName}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.created_at).toLocaleString()}</div></div><div style={{ textAlign: 'right' }}>{h.oldPrice && <div style={{ textDecoration: 'line-through', color: T.red }}>{fmt(h.oldPrice)}</div>}{h.newPrice && <div style={{ color: T.green, fontWeight: 700 }}>{fmt(h.newPrice)}</div>}</div></div>
         ))}</div>
       ))}
 
@@ -1027,13 +1040,13 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 16px', color: T.teal }}>📦 {t('stock')} {t('history')}</h3>
             <div style={{ maxHeight: 400, overflow: 'auto' }}>
-              {productHistory.length === 0 ? (
+              {stockHistory.length === 0 ? (
                 <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noPriceHistory')}</p>
               ) : (
-                productHistory.map((h: any, i: number) => (
-                  <div key={i} style={{ padding: 10, background: T.gray50, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-                    <div><strong>{h.productName || h.name}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.timestamp || h.date).toLocaleString()}</div></div>
-                    <div style={{ textAlign: 'right' }}>{h.oldPrice && <div style={{ textDecoration: 'line-through', color: T.red }}>{fmt(h.oldPrice)}</div>}{h.newPrice && <div style={{ color: T.green, fontWeight: 700 }}>{fmt(h.newPrice)}</div>}</div>
+                stockHistory.map((h: any, i: number) => (
+                  <div key={i} style={{ padding: 10, background: h.type === 'add' ? T.greenLight : T.redLight, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
+                    <div><strong>{h.productName}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.created_at).toLocaleString()}</div><div style={{ fontSize: 12, color: T.gray500 }}>{h.reason || '-'}</div></div>
+                    <div style={{ textAlign: 'right' }}><div style={{ fontWeight: 700, color: h.type === 'add' ? T.green : T.red }}>{h.type === 'add' ? '+' : '-'}{h.quantity}</div><div style={{ fontSize: 12, color: T.gray500 }}>{h.oldStock} → {h.newStock}</div></div>
                   </div>
                 ))
               )}
