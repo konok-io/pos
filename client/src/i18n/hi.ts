@@ -468,4 +468,5 @@ export const hi: Record<string, string> = {
   more: 'और अधिक',
   priceHistory: 'मूल्य इतिहास',
   deleteHistory: 'हटाएं इतिहास',
+  csvImport: 'CSV आयात',
 };

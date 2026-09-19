@@ -64,6 +64,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [stockAdjustType, setStockAdjustType] = useState('add');
   const [stockAdjustReason, setStockAdjustReason] = useState('');
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showSupplierMoreMenu, setShowSupplierMoreMenu] = useState(false);
 
   useEffect(() => { localStorage.setItem('pos_product_tab', productTab); }, [productTab]);
 
@@ -231,7 +232,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         </div>
         <span style={{ fontSize: 14, color: T.gray400 }}>{filteredSuppliers.length}</span>
         <button style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}>🖨️ {t('print')}</button>
-        <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' }); setShowSupplierModal(true); }}>➕ {t('addSupplier')}</button>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         {filteredSuppliers.length === 0 ? (
@@ -487,6 +487,19 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
               )}
             </div>
             <button style={{ ...btn('primary', 'sm') }} onClick={() => alert(t('comingSoon'))}>➕ {t('addNewProduct')}</button>
+          </div>
+        )}
+        {productTab === 'suppliers' && (
+          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+            <div style={{ position: 'relative' }}>
+              <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowSupplierMoreMenu(!showSupplierMoreMenu)}>⋯ {t('more')}</button>
+              {showSupplierMoreMenu && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
+                  <button onClick={() => { setShowSupplierMoreMenu(false); alert(t('comingSoon')); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📥 {t('csvImport')} {t('suppliers')}</button>
+                </div>
+              )}
+            </div>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' }); setShowSupplierModal(true); }}>➕ {t('addSupplier')}</button>
           </div>
         )}
       </div>

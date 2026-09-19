@@ -473,4 +473,5 @@ export const ar: Record<string, string> = {
   more: ' المزيد',
   priceHistory: 'سجل الأسعار',
   deleteHistory: 'سجل الحذف',
+  csvImport: 'استيراد CSV',
 };

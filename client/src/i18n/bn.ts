@@ -477,4 +477,5 @@ export const bn: Record<string, string> = {
   more: 'আরও কার্যক্রম',
   priceHistory: 'দামের ইতিহাস',
   deleteHistory: 'ডিলিট হিস্ট্রি',
+  csvImport: 'CSV ইমপোর্ট',
 };
