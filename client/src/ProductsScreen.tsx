@@ -178,11 +178,17 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const renderAllProducts = () => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
+        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
+          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+        </div>
+        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredProducts.length}</span>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}>🖨️ {t('print')}</button>
         <button style={{ ...btn('primary', 'sm') }} onClick={() => alert(t('comingSoon'))}>➕ {t('addNewProduct')}</button>
         <div style={{ position: 'relative' }}>
           <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowMoreMenu(!showMoreMenu)}>⋯ {t('more')}</button>
           {showMoreMenu && (
-            <div style={{ position: 'absolute', top: '100%', left: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 180, padding: 4 }}>
+            <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 180, padding: 4 }}>
               <button onClick={() => { setShowImportModal(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📥 {t('csvUpload')}</button>
               <button onClick={() => { setShowPriceHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📜 {t('priceHistory')}</button>
               <button onClick={() => { setShowDeleteHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>🗑️ {t('deleteHistory')}</button>
@@ -190,12 +196,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             </div>
           )}
         </div>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
-        </div>
-        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredProducts.length}</span>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}>🖨️ {t('print')}</button>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
@@ -237,13 +237,13 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const renderSupplier = () => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-        <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' }); setShowSupplierModal(true); }}>➕ {t('addSupplier')}</button>
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
           <input value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder={t('searchSupplier')} style={{ ...inputStyle, paddingLeft: 32 }} />
         </div>
         <span style={{ fontSize: 14, color: T.gray400 }}>{filteredSuppliers.length}</span>
         <button style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}>🖨️ {t('print')}</button>
+        <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' }); setShowSupplierModal(true); }}>➕ {t('addSupplier')}</button>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         {filteredSuppliers.length === 0 ? (
@@ -300,13 +300,13 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const renderCategory = () => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-        <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ name: '' }); setShowCategoryModal(true); }}>➕ {t('addCategory')}</button>
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
           <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
         </div>
         <span style={{ fontSize: 14, color: T.gray400 }}>{filteredCategories.length}</span>
         <button style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}>🖨️ {t('print')}</button>
+        <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ name: '' }); setShowCategoryModal(true); }}>➕ {t('addCategory')}</button>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         {filteredCategories.length === 0 ? (
