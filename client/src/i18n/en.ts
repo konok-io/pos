@@ -513,4 +513,11 @@ export const en: Record<string, string> = {
   selected: 'selected',
   stockFilters: 'Stock Filters',
   exportCsv: 'Export CSV',
+  csvMinRows: 'CSV must have at least 2 rows (header + 1 data row)',
+  selectCsvFile: 'Select a CSV file to import products',
+  csvFormat: 'CSV Format',
+  id: 'ID',
+  enterToSearch: 'Press Enter to search',
+  stockAddHistory: 'Stock Add History',
+  stockRemoveHistory: 'Stock Remove History',
 };

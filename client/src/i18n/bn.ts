@@ -485,4 +485,11 @@ export const bn: Record<string, string> = {
   selected: 'নির্বাচিত',
   stockFilters: 'স্টক ফিল্টার',
   exportCsv: 'CSV এক্সপোর্ট',
+  csvMinRows: 'CSV তে কমপক্ষে ২ টি লাইন থাকতে হবে (হেডার + ১ টি ডেটা)',
+  selectCsvFile: 'পণ্য ইম্পোর্ট করতে CSV ফাইল সিলেক্ট করুন',
+  csvFormat: 'CSV ফরম্যাট',
+  id: 'আইডি',
+  enterToSearch: 'সার্চ করতে Enter চাপুন',
+  stockAddHistory: 'স্টক যোগ হিস্ট্রি',
+  stockRemoveHistory: 'স্টক বিয়োগ হিস্ট্রি',
 };

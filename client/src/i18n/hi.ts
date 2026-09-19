@@ -476,4 +476,11 @@ export const hi: Record<string, string> = {
   selected: 'चयनित',
   stockFilters: 'स्टॉक फ़िल्टर',
   exportCsv: 'CSV निर्यात',
+  csvMinRows: 'CSV में कम से कम 2 पंक्तियाँ होनी चाहिए',
+  selectCsvFile: 'उत्पाद आयात करने के लिए CSV फ़ाइल चुनें',
+  csvFormat: 'CSV प्रारूप',
+  id: 'आईडी',
+  enterToSearch: 'खोजने के लिए Enter दबाएँ',
+  stockAddHistory: 'स्टॉक जोड़ें इतिहास',
+  stockRemoveHistory: 'स्टॉक हटाएं इतिहास',
 };

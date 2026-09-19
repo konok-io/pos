@@ -94,8 +94,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'profit'>('name');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [stockHistory, setStockHistory] = useState<any[]>([]);
-
-  useEffect(() => { }, [productTab]);
+  const [stockHistoryFilter, setStockHistoryFilter] = useState<'all' | 'add' | 'remove'>('all');
 
   // Load ALL data from MySQL on mount - always override local data
   useEffect(() => {
@@ -759,8 +758,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   <button onClick={() => { setStockFilter('low'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'low' ? T.amberLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>⚠️ {t('stockLow')}</button>
                   <div style={{ borderTop: `1px solid ${T.gray100}`, margin: '4px 0' }}></div>
                   <button onClick={() => { exportStockCsv(); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📤 {t('exportCsv')}</button>
-                  <button onClick={() => { setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} + {t('history')}</button>
-                  <button onClick={() => { setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} - {t('history')}</button>
+                  <button onClick={() => { setStockHistoryFilter('add'); setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} + {t('history')}</button>
+                  <button onClick={() => { setStockHistoryFilter('remove'); setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} - {t('history')}</button>
                 </div>
               )}
             </div>
@@ -812,11 +811,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       ))}
 
       {showPurchaseHistory && (
-        <div style={overlay} onClick={() => setShowPurchaseHistory(false)}>
+        <div style={overlay} onClick={() => { setShowPurchaseHistory(false); setViewPurchase(null); }}>
           <div style={{ background: T.white, borderRadius: 12, width: '90vw', maxWidth: 700, maxHeight: '80vh', overflow: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <div style={{ padding: '16px 20px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <h3 style={{ margin: 0, color: T.teal }}>📦 {t('purchases')}</h3>
-              <button onClick={() => setShowPurchaseHistory(false)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: T.gray400 }}>✕</button>
+              <button onClick={() => { setShowPurchaseHistory(false); setViewPurchase(null); }} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: T.gray400 }}>✕</button>
             </div>
             <div style={{ padding: 20 }}>
               {purchases.length === 0 ? <p style={{ textAlign: 'center', color: T.gray400 }}>{t('noPurchaseRecords')}</p> : [...purchases].reverse().map((p: any) => {
@@ -934,7 +933,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                       }
                     }}
                     style={inputStyle}
-                    placeholder={`${t('supplierId')} - Enter to search`}
+                    placeholder={`${t('supplierId')} - ${t('enterToSearch')}`}
                   />
                   {productForm.supplierId && suppliers.filter((s: any) =>
                     s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())
@@ -1038,12 +1037,12 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       {showStockHistoryModal && (
         <div style={overlay} onClick={() => setShowStockHistoryModal(false)}>
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}>📦 {t('stock')} {t('history')}</h3>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}>📦 {stockHistoryFilter === 'add' ? t('stockAddHistory') : stockHistoryFilter === 'remove' ? t('stockRemoveHistory') : t('stock')} {t('history')}</h3>
             <div style={{ maxHeight: 400, overflow: 'auto' }}>
-              {stockHistory.length === 0 ? (
+              {stockHistory.filter((h: any) => stockHistoryFilter === 'all' || h.type === stockHistoryFilter).length === 0 ? (
                 <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noPriceHistory')}</p>
               ) : (
-                stockHistory.map((h: any, i: number) => (
+                stockHistory.filter((h: any) => stockHistoryFilter === 'all' || h.type === stockHistoryFilter).map((h: any, i: number) => (
                   <div key={i} style={{ padding: 10, background: h.type === 'add' ? T.greenLight : T.redLight, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
                     <div><strong>{h.productName}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.created_at).toLocaleString()}</div><div style={{ fontSize: 12, color: T.gray500 }}>{h.reason || '-'}</div></div>
                     <div style={{ textAlign: 'right' }}><div style={{ fontWeight: 700, color: h.type === 'add' ? T.green : T.red }}>{h.type === 'add' ? '+' : '-'}{h.quantity}</div><div style={{ fontSize: 12, color: T.gray500 }}>{h.oldStock} → {h.newStock}</div></div>

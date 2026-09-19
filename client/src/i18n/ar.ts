@@ -481,4 +481,11 @@ export const ar: Record<string, string> = {
   selected: 'محدد',
   stockFilters: 'فلاتر المخزون',
   exportCsv: 'تصدير CSV',
+  csvMinRows: 'يجب أن يحتوي CSV على صفوفين على الأقل',
+  selectCsvFile: 'اختر ملف CSV لاستيراد المنتجات',
+  csvFormat: 'تنسيق CSV',
+  id: 'المعرّف',
+  enterToSearch: 'اضغط Enter للبحث',
+  stockAddHistory: 'سجل إضافة المخزون',
+  stockRemoveHistory: 'سجل حذف المخزون',
 };
