@@ -68,6 +68,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [showCategoryMoreMenu, setShowCategoryMoreMenu] = useState(false);
   const [showStockMoreMenu, setShowStockMoreMenu] = useState(false);
   const [showStockSettingsMenu, setShowStockSettingsMenu] = useState(false);
+  const [stockFilter, setStockFilter] = useState<'all' | 'available' | 'out' | 'low'>('all');
   const [showPurchaseBarcodeModal, setShowPurchaseBarcodeModal] = useState(false);
   const [purchaseBarcodeId, setPurchaseBarcodeId] = useState('');
   const [showCustomBarcodeModal, setShowCustomBarcodeModal] = useState(false);
@@ -92,7 +93,12 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const allCategories = [...new Set([...categories.map((c: any) => c.name).filter(Boolean), ...products.map((p: any) => p.cat).filter(Boolean)])].sort();
   const filteredCategories = allCategories.filter(c => !categorySearch || (c || '').toLowerCase().includes(categorySearch.toLowerCase()));
   const barcodeProducts = products.filter((p: any) => !barcodeSearch || (p.code || '').toLowerCase().includes(barcodeSearch.toLowerCase()) || (p.name || '').toLowerCase().includes(barcodeSearch.toLowerCase()));
-  const stockProducts = products.filter((p: any) => !stockSearch || (p.name || '').toLowerCase().includes(stockSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(stockSearch.toLowerCase())).sort((a: any, b: any) => a.stock - b.stock);
+  const stockProducts = products.filter((p: any) => {
+    if (stockFilter === 'out') return p.stock <= 0;
+    if (stockFilter === 'low') return p.stock > 0 && p.stock <= (p.minStock || 5);
+    if (stockFilter === 'available') return p.stock > (p.minStock || 5);
+    return true;
+  }).filter((p: any) => !stockSearch || (p.name || '').toLowerCase().includes(stockSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(stockSearch.toLowerCase())).sort((a: any, b: any) => a.stock - b.stock);
 
   const handleEditProduct = () => {
     if (!editProduct) return;
@@ -563,13 +569,13 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
               )}
             </div>
             <div style={{ position: 'relative' }}>
-              <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowStockSettingsMenu(!showStockSettingsMenu)}>⚙️ {t('settings')}</button>
+              <button style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined }} onClick={() => setShowStockSettingsMenu(!showStockSettingsMenu)}>⚙️ {t('settings')}</button>
               {showStockSettingsMenu && (
                 <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 8 }}>
-                  <div style={{ padding: '4px 8px', fontSize: 13, color: T.gray500 }}>{t('totalProducts')}: <strong>{products.length}</strong></div>
-                  <div style={{ padding: '4px 8px', fontSize: 13, color: T.green }}>{t('stockAvailable')}: <strong>{stockCount}</strong></div>
-                  <div style={{ padding: '4px 8px', fontSize: 13, color: T.red }}>{t('stockOut')}: <strong>{outOfStockCount}</strong></div>
-                  <div style={{ padding: '4px 8px', fontSize: 13, color: T.amber }}>{t('stockLow')}: <strong>{lowStockCount}</strong></div>
+                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'all' ? T.tealLight : undefined }} onClick={() => { setStockFilter('all'); setShowStockSettingsMenu(false); }}>{t('totalProducts')}: <strong>{products.length}</strong></button>
+                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'available' ? T.greenLight : undefined }} onClick={() => { setStockFilter('available'); setShowStockSettingsMenu(false); }}>{t('stockAvailable')}: <strong>{stockCount}</strong></button>
+                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'out' ? T.redLight : undefined }} onClick={() => { setStockFilter('out'); setShowStockSettingsMenu(false); }}>{t('stockOut')}: <strong>{outOfStockCount}</strong></button>
+                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'low' ? T.amberLight : undefined }} onClick={() => { setStockFilter('low'); setShowStockSettingsMenu(false); }}>{t('stockLow')}: <strong>{lowStockCount}</strong></button>
                 </div>
               )}
             </div>
