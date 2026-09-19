@@ -2939,6 +2939,7 @@ export default function App() {
             setCustomers={setCustomers}
             sales={sales}
             onDeleteCustomer={handleDeleteCustomerFromDB}
+            settings={settings}
           />
         )}
 
@@ -4471,6 +4472,7 @@ interface CustomerManagementProps {
   setCustomers: React.Dispatch<React.SetStateAction<Customer[]>>;
   sales: any[];
   onDeleteCustomer?: (customer: Customer) => void;
+  settings: any;
 }
 
 type ViewType = 'dashboard' | 'general' | 'regular';
@@ -4974,7 +4976,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
   );
 }
 
-export function CustomerManagement({ customers, setCustomers, sales, onDeleteCustomer }: CustomerManagementProps) {
+export function CustomerManagement({ customers, setCustomers, sales, onDeleteCustomer, settings }: CustomerManagementProps) {
   const { t, isRTL } = useLanguage();
   const [view, setView] = useState<ViewType>(() => (localStorage.getItem('pos_customer_view') as ViewType) || 'dashboard');
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
@@ -5004,7 +5006,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   const [depositComment, setDepositComment] = useState('');
   const [dueAmount, setDueAmount] = useState('');
   const [dueComment, setDueComment] = useState('');
-  const modalFmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const modalFmt = (n: number) => `${settings?.currencySymbol || '৳'} ${(+n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   // Helper to create transaction
   const createTransaction = (type: 'due' | 'deposit', amount: number, note?: string, paymentMethod?: string): Transaction => ({
@@ -5573,7 +5575,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   };
 
   // Format currency
-  const fmt = (n: number) => `$${(+n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const fmt = (n: number) => `${settings?.currencySymbol || '৳'} ${(+n || 0).toLocaleString('en-IN')}`;
 
   // Styles
   const containerStyle: React.CSSProperties = {
@@ -6860,7 +6862,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     value={form.currencySymbol}
                     onChange={e => setForm(p => ({ ...p, currencySymbol: e.target.value }))}
                     style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                    placeholder="৳"
+                    placeholder={form.currencySymbol || '৳'}
                     maxLength={5}
                   />
                 </div>

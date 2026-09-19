@@ -31,7 +31,6 @@ const genUniqueId = () => {
   const unique = String(Math.floor(10000 + Math.random() * 90000));
   return `${y}${m}${d}${unique}`;
 };
-const fmt = (n: number) => `$${(+n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtN = (n: number) => (+n || 0).toLocaleString('en-IN');
 
 interface ProductsScreenProps {
@@ -49,6 +48,7 @@ interface ProductsScreenProps {
 
 export default function ProductsScreen({ products: _initProducts, suppliers: _initSuppliers, categories: _initCategories, purchases, productHistory: _productHistory, setProducts: setProductsParent, setSuppliers: setSuppliersParent, setCategories: setCategoriesParent, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
   const { t } = useLanguage();
+  const fmt = (n: number) => `${_settings?.currencySymbol || '৳'} ${(+n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   const [products, setProducts] = useState<any[]>([]);
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
