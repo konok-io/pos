@@ -22,6 +22,14 @@ const inputStyle: React.CSSProperties = { padding: '9px 12px', border: `1px soli
 const labelStyle: React.CSSProperties = { fontSize: 14, fontWeight: 700, color: T.gray600, marginBottom: 6, display: 'block' };
 
 const genId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+const genUniqueId = () => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const unique = String(Math.floor(10000 + Math.random() * 90000));
+  return `${y}${m}${d}${unique}`;
+};
 const fmt = (n: number) => `$${(+n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fmtN = (n: number) => (+n || 0).toLocaleString('en-IN');
 
@@ -52,11 +60,11 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [supplierSearch, setSupplierSearch] = useState('');
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<any>(null);
-  const [supplierForm, setSupplierForm] = useState({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' });
+  const [supplierForm, setSupplierForm] = useState({ id: '', name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' });
   const [categorySearch, setCategorySearch] = useState('');
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [categoryForm, setCategoryForm] = useState({ name: '' });
+  const [categoryForm, setCategoryForm] = useState({ id: '', name: '' });
   const [barcodeSearch, setBarcodeSearch] = useState('');
   const [stockSearch, setStockSearch] = useState('');
   const [stockAdjustProduct, setStockAdjustProduct] = useState<any>(null);
@@ -394,6 +402,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         <div style={overlay} onClick={() => setShowSupplierModal(false)}>
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 450, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 16px', color: T.teal }}>🏢 {editingSupplier ? t('edit') : t('addSupplier')}</h3>
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('id')}</label><input value={supplierForm.id} readOnly style={{ ...inputStyle, background: T.gray50, fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }} /></div>
             <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('name')} *</label><input value={supplierForm.name} onChange={e => setSupplierForm({ ...supplierForm, name: e.target.value })} style={inputStyle} /></div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
               <div><label style={labelStyle}>{t('phone')}</label><input value={supplierForm.phone} onChange={e => setSupplierForm({ ...supplierForm, phone: e.target.value })} style={inputStyle} /></div>
@@ -406,7 +415,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowSupplierModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { setSuppliers(suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...supplierForm } : s)); } else { setSuppliers([...suppliers, { id: genId(), ...supplierForm }]); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { setSuppliers(suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...supplierForm } : s)); } else { setSuppliers([...suppliers, { ...supplierForm }]); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
             </div>
           </div>
         </div>
@@ -458,10 +467,11 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         <div style={overlay} onClick={() => setShowCategoryModal(false)}>
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 16px', color: T.teal }}>📂 {editingCategory ? t('edit') : t('addCategory')}</h3>
-            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('id')}</label><input value={categoryForm.id} readOnly style={{ ...inputStyle, background: T.gray50, fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }} /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowCategoryModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } if (editingCategory) { setCategories(categories.map((c: any) => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c)); } else { setCategories([...categories, { id: genId(), name: categoryForm.name }]); } setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } if (editingCategory) { setCategories(categories.map((c: any) => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c)); } else { setCategories([...categories, { id: categoryForm.id || genUniqueId(), name: categoryForm.name }]); } setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
             </div>
           </div>
         </div>
@@ -638,7 +648,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
                 </div>
               )}
             </div>
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' }); setShowSupplierModal(true); }}>➕ {t('addSupplier')}</button>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ id: genUniqueId(), name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' }); setShowSupplierModal(true); }}>➕ {t('addSupplier')}</button>
           </div>
         )}
         {productTab === 'categories' && (
@@ -652,7 +662,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
                 </div>
               )}
             </div>
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ name: '' }); setShowCategoryModal(true); }}>➕ {t('addCategory')}</button>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genUniqueId(), name: '' }); setShowCategoryModal(true); }}>➕ {t('addCategory')}</button>
           </div>
         )}
         {productTab === 'barcode' && (
