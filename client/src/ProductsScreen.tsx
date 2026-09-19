@@ -359,31 +359,35 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         {filteredSuppliers.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}>🏢</div><p>{t('noSuppliers')}</p></div>
         ) : (
-          <div style={{ display: 'grid', gap: 12 }}>
-            {filteredSuppliers.map((company: string) => {
-              const prodCount = products.filter((p: any) => (p.company || '').toLowerCase() === company.toLowerCase()).length;
-              const purchaseCount = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === company.toLowerCase()).length;
-              const totalPurchase = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === company.toLowerCase()).reduce((s: number, p: any) => s + (p.items || []).reduce((ss: number, i: any) => ss + (i.stock || 0) * (i.costPrice || 0), 0), 0);
-              return (
-                <div key={company} style={{ padding: 16, background: T.white, borderRadius: 12, border: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 10, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🏢</div>
-                    <div style={{ cursor: 'pointer' }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}>
-                      <div style={{ fontWeight: 700, fontSize: 16 }}>{company}</div>
-                      <div style={{ fontSize: 13, color: T.gray500, marginTop: 2 }}>{prodCount} {t('products')} | {purchaseCount} {t('purchases')}</div>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontWeight: 700, color: T.green, fontSize: 15 }}>{fmt(totalPurchase)}</div>
-                      <div style={{ fontSize: 12, color: T.gray400 }}>{t('totalPurchase')}</div>
-                    </div>
-                    <button style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteSupplier(company)}>🗑️</button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
+            <thead><tr style={{ background: T.tealLight }}>
+              {[t('name'), t('phone'), t('email'), t('products'), t('purchases'), t('totalPurchase'), t('actions')].map((h, i) => (
+                <th key={i} style={{ padding: '10px 12px', textAlign: i >= 3 && i <= 4 ? 'center' : i === 5 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {filteredSuppliers.map((company: string, i: number) => {
+                const supplier = suppliers.find((s: any) => s.name === company);
+                const prodCount = products.filter((p: any) => (p.company || '').toLowerCase() === company.toLowerCase()).length;
+                const purchaseCount = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === company.toLowerCase()).length;
+                const totalPurchase = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === company.toLowerCase()).reduce((s: number, p: any) => s + (p.items || []).reduce((ss: number, i: any) => ss + (i.stock || 0) * (i.costPrice || 0), 0), 0);
+                return (
+                  <tr key={company} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                    <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, cursor: 'pointer' }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}>{company}<div style={{ fontSize: 12, color: T.gray400 }}>{supplier?.crNumber || '-'}</div></td>
+                    <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{supplier?.phone || '-'}</td>
+                    <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{supplier?.email || '-'}</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14 }}>{prodCount}</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14 }}>{purchaseCount}</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.green }}>{fmt(totalPurchase)}</td>
+                    <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+                      <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}>👁️</button>
+                      <button style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteSupplier(company)}>🗑️</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </div>
       {showSupplierModal && (
@@ -424,24 +428,30 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         {filteredCategories.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}>📂</div><p>{t('noCategories')}</p></div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 12 }}>
-            {filteredCategories.map((cat: string) => {
-              const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === cat.toLowerCase());
-              const totalValue = catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0);
-              return (
-                <div key={cat} style={{ padding: 16, background: T.white, borderRadius: 12, border: `1px solid ${T.gray200}`, cursor: 'pointer' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ fontWeight: 700, fontSize: 16, color: T.teal, cursor: 'pointer' }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}>📂 {cat}</div>
-                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-                      <span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catProducts.length}</span>
-                      <button style={{ ...btn('danger', 'sm'), padding: '2px 6px', fontSize: 12 }} onClick={() => deleteCategory(cat)}>🗑️</button>
-                    </div>
-                  </div>
-                  <div style={{ fontSize: 13, color: T.gray500 }}>{t('totalValue')}: {fmt(totalValue)}</div>
-                </div>
-              );
-            })}
-          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
+            <thead><tr style={{ background: T.tealLight }}>
+              {[t('categoryName'), t('products'), t('totalValue'), t('actions')].map((h, i) => (
+                <th key={i} style={{ padding: '10px 12px', textAlign: i === 1 ? 'center' : i === 2 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {filteredCategories.map((cat: string, i: number) => {
+                const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === cat.toLowerCase());
+                const totalValue = catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0);
+                return (
+                  <tr key={cat} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                    <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, color: T.teal, cursor: 'pointer' }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}>📂 {cat}</td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catProducts.length}</span></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{fmt(totalValue)}</td>
+                    <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+                      <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}>👁️</button>
+                      <button style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteCategory(cat)}>🗑️</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         )}
       </div>
       {showCategoryModal && (
@@ -473,24 +483,27 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         {barcodeProducts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}>📊</div><p>{t('noProductsYet')}</p></div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-            {barcodeProducts.map((p: any) => (
-              <div key={p.id} style={{ padding: 16, background: T.white, borderRadius: 12, border: `1px solid ${T.gray200}` }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                  <div><div style={{ fontWeight: 700, fontSize: 15 }}>{p.name}</div><div style={{ fontSize: 13, color: T.gray500 }}>{p.company || '-'}</div></div>
-                  <button style={{ ...btn('primary', 'sm') }} onClick={() => printBarcode(p)}>🖨️ {t('print')}</button>
-                </div>
-                <div style={{ background: T.gray50, borderRadius: 8, padding: 12, textAlign: 'center', border: `1px dashed ${T.gray300}` }}>
-                  <div style={{ fontFamily: 'monospace', fontSize: 24, letterSpacing: 4, fontWeight: 700 }}>{p.code || 'N/A'}</div>
-                  <div style={{ fontSize: 12, color: T.gray400, marginTop: 4 }}>{t('barcode')}</div>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
-                  <span style={{ fontSize: 14, color: T.gray500 }}>{t('purchasePrice')}: {fmt(p.costPrice)}</span>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: T.teal }}>{t('sellPrice')}: {fmt(p.sellPrice)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
+            <thead><tr style={{ background: T.tealLight }}>
+              {[t('productName'), t('company'), t('barcode'), t('purchasePrice'), t('sellPrice'), t('actions')].map((h, i) => (
+                <th key={i} style={{ padding: '10px 12px', textAlign: i >= 3 && i <= 4 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {barcodeProducts.map((p: any, i: number) => (
+                <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                  <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{p.name}</td>
+                  <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{p.company || '-'}</td>
+                  <td style={{ padding: '10px 12px' }}><span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, background: T.gray50, padding: '2px 8px', borderRadius: 4, border: `1px dashed ${T.gray300}` }}>{p.code || 'N/A'}</span></td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(p.costPrice)}</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.teal }}>{fmt(p.sellPrice)}</td>
+                  <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+                    <button style={{ ...btn('primary', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => printBarcode(p)}>🖨️ {t('print')}</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
     </div>
