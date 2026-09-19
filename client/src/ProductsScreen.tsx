@@ -156,7 +156,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
               <button onClick={() => { setShowPriceHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📜 {t('priceHistory')}</button>
               <button onClick={() => { setShowDeleteHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>🗑️ {t('deleteHistory')}</button>
               <button onClick={() => { setShowPurchaseHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('purchases')}</button>
-              <button onClick={() => { printProductList(); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>🖨️ {t('print')}</button>
             </div>
           )}
         </div>
@@ -165,6 +164,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
         </div>
         <span style={{ fontSize: 14, color: T.gray400 }}>{filteredProducts.length}</span>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}>🖨️ {t('print')}</button>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
