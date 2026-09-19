@@ -1027,11 +1027,11 @@ export default function App() {
 
   // Tabs configuration
   const otherTabs = [
-    { id: 'products', icon: '<i className="fas fa-box"></i>', label: t('products') },
+    { id: 'products', icon: <i className="fas fa-box"></i>, label: t('products') },
     { id: 'customers', icon: '👥', label: t('customers') },
-    { id: 'income', icon: '<i className="fas fa-money-bill"></i>', label: t('incomeExpenses') },
-    { id: 'reports', icon: '<i className="fas fa-chart-bar"></i>', label: t('reports') },
-    { id: 'settings', icon: '<i className="fas fa-gear"></i>', label: t('settings') },
+    { id: 'income', icon: <i className="fas fa-money-bill"></i>, label: t('incomeExpenses') },
+    { id: 'reports', icon: <i className="fas fa-chart-bar"></i>, label: t('reports') },
+    { id: 'settings', icon: <i className="fas fa-gear"></i>, label: t('settings') },
   ];
 
   // Menu scroll ref
@@ -1407,11 +1407,11 @@ export default function App() {
     // Check due sales permission
     const dueSalesEnabled = settings.dueSalesEnabled !== false;
     if (due > 0 && !selectedCustomer) {
-      alert('<i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> ' + t('selectCustomerOrPayFull'));
+      alert(t('selectCustomerOrPayFull'));
       return;
     }
     if (due > 0 && selectedCustomer && !dueSalesEnabled) {
-      alert('<i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> ' + t('dueSalesNotEnabled'));
+      alert(t('dueSalesNotEnabled'));
       return;
     }
 
@@ -2213,9 +2213,9 @@ export default function App() {
                         {stockFilter !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
                             <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
-                              {stockFilter === 'available' && '<i className="fas fa-box" style={{marginRight: 4}}></i> ' + t('stockAvailable') + ` (${filteredProducts.length})`}
-                              {stockFilter === 'low' && '<i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> ' + t('stockLow') + ` (${filteredProducts.length})`}
-                              {stockFilter === 'out' && '<i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> ' + t('stockOut') + ` (${filteredProducts.length})`}
+                              {stockFilter === 'available' && <><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stockAvailable')}</> + ` (${filteredProducts.length})`}
+                              {stockFilter === 'low' && <><i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('stockLow')}</> + ` (${filteredProducts.length})`}
+                              {stockFilter === 'out' && <><i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('stockOut')}</> + ` (${filteredProducts.length})`}
                             </span>
                           </div>
                         )}
@@ -2517,9 +2517,9 @@ export default function App() {
                                  product.name.includes('গেম') || product.name.includes('খেলনা') ? '🎮' :
                                  product.name.includes('ফোন') || product.name.includes('মোবাইল') ? '📱' :
                                  product.name.includes('ল্যাপটপ') || product.name.includes('কম্পিউটার') ? '💻' :
-                                 product.name.includes('টাকা') || product.name.includes('কয়েন') ? '<i className="fas fa-money-bill"></i>' :
+                                 product.name.includes('টাকা') || product.name.includes('কয়েন') ? <i className="fas fa-money-bill"></i> :
                                  product.name.includes('স্ট্যাম্প') || product.name.includes('মার্ক') ? '📮' :
-                                 product.image ? product.image : '<i className="fas fa-box"></i>'}
+                                 product.image ? product.image : <i className="fas fa-box"></i>}
                               </span>
                             )}
                           </div>
@@ -3453,7 +3453,7 @@ Sujin Chips,002,${uniqueCompanies[0] || 'Company'},Snacks,pcs,20,25,200,20`;
 
       if (items.length > 0) {
         setPurchaseItems([...purchaseItems, ...items]);
-        alert('<i className="fas fa-check"></i> ' + items.length + ' ' + t('productsUploaded'));
+        alert(items.length + ' ' + t('productsUploaded'));
       }
     };
     reader.readAsText(file);
@@ -3836,7 +3836,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       s.id !== editingSupplier?.id && (s.name || '').toLowerCase().trim() === nameLower
     );
     if (exists) {
-      alert('<i className="fas fa-xmark"></i> ' + t('supplierNameExists'));
+      alert(t('supplierNameExists'));
       return;
     }
     
@@ -3859,7 +3859,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           company: supplierForm.name.trim()
         };
         setSuppliers(prev => prev.map(s => s.id === editingSupplier.id ? updated : s));
-        alert('<i className="fas fa-check"></i> ' + t('supplierUpdated'));
+        alert(t('supplierUpdated'));
       } else {
         const newSupplier: Supplier = {
           id: genId(),
@@ -3873,14 +3873,14 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           company: supplierForm.name.trim()
         };
         setSuppliers(prev => [...prev, newSupplier]);
-        alert('<i className="fas fa-check"></i> ' + t('supplierUpdated') + '\n' + t('supplierCode') + ': ' + codeToUse);
+        alert(t('supplierUpdated') + '\n' + t('supplierCode') + ': ' + codeToUse);
       }
       
       setShowSupplierModal(false);
       setEditingSupplier(null);
       setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' });
     } catch (error) {
-      alert('<i className="fas fa-xmark"></i> ' + t('errorOccurred'));
+      alert(t('errorOccurred'));
     }
   };
   
@@ -3888,7 +3888,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const deleteSupplier = async (supplier: Supplier) => {
     const hasProducts = products.some(p => (p.company || '').toLowerCase() === (supplier.name || '').toLowerCase());
     if (hasProducts) {
-      alert('<i className="fas fa-xmark"></i> ' + t('companyHasProducts'));
+      alert(t('companyHasProducts'));
       return;
     }
     
@@ -3898,7 +3898,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       setSuppliers(prev => prev.filter(s => s.id !== supplier.id));
       setViewSupplier(null);
     } catch (error) {
-      alert('<i className="fas fa-xmark"></i> ' + t('deleteFailed'));
+      alert(t('deleteFailed'));
     }
   };
   
@@ -3913,21 +3913,21 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       if (editingCategory) {
         const updated: SupplierCategory = { ...editingCategory, name: categoryForm.name.trim() };
         setCategories(prev => prev.map(c => c.id === editingCategory.id ? updated : c));
-        alert('<i className="fas fa-check"></i> ' + t('categoryUpdated'));
+        alert(t('categoryUpdated'));
       } else {
         const newCategory: SupplierCategory = {
           id: genId(),
           name: categoryForm.name.trim()
         };
         setCategories(prev => [...prev, newCategory]);
-        alert('<i className="fas fa-check"></i> ' + t('categoryAdded'));
+        alert(t('categoryAdded'));
       }
       
       setShowCategoryModal(false);
       setEditingCategory(null);
       setCategoryForm({ name: '' });
     } catch (error) {
-      alert('<i className="fas fa-xmark"></i> ' + t('errorOccurred'));
+      alert(t('errorOccurred'));
     }
   };
   
@@ -3935,7 +3935,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const deleteCategory = async (cat: SupplierCategory) => {
     const hasProducts = products.some(p => (p.cat || '').toLowerCase() === (cat.name || '').toLowerCase());
     if (hasProducts) {
-      alert('<i className="fas fa-xmark"></i> ' + t('categoryHasProducts'));
+      alert(t('categoryHasProducts'));
       return;
     }
     
@@ -3951,7 +3951,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   // Save Product
   const saveProduct = async () => {
     if (!productForm.name?.trim() || !productForm.company?.trim() || !productForm.cat?.trim()) {
-      alert('<i className="fas fa-xmark"></i> ' + t('fillRequiredFields'));
+      alert(t('fillRequiredFields'));
       return;
     }
     
@@ -3994,11 +3994,11 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         setSuppliers(prev => [...prev, newSupplier]);
       }
       
-      alert('<i className="fas fa-check"></i> ' + t('productAdded'));
+      alert(t('productAdded'));
       setShowProductModal(false);
       setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5' });
     } catch (error) {
-      alert('<i className="fas fa-xmark"></i> ' + t('errorOccurred'));
+      alert(t('errorOccurred'));
     }
   };
 
@@ -4215,7 +4215,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
-              {editingSupplier ? '<i className="fas fa-pen" style={{marginRight: 4}}></i> ' + t('editSupplier') : '<i className="fas fa-plus" style={{marginRight: 4}}></i> ' + t('newCompany')}
+              {editingSupplier ? <><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('editSupplier')}</> : <><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('newCompany')}</>}
             </h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -4274,7 +4274,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
-              {editingCategory ? '<i className="fas fa-pen" style={{marginRight: 4}}></i> ' + t('editCategory') : '<i className="fas fa-plus" style={{marginRight: 4}}></i> ' + t('newCategory')}
+              {editingCategory ? <><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('editCategory')}</> : <><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('newCategory')}</>}
             </h3>
             
             <div>
@@ -6564,7 +6564,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      alert('<i className="fas fa-xmark"></i> ' + t('settingsSaveFailed'));
+      alert(t('settingsSaveFailed'));
     }
   };
 
@@ -6578,7 +6578,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       alert(t('dataDeletedSuccessfully'));
       window.location.reload();
     } catch (error) {
-      alert('<i className="fas fa-xmark"></i> ' + t('error') + '!');
+      alert(t('error') + '!');
     }
   };
 
@@ -6601,7 +6601,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       onRefresh();
       alert(translate('dataDeletedSuccessfully'));
     } catch (error) {
-      alert('<i className="fas fa-xmark"></i> ' + translate('error') + '!');
+      alert(translate('error') + '!');
     }
   };
 
@@ -6640,7 +6640,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         onRefresh();
         alert(translate('dataDeletedSuccessfully'));
       } catch (error) {
-          alert('<i className="fas fa-xmark"></i> ' + translate('error') + '!');
+          alert(translate('error') + '!');
       }
       return;
     }
@@ -6678,15 +6678,15 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       onRefresh();
       alert(translate('dataDeletedSuccessfully'));
     } catch (error) {
-      alert('<i className="fas fa-xmark"></i> ' + translate('error') + '!');
+      alert(translate('error') + '!');
     }
   };
 
   const tabs = [
-    { icon: '<i className="fas fa-gear"></i>', label: t('settings') },
-    { icon: '<i className="fas fa-palette"></i>', label: t('design') },
-    { icon: '👤', label: t('user') },
-    { icon: '💥', label: t('dataReset') },
+    { icon: <i className="fas fa-gear"></i>, label: t('settings') },
+    { icon: <i className="fas fa-palette"></i>, label: t('design') },
+    { icon: <i className="fas fa-user"></i>, label: t('user') },
+    { icon: <i className="fas fa-trash-can"></i>, label: t('dataReset') },
   ];
 
   return (
@@ -6750,7 +6750,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           gap: 6,
           boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         }}>
-          {saved ? '<i className="fas fa-check"></i> ' + t('saved') : '<i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> ' + t('saveSettings')}
+          {saved ? <><i className="fas fa-check"></i> {t('saved')}</> : <><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveSettings')}</>}
         </button>
       </div>
 
@@ -6877,7 +6877,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               }}>
                 <div>
                   <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>
-                    {t('vatEnabled')} {form.vatEnabled ? '<i className="fas fa-check"></i>' : '<i className="fas fa-xmark"></i>'}
+                    {t('vatEnabled')} {form.vatEnabled ? <i className="fas fa-check"></i> : <i className="fas fa-xmark"></i>}
                   </h4>
                   <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
                     {form.vatEnabled ? t('vatAppliedToAllSales') : t('vatCalculationOff')}
@@ -7173,11 +7173,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             {/* Row 1: 5 Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 10 }}>
               {[
-                { label: t('productData'), count: products.length, icon: '<i className="fas fa-box"></i>', onClick: () => deleteAllItems('products', products, setProducts, t) },
+                { label: t('productData'), count: products.length, icon: <i className="fas fa-box"></i>, onClick: () => deleteAllItems('products', products, setProducts, t) },
                 { label: t('customerData'), count: customers.filter(c => !c.isSystem).length, icon: '👥', onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.filter(c => !c.isSystem).length === 0 },
-                { label: t('categoryData'), count: categories.length, icon: '<i className="fas fa-folder"></i>', onClick: () => deleteAllItems('categories', categories, setCategories, t) },
-                { label: t('supplierData'), count: suppliers.length, icon: '<i className="fas fa-building"></i>', onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
-                { label: t('salesData'), count: sales.length, icon: '<i className="fas fa-cart-shopping"></i>', onClick: () => deleteAllItems('sales', sales, setSales, t) },
+                { label: t('categoryData'), count: categories.length, icon: <i className="fas fa-folder"></i>, onClick: () => deleteAllItems('categories', categories, setCategories, t) },
+                { label: t('supplierData'), count: suppliers.length, icon: <i className="fas fa-building"></i>, onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
+                { label: t('salesData'), count: sales.length, icon: <i className="fas fa-cart-shopping"></i>, onClick: () => deleteAllItems('sales', sales, setSales, t) },
               ].map((item, i) => (
                 <div key={i} style={{ 
                   background: '#fff', 

@@ -665,11 +665,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   );
 
   const tabs = [
-    { id: 'allProducts', icon: '<i className="fas fa-box"></i>', label: t('allProducts') },
-    { id: 'suppliers', icon: '<i className="fas fa-building"></i>', label: t('suppliers') },
-    { id: 'categories', icon: '<i className="fas fa-folder"></i>', label: t('categories') },
-    { id: 'barcode', icon: '<i className="fas fa-chart-bar"></i>', label: t('barcode') },
-    { id: 'stock', icon: '🏭', label: t('stock') },
+    { id: 'allProducts', icon: <i className="fas fa-box"></i>, label: t('allProducts') },
+    { id: 'suppliers', icon: <i className="fas fa-building"></i>, label: t('suppliers') },
+    { id: 'categories', icon: <i className="fas fa-folder"></i>, label: t('categories') },
+    { id: 'barcode', icon: <i className="fas fa-chart-bar"></i>, label: t('barcode') },
+    { id: 'stock', icon: <i className="fas fa-warehouse"></i>, label: t('stock') },
   ];
 
   return (
