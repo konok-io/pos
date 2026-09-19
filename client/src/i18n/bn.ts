@@ -477,5 +477,9 @@ export const bn: Record<string, string> = {
   more: 'আরও কার্যক্রম',
   priceHistory: 'দামের ইতিহাস',
   deleteHistory: 'ডিলিট হিস্ট্রি',
-  csvImport: 'CSV ইমপোর্ট',
+  purchaseBarcode: 'পারচেজ বারকোড',
+  customBarcode: 'কাস্টম বারকোড',
+  enterPurchaseId: 'সেই পারচেজ এর সব পণ্যের বারকোড প্রিন্ট করতে পারচেজ আইডি দিন',
+  selectProductsForBarcode: 'বারকোড প্রিন্ট করতে পণ্য নির্বাচন করুন',
+  selected: 'নির্বাচিত',
 };

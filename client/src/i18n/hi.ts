@@ -468,5 +468,9 @@ export const hi: Record<string, string> = {
   more: 'और अधिक',
   priceHistory: 'मूल्य इतिहास',
   deleteHistory: 'हटाएं इतिहास',
-  csvImport: 'CSV आयात',
+  purchaseBarcode: 'खरीद बारकोड',
+  customBarcode: 'कस्टम बारकोड',
+  enterPurchaseId: 'उस खरीद के सभी उत्पादों का बारकोड प्रिंट करने के लिए खरीद आईडी दर्ज करें',
+  selectProductsForBarcode: 'बारकोड प्रिंट करने के लिए उत्पाद चुनें',
+  selected: 'चयनित',
 };

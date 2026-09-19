@@ -505,4 +505,9 @@ export const en: Record<string, string> = {
   more: 'More actions',
   priceHistory: 'Price History',
   deleteHistory: 'Delete History',
+  purchaseBarcode: 'Purchase Barcode',
+  customBarcode: 'Custom Barcode',
+  enterPurchaseId: 'Enter Purchase ID to print barcodes for all products in that purchase',
+  selectProductsForBarcode: 'Select products with barcodes to print',
+  selected: 'selected',
 };

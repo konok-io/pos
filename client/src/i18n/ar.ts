@@ -473,5 +473,9 @@ export const ar: Record<string, string> = {
   more: ' المزيد',
   priceHistory: 'سجل الأسعار',
   deleteHistory: 'سجل الحذف',
-  csvImport: 'استيراد CSV',
+  purchaseBarcode: 'باركود الشراء',
+  customBarcode: 'باركود مخصص',
+  enterPurchaseId: 'أدخل رقم الشراء لطباعة باركود جميع المنتجات في هذا الشراء',
+  selectProductsForBarcode: 'اختر المنتجات للطباعة',
+  selected: 'محدد',
 };

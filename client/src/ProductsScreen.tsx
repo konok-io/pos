@@ -66,6 +66,11 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showSupplierMoreMenu, setShowSupplierMoreMenu] = useState(false);
   const [showCategoryMoreMenu, setShowCategoryMoreMenu] = useState(false);
+  const [showPurchaseBarcodeModal, setShowPurchaseBarcodeModal] = useState(false);
+  const [purchaseBarcodeId, setPurchaseBarcodeId] = useState('');
+  const [showCustomBarcodeModal, setShowCustomBarcodeModal] = useState(false);
+  const [customBarcodeProducts, setCustomBarcodeProducts] = useState<any[]>([]);
+  const [customBarcodeSearch, setCustomBarcodeSearch] = useState('');
 
   useEffect(() => { localStorage.setItem('pos_product_tab', productTab); }, [productTab]);
 
@@ -142,6 +147,28 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('stock')}</h1><p>${new Date().toLocaleDateString()} | ${stockProducts.length} ${t('products')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('company')}</th><th>${t('stock')}</th><th>${t('minStock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
     const win = window.open('', '_blank', 'width=1000,height=600');
     if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 250); }
+  };
+
+  const printPurchaseBarcode = () => {
+    if (!purchaseBarcodeId.trim()) { alert(t('enterName')); return; }
+    const matchedProducts = products.filter((p: any) => (p.purchaseId || '').toLowerCase() === purchaseBarcodeId.trim().toLowerCase());
+    if (matchedProducts.length === 0) { alert(t('noProductsFound')); return; }
+    const items = matchedProducts.map((p: any) => `<div class="barcode-item"><h4>${p.name}</h4><div class="code">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item h4{font-size:11px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
+    const win = window.open('', '_blank', 'width=800,height=600');
+    if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); }
+    setShowPurchaseBarcodeModal(false);
+    setPurchaseBarcodeId('');
+  };
+
+  const printCustomBarcode = () => {
+    if (customBarcodeProducts.length === 0) { alert(t('noProductsFound')); return; }
+    const items = customBarcodeProducts.map((p: any) => `<div class="barcode-item"><h4>${p.name}</h4><div class="code">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item h4{font-size:11px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
+    const win = window.open('', '_blank', 'width=800,height=600');
+    if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); }
+    setShowCustomBarcodeModal(false);
+    setCustomBarcodeProducts([]);
   };
 
   const handleCsvImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -515,6 +542,12 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ name: '' }); setShowCategoryModal(true); }}>➕ {t('addCategory')}</button>
           </div>
         )}
+        {productTab === 'barcode' && (
+          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowPurchaseBarcodeModal(true)}>📦 {t('purchaseBarcode')}</button>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setShowCustomBarcodeModal(true); setCustomBarcodeSearch(''); setCustomBarcodeProducts([]); }}>📊 {t('customBarcode')}</button>
+          </div>
+        )}
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {productTab === 'allProducts' && renderAllProducts()}
@@ -605,6 +638,53 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
           </div>
         </div>
       ))}
+
+      {showPurchaseBarcodeModal && (
+        <div style={overlay} onClick={() => setShowPurchaseBarcodeModal(false)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}>📦 {t('purchaseBarcode')}</h3>
+            <p style={{ fontSize: 14, color: T.gray600, marginBottom: 12 }}>{t('enterPurchaseId')}</p>
+            <div style={{ marginBottom: 16 }}>
+              <input value={purchaseBarcodeId} onChange={e => setPurchaseBarcodeId(e.target.value)} placeholder={t('purchaseId')} style={inputStyle} />
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setShowPurchaseBarcodeModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+              <button onClick={printPurchaseBarcode} style={{ ...btn('primary'), flex: 2 }}>🖨️ {t('print')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCustomBarcodeModal && (
+        <div style={overlay} onClick={() => setShowCustomBarcodeModal(false)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}>📊 {t('customBarcode')}</h3>
+            <p style={{ fontSize: 14, color: T.gray600, marginBottom: 12 }}>{t('selectProductsForBarcode')}</p>
+            <div style={{ position: 'relative', marginBottom: 12 }}>
+              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
+              <input value={customBarcodeSearch} onChange={e => setCustomBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
+            </div>
+            <div style={{ maxHeight: 300, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 8, marginBottom: 16 }}>
+              {products.filter((p: any) => p.code && (!customBarcodeSearch || (p.name || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()))).map((p: any) => {
+                const isSelected = customBarcodeProducts.some((cp: any) => cp.id === p.id);
+                return (
+                  <div key={p.id} onClick={() => { setCustomBarcodeProducts(isSelected ? customBarcodeProducts.filter((cp: any) => cp.id !== p.id) : [...customBarcodeProducts, p]); }} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, background: isSelected ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <input type="checkbox" checked={isSelected} readOnly style={{ width: 16, height: 16 }} />
+                    <div><div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div><div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div></div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <span style={{ fontSize: 14, color: T.gray500 }}>{customBarcodeProducts.length} {t('products')} {t('selected')}</span>
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setShowCustomBarcodeModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+              <button onClick={printCustomBarcode} style={{ ...btn('primary'), flex: 2 }}>🖨️ {t('print')}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
