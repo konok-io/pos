@@ -1068,7 +1068,7 @@ export default function App() {
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [currency, setCurrency] = useState('৳'); // Currency symbol
-  const fmt = (n: number) => `${currency}${(+n || 0).toLocaleString('en-IN')}`;
+  const fmt = (n: number) => `${currency} ${(+n || 0).toLocaleString('en-IN')}`;
   
   // Load settings from localDB on startup
   useEffect(() => {
@@ -2255,7 +2255,7 @@ export default function App() {
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ padding: '8px 16px', background: searchedCustomer.balance > 0 ? 'rgba(220,38,38,0.3)' : 'rgba(34,197,94,0.3)', borderRadius: 8, marginBottom: 8 }}>
                             <div style={{ fontSize: 11, color: '#fff', opacity: 0.9 }}>{t('balance')}</div>
-                            <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>{settings.currencySymbol}{searchedCustomer.balance}</div>
+                            <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>{settings.currencySymbol} {searchedCustomer.balance}</div>
                           </div>
                           <div style={{ display: 'flex', gap: 8 }}>
                             <button 
@@ -2331,7 +2331,7 @@ export default function App() {
                                 <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
                                 <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><i className="fas fa-mobile-screen"></i> {c.phone}</div>
                                 {c.balance > 0 && (
-                                  <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>{t('due')}: {settings.currencySymbol}{c.balance}</div>
+                                  <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>{t('due')}: {settings.currencySymbol} {c.balance}</div>
                                 )}
                               </div>
                             ))}
@@ -3161,12 +3161,12 @@ export default function App() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}><i className="fas fa-chart-line"></i></div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>{settings.currencySymbol}0</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>{settings.currencySymbol} 0</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalIncome')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}><i className="fas fa-chart-line"></i></div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>{settings.currencySymbol}0</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>{settings.currencySymbol} 0</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalExpense')}</div>
               </div>
             </div>
@@ -4203,7 +4203,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   <div key={i} style={{ padding: 12, borderBottom: '1px solid #E5E7EB' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ fontWeight: 600 }}>{new Date(p.date).toLocaleDateString()}</span>
-                      <span style={{ fontWeight: 700, color: '#115E59' }}>{settings.currencySymbol}{p.total?.toLocaleString()}</span>
+                      <span style={{ fontWeight: 700, color: '#115E59' }}>{settings.currencySymbol} {p.total?.toLocaleString()}</span>
                     </div>
                     <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>{t('item')}: {p.items?.length || 0}</div>
                   </div>
@@ -7046,37 +7046,37 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0' }}>
                       <div>{t('productName')} 1</div>
                       <div style={{ textAlign: 'center' }}>2</div>
-                      <div style={{ textAlign: 'right' }}>{form.currencySymbol}50</div>
-                      <div style={{ textAlign: 'right' }}>{form.currencySymbol}100</div>
+                      <div style={{ textAlign: 'right' }}>{form.currencySymbol} 50</div>
+                      <div style={{ textAlign: 'right' }}>{form.currencySymbol} 100</div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0', borderBottom: '1px dashed #ccc' }}>
                       <div>{t('productName')} 2</div>
                       <div style={{ textAlign: 'center' }}>1</div>
-                      <div style={{ textAlign: 'right' }}>{form.currencySymbol}75</div>
-                      <div style={{ textAlign: 'right' }}>{form.currencySymbol}75</div>
+                      <div style={{ textAlign: 'right' }}>{form.currencySymbol} 75</div>
+                      <div style={{ textAlign: 'right' }}>{form.currencySymbol} 75</div>
                     </div>
 
                     {/* Totals */}
                     <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #000' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('subtotal')}:</span>
-                        <span>{form.currencySymbol}175</span>
+                        <span>{form.currencySymbol} 175</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('vat')} (15%):</span>
-                        <span>{form.currencySymbol}26.25</span>
+                        <span>{form.currencySymbol} 26.25</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}>
                         <span>{t('total')}:</span>
-                        <span>{form.currencySymbol}201.25</span>
+                        <span>{form.currencySymbol} 201.25</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('paid')}:</span>
-                        <span>{form.currencySymbol}210</span>
+                        <span>{form.currencySymbol} 210</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('change')}:</span>
-                        <span>{form.currencySymbol}8.75</span>
+                        <span>{form.currencySymbol} 8.75</span>
                       </div>
                     </div>
 
@@ -7109,31 +7109,31 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0' }}>
                       <div>{t('productName')} 1</div>
                       <div style={{ textAlign: 'center' }}>10</div>
-                      <div style={{ textAlign: 'right' }}>{form.currencySymbol}50</div>
-                      <div style={{ textAlign: 'right' }}>{form.currencySymbol}500</div>
+                      <div style={{ textAlign: 'right' }}>{form.currencySymbol} 50</div>
+                      <div style={{ textAlign: 'right' }}>{form.currencySymbol} 500</div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0', borderBottom: '1px dashed #ccc' }}>
                       <div>{t('productName')} 2</div>
                       <div style={{ textAlign: 'center' }}>5</div>
-                      <div style={{ textAlign: 'right' }}>{form.currencySymbol}80</div>
-                      <div style={{ textAlign: 'right' }}>{form.currencySymbol}400</div>
+                      <div style={{ textAlign: 'right' }}>{form.currencySymbol} 80</div>
+                      <div style={{ textAlign: 'right' }}>{form.currencySymbol} 400</div>
                     </div>
 
                     {/* Totals */}
                     <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #000' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('subtotal')}:</span>
-                        <span>{form.currencySymbol}900</span>
+                        <span>{form.currencySymbol} 900</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('vat')} (15%):</span>
-                        <span>{form.currencySymbol}135</span>
+                        <span>{form.currencySymbol} 135</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}>
                         <span>{t('total')} ({t('vatWith')}):
 
                         </span>
-                        <span>{form.currencySymbol}1,035</span>
+                        <span>{form.currencySymbol} 1,035</span>
                       </div>
                     </div>
                   </>
