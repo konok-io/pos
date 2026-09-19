@@ -474,4 +474,7 @@ export const bn: Record<string, string> = {
   csvFormatHelp: 'হেডার: name, barcode, company, category, unit, buyprice, sellprice, stock, minstock',
   comingSoon: 'শীঘ্রই আসছে!',
   price: 'দাম',
+  more: 'আরও কার্যক্রম',
+  priceHistory: 'দামের ইতিহাস',
+  deleteHistory: 'ডিলিট হিস্ট্রি',
 };

@@ -470,4 +470,7 @@ export const ar: Record<string, string> = {
   csvFormatHelp: 'الرأس: name, barcode, company, category, unit, buyprice, sellprice, stock, minstock',
   comingSoon: 'قريباً!',
   price: 'السعر',
+  more: ' المزيد',
+  priceHistory: 'سجل الأسعار',
+  deleteHistory: 'سجل الحذف',
 };

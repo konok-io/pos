@@ -502,4 +502,7 @@ export const en: Record<string, string> = {
   csvFormatHelp: 'Header: name, barcode, company, category, unit, buyprice, sellprice, stock, minstock',
   comingSoon: 'Coming soon!',
   price: 'Price',
+  more: 'More actions',
+  priceHistory: 'Price History',
+  deleteHistory: 'Delete History',
 };

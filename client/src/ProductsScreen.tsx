@@ -62,6 +62,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [stockAdjustQty, setStockAdjustQty] = useState('');
   const [stockAdjustType, setStockAdjustType] = useState('add');
   const [stockAdjustReason, setStockAdjustReason] = useState('');
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
 
   useEffect(() => { localStorage.setItem('pos_product_tab', productTab); }, [productTab]);
 
@@ -164,13 +165,20 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         </div>
         <span style={{ fontSize: 14, color: T.gray400 }}>{filteredProducts.length}</span>
       </div>
-      <div style={{ padding: '8px 12px', display: 'flex', gap: 8, background: T.gray50, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
+      <div style={{ padding: '8px 12px', display: 'flex', gap: 8, background: T.gray50, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap', alignItems: 'center' }}>
         <button style={{ ...btn('primary', 'sm') }} onClick={() => alert(t('comingSoon'))}>➕ {t('addNewProduct')}</button>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowImportModal(true)}>📥 {t('csvUpload')}</button>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowPriceHistory(true)}>📜 {t('priceHistory')}</button>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowDeleteHistory(true)}>🗑️ {t('deleteHistory')}</button>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowPurchaseHistory(true)}>📦 {t('purchases')}</button>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}>🖨️ {t('print')}</button>
+        <div style={{ position: 'relative', marginLeft: 'auto' }}>
+          <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowMoreMenu(!showMoreMenu)}>⋯ {t('more')}</button>
+          {showMoreMenu && (
+            <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 180, padding: 4 }}>
+              <button onClick={() => { setShowImportModal(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📥 {t('csvUpload')}</button>
+              <button onClick={() => { setShowPriceHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📜 {t('priceHistory')}</button>
+              <button onClick={() => { setShowDeleteHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>🗑️ {t('deleteHistory')}</button>
+              <button onClick={() => { setShowPurchaseHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('purchases')}</button>
+              <button onClick={() => { printProductList(); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>🖨️ {t('print')}</button>
+            </div>
+          )}
+        </div>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>

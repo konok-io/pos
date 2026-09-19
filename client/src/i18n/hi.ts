@@ -465,4 +465,7 @@ export const hi: Record<string, string> = {
   csvFormatHelp: 'हेडर: name, barcode, company, category, unit, buyprice, sellprice, stock, minstock',
   comingSoon: 'जल्द आ रहा है!',
   price: 'मूल्य',
+  more: 'और अधिक',
+  priceHistory: 'मूल्य इतिहास',
+  deleteHistory: 'हटाएं इतिहास',
 };
