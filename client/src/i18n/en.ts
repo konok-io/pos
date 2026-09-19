@@ -511,4 +511,5 @@ export const en: Record<string, string> = {
   selectProductsForBarcode: 'Select products with barcodes to print',
   selected: 'selected',
   stockFilters: 'Stock Filters',
+  exportCsv: 'Export CSV',
 };

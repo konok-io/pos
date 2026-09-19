@@ -483,4 +483,5 @@ export const bn: Record<string, string> = {
   selectProductsForBarcode: 'বারকোড প্রিন্ট করতে পণ্য নির্বাচন করুন',
   selected: 'নির্বাচিত',
   stockFilters: 'স্টক ফিল্টার',
+  exportCsv: 'CSV এক্সপোর্ট',
 };

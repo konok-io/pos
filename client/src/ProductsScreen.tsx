@@ -73,6 +73,14 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [showCustomBarcodeModal, setShowCustomBarcodeModal] = useState(false);
   const [customBarcodeProducts, setCustomBarcodeProducts] = useState<any[]>([]);
   const [customBarcodeSearch, setCustomBarcodeSearch] = useState('');
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5 });
+  const [editFullProduct, setEditFullProduct] = useState<any>(null);
+  const [viewSupplier, setViewSupplier] = useState<any>(null);
+  const [viewCategory, setViewCategory] = useState<any>(null);
+  const [showStockHistoryModal, setShowStockHistoryModal] = useState(false);
+  const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'profit'>('name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => { localStorage.setItem('pos_product_tab', productTab); }, [productTab]);
 
@@ -85,7 +93,14 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
 
   const filteredProducts = products.filter((p: any) => {
     return !search || (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.company || '').toLowerCase().includes(search.toLowerCase()) || (p.code || '').toLowerCase().includes(search.toLowerCase()) || (p.cat || '').toLowerCase().includes(search.toLowerCase());
-  }).sort((a: any, b: any) => a.name.localeCompare(b.name));
+  }).sort((a: any, b: any) => {
+    let cmp = 0;
+    if (sortBy === 'name') cmp = a.name.localeCompare(b.name);
+    else if (sortBy === 'price') cmp = a.sellPrice - b.sellPrice;
+    else if (sortBy === 'stock') cmp = a.stock - b.stock;
+    else if (sortBy === 'profit') cmp = (a.sellPrice - a.costPrice) - (b.sellPrice - b.costPrice);
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
 
   const allCompanies = [...new Set([...suppliers.map((s: any) => s.name).filter(Boolean), ...products.map((p: any) => p.company).filter(Boolean)])].sort();
   const filteredSuppliers = allCompanies.filter(c => !supplierSearch || (c || '').toLowerCase().includes(supplierSearch.toLowerCase()));
@@ -105,11 +120,82 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     setEditProduct(null);
   };
 
+  const handleAddProduct = () => {
+    if (!productForm.name.trim()) { alert(t('enterName')); return; }
+    setProducts([...products, { id: genId(), ...productForm }]);
+    setShowAddProductModal(false);
+    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5 });
+  };
+
+  const handleEditFullProduct = () => {
+    if (!editFullProduct) return;
+    setProducts(products.map((p: any) => p.id === editFullProduct.id ? { ...p, name: editFullProduct.name, code: editFullProduct.code, company: editFullProduct.company, cat: editFullProduct.cat, unit: editFullProduct.unit, costPrice: editFullProduct.costPrice, sellPrice: editFullProduct.sellPrice, minStock: editFullProduct.minStock } : p));
+    setEditFullProduct(null);
+  };
+
   const deleteProduct = (id: string) => {
     const product = products.find((p: any) => p.id === id);
     if (!product) return;
     if (!window.confirm(`"${product.name}" ${t('confirmDelete')}`)) return;
     setProducts(products.filter((p: any) => p.id !== id));
+  };
+
+  const deleteSupplier = (name: string) => {
+    const supplierProducts = products.filter((p: any) => (p.company || '').toLowerCase() === name.toLowerCase());
+    const msg = supplierProducts.length > 0 ? `\n\n${t('products')}: ${supplierProducts.length}` : '';
+    if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
+    setSuppliers(suppliers.filter((s: any) => s.name !== name));
+  };
+
+  const deleteCategory = (name: string) => {
+    const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === name.toLowerCase());
+    const msg = catProducts.length > 0 ? `\n\n${t('products')}: ${catProducts.length}` : '';
+    if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
+    setCategories(categories.filter((c: any) => c.name !== name));
+  };
+
+  const exportProductsCsv = () => {
+    const headers = ['Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Stock', 'MinStock'];
+    const rows = products.map((p: any) => [p.name, p.code || '', p.company || '', p.cat || '', p.unit, p.costPrice, p.sellPrice, p.stock, p.minStock || 5].join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    downloadCsv(csv, 'products.csv');
+  };
+
+  const exportSuppliersCsv = () => {
+    const headers = ['Name', 'Phone', 'Email', 'Address', 'CR Number', 'VAT Number'];
+    const rows = suppliers.map((s: any) => [s.name, s.phone || '', s.email || '', s.address || '', s.crNumber || '', s.vatNumber || ''].join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    downloadCsv(csv, 'suppliers.csv');
+  };
+
+  const exportCategoriesCsv = () => {
+    const headers = ['Name', 'Products', 'TotalValue'];
+    const rows = filteredCategories.map((c: string) => {
+      const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === c.toLowerCase());
+      return [c, catProducts.length, catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0)].join(',');
+    });
+    const csv = [headers.join(','), ...rows].join('\n');
+    downloadCsv(csv, 'categories.csv');
+  };
+
+  const exportStockCsv = () => {
+    const headers = ['Name', 'Barcode', 'Company', 'Stock', 'MinStock', 'CostValue', 'Status'];
+    const rows = stockProducts.map((p: any) => {
+      const status = p.stock <= 0 ? 'Out' : p.stock <= (p.minStock || 5) ? 'Low' : 'Available';
+      return [p.name, p.code || '', p.company || '', p.stock, p.minStock || 5, (p.stock * p.costPrice).toFixed(2), status].join(',');
+    });
+    const csv = [headers.join(','), ...rows].join('\n');
+    downloadCsv(csv, 'stock.csv');
+  };
+
+  const downloadCsv = (csv: string, filename: string) => {
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const printBarcode = (product: any) => {
@@ -246,7 +332,8 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
                   <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400, textAlign: 'center' }}>{p.unit}</td>
                   <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
                     <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setViewProduct(p)}>👁️</button>
-                    <button style={{ ...btn('primary', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setEditProduct({ ...p, buyP: p.costPrice, sellP: p.sellPrice })}>✏️</button>
+                    <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setEditFullProduct({ ...p })}>✏️</button>
+                    <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => printBarcode(p)}>📊</button>
                     {p.stock <= 0 ? <button style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteProduct(p.id)}>🗑️</button> : <button disabled style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13, opacity: 0.4, cursor: 'not-allowed' }}>🔒</button>}
                   </td>
                 </tr>
@@ -281,14 +368,17 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
                 <div key={company} style={{ padding: 16, background: T.white, borderRadius: 12, border: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{ width: 44, height: 44, borderRadius: 10, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🏢</div>
-                    <div>
+                    <div style={{ cursor: 'pointer' }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}>
                       <div style={{ fontWeight: 700, fontSize: 16 }}>{company}</div>
                       <div style={{ fontSize: 13, color: T.gray500, marginTop: 2 }}>{prodCount} {t('products')} | {purchaseCount} {t('purchases')}</div>
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ fontWeight: 700, color: T.green, fontSize: 15 }}>{fmt(totalPurchase)}</div>
-                    <div style={{ fontSize: 12, color: T.gray400 }}>{t('totalPurchase')}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontWeight: 700, color: T.green, fontSize: 15 }}>{fmt(totalPurchase)}</div>
+                      <div style={{ fontSize: 12, color: T.gray400 }}>{t('totalPurchase')}</div>
+                    </div>
+                    <button style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteSupplier(company)}>🗑️</button>
                   </div>
                 </div>
               );
@@ -341,8 +431,11 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
               return (
                 <div key={cat} style={{ padding: 16, background: T.white, borderRadius: 12, border: `1px solid ${T.gray200}`, cursor: 'pointer' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <div style={{ fontWeight: 700, fontSize: 16, color: T.teal }}>📂 {cat}</div>
-                    <span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catProducts.length}</span>
+                    <div style={{ fontWeight: 700, fontSize: 16, color: T.teal, cursor: 'pointer' }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}>📂 {cat}</div>
+                    <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                      <span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catProducts.length}</span>
+                      <button style={{ ...btn('danger', 'sm'), padding: '2px 6px', fontSize: 12 }} onClick={() => deleteCategory(cat)}>🗑️</button>
+                    </div>
                   </div>
                   <div style={{ fontSize: 13, color: T.gray500 }}>{t('totalValue')}: {fmt(totalValue)}</div>
                 </div>
@@ -499,18 +592,26 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         </div>
         {productTab === 'allProducts' && (
           <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} style={{ padding: '5px 8px', borderRadius: 7, border: `1px solid ${T.gray200}`, fontSize: 13, background: T.white, cursor: 'pointer' }}>
+              <option value="name">{t('name')}</option>
+              <option value="price">{t('sellPrice')}</option>
+              <option value="stock">{t('stock')}</option>
+              <option value="profit">{t('profit')}</option>
+            </select>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => setSortDir(sortDir === 'asc' ? 'desc' : 'asc')}>{sortDir === 'asc' ? '↑' : '↓'}</button>
             <div style={{ position: 'relative' }}>
               <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowMoreMenu(!showMoreMenu)}>⋯ {t('more')}</button>
               {showMoreMenu && (
                 <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 180, padding: 4 }}>
                   <button onClick={() => { setShowImportModal(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📥 {t('csvUpload')}</button>
+                  <button onClick={() => { exportProductsCsv(); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📤 {t('exportCsv')}</button>
                   <button onClick={() => { setShowPriceHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📜 {t('priceHistory')}</button>
                   <button onClick={() => { setShowDeleteHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>🗑️ {t('deleteHistory')}</button>
                   <button onClick={() => { setShowPurchaseHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('purchases')}</button>
                 </div>
               )}
             </div>
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => alert(t('comingSoon'))}>➕ {t('addNewProduct')}</button>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5 }); setShowAddProductModal(true); }}>➕ {t('addNewProduct')}</button>
           </div>
         )}
         {productTab === 'suppliers' && (
@@ -520,6 +621,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
               {showSupplierMoreMenu && (
                 <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
                   <button onClick={() => { setShowSupplierMoreMenu(false); alert(t('comingSoon')); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📥 {t('csvImport')} {t('suppliers')}</button>
+                  <button onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📤 {t('exportCsv')}</button>
                 </div>
               )}
             </div>
@@ -533,6 +635,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
               {showCategoryMoreMenu && (
                 <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
                   <button onClick={() => { setShowCategoryMoreMenu(false); alert(t('comingSoon')); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📥 {t('csvImport')} {t('categories')}</button>
+                  <button onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📤 {t('exportCsv')}</button>
                 </div>
               )}
             </div>
@@ -564,8 +667,9 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
                   <button onClick={() => { setStockFilter('out'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'out' ? T.redLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>❌ {t('stockOut')}</button>
                   <button onClick={() => { setStockFilter('low'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'low' ? T.amberLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>⚠️ {t('stockLow')}</button>
                   <div style={{ borderTop: `1px solid ${T.gray100}`, margin: '4px 0' }}></div>
-                  <button onClick={() => { alert(t('comingSoon')); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} + {t('history')}</button>
-                  <button onClick={() => { alert(t('comingSoon')); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} - {t('history')}</button>
+                  <button onClick={() => { exportStockCsv(); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📤 {t('exportCsv')}</button>
+                  <button onClick={() => { setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} + {t('history')}</button>
+                  <button onClick={() => { setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} - {t('history')}</button>
                 </div>
               )}
             </div>
@@ -705,6 +809,116 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
               <button onClick={() => setShowCustomBarcodeModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
               <button onClick={printCustomBarcode} style={{ ...btn('primary'), flex: 2 }}>🖨️ {t('print')}</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {showAddProductModal && (
+        <div style={overlay} onClick={() => setShowAddProductModal(false)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}>➕ {t('addNewProduct')}</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div><label style={labelStyle}>{t('productName')} *</label><input value={productForm.name} onChange={e => setProductForm({ ...productForm, name: e.target.value })} style={inputStyle} placeholder={t('productName')} /></div>
+              <div><label style={labelStyle}>{t('barcode')}</label><input value={productForm.code} onChange={e => setProductForm({ ...productForm, code: e.target.value })} style={inputStyle} placeholder={t('barcode')} /></div>
+              <div><label style={labelStyle}>{t('company')}</label><input value={productForm.company} onChange={e => setProductForm({ ...productForm, company: e.target.value })} style={inputStyle} placeholder={t('company')} /></div>
+              <div><label style={labelStyle}>{t('category')}</label><input value={productForm.cat} onChange={e => setProductForm({ ...productForm, cat: e.target.value })} style={inputStyle} placeholder={t('category')} /></div>
+              <div><label style={labelStyle}>{t('unit')}</label><input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={inputStyle} placeholder={t('unit')} /></div>
+              <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('purchasePrice')} ($)</label><input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('sellPrice')} ($)</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('stock')}</label><input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={inputStyle} /></div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <button onClick={() => setShowAddProductModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+              <button onClick={handleAddProduct} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editFullProduct && (
+        <div style={overlay} onClick={() => setEditFullProduct(null)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}>✏️ {t('edit')}</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div><label style={labelStyle}>{t('productName')} *</label><input value={editFullProduct.name} onChange={e => setEditFullProduct({ ...editFullProduct, name: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('barcode')}</label><input value={editFullProduct.code} onChange={e => setEditFullProduct({ ...editFullProduct, code: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('company')}</label><input value={editFullProduct.company} onChange={e => setEditFullProduct({ ...editFullProduct, company: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('category')}</label><input value={editFullProduct.cat} onChange={e => setEditFullProduct({ ...editFullProduct, cat: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('unit')}</label><input value={editFullProduct.unit} onChange={e => setEditFullProduct({ ...editFullProduct, unit: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={editFullProduct.minStock} onChange={e => setEditFullProduct({ ...editFullProduct, minStock: parseInt(e.target.value) || 5 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('purchasePrice')} ($)</label><input type="number" value={editFullProduct.costPrice} onChange={e => setEditFullProduct({ ...editFullProduct, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('sellPrice')} ($)</label><input type="number" value={editFullProduct.sellPrice} onChange={e => setEditFullProduct({ ...editFullProduct, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <button onClick={() => setEditFullProduct(null)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+              <button onClick={handleEditFullProduct} style={{ ...btn('primary'), flex: 2 }}>💾 {t('saveChanges')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewSupplier && (
+        <div style={overlay} onClick={() => setViewSupplier(null)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}>🏢 {viewSupplier.name}</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
+              <div><div style={{ fontSize: 13, color: T.gray400 }}>{t('products')}</div><div style={{ fontWeight: 600, fontSize: 16 }}>{viewSupplier.prodCount}</div></div>
+              <div><div style={{ fontSize: 13, color: T.gray400 }}>{t('purchases')}</div><div style={{ fontWeight: 600, fontSize: 16 }}>{viewSupplier.purchaseCount}</div></div>
+              <div style={{ gridColumn: 'span 2' }}><div style={{ fontSize: 13, color: T.gray400 }}>{t('totalPurchase')}</div><div style={{ fontWeight: 700, fontSize: 18, color: T.green }}>{fmt(viewSupplier.totalPurchase)}</div></div>
+            </div>
+            <h4 style={{ margin: '0 0 8px', fontSize: 14, color: T.gray600 }}>{t('products')}</h4>
+            <div style={{ maxHeight: 200, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 8, marginBottom: 16 }}>
+              {products.filter((p: any) => (p.company || '').toLowerCase() === viewSupplier.name.toLowerCase()).map((p: any) => (
+                <div key={p.id} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 14 }}>{p.name}</span>
+                  <span style={{ fontSize: 14, color: T.gray500 }}>{fmt(p.sellPrice)}</span>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setViewSupplier(null)} style={{ ...btn(), width: '100%' }}>{t('close')}</button>
+          </div>
+        </div>
+      )}
+
+      {viewCategory && (
+        <div style={overlay} onClick={() => setViewCategory(null)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}>📂 {viewCategory.name}</h3>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 13, color: T.gray400 }}>{t('totalValue')}</div>
+              <div style={{ fontWeight: 700, fontSize: 18, color: T.green }}>{fmt(viewCategory.totalValue)}</div>
+            </div>
+            <div style={{ maxHeight: 300, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 8, marginBottom: 16 }}>
+              {viewCategory.products.map((p: any) => (
+                <div key={p.id} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div><div style={{ fontSize: 14, fontWeight: 600 }}>{p.name}</div><div style={{ fontSize: 12, color: T.gray400 }}>{p.code || '-'}</div></div>
+                  <div style={{ textAlign: 'right' }}><div style={{ fontSize: 14, fontWeight: 600 }}>{fmt(p.sellPrice)}</div><div style={{ fontSize: 12, color: T.gray500 }}>{t('stock')}: {p.stock}</div></div>
+                </div>
+              ))}
+            </div>
+            <button onClick={() => setViewCategory(null)} style={{ ...btn(), width: '100%' }}>{t('close')}</button>
+          </div>
+        </div>
+      )}
+
+      {showStockHistoryModal && (
+        <div style={overlay} onClick={() => setShowStockHistoryModal(false)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}>📦 {t('stock')} {t('history')}</h3>
+            <div style={{ maxHeight: 400, overflow: 'auto' }}>
+              {productHistory.length === 0 ? (
+                <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noPriceHistory')}</p>
+              ) : (
+                productHistory.map((h: any, i: number) => (
+                  <div key={i} style={{ padding: 10, background: T.gray50, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
+                    <div><strong>{h.productName || h.name}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.timestamp || h.date).toLocaleString()}</div></div>
+                    <div style={{ textAlign: 'right' }}>{h.oldPrice && <div style={{ textDecoration: 'line-through', color: T.red }}>{fmt(h.oldPrice)}</div>}{h.newPrice && <div style={{ color: T.green, fontWeight: 700 }}>{fmt(h.newPrice)}</div>}</div>
+                  </div>
+                ))
+              )}
+            </div>
+            <button onClick={() => setShowStockHistoryModal(false)} style={{ ...btn(), width: '100%', marginTop: 12 }}>{t('close')}</button>
           </div>
         </div>
       )}

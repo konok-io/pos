@@ -474,4 +474,5 @@ export const hi: Record<string, string> = {
   selectProductsForBarcode: 'बारकोड प्रिंट करने के लिए उत्पाद चुनें',
   selected: 'चयनित',
   stockFilters: 'स्टॉक फ़िल्टर',
+  exportCsv: 'CSV निर्यात',
 };

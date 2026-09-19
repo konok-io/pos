@@ -479,4 +479,5 @@ export const ar: Record<string, string> = {
   selectProductsForBarcode: 'اختر المنتجات للطباعة',
   selected: 'محدد',
   stockFilters: 'فلاتر المخزون',
+  exportCsv: 'تصدير CSV',
 };
