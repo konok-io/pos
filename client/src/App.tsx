@@ -6513,8 +6513,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     vatEnabled: true,
     vatPercent: 15,
     bannerImage: '',
-    receiptHeader: '🧾 বিক্রয় রিসিট',
-    receiptFooter: 'ধন্যবাদ',
+    receiptHeader: '🧾 Sales Receipt',
+    receiptFooter: 'Thank You',
     receiptShowLogo: true,
     receiptShowAddress: true,
     receiptShowPhone: true,
@@ -6523,8 +6523,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     receiptShowQr: true,
     receiptFontSize: 11,
     receiptLogo: '',
-    purchaseHeader: '🛒 পারচেজ ইনভয়েস',
-    purchaseFooter: 'ধন্যবাদ',
+    purchaseHeader: '🛒 Purchase Invoice',
+    purchaseFooter: 'Thank You',
     purchaseShowLogo: true,
     purchaseShowAddress: true,
     purchaseShowSupplier: true,
@@ -6572,12 +6572,12 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
       console.error('Failed to save settings:', error);
-      alert('❌ সেটিংস সংরক্ষণ ব্যর্থ হয়েছে!');
+      alert('❌ ' + t('settingsSaveFailed'));
     }
   };
 
   const clearAll = async () => {
-    if (!window.confirm('সতর্কতা: সম্পূর্ণ ডাটা রিসেট হবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।\n\nআপনি কি নিশ্চিত?')) {
+    if (!window.confirm(t('resetWarning'))) {
       return;
     }
 
@@ -6783,26 +6783,26 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 color: '#fff'
               }}>⚙️</div>
               <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>সাধারণ তথ্য</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>আপনার ব্যবসার মূল তথ্য</p>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('generalInfo')}</h3>
+                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('businessBasicInfo')}</p>
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
               <div>
                 <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  🏪 ব্যবসার নাম *
+                  🏪 {t('businessName')} *
                 </label>
                 <input
                   value={form.name}
                   onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
                   style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                  placeholder="আপনার ব্যবসার নাম লিখুন"
+                  placeholder={t('enterBusinessName')}
                 />
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  📞 মোবাইল নম্বর
+                  📞 {t('mobileNumber')}
                 </label>
                 <input
                   value={form.phone}
@@ -6813,18 +6813,18 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  📍 ঠিকানা
+                  📍 {t('address')}
                 </label>
                 <input
                   value={form.address}
                   onChange={e => setForm(p => ({ ...p, address: e.target.value }))}
                   style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                  placeholder="আপনার ব্যবসার ঠিকানা"
+                  placeholder={t('enterBusinessAddress')}
                 />
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  📧 ইমেইল
+                  📧 {t('email')}
                 </label>
                 <input
                   value={form.email}
@@ -6836,31 +6836,31 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  🔢 VAT নম্বর (TIN)
+                  🔢 VAT {t('number')} (TIN)
                 </label>
                 <input
                   value={form.taxId}
                   onChange={e => setForm(p => ({ ...p, taxId: e.target.value }))}
                   style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                  placeholder="১৫ ডিজিটের VAT নম্বর"
+                  placeholder={t('vat15Digit')}
                 />
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#475569' }}>
-                  🏢 CR নম্বর
+                  🏢 CR {t('number')}
                 </label>
                 <input
                   value={form.crNumber}
                   onChange={e => setForm(p => ({ ...p, crNumber: e.target.value }))}
                   style={{ width: '100%', padding: '12px 14px', fontSize: 14, border: '2px solid #e2e8f0', borderRadius: 8, outline: 'none', boxSizing: 'border-box', color: '#1e293b', background: '#f8fafc' }}
-                  placeholder="CR নম্বর"
+                  placeholder={t('crNumberPlaceholder')}
                 />
               </div>
             </div>
 
             {/* VAT Settings */}
             <div style={{ marginTop: 24 }}>
-              <h5 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>💰 ভ্যাট সেটিংস</h5>
+              <h5 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}>💰 {t('vatSettings')}</h5>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -6872,10 +6872,10 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               }}>
                 <div>
                   <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>
-                    ভ্যাট সক্রিয় {form.vatEnabled ? '✅' : '❌'}
+                    {t('vatEnabled')} {form.vatEnabled ? '✅' : '❌'}
                   </h4>
                   <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
-                    {form.vatEnabled ? 'সকল বিক্রয়ে ভ্যাট যোগ হবে' : 'ভ্যাট গণনা বন্ধ আছে'}
+                    {form.vatEnabled ? t('vatAppliedToAllSales') : t('vatCalculationOff')}
                   </p>
                 </div>
                 <button
@@ -6891,7 +6891,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     cursor: 'pointer'
                   }}
                 >
-                  {form.vatEnabled ? 'সক্রিয়' : 'নিষ্ক্রিয়'}
+                  {form.vatEnabled ? t('active') : t('inactive')}
                 </button>
               </div>
 
@@ -6907,7 +6907,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   gap: 12
                 }}>
                   <label style={{ fontSize: 14, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>
-                    ডিফল্ট ভ্যাট শতাংশ:
+                    {t('defaultVatPercent')}:
                   </label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <input
@@ -7685,8 +7685,8 @@ export function DatabaseSettings() {
         </div>
         <p style={{ fontSize: 13, color: '#6B7280', marginTop: 12 }}>
           {isOnline 
-            ? 'সার্ভারে সংযুক্ত। Sales automatically sync হবে।'
-            : 'অফলাইনে কাজ করছেন। সব data আপনার ডিভাইসে সংরক্ষিত।'}
+            ? t('connectedToServer')
+            : t('workingOffline')}
         </p>
       </div>
 
@@ -7793,10 +7793,10 @@ export function DatabaseSettings() {
       <div className="card" style={{ background: '#F0FDFA', border: '1px solid #99F6E4' }}>
         <h4 style={{ marginBottom: 8, color: '#115E59' }}>💡 {t('howItWorks')}</h4>
         <ul style={{ fontSize: 13, color: '#374151', margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
-          <li>ডাটা IndexedDB-তে লোকালি সেভ থাকে</li>
-          <li>অফলাইনেও সব কাজ করা যায়</li>
-          <li>Online হলে automatic sync হয়</li>
-          <li>Backup/Restore করা যায়</li>
+          <li>{t('dataSavedLocally')}</li>
+          <li>{t('worksOffline')}</li>
+          <li>{t('autoSyncOnline')}</li>
+          <li>{t('canBackupRestore')}</li>
         </ul>
       </div>
     </div>
