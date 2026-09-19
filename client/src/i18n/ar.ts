@@ -8,6 +8,7 @@ export const ar: Record<string, string> = {
   products: 'المنتجات',
   categories: 'الفئات',
   suppliers: 'الموردون',
+  supplierId: 'معرّف المورد',
   customers: 'العملاء',
   purchases: 'المشتريات',
   expenses: 'المصروفات',

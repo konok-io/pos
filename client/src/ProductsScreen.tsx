@@ -86,7 +86,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const [customBarcodeProducts, setCustomBarcodeProducts] = useState<any[]>([]);
   const [customBarcodeSearch, setCustomBarcodeSearch] = useState('');
   const [showAddProductModal, setShowAddProductModal] = useState(false);
-  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5 });
+  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' });
   const [editFullProduct, setEditFullProduct] = useState<any>(null);
   const [viewSupplier, setViewSupplier] = useState<any>(null);
   const [viewCategory, setViewCategory] = useState<any>(null);
@@ -161,7 +161,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     setProductsParent(updated);
     api.addProduct(newProduct).catch(() => {});
     setShowAddProductModal(false);
-    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5 });
+    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' });
   };
 
   const handleEditFullProduct = () => {
@@ -689,7 +689,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 </div>
               )}
             </div>
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5 }); setShowAddProductModal(true); }}>➕ {t('addNewProduct')}</button>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' }); setShowAddProductModal(true); }}>➕ {t('addNewProduct')}</button>
           </div>
         )}
         {productTab === 'suppliers' && (
@@ -898,7 +898,49 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div><label style={labelStyle}>{t('productName')} *</label><input value={productForm.name} onChange={e => setProductForm({ ...productForm, name: e.target.value })} style={inputStyle} placeholder={t('productName')} /></div>
               <div><label style={labelStyle}>{t('barcode')}</label><input value={productForm.code} onChange={e => setProductForm({ ...productForm, code: e.target.value })} style={inputStyle} placeholder={t('barcode')} /></div>
-              <div><label style={labelStyle}>{t('company')}</label><input value={productForm.company} onChange={e => setProductForm({ ...productForm, company: e.target.value })} style={inputStyle} placeholder={t('company')} /></div>
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={labelStyle}>{t('supplierId')} / {t('company')}</label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    value={productForm.supplierId}
+                    onChange={e => {
+                      const val = e.target.value;
+                      const found = suppliers.find((s: any) => s.id === val || s.name.toLowerCase() === val.toLowerCase());
+                      if (found) {
+                        setProductForm({ ...productForm, supplierId: found.id, company: found.name });
+                      } else {
+                        setProductForm({ ...productForm, supplierId: val });
+                      }
+                    }}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        const found = suppliers.find((s: any) => s.id === productForm.supplierId || s.name.toLowerCase() === productForm.supplierId.toLowerCase());
+                        if (found) {
+                          setProductForm({ ...productForm, supplierId: found.id, company: found.name });
+                        }
+                      }
+                    }}
+                    style={inputStyle}
+                    placeholder={`${t('supplierId')} - Enter to search`}
+                  />
+                  {productForm.supplierId && suppliers.filter((s: any) =>
+                    s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())
+                  ).length > 0 && (
+                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 7, maxHeight: 150, overflow: 'auto', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                      {suppliers.filter((s: any) =>
+                        s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())
+                      ).map((s: any) => (
+                        <div key={s.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 13 }} onClick={() => {
+                          setProductForm({ ...productForm, supplierId: s.id, company: s.name });
+                        }}>
+                          <span style={{ color: T.teal, fontWeight: 600 }}>{s.id}</span> - <span>{s.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {productForm.company && <div style={{ fontSize: 12, color: T.green, marginTop: 4 }}>✓ {productForm.company}</div>}
+              </div>
               <div><label style={labelStyle}>{t('category')}</label><input value={productForm.cat} onChange={e => setProductForm({ ...productForm, cat: e.target.value })} style={inputStyle} placeholder={t('category')} /></div>
               <div><label style={labelStyle}>{t('unit')}</label><input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={inputStyle} placeholder={t('unit')} /></div>
               <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={inputStyle} /></div>

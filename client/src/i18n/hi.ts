@@ -8,6 +8,7 @@ export const hi: Record<string, string> = {
   products: 'उत्पाद',
   categories: 'श्रेणियाँ',
   suppliers: 'आपूर्तिकर्ता',
+  supplierId: 'आपूर्तिकर्ता आईडी',
   customers: 'ग्राहक',
   purchases: 'खरीदारी',
   expenses: 'खर्च',

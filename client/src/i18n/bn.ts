@@ -8,6 +8,7 @@ export const bn: Record<string, string> = {
   products: 'পণ্য',
   categories: 'ক্যাটাগরি',
   suppliers: 'সরবরাহকারী',
+  supplierId: 'সরবরাহকারী আইডি',
   customers: 'কাস্টমার',
   purchases: 'ক্রয়',
   expenses: 'ব্যয়',

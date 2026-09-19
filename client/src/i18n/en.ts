@@ -132,6 +132,7 @@ export const en: Record<string, string> = {
   profit: 'Profit',
   profitPercent: 'Profit (%)',
   supplier: 'Supplier',
+  supplierId: 'Supplier ID',
   company: 'Company',
   stockAvailableShort: 'Stock Available',
   stockOutShort: 'Stock Out',
