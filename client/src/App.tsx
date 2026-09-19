@@ -1611,7 +1611,7 @@ export default function App() {
             </div>
             
             {/* Logout Button */}
-            <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title={t("logout")}>↩️</button>
+            <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title={t("logout")}><i className="fas fa-right-from-bracket"></i></button>
 
             {/* Date & Time */}
             <TimeDisplay language={language} />
@@ -4119,7 +4119,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
             
             {viewSupplier.code && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>{t('supplierCode')}: <strong>{viewSupplier.code}</strong></div>}
             {viewSupplier.phone && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}><i className="fas fa-phone" style={{marginRight: 4}}></i> {viewSupplier.phone}</div>}
-            {viewSupplier.email && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>✉️ {viewSupplier.email}</div>}
+            {viewSupplier.email && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}><i className="fas fa-envelope" style={{marginRight: 4}}></i> {viewSupplier.email}</div>}
             {viewSupplier.address && <div style={{ marginBottom: 16, fontSize: 14, color: '#6B7280' }}><i className="fas fa-location-dot" style={{marginRight: 4}}></i> {viewSupplier.address}</div>}
             
             <div style={{ background: '#F0FDFA', borderRadius: 10, padding: 16, marginBottom: 16 }}>
@@ -5207,7 +5207,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                   }}
                 >
                   <span style={{ fontSize: '18px' }}>
-                    {method === 'cash' ? '<i className="fas fa-dollar-sign"></i>' : method === 'card' ? '💳' : method === 'bank' ? '🏦' : '📱'}
+                    {method === 'cash' ? <i className="fas fa-dollar-sign"></i> : method === 'card' ? <i className="fas fa-credit-card"></i> : method === 'bank' ? <i className="fas fa-university"></i> : <i className="fas fa-mobile-screen"></i>}
                   </span>
                   <span>{t(method)}</span>
                 </button>
@@ -7650,7 +7650,7 @@ export function DatabaseSettings() {
 
   return (
     <div style={{ padding: 16, maxWidth: 600, margin: '0 auto' }}>
-      <h2 style={{ marginBottom: 24 }}>🗄️ {t('databaseSettings')}</h2>
+      <h2 style={{ marginBottom: 24 }}><i className="fas fa-database" style={{marginRight: 8}}></i> {t('databaseSettings')}</h2>
 
       {/* Database Info */}
       <div className="card" style={{ marginBottom: 16 }}>
