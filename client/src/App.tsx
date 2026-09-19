@@ -1567,7 +1567,7 @@ export default function App() {
                   color: '#4B5563' 
                 }}
               >
-                <i className="fas fa-globe"></i> {currentLang.flag} {currentLang.nativeName}
+                <i className="fas fa-globe" style={{marginRight: 4}}></i> {currentLang.flag} {currentLang.nativeName}
               </button>
               {showLangDropdown && (
                 <div style={{ 
@@ -1740,7 +1740,7 @@ export default function App() {
                               background: c.balance > 0 ? '#FEE2E2' : '#D1FAE5',
                               color: c.balance > 0 ? '#DC2626' : '#10B981'
                             }}>
-                              {c.balance > 0 ? `${settings.currencySymbol}${c.balance}` : <><i className="fas fa-check"></i> Paid</>}
+                              {c.balance > 0 ? `${settings.currencySymbol}${c.balance}` : <><i className="fas fa-check" style={{marginRight: 4}}></i> Paid</>}
                             </div>
                           </div>
                         ))}
@@ -1777,7 +1777,7 @@ export default function App() {
                         paddingRight: 32
                       }}
                     >
-                      <option value="all"><i className="fas fa-clipboard-list"></i> {t('allSuppliers')}</option>
+                      <option value="all"><i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('allSuppliers')}</option>
                       {[...new Set(products.map(p => p.supplier || t('other')))].map(s => (
                         <option key={s} value={s}>{s}</option>
                       ))}
@@ -1813,7 +1813,7 @@ export default function App() {
                         paddingRight: 32
                       }}
                     >
-                      <option value="all"><i className="fas fa-folder-open"></i> {t('allCategories')}</option>
+                      <option value="all"><i className="fas fa-folder-open" style={{marginRight: 4}}></i> {t('allCategories')}</option>
                       {categories.map(cat => (
                         <option key={cat.id} value={cat.id}>{cat.name}</option>
                       ))}
@@ -2083,7 +2083,7 @@ export default function App() {
                       
                       {/* Hold Sales Pill - Left Side */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-clipboard-list"></i> {t('holdSales')} ({heldSales.length})</span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('holdSales')} ({heldSales.length})</span>
                       </div>
 
                       {/* Clear All Button - Right Side */}
@@ -2091,7 +2091,7 @@ export default function App() {
                         <button 
                           onClick={() => setShowHeldSales(false)}
                           style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                          <i className="fas fa-xmark"></i> {t('close')}
+                          <i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}
                         </button>
                       </div>
                     </div>
@@ -2195,21 +2195,21 @@ export default function App() {
                         {/* Filter Pills - Left Side */}
                         {searchQuery && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#EEF2FF', borderRadius: 20, border: '1px solid #C7D2FE' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}><i className="fas fa-magnifying-glass"></i> "{searchQuery}" ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#4338CA' }}><i className="fas fa-magnifying-glass" style={{marginRight: 4}}></i> "{searchQuery}" ({filteredProducts.length})</span>
                           </div>
                         )}
                         
                         {/* Category Filter */}
                         {selectedCategory !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-folder-open"></i> {categories.find(c => c.id === selectedCategory)?.name} ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-folder-open" style={{marginRight: 4}}></i> {categories.find(c => c.id === selectedCategory)?.name} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
                         {/* Supplier Filter */}
                         {selectedSupplier !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#FEF3C7', borderRadius: 20, border: '1px solid #FDE68A' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}><i className="fas fa-clipboard-list"></i> {selectedSupplier} ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#D97706' }}><i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {selectedSupplier} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
@@ -2235,7 +2235,7 @@ export default function App() {
                               setShowHeldSales(false);
                             }}
                             style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
-                            <i className="fas fa-xmark"></i> {t('close')}
+                            <i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}
                           </button>
                         </div>
                       </div>
@@ -2249,7 +2249,7 @@ export default function App() {
                         </div>
                         <div style={{ flex: 1, color: '#fff' }}>
                           <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{searchedCustomer.name}</div>
-                          <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 2 }}><i className="fas fa-mobile-screen"></i> {searchedCustomer.phone}</div>
+                          <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 2 }}><i className="fas fa-mobile-screen" style={{marginRight: 4}}></i> {searchedCustomer.phone}</div>
                           <div style={{ fontSize: 13, opacity: 0.9 }}><i className="fas fa-location-dot" style={{marginRight: 4}}></i> {searchedCustomer.address}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
@@ -2261,7 +2261,7 @@ export default function App() {
                             <button 
                               onClick={() => { setSelectedCustomer(searchedCustomer); setCustomerSearch(''); }}
                               style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#fff', color: '#667eea', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
-                              <i className="fas fa-check"></i> {t('selectCustomer')}
+                              <i className="fas fa-check" style={{marginRight: 4}}></i> {t('selectCustomer')}
                             </button>
                             <button 
                               onClick={() => setCustomerSearch('')}
@@ -2282,7 +2282,7 @@ export default function App() {
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><i className="fas fa-calendar"></i></div>
                             <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
                           </div>
-                          <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark"></i> {t('close')}</button>
+                          <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
                         </div>
                         {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
@@ -2296,7 +2296,7 @@ export default function App() {
                                 <div key={p.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                   <div>
                                     <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{p.name}</div>
-                                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><i className="fas fa-calendar"></i> {p.expiryDate}</div>
+                                    <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><i className="fas fa-calendar" style={{marginRight: 4}}></i> {p.expiryDate}</div>
                                   </div>
                                   <div style={{ background: daysLeft <= 7 ? '#FEE2E2' : '#F0FDFA', color: daysLeft <= 7 ? '#DC2626' : '#115E59', padding: '4px 10px', borderRadius: 8, fontSize: 12, fontWeight: 600 }}>
                                     {daysLeft} days
@@ -2318,7 +2318,7 @@ export default function App() {
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><i className="fas fa-users"></i></div>
                             <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('customers')} ({customers.length})</h3>
                           </div>
-                          <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark"></i> {t('close')}</button>
+                          <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
                         </div>
                         {customers.length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
@@ -2329,7 +2329,7 @@ export default function App() {
                             {customers.map(c => (
                               <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12 }}>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
-                                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><i className="fas fa-mobile-screen"></i> {c.phone}</div>
+                                <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><i className="fas fa-mobile-screen" style={{marginRight: 4}}></i> {c.phone}</div>
                                 {c.balance > 0 && (
                                   <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>{t('due')}: {settings.currencySymbol} {c.balance}</div>
                                 )}
@@ -2627,7 +2627,7 @@ export default function App() {
                         border: '1.5px solid #10B981',
                       }}>
                         <span style={{ fontSize: 13, fontWeight: 600, color: '#065F46' }}>
-                          <i className="fas fa-user"></i> {selectedCustomer.name} • {selectedCustomer.phone}
+                          <i className="fas fa-user" style={{marginRight: 4}}></i> {selectedCustomer.name} • {selectedCustomer.phone}
                         </span>
                         <button 
                           onClick={() => { setSelectedCustomer(null); setCartCustomerInput(''); }}
@@ -2898,7 +2898,7 @@ export default function App() {
                       color: cart.length > 0 ? '#115E59' : '#9CA3AF',
                       fontWeight: 600, fontSize: 13, cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                     }}>
-                    <i className="fas fa-clipboard-list"></i> {t('hold')}
+                    <i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('hold')}
                   </button>
                   {/* Complete Sale Button */}
                   <button onClick={handleCheckout}
@@ -2910,7 +2910,7 @@ export default function App() {
                       cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
                       boxShadow: cart.length > 0 ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
                     }}>
-                    <i className="fas fa-check"></i> {t('completeSale')}
+                    <i className="fas fa-check" style={{marginRight: 4}}></i> {t('completeSale')}
                   </button>
                 </div>
               </div>
@@ -2945,7 +2945,7 @@ export default function App() {
 
         {currentTab === 'reports' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}><i className="fas fa-chart-line"></i> {t('reports')}</h2>
+            <h2 style={{ marginBottom: 16 }}><i className="fas fa-chart-line" style={{marginRight: 4}}></i> {t('reports')}</h2>
             <div className="stats-grid">
               <div className="stat-card">
                 <div className="label">{t('totalProducts')}</div>
@@ -3129,7 +3129,7 @@ export default function App() {
 
         {currentTab === 'inventory' && (
           <div>
-            <h2 style={{ marginBottom: 16 }}><i className="fas fa-warehouse"></i> {t('stock')}</h2>
+            <h2 style={{ marginBottom: 16 }}><i className="fas fa-warehouse" style={{marginRight: 4}}></i> {t('stock')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}><i className="fas fa-box"></i></div>
@@ -3201,7 +3201,7 @@ export default function App() {
         <div className="modal-overlay" onClick={() => setShowReceiptModal(false)}>
           <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3><i className="fas fa-check"></i> {t('saleComplete')}</h3>
+              <h3><i className="fas fa-check" style={{marginRight: 4}}></i> {t('saleComplete')}</h3>
               <button className="modal-close" onClick={() => setShowReceiptModal(false)}><i className="fas fa-xmark"></i></button>
             </div>
             <div className="modal-body">
@@ -3259,7 +3259,7 @@ export default function App() {
                 )}
               </div>
               <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 20 }} onClick={() => setShowReceiptModal(false)}>
-                <i className="fas fa-check"></i> {t('finish')}
+                <i className="fas fa-check" style={{marginRight: 4}}></i> {t('finish')}
               </button>
             </div>
           </div>
@@ -3581,7 +3581,7 @@ Sujin Chips,002,${uniqueCompanies[0] || 'Company'},Snacks,pcs,20,25,200,20`;
             {/* Unit + Stock + MinStock: 3 columns */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><i className="fas fa-file-import"></i> {t('unit')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('unit')}</label>
                 <select
                   value={form.unit}
                   onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
@@ -3599,7 +3599,7 @@ Sujin Chips,002,${uniqueCompanies[0] || 'Company'},Snacks,pcs,20,25,200,20`;
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><i className="fas fa-file-import"></i> {t('stock')}</label>
+                <label style={{ display: 'block', marginBottom: 6, fontWeight: 600, fontSize: 14, color: '#6B7280' }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('stock')}</label>
                 <input
                   type="number"
                   value={form.stock}
@@ -3684,7 +3684,7 @@ Sujin Chips,002,${uniqueCompanies[0] || 'Company'},Snacks,pcs,20,25,200,20`;
 
         {/* Right: Purchase List */}
         <div style={{ width: 350, padding: 12, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 8, background: '#F9FAFB' }}>
-          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}><i className="fas fa-list-check"></i> {t('productList')} ({purchaseItems.length})</h3>
+          <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}><i className="fas fa-list-check" style={{marginRight: 4}}></i> {t('productList')} ({purchaseItems.length})</h3>
 
           {purchaseItems.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF', background: 'white', borderRadius: 14, border: '1px solid #E5E7EB', fontSize: 14 }}>
@@ -4762,7 +4762,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                       cursor: 'pointer',
                     }}
                   >
-                    <i className="fas fa-folder-open"></i> {t('browse')}
+                    <i className="fas fa-folder-open" style={{marginRight: 4}}></i> {t('browse')}
                   </button>
                   {avatar && (
                     <button
@@ -4778,7 +4778,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                         cursor: 'pointer',
                       }}
                     >
-                      <i className="fas fa-xmark"></i> {t('remove')}
+                      <i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('remove')}
                     </button>
                   )}
                 </>
@@ -5284,7 +5284,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 gap: '6px',
               }}
             >
-              <i className="fas fa-check"></i> {t('addDeposit')}
+              <i className="fas fa-check" style={{marginRight: 4}}></i> {t('addDeposit')}
             </button>
           </div>
         </div>
@@ -5483,7 +5483,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 gap: '6px',
               }}
             >
-              <i className="fas fa-check"></i> {t('addDue')}
+              <i className="fas fa-check" style={{marginRight: 4}}></i> {t('addDue')}
             </button>
           </div>
         </div>
@@ -6231,7 +6231,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 gap: '6px',
               }}
             >
-              <i className="fas fa-clipboard-list"></i> {t('addDue')}
+              <i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('addDue')}
             </button>
             <button
               onClick={() => setIsAddDepositModalOpen(true)}
@@ -6756,7 +6756,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           gap: 6,
           boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         }}>
-          {saved ? <><i className="fas fa-check"></i> {t('saved')}</> : <><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveSettings')}</>}
+          {saved ? <><i className="fas fa-check" style={{marginRight: 4}}></i> {t('saved')}</> : <><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveSettings')}</>}
         </button>
       </div>
 
@@ -7353,7 +7353,7 @@ export function TranslationSettings() {
     <div style={{ padding: 20 }}>
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-        <h2 style={{ margin: 0 }}><i className="fas fa-globe"></i> Translation Settings</h2>
+        <h2 style={{ margin: 0 }}><i className="fas fa-globe" style={{marginRight: 4}}></i> Translation Settings</h2>
         <button
           onClick={handleSync}
           disabled={syncStatus === 'syncing'}
@@ -7679,7 +7679,7 @@ export function DatabaseSettings() {
 
       {/* Connection Status */}
       <div className="card" style={{ marginBottom: 16 }}>
-        <h3 style={{ marginBottom: 12 }}><i className="fas fa-globe"></i> {t('serverConnection')}</h3>
+        <h3 style={{ marginBottom: 12 }}><i className="fas fa-globe" style={{marginRight: 4}}></i> {t('serverConnection')}</h3>
         <div style={{ 
           display: 'flex', 
           alignItems: 'center', 
@@ -7722,7 +7722,7 @@ export function DatabaseSettings() {
               cursor: 'pointer',
             }}
           >
-            <i className="fas fa-file-export"></i> {t('exportData') || 'Export Data'}
+            <i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportData') || 'Export Data'}
           </button>
         </div>
 
