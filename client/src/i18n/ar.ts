@@ -594,4 +594,10 @@ export const ar: Record<string, string> = {
   other: 'أخرى',
   cameraAccessDenied: 'تم رفض الوصول إلى الكاميرا أو غير متاحة',
   exitFullscreen: 'الخروج من وضع الشاشة الكاملة',
+  currencySettings: 'إعدادات العملة',
+  currencySymbolLabel: 'رمز العملة',
+  dueSales: 'مبيعات الآجل',
+  dueSalesEnabled: 'مبيعات الآجل مفعلة',
+  dueSalesEnabledDesc: 'السماح للعملاء بالشراء بالآجل',
+  dueSalesDisabledDesc: 'جميع المبيعات يجب أن تُدفع مقدماً',
 };

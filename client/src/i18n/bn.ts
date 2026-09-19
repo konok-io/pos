@@ -596,4 +596,10 @@ export const bn: Record<string, string> = {
   other: 'অন্যান্য',
   cameraAccessDenied: 'ক্যামেরা অ্যাক্সেস নিষিদ্ধ বা উপলব্ধ নয়',
   exitFullscreen: 'ফুল স্ক্রিন থেকে বের হন',
+  currencySettings: 'মুদ্রা সেটিংস',
+  currencySymbolLabel: 'মুদ্রা প্রতীক',
+  dueSales: 'বকেয় বিক্রয়',
+  dueSalesEnabled: 'বকেয় বিক্রয় সক্রিয়',
+  dueSalesEnabledDesc: 'গ্রাহকদের বকেয়ে কেনার অনুমতি দিন',
+  dueSalesDisabledDesc: 'সব বিক্রয় অগ্রিম পরিশোধ করতে হবে',
 };

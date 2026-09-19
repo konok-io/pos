@@ -603,4 +603,10 @@ export const en: Record<string, string> = {
   other: 'Other',
   cameraAccessDenied: 'Camera access denied or not available',
   exitFullscreen: 'Exit Fullscreen',
+  currencySettings: 'Currency Settings',
+  currencySymbolLabel: 'Currency Symbol',
+  dueSales: 'Due Sales',
+  dueSalesEnabled: 'Due Sales Enabled',
+  dueSalesEnabledDesc: 'Allow customers to purchase on credit (due)',
+  dueSalesDisabledDesc: 'All sales must be paid upfront',
 };

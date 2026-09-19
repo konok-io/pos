@@ -594,4 +594,10 @@ export const hi: Record<string, string> = {
   other: 'अन्य',
   cameraAccessDenied: 'कैमरा एक्सेस अस्वीकृत या उपलब्ध नहीं',
   exitFullscreen: 'फुल स्क्रीन से बाहर निकलें',
+  currencySettings: 'मुद्रा सेटिंग्स',
+  currencySymbolLabel: 'मुद्रा प्रतीक',
+  dueSales: 'उधार बिक्री',
+  dueSalesEnabled: 'उधार बिक्री सक्रिय',
+  dueSalesEnabledDesc: 'ग्राहकों को उधार में खरीदने की अनुमति दें',
+  dueSalesDisabledDesc: 'सभी बिक्री का भुगतान अग्रिम में करना होगा',
 };
