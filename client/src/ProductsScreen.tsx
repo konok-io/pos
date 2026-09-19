@@ -66,6 +66,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showSupplierMoreMenu, setShowSupplierMoreMenu] = useState(false);
   const [showCategoryMoreMenu, setShowCategoryMoreMenu] = useState(false);
+  const [showStockMoreMenu, setShowStockMoreMenu] = useState(false);
   const [showPurchaseBarcodeModal, setShowPurchaseBarcodeModal] = useState(false);
   const [purchaseBarcodeId, setPurchaseBarcodeId] = useState('');
   const [showCustomBarcodeModal, setShowCustomBarcodeModal] = useState(false);
@@ -547,6 +548,23 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
           <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
             <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowPurchaseBarcodeModal(true)}>📦 {t('purchaseBarcode')}</button>
             <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setShowCustomBarcodeModal(true); setCustomBarcodeSearch(''); setCustomBarcodeProducts([]); }}>📊 {t('customBarcode')}</button>
+          </div>
+        )}
+        {productTab === 'stock' && (
+          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+            <div style={{ position: 'relative' }}>
+              <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}>⋯ {t('more')}</button>
+              {showStockMoreMenu && (
+                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 8 }}>
+                  <div style={{ padding: '4px 8px', fontSize: 13, color: T.gray500 }}>{t('totalProducts')}: <strong>{products.length}</strong></div>
+                  <div style={{ padding: '4px 8px', fontSize: 13, color: T.green }}>{t('stockAvailable')}: <strong>{stockCount}</strong></div>
+                  <div style={{ padding: '4px 8px', fontSize: 13, color: T.red }}>{t('stockOut')}: <strong>{outOfStockCount}</strong></div>
+                  <div style={{ padding: '4px 8px', fontSize: 13, color: T.amber }}>{t('stockLow')}: <strong>{lowStockCount}</strong></div>
+                </div>
+              )}
+            </div>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => alert(t('comingSoon'))}>📦 {t('stock')} + {t('history')}</button>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => alert(t('comingSoon'))}>📦 {t('stock')} - {t('history')}</button>
           </div>
         )}
       </div>
