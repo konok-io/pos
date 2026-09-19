@@ -547,7 +547,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         )}
         {productTab === 'stock' && (
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginLeft: 'auto' }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '4px 8px', background: T.tealLight, borderRadius: 8 }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               <div style={{ textAlign: 'center' }}><div style={{ fontSize: 10, color: T.gray400 }}>{t('totalProducts')}</div><div style={{ fontSize: 14, fontWeight: 700, color: T.teal }}>{products.length}</div></div>
               <div style={{ textAlign: 'center' }}><div style={{ fontSize: 10, color: T.gray400 }}>{t('stockAvailable')}</div><div style={{ fontSize: 14, fontWeight: 700, color: T.green }}>{stockCount}</div></div>
               <div style={{ textAlign: 'center' }}><div style={{ fontSize: 10, color: T.gray400 }}>{t('stockOut')}</div><div style={{ fontSize: 14, fontWeight: 700, color: T.red }}>{outOfStockCount}</div></div>
