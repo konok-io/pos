@@ -1067,14 +1067,14 @@ export default function App() {
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
-  const [currency, setCurrency] = useState('SAR '); // Currency symbol
+  const [currency, setCurrency] = useState('৳'); // Currency symbol
   const fmt = (n: number) => `${currency}${(+n || 0).toLocaleString('en-IN')}`;
   
   // Load settings from localDB on startup
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const savedCurrency = await localDb.getSetting<string>('currency');
+        const savedCurrency = await localDb.getSetting<string>('currencySymbol');
         if (savedCurrency) setCurrency(savedCurrency);
         
         const savedVat = await localDb.getSetting<string>('vatPercent');
@@ -1118,13 +1118,17 @@ export default function App() {
         setVatPercent(savedVat);
         setDefaultVatPercent(vat);
       }
-      const savedCurrency = await localDb.getSetting<string>('currency');
+      const savedCurrency = await localDb.getSetting<string>('currencySymbol');
       if (savedCurrency) {
         setCurrency(savedCurrency);
       }
       const savedDueSales = await localDb.getSetting<string>('dueSalesEnabled');
       if (savedDueSales !== null) {
         _setSettings((prev: any) => ({ ...prev, dueSalesEnabled: savedDueSales === 'true' }));
+      }
+      const savedCurrencySymbol = await localDb.getSetting<string>('currencySymbol');
+      if (savedCurrencySymbol) {
+        _setSettings((prev: any) => ({ ...prev, currencySymbol: savedCurrencySymbol }));
       }
       
       // Load cart state from IndexedDB
