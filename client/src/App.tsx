@@ -1416,7 +1416,7 @@ export default function App() {
       return;
     }
     if (due > 0 && selectedCustomer && !dueSalesEnabled) {
-      alert('⚠️ ডিউ সেলস সক্রিয় নেই! সেটিংসে ডিউ সেলস চালু করুন।');
+      alert('⚠️ ' + t('dueSalesNotEnabled'));
       return;
     }
 
@@ -1425,7 +1425,7 @@ export default function App() {
       invoiceNo: `INV${Date.now()}`,
       date: now(),
       customerId: selectedCustomer?.id || null,
-      customerName: selectedCustomer?.name || 'সাধারণ ক্রেতা',
+      customerName: selectedCustomer?.name || t('generalCustomer'),
       items: cart.map(item => ({
         name: item.name,
         quantity: item.quantity,
@@ -1543,10 +1543,10 @@ export default function App() {
           {/* Actions Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 8 }}>
             {/* Refresh Button */}
-            <button onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title="🔄 হার্ড রিফ্রেশ">🔄</button>
+            <button onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title={t("hardRefresh")}>🔄</button>
             
             {/* Fullscreen Button */}
-            <button onClick={handleFullscreen} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title={isFullscreen ? '✕ বের হতে চাপুন' : '⛶ ফুল স্ক্রিন'}>{isFullscreen ? '✕' : '⛶'}</button>
+            <button onClick={handleFullscreen} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title={isFullscreen ? '✕ ' + t('exitFullscreen') : '⛶ ' + t('fullScreen')}>{isFullscreen ? '✕' : '⛶'}</button>
             
             {/* Language Selector */}
             <div style={{ position: 'relative' }}>
@@ -1616,7 +1616,7 @@ export default function App() {
             </div>
             
             {/* Logout Button */}
-            <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title="লগআউট">↩️</button>
+            <button onClick={handleLogout} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title={t("logout")}>↩️</button>
 
             {/* Date & Time */}
             <TimeDisplay language={language} />
@@ -1741,7 +1741,7 @@ export default function App() {
                               background: c.balance > 0 ? '#FEE2E2' : '#D1FAE5',
                               color: c.balance > 0 ? '#DC2626' : '#10B981'
                             }}>
-                              {c.balance > 0 ? `৳${c.balance}` : '✓ Paid'}
+                              {c.balance > 0 ? `{t('currencySymbol')}{c.balance}` : '✓ Paid'}
                             </div>
                           </div>
                         ))}
@@ -1841,7 +1841,7 @@ export default function App() {
                     }}>
                       <span style={{ fontSize: 14 }}>📦</span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: '#424242' }}>{filteredProducts.length}</span>
-                      <span style={{ fontSize: 11, color: '#757575' }}>পণ্য</span>
+                      <span style={{ fontSize: 11, color: '#757575' }}>{t("products")}</span>
                     </div>
                   </div>
                 </div>
@@ -2256,7 +2256,7 @@ export default function App() {
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ padding: '8px 16px', background: searchedCustomer.balance > 0 ? 'rgba(220,38,38,0.3)' : 'rgba(34,197,94,0.3)', borderRadius: 8, marginBottom: 8 }}>
                             <div style={{ fontSize: 11, color: '#fff', opacity: 0.9 }}>{t('balance')}</div>
-                            <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>৳{searchedCustomer.balance}</div>
+                            <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>{t('currencySymbol')}{searchedCustomer.balance}</div>
                           </div>
                           <div style={{ display: 'flex', gap: 8 }}>
                             <button 
@@ -2332,7 +2332,7 @@ export default function App() {
                                 <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
                                 <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>📱 {c.phone}</div>
                                 {c.balance > 0 && (
-                                  <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>বাকি: ৳{c.balance}</div>
+                                  <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>{t('due')}: {t('currencySymbol')}{c.balance}</div>
                                 )}
                               </div>
                             ))}
@@ -2669,7 +2669,7 @@ export default function App() {
                   </div>
                   <button 
                     onClick={() => {
-                      alert('কাস্টমার যোগ করার ফিচার শীঘ্রই আসছে!');
+                      alert(t('comingSoon'));
                     }}
                     style={{ 
                       padding: '8px 12px', 
@@ -2863,7 +2863,7 @@ export default function App() {
                   {/* Clear Cart Button */}
                   <button 
                     onClick={() => {
-                      if (cart.length > 0 && confirm('কার্ট পরিষ্কার করবেন?')) {
+                      if (cart.length > 0 && confirm(t('clearCartConfirm'))) {
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
@@ -3132,17 +3132,17 @@ export default function App() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>📦</div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>০</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#166534' }}>{0}</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProductsCount')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>⚠️</div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: '#DC2626' }}>০</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#DC2626' }}>{0}</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockLow')}</div>
               </div>
               <div className="card" style={{ background: '#ECFDF5', border: '1px solid #A7F3D0' }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>✅</div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: '#059669' }}>০</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: '#059669' }}>{0}</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('stockAvailable')}</div>
               </div>
             </div>
@@ -3161,12 +3161,12 @@ export default function App() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📈</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>৳০</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#166534' }}>{t('currencySymbol')}0</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalIncome')}</div>
               </div>
               <div className="card" style={{ background: '#FEF2F2', border: '1px solid #FECACA' }}>
                 <div style={{ fontSize: 24, marginBottom: 8 }}>📉</div>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>৳০</div>
+                <div style={{ fontSize: 20, fontWeight: 700, color: '#DC2626' }}>{t('currencySymbol')}0</div>
                 <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalExpense')}</div>
               </div>
             </div>
@@ -3303,7 +3303,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
     barcode: '',
     company: '',
     cat: '',
-    unit: 'পিস',
+    unit: 'pcs',
     buyP: '',
     sellP: '',
     stock: '',
@@ -3348,14 +3348,14 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
       barcode: form.barcode || '',
       company: form.company,
       cat: form.cat || '',
-      unit: form.unit || 'পিস',
+      unit: form.unit || 'pcs',
       buyP: +form.buyP || 0,
       sellP: +form.sellP || 0,
       stock: +form.stock || 0,
       minStock: +form.minStock || 5
     };
     setPurchaseItems([...purchaseItems, item]);
-    setForm({ name: '', barcode: '', company: form.company, cat: '', unit: 'পিস', buyP: '', sellP: '', stock: '', minStock: '5' });
+    setForm({ name: '', barcode: '', company: form.company, cat: '', unit: 'pcs', buyP: '', sellP: '', stock: '', minStock: '5' });
     setBarcodeVal('');
   };
 
@@ -3370,7 +3370,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
     onAddProducts(purchaseItems);
     alert(`${purchaseItems.length}${t('productsSaved')}`);
     setPurchaseItems([]);
-    setForm({ name: '', barcode: '', company: '', cat: '', unit: 'পিস', buyP: '', sellP: '', stock: '', minStock: '5' });
+    setForm({ name: '', barcode: '', company: '', cat: '', unit: 'pcs', buyP: '', sellP: '', stock: '', minStock: '5' });
     setSupplierQ('');
   };
 
@@ -3391,7 +3391,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
           barcode: found.barcode || '',
           company: companyName,
           cat: catName,
-          unit: found.unit || 'পিস',
+          unit: found.unit || 'pcs',
           buyP: buyPrice.toString(),
           sellP: sellPrice.toString(),
           stock: '',
@@ -3406,14 +3406,14 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
 
   // Download demo CSV
   const downloadDemoCSV = () => {
-    const csv = `# পণ্যের তালিকা CSV
-পণ্যের নাম,বারকোড,সরবরাহকারী,ক্যাটাগরি,একক,ক্রয়মূল্য,বিক্রয়মূল্য,স্টক,মিনস্টক
-মিনিকেট চাল,001,${uniqueCompanies[0] || 'কোম্পানি নাম'},খাদ্যপণ্য,কেজি,55,65,100,10
-সুজি চিপস,002,${uniqueCompanies[0] || 'কোম্পানি নাম'},স্ন্যাকস,পিস,20,25,200,20`;
+    const csv = `# Products CSV
+name,barcode,company,cat,unit,buyprice,sellprice,stock,minstock
+Mini Cement,001,${uniqueCompanies[0] || 'Company'},Food,kg,55,65,100,10
+Sujin Chips,002,${uniqueCompanies[0] || 'Company'},Snacks,pcs,20,25,200,20`;
     const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'পণ্যের_তালিকা.csv';
+    a.download = 'products.csv';
     a.click();
   };
 
@@ -3428,7 +3428,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
       const lines = text.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
 
       if (lines.length < 2) {
-        alert('CSV ফাইলে কমপক্ষে হেডার ও একটি পণ্য থাকতে হবে');
+        alert(t('csvMinRows'));
         return;
       }
 
@@ -3441,15 +3441,15 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
         headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
 
         const item: NewProductItem = {
-          name: row['পণ্যের নাম'] || row['name'] || '',
-          barcode: row['বারকোড'] || row['barcode'] || '',
-          company: row['সরবরাহকারী'] || row['supplier'] || '',
-          cat: row['ক্যাটাগরি'] || row['category'] || '',
-          unit: row['একক'] || row['unit'] || 'পিস',
-          buyP: parseFloat(row['ক্রয়মূল্য'] || row['buyprice'] || row['buy'] || '0'),
-          sellP: parseFloat(row['বিক্রয়মূল্য'] || row['sellprice'] || row['sell'] || '0'),
-          stock: parseFloat(row['স্টক'] || row['stock'] || '0'),
-          minStock: parseFloat(row['মিনস্টক'] || row['minstock'] || '5')
+          name: row['name'] || row['নাম'] || '',
+          barcode: row['barcode'] || row['বারকোড'] || '',
+          company: row['company'] || row['সরবরাহকারী'] || '',
+          cat: row['cat'] || row['ক্যাটাগরি'] || '',
+          unit: row['unit'] || row['একক'] || 'pcs',
+          buyP: parseFloat(row['buyprice'] || row['buy'] || row['ক্রয়মূল্য'] || '0'),
+          sellP: parseFloat(row['sellprice'] || row['sell'] || row['বিক্রয়মূল্য'] || '0'),
+          stock: parseFloat(row['stock'] || row['স্টক'] || '0'),
+          minStock: parseFloat(row['minstock'] || row['মিনস্টক'] || '5')
         };
 
         if (item.name) items.push(item);
@@ -3457,7 +3457,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
 
       if (items.length > 0) {
         setPurchaseItems([...purchaseItems, ...items]);
-        alert(`✅ ${items.length}টি পণ্য যোগ হয়েছে!`);
+        alert('✅ ' + items.length + ' ' + t('productsUploaded'));
       }
     };
     reader.readAsText(file);
@@ -3468,7 +3468,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F9FAFB' }}>
       {/* Header */}
       <div style={{ padding: '12px 16px', display: 'flex', gap: 12, alignItems: 'center', background: 'white', borderBottom: '1px solid #E5E7EB', flexWrap: 'wrap' }}>
-        <span style={{ fontWeight: 700, fontSize: 16 }}>📦 {t('newProductSave')}</span>
+        <span style={{ fontWeight: 700, fontSize: 16 }}>{t('products')} {t('newProductSave')}</span>
         <span style={{ fontSize: 14, color: '#6B7280', marginLeft: 'auto' }}>{purchaseItems.length} {t('productsAdded')}</span>
         {purchaseItems.length > 0 && (
           <button onClick={savePurchase} style={{ padding: '8px 16px', background: '#0D9488', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
@@ -3519,7 +3519,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                         {c}
                       </div>
                     ))}
-                    {filteredCompanies.length === 0 && <div style={{ padding: '8px 12px', color: '#9CA3AF', fontSize: 14 }}>কোনো সরবরাহকারী নেই</div>}
+                    {filteredCompanies.length === 0 && <div style={{ padding: '8px 12px', color: '#9CA3AF', fontSize: 14 }}>{t('noProductsAdded')}</div>}
                   </div>
                 )}
               </div>
@@ -3546,7 +3546,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                         {c}
                       </div>
                     ))}
-                    {filteredCategories.length === 0 && <div style={{ padding: '8px 12px', color: '#9CA3AF', fontSize: 14 }}>কোনো ক্যাটাগরি নেই</div>}
+                    {filteredCategories.length === 0 && <div style={{ padding: '8px 12px', color: '#9CA3AF', fontSize: 14 }}>{t('noProductsAdded')}</div>}
                   </div>
                 )}
               </div>
@@ -3586,15 +3586,15 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                   onChange={e => setForm(f => ({ ...f, unit: e.target.value }))}
                   style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #E5E7EB', borderRadius: 8, fontSize: 14, outline: 'none', background: '#F9FAFB', boxSizing: 'border-box', cursor: 'pointer' }}
                 >
-                  <option value="পিস">পিস</option>
-                  <option value="কেজি">কেজি</option>
-                  <option value="লিটার">লিটার</option>
-                  <option value="বাক্স">বাক্স</option>
-                  <option value="গ্রাম">গ্রাম</option>
-                  <option value="মিটার">মিটার</option>
-                  <option value="ডজন">ডজন</option>
-                  <option value="বোতল">বোতল</option>
-                  <option value="সেট">সেট</option>
+                  <option value="pcs">{t("pcs")}</option>
+                  <option value="kg">{t("kg")}</option>
+                  <option value="liter">{t("liter")}</option>
+                  <option value="box">{t("box")}</option>
+                  <option value="gram">{t("gram")}</option>
+                  <option value="meter">{t("meter")}</option>
+                  <option value="dozen">{t("dozen")}</option>
+                  <option value="bottle">{t("bottle")}</option>
+                  <option value="set">{t("setUnit")}</option>
                 </select>
               </div>
               <div>
@@ -3699,7 +3699,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
                     🏢 {item.company} {item.cat ? `- 📂 ${item.cat}` : ''}
                   </div>
                   <div style={{ fontSize: 13, color: '#6B7280', display: 'flex', gap: 8, marginTop: 4 }}>
-                    <span>📦 {item.stock} {item.unit}</span>
+                    <span>{t('products')} {item.stock} {item.unit}</span>
                     <span>💰 {fmt(item.buyP)}</span>
                     <span>💵 {fmt(item.sellP)}</span>
                   </div>
@@ -3777,7 +3777,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const [productForm, setProductForm] = useState<{
     company: string; cat: string; name: string; barcode: string; unit: string; buyP: string; sellP: string; stock: string; minStock: string
   }>({
-    company: '', cat: '', name: '', barcode: '', unit: 'পিস', buyP: '', sellP: '', stock: '0', minStock: '5'
+    company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5'
   });
   
   const [showCompanyDrop, setShowCompanyDrop] = useState(false);
@@ -3828,7 +3828,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   // Save Supplier
   const saveSupplier = async () => {
     if (!supplierForm.name?.trim()) {
-      alert(t('enterSupplierName') || 'সরবরাহকারীর নাম লিখুন!');
+      alert(t('enterSupplierName'));
       return;
     }
     
@@ -3839,7 +3839,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       s.id !== editingSupplier?.id && (s.name || '').toLowerCase().trim() === nameLower
     );
     if (exists) {
-      alert('❌ এই সরবরাহকারীর নাম ইতিমধ্যে আছে!');
+      alert('❌ ' + t('supplierNameExists'));
       return;
     }
     
@@ -3862,7 +3862,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           company: supplierForm.name.trim()
         };
         setSuppliers(prev => prev.map(s => s.id === editingSupplier.id ? updated : s));
-        alert('✅ সরবরাহকারী আপডেট করা হয়েছে!');
+        alert('✅ ' + t('supplierUpdated'));
       } else {
         const newSupplier: Supplier = {
           id: genId(),
@@ -3876,7 +3876,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           company: supplierForm.name.trim()
         };
         setSuppliers(prev => [...prev, newSupplier]);
-        alert(`✅ সরবরাহকারী যোগ করা হয়েছে!\nকোড: ${codeToUse}`);
+        alert('✅ ' + t('supplierUpdated') + '\n' + t('supplierCode') + ': ' + codeToUse);
       }
       
       setShowSupplierModal(false);
@@ -3884,7 +3884,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' });
     } catch (error) {
       console.error('Failed to save supplier:', error);
-      alert('❌ সমস্যা হয়েছে!');
+      alert('❌ ' + t('errorOccurred'));
     }
   };
   
@@ -3892,25 +3892,25 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const deleteSupplier = async (supplier: Supplier) => {
     const hasProducts = products.some(p => (p.company || '').toLowerCase() === (supplier.name || '').toLowerCase());
     if (hasProducts) {
-      alert('❌ এই কোম্পানিতে পণ্য আছে বলে মুছা যাবে না!');
+      alert('❌ ' + t('companyHasProducts'));
       return;
     }
     
-    if (!confirm('এই কোম্পানি মুছে ফেলবেন?')) return;
+    if (!confirm(t('confirmDeleteCompany'))) return;
     
     try {
       setSuppliers(prev => prev.filter(s => s.id !== supplier.id));
       setViewSupplier(null);
     } catch (error) {
       console.error('Delete failed:', error);
-      alert('❌ ডিলিট ব্যর্থ হয়েছে!');
+      alert('❌ ' + t('deleteFailed'));
     }
   };
   
   // Save Category
   const saveCategory = async () => {
     if (!categoryForm.name?.trim()) {
-      alert('ক্যাটাগরির নাম দিন');
+      alert(t('enterCategoryNameAlert'));
       return;
     }
     
@@ -3918,14 +3918,14 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       if (editingCategory) {
         const updated: SupplierCategory = { ...editingCategory, name: categoryForm.name.trim() };
         setCategories(prev => prev.map(c => c.id === editingCategory.id ? updated : c));
-        alert('✅ ক্যাটাগরি আপডেট হয়েছে!');
+        alert('✅ ' + t('categoryUpdated'));
       } else {
         const newCategory: SupplierCategory = {
           id: genId(),
           name: categoryForm.name.trim()
         };
         setCategories(prev => [...prev, newCategory]);
-        alert('✅ ক্যাটাগরি যোগ হয়েছে!');
+        alert('✅ ' + t('categoryAdded'));
       }
       
       setShowCategoryModal(false);
@@ -3933,7 +3933,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       setCategoryForm({ name: '' });
     } catch (error) {
       console.error('Failed to save category:', error);
-      alert('❌ সমস্যা হয়েছে!');
+      alert('❌ ' + t('errorOccurred'));
     }
   };
   
@@ -3941,11 +3941,11 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const deleteCategory = async (cat: SupplierCategory) => {
     const hasProducts = products.some(p => (p.cat || '').toLowerCase() === (cat.name || '').toLowerCase());
     if (hasProducts) {
-      alert('❌ এই ক্যাটাগরিতে পণ্য আছে!');
+      alert('❌ ' + t('categoryHasProducts'));
       return;
     }
     
-    if (!confirm('এই ক্যাটাগরি মুছে ফেলবেন?')) return;
+    if (!confirm(t('confirmDeleteCategory'))) return;
     
     try {
       setCategories(prev => prev.filter(c => c.id !== cat.id));
@@ -3958,7 +3958,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   // Save Product
   const saveProduct = async () => {
     if (!productForm.name?.trim() || !productForm.company?.trim() || !productForm.cat?.trim()) {
-      alert('❌ কোম্পানি, ক্যাটাগরি এবং পণ্যের নাম দিন!');
+      alert('❌ ' + t('fillRequiredFields'));
       return;
     }
     
@@ -3978,7 +3978,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         cat: productForm.cat.trim(),
         catId: catId!,
         barcode: productForm.barcode || '',
-        unit: productForm.unit || 'পিস',
+        unit: productForm.unit || 'pcs',
         buyPrice: parseFloat(productForm.buyP) || 0,
         sellPrice: parseFloat(productForm.sellP) || 0,
         stock: parseInt(productForm.stock) || 0,
@@ -4001,12 +4001,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         setSuppliers(prev => [...prev, newSupplier]);
       }
       
-      alert('✅ পণ্য যোগ করা হয়েছে!');
+      alert('✅ ' + t('productAdded'));
       setShowProductModal(false);
-      setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'পিস', buyP: '', sellP: '', stock: '0', minStock: '5' });
+      setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5' });
     } catch (error) {
       console.error('Failed to save product:', error);
-      alert('❌ সমস্যা হয়েছে!');
+      alert('❌ ' + t('errorOccurred'));
     }
   };
 
@@ -4015,23 +4015,23 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1F2937' }}>
-          🏢 {t('suppliers') || 'সরবরাহকারী'}
+          🏢 {t('suppliers')}
         </h2>
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={() => { setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setEditingSupplier(null); setShowSupplierModal(true); }}
             style={{ padding: '8px 14px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            ➕ কোম্পানি
+            ➕ {t('newCompany')}
           </button>
           <button
             onClick={() => { setCategoryForm({ name: '' }); setEditingCategory(null); setShowCategoryModal(true); }}
             style={{ padding: '8px 14px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            📂 ক্যাটাগরি
+            📂 {t('categories')}
           </button>
           <button
             onClick={() => setShowProductModal(true)}
             style={{ padding: '8px 14px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            📦 পণ্য
+            {t('products')} {t('products')}
           </button>
         </div>
       </div>
@@ -4040,7 +4040,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       <div style={{ marginBottom: 16 }}>
         <input
           type="text"
-          placeholder="🔍 সরবরাহকারী বা ক্যাটাগরি খুঁজুন..."
+          placeholder={t("searchSupplierCategory")}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ width: '100%', padding: '10px 14px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14, boxSizing: 'border-box' }}
@@ -4052,12 +4052,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <button
           onClick={() => setActiveTab('companies')}
           style={{ padding: '8px 16px', background: activeTab === 'companies' ? '#115E59' : '#F3F4F6', color: activeTab === 'companies' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
-          🏢 কোম্পানি ({allSuppliers.length})
+          🏢 {t('suppliers')} ({allSuppliers.length})
         </button>
         <button
           onClick={() => setActiveTab('categories')}
           style={{ padding: '8px 16px', background: activeTab === 'categories' ? '#115E59' : '#F3F4F6', color: activeTab === 'categories' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
-          📂 ক্যাটাগরি ({categories.length})
+          📂 {t('categories')} ({categories.length})
         </button>
       </div>
       
@@ -4066,7 +4066,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
           {filteredSuppliers.length === 0 ? (
             <div style={{ gridColumn: '1/-1', padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
-              কোনো কোম্পানি পাওয়া যায়নি
+              {t('noProductsAdded')}
             </div>
           ) : filteredSuppliers.map(s => (
             <div
@@ -4082,12 +4082,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                     🏢 {s.name}
                     {s.isAuto && <span style={{ fontSize: 10, background: '#FEF3C7', color: '#D97706', padding: '2px 6px', borderRadius: 4, marginLeft: 6 }}>Auto</span>}
                   </div>
-                  {s.code && <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>কোড: {s.code}</div>}
+                  {s.code && <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{t('supplierCode')}: {s.code}</div>}
                   {s.phone && <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>📞 {s.phone}</div>}
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 20, fontWeight: 800, color: '#115E59' }}>{getProductsCount(s.name)}</div>
-                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>পণ্য</div>
+                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>{t('products')}</div>
                 </div>
               </div>
             </div>
@@ -4099,7 +4099,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
           {filteredCategories.length === 0 ? (
             <div style={{ gridColumn: '1/-1', padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
-              কোনো ক্যাটাগরি পাওয়া যায়নি
+              {t('noProductsAdded')}
             </div>
           ) : filteredCategories.map(c => (
             <div
@@ -4110,7 +4110,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               onMouseOut={e => (e.currentTarget.style.boxShadow = 'none')}
             >
               <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}>📂 {c.name}</div>
-              <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>{products.filter(p => (p.cat || '').toLowerCase() === (c.name || '').toLowerCase()).length} পণ্য</div>
+              <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>{products.filter(p => (p.cat || '').toLowerCase() === (c.name || '').toLowerCase()).length} {t('products')}</div>
             </div>
           ))}
         </div>
@@ -4125,33 +4125,33 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <button onClick={() => setViewSupplier(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
             </div>
             
-            {viewSupplier.code && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>কোড: <strong>{viewSupplier.code}</strong></div>}
+            {viewSupplier.code && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>{t('supplierCode')}: <strong>{viewSupplier.code}</strong></div>}
             {viewSupplier.phone && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>📞 {viewSupplier.phone}</div>}
             {viewSupplier.email && <div style={{ marginBottom: 8, fontSize: 14, color: '#6B7280' }}>✉️ {viewSupplier.email}</div>}
             {viewSupplier.address && <div style={{ marginBottom: 16, fontSize: 14, color: '#6B7280' }}>📍 {viewSupplier.address}</div>}
             
             <div style={{ background: '#F0FDFA', borderRadius: 10, padding: 16, marginBottom: 16 }}>
               <div style={{ fontSize: 24, fontWeight: 800, color: '#115E59' }}>{getProductsCount(viewSupplier.name)}</div>
-              <div style={{ fontSize: 13, color: '#6B7280' }}>মোট পণ্য সংখ্যা</div>
+              <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProducts')}</div>
             </div>
             
             <div style={{ display: 'flex', gap: 8 }}>
               <button
                 onClick={() => { setShowPurchaseHistory(viewSupplier); setViewSupplier(null); }}
                 style={{ flex: 1, padding: '10px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
-                📜 ক্রয় ইতিহাস
+                📜 {t('purchaseHistory')}
               </button>
               {!viewSupplier.isAuto && (
                 <>
                   <button
                     onClick={() => { setSupplierForm(viewSupplier); setEditingSupplier(viewSupplier); setShowSupplierModal(true); setViewSupplier(null); }}
                     style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
-                    ✏️ সম্পাদনা
+                    ✏️ {t('edit')}
                   </button>
                   <button
                     onClick={() => deleteSupplier(viewSupplier)}
                     style={{ flex: 1, padding: '10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
-                    🗑️ মুছুন
+                    🗑️ {t('deleteAction')}
                   </button>
                 </>
               )}
@@ -4171,19 +4171,19 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
             
             <div style={{ background: '#F0FDFA', borderRadius: 10, padding: 16, marginBottom: 16 }}>
               <div style={{ fontSize: 24, fontWeight: 800, color: '#115E59' }}>{products.filter(p => (p.cat || '').toLowerCase() === (viewCategory.name || '').toLowerCase()).length}</div>
-              <div style={{ fontSize: 13, color: '#6B7280' }}>পণ্য সংখ্যা</div>
+              <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProducts')}</div>
             </div>
             
             <div style={{ display: 'flex', gap: 8 }}>
               <button
                 onClick={() => { setCategoryForm(viewCategory); setEditingCategory(viewCategory); setShowCategoryModal(true); setViewCategory(null); }}
                 style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
-                ✏️ সম্পাদনা
+                ✏️ {t('edit')}
               </button>
               <button
                 onClick={() => deleteCategory(viewCategory)}
                 style={{ flex: 1, padding: '10px', background: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
-                🗑️ মুছুন
+                🗑️ {t('deleteAction')}
               </button>
             </div>
           </div>
@@ -4195,21 +4195,21 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 600, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>📜 {showPurchaseHistory.name} - ক্রয় ইতিহাস</h3>
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>📜 {showPurchaseHistory.name} - {t('purchaseHistory')}</h3>
               <button onClick={() => setShowPurchaseHistory(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
             </div>
             
             {getSupplierPurchases(showPurchaseHistory.name).length === 0 ? (
-              <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>কোনো ক্রয় পাওয়া যায়নি</div>
+              <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>{t('noPurchasesFound')}</div>
             ) : (
               <div>
                 {getSupplierPurchases(showPurchaseHistory.name).map((p, i) => (
                   <div key={i} style={{ padding: 12, borderBottom: '1px solid #E5E7EB' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ fontWeight: 600 }}>{new Date(p.date).toLocaleDateString()}</span>
-                      <span style={{ fontWeight: 700, color: '#115E59' }}>৳{p.total?.toLocaleString()}</span>
+                      <span style={{ fontWeight: 700, color: '#115E59' }}>{t('currencySymbol')}{p.total?.toLocaleString()}</span>
                     </div>
-                    <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>আইটেম: {p.items?.length || 0}টি</div>
+                    <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>{t('item')}: {p.items?.length || 0}</div>
                   </div>
                 ))}
               </div>
@@ -4223,43 +4223,43 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
-              {editingSupplier ? '✏️ সরবরাহকারী সম্পাদনা' : '➕ নতুন কোম্পানি'}
+              {editingSupplier ? '✏️ ' + t('editSupplier') : '➕ ' + t('newCompany')}
             </h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>🏢 নাম *</label>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>{t('companyName')} *</label>
                 <input
                   value={supplierForm.name}
                   onChange={e => setSupplierForm(p => ({ ...p, name: e.target.value }))}
-                  placeholder="কোম্পানির নাম"
+                  placeholder={t("companyName")}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📞 ফোন</label>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>{t('phone')}</label>
                 <input
                   value={supplierForm.phone}
                   onChange={e => setSupplierForm(p => ({ ...p, phone: e.target.value }))}
-                  placeholder="ফোন নম্বর"
+                  placeholder={t("phone")}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>✉️ ইমেইল</label>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>{t('email')}</label>
                 <input
                   value={supplierForm.email}
                   onChange={e => setSupplierForm(p => ({ ...p, email: e.target.value }))}
-                  placeholder="ইমেইল"
+                  placeholder={t("email")}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📍 ঠিকানা</label>
+                <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>{t('address')}</label>
                 <input
                   value={supplierForm.address}
                   onChange={e => setSupplierForm(p => ({ ...p, address: e.target.value }))}
-                  placeholder="ঠিকানা"
+                  placeholder={t("address")}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                 />
               </div>
@@ -4267,10 +4267,10 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
             
             <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
               <button onClick={() => setShowSupplierModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
-                বাতিল
+                {t('cancel')}
               </button>
               <button onClick={saveSupplier} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>
-                💾 সংরক্ষণ
+                💾 {t('save')}
               </button>
             </div>
           </div>
@@ -4282,25 +4282,25 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>
-              {editingCategory ? '✏️ ক্যাটাগরি সম্পাদনা' : '➕ নতুন ক্যাটাগরি'}
+              {editingCategory ? '✏️ ' + t('editCategory') : '➕ ' + t('newCategory')}
             </h3>
             
             <div>
-              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📂 নাম *</label>
+              <label style={{ display: 'block', marginBottom: 4, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>{t('categoryName')} *</label>
               <input
                 value={categoryForm.name}
                 onChange={e => setCategoryForm({ name: e.target.value })}
-                placeholder="ক্যাটাগরির নাম"
+                placeholder={t("categoryName")}
                 style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
               />
             </div>
             
             <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
               <button onClick={() => setShowCategoryModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
-                বাতিল
+                {t('cancel')}
               </button>
               <button onClick={saveCategory} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>
-                💾 সংরক্ষণ
+                💾 {t('save')}
               </button>
             </div>
           </div>
@@ -4311,17 +4311,17 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       {showProductModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 450, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>📦 নতুন পণ্য যোগ করুন</h3>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>{t('products')} {t('newProductForm')}</h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {/* Company Dropdown */}
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>🏢 কোম্পানি *</label>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>🏢 {t('suppliers')} *</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     value={productForm.company}
                     onChange={e => { setProductForm(p => ({ ...p, company: e.target.value, cat: '' })); setShowCompanyDrop(true); }}
-                    placeholder="সরবরাহকারী নির্বাচন করুন"
+                    placeholder={t("selectSupplier")}
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                   />
                   {showCompanyDrop && filteredCompanies.length > 0 && (
@@ -4338,12 +4338,12 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               
               {/* Category Dropdown */}
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📂 ক্যাটাগরি *</label>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📂 {t('categories')} *</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     value={productForm.cat}
                     onChange={e => { setProductForm(p => ({ ...p, cat: e.target.value })); setShowCatDrop(true); }}
-                    placeholder="ক্যাটাগরি নির্বাচন করুন"
+                    placeholder={t("selectCategory")}
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                   />
                   {showCatDrop && filteredCats.length > 0 && (
@@ -4359,28 +4359,28 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📦 পণ্যের নাম *</label>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>{t('productName')} *</label>
                 <input
                   value={productForm.name}
                   onChange={e => setProductForm(p => ({ ...p, name: e.target.value }))}
-                  placeholder="পণ্যের নাম"
+                  placeholder={t("productName")}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                 />
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📊 বারকোড</label>
+                <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📊 {t('barcode')}</label>
                 <input
                   value={productForm.barcode}
                   onChange={e => setProductForm(p => ({ ...p, barcode: e.target.value }))}
-                  placeholder="বারকোড (ঐচ্ছিক)"
+                  placeholder={t("barcodeOptional")}
                   style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                 />
               </div>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>💰 ক্রয়মূল্য</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>💰 {t('buyPrice')}</label>
                   <input
                     type="number"
                     value={productForm.buyP}
@@ -4390,7 +4390,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>💵 বিক্রয়মূল্য</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>💵 {t('sellPrice')}</label>
                   <input
                     type="number"
                     value={productForm.sellP}
@@ -4403,7 +4403,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📦 স্টক</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>{t('stock')}</label>
                   <input
                     type="number"
                     value={productForm.stock}
@@ -4413,16 +4413,16 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📏 একক</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>📏 {t('unit')}</label>
                   <input
                     value={productForm.unit}
                     onChange={e => setProductForm(p => ({ ...p, unit: e.target.value }))}
-                    placeholder="পিস"
+                    placeholder={t("unitPcs")}
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>⚠️ মিন স্টক</label>
+                  <label style={{ display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: '#4B5563' }}>⚠️ {t('minStock')}</label>
                   <input
                     type="number"
                     value={productForm.minStock}
@@ -4436,10 +4436,10 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
             
             <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
               <button onClick={() => setShowProductModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
-                বাতিল
+                {t('cancel')}
               </button>
               <button onClick={saveProduct} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>
-                💾 সংরক্ষণ
+                💾 {t('save')}
               </button>
             </div>
           </div>
@@ -7037,37 +7037,37 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0' }}>
                       <div>{t('productName')} 1</div>
                       <div style={{ textAlign: 'center' }}>2</div>
-                      <div style={{ textAlign: 'right' }}>৳50</div>
-                      <div style={{ textAlign: 'right' }}>৳100</div>
+                      <div style={{ textAlign: 'right' }}>{t('currencySymbol')}50</div>
+                      <div style={{ textAlign: 'right' }}>{t('currencySymbol')}100</div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0', borderBottom: '1px dashed #ccc' }}>
                       <div>{t('productName')} 2</div>
                       <div style={{ textAlign: 'center' }}>1</div>
-                      <div style={{ textAlign: 'right' }}>৳75</div>
-                      <div style={{ textAlign: 'right' }}>৳75</div>
+                      <div style={{ textAlign: 'right' }}>{t('currencySymbol')}75</div>
+                      <div style={{ textAlign: 'right' }}>{t('currencySymbol')}75</div>
                     </div>
 
                     {/* Totals */}
                     <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #000' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('subtotal')}:</span>
-                        <span>৳175</span>
+                        <span>{t('currencySymbol')}175</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('vat')} (15%):</span>
-                        <span>৳26.25</span>
+                        <span>{t('currencySymbol')}26.25</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}>
                         <span>{t('total')}:</span>
-                        <span>৳201.25</span>
+                        <span>{t('currencySymbol')}201.25</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('paid')}:</span>
-                        <span>৳210</span>
+                        <span>{t('currencySymbol')}210</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('change')}:</span>
-                        <span>৳8.75</span>
+                        <span>{t('currencySymbol')}8.75</span>
                       </div>
                     </div>
 
@@ -7100,31 +7100,31 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0' }}>
                       <div>{t('productName')} 1</div>
                       <div style={{ textAlign: 'center' }}>10</div>
-                      <div style={{ textAlign: 'right' }}>৳50</div>
-                      <div style={{ textAlign: 'right' }}>৳500</div>
+                      <div style={{ textAlign: 'right' }}>{t('currencySymbol')}50</div>
+                      <div style={{ textAlign: 'right' }}>{t('currencySymbol')}500</div>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 30px 45px 50px', fontSize: 10, padding: '3px 0', borderBottom: '1px dashed #ccc' }}>
                       <div>{t('productName')} 2</div>
                       <div style={{ textAlign: 'center' }}>5</div>
-                      <div style={{ textAlign: 'right' }}>৳80</div>
-                      <div style={{ textAlign: 'right' }}>৳400</div>
+                      <div style={{ textAlign: 'right' }}>{t('currencySymbol')}80</div>
+                      <div style={{ textAlign: 'right' }}>{t('currencySymbol')}400</div>
                     </div>
 
                     {/* Totals */}
                     <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px dashed #000' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('subtotal')}:</span>
-                        <span>৳900</span>
+                        <span>{t('currencySymbol')}900</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10 }}>
                         <span>{t('vat')} (15%):</span>
-                        <span>৳135</span>
+                        <span>{t('currencySymbol')}135</span>
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 'bold', borderTop: '1px dashed #000', marginTop: 4, paddingTop: 4 }}>
                         <span>{t('total')} ({t('vatWith')}):
 
                         </span>
-                        <span>৳1,035</span>
+                        <span>{t('currencySymbol')}1,035</span>
                       </div>
                     </div>
                   </>
