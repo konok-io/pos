@@ -40,7 +40,7 @@ interface ProductsScreenProps {
 
 export default function ProductsScreen({ products, suppliers, categories, purchases, productHistory, setProducts, setSuppliers, setCategories, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
   const { t } = useLanguage();
-  const [productTab, setProductTab] = useState(() => localStorage.getItem('pos_product_tab') || 'allProducts');
+  const [productTab, setProductTab] = useState('allProducts');
   const [search, setSearch] = useState('');
   const [editProduct, setEditProduct] = useState<any>(null);
   const [viewProduct, setViewProduct] = useState<any>(null);
@@ -82,7 +82,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'profit'>('name');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
-  useEffect(() => { localStorage.setItem('pos_product_tab', productTab); }, [productTab]);
+  useEffect(() => { }, [productTab]);
 
   const overlay: React.CSSProperties = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 };
 
