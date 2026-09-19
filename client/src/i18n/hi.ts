@@ -589,4 +589,9 @@ export const hi: Record<string, string> = {
   selectSupplierPlaceholder: 'आपूर्तिकर्ता चुनें',
   selectCategoryPlaceholder: 'श्रेणी चुनें',
   unitPcs: 'पीस',
+  sale: 'बिक्री',
+  pos: 'पॉइंट ऑफ़ सेल',
+  other: 'अन्य',
+  cameraAccessDenied: 'कैमरा एक्सेस अस्वीकृत या उपलब्ध नहीं',
+  exitFullscreen: 'फुल स्क्रीन से बाहर निकलें',
 };

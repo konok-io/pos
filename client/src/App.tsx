@@ -91,8 +91,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
           setUsers(parsedUsers);
         }
       } catch (e) {
-        console.error('Failed to parse users:', e);
-      }
+          }
     }
   }, []);
 
@@ -1081,8 +1080,7 @@ export default function App() {
         const savedVat = await localDb.getSetting<string>('vatPercent');
         if (savedVat) setVatPercent(savedVat);
       } catch (e) {
-        console.error('Failed to load settings:', e);
-      }
+          }
     };
     loadSettings();
   }, []);
@@ -1141,8 +1139,7 @@ export default function App() {
           if (savedCart.paidAmount !== undefined) setPaidAmount(savedCart.paidAmount);
           if (savedCart.paymentMethod) setPaymentMethod(savedCart.paymentMethod);
         } catch (e) {
-          console.log('Error loading cart from IndexedDB');
-        }
+              }
       }
       
       // Load held sales from IndexedDB
@@ -1151,8 +1148,7 @@ export default function App() {
         try {
           setHeldSales(savedHeldSales);
         } catch (e) {
-          console.log('Error loading held sales from IndexedDB');
-        }
+              }
       }
       
       // Load products, categories, customers, sales from IndexedDB
@@ -1284,8 +1280,7 @@ export default function App() {
     try {
       await db.delete('customers', customer.id);
     } catch (err) {
-      console.error('Failed to delete customer from IndexedDB:', err);
-    }
+      }
   };
 
   // Save sales to IndexedDB whenever it changes (only after initial load)
@@ -1779,7 +1774,7 @@ export default function App() {
                       }}
                     >
                       <option value="all">📋 {t('allSuppliers')}</option>
-                      {[...new Set(products.map(p => p.supplier || 'Other'))].map(s => (
+                      {[...new Set(products.map(p => p.supplier || t('other')))].map(s => (
                         <option key={s} value={s}>{s}</option>
                       ))}
                     </select>
@@ -2682,7 +2677,7 @@ export default function App() {
                       cursor: 'pointer',
                       whiteSpace: 'nowrap'
                     }}>
-                    ➕ Add
+                    ➕ {t('add')}
                   </button>
                 </div>
               </div>
@@ -2986,7 +2981,7 @@ export default function App() {
                 <table>
                   <thead>
                     <tr>
-                      <th>Invoice</th>
+                      <th>{t('invoice')}</th>
                       <th>{t('date')}</th>
                       <th>{t('customer')}</th>
                       <th>{t('total')}</th>
@@ -3883,7 +3878,6 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       setEditingSupplier(null);
       setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' });
     } catch (error) {
-      console.error('Failed to save supplier:', error);
       alert('❌ ' + t('errorOccurred'));
     }
   };
@@ -3902,7 +3896,6 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       setSuppliers(prev => prev.filter(s => s.id !== supplier.id));
       setViewSupplier(null);
     } catch (error) {
-      console.error('Delete failed:', error);
       alert('❌ ' + t('deleteFailed'));
     }
   };
@@ -3932,7 +3925,6 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       setEditingCategory(null);
       setCategoryForm({ name: '' });
     } catch (error) {
-      console.error('Failed to save category:', error);
       alert('❌ ' + t('errorOccurred'));
     }
   };
@@ -3951,7 +3943,6 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       setCategories(prev => prev.filter(c => c.id !== cat.id));
       setViewCategory(null);
     } catch (error) {
-      console.error('Delete failed:', error);
     }
   };
   
@@ -4005,7 +3996,6 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       setShowProductModal(false);
       setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5' });
     } catch (error) {
-      console.error('Failed to save product:', error);
       alert('❌ ' + t('errorOccurred'));
     }
   };
@@ -4558,7 +4548,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
       }
       setIsCameraOpen(true);
     } catch (err) {
-      alert('Camera access denied or not available');
+      alert(t('cameraAccessDenied'));
     }
   };
 
@@ -4716,7 +4706,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                       cursor: 'pointer',
                     }}
                   >
-                    📷 Capture
+                    📷 {t('capture')}
                   </button>
                   <button
                     onClick={() => { stopCamera(); setIsCameraOpen(false); }}
@@ -4822,7 +4812,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
                 disabled={isEditMode}
-                placeholder={isEditMode ? '' : 'Auto-generated if empty'}
+                placeholder={isEditMode ? '' : t('autoGeneratedIfEmpty')}
                 readOnly={isEditMode}
                 style={{
                   width: '100%',
@@ -5823,7 +5813,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                       {hasDue ? (
                         <><span>⚠️</span> {t('due')}: {fmt(netDue)}</>
                       ) : hasDeposit ? (
-                        <><span>💰</span> Deposit: {fmt(netDeposit)}</>
+                        <><span>💰</span> {t('deposit')}: {fmt(netDeposit)}</>
                       ) : isGeneralCustomer(customer) ? (
                         <><span>📋</span> {t('viewHistory')}</>
                       ) : (
@@ -6034,8 +6024,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                   <tr key={sale.id} style={{ borderTop: i > 0 ? `1px solid ${T.gray100}` : 'none' }}>
                     <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(sale.date).toLocaleString()}</td>
                     <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.invoiceNo}</td>
-                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.paymentMethod || 'Sale'}</td>
-                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.user || 'POS'}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.paymentMethod || t('sale')}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.user || t('pos')}</td>
                     <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800, textAlign: 'right', fontWeight: 600 }}>{fmt(sale.total)}</td>
                   </tr>
                 ))}
@@ -6353,8 +6343,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                   <tr key={sale.id} style={{ borderTop: i > 0 ? `1px solid ${T.gray100}` : 'none' }}>
                     <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{new Date(sale.date).toLocaleString()}</td>
                     <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.invoiceNo}</td>
-                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.paymentMethod || 'Sale'}</td>
-                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.user || 'POS'}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.paymentMethod || t('sale')}</td>
+                    <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800 }}>{sale.user || t('pos')}</td>
                     <td style={{ padding: '12px 16px', fontSize: '14px', color: T.gray800, textAlign: 'right', fontWeight: 600 }}>{fmt(sale.total)}</td>
                   </tr>
                 ))}
@@ -6513,8 +6503,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     vatEnabled: true,
     vatPercent: 15,
     bannerImage: '',
-    receiptHeader: '🧾 Sales Receipt',
-    receiptFooter: 'Thank You',
+    receiptHeader: t('salesReceipt'),
+    receiptFooter: t('thankYou'),
     receiptShowLogo: true,
     receiptShowAddress: true,
     receiptShowPhone: true,
@@ -6523,8 +6513,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     receiptShowQr: true,
     receiptFontSize: 11,
     receiptLogo: '',
-    purchaseHeader: '🛒 Purchase Invoice',
-    purchaseFooter: 'Thank You',
+    purchaseHeader: t('purchaseInvoice'),
+    purchaseFooter: t('thankYou'),
     purchaseShowLogo: true,
     purchaseShowAddress: true,
     purchaseShowSupplier: true,
@@ -6571,7 +6561,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
-      console.error('Failed to save settings:', error);
       alert('❌ ' + t('settingsSaveFailed'));
     }
   };
@@ -6586,7 +6575,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       alert(t('dataDeletedSuccessfully'));
       window.location.reload();
     } catch (error) {
-      console.error('Failed to clear data:', error);
       alert('❌ ' + t('error') + '!');
     }
   };
@@ -6610,7 +6598,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       onRefresh();
       alert(translate('dataDeletedSuccessfully'));
     } catch (error) {
-      console.error('Failed to delete items:', error);
       alert('❌ ' + translate('error') + '!');
     }
   };
@@ -6650,8 +6637,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         onRefresh();
         alert(translate('dataDeletedSuccessfully'));
       } catch (error) {
-        console.error('Failed to reset customers:', error);
-        alert('❌ ' + translate('error') + '!');
+          alert('❌ ' + translate('error') + '!');
       }
       return;
     }
@@ -6689,7 +6675,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       onRefresh();
       alert(translate('dataDeletedSuccessfully'));
     } catch (error) {
-      console.error('Failed to delete customers:', error);
       alert('❌ ' + translate('error') + '!');
     }
   };
@@ -7001,7 +6986,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                 <div style={{ textAlign: 'center', borderBottom: '1px dashed #000', paddingBottom: 8, marginBottom: 8 }}>
                   {form.receiptLogo && <div style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 4 }}>{form.receiptLogo}</div>}
                   {form.name && <div style={{ fontSize: 12, fontWeight: 'bold' }}>{form.name}</div>}
-                  {form.name && <div style={{ fontSize: 10 }}>Bangladesh</div>}
+                  {form.name && <div style={{ fontSize: 10 }}>{t('countryName')}</div>}
                   {form.phone && <div style={{ fontSize: 10 }}>{form.phone}</div>}
                   {form.taxId && <div style={{ fontSize: 10, fontWeight: 'bold' }}>{t('vatRegNo')}: {form.taxId}</div>}
                 </div>
@@ -7285,7 +7270,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
 // TranslationSettings Component
 export function TranslationSettings() {
-  const { language, customTranslations, syncTranslations, saveTranslation } = useLanguage();
+  const { language, customTranslations, syncTranslations, saveTranslation, t } = useLanguage();
   const [selectedLang, setSelectedLang] = useState<Language>(language);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingKey, setEditingKey] = useState<string | null>(null);
@@ -7356,7 +7341,7 @@ export function TranslationSettings() {
             fontWeight: 600,
           }}
         >
-          {syncStatus === 'syncing' ? '⏳ Syncing...' : syncStatus || '🔄 Sync from Code'}
+          {syncStatus === 'syncing' ? t('syncing') : syncStatus || t('syncFromCode')}
         </button>
       </div>
 
@@ -7385,7 +7370,7 @@ export function TranslationSettings() {
       <div style={{ marginBottom: 16 }}>
         <input
           type="text"
-          placeholder="Search translations..."
+          placeholder={t("searchTranslations")}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{
@@ -7462,7 +7447,7 @@ export function TranslationSettings() {
                           cursor: 'pointer',
                         }}
                       >
-                        {saving ? '...' : 'Save'}
+                        {saving ? '...' : t('save')}
                       </button>
                       <button
                         onClick={() => setEditingKey(null)}
@@ -7496,7 +7481,7 @@ export function TranslationSettings() {
                         fontSize: 12,
                       }}
                     >
-                      ✏️ Edit
+                      ✏️ {t('edit')}
                     </button>
                   )}
                 </td>
@@ -7507,7 +7492,7 @@ export function TranslationSettings() {
 
         {filteredKeys.length === 0 && (
           <div style={{ padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
-            No translations found
+            {t('noTranslationsFound')}
           </div>
         )}
       </div>
@@ -7555,7 +7540,6 @@ export function DatabaseSettings() {
       const categories = await localDb.getCategories();
       setDocCount(products.length + sales.length + customers.length + categories.length);
     } catch (error) {
-      console.error('Error loading DB info:', error);
     }
   };
 
@@ -7631,7 +7615,7 @@ export function DatabaseSettings() {
       clearInterval(progressInterval);
       setImportProgress(100);
       
-      setMessage('Import successful!');
+      setMessage(t('importSuccessful'));
       setMessageType('success');
       setImportFile(null);
       loadDbInfo();

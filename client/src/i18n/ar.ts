@@ -589,4 +589,9 @@ export const ar: Record<string, string> = {
   selectSupplierPlaceholder: 'اختر المورد',
   selectCategoryPlaceholder: 'اختر الفئة',
   unitPcs: 'قطعة',
+  sale: 'بيع',
+  pos: 'نقطة بيع',
+  other: 'أخرى',
+  cameraAccessDenied: 'تم رفض الوصول إلى الكاميرا أو غير متاحة',
+  exitFullscreen: 'الخروج من وضع الشاشة الكاملة',
 };

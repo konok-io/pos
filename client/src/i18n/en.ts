@@ -598,4 +598,9 @@ export const en: Record<string, string> = {
   selectSupplierPlaceholder: 'Select Supplier',
   selectCategoryPlaceholder: 'Select Category',
   unitPcs: 'Pcs',
+  sale: 'Sale',
+  pos: 'POS',
+  other: 'Other',
+  cameraAccessDenied: 'Camera access denied or not available',
+  exitFullscreen: 'Exit Fullscreen',
 };

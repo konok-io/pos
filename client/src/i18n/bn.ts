@@ -591,4 +591,9 @@ export const bn: Record<string, string> = {
   selectSupplierPlaceholder: 'সরবরাহকারী নির্বাচন করুন',
   selectCategoryPlaceholder: 'ক্যাটাগরি নির্বাচন করুন',
   unitPcs: 'পিস',
+  sale: 'বিক্রয়',
+  pos: 'পজ',
+  other: 'অন্যান্য',
+  cameraAccessDenied: 'ক্যামেরা অ্যাক্সেস নিষিদ্ধ বা উপলব্ধ নয়',
+  exitFullscreen: 'ফুল স্ক্রিন থেকে বের হন',
 };
