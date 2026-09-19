@@ -113,6 +113,35 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 250); }
   };
 
+  const printSupplierList = () => {
+    const rows = filteredSuppliers.map((c: string) => {
+      const prodCount = products.filter((p: any) => (p.company || '').toLowerCase() === c.toLowerCase()).length;
+      const totalP = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === c.toLowerCase()).reduce((s: number, p: any) => s + (p.items || []).reduce((ss: number, i: any) => ss + (i.stock || 0) * (i.costPrice || 0), 0), 0);
+      return `<tr><td>${c}</td><td>${prodCount}</td><td>${fmt(totalP)}</td></tr>`;
+    }).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('suppliers')}</h1><p>${new Date().toLocaleDateString()} | ${filteredSuppliers.length} ${t('suppliers')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('products')}</th><th>${t('totalPurchase')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const win = window.open('', '_blank', 'width=1000,height=600');
+    if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 250); }
+  };
+
+  const printCategoryList = () => {
+    const rows = filteredCategories.map((c: string) => {
+      const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === c.toLowerCase());
+      const totalV = catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0);
+      return `<tr><td>${c}</td><td>${catProducts.length}</td><td>${fmt(totalV)}</td></tr>`;
+    }).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('categories')}</h1><p>${new Date().toLocaleDateString()} | ${filteredCategories.length} ${t('categories')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('products')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const win = window.open('', '_blank', 'width=1000,height=600');
+    if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 250); }
+  };
+
+  const printStockList = () => {
+    const rows = stockProducts.map((p: any) => `<tr><td>${p.name}</td><td>${p.company || '-'}</td><td>${p.stock}</td><td>${p.minStock || 5}</td><td>${fmt(p.stock * p.costPrice)}</td></tr>`).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('stock')}</h1><p>${new Date().toLocaleDateString()} | ${stockProducts.length} ${t('products')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('company')}</th><th>${t('stock')}</th><th>${t('minStock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const win = window.open('', '_blank', 'width=1000,height=600');
+    if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 250); }
+  };
+
   const handleCsvImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -213,7 +242,8 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
           <input value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder={t('searchSupplier')} style={{ ...inputStyle, paddingLeft: 32 }} />
         </div>
-        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredSuppliers.length} {t('suppliers')}</span>
+        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredSuppliers.length}</span>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}>🖨️ {t('print')}</button>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         {filteredSuppliers.length === 0 ? (
@@ -275,7 +305,8 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
           <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
         </div>
-        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredCategories.length} {t('categories')}</span>
+        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredCategories.length}</span>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}>🖨️ {t('print')}</button>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         {filteredCategories.length === 0 ? (
@@ -368,6 +399,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
           <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
         </div>
         <span style={{ fontSize: 14, color: T.gray400 }}>{stockProducts.length}</span>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={printStockList}>🖨️ {t('print')}</button>
       </div>
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
