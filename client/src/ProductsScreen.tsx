@@ -111,33 +111,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     loadData();
   }, []);
 
-  // Sync products to MySQL when changed
-  useEffect(() => {
-    if (products.length > 0) {
-      products.forEach(async (p: any) => {
-        try { await api.updateProduct(p.id, p); } catch {}
-      });
-    }
-  }, [products]);
-
-  // Sync suppliers to MySQL when changed
-  useEffect(() => {
-    if (suppliers.length > 0) {
-      suppliers.forEach(async (s: any) => {
-        try { await api.updateSupplier(s.id, s); } catch {}
-      });
-    }
-  }, [suppliers]);
-
-  // Sync categories to MySQL when changed
-  useEffect(() => {
-    if (categories.length > 0) {
-      categories.forEach(async (c: any) => {
-        try { await api.updateCategory(c.id, c); } catch {}
-      });
-    }
-  }, [categories]);
-
   const overlay: React.CSSProperties = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 };
 
   const stockCount = products.filter((p: any) => p.stock > 0).length;
