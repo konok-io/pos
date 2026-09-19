@@ -405,17 +405,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
 
   const renderStock = () => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '12px 16px', background: T.tealLight, borderBottom: `1px solid ${T.gray200}`, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-        {[
-          { label: t('totalProducts'), value: products.length, color: T.teal },
-          { label: t('stockAvailable'), value: stockCount, color: T.green },
-          { label: t('stockOut'), value: outOfStockCount, color: T.red },
-          { label: t('stockLow'), value: lowStockCount, color: T.amber },
-          { label: t('totalValue'), value: fmt(totalStockValue), color: T.teal },
-        ].map((s, i) => (
-          <div key={i} style={{ textAlign: 'center' }}><div style={{ fontSize: 12, color: T.gray500 }}>{s.label}</div><div style={{ fontSize: 20, fontWeight: 700, color: s.color }}>{s.value}</div></div>
-        ))}
-      </div>
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
@@ -562,6 +551,16 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
               <button style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}>⋯ {t('more')}</button>
               {showStockMoreMenu && (
                 <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 220, padding: 4 }}>
+                  <div style={{ padding: '8px 12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, borderBottom: `1px solid ${T.gray100}` }}>
+                    <div><div style={{ fontSize: 11, color: T.gray400 }}>{t('totalProducts')}</div><div style={{ fontSize: 16, fontWeight: 700, color: T.teal }}>{products.length}</div></div>
+                    <div><div style={{ fontSize: 11, color: T.gray400 }}>{t('stockAvailable')}</div><div style={{ fontSize: 16, fontWeight: 700, color: T.green }}>{stockCount}</div></div>
+                    <div><div style={{ fontSize: 11, color: T.gray400 }}>{t('stockOut')}</div><div style={{ fontSize: 16, fontWeight: 700, color: T.red }}>{outOfStockCount}</div></div>
+                    <div><div style={{ fontSize: 11, color: T.gray400 }}>{t('stockLow')}</div><div style={{ fontSize: 16, fontWeight: 700, color: T.amber }}>{lowStockCount}</div></div>
+                  </div>
+                  <div style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}` }}>
+                    <div style={{ fontSize: 11, color: T.gray400 }}>{t('totalValue')}</div>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: T.teal }}>{fmt(totalStockValue)}</div>
+                  </div>
                   <div style={{ padding: '4px 12px', fontSize: 12, fontWeight: 700, color: T.gray400 }}>{t('stockFilters')}</div>
                   <button onClick={() => { setStockFilter('all'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'all' ? T.tealLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('totalProducts')}</button>
                   <button onClick={() => { setStockFilter('available'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'available' ? T.greenLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>✅ {t('stockAvailable')}</button>
