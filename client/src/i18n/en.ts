@@ -510,4 +510,5 @@ export const en: Record<string, string> = {
   enterPurchaseId: 'Enter Purchase ID to print barcodes for all products in that purchase',
   selectProductsForBarcode: 'Select products with barcodes to print',
   selected: 'selected',
+  stockFilters: 'Stock Filters',
 };

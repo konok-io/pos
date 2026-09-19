@@ -473,4 +473,5 @@ export const hi: Record<string, string> = {
   enterPurchaseId: 'उस खरीद के सभी उत्पादों का बारकोड प्रिंट करने के लिए खरीद आईडी दर्ज करें',
   selectProductsForBarcode: 'बारकोड प्रिंट करने के लिए उत्पाद चुनें',
   selected: 'चयनित',
+  stockFilters: 'स्टॉक फ़िल्टर',
 };

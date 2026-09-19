@@ -67,7 +67,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const [showSupplierMoreMenu, setShowSupplierMoreMenu] = useState(false);
   const [showCategoryMoreMenu, setShowCategoryMoreMenu] = useState(false);
   const [showStockMoreMenu, setShowStockMoreMenu] = useState(false);
-  const [showStockSettingsMenu, setShowStockSettingsMenu] = useState(false);
   const [stockFilter, setStockFilter] = useState<'all' | 'available' | 'out' | 'low'>('all');
   const [showPurchaseBarcodeModal, setShowPurchaseBarcodeModal] = useState(false);
   const [purchaseBarcodeId, setPurchaseBarcodeId] = useState('');
@@ -560,22 +559,17 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         {productTab === 'stock' && (
           <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
             <div style={{ position: 'relative' }}>
-              <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}>⋯ {t('more')}</button>
+              <button style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}>⋯ {t('more')}</button>
               {showStockMoreMenu && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 8 }}>
-                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start' }} onClick={() => { alert(t('comingSoon')); setShowStockMoreMenu(false); }}>📦 {t('stock')} + {t('history')}</button>
-                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start' }} onClick={() => { alert(t('comingSoon')); setShowStockMoreMenu(false); }}>📦 {t('stock')} - {t('history')}</button>
-                </div>
-              )}
-            </div>
-            <div style={{ position: 'relative' }}>
-              <button style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined }} onClick={() => setShowStockSettingsMenu(!showStockSettingsMenu)}>⚙️ {t('settings')}</button>
-              {showStockSettingsMenu && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 8 }}>
-                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'all' ? T.tealLight : undefined }} onClick={() => { setStockFilter('all'); setShowStockSettingsMenu(false); }}>{t('totalProducts')}: <strong>{products.length}</strong></button>
-                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'available' ? T.greenLight : undefined }} onClick={() => { setStockFilter('available'); setShowStockSettingsMenu(false); }}>{t('stockAvailable')}: <strong>{stockCount}</strong></button>
-                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'out' ? T.redLight : undefined }} onClick={() => { setStockFilter('out'); setShowStockSettingsMenu(false); }}>{t('stockOut')}: <strong>{outOfStockCount}</strong></button>
-                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'low' ? T.amberLight : undefined }} onClick={() => { setStockFilter('low'); setShowStockSettingsMenu(false); }}>{t('stockLow')}: <strong>{lowStockCount}</strong></button>
+                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 220, padding: 8 }}>
+                  <div style={{ padding: '4px 8px', fontSize: 12, fontWeight: 700, color: T.gray400, borderBottom: `1px solid ${T.gray100}`, marginBottom: 4 }}>{t('stockFilters')}</div>
+                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'all' ? T.tealLight : undefined }} onClick={() => { setStockFilter('all'); setShowStockMoreMenu(false); }}>📦 {t('totalProducts')}: <strong>{products.length}</strong></button>
+                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'available' ? T.greenLight : undefined }} onClick={() => { setStockFilter('available'); setShowStockMoreMenu(false); }}>✅ {t('stockAvailable')}: <strong>{stockCount}</strong></button>
+                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'out' ? T.redLight : undefined }} onClick={() => { setStockFilter('out'); setShowStockMoreMenu(false); }}>❌ {t('stockOut')}: <strong>{outOfStockCount}</strong></button>
+                  <button style={{ ...btn('ghost', 'sm'), width: '100%', justifyContent: 'flex-start', background: stockFilter === 'low' ? T.amberLight : undefined }} onClick={() => { setStockFilter('low'); setShowStockMoreMenu(false); }}>⚠️ {t('stockLow')}: <strong>{lowStockCount}</strong></button>
+                  <div style={{ borderTop: `1px solid ${T.gray100}`, margin: '4px 0' }}></div>
+                  <button onClick={() => { alert(t('comingSoon')); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} + {t('history')}</button>
+                  <button onClick={() => { alert(t('comingSoon')); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('stock')} - {t('history')}</button>
                 </div>
               )}
             </div>

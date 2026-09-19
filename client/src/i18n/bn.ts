@@ -482,4 +482,5 @@ export const bn: Record<string, string> = {
   enterPurchaseId: 'সেই পারচেজ এর সব পণ্যের বারকোড প্রিন্ট করতে পারচেজ আইডি দিন',
   selectProductsForBarcode: 'বারকোড প্রিন্ট করতে পণ্য নির্বাচন করুন',
   selected: 'নির্বাচিত',
+  stockFilters: 'স্টক ফিল্টার',
 };
