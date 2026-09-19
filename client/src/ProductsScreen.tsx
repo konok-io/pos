@@ -475,7 +475,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
         </div>
         {productTab === 'allProducts' && (
           <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => alert(t('comingSoon'))}>➕ {t('addNewProduct')}</button>
             <div style={{ position: 'relative' }}>
               <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowMoreMenu(!showMoreMenu)}>⋯ {t('more')}</button>
               {showMoreMenu && (
@@ -487,6 +486,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
                 </div>
               )}
             </div>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => alert(t('comingSoon'))}>➕ {t('addNewProduct')}</button>
           </div>
         )}
       </div>
