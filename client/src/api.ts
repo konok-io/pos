@@ -1,4 +1,4 @@
-const API_URL = 'http://187.127.217.235:3001/api';
+const API_URL = '/api';
 
 let authToken = localStorage.getItem('pos_api_token') || '';
 
