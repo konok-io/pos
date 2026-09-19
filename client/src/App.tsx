@@ -1028,7 +1028,7 @@ export default function App() {
   // Tabs configuration
   const otherTabs = [
     { id: 'products', icon: <i className="fas fa-box"></i>, label: t('products') },
-    { id: 'customers', icon: '👥', label: t('customers') },
+    { id: 'customers', icon: <i className="fas fa-users"></i>, label: t('customers') },
     { id: 'income', icon: <i className="fas fa-money-bill"></i>, label: t('incomeExpenses') },
     { id: 'reports', icon: <i className="fas fa-chart-bar"></i>, label: t('reports') },
     { id: 'settings', icon: <i className="fas fa-gear"></i>, label: t('settings') },
@@ -1505,7 +1505,7 @@ export default function App() {
                   borderRadius: 6,
                 }}>
                   <span style={{ fontSize: 16 }}><i className="fas fa-cart-shopping"></i></span>
-                  <span>{t('sales')}</span>
+                  <span style={{ marginLeft: 6 }}>{t('sales')}</span>
                 </button>
                 {otherTabs.map((t) => (
                   <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
@@ -1525,7 +1525,7 @@ export default function App() {
                     borderRadius: 6,
                   }}>
                     <span style={{ fontSize: 16 }}>{t.icon}</span>
-                    <span>{t.label}</span>
+                    <span style={{ marginLeft: 6 }}>{t.label}</span>
                   </button>
                 ))}
               </div>
