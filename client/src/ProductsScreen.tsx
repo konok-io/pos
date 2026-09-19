@@ -546,21 +546,18 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
           </div>
         )}
         {productTab === 'stock' && (
-          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginLeft: 'auto' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '4px 8px', background: T.tealLight, borderRadius: 8 }}>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 10, color: T.gray400 }}>{t('totalProducts')}</div><div style={{ fontSize: 14, fontWeight: 700, color: T.teal }}>{products.length}</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 10, color: T.gray400 }}>{t('stockAvailable')}</div><div style={{ fontSize: 14, fontWeight: 700, color: T.green }}>{stockCount}</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 10, color: T.gray400 }}>{t('stockOut')}</div><div style={{ fontSize: 14, fontWeight: 700, color: T.red }}>{outOfStockCount}</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 10, color: T.gray400 }}>{t('stockLow')}</div><div style={{ fontSize: 14, fontWeight: 700, color: T.amber }}>{lowStockCount}</div></div>
+              <div style={{ borderLeft: `1px solid ${T.gray300}`, paddingLeft: 12 }}><div style={{ fontSize: 10, color: T.gray400 }}>{t('totalValue')}</div><div style={{ fontSize: 14, fontWeight: 700, color: T.teal }}>{fmt(totalStockValue)}</div></div>
+            </div>
             <div style={{ position: 'relative' }}>
               <button style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}>⋯ {t('more')}</button>
               {showStockMoreMenu && (
-                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 220, padding: 4 }}>
-                  <div style={{ padding: '8px 12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, borderBottom: `1px solid ${T.gray100}` }}>
-                    <div><div style={{ fontSize: 11, color: T.gray400 }}>{t('totalProducts')}</div><div style={{ fontSize: 16, fontWeight: 700, color: T.teal }}>{products.length}</div></div>
-                    <div><div style={{ fontSize: 11, color: T.gray400 }}>{t('stockAvailable')}</div><div style={{ fontSize: 16, fontWeight: 700, color: T.green }}>{stockCount}</div></div>
-                    <div><div style={{ fontSize: 11, color: T.gray400 }}>{t('stockOut')}</div><div style={{ fontSize: 16, fontWeight: 700, color: T.red }}>{outOfStockCount}</div></div>
-                    <div><div style={{ fontSize: 11, color: T.gray400 }}>{t('stockLow')}</div><div style={{ fontSize: 16, fontWeight: 700, color: T.amber }}>{lowStockCount}</div></div>
-                  </div>
-                  <div style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}` }}>
-                    <div style={{ fontSize: 11, color: T.gray400 }}>{t('totalValue')}</div>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: T.teal }}>{fmt(totalStockValue)}</div>
-                  </div>
+                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
                   <div style={{ padding: '4px 12px', fontSize: 12, fontWeight: 700, color: T.gray400 }}>{t('stockFilters')}</div>
                   <button onClick={() => { setStockFilter('all'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'all' ? T.tealLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>📦 {t('totalProducts')}</button>
                   <button onClick={() => { setStockFilter('available'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'available' ? T.greenLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}>✅ {t('stockAvailable')}</button>
