@@ -40,7 +40,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const { t } = useLanguage();
   const [productTab, setProductTab] = useState(() => localStorage.getItem('pos_product_tab') || 'allProducts');
   const [search, setSearch] = useState('');
-  const [stockFilter, setStockFilter] = useState('all');
   const [editProduct, setEditProduct] = useState<any>(null);
   const [viewProduct, setViewProduct] = useState<any>(null);
   const [viewPurchase, setViewPurchase] = useState<any>(null);
@@ -74,11 +73,8 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const totalStockValue = products.reduce((s: number, p: any) => s + p.stock * p.costPrice, 0);
 
   const filteredProducts = products.filter((p: any) => {
-    if (stockFilter === 'inStock' && p.stock <= 0) return false;
-    if (stockFilter === 'outOfStock' && p.stock > 0) return false;
-    if (stockFilter === 'lowStock' && (p.stock <= 0 || p.stock > ((p as any).minStock || 5))) return false;
     return !search || (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.company || '').toLowerCase().includes(search.toLowerCase()) || (p.code || '').toLowerCase().includes(search.toLowerCase()) || (p.cat || '').toLowerCase().includes(search.toLowerCase());
-  }).sort((a: any, b: any) => { if (stockFilter === 'lowStock') return a.stock - b.stock; return a.name.localeCompare(b.name); });
+  }).sort((a: any, b: any) => a.name.localeCompare(b.name));
 
   const allCompanies = [...new Set([...suppliers.map((s: any) => s.name).filter(Boolean), ...products.map((p: any) => p.company).filter(Boolean)])].sort();
   const filteredSuppliers = allCompanies.filter(c => !supplierSearch || (c || '').toLowerCase().includes(supplierSearch.toLowerCase()));
@@ -151,14 +147,6 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const renderAllProducts = () => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
-        {[
-          { key: 'all', label: `${t('allProducts')}`, count: products.length, bg: T.teal, bgLight: T.gray100 },
-          { key: 'inStock', label: `${t('stockAvailable')}`, count: stockCount, bg: T.green, bgLight: T.greenLight },
-          { key: 'outOfStock', label: `${t('stockOut')}`, count: outOfStockCount, bg: T.red, bgLight: T.redLight },
-          { key: 'lowStock', label: `${t('stockLow')}`, count: lowStockCount, bg: T.amber, bgLight: T.amberLight },
-        ].map(f => (
-          <button key={f.key} onClick={() => setStockFilter(f.key)} style={{ padding: '8px 14px', borderRadius: 7, border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer', background: stockFilter === f.key ? f.bg : f.bgLight, color: stockFilter === f.key ? T.white : T.gray600, whiteSpace: 'nowrap' }}>{f.label} ({f.count})</button>
-        ))}
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 150 }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}>🔍</span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
