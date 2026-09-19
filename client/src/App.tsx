@@ -1236,26 +1236,34 @@ export default function App() {
   useEffect(() => {
     if (!isInitialized) return;
     const saveProducts = async () => {
+      const existing = await db.getAll('products');
+      const existingIds = new Set(existing.map((p: any) => p.id));
+      const currentIds = new Set(products.filter((p: any) => p?.id).map((p: any) => p.id));
+      for (const id of existingIds) {
+        if (!currentIds.has(id)) await db.delete('products', id);
+      }
       for (const product of products) {
-        if (product?.id) {
-          await db.put('products', product.id, product);
-        }
+        if (product?.id) await db.put('products', product.id, product);
       }
     };
-    if (products.length > 0) saveProducts();
+    saveProducts();
   }, [isInitialized, products]);
 
   // Save categories to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
     if (!isInitialized) return;
     const saveCategories = async () => {
+      const existing = await db.getAll('categories');
+      const existingIds = new Set(existing.map((c: any) => c.id));
+      const currentIds = new Set(categories.filter((c: any) => c?.id).map((c: any) => c.id));
+      for (const id of existingIds) {
+        if (!currentIds.has(id)) await db.delete('categories', id);
+      }
       for (const category of categories) {
-        if (category?.id) {
-          await db.put('categories', category.id, category);
-        }
+        if (category?.id) await db.put('categories', category.id, category);
       }
     };
-    if (categories.length > 0) saveCategories();
+    saveCategories();
   }, [isInitialized, categories]);
 
   // Save customers to IndexedDB whenever it changes (only after initial load)

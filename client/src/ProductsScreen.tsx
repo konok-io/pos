@@ -47,8 +47,11 @@ interface ProductsScreenProps {
   currentUser?: any;
 }
 
-export default function ProductsScreen({ products, suppliers, categories, purchases, productHistory, setProducts, setSuppliers, setCategories, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
+export default function ProductsScreen({ products: _initProducts, suppliers: _initSuppliers, categories: _initCategories, purchases, productHistory, setProducts: setProductsParent, setSuppliers: setSuppliersParent, setCategories: setCategoriesParent, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
   const { t } = useLanguage();
+  const [products, setProducts] = useState<any[]>([]);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [productTab, setProductTab] = useState('allProducts');
   const [search, setSearch] = useState('');
   const [editProduct, setEditProduct] = useState<any>(null);
@@ -93,7 +96,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
 
   useEffect(() => { }, [productTab]);
 
-  // Load data from MySQL on mount
+  // Load ALL data from MySQL on mount - always override local data
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -103,10 +106,13 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
           setToken(res.token);
         }
         const [prods, cats, sups] = await Promise.all([api.getProducts(), api.getCategories(), api.getSuppliers()]);
-        if (prods.length > 0) setProducts(prods);
-        if (cats.length > 0) setCategories(cats);
-        if (sups.length > 0) setSuppliers(sups);
-      } catch (e) { console.log('API not available, using local data'); }
+        setProducts(prods);
+        setCategories(cats);
+        setSuppliers(sups);
+        setProductsParent(prods);
+        setCategoriesParent(cats);
+        setSuppliersParent(sups);
+      } catch (e) { console.error('API load failed:', e); }
     };
     loadData();
   }, []);
@@ -150,7 +156,9 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const handleAddProduct = () => {
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
     const newProduct = { id: genId(), ...productForm };
-    setProducts([...products, newProduct]);
+    const updated = [...products, newProduct];
+    setProducts(updated);
+    setProductsParent(updated);
     api.addProduct(newProduct).catch(() => {});
     setShowAddProductModal(false);
     setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5 });
@@ -158,7 +166,9 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
 
   const handleEditFullProduct = () => {
     if (!editFullProduct) return;
-    setProducts(products.map((p: any) => p.id === editFullProduct.id ? { ...p, name: editFullProduct.name, code: editFullProduct.code, company: editFullProduct.company, cat: editFullProduct.cat, unit: editFullProduct.unit, costPrice: editFullProduct.costPrice, sellPrice: editFullProduct.sellPrice, minStock: editFullProduct.minStock } : p));
+    const updated = products.map((p: any) => p.id === editFullProduct.id ? { ...p, name: editFullProduct.name, code: editFullProduct.code, company: editFullProduct.company, cat: editFullProduct.cat, unit: editFullProduct.unit, costPrice: editFullProduct.costPrice, sellPrice: editFullProduct.sellPrice, minStock: editFullProduct.minStock } : p);
+    setProducts(updated);
+    setProductsParent(updated);
     api.updateProduct(editFullProduct.id, editFullProduct).catch(() => {});
     setEditFullProduct(null);
   };
@@ -167,7 +177,9 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     const product = products.find((p: any) => p.id === id);
     if (!product) return;
     if (!window.confirm(`"${product.name}" ${t('confirmDelete')}`)) return;
-    setProducts(products.filter((p: any) => p.id !== id));
+    const updated = products.filter((p: any) => p.id !== id);
+    setProducts(updated);
+    setProductsParent(updated);
     api.deleteProduct(id).catch(() => {});
   };
 
@@ -176,7 +188,9 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     const msg = supplierProducts.length > 0 ? `\n\n${t('products')}: ${supplierProducts.length}` : '';
     if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
     const supplier = suppliers.find((s: any) => s.name === name);
-    setSuppliers(suppliers.filter((s: any) => s.name !== name));
+    const updated = suppliers.filter((s: any) => s.name !== name);
+    setSuppliers(updated);
+    setSuppliersParent(updated);
     if (supplier) api.deleteSupplier(supplier.id).catch(() => {});
   };
 
@@ -185,7 +199,9 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     const msg = catProducts.length > 0 ? `\n\n${t('products')}: ${catProducts.length}` : '';
     if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
     const cat = categories.find((c: any) => c.name === name);
-    setCategories(categories.filter((c: any) => c.name !== name));
+    const updated = categories.filter((c: any) => c.name !== name);
+    setCategories(updated);
+    setCategoriesParent(updated);
     if (cat) api.deleteCategory(cat.id).catch(() => {});
   };
 
@@ -328,7 +344,9 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     if (qty <= 0) return;
     const oldStock = stockAdjustProduct.stock;
     const newStock = stockAdjustType === 'add' ? oldStock + qty : Math.max(0, oldStock - qty);
-    setProducts(products.map((p: any) => p.id === stockAdjustProduct.id ? { ...p, stock: newStock } : p));
+    const updated = products.map((p: any) => p.id === stockAdjustProduct.id ? { ...p, stock: newStock } : p);
+    setProducts(updated);
+    setProductsParent(updated);
     api.addStockHistory({
       productId: stockAdjustProduct.id,
       productName: stockAdjustProduct.name,
@@ -452,7 +470,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowSupplierModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { setSuppliers(suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...supplierForm } : s)); api.updateSupplier(editingSupplier.id, supplierForm).catch(() => {}); } else { const newSupplier = { ...supplierForm }; setSuppliers([...suppliers, newSupplier]); api.addSupplier(newSupplier).catch(() => {}); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { const updated = suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...supplierForm } : s); setSuppliers(updated); setSuppliersParent(updated); api.updateSupplier(editingSupplier.id, supplierForm).catch(() => {}); } else { const newSupplier = { ...supplierForm }; const updated = [...suppliers, newSupplier]; setSuppliers(updated); setSuppliersParent(updated); api.addSupplier(newSupplier).catch(() => {}); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
             </div>
           </div>
         </div>
@@ -508,7 +526,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowCategoryModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } if (editingCategory) { setCategories(categories.map((c: any) => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c)); api.updateCategory(editingCategory.id, { name: categoryForm.name }).catch(() => {}); } else { const newCat = { id: categoryForm.id || genUniqueId(), name: categoryForm.name }; setCategories([...categories, newCat]); api.addCategory(newCat).catch(() => {}); } setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } if (editingCategory) { const updated = categories.map((c: any) => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c); setCategories(updated); setCategoriesParent(updated); api.updateCategory(editingCategory.id, { name: categoryForm.name }).catch(() => {}); } else { const newCat = { id: categoryForm.id || genUniqueId(), name: categoryForm.name }; const updated = [...categories, newCat]; setCategories(updated); setCategoriesParent(updated); api.addCategory(newCat).catch(() => {}); } setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
             </div>
           </div>
         </div>
