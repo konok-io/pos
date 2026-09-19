@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from './i18n';
+import { api, setToken } from './api';
 
 const T = {
   teal: '#0F766E', tealDark: '#115E59', tealLight: '#F0FDFA',
@@ -92,6 +93,51 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
 
   useEffect(() => { }, [productTab]);
 
+  // Load data from MySQL on mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const token = localStorage.getItem('pos_api_token');
+        if (!token) {
+          const res = await api.login('admin@pos.test', 'admin123');
+          setToken(res.token);
+        }
+        const [prods, cats, sups] = await Promise.all([api.getProducts(), api.getCategories(), api.getSuppliers()]);
+        if (prods.length > 0) setProducts(prods);
+        if (cats.length > 0) setCategories(cats);
+        if (sups.length > 0) setSuppliers(sups);
+      } catch (e) { console.log('API not available, using local data'); }
+    };
+    loadData();
+  }, []);
+
+  // Sync products to MySQL when changed
+  useEffect(() => {
+    if (products.length > 0) {
+      products.forEach(async (p: any) => {
+        try { await api.updateProduct(p.id, p); } catch {}
+      });
+    }
+  }, [products]);
+
+  // Sync suppliers to MySQL when changed
+  useEffect(() => {
+    if (suppliers.length > 0) {
+      suppliers.forEach(async (s: any) => {
+        try { await api.updateSupplier(s.id, s); } catch {}
+      });
+    }
+  }, [suppliers]);
+
+  // Sync categories to MySQL when changed
+  useEffect(() => {
+    if (categories.length > 0) {
+      categories.forEach(async (c: any) => {
+        try { await api.updateCategory(c.id, c); } catch {}
+      });
+    }
+  }, [categories]);
+
   const overlay: React.CSSProperties = { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 };
 
   const stockCount = products.filter((p: any) => p.stock > 0).length;
@@ -130,7 +176,9 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
 
   const handleAddProduct = () => {
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
-    setProducts([...products, { id: genId(), ...productForm }]);
+    const newProduct = { id: genId(), ...productForm };
+    setProducts([...products, newProduct]);
+    api.addProduct(newProduct).catch(() => {});
     setShowAddProductModal(false);
     setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5 });
   };
@@ -138,6 +186,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
   const handleEditFullProduct = () => {
     if (!editFullProduct) return;
     setProducts(products.map((p: any) => p.id === editFullProduct.id ? { ...p, name: editFullProduct.name, code: editFullProduct.code, company: editFullProduct.company, cat: editFullProduct.cat, unit: editFullProduct.unit, costPrice: editFullProduct.costPrice, sellPrice: editFullProduct.sellPrice, minStock: editFullProduct.minStock } : p));
+    api.updateProduct(editFullProduct.id, editFullProduct).catch(() => {});
     setEditFullProduct(null);
   };
 
@@ -146,20 +195,25 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     if (!product) return;
     if (!window.confirm(`"${product.name}" ${t('confirmDelete')}`)) return;
     setProducts(products.filter((p: any) => p.id !== id));
+    api.deleteProduct(id).catch(() => {});
   };
 
   const deleteSupplier = (name: string) => {
     const supplierProducts = products.filter((p: any) => (p.company || '').toLowerCase() === name.toLowerCase());
     const msg = supplierProducts.length > 0 ? `\n\n${t('products')}: ${supplierProducts.length}` : '';
     if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
+    const supplier = suppliers.find((s: any) => s.name === name);
     setSuppliers(suppliers.filter((s: any) => s.name !== name));
+    if (supplier) api.deleteSupplier(supplier.id).catch(() => {});
   };
 
   const deleteCategory = (name: string) => {
     const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === name.toLowerCase());
     const msg = catProducts.length > 0 ? `\n\n${t('products')}: ${catProducts.length}` : '';
     if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
+    const cat = categories.find((c: any) => c.name === name);
     setCategories(categories.filter((c: any) => c.name !== name));
+    if (cat) api.deleteCategory(cat.id).catch(() => {});
   };
 
   const exportProductsCsv = () => {
@@ -299,8 +353,18 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
     if (!stockAdjustProduct || !stockAdjustQty) return;
     const qty = parseInt(stockAdjustQty) || 0;
     if (qty <= 0) return;
-    const newStock = stockAdjustType === 'add' ? stockAdjustProduct.stock + qty : Math.max(0, stockAdjustProduct.stock - qty);
+    const oldStock = stockAdjustProduct.stock;
+    const newStock = stockAdjustType === 'add' ? oldStock + qty : Math.max(0, oldStock - qty);
     setProducts(products.map((p: any) => p.id === stockAdjustProduct.id ? { ...p, stock: newStock } : p));
+    api.addStockHistory({
+      productId: stockAdjustProduct.id,
+      productName: stockAdjustProduct.name,
+      type: stockAdjustType === 'add' ? 'add' : 'remove',
+      quantity: qty,
+      oldStock,
+      newStock,
+      reason: stockAdjustReason,
+    }).catch(() => {});
     alert(`${stockAdjustProduct.name}: ${stockAdjustType === 'add' ? '+' : '-'}${qty} = ${newStock}`);
     setStockAdjustProduct(null); setStockAdjustQty(''); setStockAdjustReason('');
   };
@@ -415,7 +479,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowSupplierModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { setSuppliers(suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...supplierForm } : s)); } else { setSuppliers([...suppliers, { ...supplierForm }]); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { setSuppliers(suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...supplierForm } : s)); api.updateSupplier(editingSupplier.id, supplierForm).catch(() => {}); } else { const newSupplier = { ...supplierForm }; setSuppliers([...suppliers, newSupplier]); api.addSupplier(newSupplier).catch(() => {}); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
             </div>
           </div>
         </div>
@@ -471,7 +535,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowCategoryModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } if (editingCategory) { setCategories(categories.map((c: any) => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c)); } else { setCategories([...categories, { id: categoryForm.id || genUniqueId(), name: categoryForm.name }]); } setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } if (editingCategory) { setCategories(categories.map((c: any) => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c)); api.updateCategory(editingCategory.id, { name: categoryForm.name }).catch(() => {}); } else { const newCat = { id: categoryForm.id || genUniqueId(), name: categoryForm.name }; setCategories([...categories, newCat]); api.addCategory(newCat).catch(() => {}); } setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
             </div>
           </div>
         </div>
