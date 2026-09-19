@@ -2919,6 +2919,8 @@ export default function App() {
             purchases={purchases}
             productHistory={productHistory}
             setProducts={setProducts}
+            setSuppliers={setSuppliers}
+            setCategories={setCategories}
             settings={settings}
             currentUser={currentUser}
           />

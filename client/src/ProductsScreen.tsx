@@ -32,11 +32,13 @@ interface ProductsScreenProps {
   purchases: any[];
   productHistory: any[];
   setProducts: React.Dispatch<React.SetStateAction<any[]>>;
+  setSuppliers: React.Dispatch<React.SetStateAction<any[]>>;
+  setCategories: React.Dispatch<React.SetStateAction<any[]>>;
   settings: any;
   currentUser?: any;
 }
 
-export default function ProductsScreen({ products, suppliers, categories, purchases, productHistory, setProducts, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
+export default function ProductsScreen({ products, suppliers, categories, purchases, productHistory, setProducts, setSuppliers, setCategories, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
   const { t } = useLanguage();
   const [productTab, setProductTab] = useState(() => localStorage.getItem('pos_product_tab') || 'allProducts');
   const [search, setSearch] = useState('');
@@ -257,7 +259,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             </div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowSupplierModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } alert(editingSupplier ? t('updated') : t('added')); setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { setSuppliers(suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...supplierForm } : s)); } else { setSuppliers([...suppliers, { id: genId(), ...supplierForm }]); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
             </div>
           </div>
         </div>
@@ -303,7 +305,7 @@ export default function ProductsScreen({ products, suppliers, categories, purcha
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
             <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={() => setShowCategoryModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } alert(editingCategory ? t('updated') : t('added')); setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
+              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } if (editingCategory) { setCategories(categories.map((c: any) => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c)); } else { setCategories([...categories, { id: genId(), name: categoryForm.name }]); } setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}>💾 {t('save')}</button>
             </div>
           </div>
         </div>
