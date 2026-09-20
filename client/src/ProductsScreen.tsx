@@ -1068,7 +1068,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0 });
+  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0, expiryDate: '' });
 
 
 
@@ -2016,7 +2016,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0 });
+    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0, expiryDate: '' });
 
 
 
@@ -2100,7 +2100,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId, vat: 0 });
+    setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId, vat: 0, expiryDate: '' });
 
 
 
@@ -9772,27 +9772,36 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     )}
                   </div>
                 </div>
-                {/* Category */}
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('categories')}</label>
-                  <div style={{ position: 'relative' }}>
-                    <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-folder" style={{ fontSize: 13 }}></i></div>
-                    <input value={productForm.cat} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, cat: val }); }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.cat ? '#FFFBEB' : T.gray50, borderColor: productForm.cat ? '#D97706' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
-                    {productForm.cat && categories.filter((ca: any) => ((ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())) && (ca.name || '').toLowerCase() !== productForm.cat.toLowerCase()).length > 0 && (
-                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 120, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
-                        {categories.filter((ca: any) => ((ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())) && (ca.name || '').toLowerCase() !== productForm.cat.toLowerCase()).map((ca: any) => (
-                          <div key={ca.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, cat: ca.name })}>
-                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <i className="fas fa-folder" style={{ color: '#D97706', fontSize: 11 }}></i>
+                {/* Category + Expiry Date */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('categories')}</label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-folder" style={{ fontSize: 13 }}></i></div>
+                      <input value={productForm.cat} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, cat: val }); }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.cat ? '#FFFBEB' : T.gray50, borderColor: productForm.cat ? '#D97706' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
+                      {productForm.cat && categories.filter((ca: any) => ((ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())) && (ca.name || '').toLowerCase() !== productForm.cat.toLowerCase()).length > 0 && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 120, overflow: 'auto', zIndex: 20, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
+                          {categories.filter((ca: any) => ((ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())) && (ca.name || '').toLowerCase() !== productForm.cat.toLowerCase()).map((ca: any) => (
+                            <div key={ca.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, cat: ca.name })}>
+                              <div style={{ width: 28, height: 28, borderRadius: 6, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <i className="fas fa-folder" style={{ color: '#D97706', fontSize: 11 }}></i>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontWeight: 600, color: '#B45309' }}>{ca.id}</div>
+                                <div style={{ fontSize: 11, color: T.gray500 }}>{ca.name}</div>
+                              </div>
                             </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontWeight: 600, color: '#B45309' }}>{ca.id}</div>
-                              <div style={{ fontSize: 11, color: T.gray500 }}>{ca.name}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('expiryDate')}</label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-calendar-alt" style={{ fontSize: 13 }}></i></div>
+                      <input value={productForm.expiryDate || ''} onChange={e => setProductForm({ ...productForm, expiryDate: e.target.value })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.expiryDate ? '#FFF1F2' : T.gray50, borderColor: productForm.expiryDate ? '#E11D48' : T.gray200, height: 40 }} placeholder="DD-MM-YYYY" />
+                    </div>
                   </div>
                 </div>
                 {/* Product Name + Barcode */}
@@ -9932,7 +9941,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 })()}
                 {/* Buttons */}
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0 })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
+                  <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
                   <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-plus" style={{marginRight: 6}}></i> {t('add')}</button>
                 </div>
               </div>
@@ -9978,6 +9987,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ fontWeight: 600, fontSize: 13, color: T.gray800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
                           <div style={{ fontSize: 11, color: T.gray400 }}>{item.company || '-'} {item.cat ? `| ${item.cat}` : ''}</div>
+                          {item.expiryDate && <div style={{ fontSize: 10, color: '#E11D48' }}>{item.expiryDate}</div>}
                         </div>
                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
                           <div style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol} {item.sellPrice}</div>

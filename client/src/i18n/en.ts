@@ -98,6 +98,7 @@ export const en: Record<string, string> = {
   enterProductName: 'Enter product name',
   enterProductCode: 'Enter product code',
   selectCategory: 'Select Category',
+  expiryDate: 'Expiry Date',
   selectSupplier: 'Select Supplier',
   fillProductDetails: 'Fill in product details',
   salesPriceWithVat: 'Sales Price with VAT',

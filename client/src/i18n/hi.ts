@@ -98,6 +98,7 @@ export const hi: Record<string, string> = {
   enterProductName: 'उत्पाद का नाम दर्ज करें',
   enterProductCode: 'उत्पाद कोड दर्ज करें',
   selectCategory: 'श्रेणी चुनें',
+  expiryDate: 'समाप्ति तिथि',
   selectSupplier: 'आपूर्तिकर्ता चुनें',
   fillProductDetails: 'उत्पाद विवरण भरें',
   salesPriceWithVat: 'वैट सहित बिक्री मूल्य',

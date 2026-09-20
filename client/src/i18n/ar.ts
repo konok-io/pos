@@ -98,6 +98,7 @@ export const ar: Record<string, string> = {
   enterProductName: 'أدخل اسم المنتج',
   enterProductCode: 'أدخل كود المنتج',
   selectCategory: 'اختر الفئة',
+  expiryDate: 'تاريخ انتهاء الصلاحية',
   selectSupplier: 'اختر المورد',
   fillProductDetails: 'املأ تفاصيل المنتج',
   salesPriceWithVat: 'سعر البيع شامل الضريبة',
