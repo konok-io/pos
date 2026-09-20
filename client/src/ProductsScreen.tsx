@@ -5705,7 +5705,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                const totalPurchase = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === company.toLowerCase()).reduce((s: number, p: any) => s + (p.items || []).reduce((ss: number, i: any) => ss + (i.stock || 0) * (i.costPrice || 0), 0), 0);
+                const totalPurchase = supplierProducts.reduce((s: number, p: any) => s + (p.stock || 0) * (p.costPrice || 0), 0);
 
 
 
