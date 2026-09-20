@@ -4904,22 +4904,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   <div style={{ position: 'relative' }}>
                     <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-folder" style={{ fontSize: 13 }}></i></div>
                     <input value={productForm.cat} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, cat: val }); }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.cat ? '#FFFBEB' : T.gray50, borderColor: productForm.cat ? '#D97706' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
-                    {productForm.cat && allCategories.filter(c => c.toLowerCase().includes(productForm.cat.toLowerCase()) && c.toLowerCase() !== productForm.cat.toLowerCase()).length > 0 && (
+                    {productForm.cat && categories.filter((ca: any) => (ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())).length > 0 && (
                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 120, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
-                        {allCategories.filter(c => c.toLowerCase().includes(productForm.cat.toLowerCase()) && c.toLowerCase() !== productForm.cat.toLowerCase()).map(c => {
-                          const catObj = categories.find((ca: any) => ca.name === c);
-                          return (
-                            <div key={c} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, cat: c })}>
-                              <div style={{ width: 28, height: 28, borderRadius: 6, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <i className="fas fa-folder" style={{ color: '#D97706', fontSize: 11 }}></i>
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontWeight: 600, color: '#B45309' }}>{catObj?.id || '-'}</div>
-                                <div style={{ fontSize: 11, color: T.gray500 }}>{c}</div>
-                              </div>
+                        {categories.filter((ca: any) => (ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())).map((ca: any) => (
+                          <div key={ca.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, cat: ca.name })}>
+                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <i className="fas fa-folder" style={{ color: '#D97706', fontSize: 11 }}></i>
                             </div>
-                          );
-                        })}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontWeight: 600, color: '#B45309' }}>{ca.id}</div>
+                              <div style={{ fontSize: 11, color: T.gray500 }}>{ca.name}</div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
