@@ -97,6 +97,7 @@ export const ar: Record<string, string> = {
   enterProductCode: 'أدخل كود المنتج',
   selectCategory: 'اختر الفئة',
   selectSupplier: 'اختر المورد',
+  fillProductDetails: 'املأ تفاصيل المنتج',
   selectProduct: 'اختر المنتج',
   unit: 'الوحدة',
   save: 'حفظ',

@@ -98,6 +98,7 @@ export const bn: Record<string, string> = {
   enterProductCode: 'পণ্যের কোড লিখুন',
   selectCategory: 'ক্যাটাগরি নির্বাচন',
   selectSupplier: 'সরবরাহকারী নির্বাচন',
+  fillProductDetails: 'প্রোডাক্টের বিবরণ পূরণ করুন',
   selectProduct: 'পণ্য নির্বাচন',
   unit: 'ইউনিট',
   save: 'সেভ করুন',

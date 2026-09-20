@@ -97,6 +97,7 @@ export const en: Record<string, string> = {
   enterProductCode: 'Enter product code',
   selectCategory: 'Select Category',
   selectSupplier: 'Select Supplier',
+  fillProductDetails: 'Fill in product details',
   unit: 'Unit',
   save: 'Save',
   selectProduct: 'Select Product',

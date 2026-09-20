@@ -97,6 +97,7 @@ export const hi: Record<string, string> = {
   enterProductCode: 'उत्पाद कोड दर्ज करें',
   selectCategory: 'श्रेणी चुनें',
   selectSupplier: 'आपूर्तिकर्ता चुनें',
+  fillProductDetails: 'उत्पाद विवरण भरें',
   selectProduct: 'उत्पाद चुनें',
   unit: 'इकाई',
   save: 'सेव करें',
