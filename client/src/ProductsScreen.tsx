@@ -437,8 +437,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
             <thead><tr style={{ background: T.tealLight }}>
-              {[t('id'), t('name'), t('phone'), t('email'), t('products'), t('stock'), t('purchases'), t('totalPurchase'), t('actions')].map((h, i) => (
-                <th key={i} style={{ padding: '10px 12px', textAlign: i >= 2 && i <= 5 ? 'center' : i === 6 ? 'center' : i === 7 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+              {[t('id'), t('name'), t('products'), t('stock'), t('purchases'), t('totalPurchase'), t('actions')].map((h, i) => (
+                <th key={i} style={{ padding: '10px 12px', textAlign: i === 1 ? 'left' : i >= 2 && i <= 4 ? 'center' : i === 5 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
@@ -453,9 +453,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 return (
                   <tr key={company} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
                     <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{supplier?.id || '-'}</td>
-                    <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, cursor: 'pointer' }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}>{company}<div style={{ fontSize: 12, color: T.gray400 }}>{supplier?.crNumber || '-'}</div></td>
-                    <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600, textAlign: 'center' }}>{supplier?.phone || '-'}</td>
-                    <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600, textAlign: 'center' }}>{supplier?.email || '-'}</td>
+                    <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, cursor: 'pointer', minWidth: 180 }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}>{company}<div style={{ fontSize: 12, color: T.gray400 }}>{supplier?.crNumber || '-'}</div></td>
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{prodCount}</span></td>
                     <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{totalStock}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14 }}>{purchaseCount}</td>
