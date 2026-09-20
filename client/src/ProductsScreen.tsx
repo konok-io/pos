@@ -9805,7 +9805,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   </div>
                 </div>
                 {/* Product Name + Barcode */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 150px', gap: 10, marginBottom: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('productName')} *</label>
                     <div style={{ position: 'relative' }}>
