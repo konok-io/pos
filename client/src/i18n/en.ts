@@ -111,6 +111,7 @@ export const en: Record<string, string> = {
   productsAdded: 'products added',
   csvUpload: 'CSV Upload',
   demoCsv: 'Demo CSV',
+  supplierNotFound: 'Supplier not found! Add supplier first.',
   supplierRequired: 'Enter supplier name',
   productNameRequired: 'Enter product name',
   addAtLeastOne: 'Add at least one product',

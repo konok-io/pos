@@ -112,6 +112,7 @@ export const ar: Record<string, string> = {
   productsAdded: 'منتجات مضافة',
   csvUpload: 'رفع CSV',
   demoCsv: 'CSV تجريبي',
+  supplierNotFound: 'المورد غير موجود! أضف المورد أولاً.',
   supplierRequired: 'أدخل اسم المورد',
   productNameRequired: 'أدخل اسم المنتج',
   addAtLeastOne: 'أضف منتج واحد على الأقل',

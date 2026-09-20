@@ -112,6 +112,7 @@ export const hi: Record<string, string> = {
   productsAdded: 'उत्पाद जोड़े गए',
   csvUpload: 'CSV अपलोड',
   demoCsv: 'डेमो CSV',
+  supplierNotFound: 'सप्लायर नहीं मिला! पहले सप्लायर जोड़ें।',
   supplierRequired: 'आपूर्तिकर्ता का नाम दर्ज करें',
   productNameRequired: 'उत्पाद का नाम दर्ज करें',
   addAtLeastOne: 'कम से कम एक उत्पाद जोड़ें',

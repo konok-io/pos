@@ -113,6 +113,7 @@ export const bn: Record<string, string> = {
   productsAdded: 'টি পণ্য যোগ হয়েছে',
   csvUpload: 'CSV আপলোড',
   demoCsv: 'ডেমো CSV',
+  supplierNotFound: 'সাপ্লাইয়ার পাওয়া যায়নি! প্রথমে সাপ্লাইয়ার যোগ করুন।',
   supplierRequired: 'সরবরাহকারীর নাম দিন',
   productNameRequired: 'পণ্যের নাম দিন',
   addAtLeastOne: 'কমপক্ষে একটি পণ্য যোগ করুন',
