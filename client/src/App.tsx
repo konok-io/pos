@@ -1760,6 +1760,21 @@ export default function App() {
                     )}
                   </div>
 
+                  {/* Add Customer + Button */}
+                  <button
+                    onClick={() => setIsAddCustomerModalOpen(true)}
+                    title={t('addCustomer')}
+                    style={{
+                      width: 34, height: 34, borderRadius: 8,
+                      border: '1px solid #D1D5DB', background: '#FFFFFF',
+                      cursor: 'pointer', display: 'flex', alignItems: 'center',
+                      justifyContent: 'center', fontSize: 16, color: '#115E59',
+                      transition: 'all 0.2s', flexShrink: 0,
+                    }}
+                  >
+                    <i className="fas fa-plus"></i>
+                  </button>
+
                   {/* Supplier - Enhanced Select */}
                   <div style={{ 
                     flex: '1 1 140px', 
