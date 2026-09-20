@@ -224,10 +224,10 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   };
 
   const exportCategoriesCsv = () => {
-    const headers = ['Name', 'Products', 'TotalValue'];
+    const headers = ['Name', 'Products', 'Stock', 'TotalValue'];
     const rows = filteredCategories.map((c: string) => {
       const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === c.toLowerCase());
-      return [c, catProducts.length, catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0)].join(',');
+      return [c, catProducts.length, catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0), catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0)].join(',');
     });
     const csv = [headers.join(','), ...rows].join('\n');
     downloadCsv(csv, 'categories.csv');
@@ -282,10 +282,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const printCategoryList = () => {
     const rows = filteredCategories.map((c: string) => {
       const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === c.toLowerCase());
+      const totalStock = catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
       const totalV = catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0);
-      return `<tr><td>${c}</td><td>${catProducts.length}</td><td>${fmt(totalV)}</td></tr>`;
+      return `<tr><td>${c}</td><td>${catProducts.length}</td><td>${totalStock}</td><td>${fmt(totalV)}</td></tr>`;
     }).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('categories')}</h1><p>${new Date().toLocaleDateString()} | ${filteredCategories.length} ${t('categories')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('products')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('categories')}</h1><p>${new Date().toLocaleDateString()} | ${filteredCategories.length} ${t('categories')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('products')}</th><th>${t('stock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
     const win = window.open('', '_blank', 'width=1000,height=600');
     if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 250); }
   };
@@ -506,8 +507,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
             <thead><tr style={{ background: T.tealLight }}>
-              {[t('id'), t('categoryName'), t('products'), t('totalValue'), t('actions')].map((h, i) => (
-                <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 ? 'center' : i === 3 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+              {[t('id'), t('categoryName'), t('products'), t('stock'), t('totalValue'), t('actions')].map((h, i) => (
+                <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 ? 'center' : i === 3 ? 'center' : i === 4 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
@@ -515,12 +516,14 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 const catObj = categories.find((c: any) => c.name === cat);
                 const catId = catObj?.id || '-';
                 const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === cat.toLowerCase());
+                const totalStock = catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
                 const totalValue = catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0);
                 return (
                   <tr key={cat} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
                     <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{catId}</td>
                     <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, color: T.teal, cursor: 'pointer' }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-folder" style={{marginRight: 4}}></i> {cat}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catProducts.length}</span></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{totalStock}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{fmt(totalValue)}</td>
                     <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
                       <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => { setEditingCategory(catObj); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
