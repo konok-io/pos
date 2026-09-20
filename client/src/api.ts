@@ -16,6 +16,10 @@ export function clearToken() {
   localStorage.removeItem('pos_api_token');
 }
 
+function mapProduct(p: any) {
+  return { ...p, costPrice: p.cost_price ?? p.costPrice ?? 0, sellPrice: p.sell_price ?? p.sellPrice ?? 0, minStock: p.min_stock ?? p.minStock ?? 5, categoryId: p.category_id ?? p.categoryId ?? '', expiryDate: p.expiry_date ?? p.expiryDate ?? '', purchaseId: p.purchase_id ?? p.purchaseId ?? '' };
+}
+
 async function request(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -40,7 +44,7 @@ export const api = {
     request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
 
   // Products
-  getProducts: () => request('/products'),
+  getProducts: () => request('/products').then((d: any) => Array.isArray(d) ? d.map(mapProduct) : d),
   addProduct: (p: any) => request('/products', { method: 'POST', body: JSON.stringify(p) }),
   updateProduct: (id: string, p: any) => request(`/products/${id}`, { method: 'PUT', body: JSON.stringify(p) }),
   deleteProduct: (id: string) => request(`/products/${id}`, { method: 'DELETE' }),
