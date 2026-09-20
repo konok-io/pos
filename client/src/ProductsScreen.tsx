@@ -508,7 +508,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
             <thead><tr style={{ background: T.tealLight }}>
               {[t('id'), t('categoryName'), t('products'), t('stock'), t('totalValue'), t('actions')].map((h, i) => (
-                <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 ? 'center' : i === 3 ? 'center' : i === 4 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+                <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 ? 'center' : i === 3 ? 'center' : i === 4 ? 'right' : i === 5 ? 'center' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
