@@ -872,8 +872,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 </div>
               </div>
             </div>
-            {/* RIGHT: Product Form + Product List */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            {/* RIGHT: Product Form + Product List (fixed like sales cart) */}
+            <div style={{ width: 380, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: `1px solid ${T.gray200}`, flexShrink: 0 }}>
               {/* Product Form */}
               <div style={{ borderBottom: `2px solid ${T.gray200}`, background: '#FAFBFC' }}>
                 <div style={{ padding: '10px 16px', background: T.tealLight, borderBottom: `1px solid ${T.gray200}` }}>
