@@ -1334,20 +1334,27 @@ export default function App() {
 
   const fetchProductImage = async (productName: string, cat: string): Promise<string | null> => {
     const cleanName = (productName || '').replace(/[0-9]/g, '').trim();
-    const searchTerms = [cleanName, cat].filter(Boolean);
-    for (const term of searchTerms) {
+    const searchQueries = [cleanName, cat].filter(Boolean);
+    for (const query of searchQueries) {
       try {
-        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(term)}`);
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json&origin=*`);
         if (res.ok) {
           const data = await res.json();
-          if (data.thumbnail && data.thumbnail.source) return data.thumbnail.source;
-          if (data.originalimage && data.originalimage.source) return data.originalimage.source;
+          const title = data?.query?.search?.[0]?.title;
+          if (title) {
+            const imgRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+            if (imgRes.ok) {
+              const imgData = await imgRes.json();
+              if (imgData.thumbnail && imgData.thumbnail.source) return imgData.thumbnail.source;
+              if (imgData.originalimage && imgData.originalimage.source) return imgData.originalimage.source;
+            }
+          }
         }
       } catch {}
     }
-    const keywords = [cleanName, cat, 'product'].filter(Boolean).join(',');
+    const flickrKeywords = [cleanName, cat].filter(Boolean).join(',');
     try {
-      const res = await fetch(`https://loremflickr.com/400/400/${encodeURIComponent(keywords)}`, { redirect: 'follow' });
+      const res = await fetch(`https://loremflickr.com/400/400/${encodeURIComponent(flickrKeywords)}`, { redirect: 'follow' });
       if (res.ok && res.url) return res.url;
     } catch {}
     return null;
