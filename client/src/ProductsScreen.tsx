@@ -741,11 +741,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         {productTab === 'stock' && (
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginLeft: 'auto' }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 11, color: T.gray400, lineHeight: 1 }}>{t('totalProducts')}</div><div style={{ fontSize: 13, fontWeight: 700, color: T.teal, lineHeight: 1.2 }}>{products.length}</div></div>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 11, color: T.gray400, lineHeight: 1 }}>{t('stockAvailable')}</div><div style={{ fontSize: 13, fontWeight: 700, color: T.green, lineHeight: 1.2 }}>{stockCount}</div></div>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 11, color: T.gray400, lineHeight: 1 }}>{t('stockOut')}</div><div style={{ fontSize: 13, fontWeight: 700, color: T.red, lineHeight: 1.2 }}>{outOfStockCount}</div></div>
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 11, color: T.gray400, lineHeight: 1 }}>{t('stockLow')}</div><div style={{ fontSize: 13, fontWeight: 700, color: T.amber, lineHeight: 1.2 }}>{lowStockCount}</div></div>
-              <div style={{ borderLeft: `1px solid ${T.gray300}`, paddingLeft: 8 }}><div style={{ fontSize: 11, color: T.gray400, lineHeight: 1 }}>{t('totalValue')}</div><div style={{ fontSize: 13, fontWeight: 700, color: T.teal, lineHeight: 1.2 }}>{fmt(totalStockValue)}</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('totalProducts')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.teal, lineHeight: 1.2 }}>{products.length}</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('stockAvailable')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.green, lineHeight: 1.2 }}>{stockCount}</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('stockOut')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.red, lineHeight: 1.2 }}>{outOfStockCount}</div></div>
+              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('stockLow')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.amber, lineHeight: 1.2 }}>{lowStockCount}</div></div>
+              <div style={{ borderLeft: `1px solid ${T.gray300}`, paddingLeft: 8 }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('totalValue')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.teal, lineHeight: 1.2 }}>{fmt(totalStockValue)}</div></div>
             </div>
             <div style={{ position: 'relative' }}>
               <button style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}>⋯ {t('more')}</button>
