@@ -4,7 +4,19 @@ import { useState, useEffect } from 'react';
 
 
 
+
+
+
+
+
+
 import { useLanguage } from './i18n';
+
+
+
+
+
+
 
 
 
@@ -22,7 +34,25 @@ import { api, setToken } from './api';
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 const T = {
+
+
+
+
+
+
 
 
 
@@ -34,7 +64,19 @@ const T = {
 
 
 
+
+
+
+
+
+
   orange: '#EA580C', green: '#16A34A', greenLight: '#F0FDF4',
+
+
+
+
+
+
 
 
 
@@ -46,7 +88,19 @@ const T = {
 
 
 
+
+
+
+
+
+
   gray50: '#F9FAFB', gray100: '#F3F4F6', gray200: '#E5E7EB', gray300: '#D1D5DB',
+
+
+
+
+
+
 
 
 
@@ -58,13 +112,37 @@ const T = {
 
 
 
+
+
+
+
+
+
   white: '#FFFFFF',
 
 
 
 
 
+
+
+
+
+
+
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -82,7 +160,19 @@ const btn = (type: string = 'default', size: string = 'md') => {
 
 
 
+
+
+
+
+
+
   const bgMap: Record<string, string> = { primary: T.teal, success: T.green, danger: T.red, ghost: 'transparent', default: T.gray100 };
+
+
+
+
+
+
 
 
 
@@ -94,7 +184,19 @@ const btn = (type: string = 'default', size: string = 'md') => {
 
 
 
+
+
+
+
+
+
   const padding = size === 'sm' ? '5px 10px' : '8px 14px';
+
+
+
+
+
+
 
 
 
@@ -106,13 +208,37 @@ const btn = (type: string = 'default', size: string = 'md') => {
 
 
 
+
+
+
+
+
+
   return { padding, fontSize, background: bgMap[type] || bgMap.default, color: colorMap[type] || colorMap.default, border: type === 'ghost' ? `1px solid ${T.gray200}` : 'none', borderRadius: 7, cursor: 'pointer' as const, fontWeight: 600, display: 'inline-flex', alignItems: 'center', transition: 'all 0.15s' };
 
 
 
 
 
+
+
+
+
+
+
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -130,7 +256,25 @@ const inputStyle: React.CSSProperties = { padding: '9px 12px', border: `1px soli
 
 
 
+
+
+
+
+
+
 const labelStyle: React.CSSProperties = { fontSize: 14, fontWeight: 700, color: T.gray600, marginBottom: 6, display: 'block' };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -148,7 +292,19 @@ const genId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
 
 
 
+
+
+
+
+
+
 const genUniqueId = () => {
+
+
+
+
+
+
 
 
 
@@ -160,7 +316,19 @@ const genUniqueId = () => {
 
 
 
+
+
+
+
+
+
   const y = now.getFullYear();
+
+
+
+
+
+
 
 
 
@@ -172,7 +340,19 @@ const genUniqueId = () => {
 
 
 
+
+
+
+
+
+
   const d = String(now.getDate()).padStart(2, '0');
+
+
+
+
+
+
 
 
 
@@ -184,13 +364,31 @@ const genUniqueId = () => {
 
 
 
+
+
+
+
+
+
   return `${y}${m}${d}${unique}`;
 
 
 
 
 
+
+
+
+
+
+
 };
+
+
+
+
+
+
 
 
 
@@ -208,7 +406,25 @@ const fmtN = (n: number) => (+n || 0).toLocaleString('en-IN');
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 interface ProductsScreenProps {
+
+
+
+
+
+
 
 
 
@@ -220,7 +436,19 @@ interface ProductsScreenProps {
 
 
 
+
+
+
+
+
+
   suppliers: any[];
+
+
+
+
+
+
 
 
 
@@ -232,7 +460,19 @@ interface ProductsScreenProps {
 
 
 
+
+
+
+
+
+
   purchases: any[];
+
+
+
+
+
+
 
 
 
@@ -244,7 +484,19 @@ interface ProductsScreenProps {
 
 
 
+
+
+
+
+
+
   setProducts: React.Dispatch<React.SetStateAction<any[]>>;
+
+
+
+
+
+
 
 
 
@@ -256,7 +508,19 @@ interface ProductsScreenProps {
 
 
 
+
+
+
+
+
+
   setCategories: React.Dispatch<React.SetStateAction<any[]>>;
+
+
+
+
+
+
 
 
 
@@ -268,7 +532,19 @@ interface ProductsScreenProps {
 
 
 
+
+
+
+
+
+
   currentUser?: any;
+
+
+
+
+
+
 
 
 
@@ -286,7 +562,25 @@ interface ProductsScreenProps {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 export default function ProductsScreen({ products: _initProducts, suppliers: _initSuppliers, categories: _initCategories, purchases, productHistory: _productHistory, setProducts: setProductsParent, setSuppliers: setSuppliersParent, setCategories: setCategoriesParent, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
+
+
+
+
+
+
 
 
 
@@ -298,7 +592,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const fmt = (n: number) => `${_settings?.currencySymbol || '৳'} ${(+n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+
+
+
+
+
 
 
 
@@ -310,7 +616,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [suppliers, setSuppliers] = useState<any[]>([]);
+
+
+
+
+
+
 
 
 
@@ -322,7 +640,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [productTab, setProductTab] = useState('allProducts');
+
+
+
+
+
+
 
 
 
@@ -334,7 +664,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [editProduct, setEditProduct] = useState<any>(null);
+
+
+
+
+
+
 
 
 
@@ -346,7 +688,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [viewPurchase, setViewPurchase] = useState<any>(null);
+
+
+
+
+
+
 
 
 
@@ -358,7 +712,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showPriceHistory, setShowPriceHistory] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -370,7 +736,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showImportModal, setShowImportModal] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -382,7 +760,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showSupplierModal, setShowSupplierModal] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -394,7 +784,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [supplierForm, setSupplierForm] = useState({ id: '', name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' });
+
+
+
+
+
+
 
 
 
@@ -406,7 +808,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -418,7 +832,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [categoryForm, setCategoryForm] = useState({ id: '', name: '' });
+
+
+
+
+
+
 
 
 
@@ -430,7 +856,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [stockSearch, setStockSearch] = useState('');
+
+
+
+
+
+
 
 
 
@@ -442,7 +880,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [stockAdjustQty, setStockAdjustQty] = useState('');
+
+
+
+
+
+
 
 
 
@@ -454,7 +904,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [stockAdjustReason, setStockAdjustReason] = useState('');
+
+
+
+
+
+
 
 
 
@@ -466,7 +928,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showSupplierMoreMenu, setShowSupplierMoreMenu] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -478,7 +952,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showStockMoreMenu, setShowStockMoreMenu] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -490,7 +976,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showPurchaseBarcodeModal, setShowPurchaseBarcodeModal] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -502,7 +1000,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showCustomBarcodeModal, setShowCustomBarcodeModal] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -514,7 +1024,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [customBarcodeSearch, setCustomBarcodeSearch] = useState('');
+
+
+
+
+
+
 
 
 
@@ -526,13 +1048,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [tempProducts, setTempProducts] = useState<any[]>([]);
 
 
 
 
 
-  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' });
+
+
+
+
+
+
+  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0 });
+
+
+
+
+
+
 
 
 
@@ -544,7 +1084,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [viewSupplier, setViewSupplier] = useState<any>(null);
+
+
+
+
+
+
 
 
 
@@ -556,7 +1108,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [showStockHistoryModal, setShowStockHistoryModal] = useState(false);
+
+
+
+
+
+
 
 
 
@@ -568,13 +1132,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
 
 
 
 
+
+
+
+
+
+
   const [stockHistory, setStockHistory] = useState<any[]>([]);
+
+
+
+
+
+
 
 
 
@@ -592,7 +1174,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   // Load ALL data from MySQL on mount - always override local data
+
+
+
+
+
+
 
 
 
@@ -604,7 +1204,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const loadData = async () => {
+
+
+
+
+
+
 
 
 
@@ -616,7 +1228,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         const token = localStorage.getItem('pos_api_token');
+
+
+
+
+
+
 
 
 
@@ -628,7 +1252,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           const res = await api.login('admin@pos.test', 'admin123');
+
+
+
+
+
+
 
 
 
@@ -640,7 +1276,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         }
+
+
+
+
+
+
 
 
 
@@ -652,7 +1300,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         setProducts(prods);
+
+
+
+
+
+
 
 
 
@@ -664,7 +1324,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         setSuppliers(sups);
+
+
+
+
+
+
 
 
 
@@ -676,7 +1348,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         setProductsParent(prods);
+
+
+
+
+
+
 
 
 
@@ -688,7 +1372,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         setSuppliersParent(sups);
+
+
+
+
+
+
 
 
 
@@ -700,7 +1396,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     };
+
+
+
+
+
+
 
 
 
@@ -712,7 +1420,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   }, []);
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -736,7 +1462,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   const stockCount = products.filter((p: any) => p.stock > 0).length;
+
+
+
+
+
+
 
 
 
@@ -748,7 +1492,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const lowStockCount = products.filter((p: any) => p.stock > 0 && p.stock <= ((p as any).minStock || 5)).length;
+
+
+
+
+
+
 
 
 
@@ -766,7 +1522,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   const filteredProducts = products.filter((p: any) => {
+
+
+
+
+
+
 
 
 
@@ -778,7 +1552,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   }).sort((a: any, b: any) => {
+
+
+
+
+
+
 
 
 
@@ -790,7 +1576,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (sortBy === 'name') cmp = a.name.localeCompare(b.name);
+
+
+
+
+
+
 
 
 
@@ -802,7 +1600,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     else if (sortBy === 'stock') cmp = a.stock - b.stock;
+
+
+
+
+
+
 
 
 
@@ -814,7 +1624,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     return sortDir === 'asc' ? cmp : -cmp;
+
+
+
+
+
+
 
 
 
@@ -832,7 +1654,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   const allCompanies = [...new Set([...suppliers.map((s: any) => s.name).filter(Boolean), ...products.map((p: any) => p.company).filter(Boolean)])].sort();
+
+
+
+
+
+
 
 
 
@@ -844,7 +1684,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const allCategories = [...new Set([...categories.map((c: any) => c.name).filter(Boolean), ...products.map((p: any) => p.cat).filter(Boolean)])].sort();
+
+
+
+
+
+
 
 
 
@@ -856,7 +1708,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   const barcodeProducts = products.filter((p: any) => !barcodeSearch || (p.code || '').toLowerCase().includes(barcodeSearch.toLowerCase()) || (p.name || '').toLowerCase().includes(barcodeSearch.toLowerCase()));
+
+
+
+
+
+
 
 
 
@@ -868,7 +1732,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (stockFilter === 'out') return p.stock <= 0;
+
+
+
+
+
+
 
 
 
@@ -880,13 +1756,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (stockFilter === 'available') return p.stock > (p.minStock || 5);
 
 
 
 
 
+
+
+
+
+
+
     return true;
+
+
+
+
+
+
 
 
 
@@ -904,7 +1798,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   const handleEditProduct = () => {
+
+
+
+
+
+
 
 
 
@@ -916,7 +1828,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const updated = products.map((p: any) => p.id === editProduct.id ? { ...p, costPrice: editProduct.costPrice, sellPrice: editProduct.sellPrice } : p);
+
+
+
+
+
+
 
 
 
@@ -928,7 +1852,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setProductsParent(updated);
+
+
+
+
+
+
 
 
 
@@ -940,13 +1876,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setEditProduct(null);
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -964,7 +1924,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
+
+
+
+
+
+
 
 
 
@@ -976,7 +1948,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const updated = [...products, newProduct];
+
+
+
+
+
+
 
 
 
@@ -988,7 +1972,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setProductsParent(updated);
+
+
+
+
+
+
 
 
 
@@ -1000,19 +1996,49 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setShowAddProductModal(false);
 
 
 
 
 
-    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' });
+
+
+
+
+
+
+    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0 });
+
+
+
+
+
+
 
 
 
 
 
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1030,7 +2056,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
+
+
+
+
+
+
 
 
 
@@ -1042,19 +2080,49 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setTempProducts(prev => [...prev, tempProduct]);
 
 
 
 
 
-    setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId });
+
+
+
+
+
+
+    setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId, vat: 0 });
+
+
+
+
+
+
 
 
 
 
 
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1072,13 +2140,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setTempProducts(prev => prev.filter(p => p.id !== id));
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1096,7 +2188,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (tempProducts.length === 0) { alert(t('addAtLeastOne')); return; }
+
+
+
+
+
+
 
 
 
@@ -1108,7 +2212,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const results = await Promise.allSettled(
+
+
+
+
+
+
 
 
 
@@ -1120,7 +2236,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         const product = { ...p, purchaseId };
+
+
+
+
+
+
 
 
 
@@ -1132,7 +2260,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         return api.addProduct(product);
+
+
+
+
+
+
 
 
 
@@ -1144,7 +2284,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     );
+
+
+
+
+
+
 
 
 
@@ -1156,7 +2308,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const failed = results.filter(r => r.status === 'rejected').length;
+
+
+
+
+
+
 
 
 
@@ -1168,7 +2332,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setProducts(prods);
+
+
+
+
+
+
 
 
 
@@ -1180,7 +2356,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setTempProducts([]);
+
+
+
+
+
+
 
 
 
@@ -1192,7 +2380,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1210,7 +2416,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (!editFullProduct) return;
+
+
+
+
+
+
 
 
 
@@ -1222,7 +2440,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setProducts(updated);
+
+
+
+
+
+
 
 
 
@@ -1234,7 +2464,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     api.updateProduct(editFullProduct.id, editFullProduct).catch(() => {});
+
+
+
+
+
+
 
 
 
@@ -1246,7 +2488,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1264,7 +2524,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const product = products.find((p: any) => p.id === id);
+
+
+
+
+
+
 
 
 
@@ -1276,7 +2548,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (!window.confirm(`"${product.name}" ${t('confirmDelete')}`)) return;
+
+
+
+
+
+
 
 
 
@@ -1288,7 +2572,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setProducts(updated);
+
+
+
+
+
+
 
 
 
@@ -1300,13 +2596,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     api.deleteProduct(id).catch(() => {});
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1324,7 +2644,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const supplierProducts = products.filter((p: any) => (p.company || '').toLowerCase() === name.toLowerCase());
+
+
+
+
+
+
 
 
 
@@ -1336,7 +2668,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
+
+
+
+
+
+
 
 
 
@@ -1348,7 +2692,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const updated = suppliers.filter((s: any) => s.name !== name);
+
+
+
+
+
+
 
 
 
@@ -1360,7 +2716,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setSuppliersParent(updated);
+
+
+
+
+
+
 
 
 
@@ -1372,7 +2740,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1390,7 +2776,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === name.toLowerCase());
+
+
+
+
+
+
 
 
 
@@ -1402,7 +2800,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
+
+
+
+
+
+
 
 
 
@@ -1414,7 +2824,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const updated = categories.filter((c: any) => c.name !== name);
+
+
+
+
+
+
 
 
 
@@ -1426,7 +2848,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setCategoriesParent(updated);
+
+
+
+
+
+
 
 
 
@@ -1438,7 +2872,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1456,7 +2908,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const headers = ['Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Stock', 'MinStock'];
+
+
+
+
+
+
 
 
 
@@ -1468,7 +2932,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const csv = [headers.join(','), ...rows].join('\n');
+
+
+
+
+
+
 
 
 
@@ -1480,7 +2956,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1498,7 +2992,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const headers = ['Name', 'Phone', 'Email', 'Address', 'CR Number', 'VAT Number'];
+
+
+
+
+
+
 
 
 
@@ -1510,7 +3016,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const csv = [headers.join(','), ...rows].join('\n');
+
+
+
+
+
+
 
 
 
@@ -1522,7 +3040,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1540,7 +3076,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const headers = ['Name', 'Products', 'Stock', 'TotalValue'];
+
+
+
+
+
+
 
 
 
@@ -1552,7 +3100,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === c.toLowerCase());
+
+
+
+
+
+
 
 
 
@@ -1564,7 +3124,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     });
+
+
+
+
+
+
 
 
 
@@ -1576,13 +3148,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     downloadCsv(csv, 'categories.csv');
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1600,7 +3196,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const headers = ['Name', 'Barcode', 'Company', 'Stock', 'MinStock', 'CostValue', 'Status'];
+
+
+
+
+
+
 
 
 
@@ -1612,7 +3220,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       const status = p.stock <= 0 ? 'Out' : p.stock <= (p.minStock || 5) ? 'Low' : 'Available';
+
+
+
+
+
+
 
 
 
@@ -1624,7 +3244,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     });
+
+
+
+
+
+
 
 
 
@@ -1636,13 +3268,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     downloadCsv(csv, 'stock.csv');
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1660,7 +3316,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const blob = new Blob([csv], { type: 'text/csv' });
+
+
+
+
+
+
 
 
 
@@ -1672,7 +3340,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const a = document.createElement('a');
+
+
+
+
+
+
 
 
 
@@ -1684,7 +3364,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     a.download = filename;
+
+
+
+
+
+
 
 
 
@@ -1696,13 +3388,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     URL.revokeObjectURL(url);
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1720,7 +3436,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const items = Array(6).fill(0).map(() => `<div class="barcode-item"><h4>${product.name}</h4><div class="code">${product.code || 'N/A'}</div><div class="price">${fmt(product.sellPrice)}</div></div>`).join('');
+
+
+
+
+
+
 
 
 
@@ -1732,7 +3460,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const win = window.open('', '_blank', 'width=800,height=600');
+
+
+
+
+
+
 
 
 
@@ -1744,7 +3484,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1762,7 +3520,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const list = filteredProducts.length > 0 ? filteredProducts : products;
+
+
+
+
+
+
 
 
 
@@ -1774,7 +3544,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:6px 5px;text-align:left;font-size:10px;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:6px 5px;font-size:11px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('productList')}</h1><p>${new Date().toLocaleDateString()} | ${list.length} ${t('products')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('company')}</th><th>${t('category')}</th><th>${t('purchasePrice')}</th><th>${t('sellPrice')}</th><th>${t('stock')}</th><th>${t('unit')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+
+
+
+
+
+
 
 
 
@@ -1786,13 +3568,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 250); }
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1810,7 +3616,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const rows = filteredSuppliers.map((c: string) => {
+
+
+
+
+
+
 
 
 
@@ -1822,7 +3640,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       const totalP = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === c.toLowerCase()).reduce((s: number, p: any) => s + (p.items || []).reduce((ss: number, i: any) => ss + (i.stock || 0) * (i.costPrice || 0), 0), 0);
+
+
+
+
+
+
 
 
 
@@ -1834,7 +3664,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     }).join('');
+
+
+
+
+
+
 
 
 
@@ -1846,7 +3688,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const win = window.open('', '_blank', 'width=1000,height=600');
+
+
+
+
+
+
 
 
 
@@ -1858,7 +3712,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1876,7 +3748,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const rows = filteredCategories.map((c: string) => {
+
+
+
+
+
+
 
 
 
@@ -1888,7 +3772,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       const totalStock = catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
+
+
+
+
+
+
 
 
 
@@ -1900,7 +3796,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       return `<tr><td>${c}</td><td>${catProducts.length}</td><td>${totalStock}</td><td>${fmt(totalV)}</td></tr>`;
+
+
+
+
+
+
 
 
 
@@ -1912,7 +3820,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('categories')}</h1><p>${new Date().toLocaleDateString()} | ${filteredCategories.length} ${t('categories')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('products')}</th><th>${t('stock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+
+
+
+
+
+
 
 
 
@@ -1924,13 +3844,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 250); }
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1948,7 +3892,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const rows = stockProducts.map((p: any) => `<tr><td>${p.name}</td><td>${p.company || '-'}</td><td>${p.stock}</td><td>${p.minStock || 5}</td><td>${fmt(p.stock * p.costPrice)}</td></tr>`).join('');
+
+
+
+
+
+
 
 
 
@@ -1960,7 +3916,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const win = window.open('', '_blank', 'width=1000,height=600');
+
+
+
+
+
+
 
 
 
@@ -1972,7 +3940,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1990,7 +3976,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (!purchaseBarcodeId.trim()) { alert(t('enterName')); return; }
+
+
+
+
+
+
 
 
 
@@ -2002,7 +4000,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (matchedProducts.length === 0) { alert(t('noProductsFound')); return; }
+
+
+
+
+
+
 
 
 
@@ -2014,7 +4024,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item h4{font-size:11px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
+
+
+
+
+
+
 
 
 
@@ -2026,7 +4048,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); }
+
+
+
+
+
+
 
 
 
@@ -2038,13 +4072,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setPurchaseBarcodeId('');
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2062,7 +4120,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (customBarcodeProducts.length === 0) { alert(t('noProductsFound')); return; }
+
+
+
+
+
+
 
 
 
@@ -2074,7 +4144,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item h4{font-size:11px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
+
+
+
+
+
+
 
 
 
@@ -2086,7 +4168,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); }
+
+
+
+
+
+
 
 
 
@@ -2098,13 +4192,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setCustomBarcodeProducts([]);
 
 
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2122,7 +4240,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const file = e.target.files?.[0];
+
+
+
+
+
+
 
 
 
@@ -2134,7 +4264,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const reader = new FileReader();
+
+
+
+
+
+
 
 
 
@@ -2146,7 +4288,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       const text = event.target?.result as string;
+
+
+
+
+
+
 
 
 
@@ -2158,7 +4312,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       if (lines.length < 2) { alert(t('csvMinRows')); return; }
+
+
+
+
+
+
 
 
 
@@ -2170,7 +4336,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       const items: any[] = [];
+
+
+
+
+
+
 
 
 
@@ -2182,7 +4360,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         const values = lines[i].split(',').map(v => v.trim());
+
+
+
+
+
+
 
 
 
@@ -2194,7 +4384,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
+
+
+
+
+
+
 
 
 
@@ -2206,7 +4408,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -2218,7 +4432,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       if (valid.length > 0) {
+
+
+
+
+
+
 
 
 
@@ -2230,7 +4456,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         setProducts(updated);
+
+
+
+
+
+
 
 
 
@@ -2242,7 +4480,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         valid.forEach((p: any) => api.addProduct(p).catch(() => {}));
+
+
+
+
+
+
 
 
 
@@ -2254,7 +4504,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       }
+
+
+
+
+
+
 
 
 
@@ -2266,7 +4528,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     reader.readAsText(file);
+
+
+
+
+
+
 
 
 
@@ -2278,7 +4552,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2296,7 +4588,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (!stockAdjustProduct || !stockAdjustQty) return;
+
+
+
+
+
+
 
 
 
@@ -2308,7 +4612,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     if (qty <= 0) return;
+
+
+
+
+
+
 
 
 
@@ -2320,7 +4636,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     const newStock = stockAdjustType === 'add' ? oldStock + qty : Math.max(0, oldStock - qty);
+
+
+
+
+
+
 
 
 
@@ -2332,7 +4660,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setProducts(updated);
+
+
+
+
+
+
 
 
 
@@ -2344,7 +4684,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     api.addStockHistory({
+
+
+
+
+
+
 
 
 
@@ -2356,7 +4708,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       productName: stockAdjustProduct.name,
+
+
+
+
+
+
 
 
 
@@ -2368,7 +4732,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       quantity: qty,
+
+
+
+
+
+
 
 
 
@@ -2380,7 +4756,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       newStock,
+
+
+
+
+
+
 
 
 
@@ -2392,7 +4780,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     }).then((res: any) => {
+
+
+
+
+
+
 
 
 
@@ -2404,7 +4804,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     }).catch(() => {});
+
+
+
+
+
+
 
 
 
@@ -2416,7 +4828,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     setStockAdjustProduct(null); setStockAdjustQty(''); setStockAdjustReason('');
+
+
+
+
+
+
 
 
 
@@ -2434,7 +4858,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   const renderAllProducts = () => (
+
+
+
+
+
+
 
 
 
@@ -2446,7 +4888,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+
+
+
+
+
+
 
 
 
@@ -2458,7 +4912,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+
+
+
+
+
+
 
 
 
@@ -2470,7 +4936,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -2482,13 +4960,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
 
 
 
 
 
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
 
 
 
@@ -2500,7 +4996,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
+
+
+
+
+
+
 
 
 
@@ -2512,7 +5020,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             {[t('productName'), t('company'), t('category'), t('purchasePrice'), t('sellPrice'), t('profit'), t('stock'), t('unit'), t('actions')].map((h, i) => (
+
+
+
+
+
+
 
 
 
@@ -2524,7 +5044,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             ))}
+
+
+
+
+
+
 
 
 
@@ -2536,7 +5068,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <tbody>
+
+
+
+
+
+
 
 
 
@@ -2548,7 +5092,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <tr><td colSpan={9} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noProductsYet')}</td></tr>
+
+
+
+
+
+
 
 
 
@@ -2560,7 +5116,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
+
+
+
+
+
+
 
 
 
@@ -2572,7 +5140,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               return (
+
+
+
+
+
+
 
 
 
@@ -2584,7 +5164,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px' }}><div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>{p.code && <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div>}</td>
+
+
+
+
+
+
 
 
 
@@ -2596,7 +5188,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{p.cat || '-'}</td>
+
+
+
+
+
+
 
 
 
@@ -2608,7 +5212,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', fontWeight: 700, fontSize: 14, textAlign: 'right' }}>{fmt(p.sellPrice)}</td>
+
+
+
+
+
+
 
 
 
@@ -2620,7 +5236,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ fontWeight: 700, fontSize: 15, color: p.stock <= 0 ? T.red : low ? T.amber : T.gray900 }}>{fmtN(p.stock)}</span>{low && <i className="fas fa-triangle-exclamation" style={{color:'#F59E0B',marginRight:4}}></i>}{p.stock <= 0 && ' <i className="fas fa-xmark"></i>'}</td>
+
+
+
+
+
+
 
 
 
@@ -2632,7 +5260,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+
+
+
+
+
+
 
 
 
@@ -2644,7 +5284,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setEditFullProduct({ ...p })}><i className="fas fa-pen"></i></button>
+
+
+
+
+
+
 
 
 
@@ -2656,7 +5308,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     {p.stock <= 0 ? <button style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button> : <button disabled style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: 0.4, cursor: 'not-allowed' }}><i className="fas fa-lock"></i></button>}
+
+
+
+
+
+
 
 
 
@@ -2668,7 +5332,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 </tr>
+
+
+
+
+
+
 
 
 
@@ -2680,7 +5356,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             })}
+
+
+
+
+
+
 
 
 
@@ -2692,7 +5380,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </table>
+
+
+
+
+
+
 
 
 
@@ -2704,13 +5404,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     </div>
 
 
 
 
 
+
+
+
+
+
+
   );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2728,7 +5452,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+
+
+
+
+
 
 
 
@@ -2740,7 +5476,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+
+
+
+
+
+
 
 
 
@@ -2752,13 +5500,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <input value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder={t('searchSupplier')} style={{ ...inputStyle, paddingLeft: 32 }} />
 
 
 
 
 
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -2770,13 +5536,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <button style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
 
 
 
 
 
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
 
 
 
@@ -2788,7 +5572,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         {filteredSuppliers.length === 0 ? (
+
+
+
+
+
+
 
 
 
@@ -2800,7 +5596,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         ) : (
+
+
+
+
+
+
 
 
 
@@ -2812,7 +5620,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <thead><tr style={{ background: T.tealLight }}>
+
+
+
+
+
+
 
 
 
@@ -2824,7 +5644,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 <th key={i} style={{ padding: '10px 12px', textAlign: i === 1 ? 'left' : i >= 2 && i <= 4 ? 'center' : i === 5 ? 'right' : i === 6 ? 'center' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+
+
+
+
+
+
 
 
 
@@ -2836,7 +5668,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </tr></thead>
+
+
+
+
+
+
 
 
 
@@ -2848,7 +5692,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {filteredSuppliers.map((company: string, i: number) => {
+
+
+
+
+
+
 
 
 
@@ -2860,7 +5716,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 const supplierProducts = products.filter((p: any) => (p.company || '').toLowerCase() === company.toLowerCase());
+
+
+
+
+
+
 
 
 
@@ -2872,7 +5740,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 const catCount = [...new Set(supplierProducts.map((p: any) => p.cat).filter(Boolean))].length;
+
+
+
+
+
+
 
 
 
@@ -2884,7 +5764,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 const totalPurchase = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === company.toLowerCase()).reduce((s: number, p: any) => s + (p.items || []).reduce((ss: number, i: any) => ss + (i.stock || 0) * (i.costPrice || 0), 0), 0);
+
+
+
+
+
+
 
 
 
@@ -2896,7 +5788,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 return (
+
+
+
+
+
+
 
 
 
@@ -2908,7 +5812,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{supplier?.id || '-'}</td>
+
+
+
+
+
+
 
 
 
@@ -2920,7 +5836,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{prodCount}</span></td>
+
+
+
+
+
+
 
 
 
@@ -2932,7 +5860,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{totalStock}</td>
+
+
+
+
+
+
 
 
 
@@ -2944,7 +5884,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+
+
+
+
+
+
 
 
 
@@ -2956,7 +5908,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewSupplier({ name: company, prodCount, totalPurchase })}><i className="fas fa-eye"></i></button>
+
+
+
+
+
+
 
 
 
@@ -2968,7 +5932,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     </td>
+
+
+
+
+
+
 
 
 
@@ -2980,7 +5956,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 );
+
+
+
+
+
+
 
 
 
@@ -2992,7 +5980,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </tbody>
+
+
+
+
+
+
 
 
 
@@ -3004,7 +6004,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         )}
+
+
+
+
+
+
 
 
 
@@ -3016,7 +6028,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       {showSupplierModal && (
+
+
+
+
+
+
 
 
 
@@ -3028,7 +6052,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 450, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+
+
+
+
+
+
 
 
 
@@ -3040,7 +6076,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('id')}</label><input value={supplierForm.id} readOnly style={{ ...inputStyle, background: T.gray50, fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }} /></div>
+
+
+
+
+
+
 
 
 
@@ -3052,7 +6100,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+
+
+
+
+
+
 
 
 
@@ -3064,13 +6124,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('email')}</label><input value={supplierForm.email} onChange={e => setSupplierForm({ ...supplierForm, email: e.target.value })} style={inputStyle} /></div>
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -3082,7 +6160,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+
+
+
+
+
+
 
 
 
@@ -3094,13 +6184,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>VAT {t('number')}</label><input value={supplierForm.vatNumber} onChange={e => setSupplierForm({ ...supplierForm, vatNumber: e.target.value })} style={inputStyle} /></div>
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -3112,7 +6220,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => setShowSupplierModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+
+
+
+
+
+
 
 
 
@@ -3124,7 +6244,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -3136,7 +6268,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -3148,13 +6292,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     </div>
 
 
 
 
 
+
+
+
+
+
+
   );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3172,7 +6340,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+
+
+
+
+
 
 
 
@@ -3184,7 +6364,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+
+
+
+
+
+
 
 
 
@@ -3196,13 +6388,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
 
 
 
 
 
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -3214,13 +6424,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <button style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
 
 
 
 
 
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
 
 
 
@@ -3232,7 +6460,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         {filteredCategories.length === 0 ? (
+
+
+
+
+
+
 
 
 
@@ -3244,7 +6484,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         ) : (
+
+
+
+
+
+
 
 
 
@@ -3256,7 +6508,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <thead><tr style={{ background: T.tealLight }}>
+
+
+
+
+
+
 
 
 
@@ -3268,7 +6532,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 ? 'center' : i === 3 ? 'center' : i === 4 ? 'right' : i === 5 ? 'center' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+
+
+
+
+
+
 
 
 
@@ -3280,7 +6556,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </tr></thead>
+
+
+
+
+
+
 
 
 
@@ -3292,7 +6580,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {filteredCategories.map((cat: string, i: number) => {
+
+
+
+
+
+
 
 
 
@@ -3304,7 +6604,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 const catId = catObj?.id || '-';
+
+
+
+
+
+
 
 
 
@@ -3316,7 +6628,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 const totalStock = catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
+
+
+
+
+
+
 
 
 
@@ -3328,7 +6652,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 return (
+
+
+
+
+
+
 
 
 
@@ -3340,7 +6676,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{catId}</td>
+
+
+
+
+
+
 
 
 
@@ -3352,7 +6700,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catProducts.length}</span></td>
+
+
+
+
+
+
 
 
 
@@ -3364,7 +6724,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{fmt(totalValue)}</td>
+
+
+
+
+
+
 
 
 
@@ -3376,7 +6748,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       <button disabled={catProducts.length > 0} style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13, opacity: catProducts.length > 0 ? 0.3 : 1, cursor: catProducts.length > 0 ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingCategory(catObj); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
+
+
+
+
+
+
 
 
 
@@ -3388,7 +6772,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       <button disabled={catProducts.length > 0} style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13, opacity: catProducts.length > 0 ? 0.3 : 1, cursor: catProducts.length > 0 ? 'not-allowed' : 'pointer' }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
+
+
+
+
+
+
 
 
 
@@ -3400,7 +6796,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   </tr>
+
+
+
+
+
+
 
 
 
@@ -3412,7 +6820,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               })}
+
+
+
+
+
+
 
 
 
@@ -3424,7 +6844,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           </table>
+
+
+
+
+
+
 
 
 
@@ -3436,7 +6868,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
 
 
 
@@ -3448,7 +6892,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => setShowCategoryModal(false)}>
+
+
+
+
+
+
 
 
 
@@ -3460,7 +6916,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {editingCategory ? t('edit') : t('addCategory')}</h3>
+
+
+
+
+
+
 
 
 
@@ -3472,7 +6940,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
+
+
+
+
+
+
 
 
 
@@ -3484,7 +6964,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => setShowCategoryModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+
+
+
+
+
+
 
 
 
@@ -3496,7 +6988,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -3508,7 +7012,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -3520,13 +7036,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     </div>
 
 
 
 
 
+
+
+
+
+
+
   );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3544,7 +7084,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+
+
+
+
+
 
 
 
@@ -3556,7 +7108,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+
+
+
+
+
+
 
 
 
@@ -3568,7 +7132,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <input value={barcodeSearch} onChange={e => setBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
+
+
+
+
+
+
 
 
 
@@ -3580,7 +7156,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <span style={{ fontSize: 14, color: T.gray400 }}>{barcodeProducts.length}</span>
+
+
+
+
+
+
 
 
 
@@ -3592,7 +7180,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
 
 
 
@@ -3604,7 +7204,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         {barcodeProducts.length === 0 ? (
+
+
+
+
+
+
 
 
 
@@ -3616,7 +7228,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         ) : (
+
+
+
+
+
+
 
 
 
@@ -3628,7 +7252,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <thead><tr style={{ background: T.tealLight }}>
+
+
+
+
+
+
 
 
 
@@ -3640,13 +7276,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 <th key={i} style={{ padding: '10px 12px', textAlign: i >= 3 && i <= 4 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
 
 
 
 
 
+
+
+
+
+
+
               ))}
+
+
+
+
+
+
 
 
 
@@ -3658,7 +7312,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <tbody>
+
+
+
+
+
+
 
 
 
@@ -3670,7 +7336,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+
+
+
+
+
+
 
 
 
@@ -3682,7 +7360,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{p.company || '-'}</td>
+
+
+
+
+
+
 
 
 
@@ -3694,7 +7384,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(p.costPrice)}</td>
+
+
+
+
+
+
 
 
 
@@ -3706,7 +7408,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+
+
+
+
+
+
 
 
 
@@ -3718,7 +7432,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   </td>
+
+
+
+
+
+
 
 
 
@@ -3730,7 +7456,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               ))}
+
+
+
+
+
+
 
 
 
@@ -3742,7 +7480,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           </table>
+
+
+
+
+
+
 
 
 
@@ -3754,7 +7504,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
 
 
 
@@ -3766,7 +7528,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3784,7 +7564,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+
+
+
+
+
 
 
 
@@ -3796,7 +7588,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+
+
+
+
+
+
 
 
 
@@ -3808,13 +7612,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
 
 
 
 
 
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -3826,13 +7648,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <button style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
 
 
 
 
 
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
 
 
 
@@ -3844,7 +7684,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
+
+
+
+
+
+
 
 
 
@@ -3856,7 +7708,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             {[t('productName'), t('company'), t('currentStock'), t('minStock'), t('totalValue'), t('status'), t('actions')].map((h, i) => (
+
+
+
+
+
+
 
 
 
@@ -3868,7 +7732,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             ))}
+
+
+
+
+
+
 
 
 
@@ -3880,7 +7756,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <tbody>
+
+
+
+
+
+
 
 
 
@@ -3892,7 +7780,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               const low = p.stock > 0 && p.stock <= (p.minStock || 5);
+
+
+
+
+
+
 
 
 
@@ -3904,7 +7804,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               return (
+
+
+
+
+
+
 
 
 
@@ -3916,7 +7828,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{p.name}<div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code || '-'}</div></td>
+
+
+
+
+
+
 
 
 
@@ -3928,7 +7852,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ fontWeight: 700, fontSize: 18, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>{fmtN(p.stock)}</span></td>
+
+
+
+
+
+
 
 
 
@@ -3940,13 +7876,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(p.stock * p.costPrice)}</td>
 
 
 
 
 
+
+
+
+
+
+
                   <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+
+
+
+
+
+
 
 
 
@@ -3958,7 +7912,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       {status === 'out' ? t('stockOut') : status === 'low' ? t('stockLow') : t('stockAvailable')}
+
+
+
+
+
+
 
 
 
@@ -3970,7 +7936,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   </td>
+
+
+
+
+
+
 
 
 
@@ -3982,7 +7960,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <button style={{ ...btn('primary', 'sm') }} onClick={() => { setStockAdjustProduct(p); setStockAdjustQty(''); setStockAdjustType('add'); setStockAdjustReason(''); }}><i className="fas fa-gear" style={{marginRight: 4}}></i> {t('adjust')}</button>
+
+
+
+
+
+
 
 
 
@@ -3994,7 +7984,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 </tr>
+
+
+
+
+
+
 
 
 
@@ -4006,7 +8008,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             })}
+
+
+
+
+
+
 
 
 
@@ -4018,7 +8032,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </table>
+
+
+
+
+
+
 
 
 
@@ -4030,7 +8056,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       {stockAdjustProduct && (
+
+
+
+
+
+
 
 
 
@@ -4042,7 +8080,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+
+
+
+
+
+
 
 
 
@@ -4054,7 +8104,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ background: T.gray50, borderRadius: 8, padding: 12, marginBottom: 16 }}>
+
+
+
+
+
+
 
 
 
@@ -4066,13 +8128,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div style={{ fontSize: 14, color: T.gray500 }}>{t('currentStock')}: <strong>{stockAdjustProduct.stock}</strong></div>
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -4084,7 +8164,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => setStockAdjustType('add')} style={{ flex: 1, padding: 10, borderRadius: 8, border: `2px solid ${stockAdjustType === 'add' ? T.green : T.gray200}`, background: stockAdjustType === 'add' ? T.greenLight : T.white, color: stockAdjustType === 'add' ? T.green : T.gray600, fontWeight: 700, cursor: 'pointer' }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('add')}</button>
+
+
+
+
+
+
 
 
 
@@ -4096,7 +8188,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -4108,7 +8212,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('reason')}</label><input value={stockAdjustReason} onChange={e => setStockAdjustReason(e.target.value)} style={inputStyle} placeholder={t('reasonOptional')} /></div>
+
+
+
+
+
+
 
 
 
@@ -4120,7 +8236,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => setStockAdjustProduct(null)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+
+
+
+
+
+
 
 
 
@@ -4132,7 +8260,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -4144,7 +8284,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -4156,13 +8308,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     </div>
 
 
 
 
 
+
+
+
+
+
+
   );
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4180,7 +8356,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     <div style={overlay} onClick={onClose}>
+
+
+
+
+
+
 
 
 
@@ -4192,7 +8380,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={{ padding: '16px 20px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+
+
+
+
+
 
 
 
@@ -4204,7 +8404,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: T.gray400 }}><i className="fas fa-xmark"></i></button>
+
+
+
+
+
+
 
 
 
@@ -4216,7 +8428,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={{ padding: 20 }}>{content}</div>
+
+
+
+
+
+
 
 
 
@@ -4228,7 +8452,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     </div>
+
+
+
+
+
+
 
 
 
@@ -4246,7 +8482,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   const tabs = [
+
+
+
+
+
+
 
 
 
@@ -4258,7 +8512,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     { id: 'newProduct', icon: <i className="fas fa-plus-circle"></i>, label: t('newProduct') },
+
+
+
+
+
+
 
 
 
@@ -4270,7 +8536,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     { id: 'categories', icon: <i className="fas fa-folder"></i>, label: t('categories') },
+
+
+
+
+
+
 
 
 
@@ -4282,7 +8560,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
     { id: 'stock', icon: <i className="fas fa-warehouse"></i>, label: t('stock') },
+
+
+
+
+
+
 
 
 
@@ -4300,7 +8590,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
   return (
+
+
+
+
+
+
 
 
 
@@ -4312,7 +8620,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       <div style={{ padding: '8px 16px', background: '#F5F5F5', borderBottom: `1px solid ${T.gray200}`, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+
+
+
+
+
+
 
 
 
@@ -4324,7 +8644,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           {tabs.map(tab => (
+
+
+
+
+
+
 
 
 
@@ -4336,7 +8668,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           ))}
+
+
+
+
+
+
 
 
 
@@ -4348,13 +8692,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         {productTab === 'allProducts' && (
 
 
 
 
 
+
+
+
+
+
+
           <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+
+
+
+
+
+
 
 
 
@@ -4366,7 +8728,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <option value="name">{t('name')}</option>
+
+
+
+
+
+
 
 
 
@@ -4378,7 +8752,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <option value="stock">{t('stock')}</option>
+
+
+
+
+
+
 
 
 
@@ -4390,7 +8776,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </select>
+
+
+
+
+
+
 
 
 
@@ -4402,7 +8800,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ position: 'relative' }}>
+
+
+
+
+
+
 
 
 
@@ -4414,7 +8824,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {showMoreMenu && (
+
+
+
+
+
+
 
 
 
@@ -4426,7 +8848,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <button onClick={() => { setShowImportModal(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvUpload')}</button>
+
+
+
+
+
+
 
 
 
@@ -4438,7 +8872,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <button onClick={() => { setShowPriceHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {t('priceHistory')}</button>
+
+
+
+
+
+
 
 
 
@@ -4450,7 +8896,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <button onClick={() => { setShowPurchaseHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('purchases')}</button>
+
+
+
+
+
+
 
 
 
@@ -4462,7 +8920,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               )}
+
+
+
+
+
+
 
 
 
@@ -4474,13 +8944,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           </div>
 
 
 
 
 
+
+
+
+
+
+
         )}
+
+
+
+
+
+
 
 
 
@@ -4492,13 +8980,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
 
 
 
 
 
+
+
+
+
+
+
             <div style={{ position: 'relative' }}>
+
+
+
+
+
+
 
 
 
@@ -4510,13 +9016,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {showSupplierMoreMenu && (
 
 
 
 
 
+
+
+
+
+
+
                 <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
+
+
+
+
+
+
 
 
 
@@ -4528,7 +9052,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <button onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+
+
+
+
+
+
 
 
 
@@ -4540,13 +9076,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               )}
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -4558,13 +9112,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           </div>
 
 
 
 
 
+
+
+
+
+
+
         )}
+
+
+
+
+
+
 
 
 
@@ -4576,13 +9148,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
 
 
 
 
 
+
+
+
+
+
+
             <div style={{ position: 'relative' }}>
+
+
+
+
+
+
 
 
 
@@ -4594,13 +9184,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {showCategoryMoreMenu && (
 
 
 
 
 
+
+
+
+
+
+
                 <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
+
+
+
+
+
+
 
 
 
@@ -4612,7 +9220,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <button onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+
+
+
+
+
+
 
 
 
@@ -4624,13 +9244,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               )}
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -4642,13 +9280,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           </div>
 
 
 
 
 
+
+
+
+
+
+
         )}
+
+
+
+
+
+
 
 
 
@@ -4660,7 +9316,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+
+
+
+
+
+
 
 
 
@@ -4672,7 +9340,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setShowCustomBarcodeModal(true); setCustomBarcodeSearch(''); setCustomBarcodeProducts([]); }}><i className="fas fa-barcode" style={{marginRight: 4}}></i> {t('customBarcode')}</button>
+
+
+
+
+
+
 
 
 
@@ -4684,7 +9364,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         )}
+
+
+
+
+
+
 
 
 
@@ -4696,7 +9388,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginLeft: 'auto' }}>
+
+
+
+
+
+
 
 
 
@@ -4708,7 +9412,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('totalProducts')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.teal, lineHeight: 1.2 }}>{products.length}</div></div>
+
+
+
+
+
+
 
 
 
@@ -4720,7 +9436,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('stockOut')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.red, lineHeight: 1.2 }}>{outOfStockCount}</div></div>
+
+
+
+
+
+
 
 
 
@@ -4732,13 +9460,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div style={{ borderLeft: `1px solid ${T.gray300}`, paddingLeft: 8 }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('totalValue')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.teal, lineHeight: 1.2 }}>{fmt(totalStockValue)}</div></div>
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -4750,7 +9496,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}>⋯ {t('more')}</button>
+
+
+
+
+
+
 
 
 
@@ -4762,7 +9520,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
+
+
+
+
+
+
 
 
 
@@ -4774,7 +9544,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <button onClick={() => { setStockFilter('all'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'all' ? T.tealLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('totalProducts')}</button>
+
+
+
+
+
+
 
 
 
@@ -4786,7 +9568,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <button onClick={() => { setStockFilter('out'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'out' ? T.redLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('stockOut')}</button>
+
+
+
+
+
+
 
 
 
@@ -4798,7 +9592,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <div style={{ borderTop: `1px solid ${T.gray100}`, margin: '4px 0' }}></div>
+
+
+
+
+
+
 
 
 
@@ -4810,7 +9616,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <button onClick={() => { setStockHistoryFilter('add'); setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stock')} + {t('history')}</button>
+
+
+
+
+
+
 
 
 
@@ -4822,7 +9640,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 </div>
+
+
+
+
+
+
 
 
 
@@ -4834,7 +9664,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -4846,7 +9688,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         )}
+
+
+
+
+
+
 
 
 
@@ -4858,13 +9712,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
 
 
 
 
+
+
+
+
+
+
         {productTab === 'allProducts' && renderAllProducts()}
+
+
+
+
+
+
 
 
 
@@ -4930,7 +9802,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     {productForm.name && products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase())).length > 0 && !products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) && (
                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
                         {products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase())).slice(0, 8).map((p: any) => (
-                          <div key={p.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, name: p.name, code: p.code || '', cat: p.cat || '', unit: p.unit || 'pcs', costPrice: p.costPrice, sellPrice: p.sellPrice, company: p.company || '', supplierId: p.supplierId || '' })}>
+                          <div key={p.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, name: p.name, code: p.code || '', cat: p.cat || '', unit: p.unit || 'pcs', costPrice: p.costPrice, sellPrice: p.sellPrice, company: p.company || '', supplierId: p.supplierId || '', vat: 0 })}>
                             <div style={{ width: 32, height: 32, borderRadius: 8, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               <i className="fas fa-box" style={{ color: T.teal, fontSize: 12 }}></i>
                             </div>
@@ -4952,11 +9824,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('barcode')}</label>
                   <div style={{ position: 'relative' }}>
                     <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-barcode" style={{ fontSize: 13 }}></i></div>
-                    <input value={productForm.code} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, code: val }); }} onKeyDown={e => { if (e.key === 'Enter') { const found = products.find((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()); if (found) { setProductForm({ ...productForm, name: found.name, code: found.code || '', cat: found.cat || '', unit: found.unit || 'pcs', costPrice: found.costPrice, sellPrice: found.sellPrice, stock: found.stock || 0, minStock: found.minStock || 5, company: found.company || '', supplierId: found.supplierId || '' }); } } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? '#F0FDFA' : T.gray50, borderColor: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? T.teal : T.gray200, height: 40 }} placeholder={`${t('barcode')}...`} />
+                    <input value={productForm.code} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, code: val }); }} onKeyDown={e => { if (e.key === 'Enter') { const found = products.find((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()); if (found) { setProductForm({ ...productForm, name: found.name, code: found.code || '', cat: found.cat || '', unit: found.unit || 'pcs', costPrice: found.costPrice, sellPrice: found.sellPrice, stock: found.stock || 0, minStock: found.minStock || 5, company: found.company || '', supplierId: found.supplierId || '', vat: found.vat || 0 }); } } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? '#F0FDFA' : T.gray50, borderColor: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? T.teal : T.gray200, height: 40 }} placeholder={`${t('barcode')}...`} />
                     {productForm.code && products.filter((p: any) => (p.code || '').toLowerCase().includes(productForm.code.toLowerCase())).length > 0 && !products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) && (
                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
                         {products.filter((p: any) => (p.code || '').toLowerCase().includes(productForm.code.toLowerCase())).slice(0, 8).map((p: any) => (
-                          <div key={p.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, name: p.name, code: p.code || '', cat: p.cat || '', unit: p.unit || 'pcs', costPrice: p.costPrice, sellPrice: p.sellPrice, company: p.company || '', supplierId: p.supplierId || '' })}>
+                          <div key={p.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, name: p.name, code: p.code || '', cat: p.cat || '', unit: p.unit || 'pcs', costPrice: p.costPrice, sellPrice: p.sellPrice, company: p.company || '', supplierId: p.supplierId || '', vat: 0 })}>
                             <div style={{ width: 32, height: 32, borderRadius: 8, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               <i className="fas fa-barcode" style={{ color: T.teal, fontSize: 12 }}></i>
                             </div>
@@ -4994,17 +9866,22 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('purchasePrice')} ({_settings?.currencySymbol})</label>
-                    <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 13, fontWeight: 700, color: '#16A34A' }}>{_settings?.currencySymbol}</span>
-                      <input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, paddingLeft: 28, height: 38, color: '#15803D' }} />
-                    </div>
+                    <input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#15803D' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('sellPrice')} ({_settings?.currencySymbol})</label>
-                    <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 13, fontWeight: 700, color: '#DC2626' }}>{_settings?.currencySymbol}</span>
-                      <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, paddingLeft: 28, height: 38, color: '#B91C1C' }} />
-                    </div>
+                    <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#B91C1C' }} />
+                  </div>
+                </div>
+                {/* Profit + VAT */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} ({_settings?.currencySymbol})</label>
+                    <input type="number" readOnly value={Math.max(0, (productForm.sellPrice || 0) - (productForm.costPrice || 0))} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: (productForm.sellPrice || 0) - (productForm.costPrice || 0) > 0 ? '#16A34A' : T.gray500, background: T.gray50, cursor: 'not-allowed' }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('vat')} (%)</label>
+                    <input type="number" value={productForm.vat || _settings?.vatPercent || 0} onChange={e => setProductForm({ ...productForm, vat: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#7C3AED' }} />
                   </div>
                 </div>
                 {/* Stock */}
@@ -5017,8 +9894,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 </div>
                 {/* Buttons */}
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px' }}><i className="fas fa-plus" style={{marginRight: 6}}></i> {t('add')}</button>
-                  <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
+                  <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0 })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
+                  <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-plus" style={{marginRight: 6}}></i> {t('add')}</button>
                 </div>
               </div>
             </div>
@@ -5084,7 +9961,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         {productTab === 'categories' && renderCategory()}
+
+
+
+
+
+
 
 
 
@@ -5096,7 +9985,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         {productTab === 'stock' && renderStock()}
+
+
+
+
+
+
 
 
 
@@ -5114,7 +10015,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
       {editProduct && (
+
+
+
+
+
+
 
 
 
@@ -5126,7 +10045,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+
+
+
+
+
+
 
 
 
@@ -5138,7 +10069,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ marginBottom: 12 }}><div style={{ fontWeight: 600, fontSize: 15 }}>{editProduct.name}</div><div style={{ fontSize: 13, color: T.gray400 }}>{editProduct.company} - {editProduct.cat || '-'}</div></div>
+
+
+
+
+
+
 
 
 
@@ -5150,7 +10093,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editProduct.sellPrice} onChange={e => setEditProduct({ ...editProduct, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+
+
+
+
+
+
 
 
 
@@ -5162,7 +10117,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           </div>
+
+
+
+
+
+
 
 
 
@@ -5174,7 +10141,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5192,7 +10177,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => setViewProduct(null)}>
+
+
+
+
+
+
 
 
 
@@ -5204,7 +10201,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('productDetails')}</h3>
+
+
+
+
+
+
 
 
 
@@ -5216,7 +10225,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {[[t('productName'), viewProduct.name], [t('barcode'), viewProduct.code || '-'], [t('company'), viewProduct.company || '-'], [t('category'), viewProduct.cat || '-'], [t('purchasePrice'), fmt(viewProduct.costPrice)], [t('sellPrice'), fmt(viewProduct.sellPrice)], [t('stock'), `${viewProduct.stock} ${viewProduct.unit}`], [t('minStock'), `${viewProduct.minStock || 5} ${viewProduct.unit}`]].map(([label, value]) => (
+
+
+
+
+
+
 
 
 
@@ -5228,7 +10249,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               ))}
+
+
+
+
+
+
 
 
 
@@ -5240,7 +10273,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <button onClick={() => setViewProduct(null)} style={{ ...btn(), width: '100%' }}>{t('close')}</button>
+
+
+
+
+
+
 
 
 
@@ -5252,13 +10297,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
 
 
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5276,7 +10345,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div>{stockHistory.length === 0 ? <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noPriceHistory')}</p> : stockHistory.filter((h: any) => h.type === 'price').map((h: any, i: number) => (
+
+
+
+
+
+
 
 
 
@@ -5288,13 +10369,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         ))}</div>
 
 
 
 
 
+
+
+
+
+
+
       ))}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5312,13 +10417,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div><p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noDeleteHistory')}</p></div>
 
 
 
 
 
+
+
+
+
+
+
       ))}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5336,7 +10465,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => { setShowPurchaseHistory(false); setViewPurchase(null); }}>
+
+
+
+
+
+
 
 
 
@@ -5348,7 +10489,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ padding: '16px 20px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+
+
+
+
+
+
 
 
 
@@ -5360,13 +10513,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => { setShowPurchaseHistory(false); setViewPurchase(null); }} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: T.gray400 }}><i className="fas fa-xmark"></i></button>
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -5378,7 +10549,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {purchases.length === 0 ? <p style={{ textAlign: 'center', color: T.gray400 }}>{t('noPurchaseRecords')}</p> : [...purchases].reverse().map((p: any) => {
+
+
+
+
+
+
 
 
 
@@ -5390,7 +10573,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 return (
+
+
+
+
+
+
 
 
 
@@ -5402,7 +10597,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <div><div style={{ fontWeight: 700, color: T.teal, fontSize: 14 }}>{p.id}</div><div style={{ fontSize: 13, color: T.gray500, marginTop: 2 }}>{new Date(p.date).toLocaleDateString()} - {p.supplier}</div></div>
+
+
+
+
+
+
 
 
 
@@ -5414,7 +10621,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   </div>
+
+
+
+
+
+
 
 
 
@@ -5426,7 +10645,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               })}
+
+
+
+
+
+
 
 
 
@@ -5438,7 +10669,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             {viewPurchase && (
+
+
+
+
+
+
 
 
 
@@ -5450,7 +10693,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 <h4 style={{ margin: '0 0 12px', color: T.teal }}>{viewPurchase.id} - {t('details')}</h4>
+
+
+
+
+
+
 
 
 
@@ -5462,7 +10717,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <thead><tr style={{ background: T.gray50 }}><th style={{ padding: 8, textAlign: 'left', fontSize: 13 }}>{t('products')}</th><th style={{ padding: 8, textAlign: 'center', fontSize: 13 }}>{t('quantity')}</th><th style={{ padding: 8, textAlign: 'right', fontSize: 13 }}>{t('price')}</th><th style={{ padding: 8, textAlign: 'right', fontSize: 13 }}>{t('total')}</th></tr></thead>
+
+
+
+
+
+
 
 
 
@@ -5474,7 +10741,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <tr key={i} style={{ borderBottom: `1px solid ${T.gray100}` }}><td style={{ padding: 10, fontSize: 14 }}>{item.name}<div style={{ fontSize: 12, color: T.gray400 }}>{item.company}</div></td><td style={{ padding: 10, textAlign: 'center' }}>{item.stock} {item.unit}</td><td style={{ padding: 10, textAlign: 'right' }}>{fmt(item.costPrice)}</td><td style={{ padding: 10, textAlign: 'right', fontWeight: 700 }}>{fmt((item.stock || 0) * (item.costPrice || 0))}</td></tr>
+
+
+
+
+
+
 
 
 
@@ -5486,7 +10765,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 </table>
+
+
+
+
+
+
 
 
 
@@ -5498,7 +10789,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             )}
+
+
+
+
+
+
 
 
 
@@ -5510,13 +10813,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
 
 
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5534,7 +10861,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div>
+
+
+
+
+
+
 
 
 
@@ -5546,7 +10885,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ fontSize: 48, marginBottom: 12 }}><i className="fas fa-file-csv"></i></div>
+
+
+
+
+
+
 
 
 
@@ -5558,13 +10909,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <label style={{ ...btn('primary'), cursor: 'pointer' }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {t('selectFile')}<input type="file" accept=".csv" onChange={handleCsvImport} style={{ display: 'none' }} /></label>
 
 
 
 
 
+
+
+
+
+
+
           </div>
+
+
+
+
+
+
 
 
 
@@ -5576,7 +10945,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <strong>{t('csvFormat')}:</strong> {t('csvFormatHelp')}
+
+
+
+
+
+
 
 
 
@@ -5588,7 +10969,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
 
 
 
@@ -5606,7 +10999,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
       {showPurchaseBarcodeModal && (
+
+
+
+
+
+
 
 
 
@@ -5618,7 +11029,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+
+
+
+
+
+
 
 
 
@@ -5630,7 +11053,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <p style={{ fontSize: 14, color: T.gray600, marginBottom: 12 }}>{t('enterPurchaseId')}</p>
+
+
+
+
+
+
 
 
 
@@ -5642,13 +11077,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <input value={purchaseBarcodeId} onChange={e => setPurchaseBarcodeId(e.target.value)} placeholder={t('purchaseId')} style={inputStyle} />
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -5660,7 +11113,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => setShowPurchaseBarcodeModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+
+
+
+
+
+
 
 
 
@@ -5672,7 +11137,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -5684,13 +11161,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
 
 
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5708,7 +11209,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => setShowCustomBarcodeModal(false)}>
+
+
+
+
+
+
 
 
 
@@ -5720,7 +11233,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-barcode" style={{marginRight: 4}}></i> {t('customBarcode')}</h3>
+
+
+
+
+
+
 
 
 
@@ -5732,7 +11257,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ position: 'relative', marginBottom: 12 }}>
+
+
+
+
+
+
 
 
 
@@ -5744,13 +11281,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <input value={customBarcodeSearch} onChange={e => setCustomBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -5762,7 +11317,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {products.filter((p: any) => p.code && (!customBarcodeSearch || (p.name || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()))).map((p: any) => {
+
+
+
+
+
+
 
 
 
@@ -5774,7 +11341,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 return (
+
+
+
+
+
+
 
 
 
@@ -5786,7 +11365,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <input type="checkbox" checked={isSelected} readOnly style={{ width: 16, height: 16 }} />
+
+
+
+
+
+
 
 
 
@@ -5798,7 +11389,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   </div>
+
+
+
+
+
+
 
 
 
@@ -5810,13 +11413,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               })}
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -5828,13 +11449,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <span style={{ fontSize: 14, color: T.gray500 }}>{customBarcodeProducts.length} {t('products')} {t('selected')}</span>
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -5846,7 +11485,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => setShowCustomBarcodeModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+
+
+
+
+
+
 
 
 
@@ -5858,7 +11509,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -5870,13 +11533,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
 
 
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5894,7 +11581,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => setShowAddProductModal(false)}>
+
+
+
+
+
+
 
 
 
@@ -5906,7 +11605,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addNewProduct')}</h3>
+
+
+
+
+
+
 
 
 
@@ -5918,7 +11629,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('productName')} *</label><input value={productForm.name} onChange={e => setProductForm({ ...productForm, name: e.target.value })} style={inputStyle} placeholder={t('productName')} /></div>
+
+
+
+
+
+
 
 
 
@@ -5930,7 +11653,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div style={{ gridColumn: 'span 2' }}>
+
+
+
+
+
+
 
 
 
@@ -5942,7 +11677,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 <div style={{ position: 'relative' }}>
+
+
+
+
+
+
 
 
 
@@ -5954,7 +11701,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     value={productForm.supplierId}
+
+
+
+
+
+
 
 
 
@@ -5966,7 +11725,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       const val = e.target.value;
+
+
+
+
+
+
 
 
 
@@ -5978,7 +11749,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       if (found) {
+
+
+
+
+
+
 
 
 
@@ -5990,7 +11773,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       } else {
+
+
+
+
+
+
 
 
 
@@ -6002,13 +11797,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       }
 
 
 
 
 
+
+
+
+
+
+
                     }}
+
+
+
+
+
+
 
 
 
@@ -6020,7 +11833,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       if (e.key === 'Enter') {
+
+
+
+
+
+
 
 
 
@@ -6032,7 +11857,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                         if (found) {
+
+
+
+
+
+
 
 
 
@@ -6044,7 +11881,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                         }
+
+
+
+
+
+
 
 
 
@@ -6056,7 +11905,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     }}
+
+
+
+
+
+
 
 
 
@@ -6068,7 +11929,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     placeholder={`${t('supplierId')} - ${t('enterToSearch')}`}
+
+
+
+
+
+
 
 
 
@@ -6080,7 +11953,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   {productForm.supplierId && suppliers.filter((s: any) =>
+
+
+
+
+
+
 
 
 
@@ -6092,7 +11977,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   ).length > 0 && (
+
+
+
+
+
+
 
 
 
@@ -6104,7 +12001,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       {suppliers.filter((s: any) =>
+
+
+
+
+
+
 
 
 
@@ -6116,7 +12025,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       ).map((s: any) => (
+
+
+
+
+
+
 
 
 
@@ -6128,7 +12049,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                           setProductForm({ ...productForm, supplierId: s.id, company: s.name });
+
+
+
+
+
+
 
 
 
@@ -6140,7 +12073,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                           <span style={{ color: T.teal, fontWeight: 600 }}>{s.id}</span> - <span>{s.name}</span>
+
+
+
+
+
+
 
 
 
@@ -6152,7 +12097,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                       ))}
+
+
+
+
+
+
 
 
 
@@ -6164,7 +12121,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   )}
+
+
+
+
+
+
 
 
 
@@ -6176,7 +12145,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 {productForm.company && <div style={{ fontSize: 12, color: T.green, marginTop: 4 }}><i className="fas fa-check" style={{marginRight: 4}}></i> {productForm.company}</div>}
+
+
+
+
+
+
 
 
 
@@ -6188,7 +12169,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('category')}</label><input value={productForm.cat} onChange={e => setProductForm({ ...productForm, cat: e.target.value })} style={inputStyle} placeholder={t('category')} /></div>
+
+
+
+
+
+
 
 
 
@@ -6200,7 +12193,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={inputStyle} /></div>
+
+
+
+
+
+
 
 
 
@@ -6212,7 +12217,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+
+
+
+
+
+
 
 
 
@@ -6224,7 +12241,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -6236,7 +12265,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => setShowAddProductModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+
+
+
+
+
+
 
 
 
@@ -6248,7 +12289,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -6260,13 +12313,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
 
 
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6284,7 +12361,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => setEditFullProduct(null)}>
+
+
+
+
+
+
 
 
 
@@ -6296,7 +12385,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit')}</h3>
+
+
+
+
+
+
 
 
 
@@ -6308,7 +12409,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('productName')} *</label><input value={editFullProduct.name} onChange={e => setEditFullProduct({ ...editFullProduct, name: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
 
 
 
@@ -6320,7 +12433,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('company')}</label><input value={editFullProduct.company} onChange={e => setEditFullProduct({ ...editFullProduct, company: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
 
 
 
@@ -6332,7 +12457,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('unit')}</label><input value={editFullProduct.unit} onChange={e => setEditFullProduct({ ...editFullProduct, unit: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
 
 
 
@@ -6344,7 +12481,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editFullProduct.costPrice} onChange={e => setEditFullProduct({ ...editFullProduct, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+
+
+
+
+
+
 
 
 
@@ -6356,7 +12505,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -6368,7 +12529,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <button onClick={() => setEditFullProduct(null)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+
+
+
+
+
+
 
 
 
@@ -6380,7 +12553,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -6392,13 +12577,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
 
 
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6416,7 +12625,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => setViewSupplier(null)}>
+
+
+
+
+
+
 
 
 
@@ -6428,7 +12649,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-building" style={{marginRight: 4}}></i> {viewSupplier.name}</h3>
+
+
+
+
+
+
 
 
 
@@ -6440,7 +12673,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div><div style={{ fontSize: 13, color: T.gray400 }}>{t('products')}</div><div style={{ fontWeight: 600, fontSize: 16 }}>{viewSupplier.prodCount}</div></div>
+
+
+
+
+
+
 
 
 
@@ -6452,13 +12697,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div style={{ gridColumn: 'span 2' }}><div style={{ fontSize: 13, color: T.gray400 }}>{t('totalPurchase')}</div><div style={{ fontWeight: 700, fontSize: 18, color: T.green }}>{fmt(viewSupplier.totalPurchase)}</div></div>
 
 
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -6470,7 +12733,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <div style={{ maxHeight: 200, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 8, marginBottom: 16 }}>
+
+
+
+
+
+
 
 
 
@@ -6482,7 +12757,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 <div key={p.id} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between' }}>
+
+
+
+
+
+
 
 
 
@@ -6494,7 +12781,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <span style={{ fontSize: 14, color: T.gray500 }}>{fmt(p.sellPrice)}</span>
+
+
+
+
+
+
 
 
 
@@ -6506,7 +12805,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               ))}
+
+
+
+
+
+
 
 
 
@@ -6518,7 +12829,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <button onClick={() => setViewSupplier(null)} style={{ ...btn(), width: '100%' }}>{t('close')}</button>
+
+
+
+
+
+
 
 
 
@@ -6530,13 +12853,37 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         </div>
 
 
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6554,7 +12901,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => setViewCategory(null)}>
+
+
+
+
+
+
 
 
 
@@ -6566,7 +12925,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {viewCategory.name}</h3>
+
+
+
+
+
+
 
 
 
@@ -6578,7 +12949,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               <div style={{ fontSize: 13, color: T.gray400 }}>{t('totalValue')}</div>
+
+
+
+
+
+
 
 
 
@@ -6590,7 +12973,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -6602,7 +12997,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {viewCategory.products.map((p: any) => (
+
+
+
+
+
+
 
 
 
@@ -6614,7 +13021,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <div><div style={{ fontSize: 14, fontWeight: 600 }}>{p.name}</div><div style={{ fontSize: 12, color: T.gray400 }}>{p.code || '-'}</div></div>
+
+
+
+
+
+
 
 
 
@@ -6626,7 +13045,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 </div>
+
+
+
+
+
+
 
 
 
@@ -6638,7 +13069,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -6650,7 +13093,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           </div>
+
+
+
+
+
+
 
 
 
@@ -6662,7 +13117,25 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6680,7 +13153,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
         <div style={overlay} onClick={() => setShowStockHistoryModal(false)}>
+
+
+
+
+
+
 
 
 
@@ -6692,7 +13177,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-box" style={{marginRight: 4}}></i> {stockHistoryFilter === 'add' ? t('stockAddHistory') : stockHistoryFilter === 'remove' ? t('stockRemoveHistory') : t('stock')} {t('history')}</h3>
+
+
+
+
+
+
 
 
 
@@ -6704,7 +13201,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               {stockHistory.filter((h: any) => stockHistoryFilter === 'all' || h.type === stockHistoryFilter).length === 0 ? (
+
+
+
+
+
+
 
 
 
@@ -6716,7 +13225,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
               ) : (
+
+
+
+
+
+
 
 
 
@@ -6728,7 +13249,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                   <div key={i} style={{ padding: 10, background: h.type === 'add' ? T.greenLight : T.redLight, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
+
+
+
+
+
+
 
 
 
@@ -6740,7 +13273,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                     <div style={{ textAlign: 'right' }}><div style={{ fontWeight: 700, color: h.type === 'add' ? T.green : T.red }}>{h.type === 'add' ? '+' : '-'}{h.quantity}</div><div style={{ fontSize: 12, color: T.gray500 }}>{h.oldStock} → {h.newStock}</div></div>
+
+
+
+
+
+
 
 
 
@@ -6752,7 +13297,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
                 ))
+
+
+
+
+
+
 
 
 
@@ -6764,7 +13321,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
 
 
 
@@ -6776,7 +13345,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
           </div>
+
+
+
+
+
+
 
 
 
@@ -6788,7 +13369,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
       )}
+
+
+
+
+
+
 
 
 
@@ -6800,13 +13393,31 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+
+
+
+
+
   );
 
 
 
 
 
+
+
+
+
+
+
 }
+
+
+
+
+
+
 
 
 
