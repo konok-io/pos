@@ -9812,7 +9812,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                                 <div style={{ fontSize: 11, color: T.gray400 }}>{p.code || '-'}</div>
                               </div>
                               <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: 12, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol}{p.sellPrice}</div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol} {p.sellPrice}</div>
                               </div>
                             </div>
                           ))}
@@ -9893,7 +9893,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                       const profit = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
                       return (
                         <div style={{ height: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7, display: 'flex', alignItems: 'center' }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400 }}>{_settings?.currencySymbol}{profit}</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400 }}>{_settings?.currencySymbol} {profit}</span>
                         </div>
                       );
                     })()}
@@ -9924,7 +9924,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                         </div>
                         <span style={{ fontSize: 12, fontWeight: 600, color: '#15803D' }}>{t('salesPriceWithVat')}</span>
                       </div>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: '#15803D' }}>{_settings?.currencySymbol}{totalWithVat.toFixed(2)}</span>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: '#15803D' }}>{_settings?.currencySymbol} {totalWithVat.toFixed(2)}</span>
                     </div>
                   );
                 })()}
@@ -9978,7 +9978,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                           <div style={{ fontSize: 11, color: T.gray400 }}>{item.company || '-'} {item.cat ? `| ${item.cat}` : ''}</div>
                         </div>
                         <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol}{item.sellPrice}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol} {item.sellPrice}</div>
                           <div style={{ fontSize: 11, color: T.gray500 }}>x{item.stock}</div>
                         </div>
                         <button onClick={() => handleRemoveTempProduct(item.id)} style={{ width: 24, height: 24, border: 'none', borderRadius: 6, background: T.redLight, color: T.red, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}><i className="fas fa-xmark"></i></button>
