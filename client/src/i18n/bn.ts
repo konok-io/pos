@@ -53,6 +53,8 @@ export const bn: Record<string, string> = {
   selectCustomer: 'সিলেক্ট',
   cartEmpty: 'কার্টে কোনো পণ্য নেই!',
   addProductsFromLeft: 'বাম দিক থেকে পণ্য যোগ করুন',
+  fillFormLeft: 'বাম দিকের ফর্ম পূরণ করুন',
+  addProductsToCart: 'পণ্যগুলো এখানে দেখা যাবে',
   newProduct: 'পণ্য যোগ করুন',
   addToCart: 'যোগ করুন',
   subtotal: 'সাবটোটাল',

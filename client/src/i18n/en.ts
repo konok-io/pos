@@ -52,6 +52,8 @@ export const en: Record<string, string> = {
   selectCustomer: 'Select',
   cartEmpty: 'Cart is empty',
   addProductsFromLeft: 'Add products from left',
+  fillFormLeft: 'Fill the form on the left',
+  addProductsToCart: 'Products will appear here',
   newProduct: 'Add Product',
   addToCart: 'Add',
   subtotal: 'Subtotal',

@@ -52,6 +52,8 @@ export const hi: Record<string, string> = {
   customerRequired: 'ग्राहक जोड़ें',
   cartEmpty: 'कार्ट खाली है!',
   addProductsFromLeft: 'बाईं ओर से उत्पाद जोड़ें',
+  fillFormLeft: 'बाईं ओर फॉर्म भरें',
+  addProductsToCart: 'उत्पाद यहां दिखाई देंगे',
   newProduct: 'उत्पाद जोड़ें',
   addToCart: 'जोड़ें',
   subtotal: 'उप-योग',

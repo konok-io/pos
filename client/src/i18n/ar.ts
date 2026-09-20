@@ -52,6 +52,8 @@ export const ar: Record<string, string> = {
   customerRequired: 'أضف عميل',
   cartEmpty: 'السلة فارغة!',
   addProductsFromLeft: 'أضف منتجات من اليسار',
+  fillFormLeft: 'املأ النموذج على اليسار',
+  addProductsToCart: 'ستظهر المنتجات هنا',
   newProduct: 'إضافة منتج',
   addToCart: 'إضافة',
   subtotal: 'المجموع الفرعي',
