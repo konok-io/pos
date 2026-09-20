@@ -2732,7 +2732,7 @@ export default function App() {
                       <span style={{ fontSize: 15, fontWeight: 600, color: '#16A34A' }}>−{fmt(parseFloat(discount) || 0)}</span>
                     </div>
                   )}
-                  {vatAmount > 0 && (
+                  {settings.vatEnabled && vatAmount > 0 && (
                     <div style={{ padding: '6px 12px', display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #d1d5db', background: '#FFFBEB' }}>
                       <span style={{ fontSize: 15, color: '#374151' }}>{t('vat')} ({vatRate}%)</span>
                       <span style={{ fontSize: 15, fontWeight: 600, color: '#374151' }}>+{fmt(vatAmount)}</span>
@@ -2748,7 +2748,8 @@ export default function App() {
                 <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
                   <input value={discount} onChange={(e) => setDiscount(e.target.value)} type="number" min="0"
                     placeholder={t('discount')}
-                    style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#16A34A' }}/>
+                    style={{ flex: settings.vatEnabled ? 1 : '1 1 100%', border: '1px solid #e5e7eb', borderRadius: 6, padding: '5px 8px', fontSize: 14, outline: 'none', background: '#fafbfc', boxSizing: 'border-box', color: '#16A34A' }}/>
+                  {settings.vatEnabled && (
                   <div style={{ position: 'relative', width: 70 }}>
                     <input 
                       value={vatPercent}
@@ -2772,6 +2773,7 @@ export default function App() {
                     />
                     <span style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', color: '#6B7280', fontSize: 12, pointerEvents: 'none' }}>%</span>
                   </div>
+                  )}
                 </div>
 
                 {/* Payment Input */}
@@ -6865,6 +6867,47 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     placeholder={form.currencySymbol || '৳'}
                     maxLength={5}
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* Due Sales Settings */}
+            <div style={{ marginBottom: 24 }}>
+              <h3 style={{ marginBottom: 12 }}><i className="fas fa-clock" style={{marginRight: 4}}></i> {t('dueSales')}</h3>
+              <div
+                onClick={() => setForm(p => ({ ...p, dueSalesEnabled: !p.dueSalesEnabled }))}
+                style={{
+                  padding: '16px 20px',
+                  background: form.dueSalesEnabled ? '#ecfdf5' : '#fef2f2',
+                  borderRadius: 12,
+                  cursor: 'pointer',
+                  border: `2px solid ${form.dueSalesEnabled ? '#059669' : '#ef4444'}`,
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: '#1e293b' }}>
+                    {t('dueSalesEnabled')} {form.dueSalesEnabled ? <i className="fas fa-check"></i> : <i className="fas fa-xmark"></i>}
+                  </div>
+                  <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}>
+                    {form.dueSalesEnabled ? t('dueSalesEnabledDesc') : t('dueSalesDisabledDesc')}
+                  </div>
+                </div>
+                <div style={{
+                  width: 48, height: 26, borderRadius: 13,
+                  background: form.dueSalesEnabled ? '#059669' : '#94a3b8',
+                  position: 'relative', transition: 'all 0.2s', flexShrink: 0,
+                }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: 11,
+                    background: '#fff', position: 'absolute', top: 2,
+                    left: form.dueSalesEnabled ? 24 : 2,
+                    transition: 'all 0.2s',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                  }} />
                 </div>
               </div>
             </div>

@@ -779,8 +779,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('editProductPrice')}</h3>
             <div style={{ marginBottom: 12 }}><div style={{ fontWeight: 600, fontSize: 15 }}>{editProduct.name}</div><div style={{ fontSize: 13, color: T.gray400 }}>{editProduct.company} - {editProduct.cat || '-'}</div></div>
-            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('purchasePrice')} ($)</label><input type="number" value={editProduct.costPrice} onChange={e => setEditProduct({ ...editProduct, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
-            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('sellPrice')} ($)</label><input type="number" value={editProduct.sellPrice} onChange={e => setEditProduct({ ...editProduct, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editProduct.costPrice} onChange={e => setEditProduct({ ...editProduct, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editProduct.sellPrice} onChange={e => setEditProduct({ ...editProduct, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
             <div style={{ display: 'flex', gap: 10 }}><button onClick={() => setEditProduct(null)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button><button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveChanges')}</button></div>
           </div>
         </div>
@@ -956,8 +956,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
               <div><label style={labelStyle}>{t('category')}</label><input value={productForm.cat} onChange={e => setProductForm({ ...productForm, cat: e.target.value })} style={inputStyle} placeholder={t('category')} /></div>
               <div><label style={labelStyle}>{t('unit')}</label><input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={inputStyle} placeholder={t('unit')} /></div>
               <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={inputStyle} /></div>
-              <div><label style={labelStyle}>{t('purchasePrice')} ($)</label><input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
-              <div><label style={labelStyle}>{t('sellPrice')} ($)</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
               <div><label style={labelStyle}>{t('stock')}</label><input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={inputStyle} /></div>
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
@@ -979,8 +979,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
               <div><label style={labelStyle}>{t('category')}</label><input value={editFullProduct.cat} onChange={e => setEditFullProduct({ ...editFullProduct, cat: e.target.value })} style={inputStyle} /></div>
               <div><label style={labelStyle}>{t('unit')}</label><input value={editFullProduct.unit} onChange={e => setEditFullProduct({ ...editFullProduct, unit: e.target.value })} style={inputStyle} /></div>
               <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={editFullProduct.minStock} onChange={e => setEditFullProduct({ ...editFullProduct, minStock: parseInt(e.target.value) || 5 })} style={inputStyle} /></div>
-              <div><label style={labelStyle}>{t('purchasePrice')} ($)</label><input type="number" value={editFullProduct.costPrice} onChange={e => setEditFullProduct({ ...editFullProduct, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
-              <div><label style={labelStyle}>{t('sellPrice')} ($)</label><input type="number" value={editFullProduct.sellPrice} onChange={e => setEditFullProduct({ ...editFullProduct, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editFullProduct.costPrice} onChange={e => setEditFullProduct({ ...editFullProduct, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editFullProduct.sellPrice} onChange={e => setEditFullProduct({ ...editFullProduct, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
               <button onClick={() => setEditFullProduct(null)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
