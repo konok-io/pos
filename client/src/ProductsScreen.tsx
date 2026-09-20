@@ -2208,101 +2208,28 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    const purchaseId = genUniqueId();
-
-
-
-
-
-
-
-
-
-
-
-    const results = await Promise.allSettled(
-
-
-
-
-
-
-
-
-
-
-
-      tempProducts.map(p => {
-
-
-
-
-
-
-
-
-
-
-
-        const product = { ...p, purchaseId };
-
-
-
-
-
-
-
-
-
-
-
-        delete product._temp;
-
-
-
-
-
-
-
-
-
-
-
-        return api.addProduct(product);
-
-
-
-
-
-
-
-
-
-
-
-      })
-
-
-
-
-
-
-
-
-
-
-
-    );
-
-
-
-
-
-
-
-
-
-
+    const companyGroups: Record<string, any[]> = {};
+    tempProducts.forEach((p: any) => {
+      const key = p.company || p.supplierId || 'unknown';
+      if (!companyGroups[key]) companyGroups[key] = [];
+      companyGroups[key].push(p);
+    });
+
+    const results: any[] = [];
+    const purchaseIds: string[] = [];
+
+    for (const [, group] of Object.entries(companyGroups)) {
+      const purchaseId = genUniqueId();
+      purchaseIds.push(purchaseId);
+      const groupResults = await Promise.allSettled(
+        group.map((p: any) => {
+          const product = { ...p, purchaseId };
+          delete product._temp;
+          return api.addProduct(product);
+        })
+      );
+      results.push(...groupResults);
+    }
 
     const succeeded = results.filter(r => r.status === 'fulfilled').length;
 
@@ -2376,7 +2303,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    alert(`Purchase ID: ${purchaseId} | ${succeeded} ${t('saved')}${failed ? `, ${failed} failed` : ''}`);
+    alert(`${purchaseIds.length} Purchase IDs created: ${purchaseIds.join(', ')} | ${succeeded} ${t('saved')}${failed ? `, ${failed} failed` : ''}`);
 
 
 
