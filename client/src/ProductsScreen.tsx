@@ -9802,7 +9802,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   </div>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('vat')} (%)</label>
-                    <input type="number" value={productForm.vat || _settings?.vatPercent || 0} onChange={e => setProductForm({ ...productForm, vat: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#7C3AED' }} />
+                    <input type="number" value={productForm.vat ?? _settings?.vatPercent ?? 0} onChange={e => setProductForm({ ...productForm, vat: e.target.value === '' ? 0 : parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#7C3AED' }} />
                   </div>
                 </div>
                 {/* Stock + Min Stock */}
