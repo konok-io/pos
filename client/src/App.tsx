@@ -1333,24 +1333,13 @@ export default function App() {
   };
 
   const fetchProductImage = async (productName: string, cat: string): Promise<string | null> => {
-    try {
-      const query = encodeURIComponent(productName || '');
-      const res = await fetch(`https://lexica.art/api/v1/search?q=${query}`);
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (data.images && data.images.length > 0) {
-        return data.images[0].src;
-      }
-    } catch {}
-    try {
-      const query = encodeURIComponent(cat || productName || '');
-      const res = await fetch(`https://lexica.art/api/v1/search?q=${query}`);
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (data.images && data.images.length > 0) {
-        return data.images[0].src;
-      }
-    } catch {}
+    const keywords = [productName, cat, 'product'].filter(Boolean);
+    for (const kw of keywords) {
+      try {
+        const res = await fetch(`https://loremflickr.com/200/200/${encodeURIComponent(kw)}`, { redirect: 'follow' });
+        if (res.ok && res.url) return res.url;
+      } catch {}
+    }
     return null;
   };
 
