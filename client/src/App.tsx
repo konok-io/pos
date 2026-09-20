@@ -1063,6 +1063,7 @@ export default function App() {
   const [stockFilter, setStockFilter] = useState<string>('all'); // 'all', 'available', 'low', 'out'
   const [showExpiryList, setShowExpiryList] = useState(false);
   const [showCustomerList, setShowCustomerList] = useState(false);
+  const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
   const [heldSales, setHeldSales] = useState<HeldSale[]>([]);
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
@@ -1392,6 +1393,13 @@ export default function App() {
       }
       return item;
     }).filter(item => item.quantity > 0));
+  };
+
+  // Handle add customer from POS
+  const handleAddCustomerFromPOS = (customer: Customer) => {
+    setCustomers([...customers, customer]);
+    setSelectedCustomer(customer);
+    setIsAddCustomerModalOpen(false);
   };
 
   // Calculate totals
@@ -2322,7 +2330,10 @@ export default function App() {
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><i className="fas fa-users"></i></div>
                             <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('customers')} ({customers.length})</h3>
                           </div>
-                          <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <button onClick={() => setIsAddCustomerModalOpen(true)} style={{ padding: '6px 12px', borderRadius: 6, background: '#115E59', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCustomer')}</button>
+                            <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
+                          </div>
                         </div>
                         {customers.length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
@@ -2922,6 +2933,15 @@ export default function App() {
               </div>
             </div>
           </div>
+        )}
+
+        {currentTab === 'pos' && (
+          <CustomerModal
+            isOpen={isAddCustomerModalOpen}
+            mode="add"
+            onClose={() => setIsAddCustomerModalOpen(false)}
+            onSave={handleAddCustomerFromPOS}
+          />
         )}
 
         {currentTab === 'products' && (
