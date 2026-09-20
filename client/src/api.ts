@@ -71,4 +71,11 @@ export const api = {
   // Settings
   getSettings: () => request('/settings'),
   updateSettings: (s: any) => request('/settings', { method: 'PUT', body: JSON.stringify(s) }),
+
+  // Delete All (for data reset)
+  deleteAllProducts: () => request('/products/all', { method: 'DELETE' }),
+  deleteAllCategories: () => request('/categories/all', { method: 'DELETE' }),
+  deleteAllSuppliers: () => request('/suppliers/all', { method: 'DELETE' }),
+  deleteAllSales: () => request('/sales/all', { method: 'DELETE' }),
+  deleteAllPurchases: () => request('/purchases/all', { method: 'DELETE' }),
 };

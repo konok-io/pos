@@ -1,4 +1,5 @@
 import ProductsScreen from "./ProductsScreen";
+import { api } from "./api";
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages, defaultTranslations, Language } from './i18n';
@@ -6609,7 +6610,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     }
 
     try {
-      await localDb.clearAll();
+      await api.deleteAllProducts();
+      await api.deleteAllCategories();
+      await api.deleteAllSuppliers();
+      await api.deleteAllSales();
+      await api.deleteAllPurchases();
       alert(t('dataDeletedSuccessfully'));
       window.location.reload();
     } catch (error) {
@@ -6629,8 +6634,15 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     if (!confirm(translate('warningPermanentDelete'))) return;
     
     try {
-      for (const item of items) {
-        await db.delete(storeName, item.id).catch(() => {});
+      if (storeName === 'products') await api.deleteAllProducts();
+      else if (storeName === 'categories') await api.deleteAllCategories();
+      else if (storeName === 'suppliers') await api.deleteAllSuppliers();
+      else if (storeName === 'sales') await api.deleteAllSales();
+      else if (storeName === 'purchases') await api.deleteAllPurchases();
+      else {
+        for (const item of items) {
+          await db.delete(storeName, item.id).catch(() => {});
+        }
       }
       setItems([]);
       onRefresh();
