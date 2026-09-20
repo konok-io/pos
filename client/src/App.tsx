@@ -1332,6 +1332,46 @@ export default function App() {
     window.location.reload();
   };
 
+  const fetchProductImage = async (productName: string, cat: string): Promise<string | null> => {
+    try {
+      const query = encodeURIComponent(productName || '');
+      const res = await fetch(`https://lexica.art/api/v1/search?q=${query}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (data.images && data.images.length > 0) {
+        return data.images[0].src;
+      }
+    } catch {}
+    try {
+      const query = encodeURIComponent(cat || productName || '');
+      const res = await fetch(`https://lexica.art/api/v1/search?q=${query}`);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (data.images && data.images.length > 0) {
+        return data.images[0].src;
+      }
+    } catch {}
+    return null;
+  };
+
+  useEffect(() => {
+    const missingImages = products.filter((p: any) => !p.image || !p.image.startsWith('http'));
+    if (missingImages.length === 0) return;
+    const fetchAll = async () => {
+      const updated = [...products];
+      for (const p of missingImages) {
+        const imgUrl = await fetchProductImage(p.name || '', p.cat || '');
+        if (imgUrl) {
+          const idx = updated.findIndex((x: any) => x.id === p.id);
+          if (idx >= 0) updated[idx] = { ...updated[idx], image: imgUrl };
+          api.updateProduct(String(p.id), { ...p, image: imgUrl }).catch(() => {});
+        }
+      }
+      setProducts(updated);
+    };
+    fetchAll();
+  }, [products.length]);
+
   // Filter products - only show when search, category, supplier, or stock filter is selected
   const hasFilter = searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all';
   const filteredProducts = hasFilter ? products.filter(p => {
