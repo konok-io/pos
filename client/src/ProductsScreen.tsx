@@ -437,7 +437,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
             <thead><tr style={{ background: T.tealLight }}>
-              {[t('id'), t('name'), t('products'), t('stock'), t('purchases'), t('totalPurchase'), t('actions')].map((h, i) => (
+              {[t('id'), t('name'), t('products'), t('categories'), t('stock'), t('totalPurchase'), t('actions')].map((h, i) => (
                 <th key={i} style={{ padding: '10px 12px', textAlign: i === 1 ? 'left' : i >= 2 && i <= 4 ? 'center' : i === 5 ? 'right' : i === 6 ? 'center' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
               ))}
             </tr></thead>
@@ -446,21 +446,21 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 const supplier = suppliers.find((s: any) => s.name === company);
                 const supplierProducts = products.filter((p: any) => (p.company || '').toLowerCase() === company.toLowerCase());
                 const prodCount = supplierProducts.length;
+                const catCount = [...new Set(supplierProducts.map((p: any) => p.cat).filter(Boolean))].length;
                 const totalStock = supplierProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
-                const purchaseCount = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === company.toLowerCase()).length;
                 const totalPurchase = purchases.filter((p: any) => (p.supplier || '').toLowerCase() === company.toLowerCase()).reduce((s: number, p: any) => s + (p.items || []).reduce((ss: number, i: any) => ss + (i.stock || 0) * (i.costPrice || 0), 0), 0);
                 const hasProducts = prodCount > 0;
                 return (
                   <tr key={company} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
                     <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{supplier?.id || '-'}</td>
-                    <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, cursor: 'pointer', minWidth: 180 }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}>{company}<div style={{ fontSize: 12, color: T.gray400 }}>{supplier?.crNumber || '-'}</div></td>
+                    <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, cursor: 'pointer', minWidth: 180 }} onClick={() => setViewSupplier({ name: company, prodCount, totalPurchase })}>{company}<div style={{ fontSize: 12, color: T.gray400 }}>{supplier?.crNumber || '-'}</div></td>
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{prodCount}</span></td>
+                    <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catCount}</span></td>
                     <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{totalStock}</td>
-                    <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14 }}>{purchaseCount}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.green }}>{fmt(totalPurchase)}</td>
                     <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
                       <button disabled={hasProducts} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: hasProducts ? 0.3 : 1, cursor: hasProducts ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingSupplier(supplier); setSupplierForm(supplier); setShowSupplierModal(true); }}><i className="fas fa-pen"></i></button>
-                      <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}><i className="fas fa-eye"></i></button>
+                      <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewSupplier({ name: company, prodCount, totalPurchase })}><i className="fas fa-eye"></i></button>
                       <button disabled={hasProducts} style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: hasProducts ? 0.3 : 1, cursor: hasProducts ? 'not-allowed' : 'pointer' }} onClick={() => deleteSupplier(company)}><i className="fas fa-trash"></i></button>
                     </td>
                   </tr>
