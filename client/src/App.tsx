@@ -1333,13 +1333,23 @@ export default function App() {
   };
 
   const fetchProductImage = async (productName: string, cat: string): Promise<string | null> => {
-    const keywords = [productName, cat, 'product'].filter(Boolean);
-    for (const kw of keywords) {
+    const cleanName = (productName || '').replace(/[0-9]/g, '').trim();
+    const searchTerms = [cleanName, cat].filter(Boolean);
+    for (const term of searchTerms) {
       try {
-        const res = await fetch(`https://loremflickr.com/200/200/${encodeURIComponent(kw)}`, { redirect: 'follow' });
-        if (res.ok && res.url) return res.url;
+        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(term)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.thumbnail && data.thumbnail.source) return data.thumbnail.source;
+          if (data.originalimage && data.originalimage.source) return data.originalimage.source;
+        }
       } catch {}
     }
+    const keywords = [cleanName, cat, 'product'].filter(Boolean).join(',');
+    try {
+      const res = await fetch(`https://loremflickr.com/400/400/${encodeURIComponent(keywords)}`, { redirect: 'follow' });
+      if (res.ok && res.url) return res.url;
+    } catch {}
     return null;
   };
 
