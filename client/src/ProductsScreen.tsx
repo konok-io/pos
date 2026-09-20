@@ -5165,7 +5165,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                  <td style={{ padding: '10px 12px', textAlign: 'right' }}><span style={{ fontSize: 13, fontWeight: 600, color: pct > 0 ? T.green : T.red }}>{fmt(p.sellPrice - p.costPrice)} ({pct}%)</span></td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right' }}><span style={{ fontSize: 13, fontWeight: 600, color: (p.sellPrice - p.costPrice) > 0 ? T.green : (p.sellPrice - p.costPrice) < 0 ? T.red : T.gray400 }}>{fmt(p.sellPrice - p.costPrice)} ({pct === 0 && p.costPrice === 0 && (p.sellPrice - p.costPrice) > 0 ? '∞' : pct}%)</span></td>
 
 
 
@@ -9853,7 +9853,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                       const profitPct = (productForm.costPrice || 0) > 0 ? Math.round(profit / (productForm.costPrice || 1) * 100) : 0;
                       return (
                         <div style={{ height: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7, display: 'flex', alignItems: 'center' }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400 }}>{profitPct}%</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400 }}>{profitPct === 0 && (productForm.costPrice || 0) === 0 && profit > 0 ? '∞' : profitPct}%</span>
                         </div>
                       );
                     })()}
