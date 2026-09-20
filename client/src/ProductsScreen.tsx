@@ -407,10 +407,10 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ fontWeight: 700, fontSize: 15, color: p.stock <= 0 ? T.red : low ? T.amber : T.gray900 }}>{fmtN(p.stock)}</span>{low && <i className="fas fa-triangle-exclamation" style={{color:'#F59E0B',marginRight:4}}></i>}{p.stock <= 0 && ' <i className="fas fa-xmark"></i>'}</td>
                   <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400, textAlign: 'center' }}>{p.unit}</td>
                   <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
-                    <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setViewProduct(p)}><i className="fas fa-eye"></i></button>
-                    <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setEditFullProduct({ ...p })}><i className="fas fa-pen"></i></button>
-                    <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => printBarcode(p)}><i className="fas fa-barcode"></i></button>
-                    {p.stock <= 0 ? <button style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button> : <button disabled style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13, opacity: 0.4, cursor: 'not-allowed' }}><i className="fas fa-lock"></i></button>}
+                    <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewProduct(p)}><i className="fas fa-eye"></i></button>
+                    <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setEditFullProduct({ ...p })}><i className="fas fa-pen"></i></button>
+                    <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => printBarcode(p)}><i className="fas fa-barcode"></i></button>
+                    {p.stock <= 0 ? <button style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button> : <button disabled style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: 0.4, cursor: 'not-allowed' }}><i className="fas fa-lock"></i></button>}
                   </td>
                 </tr>
               );
@@ -456,8 +456,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14 }}>{purchaseCount}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.green }}>{fmt(totalPurchase)}</td>
                     <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
-                      <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}><i className="fas fa-eye"></i></button>
-                      <button style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteSupplier(company)}><i className="fas fa-trash"></i></button>
+                      <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewSupplier({ name: company, prodCount, purchaseCount, totalPurchase })}><i className="fas fa-eye"></i></button>
+                      <button style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => deleteSupplier(company)}><i className="fas fa-trash"></i></button>
                     </td>
                   </tr>
                 );
@@ -527,7 +527,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{fmt(totalValue)}</td>
                     <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
                       <button disabled={catProducts.length > 0} style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13, opacity: catProducts.length > 0 ? 0.3 : 1, cursor: catProducts.length > 0 ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingCategory(catObj); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
-                      <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-eye"></i></button>
+                      <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-eye"></i></button>
                       <button disabled={catProducts.length > 0} style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13, opacity: catProducts.length > 0 ? 0.3 : 1, cursor: catProducts.length > 0 ? 'not-allowed' : 'pointer' }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
                     </td>
                   </tr>
@@ -582,7 +582,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(p.costPrice)}</td>
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.teal }}>{fmt(p.sellPrice)}</td>
                   <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
-                    <button style={{ ...btn('primary', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => printBarcode(p)}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+                    <button style={{ ...btn('primary', 'sm') }} onClick={() => printBarcode(p)}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
                   </td>
                 </tr>
               ))}
