@@ -6618,7 +6618,12 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       await api.deleteAllCategories();
       await api.deleteAllSuppliers();
       await api.deleteAllSales();
+      await api.deleteAllCustomers();
       await api.deleteAllPurchases();
+      if ('caches' in window) {
+        const names = await caches.keys();
+        for (const name of names) { await caches.delete(name); }
+      }
       alert(t('dataDeletedSuccessfully'));
       window.location.reload();
     } catch (error) {
