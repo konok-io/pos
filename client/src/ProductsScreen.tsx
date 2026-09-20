@@ -4904,9 +4904,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   <div style={{ position: 'relative' }}>
                     <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-folder" style={{ fontSize: 13 }}></i></div>
                     <input value={productForm.cat} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, cat: val }); }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.cat ? '#FFFBEB' : T.gray50, borderColor: productForm.cat ? '#D97706' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
-                    {productForm.cat && categories.filter((ca: any) => (ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())).length > 0 && (
+                    {productForm.cat && categories.filter((ca: any) => ((ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())) && (ca.name || '').toLowerCase() !== productForm.cat.toLowerCase()).length > 0 && (
                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 120, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
-                        {categories.filter((ca: any) => (ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())).map((ca: any) => (
+                        {categories.filter((ca: any) => ((ca.name || '').toLowerCase().includes(productForm.cat.toLowerCase()) || (ca.id || '').toLowerCase().includes(productForm.cat.toLowerCase())) && (ca.name || '').toLowerCase() !== productForm.cat.toLowerCase()).map((ca: any) => (
                           <div key={ca.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, cat: ca.name })}>
                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#FEF3C7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               <i className="fas fa-folder" style={{ color: '#D97706', fontSize: 11 }}></i>
@@ -4923,16 +4923,42 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 </div>
                 {/* Product Name */}
                 <div style={{ marginBottom: 12 }}>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('productName')} * / {t('barcode')}</label>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('productName')} *</label>
                   <div style={{ position: 'relative' }}>
                     <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-tag" style={{ fontSize: 13 }}></i></div>
-                    <input value={productForm.name} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, name: val }); }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: T.gray50, borderColor: T.gray200, height: 40 }} placeholder={`${t('productName')} / ${t('barcode')}`} />
-                    {productForm.name && products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase()) || (p.code || '').toLowerCase().includes(productForm.name.toLowerCase())).length > 0 && (
+                    <input value={productForm.name} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, name: val }); }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.name && products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) ? '#F0FDFA' : T.gray50, borderColor: productForm.name && products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) ? T.teal : T.gray200, height: 40 }} placeholder={`${t('productName')}...`} />
+                    {productForm.name && products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase())).length > 0 && !products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) && (
                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
-                        {products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase()) || (p.code || '').toLowerCase().includes(productForm.name.toLowerCase())).slice(0, 8).map((p: any) => (
+                        {products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase())).slice(0, 8).map((p: any) => (
                           <div key={p.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, name: p.name, code: p.code || '', cat: p.cat || '', unit: p.unit || 'pcs', costPrice: p.costPrice, sellPrice: p.sellPrice, company: p.company || '', supplierId: p.supplierId || '' })}>
                             <div style={{ width: 32, height: 32, borderRadius: 8, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                               <i className="fas fa-box" style={{ color: T.teal, fontSize: 12 }}></i>
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontWeight: 600, color: T.tealDark }}>{p.name}</div>
+                              <div style={{ fontSize: 11, color: T.gray400 }}>{p.code || '-'}</div>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                              <div style={{ fontSize: 12, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol}{p.sellPrice}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* Barcode */}
+                <div style={{ marginBottom: 12 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('barcode')}</label>
+                  <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-barcode" style={{ fontSize: 13 }}></i></div>
+                    <input value={productForm.code} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, code: val }); }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? '#F0FDFA' : T.gray50, borderColor: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? T.teal : T.gray200, height: 40 }} placeholder={`${t('barcode')}...`} />
+                    {productForm.code && products.filter((p: any) => (p.code || '').toLowerCase().includes(productForm.code.toLowerCase())).length > 0 && !products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) && (
+                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
+                        {products.filter((p: any) => (p.code || '').toLowerCase().includes(productForm.code.toLowerCase())).slice(0, 8).map((p: any) => (
+                          <div key={p.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, name: p.name, code: p.code || '', cat: p.cat || '', unit: p.unit || 'pcs', costPrice: p.costPrice, sellPrice: p.sellPrice, company: p.company || '', supplierId: p.supplierId || '' })}>
+                            <div style={{ width: 32, height: 32, borderRadius: 8, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <i className="fas fa-barcode" style={{ color: T.teal, fontSize: 12 }}></i>
                             </div>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ fontWeight: 600, color: T.tealDark }}>{p.name}</div>
