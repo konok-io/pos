@@ -100,6 +100,7 @@ export const en: Record<string, string> = {
   selectCategory: 'Select Category',
   selectSupplier: 'Select Supplier',
   fillProductDetails: 'Fill in product details',
+  salesPriceWithVat: 'Sales Price with VAT',
   unit: 'Unit',
   save: 'Save',
   selectProduct: 'Select Product',

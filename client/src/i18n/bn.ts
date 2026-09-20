@@ -101,6 +101,7 @@ export const bn: Record<string, string> = {
   selectCategory: 'ক্যাটাগরি নির্বাচন',
   selectSupplier: 'সরবরাহকারী নির্বাচন',
   fillProductDetails: 'প্রোডাক্টের বিবরণ পূরণ করুন',
+  salesPriceWithVat: 'ভ্যাট সহ বিক্রয় মূল্য',
   selectProduct: 'পণ্য নির্বাচন',
   unit: 'ইউনিট',
   save: 'সেভ করুন',

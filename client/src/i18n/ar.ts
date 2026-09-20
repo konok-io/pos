@@ -100,6 +100,7 @@ export const ar: Record<string, string> = {
   selectCategory: 'اختر الفئة',
   selectSupplier: 'اختر المورد',
   fillProductDetails: 'املأ تفاصيل المنتج',
+  salesPriceWithVat: 'سعر البيع شامل الضريبة',
   selectProduct: 'اختر المنتج',
   unit: 'الوحدة',
   save: 'حفظ',
