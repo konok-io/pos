@@ -75,6 +75,8 @@ export const ar: Record<string, string> = {
 
   // Products
   productList: 'قائمة المنتجات',
+  productListEmpty: 'قائمة المنتجات فارغة',
+  post: 'نشر',
   name: 'الاسم',
   code: 'الكود',
   purchasePrice: 'سعر الشراء',

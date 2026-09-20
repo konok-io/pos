@@ -75,6 +75,8 @@ export const en: Record<string, string> = {
 
   // Products
   productList: 'Product List',
+  productListEmpty: 'Product list is empty',
+  post: 'Post',
   name: 'Name',
   code: 'Code',
   purchasePrice: 'Purchase Price',

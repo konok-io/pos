@@ -75,6 +75,8 @@ export const hi: Record<string, string> = {
 
   // Products
   productList: 'उत्पाद सूची',
+  productListEmpty: 'उत्पाद सूची खाली है',
+  post: 'पोस्ट',
   name: 'नाम',
   code: 'कोड',
   purchasePrice: 'खरीद मूल्य',

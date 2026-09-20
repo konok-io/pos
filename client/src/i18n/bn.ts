@@ -76,6 +76,8 @@ export const bn: Record<string, string> = {
 
   // Products
   productList: 'পণ্য তালিকা',
+  productListEmpty: 'পণ্য তালিকা খালি',
+  post: 'পোস্ট',
   name: 'নাম',
   code: 'কোড',
   purchasePrice: 'ক্রয়মূল্য',

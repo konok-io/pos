@@ -86,6 +86,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const [customBarcodeProducts, setCustomBarcodeProducts] = useState<any[]>([]);
   const [customBarcodeSearch, setCustomBarcodeSearch] = useState('');
   const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [tempProducts, setTempProducts] = useState<any[]>([]);
   const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' });
   const [editFullProduct, setEditFullProduct] = useState<any>(null);
   const [viewSupplier, setViewSupplier] = useState<any>(null);
@@ -166,6 +167,36 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     api.addProduct(newProduct).catch(() => {});
     setShowAddProductModal(false);
     setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' });
+  };
+
+  const handleAddToTempList = () => {
+    if (!productForm.name.trim()) { alert(t('enterName')); return; }
+    const tempProduct = { id: genId(), ...productForm, _temp: true };
+    setTempProducts(prev => [...prev, tempProduct]);
+    setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId });
+  };
+
+  const handleRemoveTempProduct = (id: string) => {
+    setTempProducts(prev => prev.filter(p => p.id !== id));
+  };
+
+  const handlePostTempProducts = async () => {
+    if (tempProducts.length === 0) { alert(t('addAtLeastOne')); return; }
+    const purchaseId = genUniqueId();
+    const results = await Promise.allSettled(
+      tempProducts.map(p => {
+        const product = { ...p, purchaseId };
+        delete product._temp;
+        return api.addProduct(product);
+      })
+    );
+    const succeeded = results.filter(r => r.status === 'fulfilled').length;
+    const failed = results.filter(r => r.status === 'rejected').length;
+    const [prods] = await Promise.all([api.getProducts()]);
+    setProducts(prods);
+    setProductsParent(prods);
+    setTempProducts([]);
+    alert(`Purchase ID: ${purchaseId} | ${succeeded} ${t('saved')}${failed ? `, ${failed} failed` : ''}`);
   };
 
   const handleEditFullProduct = () => {
@@ -677,6 +708,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const tabs = [
     { id: 'allProducts', icon: <i className="fas fa-box"></i>, label: t('allProducts') },
+    { id: 'newProduct', icon: <i className="fas fa-plus-circle"></i>, label: t('newProduct') },
     { id: 'suppliers', icon: <i className="fas fa-building"></i>, label: t('suppliers') },
     { id: 'categories', icon: <i className="fas fa-folder"></i>, label: t('categories') },
     { id: 'barcode', icon: <i className="fas fa-barcode"></i>, label: t('barcode') },
@@ -779,6 +811,81 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       </div>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         {productTab === 'allProducts' && renderAllProducts()}
+        {productTab === 'newProduct' && (
+          <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+            {/* LEFT: Product Form */}
+            <div style={{ flex: '1 1 420px', maxWidth: 500, borderRight: `1px solid ${T.gray200}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ padding: '12px 16px', background: T.tealLight, borderBottom: `1px solid ${T.gray200}` }}>
+                <h3 style={{ margin: 0, color: T.teal, fontSize: 16, fontWeight: 700 }}><i className="fas fa-plus-circle" style={{marginRight: 6}}></i> {t('addNewProduct')}</h3>
+              </div>
+              <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={labelStyle}>{t('supplierId')} / {t('company')}</label>
+                    <div style={{ position: 'relative' }}>
+                      <input value={productForm.supplierId} onChange={e => { const val = e.target.value; const found = suppliers.find((s: any) => s.id === val || s.name.toLowerCase() === val.toLowerCase()); if (found) { setProductForm({ ...productForm, supplierId: found.id, company: found.name }); } else { setProductForm({ ...productForm, supplierId: val }); } }} onKeyDown={e => { if (e.key === 'Enter') { const found = suppliers.find((s: any) => s.id === productForm.supplierId || s.name.toLowerCase() === productForm.supplierId.toLowerCase()); if (found) { setProductForm({ ...productForm, supplierId: found.id, company: found.name }); } } }} style={inputStyle} placeholder={`${t('supplierId')} - ${t('enterToSearch')}`} />
+                      {productForm.supplierId && suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).length > 0 && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 7, maxHeight: 150, overflow: 'auto', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                          {suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).map((s: any) => (
+                            <div key={s.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 13 }} onClick={() => setProductForm({ ...productForm, supplierId: s.id, company: s.name })}>
+                              <span style={{ color: T.teal, fontWeight: 600 }}>{s.id}</span> - <span>{s.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {productForm.company && <div style={{ fontSize: 12, color: T.green, marginTop: 4 }}><i className="fas fa-check" style={{marginRight: 4}}></i> {productForm.company}</div>}
+                  </div>
+                  <div><label style={labelStyle}>{t('productName')} *</label><input value={productForm.name} onChange={e => setProductForm({ ...productForm, name: e.target.value })} style={inputStyle} placeholder={t('productName')} /></div>
+                  <div><label style={labelStyle}>{t('barcode')}</label><input value={productForm.code} onChange={e => setProductForm({ ...productForm, code: e.target.value })} style={inputStyle} placeholder={t('barcode')} /></div>
+                  <div><label style={labelStyle}>{t('category')}</label><input value={productForm.cat} onChange={e => setProductForm({ ...productForm, cat: e.target.value })} style={inputStyle} placeholder={t('category')} /></div>
+                  <div><label style={labelStyle}>{t('unit')}</label><input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={inputStyle} placeholder={t('unit')} /></div>
+                  <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={inputStyle} /></div>
+                  <div><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+                  <div><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+                  <div><label style={labelStyle}>{t('stock')}</label><input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={inputStyle} /></div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 14, justifyContent: 'center' }}>
+                  <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1 }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('add')}</button>
+                  <button onClick={() => setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId })} style={{ ...btn('ghost'), flex: 1 }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
+                </div>
+              </div>
+            </div>
+            {/* RIGHT: Product List */}
+            <div style={{ flex: '1 1 500px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ padding: '12px 16px', background: T.tealLight, borderBottom: `1px solid ${T.gray200}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h3 style={{ margin: 0, color: T.teal, fontSize: 16, fontWeight: 700 }}><i className="fas fa-list-check" style={{marginRight: 6}}></i> {t('productList')} ({tempProducts.length})</h3>
+                <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0} style={{ padding: '8px 16px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? '#115E59' : T.gray200, color: tempProducts.length > 0 ? '#fff' : T.gray500, fontWeight: 700, fontSize: 13, cursor: tempProducts.length > 0 ? 'pointer' : 'not-allowed' }}><i className="fas fa-paper-plane" style={{marginRight: 4}}></i> {t('post')}</button>
+              </div>
+              <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
+                {tempProducts.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}>
+                    <div style={{ fontSize: 48, marginBottom: 12 }}><i className="fas fa-inbox"></i></div>
+                    <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{t('productListEmpty')}</div>
+                    <div style={{ fontSize: 13 }}>{t('addProductsFromLeft')}</div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {tempProducts.map((p, i) => (
+                      <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: i % 2 === 0 ? T.white : '#FAFAFA', borderRadius: 8, border: `1px solid ${T.gray100}` }}>
+                        <span style={{ fontSize: 11, color: T.gray400, fontWeight: 700, minWidth: 20, textAlign: 'center' }}>{i + 1}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontWeight: 600, fontSize: 13, color: T.teal, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
+                          <div style={{ fontSize: 11, color: T.gray400 }}>{p.company || '-'} {p.cat ? `| ${p.cat}` : ''}</div>
+                        </div>
+                        <div style={{ textAlign: 'right', fontSize: 12, color: T.gray500 }}>
+                          <div>{_settings?.currencySymbol || '৳'}{p.sellPrice}</div>
+                          <div style={{ fontWeight: 700, color: T.teal }}>x{p.stock}</div>
+                        </div>
+                        <button onClick={() => handleRemoveTempProduct(p.id)} style={{ width: 24, height: 24, borderRadius: 6, border: 'none', background: '#FEF2F2', color: '#DC2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}><i className="fas fa-xmark"></i></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         {productTab === 'suppliers' && renderSupplier()}
         {productTab === 'categories' && renderCategory()}
         {productTab === 'barcode' && renderBarcode()}
