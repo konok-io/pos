@@ -9843,13 +9843,27 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     </div>
                   </div>
                 </div>
-                {/* Unit + Min Stock */}
+                {/* Unit + VAT */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('unit')}</label>
                     <div style={{ position: 'relative' }}>
                       <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-ruler" style={{ fontSize: 12 }}></i></div>
                       <input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 30, height: 38 }} placeholder="pcs" />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('vat')} (%)</label>
+                    <input type="number" value={productForm.vat || _settings?.vatPercent || 0} onChange={e => setProductForm({ ...productForm, vat: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#7C3AED' }} />
+                  </div>
+                </div>
+                {/* Stock + Min Stock */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('stock')}</label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-cubes" style={{ fontSize: 11 }}></i></div>
+                      <input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
                     </div>
                   </div>
                   <div>
@@ -9860,43 +9874,41 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     </div>
                   </div>
                 </div>
-                {/* Purchase Price */}
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('purchasePrice')} ({_settings?.currencySymbol})</label>
-                  <input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#15803D' }} />
-                </div>
-                {/* Stock + VAT */}
+                {/* Purchase Price + Sell Price */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('stock')}</label>
-                    <div style={{ position: 'relative' }}>
-                      <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-cubes" style={{ fontSize: 11 }}></i></div>
-                      <input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
-                    </div>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('purchasePrice')} ({_settings?.currencySymbol})</label>
+                    <input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#15803D' }} />
                   </div>
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('vat')} (%)</label>
-                    <input type="number" value={productForm.vat || _settings?.vatPercent || 0} onChange={e => setProductForm({ ...productForm, vat: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#7C3AED' }} />
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('sellPrice')} ({_settings?.currencySymbol})</label>
+                    <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#B91C1C' }} />
                   </div>
                 </div>
-                {/* Profit + Sell Price */}
+                {/* Profit + Profit % */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} ({_settings?.currencySymbol} / %)</label>
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} ({_settings?.currencySymbol})</label>
                     {(() => {
                       const profit = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
-                      const profitPct = (productForm.costPrice || 0) > 0 ? Math.round(profit / (productForm.costPrice || 1) * 100) : 0;
                       return (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, height: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7 }}>
+                        <div style={{ height: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7, display: 'flex', alignItems: 'center' }}>
                           <span style={{ fontSize: 14, fontWeight: 700, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400 }}>{_settings?.currencySymbol}{profit}</span>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400, background: profit > 0 ? '#F0FDF4' : profit < 0 ? '#FEF2F2' : T.gray100, padding: '2px 8px', borderRadius: 10 }}>{profitPct}%</span>
                         </div>
                       );
                     })()}
                   </div>
                   <div>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('sellPrice')} ({_settings?.currencySymbol})</label>
-                    <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#B91C1C' }} />
+                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} (%)</label>
+                    {(() => {
+                      const profit = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
+                      const profitPct = (productForm.costPrice || 0) > 0 ? Math.round(profit / (productForm.costPrice || 1) * 100) : 0;
+                      return (
+                        <div style={{ height: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7, display: 'flex', alignItems: 'center' }}>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400 }}>{profitPct}%</span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
                 {/* VAT included Sales Price */}
