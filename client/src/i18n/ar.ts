@@ -102,6 +102,8 @@ export const ar: Record<string, string> = {
   selectSupplier: 'اختر المورد',
   fillProductDetails: 'املأ تفاصيل المنتج',
   salesPriceWithVat: 'سعر البيع شامل الضريبة',
+  csvUploadDesc: 'رفع قائمة المنتجات من ملف CSV',
+  totalAmount: 'المبلغ الإجمالي',
   selectProduct: 'اختر المنتج',
   unit: 'الوحدة',
   save: 'حفظ',

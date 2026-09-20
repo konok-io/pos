@@ -9946,14 +9946,40 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 </div>
               </div>
             </div>
-            {/* MIDDLE: Empty space */}
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.gray50 }}>
-              <div style={{ textAlign: 'center', color: T.gray400 }}>
-                <div style={{ width: 80, height: 80, borderRadius: 20, background: T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                  <i className="fas fa-arrow-left" style={{ fontSize: 28, color: T.gray300 }}></i>
+            {/* MIDDLE: CSV Upload + Purchase History */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: T.gray50, overflow: 'hidden' }}>
+              {/* CSV Upload */}
+              <div style={{ padding: 16, borderBottom: `1px solid ${T.gray200}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-file-csv" style={{ color: '#fff', fontSize: 16 }}></i>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: T.gray800 }}>{t('csvUpload')}</div>
+                    <div style={{ fontSize: 11, color: T.gray400 }}>{t('csvUploadDesc')}</div>
+                  </div>
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: T.gray500, marginBottom: 4 }}>{t('fillFormLeft')}</div>
-                <div style={{ fontSize: 13 }}>{t('addProductsToCart')}</div>
+                <div style={{ border: `2px dashed ${T.gray300}`, borderRadius: 10, padding: '16px 12px', textAlign: 'center', background: T.white, cursor: 'pointer', position: 'relative' }} onClick={() => document.getElementById('csv-upload-input')?.click()}>
+                  <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines = text.split('\n').filter((l: string) => l.trim()); const headers = lines[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = headers.findIndex((h: string) => h.includes('sell') || h.includes('price')); const stockIdx = headers.findIndex((h: string) => h.includes('stock')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const imported: any[] = []; for (let i = 1; i < lines.length; i++) { const cols = lines[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? parseFloat(cols[costIdx]) || 0 : 0, sellPrice: sellIdx >= 0 ? parseFloat(cols[sellIdx]) || 0 : 0, stock: stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyIdx >= 0 ? cols[companyIdx] : '', minStock: 5, supplierId: '', vat: 0, expiryDate: '', _temp: true }); } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); alert(`${imported.length} ${t('products')} imported!`); } else { alert('No valid products found in CSV'); } }; reader.readAsText(file); e.target.value = ''; }} />
+                  <i className="fas fa-cloud-arrow-up" style={{ fontSize: 24, color: T.gray300, marginBottom: 8 }}></i>
+                  <div style={{ fontSize: 12, color: T.gray500, fontWeight: 500 }}>Click to upload CSV</div>
+                  <div style={{ fontSize: 10, color: T.gray400, marginTop: 4 }}>name, code, category, costPrice, sellPrice, stock, unit, company</div>
+                </div>
+              </div>
+              {/* Purchase History */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 10, borderBottom: `1px solid ${T.gray200}` }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className="fas fa-clock-rotate-left" style={{ color: '#fff', fontSize: 16 }}></i>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: T.gray800 }}>{t('purchaseHistory')}</div>
+                    <div style={{ fontSize: 11, color: T.gray400 }}>{products.filter((p: any) => p.purchaseId).length > 0 ? `${new Set(products.filter((p: any) => p.purchaseId).map((p: any) => p.purchaseId)).size} purchases` : 'No purchases yet'}</div>
+                  </div>
+                </div>
+                <div style={{ flex: 1, overflow: 'auto', padding: '8px 12px' }}>
+                  {(() => { const purchaseMap: Record<string, { items: any[], totalAmount: number, date: string }> = {}; products.filter((p: any) => p.purchaseId).forEach((p: any) => { if (!purchaseMap[p.purchaseId]) purchaseMap[p.purchaseId] = { items: [], totalAmount: 0, date: '' }; purchaseMap[p.purchaseId].items.push(p); purchaseMap[p.purchaseId].totalAmount += (p.costPrice || 0) * (p.stock || 0); }); const purchases = Object.entries(purchaseMap).sort((a, b) => b[1].items.length - a[1].items.length); if (purchases.length === 0) return <div style={{ textAlign: 'center', padding: '32px 16px', color: T.gray400 }}><div style={{ width: 56, height: 56, borderRadius: 14, background: T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}><i className="fas fa-receipt" style={{ fontSize: 22, color: T.gray300 }}></i></div><div style={{ fontSize: 13, fontWeight: 500 }}>No purchase history</div></div>; return purchases.map(([pid, data]) => (<div key={pid} style={{ background: T.white, borderRadius: 10, border: `1px solid ${T.gray100}`, marginBottom: 8, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}><div style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><div><div style={{ fontSize: 12, fontWeight: 700, color: T.teal }}>{pid}</div><div style={{ fontSize: 11, color: T.gray400 }}>{data.items.length} {t('products')}</div></div><div style={{ textAlign: 'right' }}><div style={{ fontSize: 14, fontWeight: 700, color: '#15803D' }}>{_settings?.currencySymbol} {data.totalAmount.toLocaleString()}</div></div></div><div style={{ padding: '0 12px 8px' }}>{data.items.slice(0, 3).map((item: any, idx: number) => (<div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: T.gray500, padding: '3px 0', borderBottom: idx < Math.min(data.items.length, 3) - 1 ? `1px solid ${T.gray50}` : 'none' }}><span>{item.name}</span><span style={{ color: T.gray600 }}>x{item.stock}</span></div>))}{data.items.length > 3 && <div style={{ fontSize: 10, color: T.gray400, marginTop: 4 }}>+{data.items.length - 3} more...</div>}</div></div>)); })()}
+                </div>
               </div>
             </div>
             {/* RIGHT: Product List Cart */}

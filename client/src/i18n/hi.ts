@@ -102,6 +102,8 @@ export const hi: Record<string, string> = {
   selectSupplier: 'आपूर्तिकर्ता चुनें',
   fillProductDetails: 'उत्पाद विवरण भरें',
   salesPriceWithVat: 'वैट सहित बिक्री मूल्य',
+  csvUploadDesc: 'CSV फ़ाइल से उत्पाद सूची अपलोड करें',
+  totalAmount: 'कुल राशि',
   selectProduct: 'उत्पाद चुनें',
   unit: 'इकाई',
   save: 'सेव करें',

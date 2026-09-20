@@ -102,6 +102,8 @@ export const en: Record<string, string> = {
   selectSupplier: 'Select Supplier',
   fillProductDetails: 'Fill in product details',
   salesPriceWithVat: 'Sales Price with VAT',
+  csvUploadDesc: 'Upload product list from CSV file',
+  totalAmount: 'Total Amount',
   unit: 'Unit',
   save: 'Save',
   selectProduct: 'Select Product',
