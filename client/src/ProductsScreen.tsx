@@ -526,9 +526,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{totalStock}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{fmt(totalValue)}</td>
                     <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
-                      <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => { setEditingCategory(catObj); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
+                      <button disabled={catProducts.length > 0} style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13, opacity: catProducts.length > 0 ? 0.3 : 1, cursor: catProducts.length > 0 ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingCategory(catObj); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
                       <button style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-eye"></i></button>
-                      <button style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
+                      <button disabled={catProducts.length > 0} style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13, opacity: catProducts.length > 0 ? 0.3 : 1, cursor: catProducts.length > 0 ? 'not-allowed' : 'pointer' }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
                     </td>
                   </tr>
                 );
