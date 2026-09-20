@@ -500,7 +500,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
                 <label htmlFor="isActive" style={{ ...labelStyle, marginBottom: 0, cursor: 'pointer' }}>{t('active')}</label>
               </div>
 
-              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+              <div style={{ display: 'flex', gap: 12, marginTop: 8, justifyContent: 'center' }}>
                 <button
                   onClick={() => setShowModal(false)}
                   style={{
@@ -591,7 +591,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+              <div style={{ display: 'flex', gap: 12, marginTop: 8, justifyContent: 'center' }}>
                 <button
                   onClick={() => setShowPasswordModal(false)}
                   style={{
@@ -2269,7 +2269,7 @@ export default function App() {
                             <div style={{ fontSize: 11, color: '#fff', opacity: 0.9 }}>{t('balance')}</div>
                             <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>{settings.currencySymbol} {searchedCustomer.balance}</div>
                           </div>
-                          <div style={{ display: 'flex', gap: 8 }}>
+                          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
                             <button 
                               onClick={() => { setSelectedCustomer(searchedCustomer); setCustomerSearch(''); }}
                               style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#fff', color: '#667eea', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
@@ -4040,7 +4040,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1F2937' }}>
           <i className="fas fa-building" style={{marginRight: 4}}></i> {t('suppliers')}
         </h2>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
           <button
             onClick={() => { setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setEditingSupplier(null); setShowSupplierModal(true); }}
             style={{ padding: '8px 14px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
@@ -4158,7 +4158,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProducts')}</div>
             </div>
             
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
               <button
                 onClick={() => { setShowPurchaseHistory(viewSupplier); setViewSupplier(null); }}
                 style={{ flex: 1, padding: '10px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
@@ -4197,7 +4197,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProducts')}</div>
             </div>
             
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
               <button
                 onClick={() => { setCategoryForm(viewCategory); setEditingCategory(viewCategory); setShowCategoryModal(true); setViewCategory(null); }}
                 style={{ flex: 1, padding: '10px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600 }}>
@@ -4288,7 +4288,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+            <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'center' }}>
               <button onClick={() => setShowSupplierModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 {t('cancel')}
               </button>
@@ -4318,7 +4318,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               />
             </div>
             
-            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+            <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'center' }}>
               <button onClick={() => setShowCategoryModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 {t('cancel')}
               </button>
@@ -4457,7 +4457,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
               </div>
             </div>
             
-            <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+            <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'center' }}>
               <button onClick={() => setShowProductModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 {t('cancel')}
               </button>
@@ -4963,6 +4963,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
           gap: '8px',
           padding: '12px 16px',
           borderTop: `1px solid ${T.gray200}`,
+          justifyContent: 'center',
         }}>
           <button
             onClick={onClose}
@@ -5275,6 +5276,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
             gap: '12px',
             padding: '16px 20px',
             borderTop: `1px solid ${T.gray200}`,
+            justifyContent: 'center',
           }}>
             <button
               onClick={() => setIsAddDepositModalOpen(false)}
@@ -5474,6 +5476,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
             gap: '12px',
             padding: '16px 20px',
             borderTop: `1px solid ${T.gray200}`,
+            justifyContent: 'center',
           }}>
             <button
               onClick={() => setIsAddDueModalOpen(false)}
@@ -7513,7 +7516,7 @@ export function TranslationSettings() {
                 </td>
                 <td style={{ padding: '10px 16px', width: '60%' }}>
                   {editingKey === key ? (
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
                       <input
                         id="translation-input"
                         type="text"
