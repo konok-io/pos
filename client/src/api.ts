@@ -77,5 +77,6 @@ export const api = {
   deleteAllCategories: () => request('/categories/all', { method: 'DELETE' }),
   deleteAllSuppliers: () => request('/suppliers/all', { method: 'DELETE' }),
   deleteAllSales: () => request('/sales/all', { method: 'DELETE' }),
+  deleteAllCustomers: () => request('/customers/all', { method: 'DELETE' }),
   deleteAllPurchases: () => request('/purchases/all', { method: 'DELETE' }),
 };

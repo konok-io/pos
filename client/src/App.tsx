@@ -1324,7 +1324,11 @@ export default function App() {
     }
   };
 
-  const handleHardRefresh = () => {
+  const handleHardRefresh = async () => {
+    if ('caches' in window) {
+      const names = await caches.keys();
+      for (const name of names) { await caches.delete(name); }
+    }
     window.location.reload();
   };
 
@@ -6658,70 +6662,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     setCustomers: React.Dispatch<React.SetStateAction<any[]>>, 
     translate: any
   ) => {
-    const deletableCustomers = customers.filter(c => !c.isSystem);
-    
-    if (deletableCustomers.length === 0 && customers.filter(c => c.isSystem).length > 0) {
-      // Only General Customer exists - reset its data completely
-      if (!confirm(translate('warningPermanentDelete'))) return;
-      
-      try {
-        // Delete all customers including General Customer's data
-        for (const customer of customers) {
-          await db.delete('customers', customer.id).catch(() => {});
-        }
-        
-        // Recreate fresh General Customer with reset data
-        const generalCustomer: Customer = {
-          id: '2000010112345',
-          name: 'General Customer',
-          phone: '',
-          address: '',
-          balance: 0,
-          deposit: 0,
-          transactions: [],
-          isSystem: true,
-        };
-        
-        await db.put('customers', generalCustomer.id, generalCustomer);
-        setCustomers([generalCustomer]);
-        onRefresh();
-        alert(translate('dataDeletedSuccessfully'));
-      } catch (error) {
-          alert(translate('error') + '!');
-      }
-      return;
-    }
-    
-    if (deletableCustomers.length === 0) {
-      alert(translate('noCustomersToDelete') || 'No customers to delete');
-      return;
-    }
-    
+    if (customers.length === 0) return;
     if (!confirm(translate('warningPermanentDelete'))) return;
-    
     try {
-      // Delete all non-system customers
-      for (const customer of deletableCustomers) {
-        await db.delete('customers', customer.id).catch(() => {});
-      }
-      
-      // Reset General Customer data completely (only ID preserved)
-      const systemCustomer = customers.find(c => c.isSystem);
-      if (systemCustomer) {
-        const resetCustomer: Customer = {
-          id: systemCustomer.id,
-          name: systemCustomer.name,
-          phone: '',
-          address: '',
-          balance: 0,
-          deposit: 0,
-          transactions: [],
-          isSystem: true,
-        };
-        await db.put('customers', resetCustomer.id, resetCustomer);
-        setCustomers([resetCustomer]);
-      }
-      
+      await api.deleteAllCustomers();
+      setCustomers([]);
       onRefresh();
       alert(translate('dataDeletedSuccessfully'));
     } catch (error) {
