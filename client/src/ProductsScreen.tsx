@@ -744,7 +744,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 </div>
               )}
             </div>
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '' }); setShowAddProductModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addNewProduct')}</button>
           </div>
         )}
         {productTab === 'suppliers' && (
