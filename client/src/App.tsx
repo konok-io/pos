@@ -1021,7 +1021,7 @@ export default function App() {
   const [suppliers, setSuppliers] = useState<any[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
   const [productHistory, _setProductHistory] = useState<any[]>([]);
-  const [settings, _setSettings] = useState<any>({ vatPercent: 15 });
+  const [settings, _setSettings] = useState<any>({ vatPercent: 15, vatEnabled: true, dueSalesEnabled: true, currencySymbol: '৳' });
   const [currentUser, _setCurrentUser] = useState<any>(DEFAULT_ADMIN);
   const [users, setUsers] = useState<User[]>([]);
 
@@ -1125,6 +1125,10 @@ export default function App() {
       const savedDueSales = await localDb.getSetting<string>('dueSalesEnabled');
       if (savedDueSales !== null) {
         _setSettings((prev: any) => ({ ...prev, dueSalesEnabled: savedDueSales === 'true' }));
+      }
+      const savedVatEnabled = await localDb.getSetting<string>('vatEnabled');
+      if (savedVatEnabled !== null) {
+        _setSettings((prev: any) => ({ ...prev, vatEnabled: savedVatEnabled === 'true' }));
       }
       const savedCurrencySymbol = await localDb.getSetting<string>('currencySymbol');
       if (savedCurrencySymbol) {
