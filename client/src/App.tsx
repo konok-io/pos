@@ -1499,9 +1499,9 @@ export default function App() {
                 <button onClick={() => setCurrentTab('pos')} style={{
                   padding: '5px 10px',
                   border: 'none',
-                  background: currentTab === 'pos' ? '#E0E0E0' : 'transparent',
+                  background: currentTab === 'pos' ? '#115E59' : 'transparent',
                   cursor: 'pointer',
-                  color: '#000000',
+                  color: currentTab === 'pos' ? '#FFFFFF' : '#374151',
                   fontWeight: 600,
                   fontSize: 13,
                   display: 'flex',
@@ -1519,9 +1519,9 @@ export default function App() {
                   <button key={t.id} onClick={() => setCurrentTab(t.id)} style={{
                     padding: '5px 10px',
                     border: 'none',
-                    background: currentTab === t.id ? '#E0E0E0' : 'transparent',
+                    background: currentTab === t.id ? '#115E59' : 'transparent',
                     cursor: 'pointer',
-                    color: '#000000',
+                    color: currentTab === t.id ? '#FFFFFF' : '#374151',
                     fontWeight: 600,
                     fontSize: 13,
                     display: 'flex',
