@@ -1054,7 +1054,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [tempProducts, setTempProducts] = useState<any[]>([]);
+  const [tempProducts, setTempProducts] = useState<any[]>(() => { try { const d = localStorage.getItem('pos_temp_products'); return d ? JSON.parse(d) : []; } catch { return []; } });
+
+  useEffect(() => { localStorage.setItem('pos_temp_products', JSON.stringify(tempProducts)); }, [tempProducts]);
 
 
 
