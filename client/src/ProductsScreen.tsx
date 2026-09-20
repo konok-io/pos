@@ -9969,6 +9969,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   <div style={{ fontSize: 12, color: T.gray500, fontWeight: 500 }}>Click to upload CSV</div>
                   <div style={{ fontSize: 10, color: T.gray400, marginTop: 4 }}>name, code, category, costPrice, sellPrice, stock, unit, company</div>
                 </div>
+                <button onClick={() => { const headers = ['Name', 'Code', 'Category', 'CostPrice', 'SellPrice', 'Stock', 'Unit', 'Company']; const demo = [headers.join(','), 'Rice Basmati,1001,Groceries,80,120,50,kg,ABC Traders', 'Samsung Galaxy S24,2001,Electronics,45000,55000,10,pcs,Mobile World', 'Notebook A4,3001,Stationery,25,40,200,pcs,Paper House'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'products_template.csv'; a.click(); URL.revokeObjectURL(url); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px 0', marginTop: 8, border: `1px solid ${T.gray200}`, borderRadius: 8, background: T.white, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: T.gray600 }}><i className="fas fa-download" style={{ fontSize: 12 }}></i> {t('demoCsv')}</button>
               </div>
               {/* Purchase History */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
