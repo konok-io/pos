@@ -813,7 +813,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         {productTab === 'newProduct' && (
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
             {/* LEFT: Supplier + Category */}
-            <div style={{ flex: '0 0 340px', borderRight: `1px solid ${T.gray200}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ flex: '0 0 300px', borderRight: `1px solid ${T.gray200}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <div style={{ flex: 1, overflow: 'auto' }}>
                 {/* Supplier Section */}
                 <div style={{ padding: '12px 16px', background: '#E0F2FE', borderBottom: `1px solid ${T.gray200}` }}>
@@ -872,44 +872,42 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 </div>
               </div>
             </div>
-            {/* RIGHT: Product Form + Product List (fixed like sales cart) */}
-            <div style={{ width: 380, display: 'flex', flexDirection: 'column', background: '#fafbfc', borderLeft: `1px solid ${T.gray200}`, flexShrink: 0 }}>
-              {/* Product Form */}
-              <div style={{ borderBottom: `2px solid ${T.gray200}`, background: '#FAFBFC' }}>
-                <div style={{ padding: '10px 16px', background: T.tealLight, borderBottom: `1px solid ${T.gray200}` }}>
-                  <h3 style={{ margin: 0, color: T.teal, fontSize: 14, fontWeight: 700 }}><i className="fas fa-box" style={{marginRight: 6}}></i> {t('addNewProduct')}</h3>
-                </div>
-                <div style={{ padding: 12 }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                    <div style={{ gridColumn: 'span 2' }}>
-                      <label style={labelStyle}>{t('productName')} * / {t('barcode')}</label>
-                      <div style={{ position: 'relative' }}>
-                        <input value={productForm.name} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, name: val }); }} style={{ ...inputStyle, fontSize: 13 }} placeholder={`${t('productName')} / ${t('barcode')}`} />
-                        {productForm.name && products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase()) || (p.code || '').toLowerCase().includes(productForm.name.toLowerCase())).length > 0 && (
-                          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 7, maxHeight: 120, overflow: 'auto', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-                            {products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase()) || (p.code || '').toLowerCase().includes(productForm.name.toLowerCase())).slice(0, 8).map((p: any) => (
-                              <div key={p.id} style={{ padding: '6px 10px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12 }} onClick={() => setProductForm({ ...productForm, name: p.name, code: p.code || '', cat: p.cat || '', unit: p.unit || 'pcs', costPrice: p.costPrice, sellPrice: p.sellPrice, company: p.company || '', supplierId: p.supplierId || '' })}>
-                                <span style={{ color: T.teal, fontWeight: 600 }}>{p.name}</span> <span style={{ color: T.gray400 }}>({p.code || '-'})</span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+            {/* MIDDLE: Product Form */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRight: `1px solid ${T.gray200}` }}>
+              <div style={{ padding: '10px 16px', background: T.tealLight, borderBottom: `1px solid ${T.gray200}` }}>
+                <h3 style={{ margin: 0, color: T.teal, fontSize: 14, fontWeight: 700 }}><i className="fas fa-box" style={{marginRight: 6}}></i> {t('addNewProduct')}</h3>
+              </div>
+              <div style={{ flex: 1, overflow: 'auto', padding: 12, background: '#FAFBFC' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label style={labelStyle}>{t('productName')} * / {t('barcode')}</label>
+                    <div style={{ position: 'relative' }}>
+                      <input value={productForm.name} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, name: val }); }} style={{ ...inputStyle, fontSize: 13 }} placeholder={`${t('productName')} / ${t('barcode')}`} />
+                      {productForm.name && products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase()) || (p.code || '').toLowerCase().includes(productForm.name.toLowerCase())).length > 0 && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 7, maxHeight: 120, overflow: 'auto', zIndex: 10, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                          {products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase()) || (p.code || '').toLowerCase().includes(productForm.name.toLowerCase())).slice(0, 8).map((p: any) => (
+                            <div key={p.id} style={{ padding: '6px 10px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12 }} onClick={() => setProductForm({ ...productForm, name: p.name, code: p.code || '', cat: p.cat || '', unit: p.unit || 'pcs', costPrice: p.costPrice, sellPrice: p.sellPrice, company: p.company || '', supplierId: p.supplierId || '' })}>
+                              <span style={{ color: T.teal, fontWeight: 600 }}>{p.name}</span> <span style={{ color: T.gray400 }}>({p.code || '-'})</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div><label style={labelStyle}>{t('unit')}</label><input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={{ ...inputStyle, fontSize: 13 }} placeholder="pcs" /></div>
-                    <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={{ ...inputStyle, fontSize: 13 }} /></div>
-                    <div><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol})</label><input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13 }} /></div>
-                    <div><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol})</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13 }} /></div>
-                    <div><label style={labelStyle}>{t('stock')}</label><input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13 }} /></div>
-                    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6 }}>
-                      <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px' }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('add')}</button>
-                      <button onClick={() => setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px' }}><i className="fas fa-eraser"></i></button>
-                    </div>
+                  </div>
+                  <div><label style={labelStyle}>{t('unit')}</label><input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={{ ...inputStyle, fontSize: 13 }} placeholder="pcs" /></div>
+                  <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={{ ...inputStyle, fontSize: 13 }} /></div>
+                  <div><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol})</label><input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13 }} /></div>
+                  <div><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol})</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13 }} /></div>
+                  <div><label style={labelStyle}>{t('stock')}</label><input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13 }} /></div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6 }}>
+                    <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px' }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('add')}</button>
+                    <button onClick={() => setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px' }}><i className="fas fa-eraser"></i></button>
                   </div>
                 </div>
               </div>
-              {/* Product List (like cart) */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            </div>
+            {/* RIGHT: Product List Cart (fixed like sales page) */}
+            <div style={{ width: 340, display: 'flex', flexDirection: 'column', background: '#fafbfc', flexShrink: 0 }}>
                 <div style={{ padding: '8px 16px', background: T.white, borderBottom: `1px solid ${T.gray200}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: T.teal }}><i className="fas fa-list-check" style={{marginRight: 4}}></i> {t('productList')} <span style={{ background: T.tealLight, color: T.teal, padding: '1px 8px', borderRadius: 10, fontSize: 12, fontWeight: 700 }}>{tempProducts.length}</span></span>
                   <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0} style={{ padding: '6px 14px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? '#115E59' : T.gray200, color: tempProducts.length > 0 ? '#fff' : T.gray500, fontWeight: 700, fontSize: 12, cursor: tempProducts.length > 0 ? 'pointer' : 'not-allowed' }}><i className="fas fa-paper-plane" style={{marginRight: 4}}></i> {t('post')}</button>
@@ -940,7 +938,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     </div>
                   )}
                 </div>
-              </div>
             </div>
           </div>
         )}
