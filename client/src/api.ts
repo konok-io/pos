@@ -17,7 +17,7 @@ export function clearToken() {
 }
 
 function mapProduct(p: any) {
-  return { ...p, costPrice: p.cost_price ?? p.costPrice ?? 0, sellPrice: p.sell_price ?? p.sellPrice ?? 0, minStock: p.min_stock ?? p.minStock ?? 5, categoryId: p.category_id ?? p.categoryId ?? '', expiryDate: p.expiry_date ?? p.expiryDate ?? '', purchaseId: p.purchase_id ?? p.purchaseId ?? '' };
+  return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '' };
 }
 
 async function request(path: string, options: RequestInit = {}) {
