@@ -661,6 +661,7 @@ interface Product {
   categoryId: string;
   supplier: string;
   image: string;
+  icon?: string;
   // Extended fields
   barcode?: string;
   description?: string;
@@ -1026,6 +1027,37 @@ export default function App() {
   const [currentUser, _setCurrentUser] = useState<any>(DEFAULT_ADMIN);
   const [users, setUsers] = useState<User[]>([]);
 
+  const getProductIcon = (name: string) => {
+    const n = (name || '').toLowerCase();
+    const icons: Record<string, string> = {
+      food: 'fa-bowl-rice', rice: 'fa-bowl-rice', dal: 'fa-bowl-rice',
+      meat: 'fa-drumstick-bite', chicken: 'fa-drumstick-bite', fish: 'fa-fish',
+      fruit: 'fa-apple-whole', apple: 'fa-apple-whole', mango: 'fa-apple-whole',
+      vegetable: 'fa-leaf', potato: 'fa-leaf', onion: 'fa-leaf',
+      drink: 'fa-mug-hot', tea: 'fa-mug-hot', coffee: 'fa-mug-hot',
+      soap: 'fa-bottle-droplet', shampoo: 'fa-bottle-droplet', cream: 'fa-bottle-droplet',
+      medicine: 'fa-pills', tablet: 'fa-pills', drug: 'fa-pills',
+      phone: 'fa-mobile-screen-button', mobile: 'fa-mobile-screen-button', samsung: 'fa-mobile-screen-button',
+      laptop: 'fa-laptop', computer: 'fa-laptop',
+      notebook: 'fa-book', book: 'fa-book', paper: 'fa-book',
+      bag: 'fa-bag-shopping',
+      shoe: 'fa-shoe-prints', sandal: 'fa-shoe-prints',
+      pen: 'fa-pen', pencil: 'fa-pen', stationery: 'fa-pen',
+      game: 'fa-gamepad', toy: 'fa-gamepad',
+      money: 'fa-money-bill',
+      electronics: 'fa-microchip', chip: 'fa-microchip',
+      shirt: 'fa-shirt', clothing: 'fa-shirt',
+      tool: 'fa-wrench',
+      biscuit: 'fa-cookie', chocolate: 'fa-cookie',
+      cigarette: 'fa-smoking',
+      sugar: 'fa-cube', salt: 'fa-cube', flour: 'fa-cube', wheat: 'fa-cube',
+    };
+    for (const [key, icon] of Object.entries(icons)) {
+      if (n.includes(key)) return icon;
+    }
+    return 'fa-box';
+  };
+
   // Tabs configuration
   const otherTabs = [
     { id: 'products', icon: <i className="fas fa-box"></i>, label: t('products') },
@@ -1331,52 +1363,6 @@ export default function App() {
     }
     window.location.reload();
   };
-
-  const fetchProductImage = async (productName: string, cat: string): Promise<string | null> => {
-    const cleanName = (productName || '').replace(/[0-9]/g, '').trim();
-    const searchQueries = [cleanName, cat].filter(Boolean);
-    for (const query of searchQueries) {
-      try {
-        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json&origin=*`);
-        if (res.ok) {
-          const data = await res.json();
-          const title = data?.query?.search?.[0]?.title;
-          if (title) {
-            const imgRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
-            if (imgRes.ok) {
-              const imgData = await imgRes.json();
-              if (imgData.thumbnail && imgData.thumbnail.source) return imgData.thumbnail.source;
-              if (imgData.originalimage && imgData.originalimage.source) return imgData.originalimage.source;
-            }
-          }
-        }
-      } catch {}
-    }
-    const flickrKeywords = [cleanName, cat].filter(Boolean).join(',');
-    try {
-      const res = await fetch(`https://loremflickr.com/400/400/${encodeURIComponent(flickrKeywords)}`, { redirect: 'follow' });
-      if (res.ok && res.url) return res.url;
-    } catch {}
-    return null;
-  };
-
-  useEffect(() => {
-    const missingImages = products.filter((p: any) => !p.image || !p.image.startsWith('http'));
-    if (missingImages.length === 0) return;
-    const fetchAll = async () => {
-      const updated = [...products];
-      for (const p of missingImages) {
-        const imgUrl = await fetchProductImage(p.name || '', p.cat || '');
-        if (imgUrl) {
-          const idx = updated.findIndex((x: any) => x.id === p.id);
-          if (idx >= 0) updated[idx] = { ...updated[idx], image: imgUrl };
-          api.updateProduct(String(p.id), { ...p, image: imgUrl }).catch(() => {});
-        }
-      }
-      setProducts(updated);
-    };
-    fetchAll();
-  }, [products.length]);
 
   // Filter products - only show when search, category, supplier, or stock filter is selected
   const hasFilter = searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all';
@@ -2556,43 +2542,7 @@ export default function App() {
                             overflow: 'hidden',
                             border: `2px solid ${product.stock <= 0 ? '#fca5a5' : product.stock <= 10 ? '#fdba74' : '#E5E7EB'}`,
                           }}>
-                            {product.image && product.image.startsWith('http') ? (
-                              <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            ) : (
-                              <span style={{ fontSize: 36 }}>
-                                {/* Auto detect icon based on product name */}
-                                {product.name.includes('চা') ? '☕' :
-                                 product.name.includes('কফি') || product.name.includes('কোকা') || product.name.includes('কোলা') ? '🥤' :
-                                 product.name.includes('পানীয়') || product.name.includes('জুস') || product.name.includes('সফট') ? '🧃' :
-                                 product.name.includes('ভাত') || product.name.includes('খাবার') || product.name.includes('খাওয়া') ? '🍚' :
-                                 product.name.includes('পোলাও') || product.name.includes('বিরিয়ানি') || product.name.includes('খিচুড়ি') ? '🍛' :
-                                 product.name.includes('চিকেন') || product.name.includes('মাংস') || product.name.includes('কারি') ? '🍗' :
-                                 product.name.includes('ফল') || product.name.includes('আম') || product.name.includes('কলা') || product.name.includes('আঙ্গুর') ? '🍎' :
-                                 product.name.includes('সবজি') || product.name.includes('আলু') || product.name.includes('পটল') ? '🥬' :
-                                 product.name.includes('মাছ') || product.name.includes('ভাত') ? '🐟' :
-                                 product.name.includes('রুটি') || product.name.includes('ব্রেড') || product.name.includes('পরোটা') ? '🫓' :
-                                 product.name.includes('সাবান') ? '🧼' :
-                                 product.name.includes('শ্যাম্পু') || product.name.includes('তেল') || product.name.includes('শ্যাম্পু') ? '🧴' :
-                                 product.name.includes('টুথ') || product.name.includes('পেস্ট') ? '🪥' :
-                                 product.name.includes('পাউডার') || product.name.includes('ক্রিম') ? '🧴' :
-                                 product.name.includes('ওষুধ') || product.name.includes('ঔষধ') || product.name.includes('ট্যাবলেট') ? '💊' :
-                                 product.name.includes('বিস্কুট') || product.name.includes('কুকি') || product.name.includes('চকলেট') ? '🍪' :
-                                 product.name.includes('চিপস') || product.name.includes('নাস্তা') ? '🍿' :
-                                 product.name.includes('আইসক্রিম') || product.name.includes('আইস') ? '🍦' :
-                                 product.name.includes('সিগারেট') || product.name.includes('সিগারেট') ? '🚬' :
-                                 product.name.includes('বই') || product.name.includes('কাগজ') ? '📚' :
-                                 product.name.includes('কলম') || product.name.includes('পেন') ? '🖊️' :
-                                 product.name.includes('ব্যাগ') ? '<i className="fas fa-bag-shopping"></i>' :
-                                 product.name.includes('জুতা') || product.name.includes('স্যান্ডেল') ? '👟' :
-                                 product.name.includes('গেম') || product.name.includes('খেলনা') ? '🎮' :
-                                 product.name.includes('ফোন') || product.name.includes('মোবাইল') ? '<i className="fas fa-mobile-screen"></i>' :
-                                 product.name.includes('ল্যাপটপ') || product.name.includes('কম্পিউটার') ? '💻' :
-                                 product.name.includes('টাকা') || product.name.includes('কয়েন') ? <i className="fas fa-money-bill"></i> :
-                                 product.name.includes('স্ট্যাম্প') || product.name.includes('মার্ক') ? '📮' :
-                                 product.image ? product.image : <i className="fas fa-box"></i>}
-                              </span>
-                            )}
-                          </div>
+                             {product.icon ? (                                 <i className={`fas ${product.icon}`} style={{ fontSize: 36, color: '#0F766E' }}></i>                                 ) : (                                 <span style={{ fontSize: 36 }}>                                     <i className={`fas ${getProductIcon(product.name)}`} style={{ color: '#0F766E' }}></i>                                 </span>                                 )}                          </div>
 
                           {/* Product Info */}
                           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
