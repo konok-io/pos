@@ -1483,7 +1483,7 @@ export default function App() {
             <div style={{ width: 50, height: 50, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(15,118,110,0.3)', cursor: 'pointer' }} onClick={() => setCurrentTab('pos')}><img src="/Logo.png" alt="Logo" style={{ width: 50, height: 50, objectFit: 'contain', borderRadius: 14 }} /></div>
             <div>
               <div style={{ fontWeight: 700, fontSize: 15, color: '#115E59', lineHeight: 1.2, width: 180, textAlign: 'center' }}>{t('posManagementSystem')}</div>
-              <div style={{ fontSize: 15, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
+              <div style={{ fontSize: 13, color: '#9CA3AF', width: 180, textAlign: 'center' }}>{t('smartBusinessPartner')}</div>
             </div>
           </div>
           
@@ -1842,9 +1842,9 @@ export default function App() {
                       boxSizing: 'border-box',
                       border: '1px solid #E0E0E0'
                     }}>
-                      <span style={{ fontSize: 14 }}><i className="fas fa-box"></i></span>
+                      <span style={{ fontSize: 13 }}><i className="fas fa-box"></i></span>
                       <span style={{ fontSize: 13, fontWeight: 700, color: '#424242' }}>{filteredProducts.length}</span>
-                      <span style={{ fontSize: 11, color: '#757575' }}>{t("products")}</span>
+                      <span style={{ fontSize: 13, color: '#757575' }}>{t("products")}</span>
                     </div>
                   </div>
                 </div>
