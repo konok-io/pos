@@ -983,6 +983,20 @@ function TimeDisplay({ language }: { language: string }) {
   );
 }
 
+function TabLoader({ text }: { text?: string }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', background: '#F9FAFB', borderRadius: 12, margin: 16, minHeight: 200 }}>
+      <div style={{
+        width: 40, height: 40, border: '4px solid #E5E7EB', borderTopColor: '#115E59',
+        borderRadius: '50%', animation: 'spin 0.8s linear infinite',
+      }} />
+      <div style={{ marginTop: 16, fontSize: 15, color: '#6B7280', fontWeight: 500 }}>
+        {text || 'Loading...'}
+      </div>
+    </div>
+  );
+}
+
 // Main App Component
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -3066,7 +3080,7 @@ export default function App() {
         )}
 
         {currentTab === 'products' && (
-          <ProductsScreen
+          (!isInitialized ? <TabLoader /> : <ProductsScreen
             products={products}
             suppliers={suppliers}
             categories={categories}
@@ -3078,20 +3092,22 @@ export default function App() {
             settings={settings}
             currentUser={currentUser}
           />
+          )
         )}
 
         {currentTab === 'customers' && (
-          <CustomerManagement
+          (!isInitialized ? <TabLoader /> : <CustomerManagement
             customers={customers}
             setCustomers={setCustomers}
             sales={sales}
             onDeleteCustomer={handleDeleteCustomerFromDB}
             settings={settings}
           />
+          )
         )}
 
         {currentTab === 'reports' && (
-          <div>
+          (!isInitialized ? <TabLoader /> : <div>
             <h2 style={{ marginBottom: 16 }}><i className="fas fa-chart-line" style={{marginRight: 4}}></i> {t('reports')}</h2>
             <div className="stats-grid">
               <div className="stat-card">
@@ -3165,10 +3181,11 @@ export default function App() {
               </div>
             </div>
           </div>
+          )
         )}
 
         {currentTab === 'settings' && (
-          <SettingsScreen 
+          (!isInitialized ? <TabLoader /> : <SettingsScreen 
             products={products}
             customers={customers}
             sales={sales}
@@ -3184,10 +3201,11 @@ export default function App() {
             users={users}
             setUsers={setUsers}
           />
+          )
         )}
 
         {currentTab === 'newproduct' && (
-          <NewProductTab 
+          (!isInitialized ? <TabLoader /> : <NewProductTab 
             products={products} 
             suppliers={suppliers}
             categories={categories}
@@ -3235,6 +3253,7 @@ export default function App() {
             t={t}
             fmt={fmt}
           />
+          )
         )}
 
         {currentTab === 'barcode' && (
