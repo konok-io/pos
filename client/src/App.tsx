@@ -5896,9 +5896,23 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                         {customer.phone || t('phoneNotFound')}
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: T.teal }}>{fmt(getCustomerTotal(customer))}</div>
+                    <div style={{ textAlign: 'right', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: T.teal }}>{fmt(getCustomerTotal(customer))}</div>
+                      </div>
+                      {netDue > 0 && (
+                        <div>
+                          <div style={{ fontSize: '10px', fontWeight: 600, color: '#D32F2F', textTransform: 'uppercase' }}>{t('due')}</div>
+                          <div style={{ fontSize: '14px', fontWeight: 700, color: '#D32F2F' }}>{fmt(netDue)}</div>
+                        </div>
+                      )}
+                      {netDeposit > 0 && (
+                        <div>
+                          <div style={{ fontSize: '10px', fontWeight: 600, color: T.tealDark, textTransform: 'uppercase' }}>{t('deposit')}</div>
+                          <div style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{fmt(netDeposit)}</div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
