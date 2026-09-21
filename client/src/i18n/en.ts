@@ -264,6 +264,7 @@ export const en: Record<string, string> = {
   stockFinished: 'stock finished!',
   maxStock: 'Maximum stock',
   selectCustomerOrPayFull: 'Select customer or pay full amount!',
+  selectCustomerForDue: 'Select a customer for due sales',
 
   // Additional translations for filter counts and counts
   itemsFound: 'items',

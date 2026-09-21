@@ -226,6 +226,7 @@ export const hi: Record<string, string> = {
   stockFinished: 'स्टॉक खत्म!',
   maxStock: 'अधिकतम स्टॉक',
   selectCustomerOrPayFull: 'ग्राहक चुनें या पूर्ण राशि दें!',
+  selectCustomerForDue: 'उधार बिक्री के लिए ग्राहक चुनें',
 
   // Additional translations for filter counts and counts
   itemsFound: 'आइटम',

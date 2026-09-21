@@ -234,6 +234,7 @@ export const bn: Record<string, string> = {
   stockFinished: 'স্টক শেষ!',
   maxStock: 'সর্বোচ্চ স্টক',
   selectCustomerOrPayFull: 'গ্রাহক সিলেক্ট করুন অথবা পূর্ণ পরিশোধ করুন!',
+  selectCustomerForDue: 'বকেয় সেলসের জন্য কাস্টমার নির্বাচন করুন',
 
   // Additional translations for filter counts and counts
   itemsFound: 'টি পণ্য',

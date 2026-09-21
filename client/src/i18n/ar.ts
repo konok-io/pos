@@ -229,6 +229,7 @@ export const ar: Record<string, string> = {
   stockFinished: 'المخزون نفد!',
   maxStock: 'الحد الأقصى للمخزون',
   selectCustomerOrPayFull: 'اختر عميل أو ادفع المبلغ الكامل!',
+  selectCustomerForDue: 'اختر عميلاً للمبيعات الآجلة',
 
   // Additional translations for filter counts and counts
   itemsFound: 'منتج',
