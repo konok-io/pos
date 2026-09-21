@@ -6658,34 +6658,45 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       return;
     }
 
+    // Try API deletes (ignore failures)
+    const apiCalls = [
+      api.deleteAllProducts().catch(() => {}),
+      api.deleteAllCategories().catch(() => {}),
+      api.deleteAllSuppliers().catch(() => {}),
+      api.deleteAllSales().catch(() => {}),
+      api.deleteAllCustomers().catch(() => {}),
+      api.deleteAllPurchases().catch(() => {}),
+    ];
+    await Promise.all(apiCalls);
+
+    // Clear service worker caches
     try {
-      await api.deleteAllProducts();
-      await api.deleteAllCategories();
-      await api.deleteAllSuppliers();
-      await api.deleteAllSales();
-      await api.deleteAllCustomers();
-      await api.deleteAllPurchases();
       if ('caches' in window) {
         const names = await caches.keys();
         for (const name of names) { await caches.delete(name); }
       }
-      alert(t('dataDeletedSuccessfully'));
-      try {
-        const storeNames = ['products', 'categories', 'suppliers', 'customers', 'sales', 'purchases', 'transactions', 'stock_history', 'price_history'];
-        for (const sn of storeNames) {
+    } catch {}
+
+    // Clear all IndexedDB stores
+    try {
+      const storeNames = ['products', 'categories', 'suppliers', 'customers', 'sales', 'purchases', 'transactions', 'stock_history', 'price_history', 'cart', 'heldSales', 'settings'];
+      for (const sn of storeNames) {
+        try {
           const all = await db.getAll(sn);
           for (const item of all as any[]) { await db.delete(sn, item.id).catch(() => {}); }
-        }
-      } catch {}
-      setProducts([]);
-      setCustomers([]);
-      setSales([]);
-      setSuppliers([]);
-      setCategories([]);
-      setPurchases([]);
-    } catch (error) {
-      alert(t('error') + '!');
-    }
+        } catch {}
+      }
+    } catch {}
+
+    // Clear React state
+    setProducts([]);
+    setCustomers([]);
+    setSales([]);
+    setSuppliers([]);
+    setCategories([]);
+    setPurchases([]);
+
+    alert(t('dataDeletedSuccessfully'));
   };
 
   // Helper function to delete all items of a type
@@ -6700,11 +6711,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     if (!confirm(translate('warningPermanentDelete'))) return;
     
     try {
-      if (storeName === 'products') await api.deleteAllProducts();
-      else if (storeName === 'categories') await api.deleteAllCategories();
-      else if (storeName === 'suppliers') await api.deleteAllSuppliers();
-      else if (storeName === 'sales') await api.deleteAllSales();
-      else if (storeName === 'purchases') await api.deleteAllPurchases();
+      if (storeName === 'products') await api.deleteAllProducts().catch(() => {});
+      else if (storeName === 'categories') await api.deleteAllCategories().catch(() => {});
+      else if (storeName === 'suppliers') await api.deleteAllSuppliers().catch(() => {});
+      else if (storeName === 'sales') await api.deleteAllSales().catch(() => {});
+      else if (storeName === 'purchases') await api.deleteAllPurchases().catch(() => {});
       try {
         const sn = storeName === 'products' ? 'products' : storeName === 'categories' ? 'categories' : storeName === 'suppliers' ? 'suppliers' : storeName === 'sales' ? 'sales' : storeName === 'purchases' ? 'purchases' : null;
         if (sn) { const all = await db.getAll(sn); for (const item of all as any[]) { await db.delete(sn, item.id).catch(() => {}); } }
@@ -6726,7 +6737,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     if (customers.length === 0) return;
     if (!confirm(translate('warningPermanentDelete'))) return;
     try {
-      await api.deleteAllCustomers();
+      await api.deleteAllCustomers().catch(() => {});
       try { const all = await db.getAll('customers'); for (const item of all as any[]) { await db.delete('customers', item.id).catch(() => {}); } } catch {}
       await onRefresh();
       alert(translate('dataDeletedSuccessfully'));
