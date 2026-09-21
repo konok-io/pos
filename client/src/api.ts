@@ -58,6 +58,7 @@ export const api = {
   // Suppliers
   getSuppliers: () => request('/suppliers'),
   addSupplier: (s: any) => request('/suppliers', { method: 'POST', body: JSON.stringify(s) }),
+  addCustomer: (c: any) => request('/customers', { method: 'POST', body: JSON.stringify(c) }),
   updateSupplier: (id: string, s: any) => request(`/suppliers/${id}`, { method: 'PUT', body: JSON.stringify(s) }),
   deleteSupplier: (id: string) => request(`/suppliers/${id}`, { method: 'DELETE' }),
 

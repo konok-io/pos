@@ -7720,26 +7720,48 @@ export function DatabaseSettings() {
 
       const text = await importFile.text();
       const data = JSON.parse(text);
-      
+
+      // Save products to IndexedDB + MySQL API
       if (data.products) {
         for (const product of data.products) {
           await localDb.saveProduct(product);
+          api.addProduct(product).catch(() => {});
         }
       }
+
+      // Save categories to IndexedDB + MySQL API
       if (data.categories) {
         for (const category of data.categories) {
           await localDb.saveCategory(category);
+          api.addCategory(category).catch(() => {});
         }
       }
+
+      // Save customers to IndexedDB + MySQL API
       if (data.customers) {
         for (const customer of data.customers) {
           await localDb.saveCustomer(customer);
+          api.addCustomer(customer).catch(() => {});
         }
       }
-      
+
+      // Save suppliers to IndexedDB + MySQL API
+      if (data.suppliers) {
+        for (const supplier of data.suppliers) {
+          api.addSupplier(supplier).catch(() => {});
+        }
+      }
+
+      // Save sales to IndexedDB
+      if (data.sales) {
+        for (const sale of data.sales) {
+          await db.put('sales', sale.id, sale).catch(() => {});
+        }
+      }
+
       clearInterval(progressInterval);
       setImportProgress(100);
-      
+
       setMessage(t('importSuccessful'));
       setMessageType('success');
       setImportFile(null);
@@ -7748,7 +7770,7 @@ export function DatabaseSettings() {
       setMessage(`${t('importFailed')}: ${error}`);
       setMessageType('error');
     }
-    
+
     setImporting(false);
     setImportProgress(0);
   };
