@@ -2979,7 +2979,7 @@ export default function App() {
                   {(() => {
                     const canComplete = cart.length > 0 && (
                       dueSalesEnabled && selectedCustomer
-                        ? paid > 0
+                        ? true
                         : paid >= total
                     );
                     return (
