@@ -2974,17 +2974,26 @@ export default function App() {
                     <i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('hold')}
                   </button>
                   {/* Complete Sale Button */}
-                  <button onClick={handleCheckout}
-                    disabled={cart.length === 0}
-                    style={{
-                      padding: '12px 16px', borderRadius: 14, border: 'none',
-                      background: cart.length > 0 ? '#EA580C' : '#e5e7eb',
-                      color: '#fff', fontWeight: 700, fontSize: 16,
-                      cursor: cart.length > 0 ? 'pointer' : 'not-allowed',
-                      boxShadow: cart.length > 0 ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
-                    }}>
-                    <i className="fas fa-check" style={{marginRight: 4}}></i> {t('completeSale')}
-                  </button>
+                  {(() => {
+                    const canComplete = cart.length > 0 && (
+                      dueSalesEnabled
+                        ? (paid > 0 || (selectedCustomer && due > 0))
+                        : paid > 0
+                    );
+                    return (
+                    <button onClick={handleCheckout}
+                      disabled={!canComplete}
+                      style={{
+                        padding: '12px 16px', borderRadius: 14, border: 'none',
+                        background: canComplete ? '#EA580C' : '#e5e7eb',
+                        color: canComplete ? '#fff' : '#9CA3AF', fontWeight: 700, fontSize: 16,
+                        cursor: canComplete ? 'pointer' : 'not-allowed',
+                        boxShadow: canComplete ? '0 4px 12px rgba(249,115,22,0.3)' : 'none',
+                      }}>
+                      <i className="fas fa-check" style={{marginRight: 4}}></i> {t('completeSale')}
+                    </button>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
