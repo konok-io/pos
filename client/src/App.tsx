@@ -1168,26 +1168,39 @@ export default function App() {
         setIsLoggedIn(true);
       }
       
-      // Load VAT settings from localDB
-      const savedVat = await localDb.getSetting<string>('vatPercent');
+      // Load settings from API first, fallback to localDb
+      let apiSettings: any = null;
+      try {
+        apiSettings = await api.getSettings();
+      } catch {}
+
+      const isTruthy = (v: any) => v === 'true' || v === true || v === 1 || v === '1';
+      const getSetting = async (key: string): Promise<string | null> => {
+        if (apiSettings && apiSettings[key] !== undefined && apiSettings[key] !== null) {
+          return String(apiSettings[key]);
+        }
+        return (await localDb.getSetting<string>(key)) ?? null;
+      };
+
+      const savedVat = await getSetting('vatPercent');
       if (savedVat) {
         const vat = parseFloat(savedVat);
         setVatPercent(savedVat);
         setDefaultVatPercent(vat);
       }
-      const savedCurrency = await localDb.getSetting<string>('currencySymbol');
+      const savedCurrency = await getSetting('currencySymbol');
       if (savedCurrency) {
         setCurrency(savedCurrency);
       }
-      const savedDueSales = await localDb.getSetting<string>('dueSalesEnabled');
+      const savedDueSales = await getSetting('dueSalesEnabled');
       if (savedDueSales !== null) {
-        _setSettings((prev: any) => ({ ...prev, dueSalesEnabled: savedDueSales === 'true' }));
+        _setSettings((prev: any) => ({ ...prev, dueSalesEnabled: isTruthy(savedDueSales) }));
       }
-      const savedVatEnabled = await localDb.getSetting<string>('vatEnabled');
+      const savedVatEnabled = await getSetting('vatEnabled');
       if (savedVatEnabled !== null) {
-        _setSettings((prev: any) => ({ ...prev, vatEnabled: savedVatEnabled === 'true' }));
+        _setSettings((prev: any) => ({ ...prev, vatEnabled: isTruthy(savedVatEnabled) }));
       }
-      const savedCurrencySymbol = await localDb.getSetting<string>('currencySymbol');
+      const savedCurrencySymbol = await getSetting('currencySymbol');
       if (savedCurrencySymbol) {
         _setSettings((prev: any) => ({ ...prev, currencySymbol: savedCurrencySymbol }));
       }
@@ -6706,8 +6719,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         for (const key of Object.keys(form)) {
           if (apiSettings[key] !== undefined && apiSettings[key] !== null) {
             const v = apiSettings[key];
-            if (v === 'true') loaded[key] = true;
-            else if (v === 'false') loaded[key] = false;
+            if (v === 'true' || v === true || v === 1 || v === '1') loaded[key] = true;
+            else if (v === 'false' || v === false || v === 0 || v === '0') loaded[key] = false;
             else if (!isNaN(Number(v)) && v !== '') loaded[key] = Number(v);
             else loaded[key] = v;
           }
@@ -6725,8 +6738,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     for (const key of keys) {
       const value = await localDb.getSetting(key);
       if (value !== null) {
-        if (value === 'true') loaded[key] = true;
-        else if (value === 'false') loaded[key] = false;
+        if (value === 'true' || value === '1') loaded[key] = true;
+        else if (value === 'false' || value === '0') loaded[key] = false;
         else if (!isNaN(Number(value)) && value !== '') loaded[key] = Number(value);
         else loaded[key] = value;
       }
@@ -6746,7 +6759,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
       // Hard reload to pick up changed settings (VAT on/off etc.)
-      setTimeout(() => window.location.reload(), 500);
+      if ('caches' in window) {
+        const names = await caches.keys();
+        for (const name of names) { await caches.delete(name); }
+      }
+      setTimeout(() => window.location.reload(), 100);
     } catch (error) {
       alert(t('settingsSaveFailed'));
     }
