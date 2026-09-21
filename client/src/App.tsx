@@ -1534,9 +1534,11 @@ export default function App() {
 
     // Update customer balance if due
     if (selectedCustomer && due > 0) {
+      const newBalance = selectedCustomer.balance + due;
       setCustomers(prev => prev.map(c =>
-        c.id === selectedCustomer.id ? { ...c, balance: c.balance + due } : c
+        c.id === selectedCustomer.id ? { ...c, balance: newBalance } : c
       ));
+      api.updateCustomer(selectedCustomer.id, { ...selectedCustomer, balance: newBalance }).catch(() => {});
     }
 
     setSales(prev => [...prev, sale]);
