@@ -9832,69 +9832,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('sellPrice')} ({_settings?.currencySymbol})</label>
                     <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#B91C1C' }} />
                   
-              <div style={{ gridColumn: '1 / -1' }}>
-                <label style={labelStyle}>Product Icon</label>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
-                  {[
-                    { icon: 'fa-box', name: 'Default' },
-                    { icon: 'fa-bowl-rice', name: 'Food' },
-                    { icon: 'fa-drumstick-bite', name: 'Meat' },
-                    { icon: 'fa-fish', name: 'Fish' },
-                    { icon: 'fa-apple-whole', name: 'Fruit' },
-                    { icon: 'fa-leaf', name: 'Vegetable' },
-                    { icon: 'fa-mug-hot', name: 'Drink' },
-                    { icon: 'fa-bottle-droplet', name: 'Liquid' },
-                    { icon: 'fa-pills', name: 'Medicine' },
-                    { icon: 'fa-mobile-screen-button', name: 'Phone' },
-                    { icon: 'fa-laptop', name: 'Laptop' },
-                    { icon: 'fa-book', name: 'Book' },
-                    { icon: 'fa-bag-shopping', name: 'Bag' },
-                    { icon: 'fa-shoe-prints', name: 'Shoe' },
-                    { icon: 'fa-cookie', name: 'Snack' },
-                    { icon: 'fa-money-bill', name: 'Money' },
-                    { icon: 'fa-shirt', name: 'Cloth' },
-                  ].map((item) => (
-                    <button
-                      key={item.icon}
-                      type="button"
-                      onClick={() => setEditFullProduct({ ...editFullProduct, icon: item.icon })}
-                      style={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: 8,
-                        border: editFullProduct.icon === item.icon ? '2px solid #0F766E' : '1px solid #E5E7EB',
-                        background: editFullProduct.icon === item.icon ? '#F0FDFA' : '#FFFFFF',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 4,
-                        cursor: 'pointer',
-                      }}
-                    >
-                      <i className={`fas ${item.icon}`} style={{ fontSize: 20, color: '#0F766E' }}></i>
-                      <span style={{ fontSize: 10, color: '#6B7280' }}>{item.name}</span>
-                    </button>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => setEditFullProduct({ ...editFullProduct, icon: '' })}
-                    style={{
-                      width: 56,
-                      height: 56,
-                      borderRadius: 8,
-                      border: !editFullProduct.icon ? '2px solid #0F766E' : '1px solid #E5E7EB',
-                      background: !editFullProduct.icon ? '#F0FDFA' : '#FFFFFF',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <i className="fas fa-times" style={{ fontSize: 20, color: '#DC2626' }}></i>
-                  </button>
-                </div>
-              </div>
 </div>
                 </div>
                 {/* Profit + Profit % */}

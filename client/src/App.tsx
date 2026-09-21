@@ -2509,7 +2509,7 @@ export default function App() {
                     </div>
                     ) : (searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all') ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-                      {filteredProducts.map(product => (
+                      {filteredProducts.filter(Boolean).map(product => (
                         <button
                           key={product.id}
                           onClick={() => addToCart(product)}
