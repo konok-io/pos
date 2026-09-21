@@ -5671,7 +5671,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   // Get customer sales
   const getCustomerSales = (customer: Customer) => {
     if (isGeneralCustomer(customer)) {
-      return sales.filter(s => !s.customerId || s.customerId === customer.id);
+      return sales.filter(s => !s.customerId || s.customerId === '' || s.customerId === customer.id);
     }
     return sales.filter(s => s.customerId === customer.id);
   };
@@ -5679,7 +5679,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   // Calculate customer total
   const getCustomerTotal = (customer: Customer) => {
     const customerSales = getCustomerSales(customer);
-    return customerSales.reduce((sum, s) => sum + s.total, 0);
+    return customerSales.reduce((sum, s) => sum + (parseFloat(s.total as any) || 0), 0);
   };
 
   // Handle CSV Export
@@ -5876,8 +5876,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
             </div>
           ) : (
             filteredCustomers.map((customer) => {
-              const rawDue = customer.balance > 0 ? customer.balance : 0;
-              const rawDeposit = customer.deposit || 0;
+              const rawDue = (parseFloat(customer.balance as any) || 0) > 0 ? parseFloat(customer.balance as any) || 0 : 0;
+              const rawDeposit = parseFloat(customer.deposit as any) || 0;
               // Calculate net due/deposit: offset deposit against due
               const netDue = Math.max(0, rawDue - rawDeposit);
               const netDeposit = Math.max(0, rawDeposit - rawDue);
@@ -6215,8 +6215,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   if (view === 'regular' && selectedCustomer) {
     const customerSales = getCustomerSales(selectedCustomer);
     const customerTotal = customerSales.reduce((sum, s) => sum + s.total, 0);
-    const rawDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
-    const rawDeposit = selectedCustomer.deposit || 0;
+    const rawDue = (parseFloat(selectedCustomer.balance as any) || 0) > 0 ? parseFloat(selectedCustomer.balance as any) || 0 : 0;
+    const rawDeposit = parseFloat(selectedCustomer.deposit as any) || 0;
     // Calculate net due/deposit: offset deposit against due
     const netDue = Math.max(0, rawDue - rawDeposit);
     const netDeposit = Math.max(0, rawDeposit - rawDue);
