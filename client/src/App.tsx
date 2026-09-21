@@ -2346,9 +2346,9 @@ export default function App() {
                         {stockFilter !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: stockFilter === 'available' ? '#F0FDFA' : stockFilter === 'low' ? '#FFF7ED' : '#FEF2F2', borderRadius: 20, border: `1px solid ${stockFilter === 'available' ? '#99F6E4' : stockFilter === 'low' ? '#FDBA74' : '#FECACA'}` }}>
                             <span style={{ fontSize: 12, fontWeight: 600, color: stockFilter === 'available' ? '#115E59' : stockFilter === 'low' ? '#EA580C' : '#DC2626' }}>
-                              {stockFilter === 'available' && <><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stockAvailable')}</> + ` (${filteredProducts.length})`}
-                              {stockFilter === 'low' && <><i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('stockLow')}</> + ` (${filteredProducts.length})`}
-                              {stockFilter === 'out' && <><i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('stockOut')}</> + ` (${filteredProducts.length})`}
+                              {stockFilter === 'available' && <><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stockAvailable')} ({filteredProducts.length})</>}
+                              {stockFilter === 'low' && <><i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('stockLow')} ({filteredProducts.length})</>}
+                              {stockFilter === 'out' && <><i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('stockOut')} ({filteredProducts.length})</>}
                             </span>
                           </div>
                         )}
