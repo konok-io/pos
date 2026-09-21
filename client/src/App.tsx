@@ -1395,12 +1395,7 @@ export default function App() {
       const names = await caches.keys();
       for (const name of names) { await caches.delete(name); }
     }
-    setProducts([]);
-      setCustomers([]);
-      setSales([]);
-      setSuppliers([]);
-      setCategories([]);
-      setPurchases([]);
+    window.location.reload();
   };
 
   // Filter products - only show when search, category, supplier, or stock filter is selected
@@ -3175,20 +3170,6 @@ export default function App() {
             setPurchases={setPurchases}
             users={users}
             setUsers={setUsers}
-            onRefresh={async () => {
-              try {
-                const prods = await db.getAll<any>('products');
-                setProducts(prods || []);
-                const cats = await db.getAll<any>('categories');
-                setCategories(cats || []);
-                const sups = await db.getAll<any>('suppliers');
-                setSuppliers(sups || []);
-                const custs = await db.getAll<any>('customers');
-                setCustomers(custs || []);
-                const sals = await db.getAll<any>('sales');
-                setSales(sals || []);
-              } catch {}
-            }}
           />
         )}
 
@@ -6655,11 +6636,10 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 }
 
 // SettingsScreen Component - extracted from pages/SettingsScreen.tsx
-export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, setProducts, setCustomers, setSales, setSuppliers, setCategories, setPurchases, users, setUsers, onRefresh }: { 
+export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, setProducts, setCustomers, setSales, setSuppliers, setCategories, setPurchases, users, setUsers }: { 
   products: any[]; customers: any[]; sales: any[]; suppliers: any[]; categories: any[]; purchases: any[];
   setProducts: any; setCustomers: any; setSales: any; setSuppliers: any; setCategories: any; setPurchases: any;
   users: User[]; setUsers: React.Dispatch<React.SetStateAction<User[]>>;
-  onRefresh: () => void 
 }) {
   const { t } = useLanguage();
 
@@ -6762,9 +6742,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         await localDb.saveSetting(key, String(value));
       }
       // Also save to MySQL API
-      api.updateSettings(form).catch(() => {});
+      await api.updateSettings(form).catch(() => {});
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+      // Hard reload to pick up changed settings (VAT on/off etc.)
+      setTimeout(() => window.location.reload(), 500);
     } catch (error) {
       alert(t('settingsSaveFailed'));
     }
@@ -6821,6 +6803,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     setPurchases([]);
 
     alert(t('dataDeletedSuccessfully'));
+    setTimeout(() => window.location.reload(), 300);
   };
 
   // Helper function to delete all items of a type
@@ -6845,8 +6828,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         if (sn) { const all = await db.getAll(sn); for (const item of all as any[]) { await db.delete(sn, item.id).catch(() => {}); } }
       } catch {}
       setItems([]);
-      await onRefresh();
       alert(translate('dataDeletedSuccessfully'));
+      window.location.reload();
     } catch (error) {
       alert(translate('error') + '!');
     }
@@ -6863,8 +6846,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     try {
       await api.deleteAllCustomers().catch(() => {});
       try { const all = await db.getAll('customers'); for (const item of all as any[]) { await db.delete('customers', item.id).catch(() => {}); } } catch {}
-      await onRefresh();
       alert(translate('dataDeletedSuccessfully'));
+      window.location.reload();
     } catch (error) {
       alert(translate('error') + '!');
     }
