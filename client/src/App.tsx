@@ -1383,7 +1383,12 @@ export default function App() {
       const names = await caches.keys();
       for (const name of names) { await caches.delete(name); }
     }
-    window.location.reload();
+    setProducts([]);
+      setCustomers([]);
+      setSales([]);
+      setSuppliers([]);
+      setCategories([]);
+      setPurchases([]);
   };
 
   // Filter products - only show when search, category, supplier, or stock filter is selected
@@ -3100,12 +3105,19 @@ export default function App() {
             setPurchases={setPurchases}
             users={users}
             setUsers={setUsers}
-            onRefresh={() => {
-              setProducts([]);
-              setCustomers([]);
-              setSales([]);
-              setSuppliers([]);
-              setPurchases([]);
+            onRefresh={async () => {
+              try {
+                const prods = await db.getAll<any>('products');
+                setProducts(prods || []);
+                const cats = await db.getAll<any>('categories');
+                setCategories(cats || []);
+                const sups = await db.getAll<any>('suppliers');
+                setSuppliers(sups || []);
+                const custs = await db.getAll<any>('customers');
+                setCustomers(custs || []);
+                const sals = await db.getAll<any>('sales');
+                setSales(sals || []);
+              } catch {}
             }}
           />
         )}
@@ -6658,7 +6670,19 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         for (const name of names) { await caches.delete(name); }
       }
       alert(t('dataDeletedSuccessfully'));
-      window.location.reload();
+      try {
+        const storeNames = ['products', 'categories', 'suppliers', 'customers', 'sales', 'purchases', 'transactions', 'stock_history', 'price_history'];
+        for (const sn of storeNames) {
+          const all = await db.getAll(sn);
+          for (const item of all as any[]) { await db.delete(sn, item.id).catch(() => {}); }
+        }
+      } catch {}
+      setProducts([]);
+      setCustomers([]);
+      setSales([]);
+      setSuppliers([]);
+      setCategories([]);
+      setPurchases([]);
     } catch (error) {
       alert(t('error') + '!');
     }
@@ -6681,13 +6705,12 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       else if (storeName === 'suppliers') await api.deleteAllSuppliers();
       else if (storeName === 'sales') await api.deleteAllSales();
       else if (storeName === 'purchases') await api.deleteAllPurchases();
-      else {
-        for (const item of items) {
-          await db.delete(storeName, item.id).catch(() => {});
-        }
-      }
+      try {
+        const sn = storeName === 'products' ? 'products' : storeName === 'categories' ? 'categories' : storeName === 'suppliers' ? 'suppliers' : storeName === 'sales' ? 'sales' : storeName === 'purchases' ? 'purchases' : null;
+        if (sn) { const all = await db.getAll(sn); for (const item of all as any[]) { await db.delete(sn, item.id).catch(() => {}); } }
+      } catch {}
       setItems([]);
-      onRefresh();
+      await onRefresh();
       alert(translate('dataDeletedSuccessfully'));
     } catch (error) {
       alert(translate('error') + '!');
@@ -6697,15 +6720,15 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   // Helper function to delete all customers (reset General Customer data)
   const deleteAllCustomers = async (
     customers: any[], 
-    setCustomers: React.Dispatch<React.SetStateAction<any[]>>, 
+    _setCustomers: React.Dispatch<React.SetStateAction<any[]>>, 
     translate: any
   ) => {
     if (customers.length === 0) return;
     if (!confirm(translate('warningPermanentDelete'))) return;
     try {
       await api.deleteAllCustomers();
-      setCustomers([]);
-      onRefresh();
+      try { const all = await db.getAll('customers'); for (const item of all as any[]) { await db.delete('customers', item.id).catch(() => {}); } } catch {}
+      await onRefresh();
       alert(translate('dataDeletedSuccessfully'));
     } catch (error) {
       alert(translate('error') + '!');
