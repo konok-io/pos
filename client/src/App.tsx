@@ -1495,7 +1495,7 @@ export default function App() {
       return;
     }
     if (due > 0 && !selectedCustomer) {
-      alert(t('selectCustomerForDue'));
+      alert(t('payFullRequired'));
       return;
     }
 
@@ -2805,7 +2805,7 @@ export default function App() {
                     </div>
                   )}
                   <div style={{ padding: '8px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#115E59' }}>
-                    <span style={{ fontSize: 14, color: '#fff', fontWeight: 700 }}>{t('totalDue')}</span>
+                    <span style={{ fontSize: 14, color: '#fff', fontWeight: 700 }}>{dueSalesEnabled && selectedCustomer && due > 0 ? t('totalDue') : t('total')}</span>
                     <span style={{ fontSize: 18, color: '#fff', fontWeight: 800 }}>{fmt(total)}</span>
                   </div>
                 </div>
@@ -2914,7 +2914,7 @@ export default function App() {
                 </div>
 
                 {/* Due/Change Alert */}
-                {due > 0 && dueSalesEnabled && (
+                {due > 0 && dueSalesEnabled && selectedCustomer && (
                   <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#FEF2F2', color: '#DC2626', fontWeight: 600, textAlign: 'center' }}>
                     <i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('due')}: {fmt(due)}
                   </div>
