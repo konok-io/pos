@@ -4625,6 +4625,15 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+    // Save stock change to MySQL API
+    api.adjustStock({
+      productId: stockAdjustProduct.id,
+      productName: stockAdjustProduct.name,
+      quantity: qty,
+      type: stockAdjustType,
+      reason: stockAdjustReason,
+    }).catch(() => {});
+
     api.addStockHistory({
 
 

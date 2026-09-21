@@ -80,4 +80,22 @@ export const api = {
   deleteAllSales: () => request('/sales/all', { method: 'DELETE' }),
   deleteAllCustomers: () => request('/customers/all', { method: 'DELETE' }),
   deleteAllPurchases: () => request('/purchases/all', { method: 'DELETE' }),
+
+  // Customers CRUD
+  getCustomers: () => request('/customers'),
+  getCustomer: (id: string) => request(`/customers/${id}`),
+  updateCustomer: (id: string, c: any) => request(`/customers/${id}`, { method: 'PUT', body: JSON.stringify(c) }),
+  deleteCustomer: (id: string) => request(`/customers/${id}`, { method: 'DELETE' }),
+
+  // Sales
+  getSales: () => request('/sales'),
+  getSale: (id: string) => request(`/sales/${id}`),
+  addSale: (s: any) => request('/sales', { method: 'POST', body: JSON.stringify(s) }),
+
+  // Purchases
+  getPurchases: () => request('/purchases'),
+  addPurchase: (p: any) => request('/purchases', { method: 'POST', body: JSON.stringify(p) }),
+
+  // Stock adjust
+  adjustStock: (data: any) => request('/stock-adjust', { method: 'POST', body: JSON.stringify(data) }),
 };

@@ -1215,49 +1215,52 @@ export default function App() {
               }
       }
       
-      // Load products, categories, customers, sales from IndexedDB
-      const savedProducts = await db.getAll<any>('products');
-      if (savedProducts && savedProducts.length > 0) {
-        setProducts(savedProducts);
+      // Load all data from MySQL API first, fallback to IndexedDB
+      try {
+        const [apiProducts, apiCategories, apiSuppliers, apiCustomers, apiSales] = await Promise.all([
+          api.getProducts().catch(() => []),
+          api.getCategories().catch(() => []),
+          api.getSuppliers().catch(() => []),
+          api.getCustomers().catch(() => []),
+          api.getSales().catch(() => []),
+        ]);
+
+        if (apiProducts && apiProducts.length > 0) setProducts(apiProducts);
+        if (apiCategories && apiCategories.length > 0) setCategories(apiCategories);
+        if (apiSuppliers && apiSuppliers.length > 0) setSuppliers(apiSuppliers);
+        if (apiSales && apiSales.length > 0) setSales(apiSales);
+
+        if (apiCustomers && apiCustomers.length > 0) {
+          const savedTransactions = await db.getAll<any>('transactions').catch(() => []);
+          const customersWithTransactions = apiCustomers.map((customer: any) => {
+            const customerTransactions = savedTransactions.filter((tx: any) => tx.customerId === customer.id);
+            return { ...customer, transactions: customerTransactions.length > 0 ? customerTransactions : (customer.transactions || []) };
+          });
+          setCustomers(customersWithTransactions);
+        }
+      } catch {
+        // Fallback to IndexedDB
+        const savedProducts = await db.getAll<any>('products');
+        if (savedProducts && savedProducts.length > 0) setProducts(savedProducts);
+        const savedCategories = await db.getAll<any>('categories');
+        if (savedCategories && savedCategories.length > 0) setCategories(savedCategories);
+        const savedCustomers = await db.getAll<any>('customers');
+        if (savedCustomers && savedCustomers.length > 0) setCustomers(savedCustomers);
+        const savedSales = await db.getAll<any>('sales');
+        if (savedSales && savedSales.length > 0) setSales(savedSales);
       }
-      
-      const savedCategories = await db.getAll<any>('categories');
-      if (savedCategories && savedCategories.length > 0) {
-        setCategories(savedCategories);
-      }
-      
-      const savedCustomers = await db.getAll<any>('customers');
-      const savedTransactions = await db.getAll<any>('transactions');
-      
-      if (savedCustomers && savedCustomers.length > 0) {
-        // Attach transactions to customers
-        const customersWithTransactions = savedCustomers.map((customer: any) => {
-          const customerTransactions = savedTransactions.filter((tx: any) => tx.customerId === customer.id);
-          return {
-            ...customer,
-            transactions: customerTransactions.length > 0 ? customerTransactions : (customer.transactions || [])
-          };
-        });
-        setCustomers(customersWithTransactions);
-      } else {
-        // Create General Customer (System) if no customers exist
-        const generalCustomer: Customer = {
-          id: generateGeneralCustomerId(),
-          name: 'General Customer',
-          phone: '',
-          address: '',
-          balance: 0,
-          deposit: 0,
-          isSystem: true,
-        };
-        setCustomers([generalCustomer]);
-        await db.put('customers', generalCustomer.id, generalCustomer);
-      }
-      
-      const savedSales = await db.getAll<any>('sales');
-      if (savedSales && savedSales.length > 0) {
-        setSales(savedSales);
-      }
+
+      // Ensure General Customer exists
+      // Always ensure general customer after load
+      const genCust: Customer = {
+        id: generateGeneralCustomerId(),
+        name: 'General Customer',
+        phone: '', address: '', balance: 0, deposit: 0, isSystem: true,
+      };
+      setCustomers((prev: any[]) => {
+        if (prev.some((c: any) => c.isSystem)) return prev;
+        return [genCust, ...prev];
+      });
       
       setIsInitialized(true); // Mark as initialized before enabling saves
       setIsLoading(false);
@@ -1461,6 +1464,7 @@ export default function App() {
 
   // Handle add customer from POS
   const handleAddCustomerFromPOS = (customer: Customer) => {
+    api.addCustomer(customer).catch(() => {});
     setCustomers([...customers, customer]);
     setSelectedCustomer(customer);
     setIsAddCustomerModalOpen(false);
@@ -1502,6 +1506,7 @@ export default function App() {
       customerId: selectedCustomer?.id || null,
       customerName: selectedCustomer?.name || t('generalCustomer'),
       items: cart.map(item => ({
+        productId: item.productId,
         name: item.name,
         quantity: item.quantity,
         price: item.sellPrice,
@@ -1518,7 +1523,10 @@ export default function App() {
       paymentMethod,
     };
 
-    // Update stock
+    // Save sale to MySQL API (server will decrease stock)
+    api.addSale(sale).catch((err) => console.error('Sale API error:', err));
+
+    // Update stock locally for instant UI
     setProducts(prev => prev.map(p => {
       const cartItem = cart.find(c => c.productId === p.id);
       return cartItem ? { ...p, stock: p.stock - cartItem.quantity } : p;
@@ -5572,13 +5580,14 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 
   // Handle add customer
   const handleAddCustomer = (customer: Customer) => {
+    api.addCustomer(customer).catch(() => {});
     setCustomers(prev => [...prev, customer]);
   };
 
   // Handle edit customer
   const handleEditCustomer = (customer: Customer) => {
+    api.updateCustomer(customer.id, customer).catch(() => {});
     setCustomers(prev => prev.map(c => c.id === customer.id ? customer : c));
-    // Update selectedCustomer to reflect changes
     setSelectedCustomer(prev => prev && prev.id === customer.id ? customer : prev);
   };
 
@@ -5591,6 +5600,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   // Handle delete customer (with IndexedDB cleanup)
   const handleDeleteCustomer = (customer: Customer) => {
     if (window.confirm(t('confirmDelete'))) {
+      api.deleteCustomer(customer.id).catch(() => {});
       setCustomers(prev => prev.filter(c => c.id !== customer.id));
       if (onDeleteCustomer) {
         onDeleteCustomer(customer);
@@ -6623,9 +6633,30 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
   }, []);
 
   const loadSettings = async () => {
+    // Try MySQL API first
+    try {
+      const apiSettings = await api.getSettings();
+      if (apiSettings && typeof apiSettings === 'object' && Object.keys(apiSettings).length > 0) {
+        const loaded: Record<string, any> = {};
+        for (const key of Object.keys(form)) {
+          if (apiSettings[key] !== undefined && apiSettings[key] !== null) {
+            const v = apiSettings[key];
+            if (v === 'true') loaded[key] = true;
+            else if (v === 'false') loaded[key] = false;
+            else if (!isNaN(Number(v)) && v !== '') loaded[key] = Number(v);
+            else loaded[key] = v;
+          }
+        }
+        if (Object.keys(loaded).length > 0) {
+          setForm(prev => ({ ...prev, ...loaded }));
+          return;
+        }
+      }
+    } catch {}
+
+    // Fallback to localDb
     const keys = Object.keys(form);
     const loaded: Record<string, any> = {};
-
     for (const key of keys) {
       const value = await localDb.getSetting(key);
       if (value !== null) {
@@ -6635,7 +6666,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         else loaded[key] = value;
       }
     }
-
     if (Object.keys(loaded).length > 0) {
       setForm(prev => ({ ...prev, ...loaded }));
     }
@@ -6646,6 +6676,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       for (const [key, value] of Object.entries(form)) {
         await localDb.saveSetting(key, String(value));
       }
+      // Also save to MySQL API
+      api.updateSettings(form).catch(() => {});
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (error) {
@@ -7752,10 +7784,11 @@ export function DatabaseSettings() {
         }
       }
 
-      // Save sales to IndexedDB
+      // Save sales to IndexedDB + MySQL API
       if (data.sales) {
         for (const sale of data.sales) {
           await db.put('sales', sale.id, sale).catch(() => {});
+          api.addSale(sale).catch(() => {});
         }
       }
 
