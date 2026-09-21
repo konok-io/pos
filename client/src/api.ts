@@ -16,7 +16,11 @@ export function clearToken() {
   localStorage.removeItem('pos_api_token');
 }
 
-function mapProduct(p: any) {
+const mapSale = (s: any) => {
+  return { ...s, customerId: s.customer_id || '', customerName: s.customer_name || '', invoiceNo: s.invoice_no || '', items: typeof s.items === 'string' ? JSON.parse(s.items) : s.items || [], vatPercent: parseFloat(s.vat_percent) || 0, vatAmount: parseFloat(s.vat_amount) || 0, changeAmount: parseFloat(s.change_amount) || 0, paymentMethod: s.payment_method || 'cash', subtotal: parseFloat(s.subtotal) || 0, discount: parseFloat(s.discount) || 0, total: parseFloat(s.total) || 0, paid: parseFloat(s.paid) || 0, due: parseFloat(s.due) || 0 };
+};
+
+const mapProduct = (p: any) => {
   return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '' };
 }
 
@@ -88,8 +92,8 @@ export const api = {
   deleteCustomer: (id: string) => request(`/customers/${id}`, { method: 'DELETE' }),
 
   // Sales
-  getSales: () => request('/sales'),
-  getSale: (id: string) => request(`/sales/${id}`),
+  getSales: async () => { const data = await request('/sales'); return Array.isArray(data) ? data.map(mapSale) : data; },
+  getSale: async (id: string) => { const data = await request(`/sales/${id}`); return data ? mapSale(data) : data; },
   addSale: (s: any) => request('/sales', { method: 'POST', body: JSON.stringify(s) }),
 
   // Purchases
