@@ -5670,6 +5670,9 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 
   // Get customer sales
   const getCustomerSales = (customer: Customer) => {
+    if (isGeneralCustomer(customer)) {
+      return sales.filter(s => !s.customerId || s.customerId === customer.id);
+    }
     return sales.filter(s => s.customerId === customer.id);
   };
 
