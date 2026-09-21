@@ -5848,7 +5848,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
                 </div>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: '10px', fontWeight: 600, color: T.gray400, textTransform: 'uppercase' }}>{t('total')}</div>
-                  <div style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{fmt(generalCustomer.balance || 0)}</div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: T.tealDark }}>{fmt(getCustomerTotal(generalCustomer))}</div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
