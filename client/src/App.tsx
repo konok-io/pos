@@ -2975,11 +2975,7 @@ export default function App() {
                   </button>
                   {/* Complete Sale Button */}
                   {(() => {
-                    const canComplete = cart.length > 0 && (
-                      dueSalesEnabled
-                        ? (paid > 0 || (selectedCustomer && due > 0))
-                        : paid > 0
-                    );
+                    const canComplete = cart.length > 0 && paid >= total;
                     return (
                     <button onClick={handleCheckout}
                       disabled={!canComplete}
