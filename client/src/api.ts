@@ -20,6 +20,10 @@ const mapSale = (s: any) => {
   return { ...s, customerId: s.customer_id || '', customerName: s.customer_name || '', invoiceNo: s.invoice_no || '', items: typeof s.items === 'string' ? JSON.parse(s.items) : s.items || [], vatPercent: parseFloat(s.vat_percent) || 0, vatAmount: parseFloat(s.vat_amount) || 0, changeAmount: parseFloat(s.change_amount) || 0, paymentMethod: s.payment_method || 'cash', subtotal: parseFloat(s.subtotal) || 0, discount: parseFloat(s.discount) || 0, total: parseFloat(s.total) || 0, paid: parseFloat(s.paid) || 0, due: parseFloat(s.due) || 0 };
 };
 
+const mapCustomer = (c: any) => {
+  return { ...c, balance: parseFloat(c.balance) || 0, deposit: parseFloat(c.deposit) || 0, isSystem: c.is_system === 1 || c.is_system === true };
+};
+
 const mapProduct = (p: any) => {
   return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '' };
 }
@@ -86,8 +90,8 @@ export const api = {
   deleteAllPurchases: () => request('/purchases/all', { method: 'DELETE' }),
 
   // Customers CRUD
-  getCustomers: () => request('/customers'),
-  getCustomer: (id: string) => request(`/customers/${id}`),
+  getCustomers: async () => { const data = await request('/customers'); return Array.isArray(data) ? data.map(mapCustomer) : data; },
+  getCustomer: async (id: string) => { const data = await request(`/customers/${id}`); return data ? mapCustomer(data) : data; },
   updateCustomer: (id: string, c: any) => request(`/customers/${id}`, { method: 'PUT', body: JSON.stringify(c) }),
   deleteCustomer: (id: string) => request(`/customers/${id}`, { method: 'DELETE' }),
 
