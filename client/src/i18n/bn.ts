@@ -547,6 +547,8 @@ export const bn: Record<string, string> = {
   autoSyncOnline: 'অনলাইন হলে অটোমেটিক সিঙ্ক হয়',
   canBackupRestore: 'ব্যাকআপ/রিস্টোর করা যায়',
   dueSalesNotEnabled: 'বকেয় সেলস সক্রিয় নেই! সেটিংসে বকেয় সেলস চালু করুন।',
+  dueSalesDisabled: 'বকেয় সেলস বন্ধ আছে',
+  payFullRequired: 'পূর্ণ পেমেন্ট আবশ্যক',
   supplierNameExists: 'এই সরবরাহকারীর নাম ইতিমধ্যে আছে!',
   supplierUpdated: 'সরবরাহকারী আপডেট করা হয়েছে!',
   errorOccurred: 'একটি সমস্যা হয়েছে!',

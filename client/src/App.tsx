@@ -1490,12 +1490,12 @@ export default function App() {
 
     // Check due sales permission
     const dueSalesEnabled = settings.dueSalesEnabled !== false;
-    if (due > 0 && !selectedCustomer) {
-      alert(t('selectCustomerOrPayFull'));
+    if (due > 0 && !dueSalesEnabled) {
+      alert(t('dueSalesNotEnabled'));
       return;
     }
-    if (due > 0 && selectedCustomer && !dueSalesEnabled) {
-      alert(t('dueSalesNotEnabled'));
+    if (due > 0 && !selectedCustomer) {
+      alert(t('selectCustomerOrPayFull'));
       return;
     }
 
@@ -2914,9 +2914,14 @@ export default function App() {
                 </div>
 
                 {/* Due/Change Alert */}
-                {due > 0 && (
+                {due > 0 && dueSalesEnabled && (
                   <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#FEF2F2', color: '#DC2626', fontWeight: 600, textAlign: 'center' }}>
                     <i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('due')}: {fmt(due)}
+                  </div>
+                )}
+                {due > 0 && !dueSalesEnabled && (
+                  <div style={{ fontSize: 14, marginBottom: 6, padding: '5px 8px', borderRadius: 6, background: '#FEF3C7', color: '#D97706', fontWeight: 600, textAlign: 'center' }}>
+                    <i className="fas fa-info-circle" style={{marginRight: 4}}></i> {t('dueSalesDisabled')} — {t('payFullRequired')}
                   </div>
                 )}
                 {change > 0 && (

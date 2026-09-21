@@ -545,6 +545,8 @@ export const ar: Record<string, string> = {
   autoSyncOnline: 'مزامنة تلقائية عند الاتصال بالإنترنت',
   canBackupRestore: 'النسخ الاحتياطي/الاستعادة متاح',
   dueSalesNotEnabled: 'مبيعات الآجل غير مفعلة! فعّل مبيعات الآجل في الإعدادات.',
+  dueSalesDisabled: 'مبيعات الآجل معطلة',
+  payFullRequired: 'الدفع الكامل مطلوب',
   supplierNameExists: 'اسم هذا المورد موجود بالفعل!',
   supplierUpdated: 'تم تحديث المورد بنجاح!',
   errorOccurred: 'حدث خطأ!',

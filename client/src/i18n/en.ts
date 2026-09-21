@@ -555,6 +555,8 @@ export const en: Record<string, string> = {
   autoSyncOnline: 'Automatic sync when online',
   canBackupRestore: 'Backup/Restore is available',
   dueSalesNotEnabled: 'Due sales not enabled! Enable due sales in settings.',
+  dueSalesDisabled: 'Due sales disabled',
+  payFullRequired: 'Full payment required',
   supplierNameExists: 'This supplier name already exists!',
   supplierUpdated: 'Supplier updated successfully!',
   errorOccurred: 'An error occurred!',

@@ -546,6 +546,8 @@ export const hi: Record<string, string> = {
   autoSyncOnline: 'ऑनलाइन होने पर स्वचालित सिंक',
   canBackupRestore: 'बैकअप/रिस्टोर उपलब्ध है',
   dueSalesNotEnabled: 'उधार बिक्री सक्रिय नहीं है! सेटिंग्स में उधार बिक्री चालू करें।',
+  dueSalesDisabled: 'उधार बिक्री बंद है',
+  payFullRequired: 'पूर्ण भुगतान आवश्यक',
   supplierNameExists: 'यह आपूर्तिकर्ता नाम पहले से मौजूद है!',
   supplierUpdated: 'आपूर्तिकर्ता अपडेट हो गया!',
   errorOccurred: 'एक त्रुटि हुई!',
