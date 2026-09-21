@@ -1480,6 +1480,7 @@ export default function App() {
   const paid = parseFloat(paidAmount) || 0;
   const due = total - paid;
   const change = paid > total ? paid - total : 0;
+  const dueSalesEnabled = settings.dueSalesEnabled !== false;
 
   // Checkout
   const handleCheckout = () => {
@@ -1489,7 +1490,6 @@ export default function App() {
     }
 
     // Check due sales permission
-    const dueSalesEnabled = settings.dueSalesEnabled !== false;
     if (due > 0 && !dueSalesEnabled) {
       alert(t('dueSalesNotEnabled'));
       return;
