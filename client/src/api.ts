@@ -38,7 +38,6 @@ async function request(path: string, options: RequestInit = {}) {
   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
   if (res.status === 401) {
     clearToken();
-    window.location.reload();
     throw new Error('Unauthorized');
   }
   const data = await res.json();
