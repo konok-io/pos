@@ -1058,6 +1058,28 @@ export default function App() {
     return 'fa-box';
   };
 
+  // Product images from internet
+  const [productImages, setProductImages] = useState<Record<string, string>>(() => {
+    try { return JSON.parse(localStorage.getItem('pos_product_images') || '{}'); } catch { return {}; }
+  });
+
+  useEffect(() => {
+    const cache = { ...productImages };
+    let changed = false;
+    (products || []).forEach((p: any) => {
+      const name = p.name || '';
+      if (!name || cache[name]) return;
+      const query = encodeURIComponent(name.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').trim().split('\s').slice(0, 3).join(' '));
+      if (!query) return;
+      cache[name] = `https://source.unsplash.com/featured/200x200/?${query}`;
+      changed = true;
+    });
+    if (changed) {
+      setProductImages(cache);
+      try { localStorage.setItem('pos_product_images', JSON.stringify(cache)); } catch {}
+    }
+  }, [products]);
+
   // Tabs configuration
   const otherTabs = [
     { id: 'products', icon: <i className="fas fa-box"></i>, label: t('products') },
@@ -2542,7 +2564,22 @@ export default function App() {
                             overflow: 'hidden',
                             border: `2px solid ${product.stock <= 0 ? '#fca5a5' : product.stock <= 10 ? '#fdba74' : '#E5E7EB'}`,
                           }}>
-                             {product.icon ? (                                 <i className={`fas ${product.icon}`} style={{ fontSize: 36, color: '#0F766E' }}></i>                                 ) : (                                 <span style={{ fontSize: 36 }}>                                     <i className={`fas ${getProductIcon(product.name)}`} style={{ color: '#0F766E' }}></i>                                 </span>                                 )}                          </div>
+                             {productImages[product.name] ? (
+                                <img
+                                  src={productImages[product.name]}
+                                  alt={product.name}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 14 }}
+                                  onError={(e: any) => { e.target.style.display = 'none'; e.target.nextSibling && (e.target.nextSibling.style.display = 'flex'); }}
+                                />
+                              ) : null}
+                              <div style={{ display: productImages[product.name] ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                                {product.icon ? (
+                                  <i className={`fas ${product.icon}`} style={{ fontSize: 36, color: '#0F766E' }}></i>
+                                ) : (
+                                  <i className={`fas ${getProductIcon(product.name)}`} style={{ fontSize: 36, color: '#0F766E' }}></i>
+                                )}
+                              </div>
+                          </div>
 
                           {/* Product Info */}
                           <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
