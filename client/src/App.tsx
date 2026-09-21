@@ -1121,6 +1121,13 @@ export default function App() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [customerSearch, setCustomerSearch] = useState('');
   const [cartCustomerInput, setCartCustomerInput] = useState('');
+
+  const cartCustomerQ = cartCustomerInput.trim().toLowerCase();
+  const cartCustomerFiltered = cartCustomerQ ? customers.filter(c =>
+    c.name.toLowerCase().includes(cartCustomerQ) ||
+    (c.phone || '').includes(cartCustomerInput) ||
+    (c.id || '').toLowerCase().includes(cartCustomerQ)
+  ).slice(0, 5) : [];
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState<string>('15');
   const [defaultVatPercent, setDefaultVatPercent] = useState(15);
@@ -1869,36 +1876,37 @@ export default function App() {
                       }}
                     />
                     {/* Customer Dropdown */}
+                    {/* Customer Card Dropdown */}
                     {customerSearch.length > 0 && filteredCustomers.length > 0 && (
-                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 220, overflow: 'auto', marginTop: 4 }}>
-                        {filteredCustomers.map(c => (
-                          <div
-                            key={c.id}
-                            onClick={() => { setSelectedCustomer(c); setCustomerSearch(''); }}
-                            style={{ padding: '10px 14px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center', transition: 'background 0.15s' }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#F0FDFA'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = '#fff'}
-                          >
-                            <div>
-                              <div style={{ fontSize: 13, fontWeight: 600, color: '#1F2937' }}>{c.name}</div>
-                              <div style={{ fontSize: 11, color: '#6B7280' }}>{c.phone}</div>
+                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 320, overflow: 'auto', padding: 8 }}>
+                        {filteredCustomers.slice(0, 8).map(c => {
+                          const netDue = Math.max(0, (parseFloat(c.balance as any) || 0) - (parseFloat(c.deposit as any) || 0));
+                          const hasDue = netDue > 0;
+                          return (
+                            <div key={c.id} onClick={() => { setSelectedCustomer(c); setCustomerSearch(''); }}
+                              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', cursor: 'pointer', borderRadius: 10, marginBottom: 4, border: '1px solid #f0f0f0', transition: 'all 0.15s' }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = '#F0FDFA'; e.currentTarget.style.borderColor = '#115E59'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#f0f0f0'; }}>
+                              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
+                                {c.name.charAt(0).toUpperCase()}
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 13, fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
+                                <div style={{ fontSize: 11, color: '#6B7280' }}><i className="fas fa-phone" style={{marginRight: 3}}></i>{c.phone || '-'}</div>
+                              </div>
+                              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>{netDue > 0 ? t('due') : t('paid')}</div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: hasDue ? '#DC2626' : '#10B981', padding: '2px 8px', borderRadius: 6, background: hasDue ? '#FEE2E2' : '#D1FAE5' }}>
+                                  {settings.currencySymbol}{hasDue ? netDue : (parseFloat(c.deposit as any) || 0)}
+                                </div>
+                              </div>
                             </div>
-                            <div style={{ 
-                              fontSize: 11, 
-                              fontWeight: 600,
-                              padding: '4px 5px',
-                              borderRadius: 6,
-                              background: c.balance > 0 ? '#FEE2E2' : '#D1FAE5',
-                              color: c.balance > 0 ? '#DC2626' : '#10B981'
-                            }}>
-                              {c.balance > 0 ? `${settings.currencySymbol}${c.balance}` : <><i className="fas fa-check" style={{marginRight: 4}}></i> Paid</>}
-                            </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
-                  </div>
 
+                  </div>
                   {/* Supplier - Enhanced Select */}
                   <div style={{ 
                     flex: '1 1 140px', 
@@ -2801,6 +2809,31 @@ export default function App() {
                         style={{ flex: 1, fontSize: 14, borderRadius: 8, padding: '8px 12px', border: '1.5px solid #e5e7eb', background: '#fafbfc', outline: 'none', boxSizing: 'border-box' }}
                       />
                     )}
+                      {cartCustomerFiltered.length > 0 && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 250, overflow: 'auto', padding: 6, marginTop: 4 }}>
+                          {cartCustomerFiltered.map(c => {
+                            const netDue = Math.max(0, (parseFloat(c.balance as any) || 0) - (parseFloat(c.deposit as any) || 0));
+                            const hasDue = netDue > 0;
+                            return (
+                              <div key={c.id} onClick={() => { setSelectedCustomer(c); setCartCustomerInput(''); }}
+                                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', cursor: 'pointer', borderRadius: 8, marginBottom: 2, border: '1px solid #f0f0f0', transition: 'all 0.15s' }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = '#F0FDFA'; e.currentTarget.style.borderColor = '#115E59'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#f0f0f0'; }}>
+                                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
+                                  {c.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontSize: 12, fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
+                                  <div style={{ fontSize: 10, color: '#6B7280' }}>{c.phone || '-'}</div>
+                                </div>
+                                <div style={{ fontSize: 11, fontWeight: 700, color: hasDue ? '#DC2626' : '#10B981', padding: '2px 6px', borderRadius: 5, background: hasDue ? '#FEE2E2' : '#D1FAE5', flexShrink: 0 }}>
+                                  {settings.currencySymbol}{hasDue ? netDue : 0}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                   </div>
                   <button 
                     onClick={() => {
