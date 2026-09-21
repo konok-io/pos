@@ -1532,13 +1532,34 @@ export default function App() {
       return cartItem ? { ...p, stock: p.stock - cartItem.quantity } : p;
     }));
 
-    // Update customer balance if due
-    if (selectedCustomer && due > 0) {
-      const newBalance = selectedCustomer.balance + due;
-      setCustomers(prev => prev.map(c =>
-        c.id === selectedCustomer.id ? { ...c, balance: newBalance } : c
-      ));
-      api.updateCustomer(selectedCustomer.id, { ...selectedCustomer, balance: newBalance }).catch(() => {});
+    // Apply deposit first, then remaining becomes due
+    if (selectedCustomer) {
+      const custDeposit = selectedCustomer.deposit || 0;
+      const custDue = selectedCustomer.balance > 0 ? selectedCustomer.balance : 0;
+      let newBalance = custDue;
+      let newDeposit = custDeposit;
+      
+      if (due > 0) {
+        // Has due: apply deposit to reduce due
+        if (custDeposit > 0) {
+          const applied = Math.min(custDeposit, due);
+          newBalance = custDue + (due - applied);
+          newDeposit = custDeposit - applied;
+        } else {
+          newBalance = custDue + due;
+        }
+      } else if (paid > total && custDeposit >= 0) {
+        // Overpaid: add extra to deposit
+        const extra = paid - total;
+        newDeposit = custDeposit + extra;
+      }
+      
+      if (newBalance !== custDue || newDeposit !== custDeposit) {
+        setCustomers(prev => prev.map(c =>
+          c.id === selectedCustomer.id ? { ...c, balance: newBalance, deposit: newDeposit } : c
+        ));
+        api.updateCustomer(selectedCustomer.id, { ...selectedCustomer, balance: newBalance, deposit: newDeposit }).catch(() => {});
+      }
     }
 
     setSales(prev => [...prev, sale]);
@@ -5149,6 +5170,9 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
       const newTransaction = createTransaction('deposit', amount, depositComment || undefined, selectedPayment);
       const newTransactions = [...(selectedCustomer.transactions || []), newTransaction];
       
+      // Save to MySQL API
+      api.updateCustomer(selectedCustomer.id, { ...selectedCustomer, balance: newBalance, deposit: newDeposit }).catch(() => {});
+      
       // Save transaction to DB
       await db.put('transactions', newTransaction.id, { ...newTransaction, customerId: selectedCustomer.id });
       
@@ -5405,6 +5429,9 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
       const newBalance = currentDue + amount;
       const newTransaction = createTransaction('due', amount, dueComment || undefined);
       const newTransactions = [...(selectedCustomer.transactions || []), newTransaction];
+      
+      // Save to MySQL API
+      api.updateCustomer(selectedCustomer.id, { ...selectedCustomer, balance: newBalance }).catch(() => {});
       
       // Save transaction to DB
       await db.put('transactions', newTransaction.id, { ...newTransaction, customerId: selectedCustomer.id });
