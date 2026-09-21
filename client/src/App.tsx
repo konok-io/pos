@@ -1211,7 +1211,12 @@ export default function App() {
       const savedHeldSales = await db.get<any>('heldSales', 'heldSales');
       if (savedHeldSales) {
         try {
-          setHeldSales(savedHeldSales);
+          // Parse items if stored as JSON string
+          const parsed = Array.isArray(savedHeldSales) ? savedHeldSales.map((s: any) => ({
+            ...s,
+            items: typeof s.items === 'string' ? JSON.parse(s.items) : s.items || [],
+          })) : [];
+          setHeldSales(parsed);
         } catch (e) {
               }
       }
@@ -2326,7 +2331,7 @@ export default function App() {
                         {/* Category Filter */}
                         {selectedCategory !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-folder-open" style={{marginRight: 4}}></i> {categories.find(c => c.id === selectedCategory)?.name} ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-folder-open" style={{marginRight: 4}}></i> {categories.find(c => String(c.id) === String(selectedCategory))?.name || selectedCategory} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
