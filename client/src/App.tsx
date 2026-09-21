@@ -1262,6 +1262,9 @@ export default function App() {
         return [genCust, ...prev];
       });
       
+      // Ensure General Customer exists in DB
+      api.addCustomer(genCust).catch(() => {});
+      
       setIsInitialized(true); // Mark as initialized before enabling saves
       setIsLoading(false);
     };
@@ -1503,7 +1506,7 @@ export default function App() {
       id: genId(),
       invoiceNo: `INV${Date.now()}`,
       date: now(),
-      customerId: selectedCustomer?.id || null,
+      customerId: selectedCustomer?.id || GENERAL_CUSTOMER_ID,
       customerName: selectedCustomer?.name || t('generalCustomer'),
       items: cart.map(item => ({
         productId: item.productId,
@@ -5671,7 +5674,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   // Get customer sales
   const getCustomerSales = (customer: Customer) => {
     if (isGeneralCustomer(customer)) {
-      return sales.filter(s => !s.customerId || s.customerId === '' || s.customerId === customer.id);
+      return sales.filter(s => !s.customerId || s.customerId === '' || s.customerId === GENERAL_CUSTOMER_ID || s.customerId === customer.id);
     }
     return sales.filter(s => s.customerId === customer.id);
   };
