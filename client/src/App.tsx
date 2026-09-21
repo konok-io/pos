@@ -1495,7 +1495,7 @@ export default function App() {
       return;
     }
     if (due > 0 && !selectedCustomer) {
-      alert(t('selectCustomerOrPayFull'));
+      alert(t('selectCustomerForDue'));
       return;
     }
 
@@ -2975,7 +2975,11 @@ export default function App() {
                   </button>
                   {/* Complete Sale Button */}
                   {(() => {
-                    const canComplete = cart.length > 0 && paid >= total;
+                    const canComplete = cart.length > 0 && (
+                      dueSalesEnabled && selectedCustomer
+                        ? paid > 0
+                        : paid >= total
+                    );
                     return (
                     <button onClick={handleCheckout}
                       disabled={!canComplete}
