@@ -1112,6 +1112,7 @@ export default function App() {
   const [defaultVatPercent, setDefaultVatPercent] = useState(15);
   const [paidAmount, setPaidAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
+  const [posBarcode, setPosBarcode] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSupplier, setSelectedSupplier] = useState('all');
@@ -1486,6 +1487,19 @@ export default function App() {
   const dueSalesEnabled = settings.dueSalesEnabled !== false;
 
   // Checkout
+  // POS Barcode Enter handler
+  const handlePosBarcodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && posBarcode.trim()) {
+      const barcode = posBarcode.trim();
+      const found = products.find(p => p.barcode === barcode || p.code === barcode);
+      if (found) {
+        addToCart(found);
+        setPosBarcode('');
+      } else {
+        alert(t('productNotFound') || 'Product not found');
+      }
+    }
+  };
   const handleCheckout = () => {
     if (cart.length === 0) {
       alert(t('cartEmpty'));
@@ -2695,6 +2709,9 @@ export default function App() {
                     fontWeight: 500,
                     color: '#1F2937'
                   }}
+                  value={posBarcode}
+                  onChange={(e) => setPosBarcode(e.target.value)}
+                  onKeyDown={handlePosBarcodeKeyDown}
                 />
               </div>
 
