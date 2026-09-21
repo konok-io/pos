@@ -6782,9 +6782,16 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
     // Clear React state
     setProducts([]);
-    setCustomers([]);
     setSales([]);
     setSuppliers([]);
+    
+    // Recreate General Customer
+    const genCust: Customer = {
+      id: generateGeneralCustomerId(),
+      name: 'General Customer',
+      phone: '', address: '', balance: 0, deposit: 0, isSystem: true,
+    };
+    setCustomers([genCust]);
     setCategories([]);
     setPurchases([]);
 
