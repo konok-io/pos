@@ -3,7 +3,7 @@ import { api } from "./api";
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages, defaultTranslations, Language } from './i18n';
-import { QR_CODE } from './qrCode';
+import { QR } from './qrCode';
 import { db } from './utils/db';
 import { localDb, initDatabase } from './services';
 
@@ -1547,7 +1547,7 @@ export default function App() {
       }
     }
   };
-  const printReceipt = (sale: Sale) => {
+  const printReceipt = async (sale: Sale) => {
     const cur = settings?.currencySymbol || '\u09f3';
     const company = settings?.name || '';
     const phone = settings?.phone || '';
@@ -1585,18 +1585,14 @@ export default function App() {
         const totalWithVat = String((+sale.total || 0).toFixed(2));
         const vatAmt = String((+sale.vatAmount || 0).toFixed(2));
 
-        let base64: string;
+        let qrBase64: string;
         if (zatcaPhase === 'phase2') {
-          // Phase 2: 8 fields (requires API integration for hash, signature, key)
-          // For now generate Phase 1 QR with 5 fields until API is connected
-          base64 = QR_CODE.tlvEncodePhase1(sellerName, vatNo, ts, totalWithVat, vatAmt);
+          qrBase64 = QR.generatePhase2QR(sellerName, vatNo, ts, totalWithVat, vatAmt, '', '', '');
         } else {
-          // Phase 1: 5 fields
-          base64 = QR_CODE.tlvEncodePhase1(sellerName, vatNo, ts, totalWithVat, vatAmt);
+          qrBase64 = QR.generatePhase1QR(sellerName, vatNo, ts, totalWithVat, vatAmt);
         }
 
-        const qrMatrix = QR_CODE.generate(base64);
-        const qrSvg = QR_CODE.toSVG(qrMatrix, 4);
+        const qrSvg = await QR.renderQRToSVG(qrBase64, 5);
         qrHtml = '<div style="text-align:center;margin-top:6px;padding-top:4px;border-top:1px dashed #ccc;">' +
           '<div style="font-size:8px;color:#666;margin-bottom:2px;">ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1') + '</div>' +
           qrSvg +
@@ -1717,7 +1713,7 @@ export default function App() {
   };
 
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) {
       alert(t('cartEmpty'));
       return;
@@ -1799,7 +1795,7 @@ export default function App() {
     setSales(prev => [...prev, sale]);
     setLastSale(sale);
     setShowReceiptModal(true);
-    printReceipt(sale);
+    await printReceipt(sale);
     setCart([]);
     setDiscount('');
     setPaidAmount('');
@@ -3585,7 +3581,7 @@ export default function App() {
                   </div>
                 )}
               </div>
-              <button className="btn btn-lg btn-block" style={{ marginTop: 10, background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 0', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%' }} onClick={() => { if (lastSale) printReceipt(lastSale); }}>
+              <button className="btn btn-lg btn-block" style={{ marginTop: 10, background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 0', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%' }} onClick={async () => { if (lastSale) await printReceipt(lastSale); }}>
                 <i className="fas fa-print" style={{marginRight: 4}}></i> Print Receipt
               </button>
               <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 20 }} onClick={() => setShowReceiptModal(false)}>
