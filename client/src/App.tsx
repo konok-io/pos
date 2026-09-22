@@ -1596,11 +1596,12 @@ export default function App() {
           ...tlvEncode(4, totalStr),
           ...tlvEncode(5, vatStr),
         ]);
-        // Encode raw TLV bytes as string for QR
-        let tlvStr = '';
-        tlvData.forEach((b: number) => { tlvStr += String.fromCharCode(b); });
-        // Generate ISO-compliant QR code
-        const qrMatrix = QR_CODE.generate(tlvStr);
+        // Encode TLV bytes as base64 (ZATCA standard)
+        let binary = '';
+        tlvData.forEach((b: number) => { binary += String.fromCharCode(b); });
+        const base64 = btoa(binary);
+        // Generate ISO-compliant QR code with base64 data
+        const qrMatrix = QR_CODE.generate(base64);
         const qrSvg = QR_CODE.toSVG(qrMatrix, 4);
         qrHtml = '<div style="text-align:center;margin-top:6px;padding-top:4px;border-top:1px dashed #ccc;">' +
           '<div style="font-size:8px;color:#666;margin-bottom:2px;">ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1') + '</div>' +
