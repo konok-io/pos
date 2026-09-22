@@ -6898,15 +6898,15 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     taxId: '',
     crNumber: '',
     zatkaEnabled: false,
-    zatkaApiUrl: '',
-    zatkaUsername: '',
-    zatkaPassword: '',
+    zatcaEnvironment: 'developer-portal',
+    
+    
     zatcaPhase: 'normal',
-    zatcaOid: '',
-    zatcaCsid: '',
-    zatcaPrivateKey: '',
-    zatcaClientId: '',
-    zatcaClientSecret: '',
+    zatcaOtp: '',
+    zatcaCsr: false,
+    
+    
+    
     vatEnabled: true,
     vatPercent: 15,
     bannerImage: '',
@@ -6988,7 +6988,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       }
       // Also save to MySQL API
       await api.updateSettings(form).catch(() => {});
-      // Save ZATCA identity to backend if Phase 2
+      // Save ZATCA config to backend if Phase 2
       if (form.zatcaPhase === 'phase2') {
         await zatcaApi.saveIdentity({
           vat_number: form.taxId || '',
@@ -6999,15 +6999,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           invoice_type: '0200000',
           egs_serial: 'POS-001',
           industry: 'Retail',
-          environment: 'developer-portal',
-          api_url: form.zatkaApiUrl || 'https://api.zatca.gov.sa',
-          username: form.zatkaUsername || '',
-          password: form.zatkaPassword || '',
-          csid: form.zatcaCsid || '',
-          oid: form.zatcaOid || '',
-          private_key: form.zatcaPrivateKey || '',
-          client_id: form.zatcaClientId || '',
-          client_secret: form.zatcaClientSecret || '',
+          environment: form.zatcaEnvironment || 'developer-portal',
         }).catch(console.error);
       }
       setSaved(true);
@@ -7337,49 +7329,114 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                     <span style={{ fontSize: 12, color: '#166534' }}>{form.zatcaPhase === 'phase2' ? 'Full API integration with ZATCA' : form.zatcaPhase === 'phase1' ? 'QR code on receipts (manual compliance)' : 'No QR code - Normal invoice only'}</span>
                   </div>
 
-                  {/* Phase 2 - API Credentials */}
+                  {/* Phase 2 - ZATCA Credentials */}
                   {form.zatcaPhase === 'phase2' && (
                     <div>
-                      <h6 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700, color: '#166534' }}><i className="fas fa-key" style={{ marginRight: 4 }}></i> ZATCA API Credentials</h6>
+                      <h6 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700, color: '#166534' }}><i className="fas fa-key" style={{ marginRight: 4 }}></i> ZATCA E-Invoicing Credentials</h6>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
                         <div>
-                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-globe" style={{ marginRight: 4 }}></i> API URL *</label>
-                          <input value={form.zatkaApiUrl || ''} onChange={e => setForm(p => ({ ...p, zatkaApiUrl: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="https://api.zatca.gov.sa" />
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-globe" style={{ marginRight: 4 }}></i> Environment</label>
+                          <select value={form.zatcaEnvironment || 'developer-portal'} onChange={e => setForm(p => ({ ...p, zatcaEnvironment: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 8 }}>
+                            <option value="developer-portal">Developer Portal (Testing)</option>
+                            <option value="simulation">Simulation</option>
+                            <option value="production">Production</option>
+                          </select>
                         </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-user" style={{ marginRight: 4 }}></i> Username *</label>
-                          <input value={form.zatkaUsername || ''} onChange={e => setForm(p => ({ ...p, zatkaUsername: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="ZATCA portal username" />
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-building" style={{ marginRight: 4 }}></i> Company Name (as registered in ZATCA)</label>
+                          <input value={form.name || ''} readOnly style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #d1d5db', borderRadius: 8, background: '#f9fafb' }} />
                         </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-lock" style={{ marginRight: 4 }}></i> Password *</label>
-                          <input type="password" value={form.zatkaPassword || ''} onChange={e => setForm(p => ({ ...p, zatkaPassword: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="ZATCA portal password" />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-id-card" style={{ marginRight: 4 }}></i> CSID (Compliance Solution ID) *</label>
-                          <input value={form.zatcaCsid || ''} onChange={e => setForm(p => ({ ...p, zatcaCsid: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="CSID from ZATCA portal" />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-building" style={{ marginRight: 4 }}></i> Organization ID (OID) *</label>
-                          <input value={form.zatcaOid || ''} onChange={e => setForm(p => ({ ...p, zatcaOid: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="Organization ID" />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-fingerprint" style={{ marginRight: 4 }}></i> Private Key *</label>
-                          <input type="password" value={form.zatcaPrivateKey || ''} onChange={e => setForm(p => ({ ...p, zatcaPrivateKey: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="Private key for CSID" />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-user-shield" style={{ marginRight: 4 }}></i> Client ID *</label>
-                          <input value={form.zatcaClientId || ''} onChange={e => setForm(p => ({ ...p, zatcaClientId: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="OAuth Client ID" />
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-user-secret" style={{ marginRight: 4 }}></i> Client Secret *</label>
-                          <input type="password" value={form.zatcaClientSecret || ''} onChange={e => setForm(p => ({ ...p, zatcaClientSecret: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="OAuth Client Secret" />
+                        <div style={{ gridColumn: 'span 2' }}>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-id-card" style={{ marginRight: 4 }}></i> VAT Number</label>
+                          <input value={form.taxId || ''} readOnly style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #d1d5db', borderRadius: 8, background: '#f9fafb' }} />
                         </div>
                       </div>
 
+                      <div style={{ marginTop: 16, padding: 12, background: '#f0fdf4', borderRadius: 8, border: '1px solid #86efac' }}>
+                        <h6 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700, color: '#166534' }}><i className="fas fa-info-circle" style={{ marginRight: 4 }}></i> ZATCA Onboarding Steps</h6>
+                        <div style={{ fontSize: 12, color: '#166534', lineHeight: 1.6 }}>
+                          <p style={{ margin: '4px 0' }}><strong>Step 1:</strong> Generate CSR from this system</p>
+                          <p style={{ margin: '4px 0' }}><strong>Step 2:</strong> Login to <a href="https://fatoora.zatca.gov.sa" target="_blank" style={{ color: '#059669' }}>Fatoora Portal</a> → Generate OTP</p>
+                          <p style={{ margin: '4px 0' }}><strong>Step 3:</strong> Submit CSR + OTP → Get Compliance CSID</p>
+                          <p style={{ margin: '4px 0' }}><strong>Step 4:</strong> Run compliance checks (6 test invoices)</p>
+                          <p style={{ margin: '4px 0' }}><strong>Step 5:</strong> Get Production CSID → Ready!</p>
+                        </div>
+                      </div>
+
+                      {/* CSR Section */}
+                      <div style={{ marginTop: 16 }}>
+                        <h6 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700, color: '#166534' }}><i className="fas fa-certificate" style={{ marginRight: 4 }}></i> Certificate Signing Request (CSR)</h6>
+                        {form.zatcaCsr ? (
+                          <div style={{ padding: 10, background: '#ecfdf5', borderRadius: 8, fontSize: 12, color: '#166534' }}>
+                            <i className="fas fa-check-circle" style={{ marginRight: 4 }}></i> CSR generated. Ready to submit to ZATCA.
+                          </div>
+                        ) : (
+                          <button onClick={async () => {
+                            if (!window.confirm('Generate CSR? This creates a new secp256k1 key pair.')) return;
+                            try {
+                              const res = await zatcaApi.generateCsr();
+                              if (res.ok) {
+                                setForm(p => ({ ...p, zatcaCsr: true }));
+                                alert('CSR generated! Copy it from the server and submit to ZATCA Fatoora Portal.');
+                              } else {
+                                alert('Error: ' + (res.error || 'Unknown'));
+                              }
+                            } catch (e: any) { alert('Error: ' + e.message); }
+                          }} style={{ padding: '8px 16px', background: '#059669', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                            <i className="fas fa-key" style={{ marginRight: 4 }}></i> Generate CSR
+                          </button>
+                        )}
+                      </div>
+
+                      {/* OTP + Compliance CSID */}
+                      <div style={{ marginTop: 16 }}>
+                        <h6 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700, color: '#166534' }}><i className="fas fa-shield-alt" style={{ marginRight: 4 }}></i> Compliance CSID</h6>
+                        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <input
+                            placeholder="Enter OTP from Fatoora Portal"
+                            value={form.zatcaOtp || ''}
+                            onChange={e => setForm(p => ({ ...p, zatcaOtp: e.target.value }))}
+                            style={{ flex: 1, padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 8 }}
+                          />
+                          <button onClick={async () => {
+                            if (!form.zatcaOtp) { alert('Enter OTP first'); return; }
+                            try {
+                              const res = await zatcaApi.requestComplianceCsid(form.zatcaOtp);
+                              if (res.data && res.data.requestID) {
+                                alert('Compliance CSID obtained! Request ID: ' + res.data.requestID);
+                              } else {
+                                alert('Error: ' + JSON.stringify(res.data || res.error));
+                              }
+                            } catch (e: any) { alert('Error: ' + e.message); }
+                          }} style={{ padding: '10px 16px', background: '#059669', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                            <i className="fas fa-paper-plane" style={{ marginRight: 4 }}></i> Submit OTP
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Production CSID */}
+                      <div style={{ marginTop: 16 }}>
+                        <h6 style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700, color: '#166534' }}><i className="fas fa-rocket" style={{ marginRight: 4 }}></i> Production CSID</h6>
+                        <button onClick={async () => {
+                          if (!window.confirm('Get Production CSID? You must complete compliance checks first.')) return;
+                          try {
+                            const res = await zatcaApi.requestProductionCsid();
+                            if (res.data && res.data.binarySecurityToken) {
+                              alert('Production CSID obtained! Ready for live invoices.');
+                            } else {
+                              alert('Response: ' + JSON.stringify(res.data || res.error));
+                            }
+                          } catch (e: any) { alert('Error: ' + e.message); }
+                        }} style={{ padding: '8px 16px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+                          <i className="fas fa-rocket" style={{ marginRight: 4 }}></i> Get Production CSID
+                        </button>
+                      </div>
+
                       {/* Status */}
-                      <div style={{ marginTop: 12, padding: '10px 14px', background: form.zatcaCsid && form.zatcaClientId ? '#ecfdf5' : '#fef3c7', borderRadius: 8, border: form.zatcaCsid && form.zatcaClientId ? '1px solid #86efac' : '1px solid #fbbf24' }}>
-                        <span style={{ fontSize: 12, color: form.zatcaCsid && form.zatcaClientId ? '#166534' : '#92400e' }}>
-                          {form.zatcaCsid && form.zatcaClientId && form.zatcaClientSecret ? '\u2713 Credentials configured - Ready for Phase 2 compliance' : '\u26a0 Fill all required fields to enable Phase 2 compliance'}
+                      <div style={{ marginTop: 12, padding: '10px 14px', background: '#ecfdf5', borderRadius: 8, border: '1px solid #86efac' }}>
+                        <span style={{ fontSize: 12, color: '#166534' }}>
+                          <i className="fas fa-info-circle" style={{ marginRight: 4 }}></i>
+                          Phase 2 requires: CSR → OTP → Compliance CSID → Compliance Checks → Production CSID
                         </span>
                       </div>
                     </div>
