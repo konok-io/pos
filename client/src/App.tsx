@@ -1576,7 +1576,7 @@ export default function App() {
 
     // ZATCA QR Code - SVG based (no script needed)
     let qrHtml = '';
-    if (zatkaEnabled && taxId) {
+    if (zatkaEnabled && taxId && zatcaPhase !== 'normal') {
       try {
         const tlvEncode = (tag: number, value: string) => {
           const encoder = new TextEncoder();
@@ -1721,7 +1721,7 @@ export default function App() {
   <div style="font-size:10px;margin:4px 0;">
     <div><strong>Invoice:</strong> ${sale.invoiceNo}</div>
     <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'})} ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
-    ${zatkaEnabled ? `<div><strong>Mode:</strong> ${zatcaPhase === 'phase2' ? 'ZATCA Phase 2' : 'ZATCA Phase 1'}</div>` : ''}
+                    ${zatcaPhase === 'phase2' ? 'ZATCA Phase 2' : zatcaPhase === 'phase1' ? 'ZATCA Phase 1' : ''}
   </div>
 
   <!-- Customer Info -->
@@ -6925,7 +6925,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     zatkaApiUrl: '',
     zatkaUsername: '',
     zatkaPassword: '',
-    zatcaPhase: 'phase1',
+    zatcaPhase: 'normal',
     zatcaOid: '',
     zatcaCsid: '',
     zatcaPrivateKey: '',
@@ -7332,10 +7332,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #86efac' }}>
                     <label style={{ fontSize: 14, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>ZATCA Phase:</label>
                     <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => setForm(p => ({ ...p, zatcaPhase: 'normal' }))} style={{ padding: '8px 16px', background: form.zatcaPhase === 'normal' ? '#6B7280' : '#e0e0e0', color: form.zatcaPhase === 'normal' ? '#fff' : '#000', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Normal</button>
                       <button onClick={() => setForm(p => ({ ...p, zatcaPhase: 'phase1' }))} style={{ padding: '8px 16px', background: form.zatcaPhase === 'phase1' ? '#059669' : '#e0e0e0', color: form.zatcaPhase === 'phase1' ? '#fff' : '#000', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Phase 1</button>
                       <button onClick={() => setForm(p => ({ ...p, zatcaPhase: 'phase2' }))} style={{ padding: '8px 16px', background: form.zatcaPhase === 'phase2' ? '#059669' : '#e0e0e0', color: form.zatcaPhase === 'phase2' ? '#fff' : '#000', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Phase 2</button>
                     </div>
-                    <span style={{ fontSize: 12, color: '#166534' }}>{form.zatcaPhase === 'phase2' ? 'Full API integration with ZATCA' : 'QR code on receipts (manual compliance)'}</span>
+                    <span style={{ fontSize: 12, color: '#166534' }}>{form.zatcaPhase === 'phase2' ? 'Full API integration with ZATCA' : form.zatcaPhase === 'phase1' ? 'QR code on receipts (manual compliance)' : 'No QR code - Normal invoice only'}</span>
                   </div>
 
                   {/* Phase 2 - API Credentials */}
