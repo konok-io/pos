@@ -7883,6 +7883,7 @@ export function DatabaseSettings() {
       setImportProgress(100);
 
       setMessage(t('importSuccessful'));
+        window.location.reload();
       setMessageType('success');
       setImportFile(null);
       loadDbInfo();
