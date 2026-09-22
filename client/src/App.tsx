@@ -167,7 +167,7 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
     } else {
       // Add new user
       const newUser: User = {
-        id: Date.now().toString(),
+        id: genId(),
         name: form.name,
         email: form.email,
         password: form.password,
@@ -646,7 +646,7 @@ const DEFAULT_ADMIN = {
 };
 
 // Helper functions
-const genId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
+const genId = () => { const now = new Date(); const y = now.getFullYear(); const m = String(now.getMonth() + 1).padStart(2, '0'); const d = String(now.getDate()).padStart(2, '0'); const unique = String(Math.floor(10000 + Math.random() * 90000)); return `${y}${m}${d}${unique}`; };
 const now = () => new Date().toISOString();
 
 // Types
@@ -5146,7 +5146,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 
   // Helper to create transaction
   const createTransaction = (type: 'due' | 'deposit', amount: number, note?: string, paymentMethod?: string): Transaction => ({
-    id: Date.now().toString(),
+    id: genId(),
     type,
     amount,
     note,
