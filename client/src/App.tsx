@@ -1576,29 +1576,53 @@ export default function App() {
 
     // ZATCA QR Code - SVG based (no script needed)
     let qrHtml = '';
-    if (zatkaEnabled && taxId && zatcaPhase !== 'normal') {
+    if (zatkaEnabled) {
       try {
-        const sellerName = company || 'Seller';
-        const vatNo = taxId;
-        const ts = new Date().toISOString();
-        const totalWithVat = String((+sale.total || 0).toFixed(2));
-        const vatAmt = String((+sale.vatAmount || 0).toFixed(2));
-
-        let qrBase64: string;
-        if (zatcaPhase === 'phase2') {
-          qrBase64 = QR.generatePhase2QR(sellerName, vatNo, ts, totalWithVat, vatAmt, '', '', '');
+        let qrData = '';
+        let label = '';
+        if (zatcaPhase === 'phase1' || zatcaPhase === 'phase2') {
+          // ZATCA TLV QR
+          const sellerName = company || 'Seller';
+          const vatNo = taxId;
+          const ts = new Date().toISOString();
+          const totalWithVat = String((+sale.total || 0).toFixed(2));
+          const vatAmt = String((+sale.vatAmount || 0).toFixed(2));
+          if (zatcaPhase === 'phase2') {
+            qrData = QR.generatePhase2QR(sellerName, vatNo, ts, totalWithVat, vatAmt, '', '', '');
+          } else {
+            qrData = QR.generatePhase1QR(sellerName, vatNo, ts, totalWithVat, vatAmt);
+          }
+          label = 'ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1');
         } else {
-          qrBase64 = QR.generatePhase1QR(sellerName, vatNo, ts, totalWithVat, vatAmt);
+          // Normal QR - plain text with all invoice info
+          const items = (sale.items || []).map((it: any) => it.name + ' x' + it.qty + ' ' + cur + (it.total || it.price * it.qty)).join('; ');
+          qrData = [
+            company || '',
+            address || '',
+            'Tel: ' + (phone || ''),
+            email ? 'Email: ' + email : '',
+            'VAT: ' + (taxId || ''),
+            'CR: ' + (crNumber || ''),
+            'Invoice: ' + (sale.invoiceNo || ''),
+            'Date: ' + new Date(sale.date || Date.now()).toLocaleDateString('en-GB'),
+            'Customer: ' + (sale.customerName || 'General'),
+            'Items: ' + items,
+            'Subtotal: ' + cur + ' ' + (+sale.subtotal || 0).toFixed(2),
+            'VAT: ' + cur + ' ' + (+sale.vatAmount || 0).toFixed(2),
+            'Total: ' + cur + ' ' + (+sale.total || 0).toFixed(2),
+            'Paid: ' + cur + ' ' + (+sale.paid || 0).toFixed(2),
+            sale.due > 0 ? 'Due: ' + cur + ' ' + (+sale.due || 0).toFixed(2) : '',
+          ].filter(Boolean).join('\n');
+          label = '';
         }
-
-        const qrSvg = await QR.renderQRToSVG(qrBase64, 3);
+        const qrSvg = await QR.renderQRToSVG(qrData, 3);
         qrHtml = '<div style="text-align:center;margin-top:6px;padding-top:4px;border-top:1px dashed #ccc;">' +
-          '<div style="font-size:8px;color:#666;margin-bottom:2px;">ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1') + '</div>' +
+          (label ? '<div style="font-size:8px;color:#666;margin-bottom:2px;">' + label + '</div>' : '') +
           qrSvg +
           '</div>';
       } catch (e) {
         console.error('QR generation failed:', e);
-        qrHtml = '<div style="text-align:center;margin-top:6px;font-size:8px;color:#999;">[QR: ' + taxId + ']</div>';
+        qrHtml = '';
       }
     }
 
