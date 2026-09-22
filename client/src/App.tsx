@@ -1697,6 +1697,7 @@ export default function App() {
 
   <!-- Footer -->
   <div class="footer" style="border-top:1px dashed #ccc;padding-top:6px;margin-top:8px;">
+    <div style="font-size:9px;color:#666;margin-top:2px;">Thanks for shopping!</div>
     <div style="font-size:9px;color:#666;">${new Date().toLocaleDateString('en-GB')}</div>
   </div>
 </body>
