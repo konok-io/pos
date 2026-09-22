@@ -1785,7 +1785,7 @@ export default function App() {
                 padding: '10px 20px',
                 boxShadow: 'none',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'visible'
               }}>
                 {/* Search Inputs Row - Compact Design */}
                 <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
