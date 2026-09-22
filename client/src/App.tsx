@@ -1594,24 +1594,24 @@ export default function App() {
           }
           label = 'ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1');
         } else {
-          // Normal QR - plain text with all invoice info
-          const items = (sale.items || []).map((it: any) => it.name + ' x' + it.qty + ' ' + cur + (it.total || it.price * it.qty)).join('; ');
+          // Normal QR - structured invoice info
+          const itemCount = (sale.items || []).reduce((sum: number, it: any) => sum + (it.qty || 1), 0);
+          const productCount = (sale.items || []).length;
+          const saleDate = new Date(sale.date || Date.now());
+          const dateStr = saleDate.toLocaleDateString('en-GB');
+          const timeStr = saleDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
           qrData = [
             company || '',
             address || '',
             'Tel: ' + (phone || ''),
-            email ? 'Email: ' + email : '',
-            'VAT: ' + (taxId || ''),
-            'CR: ' + (crNumber || ''),
+            '',
             'Invoice: ' + (sale.invoiceNo || ''),
-            'Date: ' + new Date(sale.date || Date.now()).toLocaleDateString('en-GB'),
-            'Customer: ' + (sale.customerName || 'General'),
-            'Items: ' + items,
-            'Subtotal: ' + cur + ' ' + (+sale.subtotal || 0).toFixed(2),
-            'VAT: ' + cur + ' ' + (+sale.vatAmount || 0).toFixed(2),
+            'Date: ' + dateStr + ' ' + timeStr,
+            '',
+            'Items: ' + productCount + ' | Qty: ' + itemCount,
             'Total: ' + cur + ' ' + (+sale.total || 0).toFixed(2),
             'Paid: ' + cur + ' ' + (+sale.paid || 0).toFixed(2),
-            sale.due > 0 ? 'Due: ' + cur + ' ' + (+sale.due || 0).toFixed(2) : '',
+            sale.change > 0 ? 'Change: ' + cur + ' ' + (+sale.change || 0).toFixed(2) : '',
           ].filter(Boolean).join('\n');
           label = '';
         }
@@ -1754,7 +1754,7 @@ export default function App() {
 
     const sale: Sale = {
       id: genId(),
-      invoiceNo: `INV${Date.now()}`,
+      invoiceNo: genId(),
       date: now(),
       customerId: selectedCustomer?.id || GENERAL_CUSTOMER_ID,
       customerName: selectedCustomer?.name || t('generalCustomer'),
