@@ -1869,7 +1869,7 @@ export default function App() {
                     />
                     {/* Customer Card Dropdown - Customer Management Style */}
                     {customerSearch.length > 0 && filteredCustomers.length > 0 && (
-                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 360, overflow: 'auto', padding: 10 }}>
+                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 9999, maxHeight: 360, overflow: 'auto', padding: 10 }}>
                         {filteredCustomers.slice(0, 8).map(c => {
                           const rawDue = (parseFloat(c.balance as any) || 0) > 0 ? parseFloat(c.balance as any) || 0 : 0;
                           const rawDeposit = parseFloat(c.deposit as any) || 0;
