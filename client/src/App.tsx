@@ -1850,7 +1850,7 @@ export default function App() {
                     </div>
                     <input
                       value={customerSearch}
-                      onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
+                      onChange={(e) => { setCustomerSearch(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(e.target.value.length > 0 || showCustomerList); }}
                       placeholder={t('customerSearch')}
                       style={{ 
                         width: '100%', 
@@ -1867,52 +1867,6 @@ export default function App() {
                         fontWeight: 500
                       }}
                     />
-                    {/* Customer Card Dropdown - Customer Management Style */}
-                    {customerSearch.length > 0 && filteredCustomers.length > 0 && (
-                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 9999, maxHeight: 360, overflow: 'auto', padding: 10 }}>
-                        {filteredCustomers.slice(0, 8).map(c => {
-                          const rawDue = (parseFloat(c.balance as any) || 0) > 0 ? parseFloat(c.balance as any) || 0 : 0;
-                          const rawDeposit = parseFloat(c.deposit as any) || 0;
-                          const netDue = Math.max(0, rawDue - rawDeposit);
-                          const netDeposit = Math.max(0, rawDeposit - rawDue);
-                          const totalSales = sales.filter(s => s.customerId === c.id).reduce((sum, s) => sum + (parseFloat(s.total as any) || 0), 0);
-                          return (
-                            <div key={c.id} onClick={() => { setSelectedCustomer(c); setCustomerSearch(''); }}
-                              style={{ padding: '12px', cursor: 'pointer', borderRadius: 12, marginBottom: 6, border: '1px solid #e0e0e0', background: '#fff', transition: 'all 0.15s' }}
-                              onMouseEnter={(e) => { e.currentTarget.style.background = '#F0FDFA'; e.currentTarget.style.borderColor = '#115E59'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e0e0e0'; }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
-                                  {c.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontWeight: 700, color: '#1F2937', fontSize: 14 }}>{c.name}</div>
-                                  <div style={{ fontSize: 12, color: '#9CA3AF' }}>{c.phone || t('phoneNotFound')}</div>
-                                </div>
-                                <div style={{ textAlign: 'right', display: 'flex', gap: 10, alignItems: 'center' }}>
-                                  <div>
-                                    <div style={{ fontSize: 10, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase' }}>{t('total')}</div>
-                                    <div style={{ fontSize: 13, fontWeight: 700, color: '#115E59' }}>{settings.currencySymbol}{totalSales}</div>
-                                  </div>
-                                  {netDue > 0 && (
-                                    <div>
-                                      <div style={{ fontSize: 10, fontWeight: 600, color: '#D32F2F', textTransform: 'uppercase' }}>{t('due')}</div>
-                                      <div style={{ fontSize: 13, fontWeight: 700, color: '#D32F2F' }}>{settings.currencySymbol}{netDue}</div>
-                                    </div>
-                                  )}
-                                  {netDeposit > 0 && (
-                                    <div>
-                                      <div style={{ fontSize: 10, fontWeight: 600, color: '#115E59', textTransform: 'uppercase' }}>{t('deposit')}</div>
-                                      <div style={{ fontSize: 13, fontWeight: 700, color: '#115E59' }}>{settings.currencySymbol}{netDeposit}</div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
 
                   </div>
                   {/* Supplier - Enhanced Select */}
@@ -2446,7 +2400,7 @@ export default function App() {
 
 
                     {/* Customer List */}
-                    {showCustomerList && (
+                    {(showCustomerList || customerSearch.length > 0) && (
                       <div style={{ padding: '16px 0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '10px 14px', marginBottom: 12 }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -2455,7 +2409,7 @@ export default function App() {
                           </div>
                           <div style={{ display: 'flex', gap: 6 }}>
                             <button onClick={() => setIsAddCustomerModalOpen(true)} style={{ padding: '6px 12px', borderRadius: 6, background: '#115E59', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCustomer')}</button>
-                            <button onClick={() => setShowCustomerList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
+                            <button onClick={() => { setShowCustomerList(false); setCustomerSearch(""); }} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
                           </div>
                         </div>
                         {customers.length === 0 ? (
@@ -2464,7 +2418,7 @@ export default function App() {
                           </div>
                         ) : (
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
-                            {customers.map(c => (
+                             {(customerSearch.length > 0 ? filteredCustomers : customers).map(c => (
                               <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12 }}>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
                                 <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><i className="fas fa-mobile-screen" style={{marginRight: 4}}></i> {c.phone}</div>
