@@ -1899,8 +1899,8 @@ export default function App() {
                       }}
                     >
                       <option value="all"><i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('allSuppliers')}</option>
-                      {[...new Set([...suppliers.map((s: any) => s.name), ...products.map(p => p.supplier || t('other'))])].map(s => (
-                        <option key={s} value={s}>{s}</option>
+                      {suppliers.map((s: any) => (
+                        <option key={s.id} value={s.name}>{s.name}</option>
                       ))}
                     </select>
                   </div>
