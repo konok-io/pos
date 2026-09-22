@@ -106,3 +106,56 @@ export const api = {
   // Stock adjust
   adjustStock: (data: any) => request('/stock-adjust', { method: 'POST', body: JSON.stringify(data) }),
 };
+
+
+// === ZATCA Phase 2 API (2026 Official) ===
+export const zatcaApi = {
+  getConfig: async () => {
+    const res = await fetch(`${API_URL}/zatca/config`);
+    return res.json();
+  },
+  saveIdentity: async (data: any) => {
+    const res = await fetch(`${API_URL}/zatca/identity`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return res.json();
+  },
+  generateCsr: async () => {
+    const res = await fetch(`${API_URL}/zatca/csr`, { method: 'POST' });
+    return res.json();
+  },
+  requestComplianceCsid: async (otp: string) => {
+    const res = await fetch(`${API_URL}/zatca/compliance-csid`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ otp }),
+    });
+    return res.json();
+  },
+  requestProductionCsid: async () => {
+    const res = await fetch(`${API_URL}/zatca/production-csid`, { method: 'POST' });
+    return res.json();
+  },
+  renewProductionCsid: async () => {
+    const res = await fetch(`${API_URL}/zatca/renew-csid`, { method: 'POST' });
+    return res.json();
+  },
+  submitComplianceInvoice: async (data: any) => {
+    const res = await fetch(`${API_URL}/zatca/compliance-invoice`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return res.json();
+  },
+  processInvoice: async (invoice: any) => {
+    const res = await fetch(`${API_URL}/zatca/process-invoice`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(invoice),
+    });
+    return res.json();
+  },
+};
