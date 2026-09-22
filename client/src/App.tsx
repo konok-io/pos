@@ -2366,12 +2366,13 @@ export default function App() {
                     {/* Expiry Products List */}
                     {showExpiryList && (
                       <div style={{ padding: '16px 0' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '10px 14px', marginBottom: 12 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><i className="fas fa-calendar"></i></div>
-                            <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</h3>
+                        <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-calendar" style={{marginRight: 4}}></i> {t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</span>
                           </div>
-                          <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
+                          <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
+                            <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
+                          </div>
                         </div>
                         {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
@@ -2402,14 +2403,13 @@ export default function App() {
                     {/* Customer List */}
                     {(showCustomerList || customerSearch.length > 0) && (
                       <div style={{ padding: '16px 0' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: 12, padding: '10px 14px', marginBottom: 12 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#14B8A6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><i className="fas fa-users"></i></div>
-                            <h3 style={{ fontSize: 14, fontWeight: 400, color: '#115E59', margin: 0 }}>{t('customers')} ({customers.length})</h3>
+                        <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-users" style={{marginRight: 4}}></i> {t('customers')} ({customerSearch.length > 0 ? filteredCustomers.length : customers.length})</span>
                           </div>
-                          <div style={{ display: 'flex', gap: 6 }}>
-                            <button onClick={() => setIsAddCustomerModalOpen(true)} style={{ padding: '6px 12px', borderRadius: 6, background: '#115E59', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCustomer')}</button>
-                            <button onClick={() => { setShowCustomerList(false); setCustomerSearch(""); }} style={{ padding: '6px 12px', borderRadius: 6, background: '#DC2626', border: 'none', fontSize: 12, cursor: 'pointer', color: 'white', fontWeight: 600 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
+                          <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
+                            <button onClick={() => setIsAddCustomerModalOpen(true)} style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#115E59', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCustomer')}</button>
+                            <button onClick={() => { setShowCustomerList(false); setCustomerSearch(""); }} style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
                           </div>
                         </div>
                         {customers.length === 0 ? (
