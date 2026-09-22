@@ -1058,6 +1058,21 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   useEffect(() => { localStorage.setItem('pos_temp_products', JSON.stringify(tempProducts)); }, [tempProducts]);
 
+  // Close dropdown menus when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('[data-menu]')) {
+        setShowMoreMenu(false);
+        setShowCategoryMoreMenu(false);
+        setShowStockMoreMenu(false);
+        setShowSupplierMoreMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
 
 
 
@@ -2159,7 +2174,13 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+  };
 
+  const handleClearTempProducts = () => {
+    if (tempProducts.length === 0) return;
+    if (window.confirm(t('clearAll') || 'Clear all products from list?')) {
+      setTempProducts([]);
+    }
   };
 
 
@@ -8786,7 +8807,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 180, padding: 4 }}>
+                <div data-menu="more" style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 180, padding: 4 }}>
 
 
 
@@ -8978,7 +8999,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
+                <div data-menu="supplier" style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
 
 
 
@@ -9148,7 +9169,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
+                <div data-menu="category" style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
 
 
 
@@ -9474,7 +9495,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                <div style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
+                <div data-menu="stock" style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
 
 
 
@@ -9949,6 +9970,10 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                   <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t('productList')}</span>
                   <span style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 700 }}>{tempProducts.length}</span>
                 </div>
+                <button onClick={handleClearTempProducts} disabled={tempProducts.length === 0} style={{ padding: '7px 10px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)', color: tempProducts.length > 0 ? '#DC2626' : 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: 13, cursor: tempProducts.length > 0 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <i className="fas fa-trash-can"></i>
+                </button>
+
                 <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? '#fff' : 'rgba(255,255,255,0.2)', color: tempProducts.length > 0 ? T.teal : 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: 12, cursor: tempProducts.length > 0 ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <i className="fas fa-paper-plane"></i> {t('post')}
                 </button>
