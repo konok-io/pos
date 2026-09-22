@@ -1216,6 +1216,26 @@ export default function App() {
       const savedCurrencySymbol = await getSetting('currencySymbol');
       if (savedCurrencySymbol) {
         _setSettings((prev: any) => ({ ...prev, currencySymbol: savedCurrencySymbol }));
+
+      // Load company info for receipt
+      const savedName = await getSetting('name');
+      if (savedName) _setSettings((prev: any) => ({ ...prev, name: savedName }));
+      const savedPhone = await getSetting('phone');
+      if (savedPhone) _setSettings((prev: any) => ({ ...prev, phone: savedPhone }));
+      const savedAddress = await getSetting('address');
+      if (savedAddress) _setSettings((prev: any) => ({ ...prev, address: savedAddress }));
+      const savedEmail = await getSetting('email');
+      if (savedEmail) _setSettings((prev: any) => ({ ...prev, email: savedEmail }));
+      const savedTaxId = await getSetting('taxId');
+      if (savedTaxId) _setSettings((prev: any) => ({ ...prev, taxId: savedTaxId }));
+      const savedCrNumber = await getSetting('crNumber');
+      if (savedCrNumber) _setSettings((prev: any) => ({ ...prev, crNumber: savedCrNumber }));
+      const savedZatka = await getSetting('zatkaEnabled');
+      if (savedZatka !== null) _setSettings((prev: any) => ({ ...prev, zatkaEnabled: isTruthy(savedZatka) }));
+      const savedZatcaPhase = await getSetting('zatcaPhase');
+      if (savedZatcaPhase) _setSettings((prev: any) => ({ ...prev, zatcaPhase: savedZatcaPhase }));
+      const savedReceiptFooter = await getSetting('receiptFooter');
+      if (savedReceiptFooter) _setSettings((prev: any) => ({ ...prev, receiptFooter: savedReceiptFooter }));
       }
       
       // Load cart state from IndexedDB
