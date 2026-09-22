@@ -1555,7 +1555,6 @@ export default function App() {
     const email = settings?.email || '';
     const taxId = settings?.taxId || '';
     const crNumber = settings?.crNumber || '';
-    const receiptFooter = settings?.receiptFooter || t('thanks');
     const vatEnabled = settings?.vatEnabled !== false;
     const customerName = sale.customerName || t('generalCustomer');
     const customerObj = customers.find(c => c.id === sale.customerId);
@@ -1592,7 +1591,7 @@ export default function App() {
           qrBase64 = QR.generatePhase1QR(sellerName, vatNo, ts, totalWithVat, vatAmt);
         }
 
-        const qrSvg = await QR.renderQRToSVG(qrBase64, 5);
+        const qrSvg = await QR.renderQRToSVG(qrBase64, 3);
         qrHtml = '<div style="text-align:center;margin-top:6px;padding-top:4px;border-top:1px dashed #ccc;">' +
           '<div style="font-size:8px;color:#666;margin-bottom:2px;">ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1') + '</div>' +
           qrSvg +
@@ -1697,9 +1696,8 @@ export default function App() {
   ${qrHtml}
 
   <!-- Footer -->
-  <div class="footer">
-    ${receiptFooter}
-    <div style="font-size:9px;color:#666;margin-top:4px;">${new Date().toLocaleDateString('en-GB')}</div>
+  <div class="footer" style="border-top:1px dashed #ccc;padding-top:6px;margin-top:8px;">
+    <div style="font-size:9px;color:#666;">${new Date().toLocaleDateString('en-GB')}</div>
   </div>
 </body>
 </html>`;
