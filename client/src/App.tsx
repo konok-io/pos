@@ -6988,6 +6988,28 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       }
       // Also save to MySQL API
       await api.updateSettings(form).catch(() => {});
+      // Save ZATCA identity to backend if Phase 2
+      if (form.zatcaPhase === 'phase2') {
+        await zatcaApi.saveIdentity({
+          vat_number: form.taxId || '',
+          org_name: form.name || '',
+          org_unit_name: form.address || '',
+          common_name: form.name || '',
+          country: 'SA',
+          invoice_type: '0200000',
+          egs_serial: 'POS-001',
+          industry: 'Retail',
+          environment: 'developer-portal',
+          api_url: form.zatkaApiUrl || 'https://api.zatca.gov.sa',
+          username: form.zatkaUsername || '',
+          password: form.zatkaPassword || '',
+          csid: form.zatcaCsid || '',
+          oid: form.zatcaOid || '',
+          private_key: form.zatcaPrivateKey || '',
+          client_id: form.zatcaClientId || '',
+          client_secret: form.zatcaClientSecret || '',
+        }).catch(console.error);
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
       // Hard reload to pick up changed settings (VAT on/off etc.)
