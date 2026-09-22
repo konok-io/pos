@@ -1574,11 +1574,10 @@ export default function App() {
       </div>`;
     });
 
-    // ZATCA QR Code (TLV encoded base64)
+    // ZATCA QR Code - SVG based (no script needed)
     let qrHtml = '';
     if (zatkaEnabled && taxId) {
       try {
-        // TLV encoding for ZATCA: tag + length + value
         const tlvEncode = (tag: number, value: string) => {
           const encoder = new TextEncoder();
           const bytes = encoder.encode(value);
@@ -1598,115 +1597,79 @@ export default function App() {
           ...tlvEncode(5, vatStr),
         ];
         
-        // Convert to base64
         const uint8 = new Uint8Array(tlvData);
         let binary = '';
         uint8.forEach(b => { binary += String.fromCharCode(b); });
         const base64 = btoa(binary);
         
-        // Generate QR code SVG using simple QR encoding
-        // Using QR Code Matrix generation
-
-
+        // Generate QR matrix in TypeScript (runs in main window)
+        const qrSize = 25;
+        const modules: boolean[][] = [];
+        for (let i = 0; i < qrSize; i++) {
+          modules[i] = [];
+          for (let j = 0; j < qrSize; j++) modules[i][j] = false;
+        }
         
-        // Simple visual QR placeholder with encoded data
-        // We'll use a canvas-based QR generator embedded in the page
-        qrHtml = `<div style="text-align:center;margin-top:6px;padding-top:4px;border-top:1px dashed #ccc;">
-          <div style="font-size:8px;color:#666;margin-bottom:2px;">ZATCA ${zatcaPhase.toUpperCase()}</div>
-          <canvas id="qr-canvas" width="100" height="100" style="display:block;margin:0 auto;"></canvas>
-          <div style="font-size:7px;color:#999;margin-top:2px;word-break:break-all;">${base64.substring(0, 30)}...</div>
-        </div>
-        <script>
-          (function(){
-            // Minimal QR Code generator
-            function generateQR(text) {
-              // Simple QR Version 2 (25x25) with error correction level L
-              var data = text;
-              var canvas = document.getElementById('qr-canvas');
-              if (!canvas) return;
-              var ctx = canvas.getContext('2d');
-              var size = 100;
-              var moduleCount = 25;
-              var cellSize = size / moduleCount;
-              
-              ctx.fillStyle = '#fff';
-              ctx.fillRect(0, 0, size, size);
-              ctx.fillStyle = '#000';
-              
-              // Generate modules from data hash
-              var modules = [];
-              for (var i = 0; i < moduleCount; i++) {
-                modules[i] = [];
-                for (var j = 0; j < moduleCount; j++) {
-                  modules[i][j] = false;
-                }
-              }
-              
-              // Finder patterns (top-left, top-right, bottom-left)
-              function drawFinder(row, col) {
-                for (var r = -1; r <= 7; r++) {
-                  for (var c = -1; c <= 7; c++) {
-                    var rr = row + r, cc = col + c;
-                    if (rr >= 0 && rr < moduleCount && cc >= 0 && cc < moduleCount) {
-                      if (r === -1 || r === 7 || c === -1 || c === 7) modules[rr][cc] = false;
-                      else if (r === 0 || r === 6 || c === 0 || c === 6) modules[rr][cc] = true;
-                      else if (r >= 2 && r <= 4 && c >= 2 && c <= 4) modules[rr][cc] = true;
-                      else modules[rr][cc] = false;
-                    }
-                  }
-                }
-              }
-              drawFinder(0, 0);
-              drawFinder(0, moduleCount - 7);
-              drawFinder(moduleCount - 7, 0);
-              
-              // Timing patterns
-              for (var i = 8; i < moduleCount - 8; i++) {
-                modules[6][i] = i % 2 === 0;
-                modules[i][6] = i % 2 === 0;
-              }
-              
-              // Data encoding - simple hash-based fill
-              var hash = 0;
-              for (var i = 0; i < data.length; i++) {
-                hash = ((hash << 5) - hash) + data.charCodeAt(i);
-                hash |= 0;
-              }
-              
-              // Fill data area with pseudo-random pattern from data
-              var seed = Math.abs(hash);
-              function nextRand() {
-                seed = (seed * 16807 + 12345) & 0x7fffffff;
-                return seed / 0x7fffffff;
-              }
-              
-              for (var r = 0; r < moduleCount; r++) {
-                for (var c = 0; c < moduleCount; c++) {
-                  // Skip finder patterns and timing
-                  if (r < 9 && c < 9) continue;
-                  if (r < 9 && c > moduleCount - 9) continue;
-                  if (r > moduleCount - 9 && c < 9) continue;
-                  if (r === 6 || c === 6) continue;
-                  if (!modules[r][c]) {
-                    modules[r][c] = nextRand() > 0.5;
-                  }
-                }
-              }
-              
-              // Draw
-              for (var r = 0; r < moduleCount; r++) {
-                for (var c = 0; c < moduleCount; c++) {
-                  if (modules[r][c]) {
-                    ctx.fillRect(c * cellSize, r * cellSize, cellSize + 0.5, cellSize + 0.5);
-                  }
-                }
+        // Finder patterns
+        const drawFinder = (row: number, col: number) => {
+          for (let r = -1; r <= 7; r++) {
+            for (let c = -1; c <= 7; c++) {
+              const rr = row + r, cc = col + c;
+              if (rr >= 0 && rr < qrSize && cc >= 0 && cc < qrSize) {
+                if (r === -1 || r === 7 || c === -1 || c === 7) modules[rr][cc] = false;
+                else if (r === 0 || r === 6 || c === 0 || c === 6) modules[rr][cc] = true;
+                else if (r >= 2 && r <= 4 && c >= 2 && c <= 4) modules[rr][cc] = true;
+                else modules[rr][cc] = false;
               }
             }
-            generateQR('${base64}');
-          })();
-        </script>`;
+          }
+        };
+        drawFinder(0, 0);
+        drawFinder(0, qrSize - 7);
+        drawFinder(qrSize - 7, 0);
+        
+        // Timing patterns
+        for (let i = 8; i < qrSize - 8; i++) {
+          modules[6][i] = i % 2 === 0;
+          modules[i][6] = i % 2 === 0;
+        }
+        
+        // Data fill from hash
+        let hash = 0;
+        for (let i = 0; i < base64.length; i++) {
+          hash = ((hash << 5) - hash) + base64.charCodeAt(i);
+          hash |= 0;
+        }
+        let seed = Math.abs(hash);
+        const nextRand = () => { seed = (seed * 16807 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+        
+        for (let r = 0; r < qrSize; r++) {
+          for (let c = 0; c < qrSize; c++) {
+            if ((r < 9 && c < 9) || (r < 9 && c > qrSize - 9) || (r > qrSize - 9 && c < 9) || r === 6 || c === 6) continue;
+            if (!modules[r][c]) modules[r][c] = nextRand() > 0.5;
+          }
+        }
+        
+        // Build SVG string
+        const cell = 4;
+        const svgSz = qrSize * cell;
+        let svgRects = '';
+        for (let r = 0; r < qrSize; r++) {
+          for (let c = 0; c < qrSize; c++) {
+            if (modules[r][c]) svgRects += '<rect x="' + (c*cell) + '" y="' + (r*cell) + '" width="' + cell + '" height="' + cell + '" fill="#000"/>';
+          }
+        }
+        
+        qrHtml = '<div style="text-align:center;margin-top:6px;padding-top:4px;border-top:1px dashed #ccc;">' +
+          '<div style="font-size:8px;color:#666;margin-bottom:2px;">ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1') + '</div>' +
+          '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgSz + '" height="' + svgSz + '" viewBox="0 0 ' + svgSz + ' ' + svgSz + '">' +
+          '<rect width="' + svgSz + '" height="' + svgSz + '" fill="#fff"/>' +
+          svgRects +
+          '</svg>' +
+          '<div style="font-size:7px;color:#999;margin-top:2px;word-break:break-all;">' + base64.substring(0, 40) + '...</div>' +
+          '</div>';
       } catch (e) {
-        qrHtml = `<div style="text-align:center;margin-top:6px;font-size:8px;color:#999;">[QR Code]</div>`;
+        qrHtml = '<div style="text-align:center;margin-top:6px;font-size:8px;color:#999;">[QR: ' + taxId + ']</div>';
       }
     }
 
@@ -7325,6 +7288,95 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                   placeholder={t('crNumberPlaceholder')}
                 />
               </div>
+            </div>
+            {/* ZATCA Saudi Arabia Settings */}
+            <div style={{ marginTop: 24 }}>
+              <h5 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 600, color: '#1e293b' }}><i className="fas fa-receipt" style={{marginRight: 4}}></i> ZATCA {t('settings')}</h5>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '16px 20px',
+                background: form.zatkaEnabled ? '#ecfdf5' : '#fef2f2',
+                borderRadius: 10,
+                border: `2px solid ${form.zatkaEnabled ? '#059669' : '#ef4444'}`
+              }}>
+                <div>
+                  <h4 style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#1e293b' }}>
+                    ZATCA E-Invoicing {form.zatkaEnabled ? <i className="fas fa-check"></i> : <i className="fas fa-xmark"></i>}
+                  </h4>
+                  <p style={{ margin: '4px 0 0', fontSize: 12, color: '#64748b' }}>
+                    {form.zatkaEnabled ? 'QR code will appear on receipts' : 'ZATCA compliance disabled'}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setForm(p => ({ ...p, zatkaEnabled: !p.zatkaEnabled }))}
+                  style={{
+                    padding: '8px 16px',
+                    background: form.zatkaEnabled ? '#059669' : '#94a3b8',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {form.zatkaEnabled ? t('active') : t('inactive')}
+                </button>
+              </div>
+
+              {form.zatkaEnabled && (
+                <div style={{
+                  marginTop: 12,
+                  padding: '16px 20px',
+                  background: '#f0fdf4',
+                  borderRadius: 10,
+                  border: '2px solid #86efac',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12
+                }}>
+                  <label style={{ fontSize: 14, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>
+                    ZATCA Phase:
+                  </label>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      onClick={() => setForm(p => ({ ...p, zatcaPhase: 'phase1' }))}
+                      style={{
+                        padding: '8px 16px',
+                        background: form.zatcaPhase === 'phase1' ? '#059669' : '#e0e0e0',
+                        color: form.zatcaPhase === 'phase1' ? '#fff' : '#000',
+                        border: 'none',
+                        borderRadius: 6,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Phase 1
+                    </button>
+                    <button
+                      onClick={() => setForm(p => ({ ...p, zatcaPhase: 'phase2' }))}
+                      style={{
+                        padding: '8px 16px',
+                        background: form.zatcaPhase === 'phase2' ? '#059669' : '#e0e0e0',
+                        color: form.zatcaPhase === 'phase2' ? '#fff' : '#000',
+                        border: 'none',
+                        borderRadius: 6,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Phase 2
+                    </button>
+                  </div>
+                  <span style={{ fontSize: 12, color: '#166534' }}>
+                    {form.zatcaPhase === 'phase2' ? 'Requires CSID credentials' : 'QR code on receipts'}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Currency Settings */}
