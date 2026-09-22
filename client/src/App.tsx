@@ -1171,14 +1171,6 @@ export default function App() {
     (c.id || '').toLowerCase().includes(customerSearch.toLowerCase())
   );
   
-  // Search for customer profile display
-  const searchedCustomer = customerSearch.length > 0 
-    ? customers.find(c => 
-        (c.name || '').toLowerCase().includes(customerSearch.toLowerCase()) ||
-        (c.phone || '').includes(customerSearch) ||
-        (c.id || '').toLowerCase().includes(customerSearch.toLowerCase())
-      )
-    : null;
 
   // Check auth and load settings on mount
   useEffect(() => {
@@ -2412,38 +2404,6 @@ export default function App() {
                             style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}>
                             <i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}
                           </button>
-                        </div>
-                      </div>
-                    )}
-                  
-                    {/* Customer Profile Card - Show when searched */}
-                    {searchedCustomer && (
-                      <div style={{ marginBottom: 12, padding: 16, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <div style={{ width: 50, height: 50, borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
-                          <i className="fas fa-user"></i>
-                        </div>
-                        <div style={{ flex: 1, color: '#fff' }}>
-                          <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 4 }}>{searchedCustomer.name}</div>
-                          <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 2 }}><i className="fas fa-mobile-screen" style={{marginRight: 4}}></i> {searchedCustomer.phone}</div>
-                          <div style={{ fontSize: 13, opacity: 0.9 }}><i className="fas fa-location-dot" style={{marginRight: 4}}></i> {searchedCustomer.address}</div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ padding: '8px 16px', background: searchedCustomer.balance > 0 ? 'rgba(220,38,38,0.3)' : 'rgba(34,197,94,0.3)', borderRadius: 8, marginBottom: 8 }}>
-                            <div style={{ fontSize: 11, color: '#fff', opacity: 0.9 }}>{t('balance')}</div>
-                            <div style={{ fontSize: 20, fontWeight: 700, color: '#fff' }}>{settings.currencySymbol} {searchedCustomer.balance}</div>
-                          </div>
-                          <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-                            <button 
-                              onClick={() => { setSelectedCustomer(searchedCustomer); setCustomerSearch(''); }}
-                              style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#fff', color: '#667eea', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
-                              <i className="fas fa-check" style={{marginRight: 4}}></i> {t('selectCustomer')}
-                            </button>
-                            <button 
-                              onClick={() => setCustomerSearch('')}
-                              style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: 'rgba(255,255,255,0.2)', color: '#fff', cursor: 'pointer', fontSize: 12 }}>
-                              <i className="fas fa-xmark"></i>
-                            </button>
-                          </div>
                         </div>
                       </div>
                     )}
