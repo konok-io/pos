@@ -1577,30 +1577,24 @@ export default function App() {
 
     // ZATCA QR Code - SVG based (no script needed)
     let qrHtml = '';
-    if (zatkaEnabled && taxId && zatcaPhase !== 'normal' && typeof QR_CODE !== 'undefined') {
+    if (zatkaEnabled && taxId && zatcaPhase !== 'normal') {
       try {
-        // TLV encoding for ZATCA compliance
-        const tlvEncode = (tag: number, value: string) => {
-          const bytes = new TextEncoder().encode(value);
-          return [tag, bytes.length, ...bytes];
-        };
         const sellerName = company || 'Seller';
         const vatNo = taxId;
-        const timestamp = new Date().toISOString();
-        const totalStr = String((+sale.total || 0).toFixed(2));
-        const vatStr = String((+sale.vatAmount || 0).toFixed(2));
-        const tlvData = new Uint8Array([
-          ...tlvEncode(1, sellerName),
-          ...tlvEncode(2, vatNo),
-          ...tlvEncode(3, timestamp),
-          ...tlvEncode(4, totalStr),
-          ...tlvEncode(5, vatStr),
-        ]);
-        // Encode TLV bytes as base64 (ZATCA standard)
-        let binary = '';
-        tlvData.forEach((b: number) => { binary += String.fromCharCode(b); });
-        const base64 = btoa(binary);
-        // Generate ISO-compliant QR code with base64 data
+        const ts = new Date().toISOString();
+        const totalWithVat = String((+sale.total || 0).toFixed(2));
+        const vatAmt = String((+sale.vatAmount || 0).toFixed(2));
+
+        let base64: string;
+        if (zatcaPhase === 'phase2') {
+          // Phase 2: 8 fields (requires API integration for hash, signature, key)
+          // For now generate Phase 1 QR with 5 fields until API is connected
+          base64 = QR_CODE.tlvEncodePhase1(sellerName, vatNo, ts, totalWithVat, vatAmt);
+        } else {
+          // Phase 1: 5 fields
+          base64 = QR_CODE.tlvEncodePhase1(sellerName, vatNo, ts, totalWithVat, vatAmt);
+        }
+
         const qrMatrix = QR_CODE.generate(base64);
         const qrSvg = QR_CODE.toSVG(qrMatrix, 4);
         qrHtml = '<div style="text-align:center;margin-top:6px;padding-top:4px;border-top:1px dashed #ccc;">' +
@@ -1608,6 +1602,7 @@ export default function App() {
           qrSvg +
           '</div>';
       } catch (e) {
+        console.error('QR generation failed:', e);
         qrHtml = '<div style="text-align:center;margin-top:6px;font-size:8px;color:#999;">[QR: ' + taxId + ']</div>';
       }
     }
