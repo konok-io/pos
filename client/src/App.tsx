@@ -713,6 +713,7 @@ interface Customer {
   name: string;
   phone: string;
   address: string;
+  vatNumber?: string;
   balance: number;
   deposit: number;
   transactions?: Transaction[];
@@ -1127,7 +1128,8 @@ export default function App() {
   const cartCustomerFiltered = cartCustomerQ ? customers.filter(c =>
     c.name.toLowerCase().includes(cartCustomerQ) ||
     (c.phone || '').includes(cartCustomerInput) ||
-    (c.id || '').toLowerCase().includes(cartCustomerQ)
+    (c.id || '').toLowerCase().includes(cartCustomerQ) ||
+    (c.vatNumber || '').includes(cartCustomerQ)
   ).slice(0, 5) : [];
   const [discount, setDiscount] = useState('');
   const [vatPercent, setVatPercent] = useState<string>('15');
@@ -1169,7 +1171,8 @@ export default function App() {
   const filteredCustomers = customers.filter(c => 
     (c.name || '').toLowerCase().includes(customerSearch.toLowerCase()) ||
     (c.phone || '').includes(customerSearch) ||
-    (c.id || '').toLowerCase().includes(customerSearch.toLowerCase())
+    (c.id || '').toLowerCase().includes(customerSearch.toLowerCase()) ||
+    (c.vatNumber || '').includes(customerSearch)
   );
   
 
@@ -2656,6 +2659,7 @@ export default function App() {
                               <div key={c.id} style={{ background: '#FFFFFF', border: '1px solid #CCFBF1', borderRadius: 14, padding: 12 }}>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{c.name}</div>
                                 <div style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}><i className="fas fa-mobile-screen" style={{marginRight: 4}}></i> {c.phone}</div>
+                                {c.vatNumber && <div style={{ fontSize: 10, color: '#059669', marginTop: 2 }}><i className="fas fa-building" style={{marginRight: 4}}></i> VAT: {c.vatNumber}</div>}
                                 {c.balance > 0 && (
                                   <div style={{ fontSize: 11, color: '#DC2626', marginTop: 4 }}>{t('due')}: {settings.currencySymbol} {c.balance}</div>
                                 )}
@@ -2992,6 +2996,7 @@ export default function App() {
                                   <div style={{ flex: 1, minWidth: 0 }}>
                                     <div style={{ fontWeight: 700, color: '#1F2937', fontSize: 13 }}>{c.name}</div>
                                     <div style={{ fontSize: 11, color: '#9CA3AF' }}>{c.phone || t('phoneNotFound')}</div>
+                                    {c.vatNumber && <div style={{ fontSize: 10, color: '#059669' }}>VAT: {c.vatNumber}</div>}
                                   </div>
                                   <div style={{ textAlign: 'right', display: 'flex', gap: 8, alignItems: 'center' }}>
                                     <div>
@@ -4875,6 +4880,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [vatNumber, setVatNumber] = useState('');
   const [avatar, setAvatar] = useState<string | null>(null);
   const [nameError, setNameError] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -4893,12 +4899,14 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
         setName(customer.name);
         setPhone(customer.phone || '');
         setAddress(customer.address || '');
+        setVatNumber(customer.vatNumber || '');
         setAvatar(customer.avatar || null);
       } else {
         setCustomerId('');
         setName('');
         setPhone('');
         setAddress('');
+        setVatNumber('');
         setAvatar(null);
       }
       setNameError('');
@@ -4982,6 +4990,7 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
       address: address.trim(),
       balance: isEditMode && customer ? customer.balance : 0,
       deposit: isEditMode && customer ? customer.deposit : 0,
+      vatNumber: vatNumber || undefined,
       avatar: avatar || undefined,
     };
 
@@ -5299,6 +5308,32 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
                   boxSizing: 'border-box',
                 }}
               />
+                <div style={{ marginTop: 12 }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: 6,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: '#475569',
+                  }}>
+                    VAT Number (B2B)
+                  </label>
+                  <input
+                    type="text"
+                    value={vatNumber}
+                    onChange={(e) => setVatNumber(e.target.value)}
+                    placeholder="310XXXXXXXXXX"
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      border: `1px solid ${T.gray200}`,
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
             </div>
           </div>
         </div>
