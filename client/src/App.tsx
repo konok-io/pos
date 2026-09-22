@@ -1875,29 +1875,45 @@ export default function App() {
                         fontWeight: 500
                       }}
                     />
-                    {/* Customer Dropdown */}
-                    {/* Customer Card Dropdown */}
+                    {/* Customer Card Dropdown - Customer Management Style */}
                     {customerSearch.length > 0 && filteredCustomers.length > 0 && (
-                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 320, overflow: 'auto', padding: 8 }}>
+                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 360, overflow: 'auto', padding: 10 }}>
                         {filteredCustomers.slice(0, 8).map(c => {
-                          const netDue = Math.max(0, (parseFloat(c.balance as any) || 0) - (parseFloat(c.deposit as any) || 0));
-                          const hasDue = netDue > 0;
+                          const rawDue = (parseFloat(c.balance as any) || 0) > 0 ? parseFloat(c.balance as any) || 0 : 0;
+                          const rawDeposit = parseFloat(c.deposit as any) || 0;
+                          const netDue = Math.max(0, rawDue - rawDeposit);
+                          const netDeposit = Math.max(0, rawDeposit - rawDue);
+                          const totalSales = sales.filter(s => s.customerId === c.id).reduce((sum, s) => sum + (parseFloat(s.total as any) || 0), 0);
                           return (
                             <div key={c.id} onClick={() => { setSelectedCustomer(c); setCustomerSearch(''); }}
-                              style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', cursor: 'pointer', borderRadius: 10, marginBottom: 4, border: '1px solid #f0f0f0', transition: 'all 0.15s' }}
+                              style={{ padding: '12px', cursor: 'pointer', borderRadius: 12, marginBottom: 6, border: '1px solid #e0e0e0', background: '#fff', transition: 'all 0.15s' }}
                               onMouseEnter={(e) => { e.currentTarget.style.background = '#F0FDFA'; e.currentTarget.style.borderColor = '#115E59'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#f0f0f0'; }}>
-                              <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
-                                {c.name.charAt(0).toUpperCase()}
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 13, fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
-                                <div style={{ fontSize: 11, color: '#6B7280' }}><i className="fas fa-phone" style={{marginRight: 3}}></i>{c.phone || '-'}</div>
-                              </div>
-                              <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                                <div style={{ fontSize: 10, color: '#9CA3AF', marginBottom: 2 }}>{netDue > 0 ? t('due') : t('paid')}</div>
-                                <div style={{ fontSize: 12, fontWeight: 700, color: hasDue ? '#DC2626' : '#10B981', padding: '2px 8px', borderRadius: 6, background: hasDue ? '#FEE2E2' : '#D1FAE5' }}>
-                                  {settings.currencySymbol}{hasDue ? netDue : (parseFloat(c.deposit as any) || 0)}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e0e0e0'; }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
+                                  {c.name.charAt(0).toUpperCase()}
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontWeight: 700, color: '#1F2937', fontSize: 14 }}>{c.name}</div>
+                                  <div style={{ fontSize: 12, color: '#9CA3AF' }}>{c.phone || t('phoneNotFound')}</div>
+                                </div>
+                                <div style={{ textAlign: 'right', display: 'flex', gap: 10, alignItems: 'center' }}>
+                                  <div>
+                                    <div style={{ fontSize: 10, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase' }}>{t('total')}</div>
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: '#115E59' }}>{settings.currencySymbol}{totalSales}</div>
+                                  </div>
+                                  {netDue > 0 && (
+                                    <div>
+                                      <div style={{ fontSize: 10, fontWeight: 600, color: '#D32F2F', textTransform: 'uppercase' }}>{t('due')}</div>
+                                      <div style={{ fontSize: 13, fontWeight: 700, color: '#D32F2F' }}>{settings.currencySymbol}{netDue}</div>
+                                    </div>
+                                  )}
+                                  {netDeposit > 0 && (
+                                    <div>
+                                      <div style={{ fontSize: 10, fontWeight: 600, color: '#115E59', textTransform: 'uppercase' }}>{t('deposit')}</div>
+                                      <div style={{ fontSize: 13, fontWeight: 700, color: '#115E59' }}>{settings.currencySymbol}{netDeposit}</div>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -2810,24 +2826,37 @@ export default function App() {
                       />
                     )}
                       {cartCustomerFiltered.length > 0 && (
-                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 250, overflow: 'auto', padding: 6, marginTop: 4 }}>
+                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 280, overflow: 'auto', padding: 8 }}>
                           {cartCustomerFiltered.map(c => {
-                            const netDue = Math.max(0, (parseFloat(c.balance as any) || 0) - (parseFloat(c.deposit as any) || 0));
-                            const hasDue = netDue > 0;
+                            const rawDue = (parseFloat(c.balance as any) || 0) > 0 ? parseFloat(c.balance as any) || 0 : 0;
+                            const rawDeposit = parseFloat(c.deposit as any) || 0;
+                            const netDue = Math.max(0, rawDue - rawDeposit);
+                            const totalSales = sales.filter(s => s.customerId === c.id).reduce((sum, s) => sum + (parseFloat(s.total as any) || 0), 0);
                             return (
                               <div key={c.id} onClick={() => { setSelectedCustomer(c); setCartCustomerInput(''); }}
-                                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', cursor: 'pointer', borderRadius: 8, marginBottom: 2, border: '1px solid #f0f0f0', transition: 'all 0.15s' }}
+                                style={{ padding: '10px', cursor: 'pointer', borderRadius: 10, marginBottom: 4, border: '1px solid #e0e0e0', background: '#fff', transition: 'all 0.15s' }}
                                 onMouseEnter={(e) => { e.currentTarget.style.background = '#F0FDFA'; e.currentTarget.style.borderColor = '#115E59'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#f0f0f0'; }}>
-                                <div style={{ width: 34, height: 34, borderRadius: '50%', background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
-                                  {c.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                  <div style={{ fontSize: 12, fontWeight: 700, color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
-                                  <div style={{ fontSize: 10, color: '#6B7280' }}>{c.phone || '-'}</div>
-                                </div>
-                                <div style={{ fontSize: 11, fontWeight: 700, color: hasDue ? '#DC2626' : '#10B981', padding: '2px 6px', borderRadius: 5, background: hasDue ? '#FEE2E2' : '#D1FAE5', flexShrink: 0 }}>
-                                  {settings.currencySymbol}{hasDue ? netDue : 0}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e0e0e0'; }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, color: '#fff', fontWeight: 700, flexShrink: 0 }}>
+                                    {c.name.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontWeight: 700, color: '#1F2937', fontSize: 13 }}>{c.name}</div>
+                                    <div style={{ fontSize: 11, color: '#9CA3AF' }}>{c.phone || t('phoneNotFound')}</div>
+                                  </div>
+                                  <div style={{ textAlign: 'right', display: 'flex', gap: 8, alignItems: 'center' }}>
+                                    <div>
+                                      <div style={{ fontSize: 9, fontWeight: 600, color: '#9CA3AF', textTransform: 'uppercase' }}>{t('total')}</div>
+                                      <div style={{ fontSize: 12, fontWeight: 700, color: '#115E59' }}>{settings.currencySymbol}{totalSales}</div>
+                                    </div>
+                                    {netDue > 0 && (
+                                      <div>
+                                        <div style={{ fontSize: 9, fontWeight: 600, color: '#D32F2F', textTransform: 'uppercase' }}>{t('due')}</div>
+                                        <div style={{ fontSize: 12, fontWeight: 700, color: '#D32F2F' }}>{settings.currencySymbol}{netDue}</div>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             );
