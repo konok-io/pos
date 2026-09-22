@@ -1562,7 +1562,7 @@ export default function App() {
     const custAddress = customerObj?.address || '';
     const custDeposit = customerObj?.deposit || 0;
     const custBalance = customerObj?.balance || 0;
-    const zatkaEnabled = settings?.zatkaEnabled === true || settings?.zatkaEnabled === 'true' || settings?.zatkaEnabled === 1;
+    const zatkaEnabled = settings?.zatkaEnabled === true || settings?.zatkaEnabled === 'true' || settings?.zatkaEnabled === 1 || settings?.zatkaEnabled === '1';
     const zatcaPhase = settings?.zatcaPhase || 'phase1';
 
     // Items HTML
@@ -1576,7 +1576,7 @@ export default function App() {
 
     // ZATCA QR Code - SVG based (no script needed)
     let qrHtml = '';
-    if (zatkaEnabled && taxId && zatcaPhase !== 'normal') {
+    if (zatkaEnabled && taxId && zatcaPhase !== 'normal' && typeof QR_CODE !== 'undefined') {
       try {
         // TLV encoding for ZATCA compliance
         const tlvEncode = (tag: number, value: string) => {
