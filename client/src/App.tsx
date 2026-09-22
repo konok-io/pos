@@ -1427,8 +1427,8 @@ export default function App() {
   // Filter products - only show when search, category, supplier, or stock filter is selected
   const hasFilter = searchQuery || selectedCategory !== 'all' || selectedSupplier !== 'all' || stockFilter !== 'all';
   const filteredProducts = hasFilter ? products.filter(p => {
-    const matchCategory = selectedCategory === 'all' || p.categoryId === selectedCategory;
-    const matchSupplier = selectedSupplier === 'all' || (p.supplier || '') === selectedSupplier;
+    const matchCategory = selectedCategory === 'all' || (p.cat || '') === selectedCategory;
+    const matchSupplier = selectedSupplier === 'all' || (p.company || '') === selectedSupplier;
     const matchSearch = !searchQuery || 
       (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (p.code || '').toLowerCase().includes(searchQuery.toLowerCase());
