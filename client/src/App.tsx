@@ -1578,9 +1578,9 @@ export default function App() {
     let qrHtml = '';
     if (zatkaEnabled && taxId && zatcaPhase !== 'normal') {
       try {
+        // TLV encoding for ZATCA compliance
         const tlvEncode = (tag: number, value: string) => {
-          const encoder = new TextEncoder();
-          const bytes = encoder.encode(value);
+          const bytes = new TextEncoder().encode(value);
           return [tag, bytes.length, ...bytes];
         };
         const sellerName = company || 'Seller';
@@ -1588,85 +1588,23 @@ export default function App() {
         const timestamp = new Date().toISOString();
         const totalStr = String((+sale.total || 0).toFixed(2));
         const vatStr = String((+sale.vatAmount || 0).toFixed(2));
-        
-        const tlvData = [
+        const tlvData = new Uint8Array([
           ...tlvEncode(1, sellerName),
           ...tlvEncode(2, vatNo),
           ...tlvEncode(3, timestamp),
           ...tlvEncode(4, totalStr),
           ...tlvEncode(5, vatStr),
-        ];
-        
-        const uint8 = new Uint8Array(tlvData);
+        ]);
+        // Convert TLV bytes to base64 string
         let binary = '';
-        uint8.forEach(b => { binary += String.fromCharCode(b); });
+        tlvData.forEach((b: number) => { binary += String.fromCharCode(b); });
         const base64 = btoa(binary);
-        
-        // Generate QR matrix in TypeScript (runs in main window)
-        const qrSize = 25;
-        const modules: boolean[][] = [];
-        for (let i = 0; i < qrSize; i++) {
-          modules[i] = [];
-          for (let j = 0; j < qrSize; j++) modules[i][j] = false;
-        }
-        
-        // Finder patterns
-        const drawFinder = (row: number, col: number) => {
-          for (let r = -1; r <= 7; r++) {
-            for (let c = -1; c <= 7; c++) {
-              const rr = row + r, cc = col + c;
-              if (rr >= 0 && rr < qrSize && cc >= 0 && cc < qrSize) {
-                if (r === -1 || r === 7 || c === -1 || c === 7) modules[rr][cc] = false;
-                else if (r === 0 || r === 6 || c === 0 || c === 6) modules[rr][cc] = true;
-                else if (r >= 2 && r <= 4 && c >= 2 && c <= 4) modules[rr][cc] = true;
-                else modules[rr][cc] = false;
-              }
-            }
-          }
-        };
-        drawFinder(0, 0);
-        drawFinder(0, qrSize - 7);
-        drawFinder(qrSize - 7, 0);
-        
-        // Timing patterns
-        for (let i = 8; i < qrSize - 8; i++) {
-          modules[6][i] = i % 2 === 0;
-          modules[i][6] = i % 2 === 0;
-        }
-        
-        // Data fill from hash
-        let hash = 0;
-        for (let i = 0; i < base64.length; i++) {
-          hash = ((hash << 5) - hash) + base64.charCodeAt(i);
-          hash |= 0;
-        }
-        let seed = Math.abs(hash);
-        const nextRand = () => { seed = (seed * 16807 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-        
-        for (let r = 0; r < qrSize; r++) {
-          for (let c = 0; c < qrSize; c++) {
-            if ((r < 9 && c < 9) || (r < 9 && c > qrSize - 9) || (r > qrSize - 9 && c < 9) || r === 6 || c === 6) continue;
-            if (!modules[r][c]) modules[r][c] = nextRand() > 0.5;
-          }
-        }
-        
-        // Build SVG string
-        const cell = 4;
-        const svgSz = qrSize * cell;
-        let svgRects = '';
-        for (let r = 0; r < qrSize; r++) {
-          for (let c = 0; c < qrSize; c++) {
-            if (modules[r][c]) svgRects += '<rect x="' + (c*cell) + '" y="' + (r*cell) + '" width="' + cell + '" height="' + cell + '" fill="#000"/>';
-          }
-        }
-        
+        // Generate ISO-compliant QR code using proper generator
+        const qrMatrix = QR_CODE.generate(base64);
+        const qrSvg = QR_CODE.toSVG(qrMatrix, 4);
         qrHtml = '<div style="text-align:center;margin-top:6px;padding-top:4px;border-top:1px dashed #ccc;">' +
           '<div style="font-size:8px;color:#666;margin-bottom:2px;">ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1') + '</div>' +
-          '<svg xmlns="http://www.w3.org/2000/svg" width="' + svgSz + '" height="' + svgSz + '" viewBox="0 0 ' + svgSz + ' ' + svgSz + '">' +
-          '<rect width="' + svgSz + '" height="' + svgSz + '" fill="#fff"/>' +
-          svgRects +
-          '</svg>' +
-          '<div style="font-size:7px;color:#999;margin-top:2px;word-break:break-all;">' + base64.substring(0, 40) + '...</div>' +
+          qrSvg +
           '</div>';
       } catch (e) {
         qrHtml = '<div style="text-align:center;margin-top:6px;font-size:8px;color:#999;">[QR: ' + taxId + ']</div>';
