@@ -726,6 +726,8 @@ interface Sale {
   date: string;
   customerId: string | null;
   customerName: string;
+  customerVat?: string;
+  invoiceType?: 'B2B' | 'B2C';
   items: any[];
   subtotal: number;
   discount: number;
@@ -1560,6 +1562,8 @@ export default function App() {
     const crNumber = settings?.crNumber || '';
     const vatEnabled = settings?.vatEnabled !== false;
     const customerName = sale.customerName || t('generalCustomer');
+    const invoiceType = sale.invoiceType || 'B2C';
+    const customerVat = sale.customerVat || '';
     const customerObj = customers.find(c => c.id === sale.customerId);
     const custPhone = customerObj?.phone || '';
     const custAddress = customerObj?.address || '';
@@ -1707,8 +1711,10 @@ export default function App() {
   <div class="line"></div>
   <div style="font-size:11px;padding:4px 0;">
     <div><strong>Customer:</strong> ${customerName}</div>
+    ${customerVat ? `<div><strong>VAT:</strong> ${customerVat}</div>` : ''}
     ${custPhone ? `<div><strong>Phone:</strong> ${custPhone}</div>` : ''}
     ${custAddress ? `<div><strong>Address:</strong> ${custAddress}</div>` : ''}
+    <div style="font-size:10px;color:${invoiceType === 'B2B' ? '#059669' : '#666'};margin-top:2px;">${invoiceType === 'B2B' ? 'B2B Tax Invoice (Standard)' : 'B2C Simplified Invoice'}</div>
   </div>
   ${sale.due > 0 || custBalance > 0 ? `<div class="line"></div>
   <div style="font-size:10px;padding:4px 0;background:#fef2f2;border-radius:4px;padding:4px 6px;">
@@ -1778,12 +1784,19 @@ export default function App() {
       return;
     }
 
+    // B2B/B2C detection: customer has VAT number = B2B
+    const customerVat = selectedCustomer?.vatNumber || '';
+    const isB2B = customerVat.length > 0;
+    const invoiceType = isB2B ? 'B2B' : 'B2C';
+
     const sale: Sale = {
       id: genId(),
       invoiceNo: genId(),
       date: now(),
       customerId: selectedCustomer?.id || GENERAL_CUSTOMER_ID,
       customerName: selectedCustomer?.name || t('generalCustomer'),
+      customerVat: customerVat,
+      invoiceType: invoiceType,
       items: cart.map(item => ({
         productId: item.productId,
         name: item.name,
@@ -1844,6 +1857,29 @@ export default function App() {
     setSales(prev => [...prev, sale]);
     setLastSale(sale);
     setShowReceiptModal(true);
+
+    // Submit to ZATCA if Phase 2 configured
+    if (settings.zatcaPhase === 'phase2') {
+      try {
+        const zatcaResult = await zatcaApi.processInvoice({
+          invoiceNo: sale.invoiceNo,
+          date: sale.date,
+          customerName: sale.customerName,
+          customerVat: sale.customerVat,
+          isSimplified: sale.invoiceType === 'B2C',
+          items: sale.items,
+          subtotal: sale.subtotal,
+          vatAmount: sale.vatAmount,
+          total: sale.total,
+        });
+        if (zatcaResult.status) {
+          console.log('ZATCA submitted:', zatcaResult.status);
+        }
+      } catch (e) {
+        console.error('ZATCA submit failed:', e);
+      }
+    }
+
     await printReceipt(sale);
     setCart([]);
     setDiscount('');
