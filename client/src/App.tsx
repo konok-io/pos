@@ -1526,6 +1526,117 @@ export default function App() {
       }
     }
   };
+  const printReceipt = (sale: Sale) => {
+    const cur = settings?.currencySymbol || '\u09f3';
+    const company = settings?.name || '';
+    const phone = settings?.phone || '';
+    const address = settings?.address || '';
+    const taxId = settings?.taxId || '';
+    const receiptFooter = settings?.receiptFooter || t('thanks');
+    const customerName = sale.customerName || t('generalCustomer');
+    const customerObj = customers.find(c => c.id === sale.customerId);
+    const custDeposit = customerObj?.deposit || 0;
+    const custBalance = customerObj?.balance || 0;
+
+    let itemsHtml = '';
+    sale.items.forEach((item: any) => {
+      itemsHtml += `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;">
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.name} x${item.quantity}</span>
+        <span style="width:70px;text-align:right;">${cur} ${(+item.total || 0).toLocaleString('en-IN')}</span>
+      </div>`;
+    });
+
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Receipt</title>
+<style>
+  @media print {
+    @page { size: 80mm auto; margin: 2mm; }
+    body { margin: 0; padding: 0; }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 12px;
+    width: 80mm;
+    color: #000;
+    background: #fff;
+    padding: 3mm;
+  }
+  .center { text-align: center; }
+  .bold { font-weight: bold; }
+  .line { border-top: 1px dashed #000; margin: 4px 0; }
+  .line2 { border-top: 2px solid #000; margin: 4px 0; }
+  .row { display: flex; justify-content: space-between; padding: 1px 0; font-size: 11px; }
+  .row-total { display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; border-top: 2px solid #000; margin-top: 4px; padding-top: 4px; }
+  .due { color: #dc2626; }
+  .deposit { color: #2563eb; }
+  .footer { text-align: center; font-style: italic; font-size: 10px; margin-top: 8px; border-top: 1px dashed #000; padding-top: 6px; }
+</style>
+</head>
+<body>
+  <div class="center bold" style="font-size:14px;">${company}</div>
+  ${address ? `<div class="center" style="font-size:10px;">${address}</div>` : ''}
+  ${phone ? `<div class="center" style="font-size:10px;">${phone}</div>` : ''}
+  ${taxId ? `<div class="center bold" style="font-size:10px;">VAT: ${taxId}</div>` : ''}
+  
+  <div class="line2"></div>
+  <div class="center bold" style="font-size:13px;padding:4px 0;">SALES INVOICE</div>
+  <div class="line2"></div>
+  
+  <div style="font-size:10px;margin:4px 0;">
+    <div><strong>Invoice:</strong> ${sale.invoiceNo}</div>
+    <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'})} ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
+  </div>
+  
+  <div class="line"></div>
+  <div style="font-size:11px;padding:4px 0;">
+    <div><strong>Customer:</strong> ${customerName}</div>
+    ${customerObj?.phone ? `<div><strong>Phone:</strong> ${customerObj.phone}</div>` : ''}
+  </div>
+  <div class="line"></div>
+  
+  <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:bold;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:2px;">
+    <span style="flex:1;">Product</span>
+    <span style="width:25px;text-align:center;">Qty</span>
+    <span style="width:45px;text-align:right;">Price</span>
+    <span style="width:60px;text-align:right;">Total</span>
+  </div>
+  ${itemsHtml}
+  
+  <div class="line"></div>
+  
+  <div class="row"><span>Subtotal:</span><span>${cur} ${(+sale.subtotal || 0).toLocaleString('en-IN')}</span></div>
+  ${sale.discount > 0 ? `<div class="row"><span>Discount:</span><span>-${cur} ${(+sale.discount || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  ${sale.vatAmount > 0 ? `<div class="row"><span>VAT (${sale.vatPercent}%):</span><span>${cur} ${(+sale.vatAmount || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  <div class="row-total"><span>TOTAL:</span><span>${cur} ${(+sale.total || 0).toLocaleString('en-IN')}</span></div>
+  
+  <div class="line"></div>
+  
+  <div class="row"><span>Paid:</span><span>${cur} ${(+sale.paid || 0).toLocaleString('en-IN')}</span></div>
+  ${sale.change > 0 ? `<div class="row"><span>Change:</span><span>${cur} ${(+sale.change || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  ${sale.due > 0 ? `<div class="row due"><strong><span>Due:</span><span>${cur} ${(+sale.due || 0).toLocaleString('en-IN')}</span></strong></div>` : ''}
+  ${custDeposit > 0 ? `<div class="row deposit"><span>Deposit Balance:</span><span>${cur} ${(+custDeposit || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  ${custBalance > 0 && sale.due > 0 ? `<div class="row due"><span>Total Due:</span><span>${cur} ${(+custBalance || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  
+  <div class="footer">
+    ${receiptFooter}
+    <div style="font-size:9px;color:#666;margin-top:4px;">${new Date().toLocaleDateString('en-GB')}</div>
+  </div>
+</body>
+</html>`;
+
+    const printWindow = window.open('', '_blank', 'width=320,height=600');
+    if (printWindow) {
+      printWindow.document.write(html);
+      printWindow.document.close();
+      setTimeout(() => { printWindow.print(); }, 500);
+    }
+  };
+
+
   const handleCheckout = () => {
     if (cart.length === 0) {
       alert(t('cartEmpty'));
@@ -1608,6 +1719,7 @@ export default function App() {
     setSales(prev => [...prev, sale]);
     setLastSale(sale);
     setShowReceiptModal(true);
+    printReceipt(sale);
     setCart([]);
     setDiscount('');
     setPaidAmount('');
@@ -3393,6 +3505,9 @@ export default function App() {
                   </div>
                 )}
               </div>
+              <button className="btn btn-lg btn-block" style={{ marginTop: 10, background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 0', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%' }} onClick={() => { if (lastSale) printReceipt(lastSale); }}>
+                <i className="fas fa-print" style={{marginRight: 4}}></i> Print Receipt
+              </button>
               <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 20 }} onClick={() => setShowReceiptModal(false)}>
                 <i className="fas fa-check" style={{marginRight: 4}}></i> {t('finish')}
               </button>
