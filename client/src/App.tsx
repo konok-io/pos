@@ -1,5 +1,5 @@
 import ProductsScreen from "./ProductsScreen";
-import { api } from "./api";
+import { api, zatcaApi } from "./api";
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages, defaultTranslations, Language } from './i18n';
@@ -1588,7 +1588,30 @@ export default function App() {
           const totalWithVat = String((+sale.total || 0).toFixed(2));
           const vatAmt = String((+sale.vatAmount || 0).toFixed(2));
           if (zatcaPhase === 'phase2') {
-            qrData = QR.generatePhase2QR(sellerName, vatNo, ts, totalWithVat, vatAmt, '', '', '');
+            // Call backend for Phase 2 signing + QR
+            try {
+              const processResult = await zatcaApi.processInvoice({
+                invoiceNo: sale.invoiceNo,
+                date: sale.date || new Date().toISOString(),
+                customerName: sale.customerName || 'General',
+                items: sale.items || [],
+                subtotal: sale.subtotal || 0,
+                vatAmount: sale.vatAmount || 0,
+                total: sale.total || 0,
+                paid: sale.paid || 0,
+                uuid: '',
+              });
+              if (processResult.qrBase64) {
+                qrData = processResult.qrBase64;
+              } else {
+                // Fallback to Phase 1 QR if backend not configured
+                qrData = QR.generatePhase1QR(sellerName, vatNo, ts, totalWithVat, vatAmt);
+              }
+            } catch (e) {
+              console.error('Phase 2 backend error:', e);
+              // Fallback to Phase 1 QR
+              qrData = QR.generatePhase1QR(sellerName, vatNo, ts, totalWithVat, vatAmt);
+            }
           } else {
             qrData = QR.generatePhase1QR(sellerName, vatNo, ts, totalWithVat, vatAmt);
           }
