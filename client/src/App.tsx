@@ -1936,7 +1936,7 @@ export default function App() {
                     >
                       <option value="all"><i className="fas fa-folder-open" style={{marginRight: 4}}></i> {t('allCategories')}</option>
                       {categories.map(cat => (
-                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
                       ))}
                     </select>
                   </div>
