@@ -1837,7 +1837,7 @@ export default function App() {
                     background: '#FFFFFF',
                     borderRadius: 14,
                     border: '1px solid #D1D5DB', boxShadow: 'none',
-                    overflow: 'hidden'
+                    overflow: 'visible'
                   }}>
                     <div style={{ 
                       position: 'absolute', left: 0, top: 0, bottom: 0, 
