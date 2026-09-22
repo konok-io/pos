@@ -7327,54 +7327,74 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               </div>
 
               {form.zatkaEnabled && (
-                <div style={{
-                  marginTop: 12,
-                  padding: '16px 20px',
-                  background: '#f0fdf4',
-                  borderRadius: 10,
-                  border: '2px solid #86efac',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12
-                }}>
-                  <label style={{ fontSize: 14, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>
-                    ZATCA Phase:
-                  </label>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <button
-                      onClick={() => setForm(p => ({ ...p, zatcaPhase: 'phase1' }))}
-                      style={{
-                        padding: '8px 16px',
-                        background: form.zatcaPhase === 'phase1' ? '#059669' : '#e0e0e0',
-                        color: form.zatcaPhase === 'phase1' ? '#fff' : '#000',
-                        border: 'none',
-                        borderRadius: 6,
-                        fontSize: 13,
-                        fontWeight: 600,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Phase 1
-                    </button>
-                    <button
-                      onClick={() => setForm(p => ({ ...p, zatcaPhase: 'phase2' }))}
-                      style={{
-                        padding: '8px 16px',
-                        background: form.zatcaPhase === 'phase2' ? '#059669' : '#e0e0e0',
-                        color: form.zatcaPhase === 'phase2' ? '#fff' : '#000',
-                        border: 'none',
-                        borderRadius: 6,
-                        fontSize: 13,
-                        fontWeight: 600,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Phase 2
-                    </button>
+                <div style={{ marginTop: 12, padding: '16px 20px', background: '#f0fdf4', borderRadius: 10, border: '2px solid #86efac' }}>
+                  {/* Phase Selection */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16, paddingBottom: 12, borderBottom: '1px solid #86efac' }}>
+                    <label style={{ fontSize: 14, fontWeight: 600, color: '#166534', whiteSpace: 'nowrap' }}>ZATCA Phase:</label>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => setForm(p => ({ ...p, zatcaPhase: 'phase1' }))} style={{ padding: '8px 16px', background: form.zatcaPhase === 'phase1' ? '#059669' : '#e0e0e0', color: form.zatcaPhase === 'phase1' ? '#fff' : '#000', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Phase 1</button>
+                      <button onClick={() => setForm(p => ({ ...p, zatcaPhase: 'phase2' }))} style={{ padding: '8px 16px', background: form.zatcaPhase === 'phase2' ? '#059669' : '#e0e0e0', color: form.zatcaPhase === 'phase2' ? '#fff' : '#000', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>Phase 2</button>
+                    </div>
+                    <span style={{ fontSize: 12, color: '#166534' }}>{form.zatcaPhase === 'phase2' ? 'Full API integration with ZATCA' : 'QR code on receipts (manual compliance)'}</span>
                   </div>
-                  <span style={{ fontSize: 12, color: '#166534' }}>
-                    {form.zatcaPhase === 'phase2' ? 'Requires CSID credentials' : 'QR code on receipts'}
-                  </span>
+
+                  {/* Phase 2 - API Credentials */}
+                  {form.zatcaPhase === 'phase2' && (
+                    <div>
+                      <h6 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700, color: '#166534' }}><i className="fas fa-key" style={{ marginRight: 4 }}></i> ZATCA API Credentials</h6>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-globe" style={{ marginRight: 4 }}></i> API URL *</label>
+                          <input value={form.zatkaApiUrl || ''} onChange={e => setForm(p => ({ ...p, zatkaApiUrl: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="https://api.zatca.gov.sa" />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-user" style={{ marginRight: 4 }}></i> Username *</label>
+                          <input value={form.zatkaUsername || ''} onChange={e => setForm(p => ({ ...p, zatkaUsername: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="ZATCA portal username" />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-lock" style={{ marginRight: 4 }}></i> Password *</label>
+                          <input type="password" value={form.zatkaPassword || ''} onChange={e => setForm(p => ({ ...p, zatkaPassword: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="ZATCA portal password" />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-id-card" style={{ marginRight: 4 }}></i> CSID (Compliance Solution ID) *</label>
+                          <input value={form.zatcaCsid || ''} onChange={e => setForm(p => ({ ...p, zatcaCsid: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="CSID from ZATCA portal" />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-building" style={{ marginRight: 4 }}></i> Organization ID (OID) *</label>
+                          <input value={form.zatcaOid || ''} onChange={e => setForm(p => ({ ...p, zatcaOid: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="Organization ID" />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-fingerprint" style={{ marginRight: 4 }}></i> Private Key *</label>
+                          <input type="password" value={form.zatcaPrivateKey || ''} onChange={e => setForm(p => ({ ...p, zatcaPrivateKey: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="Private key for CSID" />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-user-shield" style={{ marginRight: 4 }}></i> Client ID *</label>
+                          <input value={form.zatcaClientId || ''} onChange={e => setForm(p => ({ ...p, zatcaClientId: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="OAuth Client ID" />
+                        </div>
+                        <div>
+                          <label style={{ display: 'block', marginBottom: 4, fontSize: 12, fontWeight: 600, color: '#166534' }}><i className="fas fa-user-secret" style={{ marginRight: 4 }}></i> Client Secret *</label>
+                          <input type="password" value={form.zatcaClientSecret || ''} onChange={e => setForm(p => ({ ...p, zatcaClientSecret: e.target.value }))} style={{ width: '100%', padding: '10px 12px', fontSize: 13, border: '2px solid #86efac', borderRadius: 6, outline: 'none', boxSizing: 'border-box', background: '#fff', color: '#1e293b' }} placeholder="OAuth Client Secret" />
+                        </div>
+                      </div>
+
+                      {/* Status */}
+                      <div style={{ marginTop: 12, padding: '10px 14px', background: form.zatcaCsid && form.zatcaClientId ? '#ecfdf5' : '#fef3c7', borderRadius: 8, border: form.zatcaCsid && form.zatcaClientId ? '1px solid #86efac' : '1px solid #fbbf24' }}>
+                        <span style={{ fontSize: 12, color: form.zatcaCsid && form.zatcaClientId ? '#166534' : '#92400e' }}>
+                          {form.zatcaCsid && form.zatcaClientId && form.zatcaClientSecret ? '\u2713 Credentials configured - Ready for Phase 2 compliance' : '\u26a0 Fill all required fields to enable Phase 2 compliance'}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Phase 1 - Simple QR info */}
+                  {form.zatcaPhase === 'phase1' && (
+                    <div style={{ padding: '10px 14px', background: '#ecfdf5', borderRadius: 8, border: '1px solid #86efac' }}>
+                      <span style={{ fontSize: 12, color: '#166534' }}>
+                        <strong>Phase 1 - Simplified Invoicing</strong>
+                        <br/>QR code with invoice data will appear on receipts. No API integration needed.
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
