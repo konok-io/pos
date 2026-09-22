@@ -2740,7 +2740,7 @@ export default function App() {
                       />
                     )}
                       {cartCustomerFiltered.length > 0 && (
-                        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 280, overflow: 'auto', padding: 8 }}>
+                        <div data-menu="cart-customer" style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.15)', zIndex: 100, maxHeight: 280, overflow: 'auto', padding: 8 }}>
                           {cartCustomerFiltered.map(c => {
                             const rawDue = (parseFloat(c.balance as any) || 0) > 0 ? parseFloat(c.balance as any) || 0 : 0;
                             const rawDeposit = parseFloat(c.deposit as any) || 0;
@@ -3648,7 +3648,7 @@ Sujin Chips,002,${uniqueCompanies[0] || 'Company'},Snacks,pcs,20,25,200,20`;
                   <button type="button" onClick={() => setShowCompanyList(!showCompanyList)} style={{ padding: '4px 5px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
                 </div>
                 {showCompanyList && (
-                  <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
+                  <div data-menu="company-list" style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
                     {filteredCompanies.map((c, i) => (
                       <div key={i} onClick={() => { setSupplierQ(c || ''); setForm(f => ({ ...f, company: c || '' })); setShowCompanyList(false); }}
                         style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6', fontSize: 14 }}>
@@ -3675,7 +3675,7 @@ Sujin Chips,002,${uniqueCompanies[0] || 'Company'},Snacks,pcs,20,25,200,20`;
                   <button type="button" onClick={() => setShowCategoryList(!showCategoryList)} style={{ padding: '4px 5px', background: '#F3F4F6', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 12 }}>▼</button>
                 </div>
                 {showCategoryList && (
-                  <div style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
+                  <div data-menu="cat-list" style={{ position: 'absolute', left: 0, right: 0, top: '100%', background: 'white', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 50, maxHeight: 180, overflow: 'auto', marginTop: 2 }}>
                     {filteredCategories.map((c, i) => (
                       <div key={i} onClick={() => { setForm(f => ({ ...f, cat: c || '' })); setShowCategoryList(false); }}
                         style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6', fontSize: 14 }}>
@@ -4457,7 +4457,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                   />
                   {showCompanyDrop && filteredCompanies.length > 0 && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 10, maxHeight: 150, overflow: 'auto' }}>
+                    <div data-menu="company-drop" style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 10, maxHeight: 150, overflow: 'auto' }}>
                       {filteredCompanies.map(s => (
                         <div key={s.id} onClick={() => { setProductForm(p => ({ ...p, company: s.name })); setShowCompanyDrop(false); }} style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }} onMouseOver={e => (e.currentTarget.style.background = '#F0FDFA')} onMouseOut={e => (e.currentTarget.style.background = '#fff')}>
                           <i className="fas fa-building" style={{marginRight: 4}}></i> {s.name}
@@ -4479,7 +4479,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
                     style={{ width: '100%', padding: '10px 12px', border: '1px solid #E5E7EB', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
                   />
                   {showCatDrop && filteredCats.length > 0 && (
-                    <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 10, maxHeight: 150, overflow: 'auto' }}>
+                    <div data-menu="cat-drop" style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#fff', border: '1px solid #E5E7EB', borderRadius: 8, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', zIndex: 10, maxHeight: 150, overflow: 'auto' }}>
                       {filteredCats.map(c => (
                         <div key={c.id} onClick={() => { setProductForm(p => ({ ...p, cat: c.name })); setShowCatDrop(false); }} style={{ padding: '10px 12px', cursor: 'pointer', borderBottom: '1px solid #F3F4F6' }} onMouseOver={e => (e.currentTarget.style.background = '#F0FDFA')} onMouseOut={e => (e.currentTarget.style.background = '#fff')}>
                           <i className="fas fa-folder" style={{marginRight: 4}}></i> {c.name}
