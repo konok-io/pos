@@ -3,6 +3,7 @@ import { api } from "./api";
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages, defaultTranslations, Language } from './i18n';
+import { QR_CODE } from './qrCode';
 import { db } from './utils/db';
 import { localDb, initDatabase } from './services';
 
