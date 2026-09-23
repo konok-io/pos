@@ -1932,9 +1932,8 @@ export default function App() {
       invoiceNo: (() => {
         const d = new Date();
         const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-        const todayPrefix = `INV-${ymd}-`;
-        const seq = sales.filter(s => s.invoiceNo && s.invoiceNo.startsWith(todayPrefix)).length + 1;
-        return `${todayPrefix}${String(seq).padStart(4, '0')}`;
+        const seq = sales.filter(s => s.invoiceNo && String(s.invoiceNo).includes(ymd)).length + 1;
+        return `${ymd}${String(seq).padStart(4, '0')}`;
       })(),
       date: now(),
       customerId: selectedCustomer?.id || GENERAL_CUSTOMER_ID,
