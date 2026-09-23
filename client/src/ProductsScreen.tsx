@@ -2670,7 +2670,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const exportProductsCsv = () => {
     const headers = ['Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Profit', 'Stock', 'MinStock', 'ExpiryDate'];
-    const srcList = (search || sortBy !== 'name' || sortDir !== 'asc') ? filteredProducts : products;
+    const srcList = filteredProducts;
     const rows = srcList.map((p: any) => {
       const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
       return [p.name, p.code || '', p.company || '', p.cat || '', p.unit, p.costPrice, p.sellPrice, ((+p.sellPrice || 0) - (+p.costPrice || 0)), p.stock, p.minStock || 5, p.expiryDate || ''].map(esc).join(',');
@@ -3254,7 +3254,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const printProductList = () => {
-    const list = search || sortBy !== 'name' || sortDir !== 'asc' ? filteredProducts : filteredProducts;
+    const list = filteredProducts;
     const rows = list.map((p: any) => {
       const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
       return `<tr><td>${p.name}${p.code ? ` (${p.code})` : ''}</td><td>${p.company || '-'}</td><td>${p.cat || '-'}</td><td>${fmt(p.costPrice)}</td><td>${fmt(p.sellPrice)}</td><td>${fmt(p.sellPrice - p.costPrice)} (${pct}%)</td><td>${p.stock}</td><td>${p.unit}</td><td>${p.expiryDate || '-'}</td></tr>`;
