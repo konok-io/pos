@@ -690,6 +690,10 @@ interface HeldSale {
   id: string;
   items: CartItem[];
   createdAt: string;
+  discount?: string;
+  vatPercent?: string;
+  paidAmount?: string;
+  paymentMethod?: string;
 }
 
 interface Category {
@@ -1515,7 +1519,7 @@ export default function App() {
     const matchStock = 
       stockFilter === 'all' ||
       (stockFilter === 'available' && p.stock > 0) ||
-      (stockFilter === 'low' && p.stock > 0 && p.stock <= 10) ||
+      (stockFilter === 'low' && p.stock > 0 && p.stock <= (p.minStock || 10)) ||
       (stockFilter === 'out' && p.stock <= 0);
     return matchCategory && matchSupplier && matchSearch && matchStock;
   }) : [];
@@ -1822,11 +1826,56 @@ export default function App() {
   };
 
 
+  const posSearchRef = useRef<HTMLInputElement>(null);
+  const posPaidRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (currentTab !== 'pos') return;
+    const onKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      const inField = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+      if (e.key === 'F2') {
+        e.preventDefault();
+        posSearchRef.current?.focus();
+        posSearchRef.current?.select();
+      } else if (e.key === 'F4') {
+        e.preventDefault();
+        if (cart.length > 0) {
+          setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], createdAt: new Date().toISOString(), discount: discount || '', vatPercent: String(vatPercent), paidAmount: paidAmount || '', paymentMethod }]);
+          setCart([]);
+          setDiscount('');
+          setPaidAmount('');
+          setVatPercent(String(defaultVatPercent));
+          setPaymentMethod('cash');
+        }
+      } else if (e.key === 'F8') {
+        e.preventDefault();
+        posPaidRef.current?.focus();
+        posPaidRef.current?.select();
+      } else if (e.key === 'Escape') {
+        if (cart.length > 0 && (inField ? e.currentTarget !== target : true)) {
+          if (window.confirm(t('clearCart') || 'Clear cart?')) {
+            setCart([]);
+            setDiscount('');
+            setPaidAmount('');
+            setVatPercent(String(defaultVatPercent));
+            setSelectedCustomer(null);
+            setPaymentMethod('cash');
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [currentTab, cart.length, heldSales, discount, vatPercent, paidAmount, paymentMethod, defaultVatPercent]);
+
   const handleCheckout = async () => {
     if (cart.length === 0) {
       alert(t('cartEmpty'));
       return;
     }
+    if (!window.confirm(t('confirmCompleteSale') || 'Complete this sale?')) return;
 
     // Check due sales permission
     if (due > 0 && !dueSalesEnabled) {
@@ -1845,7 +1894,13 @@ export default function App() {
 
     const sale: Sale = {
       id: genId(),
-      invoiceNo: genId(),
+      invoiceNo: (() => {
+        const d = new Date();
+        const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+        const todayPrefix = `INV-${ymd}-`;
+        const seq = sales.filter(s => s.invoiceNo && s.invoiceNo.startsWith(todayPrefix)).length + 1;
+        return `${todayPrefix}${String(seq).padStart(4, '0')}`;
+      })(),
       date: now(),
       customerId: selectedCustomer?.id || GENERAL_CUSTOMER_ID,
       customerName: selectedCustomer?.name || t('generalCustomer'),
@@ -1911,35 +1966,40 @@ export default function App() {
     setSales(prev => [...prev, sale]);
     // No popup: print directly to thermal printer
 
-    // Submit to ZATCA if Phase 2 configured
-    if (settings.zatcaPhase === 'phase2') {
-      try {
-        const zatcaResult = await zatcaApi.processInvoice({
-          invoiceNo: sale.invoiceNo,
-          date: sale.date,
-          customerName: sale.customerName,
-          customerVat: sale.customerVat,
-          isSimplified: sale.invoiceType === 'B2C',
-          items: sale.items,
-          subtotal: sale.subtotal,
-          vatAmount: sale.vatAmount,
-          total: sale.total,
-        });
-        if (zatcaResult.status) {
-          console.log('ZATCA submitted:', zatcaResult.status);
-        }
-      } catch (e) {
-        console.error('ZATCA submit failed:', e);
-      }
-    }
-
+    // Print first (do not wait on ZATCA)
     await printReceipt(sale);
+
+    // Submit to ZATCA if Phase 2 configured (non-blocking)
+    if (settings.zatcaPhase === 'phase2') {
+      zatcaApi.processInvoice({
+        invoiceNo: sale.invoiceNo,
+        date: sale.date,
+        customerName: sale.customerName,
+        customerVat: sale.customerVat,
+        isSimplified: sale.invoiceType === 'B2C',
+        items: sale.items,
+        subtotal: sale.subtotal,
+        vatAmount: sale.vatAmount,
+        total: sale.total,
+      }).then((zatcaResult: any) => {
+        if (zatcaResult?.status) console.log('ZATCA submitted:', zatcaResult.status);
+      }).catch((e: any) => console.error('ZATCA submit failed:', e));
+    }
     setCart([]);
     setDiscount('');
     setPaidAmount('');
     setVatPercent(String(defaultVatPercent));
     setSelectedCustomer(null);
     setPaymentMethod('cash');
+    setSearchQuery('');
+    setCustomerSearch('');
+    setSelectedCategory('all');
+    setSelectedSupplier('all');
+    setStockFilter('all');
+    setShowExpiryList(false);
+    setShowCustomerList(false);
+    setShowHeldSales(false);
+    setPosBarcode('');
   };
 
   if (isLoading) return null;
@@ -2137,6 +2197,7 @@ export default function App() {
                       <span style={{ fontSize: 16 }}><i className="fas fa-box"></i></span>
                     </div>
                     <input
+                      ref={posSearchRef}
                       value={searchQuery}
                       onChange={(e) => { setSearchQuery(e.target.value); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                       placeholder={t('searchProduct')}
@@ -2226,7 +2287,7 @@ export default function App() {
                         paddingRight: 32
                       }}
                     >
-                      <option value="all"><i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('allSuppliers')}</option>
+                      <option value="all">{t('allSuppliers')}</option>
                       {suppliers.map((s: any) => (
                         <option key={s.id} value={s.name}>{s.name}</option>
                       ))}
@@ -2262,7 +2323,7 @@ export default function App() {
                         paddingRight: 32
                       }}
                     >
-                      <option value="all"><i className="fas fa-folder-open" style={{marginRight: 4}}></i> {t('allCategories')}</option>
+                      <option value="all">{t('allCategories')}</option>
                       {categories.map(cat => (
                         <option key={cat.id} value={cat.name}>{cat.name}</option>
                       ))}
@@ -2368,7 +2429,7 @@ export default function App() {
                     <div style={{ width: 28, height: 28, borderRadius: 7, background: stockFilter === 'low' ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><i className="fas fa-triangle-exclamation"></i></div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: stockFilter === 'low' ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('stockLow')}</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: stockFilter === 'low' ? '#FFFFFF' : '#D97706', lineHeight: 1 }}>{products.filter(p => p.stock > 0 && p.stock <= 10).length}</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: stockFilter === 'low' ? '#FFFFFF' : '#D97706', lineHeight: 1 }}>{products.filter(p => p.stock > 0 && p.stock <= (p.minStock || 10)).length}</div>
                     </div>
                   </div>
 
@@ -2428,7 +2489,7 @@ export default function App() {
                     <div style={{ width: 28, height: 28, borderRadius: 7, background: showExpiryList ? 'rgba(255,255,255,0.25)' : '#E0E0E0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}><i className="fas fa-calendar"></i></div>
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: showExpiryList ? 'rgba(255,255,255,0.9)' : '#6B7280', textTransform: 'uppercase' }}>{t('productExpiry')}</div>
-                      <div style={{ fontSize: 18, fontWeight: 800, color: showExpiryList ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: showExpiryList ? '#FFFFFF' : '#059669', lineHeight: 1 }}>{products.filter(p => p.expiryDate && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length}</div>
                     </div>
                   </div>
 
@@ -2555,7 +2616,7 @@ export default function App() {
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
                         {heldSales.map((sale, idx) => (
                           <div
-                            key={idx}
+                            key={sale.id}
                             style={{
                               background: '#fff',
                               border: '1.5px solid #E5E7EB',
@@ -2614,11 +2675,36 @@ export default function App() {
                               </div>
                               <button 
                                 onClick={() => {
-                                  sale.items.forEach((item) => {
-                                    const product = products.find(p => p.id === item.productId);
-                                    if (product) addToCart(product);
+                                  setCart(prev => {
+                                    let next = [...prev];
+                                    sale.items.forEach((item) => {
+                                      const product = products.find(p => p.id === item.productId);
+                                      if (!product || product.stock <= 0) return;
+                                      const qty = Math.min(item.quantity, product.stock);
+                                      const existing = next.find(i => i.productId === item.productId);
+                                      if (existing) {
+                                        next = next.map(i => i.productId === item.productId
+                                          ? { ...i, quantity: Math.min(product.stock, i.quantity + qty) }
+                                          : i);
+                                      } else {
+                                        next = [...next, {
+                                          id: genId(),
+                                          productId: product.id,
+                                          name: product.name,
+                                          sellPrice: product.sellPrice,
+                                          costPrice: product.costPrice,
+                                          quantity: qty,
+                                          unit: product.unit,
+                                          maxStock: product.stock,
+                                        }];
+                                      }
+                                    });
+                                    return next;
                                   });
-                                  // Remove this hold sale from the list
+                                  if (sale.discount !== undefined) setDiscount(String(sale.discount || ''));
+                                  if (sale.vatPercent !== undefined) setVatPercent(String(sale.vatPercent));
+                                  if (sale.paidAmount !== undefined) setPaidAmount(String(sale.paidAmount || ''));
+                                  if (sale.paymentMethod) setPaymentMethod(sale.paymentMethod);
                                   const newHeld = [...heldSales];
                                   newHeld.splice(idx, 1);
                                   setHeldSales(newHeld);
@@ -2651,7 +2737,7 @@ export default function App() {
                         {/* Category Filter */}
                         {selectedCategory !== 'all' && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-folder-open" style={{marginRight: 4}}></i> {categories.find(c => String(c.id) === String(selectedCategory))?.name || selectedCategory} ({filteredProducts.length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-folder-open" style={{marginRight: 4}}></i> {categories.find(c => c.name === selectedCategory || String(c.id) === String(selectedCategory))?.name || selectedCategory} ({filteredProducts.length})</span>
                           </div>
                         )}
                         
@@ -2696,13 +2782,13 @@ export default function App() {
                       <div style={{ padding: '16px 0' }}>
                         <div style={{ marginBottom: 12, padding: 12, background: '#FFFFFF', borderRadius: 12, border: '1px solid #E5E7EB', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 12px', background: '#F0FDFA', borderRadius: 20, border: '1px solid #99F6E4' }}>
-                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-calendar" style={{marginRight: 4}}></i> {t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</span>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: '#115E59' }}><i className="fas fa-calendar" style={{marginRight: 4}}></i> {t('productExpiry')} ({products.filter(p => p.expiryDate && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length})</span>
                           </div>
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginLeft: 'auto' }}>
                             <button onClick={() => setShowExpiryList(false)} style={{ padding: '6px 12px', borderRadius: 6, border: 'none', background: '#DC2626', cursor: 'pointer', fontSize: 12, color: 'white', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 4 }}><i className="fas fa-xmark" style={{marginRight: 4}}></i> {t('close')}</button>
                           </div>
                         </div>
-                        {products.filter(p => p.expiryDate && new Date(p.expiryDate) > new Date() && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
+                        {products.filter(p => p.expiryDate && new Date(p.expiryDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)).length === 0 ? (
                           <div style={{ textAlign: 'center', padding: 24, background: '#F0FDFA', borderRadius: 12 }}>
                             <p style={{ color: '#9CA3AF', margin: 0 }}>No products expiring within 30 days</p>
                           </div>
@@ -2884,8 +2970,8 @@ export default function App() {
                           onClick={() => addToCart(product)}
                           disabled={product.stock <= 0}
                           style={{
-                            background: product.stock <= 0 ? '#FEF2F2' : product.stock <= 10 ? '#FFF7ED' : '#FFFFFF',
-                            border: `1.5px solid ${product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#E5E7EB'}`,
+                            background: product.stock <= 0 ? '#FEF2F2' : product.stock <= (product.minStock || 10) ? '#FFF7ED' : '#FFFFFF',
+                            border: `1.5px solid ${product.stock <= 0 ? '#DC2626' : product.stock <= (product.minStock || 10) ? '#EA580C' : '#E5E7EB'}`,
                             borderRadius: 12,
                             padding: 12,
                             cursor: product.stock > 0 ? 'pointer' : 'not-allowed',
@@ -2903,23 +2989,23 @@ export default function App() {
                             width: 80,
                             height: 80,
                             borderRadius: 14,
-                            background: product.stock <= 0 ? '#fecaca' : product.stock <= 10 ? '#fed7aa' : '#F0FDFA',
+                            background: product.stock <= 0 ? '#fecaca' : product.stock <= (product.minStock || 10) ? '#fed7aa' : '#F0FDFA',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
                             flexShrink: 0,
                             overflow: 'hidden',
-                            border: `2px solid ${product.stock <= 0 ? '#fca5a5' : product.stock <= 10 ? '#fdba74' : '#E5E7EB'}`,
+                            border: `2px solid ${product.stock <= 0 ? '#fca5a5' : product.stock <= (product.minStock || 10) ? '#fdba74' : '#E5E7EB'}`,
                           }}>
-                             {productImages[product.name] ? (
+                             {productImages[product.id] || productImages[product.name] ? (
                                 <img
-                                  src={productImages[product.name]}
+                                  src={productImages[product.id] || productImages[product.name]}
                                   alt={product.name}
                                   style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 14 }}
                                   onError={(e: any) => { e.target.style.display = 'none'; e.target.nextSibling && (e.target.nextSibling.style.display = 'flex'); }}
                                 />
                               ) : null}
-                              <div style={{ display: productImages[product.name] ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
+                              <div style={{ display: (productImages[product.id] || productImages[product.name]) ? 'none' : 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
                                 {product.icon ? (
                                   <i className={`fas ${product.icon}`} style={{ fontSize: 36, color: '#0F766E' }}></i>
                                 ) : (
@@ -2949,7 +3035,7 @@ export default function App() {
 
                             {/* Bottom: Price & Stock */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                              <div style={{ fontSize: 18, fontWeight: 800, color: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#115E59', lineHeight: 1 }}>
+                              <div style={{ fontSize: 18, fontWeight: 800, color: product.stock <= 0 ? '#DC2626' : product.stock <= (product.minStock || 10) ? '#EA580C' : '#115E59', lineHeight: 1 }}>
                                 {fmt(product.sellPrice)}
                               </div>
                               <div style={{ 
@@ -2957,7 +3043,7 @@ export default function App() {
                                 borderRadius: 6,
                                 fontSize: 12,
                                 fontWeight: 700,
-                                background: product.stock <= 0 ? '#DC2626' : product.stock <= 10 ? '#EA580C' : '#115E59',
+                                background: product.stock <= 0 ? '#DC2626' : product.stock <= (product.minStock || 10) ? '#EA580C' : '#115E59',
                                 color: '#fff'
                               }}>
                                 {t('stock')}: {product.stock}
@@ -3219,7 +3305,7 @@ export default function App() {
                 </div>
 
                 {/* Payment Input */}
-                <input value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
+                <input ref={posPaidRef} value={paidAmount} onChange={(e) => setPaidAmount(e.target.value)} type="number" min="0"
                   placeholder={`${t('paid')} (${currency})`}
                   style={{ padding: '10px 14px', fontSize: 16, fontWeight: 700, borderRadius: 8, marginBottom: 8, border: '2px solid #e5e7eb', background: '#fff', boxSizing: 'border-box', width: '100%', textAlign: 'center', color: '#115E59', outline: 'none' }}
                 />
@@ -3332,7 +3418,7 @@ export default function App() {
                   <button 
                     onClick={() => {
                       if (cart.length > 0) {
-                        setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], createdAt: new Date().toISOString() }]);
+                        setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], createdAt: new Date().toISOString(), discount: discount || '', vatPercent: String(vatPercent), paidAmount: paidAmount || '', paymentMethod }]);
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
@@ -3444,7 +3530,7 @@ export default function App() {
               <div className="stat-card">
                 <div className="label">{t('lowStockProducts')}</div>
                 <div className="value" style={{ color: '#F59E0B' }}>
-                  {products.filter(p => p.stock <= 10).length}
+                  {products.filter(p => p.stock <= (p.minStock || 10)).length}
                 </div>
               </div>
             </div>
