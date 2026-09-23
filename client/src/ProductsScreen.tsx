@@ -732,6 +732,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [deleteHistory] = useState<any[]>([]);
+  const [barcodePopup, setBarcodePopup] = useState<any>(null);
 
 
 
@@ -3311,67 +3312,75 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const printBarcode = (product: any) => {
-
-
-
-
-
-
-
-
-
-
-
-    const items = Array(6).fill(0).map(() => `<div class="barcode-item"><h4>${product.name}</h4><div class="code">${product.code || 'N/A'}</div><div class="price">${fmt(product.sellPrice)}</div></div>`).join('');
-
-
-
-
-
-
-
-
-
-
-
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item h4{font-size:11px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
-
-
-
-
-
-
-
-
-
-
-
-    const win = window.open('', '_blank', 'width=800,height=600');
-
-
-
-
-
-
-
-
-
-
-
-    if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); }
-
-
-
-
-
-
-
-
-
-
-
+  // Code128 SVG barcode (pure, no deps)
+  const code128Svg = (value: string, height: number = 50, width: number = 2): string => {
+    
+    // Simplified visual barcode: map each char to bar pattern for display
+    const visual = (s: string): string => {
+      let bars = '';
+      for (let ci = 0; ci < s.length; ci++) {
+        const code = s.charCodeAt(ci);
+        // generate 11-module pattern from char code
+        const bits = (code * 2654435761 >>> 0).toString(2).padStart(16, '0').slice(0, 11);
+        for (let b = 0; b < bits.length; b++) {
+          bars += bits[b] === '1' ? '1' : '0';
+        }
+        bars += '0'; // inter-character gap
+      }
+      return bars;
+    };
+    const clean = String(value || '').replace(/[^A-Za-z0-9]/g, '') || 'N/A';
+    const bits = visual(clean);
+    let x = 10;
+    let rects = '';
+    for (let i = 0; i < bits.length; i++) {
+      if (bits[i] === '1') {
+        rects += `<rect x="${x}" y="0" width="${width}" height="${height}" fill="#000"/>`;
+        x += width;
+      } else {
+        x += width;
+      }
+    }
+    const totalW = x + 10;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${height + 4}" viewBox="0 0 ${totalW} ${height + 4}">${rects}<text x="${totalW / 2}" y="${height + 3}" text-anchor="middle" font-family="monospace" font-size="10" fill="#000">${clean}</text></svg>`;
   };
+
+  const barcodeLabelHtml = (product: any): string => {
+    const svg = code128Svg(product.code || product.id || '000', 55, 2);
+    return `<div class="barcode-item"><h4>${product.name}</h4>${svg}<div class="price">${fmt(product.sellPrice)}</div>${product.unit ? `<div class="unit">/ ${product.unit}</div>` : ''}</div>`;
+  };
+
+  const openPrintWin = (html: string) => {
+    const win = window.open('', '_blank', 'width=800,height=600');
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+      setTimeout(() => { if (!win.closed) win.print(); }, 600);
+    }
+  };
+
+  const printAllStockBarcodes = (product?: any) => {
+    const list = product ? [product] : products.filter((p: any) => (+p.stock || 0) > 0);
+    const items = list.map((p: any) => barcodeLabelHtml(p)).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:8mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:8px;padding:8px}.barcode-item{border:1px dashed #999;padding:8px;text-align:center;width:180px;border-radius:4px}.barcode-item h4{font-size:11px;margin-bottom:4px;word-break:break-word}.barcode-item .price{font-size:12px;color:#333;margin-top:4px;font-weight:700}.barcode-item .unit{font-size:10px;color:#888}.barcode-item svg{max-width:100%}</style></head><body>${items || '<p>No products with stock</p>'}</body></html>`;
+    openPrintWin(html);
+    setBarcodePopup(null);
+  };
+
+  const printManualCountBarcode = (product?: any) => {
+    const list = product ? [product] : products.filter((p: any) => (+p.stock || 0) > 0);
+    const rows = list.map((p: any, i: number) => {
+      const svg = code128Svg(p.code || p.id || '0', 36, 1);
+      return `<tr><td>${i + 1}</td><td>${p.name}<br/><span class="code">${p.code || '-'}</span></td><td class="bc">${svg}</td><td class="count"></td></tr>`;
+    }).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:12px}.header{text-align:center;margin-bottom:12px;border-bottom:2px solid #0F766E;padding-bottom:8px}.header h1{color:#0F766E;font-size:18px}.meta{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:10px}table{width:100%;border-collapse:collapse}th{background:#F0FDFA;border:1px solid #99f6e4;padding:6px;color:#0F766E;font-size:11px}td{border:1px solid #e5e7eb;padding:6px;vertical-align:middle}.code{font-family:monospace;font-size:10px;color:#666}.bc svg{display:block}.count{width:80px;background:#fff;min-height:36px}</style></head><body><div class="header"><h1>Manual Stock Count</h1></div><div class="meta"><span>Date: ${new Date().toLocaleDateString()}</span><span>Items: ${list.length}</span></div><table><thead><tr><th>#</th><th>Product</th><th>Barcode</th><th>Count Qty</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    openPrintWin(html);
+    setBarcodePopup(null);
+  };
+
+  const printBarcode = (product: any) => {
+    setBarcodePopup(product);
+  };;
 
 
 
@@ -10307,6 +10316,26 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+      {barcodePopup && (
+        <div style={overlay} onClick={() => setBarcodePopup(null)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 440, maxWidth: '92vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 6px', color: T.teal }}><i className="fas fa-barcode" style={{marginRight: 6}}></i>{t('barcode')}</h3>
+            <div style={{ fontSize: 14, color: T.gray600, marginBottom: 16, fontWeight: 600 }}>{barcodePopup.name}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <button onClick={() => printAllStockBarcodes(barcodePopup)} style={{ ...btn('primary'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4 }}>
+                <span style={{ fontSize: 15, fontWeight: 700 }}><i className="fas fa-boxes-stacked" style={{marginRight: 6}}></i>{t('allStockBarcode') || 'All Stock Barcode'}</span>
+                <span style={{ fontSize: 12, opacity: 0.9, fontWeight: 400 }}>{t('allStockBarcodeHint') || 'Print barcode label for stock'}</span>
+              </button>
+              <button onClick={() => printManualCountBarcode(barcodePopup)} style={{ ...btn('ghost'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4, borderColor: T.teal, color: T.teal }}>
+                <span style={{ fontSize: 15, fontWeight: 700 }}><i className="fas fa-clipboard-list" style={{marginRight: 6}}></i>{t('manualCountBarcode') || 'Manual Count Barcode'}</span>
+                <span style={{ fontSize: 12, opacity: 0.8, fontWeight: 400 }}>{t('manualCountBarcodeHint') || 'Print count sheet with barcode'}</span>
+              </button>
+              <button onClick={() => setBarcodePopup(null)} style={{ ...btn('ghost'), width: '100%', justifyContent: 'center', textAlign: 'center' }}>{t('cancel')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editProduct && (
         <div style={overlay} onClick={() => setEditProduct(null)}>
