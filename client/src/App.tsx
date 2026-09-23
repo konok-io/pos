@@ -1276,11 +1276,11 @@ export default function App() {
       // Load all data from MySQL API first, fallback to IndexedDB
       try {
         const [apiProducts, apiCategories, apiSuppliers, apiCustomers, apiSales] = await Promise.all([
-          api.getProducts().catch(() => []),
-          api.getCategories().catch(() => []),
-          api.getSuppliers().catch(() => []),
-          api.getCustomers().catch(() => []),
-          api.getSales().catch(() => []),
+          api.getProducts().catch((e) => { console.error('getProducts failed:', e); return []; }),
+          api.getCategories().catch((e) => { console.error('getCategories failed:', e); return []; }),
+          api.getSuppliers().catch((e) => { console.error('getSuppliers failed:', e); return []; }),
+          api.getCustomers().catch((e) => { console.error('getCustomers failed:', e); return []; }),
+          api.getSales().catch((e) => { console.error('getSales failed:', e); return []; }),
         ]);
 
         if (apiProducts && apiProducts.length > 0) setProducts(apiProducts);
@@ -1296,7 +1296,8 @@ export default function App() {
           });
           setCustomers(customersWithTransactions);
         }
-      } catch {
+      } catch (e) {
+        console.error('API load failed, falling back to IndexedDB:', e);
         // Fallback to IndexedDB
         const savedProducts = await db.getAll<any>('products');
         if (savedProducts && savedProducts.length > 0) setProducts(savedProducts);
