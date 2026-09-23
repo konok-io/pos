@@ -7796,41 +7796,249 @@ tr:nth-child(even){background:#F8FAFC}
     );
   };
 
-  const renderPriceHistory = () => {
-    const rows = stockHistory.filter((h: any) => h.type === 'price');
+  
+    const renderPriceHistory = () => {
+    const q = (search || '').toLowerCase();
+    const fromDate = (typeof filterFrom !== 'undefined' ? filterFrom : '') || '';
+    const toDate = (typeof filterTo !== 'undefined' ? filterTo : '') || '';
+    const inRange = (h: any): boolean => {
+      if (!fromDate && !toDate) return true;
+      const d = h.created_at;
+      if (!d) return false;
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return false;
+      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      if (fromDate && day < fromDate) return false;
+      if (toDate && day > toDate) return false;
+      return true;
+    };
+    const allPrice = (stockHistory || []).filter((h: any) => h.type === 'price');
+    const rows = allPrice.filter((h: any) => {
+      if (!inRange(h)) return false;
+      if (!q) return true;
+      return (h.productName || h.product_name || '').toLowerCase().includes(q)
+        || (h.reason || '').toLowerCase().includes(q);
+    });
+    const uniqueProducts = new Set(rows.map((h: any) => h.productName || h.product_name || h.productId || '').filter(Boolean));
+    let upCount = 0;
+    let downCount = 0;
+    let sumPct = 0;
+    let pctN = 0;
+    rows.forEach((h: any) => {
+      const oldP = +(h.oldPrice ?? h.oldStock ?? h.old_stock ?? 0);
+      const newP = +(h.newPrice ?? h.newStock ?? h.new_stock ?? 0);
+      if (newP > oldP) upCount++;
+      else if (newP < oldP) downCount++;
+      if (oldP > 0) {
+        sumPct += ((newP - oldP) / oldP) * 100;
+        pctN++;
+      }
+    });
+    const avgPct = pctN ? (sumPct / pctN) : 0;
+    const lastChange = rows[0] || null;
+
+    const exportPriceCsv = () => {
+      const headers = [t('productName'), t('date'), t('oldPrice'), t('newPrice'), 'Change%', t('reason')];
+      const lines = [headers.join(',')];
+      rows.forEach((h: any) => {
+        const oldP = +(h.oldPrice ?? h.oldStock ?? 0);
+        const newP = +(h.newPrice ?? h.newStock ?? 0);
+        const pct = oldP > 0 ? (((newP - oldP) / oldP) * 100).toFixed(1) : '';
+        const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+        lines.push([esc(h.productName || ''), esc(h.created_at || ''), esc(oldP), esc(newP), esc(pct), esc(h.reason || '')].join(','));
+      });
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `price-history-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    const printPriceHistory = () => {
+      const trs = rows.map((h: any, i: number) => {
+        const oldP = +(h.oldPrice ?? h.oldStock ?? 0);
+        const newP = +(h.newPrice ?? h.newStock ?? 0);
+        const diff = newP - oldP;
+        const pct = oldP > 0 ? ((diff / oldP) * 100).toFixed(1) + '%' : '-';
+        return `<tr><td>${i+1}</td><td>${h.productName || '-'}</td><td>${h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td><td>${fmt(oldP)}</td><td>${fmt(newP)}</td><td class="${diff>=0?'up':'down'}">${fmt(diff)} (${pct})</td><td>${h.reason || '-'}</td></tr>`;
+      }).join('');
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4 landscape;margin:10mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+.header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
+.header h1{color:#0F766E;font-size:14pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+.stats{display:flex;gap:4mm;margin-bottom:3mm}
+.stat{background:#F0FDFA;border:0.4mm solid #99f6e4;border-radius:2mm;padding:2mm 4mm;text-align:center}
+.stat .lbl{font-size:7pt;color:#0F766E;text-transform:uppercase}
+.stat .val{font-size:12pt;font-weight:800;color:#0F766E}
+table{width:100%;border-collapse:collapse}
+th{background:#0F766E;color:#fff;padding:2mm;text-align:left;font-size:8pt}
+td{border:0.3mm solid #cbd5e1;padding:1.5mm 2mm;font-size:9pt}
+tr:nth-child(even){background:#F8FAFC}
+.up{color:#16a34a;font-weight:700}
+.down{color:#dc2626;font-weight:700}
+.footer{margin-top:4mm;font-size:8pt;color:#64748b}
+</style></head><body>
+<div class="header"><h1>Price Change History</h1><div class="meta">${fromDate || '…'} → ${toDate || '…'}<br/>${new Date().toLocaleString()}</div></div>
+<div class="stats">
+  <div class="stat"><div class="lbl">Changes</div><div class="val">${rows.length}</div></div>
+  <div class="stat"><div class="lbl">Products</div><div class="val">${uniqueProducts.size}</div></div>
+  <div class="stat"><div class="lbl">Price Up</div><div class="val">${upCount}</div></div>
+  <div class="stat"><div class="lbl">Price Down</div><div class="val">${downCount}</div></div>
+  <div class="stat"><div class="lbl">Avg Change</div><div class="val">${avgPct.toFixed(1)}%</div></div>
+</div>
+<table><thead><tr><th>#</th><th>Product</th><th>Date</th><th>Old</th><th>New</th><th>Change</th><th>Reason</th></tr></thead><tbody>${trs || '<tr><td colspan="7" style="text-align:center;padding:8mm">No price history</td></tr>'}</tbody></table>
+<div class="footer">Generated by POS · ${rows.length} records</div>
+</body></html>`;
+      openPrintWin(html);
+    };
+
+    const stats = [
+      { icon: 'fas fa-tags', label: t('totalChanges') || 'Changes', value: String(rows.length), color: T.teal, bg: T.tealLight },
+      { icon: 'fas fa-box', label: t('products'), value: String(uniqueProducts.size), color: '#7C3AED', bg: '#EDE9FE' },
+      { icon: 'fas fa-arrow-up', label: t('priceUp') || 'Price Up', value: String(upCount), color: T.green, bg: '#DCFCE7' },
+      { icon: 'fas fa-arrow-down', label: t('priceDown') || 'Price Down', value: String(downCount), color: T.red, bg: T.redLight },
+      { icon: 'fas fa-percent', label: t('avgChange') || 'Avg Change', value: `${avgPct >= 0 ? '+' : ''}${avgPct.toFixed(1)}%`, color: avgPct >= 0 ? T.green : T.red, bg: avgPct >= 0 ? '#DCFCE7' : T.redLight },
+      { icon: 'fas fa-clock', label: t('lastChange') || 'Last Change', value: lastChange ? new Date(lastChange.created_at).toLocaleDateString() : '-', color: '#0369A1', bg: '#E0F2FE' },
+    ];
+
     return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('allProducts')}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
+        {/* Top bar */}
+        <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+          <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); if (typeof setFilterFrom === 'function') { setFilterFrom(''); setFilterTo(''); } setSearch(''); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
+          <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('priceHistory')}</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', width: 180 }}>
+              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+            </div>
+            <input type="date" value={fromDate} onChange={e => setFilterFrom && setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate')} />
+            <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
+            <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
+            <span style={{ fontSize: 14, color: T.gray400 }}>{rows.length}</span>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={exportPriceCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={printPriceHistory}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+          </div>
         </div>
-        <span style={{ fontSize: 14, color: T.gray400 }}>{rows.length}</span>
-      </div>
-      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
-          <thead><tr style={{ background: T.tealLight }}>
-            {[t('productName'), t('date'), t('oldPrice'), t('newPrice'), t('reason')].map((h, i) => (
-              <th key={i} style={{ padding: '10px 12px', textAlign: i >= 2 && i <= 3 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          {/* Gradient header */}
+          <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+              <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                <i className="fas fa-tags"></i>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('priceHistory')}</div>
+                <div style={{ fontSize: 13, opacity: 0.9 }}>
+                  {rows.length} {t('totalChanges') || 'changes'} · {uniqueProducts.size} {t('products')} · {avgPct >= 0 ? '+' : ''}{avgPct.toFixed(1)}% {t('avgChange') || 'avg'}
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                  <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                    <i className="fas fa-arrow-up" style={{ marginRight: 6 }}></i>{upCount} Up
+                  </span>
+                  <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                    <i className="fas fa-arrow-down" style={{ marginRight: 6 }}></i>{downCount} Down
+                  </span>
+                  {(fromDate || toDate) ? (
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                      <i className="fas fa-calendar" style={{ marginRight: 6 }}></i>{fromDate || '…'} → {toDate || '…'}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+              <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportPriceCsv}>
+                <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
+              </button>
+            </div>
+          </div>
+
+          {/* Stats grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
+            {stats.map((s, i) => (
+              <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className={s.icon}></i>
+                  </div>
+                  <div style={{ fontSize: 12, color: T.gray400, fontWeight: 600 }}>{s.label}</div>
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</div>
+              </div>
             ))}
-          </tr></thead>
-          <tbody>
-            {rows.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noPriceHistory')}</td></tr>
-            ) : rows.filter((h: any) => !search || (h.productName || '').toLowerCase().includes(search.toLowerCase())).map((h: any, i: number) => (
-              <tr key={h.id || i} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
-                <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{h.productName}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500 }}>{h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td>
-                <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}><span style={{ textDecoration: 'line-through', color: T.red }}>{fmt(h.oldPrice ?? h.oldStock ?? 0)}</span></td>
-                <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.green }}>{fmt(h.newPrice ?? h.newStock ?? 0)}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray600 }}>{h.reason || '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          </div>
+
+          {/* Table / list */}
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
+            <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+              <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600 }}>
+                  <i className="fas fa-list" style={{ marginRight: 6, color: T.teal }}></i>{t('priceHistory')} · {rows.length}
+                </div>
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: T.tealLight }}>
+                    {[t('productName'), t('date'), t('oldPrice'), t('newPrice'), t('change') || 'Change', t('reason')].map((h, hi) => (
+                      <th key={hi} style={{ padding: '10px 14px', textAlign: hi >= 2 && hi <= 4 ? 'right' : 'left', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} style={{ padding: 48, textAlign: 'center', color: T.gray400 }}>
+                        <i className="fas fa-tags" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
+                        {t('noPriceHistory')}
+                      </td>
+                    </tr>
+                  ) : rows.map((h: any, i: number) => {
+                    const oldP = +(h.oldPrice ?? h.oldStock ?? h.old_stock ?? 0);
+                    const newP = +(h.newPrice ?? h.newStock ?? h.new_stock ?? 0);
+                    const diff = newP - oldP;
+                    const pct = oldP > 0 ? ((diff / oldP) * 100) : null;
+                    const up = diff > 0;
+                    const down = diff < 0;
+                    return (
+                      <tr key={h.id || i} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                        <td style={{ padding: '10px 14px' }}>
+                          <div style={{ fontWeight: 600, fontSize: 14 }}>{h.productName || h.product_name || '-'}</div>
+                          {h.reason ? <div style={{ fontSize: 12, color: T.gray400, marginTop: 2 }}>{h.reason}</div> : null}
+                        </td>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray500 }}>{h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'right', fontSize: 14 }}>
+                          <span style={{ textDecoration: 'line-through', color: T.gray400 }}>{fmt(oldP)}</span>
+                        </td>
+                        <td style={{ padding: '10px 14px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: up ? T.green : down ? T.red : T.gray600 }}>
+                          {fmt(newP)}
+                        </td>
+                        <td style={{ padding: '10px 14px', textAlign: 'right' }}>
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '2px 8px',
+                            borderRadius: 10,
+                            fontSize: 12,
+                            fontWeight: 800,
+                            background: up ? '#DCFCE7' : down ? T.redLight : T.gray100,
+                            color: up ? T.green : down ? T.red : T.gray500,
+                          }}>
+                            {up ? '▲' : down ? '▼' : '—'} {fmt(Math.abs(diff))}{pct !== null ? ` (${pct >= 0 ? '+' : ''}${pct.toFixed(1)}%)` : ''}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray600 }}>{h.reason || '-'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     );
   };
 
