@@ -1551,7 +1551,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    if (sortBy === 'name') cmp = a.name.localeCompare(b.name);
+    if (sortBy === 'name') cmp = String(a.name || '').localeCompare(String(b.name || ''));
 
 
 
@@ -1563,7 +1563,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    else if (sortBy === 'price') cmp = a.sellPrice - b.sellPrice;
+    else if (sortBy === 'price') cmp = (+a.sellPrice || 0) - (+b.sellPrice || 0);
 
 
 
@@ -1575,7 +1575,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    else if (sortBy === 'stock') cmp = a.stock - b.stock;
+    else if (sortBy === 'stock') cmp = (+a.stock || 0) - (+b.stock || 0);
 
 
 
@@ -2787,88 +2787,15 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const exportProductsCsv = () => {
-
-
-
-
-
-
-
-
-
-
-
-    const headers = ['Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Stock', 'MinStock'];
-
-
-
-
-
-
-
-
-
-
-
-    const rows = products.map((p: any) => [p.name, p.code || '', p.company || '', p.cat || '', p.unit, p.costPrice, p.sellPrice, p.stock, p.minStock || 5].join(','));
-
-
-
-
-
-
-
-
-
-
-
+    const headers = ['Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Profit', 'Stock', 'MinStock', 'ExpiryDate'];
+    const srcList = (search || sortBy !== 'name' || sortDir !== 'asc') ? filteredProducts : products;
+    const rows = srcList.map((p: any) => {
+      const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+      return [p.name, p.code || '', p.company || '', p.cat || '', p.unit, p.costPrice, p.sellPrice, ((+p.sellPrice || 0) - (+p.costPrice || 0)), p.stock, p.minStock || 5, p.expiryDate || ''].map(esc).join(',');
+    });
     const csv = [headers.join(','), ...rows].join('\n');
-
-
-
-
-
-
-
-
-
-
-
     downloadCsv(csv, 'products.csv');
-
-
-
-
-
-
-
-
-
-
-
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const exportSuppliersCsv = () => {
 
@@ -3445,6 +3372,11 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const printProductList = () => {
+    const list = search || sortBy !== 'name' || sortDir !== 'asc' ? filteredProducts : filteredProducts;
+    const rows = list.map((p: any) => {
+      const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
+      return `<tr><td>${p.name}${p.code ? ` (${p.code})` : ''}</td><td>${p.company || '-'}</td><td>${p.cat || '-'}</td><td>${fmt(p.costPrice)}</td><td>${fmt(p.sellPrice)}</td><td>${fmt(p.sellPrice - p.costPrice)} (${pct}%)</td><td>${p.stock}</td><td>${p.unit}</td><td>${p.expiryDate || '-'}</td></tr>`;
+    }).join('');
 
 
 
@@ -3456,31 +3388,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-    const list = filteredProducts.length > 0 ? filteredProducts : products;
-
-
-
-
-
-
-
-
-
-
-
-    const rows = list.map((p: any) => `<tr><td>${p.name}</td><td>${p.company || '-'}</td><td>${p.cat || '-'}</td><td>${fmt(p.costPrice)}</td><td>${fmt(p.sellPrice)}</td><td>${p.stock}</td><td>${p.unit}</td></tr>`).join('');
-
-
-
-
-
-
-
-
-
-
-
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:6px 5px;text-align:left;font-size:10px;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:6px 5px;font-size:11px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('productList')}</h1><p>${new Date().toLocaleDateString()} | ${list.length} ${t('products')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('company')}</th><th>${t('category')}</th><th>${t('purchasePrice')}</th><th>${t('sellPrice')}</th><th>${t('stock')}</th><th>${t('unit')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:6px 5px;text-align:left;font-size:10px;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:6px 5px;font-size:11px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('productList')}</h1><p>${new Date().toLocaleDateString()} | ${list.length} ${t('products')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('company')}</th><th>${t('category')}</th><th>${t('purchasePrice')}</th><th>${t('sellPrice')}</th><th>${t('profit')}</th><th>${t('stock')}</th><th>${t('unit')}</th><th>${t('expiryDate')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
 
 
 
@@ -5087,7 +4995,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                  <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ fontWeight: 700, fontSize: 15, color: p.stock <= 0 ? T.red : low ? T.amber : T.gray900 }}>{fmtN(p.stock)}</span>{low && <i className="fas fa-triangle-exclamation" style={{color:'#F59E0B',marginRight:4}}></i>}{p.stock <= 0 && ' <i className="fas fa-xmark"></i>'}</td>
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ fontWeight: 700, fontSize: 15, color: p.stock <= 0 ? T.red : low ? T.amber : T.gray900 }}>{fmtN(p.stock)}</span>{low && <i className="fas fa-triangle-exclamation" style={{color:'#F59E0B',marginRight:4}}></i>}{p.stock <= 0 && <i className="fas fa-xmark" style={{color:T.red,marginLeft:4}}></i>}</td>
 
 
 
