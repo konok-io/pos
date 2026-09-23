@@ -720,18 +720,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [showPurchaseHistory, setShowPurchaseHistory] = useState(false);
-
-
-
-
-
-
-
-
-
-
-
-  const [deleteHistory] = useState<any[]>([]);
   const [barcodePopup, setBarcodePopup] = useState<any>(null);
 
 
@@ -8042,43 +8030,6 @@ tr:nth-child(even){background:#F8FAFC}
     );
   };
 
-  const renderDeleteHistory = () => {
-    return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('allProducts')}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
-        </div>
-        <span style={{ fontSize: 14, color: T.gray400 }}>{deleteHistory.length}</span>
-      </div>
-      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
-          <thead><tr style={{ background: T.redLight }}>
-            {[t('productName'), t('code'), t('stock'), t('sellPrice'), t('deletedAt')].map((h, i) => (
-              <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 || i === 3 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.red }}>{h}</th>
-            ))}
-          </tr></thead>
-          <tbody>
-            {deleteHistory.length === 0 ? (
-              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noDeleteHistory')}</td></tr>
-            ) : deleteHistory.filter((h: any) => !search || (h.name || '').toLowerCase().includes(search.toLowerCase()) || (h.code || '').toLowerCase().includes(search.toLowerCase())).map((h: any, i: number) => (
-              <tr key={h.id + h.deletedAt} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
-                <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{h.name}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{h.code || '-'}</td>
-                <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, color: T.gray600 }}>{h.stock}</td>
-                <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 600 }}>{fmt(h.sellPrice)}</td>
-                <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500 }}>{h.deletedAt ? new Date(h.deletedAt).toLocaleString() : '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    );
-  };
-
   const renderStock = () => (
 
 
@@ -9429,52 +9380,7 @@ tr:nth-child(even){background:#F8FAFC}
 
                   <button onClick={() => { setProductTab('purchaseHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-truck" style={{marginRight: 4}}></i> {t('purchaseHistory')}</button>
 
-                  <button onClick={() => { setProductTab('deleteHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</button>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                </div>
+                  </div>
 
 
 
@@ -10648,7 +10554,7 @@ tr:nth-child(even){background:#F8FAFC}
 
         {!viewProduct && productTab === 'priceHistory' && renderPriceHistory()}
 
-        {!viewProduct && productTab === 'deleteHistory' && renderDeleteHistory()}
+        
 
         {!viewProduct && productTab === 'purchaseHistory' && renderPurchaseHistory()}
 
