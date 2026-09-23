@@ -768,9 +768,6 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
     setError('');
     setLoading(true);
 
-    // Simulate login delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
     if ((username === 'admin' || username === 'admin@konok.io') && password === 'admin123') {
       onLogin();
     } else {
@@ -1155,21 +1152,7 @@ export default function App() {
   const [dataLastSyncTime, setDataLastSyncTime] = useState<string | null>(null);
   const fmt = (n: number) => `${currency} ${(+n || 0).toLocaleString('en-IN')}`;
   
-  // Load settings from localDB on startup
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const savedCurrency = await localDb.getSetting<string>('currencySymbol');
-        if (savedCurrency) setCurrency(savedCurrency);
-        
-        const savedVat = await localDb.getSetting<string>('vatPercent');
-        if (savedVat) setVatPercent(savedVat);
-      } catch (e) {
-          }
-    };
-    loadSettings();
-  }, []);
-  
+  // Settings (currency/vat) are loaded once inside initApp to avoid double hydration
 
   // Filter customers for dropdown
   const filteredCustomers = customers.filter(c => 
@@ -3571,7 +3554,7 @@ export default function App() {
         )}
 
         {currentTab === 'barcode' && (
-          <div>
+          (!isInitialized ? <TabLoader /> : <div>
             <h2 style={{ marginBottom: 16 }}><i className="fas fa-barcode" style={{marginRight: 4}}></i> {t('barcode')}</h2>
             <div className="card" style={{ maxWidth: 500 }}>
               <div className="form-group">
@@ -3585,10 +3568,11 @@ export default function App() {
               </div>
             </div>
           </div>
+          )
         )}
 
         {currentTab === 'suppliers' && (
-          <SuppliersScreen 
+          (!isInitialized ? <TabLoader /> : <SuppliersScreen 
             suppliers={suppliers}
             setSuppliers={setSuppliers}
             categories={categories}
@@ -3598,10 +3582,11 @@ export default function App() {
             purchases={purchases}
             settings={settings}
           />
+          )
         )}
 
         {currentTab === 'inventory' && (
-          <div>
+          (!isInitialized ? <TabLoader /> : <div>
             <h2 style={{ marginBottom: 16 }}><i className="fas fa-warehouse" style={{marginRight: 4}}></i> {t('stock')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
@@ -3627,10 +3612,11 @@ export default function App() {
               <p style={{ color: '#9CA3AF', textAlign: 'center', padding: 20 }}>{t('noLowStockProducts')}</p>
             </div>
           </div>
+          )
         )}
 
         {currentTab === 'income' && (
-          <div>
+          (!isInitialized ? <TabLoader /> : <div>
             <h2 style={{ marginBottom: 16 }}><i className="fas fa-money-bill" style={{marginRight: 4}}></i> {t('incomeExpenses')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
@@ -3666,6 +3652,7 @@ export default function App() {
               <button className="btn btn-primary">{t('save')}</button>
             </div>
           </div>
+          )
         )}
       </div>
 
