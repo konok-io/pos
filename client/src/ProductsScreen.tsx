@@ -600,6 +600,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const fmt = (n: number) => `${_settings?.currencySymbol || '৳'} ${(+n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+  const isExpiringSoon = (dateStr: string) => {
+    if (!dateStr) return false;
+    const str = String(dateStr);
+    const m = str.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    let d: Date;
+    if (m) d = new Date(`${m[3]}-${m[2]}-${m[1]}`);
+    else d = new Date(str);
+    if (isNaN(d.getTime())) return false;
+    const now = new Date();
+    const days = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    return days <= 30;
+  };
+
 
 
 
@@ -1131,7 +1144,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'profit'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'profit' | 'expiry'>('name');
 
 
 
@@ -1580,17 +1593,22 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
     else if (sortBy === 'profit') cmp = (a.sellPrice - a.costPrice) - (b.sellPrice - b.costPrice);
-
-
-
-
-
-
-
-
-
-
-
+    else if (sortBy === 'expiry') {
+      const parseD = (s: any) => {
+        if (!s) return null;
+        const str = String(s);
+        const m1 = str.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+        if (m1) return new Date(`${m1[3]}-${m1[2]}-${m1[1]}`).getTime();
+        const d = new Date(str);
+        return isNaN(d.getTime()) ? null : d.getTime();
+      };
+      const da = parseD(a.expiryDate);
+      const db = parseD(b.expiryDate);
+      if (da === null && db === null) cmp = 0;
+      else if (da === null) cmp = 1;
+      else if (db === null) cmp = -1;
+      else cmp = da - db;
+    }
     return sortDir === 'asc' ? cmp : -cmp;
 
 
@@ -4917,7 +4935,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-            {[t('productName'), t('company'), t('category'), t('purchasePrice'), t('sellPrice'), t('profit'), t('stock'), t('unit'), t('actions')].map((h, i) => (
+            {[t('productName'), t('company'), t('category'), t('purchasePrice'), t('sellPrice'), t('profit'), t('stock'), t('unit'), t('expiryDate'), t('actions')].map((h, i) => (
 
 
 
@@ -4989,7 +5007,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-              <tr><td colSpan={9} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noProductsYet')}</td></tr>
+              <tr><td colSpan={10} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noProductsYet')}</td></tr>
 
 
 
@@ -5147,15 +5165,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
                   <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400, textAlign: 'center' }}>{p.unit}</td>
 
-
-
-
-
-
-
-
-
-
+                  <td style={{ padding: '10px 12px', fontSize: 13, textAlign: 'center', color: p.expiryDate ? (isExpiringSoon(p.expiryDate) ? '#E11D48' : T.gray600) : T.gray400, fontWeight: p.expiryDate && isExpiringSoon(p.expiryDate) ? 700 : 400 }}>{p.expiryDate || '-'}</td>
 
                   <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
 
@@ -8762,6 +8772,18 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
               <option value="profit">{t('profit')}</option>
+
+
+
+
+
+
+
+
+
+
+
+              <option value="expiry">{t('expiryDate')}</option>
 
 
 
