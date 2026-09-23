@@ -3342,14 +3342,14 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       }
     }
     const totalW = x + 10;
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${height + 4}" viewBox="0 0 ${totalW} ${height + 4}">${rects}<text x="${totalW / 2}" y="${height + 3}" text-anchor="middle" font-family="monospace" font-size="10" fill="#000">${clean}</text></svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${height}" viewBox="0 0 ${totalW} ${height}">${rects}</svg>`;
   };
 
   const barcodeLabelHtml = (product: any): string => {
     const code = String(product.code || product.id || '000');
     const svg = code128Svg(code, 48, 2);
     return `<div class="barcode-item"><div class="bcode">${code}</div><div class="bc">${svg}</div><div class="price">${fmt(product.sellPrice)}</div></div>`;
-  };;
+  };
 
   const openPrintWin = (html: string) => {
     const win = window.open('', '_blank', 'width=800,height=600');
@@ -3372,11 +3372,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 body{font-family:Arial,sans-serif;width:210mm}
 .summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
-.barcode-item{width:50mm;height:30mm;border:0.3mm dashed #bbb;padding:1mm 1.5mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;page-break-inside:avoid}
-.barcode-item .bcode{font-family:monospace;font-size:9pt;font-weight:700;color:#111;line-height:1;margin:0;width:100%;overflow:hidden;white-space:nowrap}
-.barcode-item .bc{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
-.barcode-item .bc svg{max-width:100%;height:auto;max-height:16mm}
-.barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0}
+.barcode-item{width:50mm;height:28mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;page-break-inside:avoid;gap:0}
+.barcode-item .bcode{font-family:monospace;font-size:9pt;font-weight:700;color:#111;line-height:1;margin:0 0 0.5mm 0;width:100%;overflow:hidden;white-space:nowrap;padding-top:0}
+.barcode-item .bc{display:flex;align-items:flex-start;justify-content:center;width:100%;line-height:0;margin:0}
+.barcode-item .bc svg{max-width:100%;height:auto;max-height:15mm;display:block}
+.barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0.5mm 0 0 0}
 </style></head><body>
 <div class="summary">${p.name} | Stock: ${qty} ${p.unit || ''} | ${qty} barcode labels | ${new Date().toLocaleDateString()}</div>
 <div class="sheet">${items}</div>
@@ -3403,11 +3403,11 @@ body{font-family:Arial,sans-serif;width:210mm}
 body{font-family:Arial,sans-serif;width:210mm}
 .summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
-.barcode-item{width:50mm;height:30mm;border:0.3mm dashed #bbb;padding:1mm 1.5mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;page-break-inside:avoid}
-.barcode-item .bcode{font-family:monospace;font-size:9pt;font-weight:700;color:#111;line-height:1;margin:0;width:100%;overflow:hidden;white-space:nowrap}
-.barcode-item .bc{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
-.barcode-item .bc svg{max-width:100%;height:auto;max-height:16mm}
-.barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0}
+.barcode-item{width:50mm;height:28mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;page-break-inside:avoid;gap:0}
+.barcode-item .bcode{font-family:monospace;font-size:9pt;font-weight:700;color:#111;line-height:1;margin:0 0 0.5mm 0;width:100%;overflow:hidden;white-space:nowrap;padding-top:0}
+.barcode-item .bc{display:flex;align-items:flex-start;justify-content:center;width:100%;line-height:0;margin:0}
+.barcode-item .bc svg{max-width:100%;height:auto;max-height:15mm;display:block}
+.barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0.5mm 0 0 0}
 </style></head><body>
 <div class="summary">Manual Count | ${p.name} | ${qty} barcode labels | Stock: ${p.stock} ${p.unit || ''} | ${new Date().toLocaleDateString()}</div>
 <div class="sheet">${items}</div>
