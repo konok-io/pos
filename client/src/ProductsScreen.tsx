@@ -3359,85 +3359,57 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     }
   };
 
-  const printAllStockBarcodes = () => {
-    const list = products.filter((p: any) => (+p.stock || 0) > 0);
-    const items = list.map((p: any) => barcodeLabelHtml(p)).join('');
+  const printAllStockBarcodes = (product: any) => {
+    // Print labels = THIS product's stock qty (dynamic)
+    const p = product;
+    const qty = Math.max(1, parseInt(String(p.stock)) || 1);
+    const label = barcodeLabelHtml(p);
+    const items = Array(qty).fill(label).join('');
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
 @page{size:A4;margin:4mm}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;width:210mm}
+.summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
 .barcode-item{width:50mm;height:30mm;border:0.3mm dashed #bbb;padding:1mm 1.5mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;page-break-inside:avoid}
 .barcode-item h4{font-size:8pt;margin:0;line-height:1.1;max-height:2.4em;overflow:hidden;width:100%;font-weight:700}
 .barcode-item .bc{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
 .barcode-item .bc svg{max-width:100%;height:auto;max-height:16mm}
 .barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0}
-.barcode-item .unit{font-size:7pt;color:#666;line-height:1;margin:0}
-.summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 </style></head><body>
-<div class="summary">All Stock Barcodes | ${list.length} labels | ${new Date().toLocaleDateString()}</div>
-<div class="sheet">${items || '<p style="padding:10mm">No products with stock</p>'}</div>
+<div class="summary">${p.name} | Stock: ${qty} ${p.unit || ''} | ${qty} barcode labels | ${new Date().toLocaleDateString()}</div>
+<div class="sheet">${items}</div>
 </body></html>`;
     openPrintWin(html);
     setBarcodePopup(null);
   };
 
   const printManualCountBarcode = (product: any) => {
-    // Single product only — dynamic stock qty, no prompt
+    // Prompt for count, print that many labels for THIS product
     const p = product;
-    const expected = Math.max(0, parseInt(String(p.stock)) || 0);
-    const svg = code128Svg(p.code || p.id || '0', 40, 2);
+    const def = Math.max(1, parseInt(String(p.stock)) || 1);
+    const raw = window.prompt(
+      `${p.name}\n${t('manualCountBarcode') || 'Manual Count Barcode'}\n\n${t('howManyBarcodes') || 'How many barcodes?'} (1-500):`,
+      String(def)
+    );
+    if (raw === null) return;
+    const qty = Math.max(1, Math.min(500, parseInt(raw) || 1));
+    const label = barcodeLabelHtml(p);
+    const items = Array(qty).fill(label).join('');
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4;margin:10mm}
+@page{size:A4;margin:4mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
-.header{display:flex;justify-content:space-between;align-items:center;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:4mm}
-.header h1{color:#0F766E;font-size:15pt}
-.header .meta{font-size:9pt;color:#555;text-align:right}
-.product-card{border:0.5mm solid #0F766E;border-radius:2mm;padding:4mm;margin-bottom:4mm;background:#F0FDFA}
-.product-card h2{font-size:14pt;color:#0F766E;margin-bottom:1mm}
-.product-card .code{font-family:monospace;font-size:11pt;color:#334155;margin-bottom:2mm}
-.product-card .bc{text-align:center;margin:3mm 0}
-.stats{display:flex;gap:4mm;margin-bottom:4mm}
-.stat{flex:1;background:#fff;border:0.4mm solid #99f6e4;border-radius:2mm;padding:3mm;text-align:center}
-.stat .label{font-size:8pt;color:#0F766E;text-transform:uppercase;letter-spacing:0.3}
-.stat .val{font-size:20pt;font-weight:800;color:#0F766E}
-.stat.warn .val{color:#D97706}
-table{width:100%;border-collapse:collapse;margin-top:2mm}
-th{background:#0F766E;color:#fff;padding:2.5mm;font-size:9pt;text-align:left}
-td{border:0.3mm solid #cbd5e1;padding:3mm 2.5mm}
-.count{background:#FEF3C7;min-height:10mm}
-.diff{background:#ECFDF5}
-.footer{margin-top:6mm;font-size:9pt;color:#64748b;display:flex;justify-content:space-between;gap:4mm}
-.footer span{flex:1;border-top:0.4mm solid #94a3b8;padding-top:2mm}
+body{font-family:Arial,sans-serif;width:210mm}
+.summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
+.sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
+.barcode-item{width:50mm;height:30mm;border:0.3mm dashed #bbb;padding:1mm 1.5mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;page-break-inside:avoid}
+.barcode-item h4{font-size:8pt;margin:0;line-height:1.1;max-height:2.4em;overflow:hidden;width:100%;font-weight:700}
+.barcode-item .bc{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
+.barcode-item .bc svg{max-width:100%;height:auto;max-height:16mm}
+.barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0}
 </style></head><body>
-<div class="header">
-  <h1>Manual Stock Count — ${p.name}</h1>
-  <div class="meta">${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</div>
-</div>
-<div class="product-card">
-  <h2>${p.name}</h2>
-  <div class="code">Code: ${p.code || '-'} | Unit: ${p.unit || '-'} | Supplier: ${p.company || '-'}</div>
-  <div class="bc">${svg}</div>
-</div>
-<div class="stats">
-  <div class="stat"><div class="label">System Stock</div><div class="val">${expected}</div></div>
-  <div class="stat warn"><div class="label">Barcode Labels Needed</div><div class="val">${expected}</div></div>
-  <div class="stat"><div class="label">Min Stock</div><div class="val">${p.minStock || 5}</div></div>
-  <div class="stat"><div class="label">Sell Price</div><div class="val" style="font-size:14pt">${fmt(p.sellPrice)}</div></div>
-</div>
-<table>
-<thead><tr><th style="width:20mm">#</th><th>Product</th><th style="width:50mm">Barcode</th><th style="width:30mm">System Qty</th><th style="width:35mm">Actual Count</th><th style="width:30mm">Diff</th></tr></thead>
-<tbody><tr>
-  <td>1</td>
-  <td><strong>${p.name}</strong><div style="font-family:monospace;font-size:9pt;color:#64748b">${p.code || '-'}</div></td>
-  <td style="text-align:center">${svg}</td>
-  <td style="text-align:center;font-weight:800;font-size:16pt;color:#0F766E">${expected}</td>
-  <td class="count"></td>
-  <td class="diff"></td>
-</tr></tbody>
-</table>
-<div class="footer"><span>Counted by: _________________</span><span>Verified by: _________________</span></div>
+<div class="summary">Manual Count | ${p.name} | ${qty} barcode labels | Stock: ${p.stock} ${p.unit || ''} | ${new Date().toLocaleDateString()}</div>
+<div class="sheet">${items}</div>
 </body></html>`;
     openPrintWin(html);
     setBarcodePopup(null);
@@ -10387,9 +10359,9 @@ td{border:0.3mm solid #cbd5e1;padding:3mm 2.5mm}
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 440, maxWidth: '92vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 6px', color: T.teal }}><i className="fas fa-barcode" style={{marginRight: 6}}></i>{t('barcode')}</h3>
             <div style={{ fontSize: 14, color: T.gray600, marginBottom: 4, fontWeight: 600 }}>{barcodePopup.name}</div>
-            <div style={{ fontSize: 13, color: T.gray400, marginBottom: 14 }}>{(() => { const listCount = products.filter((pp: any) => (+pp.stock || 0) > 0).length; return `${listCount} ${t('products') || 'products'} ${t('inStock') || 'in stock'}`; })()}</div>
+            <div style={{ fontSize: 13, color: T.gray400, marginBottom: 14 }}>{barcodePopup.stock ?? 0} {t('inStock') || 'in stock'} {barcodePopup.unit ? barcodePopup.unit : ''}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <button onClick={() => printAllStockBarcodes()} style={{ ...btn('primary'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4 }}>
+              <button onClick={() => printAllStockBarcodes(barcodePopup)} style={{ ...btn('primary'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4 }}>
                 <span style={{ fontSize: 15, fontWeight: 700 }}><i className="fas fa-boxes-stacked" style={{marginRight: 6}}></i>{t('allStockBarcode') || 'All Stock Barcode'}</span>
                 <span style={{ fontSize: 12, opacity: 0.9, fontWeight: 400 }}>{t('allStockBarcodeHint') || 'Print barcode label for stock'}</span>
               </button>
