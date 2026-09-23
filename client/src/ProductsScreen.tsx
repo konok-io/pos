@@ -3346,8 +3346,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   };
 
   const barcodeLabelHtml = (product: any): string => {
-    const svg = code128Svg(product.code || product.id || '000', 48, 2);
-    return `<div class="barcode-item"><h4>${product.name}</h4><div class="bc">${svg}</div><div class="price">${fmt(product.sellPrice)}</div></div>`;
+    const code = String(product.code || product.id || '000');
+    const svg = code128Svg(code, 48, 2);
+    return `<div class="barcode-item"><div class="bcode">${code}</div><div class="bc">${svg}</div><div class="price">${fmt(product.sellPrice)}</div></div>`;
   };;
 
   const openPrintWin = (html: string) => {
@@ -3372,7 +3373,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 .summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
 .barcode-item{width:50mm;height:30mm;border:0.3mm dashed #bbb;padding:1mm 1.5mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;page-break-inside:avoid}
-.barcode-item h4{font-size:8pt;margin:0;line-height:1.1;max-height:2.4em;overflow:hidden;width:100%;font-weight:700}
+.barcode-item .bcode{font-family:monospace;font-size:9pt;font-weight:700;color:#111;line-height:1;margin:0;width:100%;overflow:hidden;white-space:nowrap}
 .barcode-item .bc{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
 .barcode-item .bc svg{max-width:100%;height:auto;max-height:16mm}
 .barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0}
@@ -3403,7 +3404,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 .summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
 .barcode-item{width:50mm;height:30mm;border:0.3mm dashed #bbb;padding:1mm 1.5mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;page-break-inside:avoid}
-.barcode-item h4{font-size:8pt;margin:0;line-height:1.1;max-height:2.4em;overflow:hidden;width:100%;font-weight:700}
+.barcode-item .bcode{font-family:monospace;font-size:9pt;font-weight:700;color:#111;line-height:1;margin:0;width:100%;overflow:hidden;white-space:nowrap}
 .barcode-item .bc{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
 .barcode-item .bc svg{max-width:100%;height:auto;max-height:16mm}
 .barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0}
@@ -3945,7 +3946,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-    const items = matchedProducts.map((p: any) => `<div class="barcode-item"><h4>${p.name}</h4><div class="code">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join('');
+    const items = matchedProducts.map((p: any) => `<div class="barcode-item"><div class="bcode">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join('');
 
 
 
@@ -3957,7 +3958,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item h4{font-size:11px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item .bcode{font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
 
 
 
@@ -4065,7 +4066,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-    const items = customBarcodeProducts.map((p: any) => `<div class="barcode-item"><h4>${p.name}</h4><div class="code">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join('');
+    const items = customBarcodeProducts.map((p: any) => `<div class="barcode-item"><div class="bcode">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join('');
 
 
 
@@ -4077,7 +4078,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item h4{font-size:11px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item .bcode{font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
 
 
 
@@ -7008,7 +7009,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => { const items = barcodeProducts.map((p: any) => `<div class="barcode-item"><h4>${p.name}</h4><div class="code">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join(''); const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item h4{font-size:11px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`; const win = window.open('', '_blank', 'width=800,height=600'); if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); } }}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={() => { const items = barcodeProducts.map((p: any) => `<div class="barcode-item"><div class="bcode">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join(''); const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item .bcode{font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`; const win = window.open('', '_blank', 'width=800,height=600'); if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); } }}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
 
 
 
