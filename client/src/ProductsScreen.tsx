@@ -7677,6 +7677,174 @@ body{font-family:Arial,sans-serif;width:210mm}
       </div>
     );
   };
+  
+    const renderPurchaseHistory = () => {
+    const q = (search || '').toLowerCase();
+    const list = (purchases || []).filter((p: any) => {
+      if (!q) return true;
+      return (p.id || '').toLowerCase().includes(q)
+        || (p.supplier || '').toLowerCase().includes(q)
+        || String(p.date || '').toLowerCase().includes(q)
+        || (p.items || []).some((it: any) => (it.name || '').toLowerCase().includes(q) || (it.code || '').toLowerCase().includes(q));
+    });
+    const totalSpend = list.reduce((s: number, p: any) => s + (p.total || (p.items || []).reduce((x: number, i: any) => x + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0)), 0);
+    const totalItems = list.reduce((s: number, p: any) => s + (p.items || []).length, 0);
+    const totalQty = list.reduce((s: number, p: any) => s + (p.items || []).reduce((x: number, i: any) => x + (i.quantity || i.stock || 0), 0), 0);
+    const suppliersSet = new Set(list.map((p: any) => p.supplier || '-').filter(Boolean));
+    const selected = viewPurchase ? list.find((p: any) => p.id === viewPurchase.id) || viewPurchase : null;
+    const exportPurchaseCsv = () => {
+      const headers = [t('purchaseId'), t('date'), t('supplier'), t('products'), t('quantity'), t('purchasePrice'), t('total')];
+      const lines = [headers.join(',')];
+      list.forEach((p: any) => {
+        const items = p.items || [];
+        const qty = items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0);
+        const tot = p.total || items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0);
+        const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        lines.push([esc(p.id), esc(p.date), esc(p.supplier), esc(items.length), esc(qty), esc(tot), esc(tot)].join(','));
+        items.forEach((it: any) => {
+          const lineQty = it.quantity || it.stock || 0;
+          const lineTot = lineQty * (it.costPrice || 0);
+          lines.push(['', '', '', esc(it.name), esc(lineQty), esc(it.costPrice || 0), esc(lineTot)].join(','));
+        });
+      });
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `purchase-history-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+    const printPurchaseInvoice = (p: any) => {
+      const items = p.items || [];
+      const rows = items.map((it: any, i: number) => {
+        const qty = it.quantity || it.stock || 0;
+        const tot = qty * (it.costPrice || 0);
+        return `<tr><td>${i+1}</td><td>${it.name || ''}</td><td>${it.code || ''}</td><td>${qty} ${it.unit || ''}</td><td>${fmt(it.costPrice || 0)}</td><td>${fmt(tot)}</td></tr>`;
+      }).join('');
+      const total = p.total || items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0);
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4;margin:12mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
+.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1.2mm solid #0F766E;padding-bottom:3mm;margin-bottom:4mm}
+.header h1{color:#0F766E;font-size:16pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+.card{background:#F0FDFA;border:0.4mm solid #99f6e4;border-radius:2mm;padding:3mm;margin-bottom:3mm;display:flex;gap:6mm;flex-wrap:wrap}
+.card div{font-size:10pt}
+.card .lbl{font-size:8pt;color:#0F766E;text-transform:uppercase}
+.card .val{font-weight:700;font-size:12pt}
+table{width:100%;border-collapse:collapse;margin-top:2mm}
+th{background:#0F766E;color:#fff;padding:2.5mm;text-align:left;font-size:9pt}
+td{border:0.3mm solid #cbd5e1;padding:2mm;font-size:10pt}
+tr:nth-child(even){background:#F8FAFC}
+.tot{margin-top:4mm;text-align:right;font-size:14pt;font-weight:800;color:#0F766E}
+.footer{margin-top:8mm;display:flex;justify-content:space-between;font-size:9pt;color:#64748b}
+.footer span{flex:1;border-top:0.4mm solid #94a3b8;padding-top:2mm;margin-right:4mm}
+</style></head><body>
+<div class="header"><h1>Purchase Invoice</h1><div class="meta">ID: ${p.id}<br/>Date: ${new Date(p.date).toLocaleString()}<br/>Supplier: ${p.supplier || '-'}</div></div>
+<div class="card">
+  <div><div class="lbl">Purchase ID</div><div class="val">${p.id}</div></div>
+  <div><div class="lbl">Supplier</div><div class="val">${p.supplier || '-'}</div></div>
+  <div><div class="lbl">Products</div><div class="val">${items.length}</div></div>
+  <div><div class="lbl">Total Qty</div><div class="val">${items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0)}</div></div>
+  <div><div class="lbl">Total</div><div class="val">${fmt(total)}</div></div>
+</div>
+<table><thead><tr><th>#</th><th>Product</th><th>Code</th><th>Qty</th><th>Cost</th><th>Total</th></tr></thead><tbody>${rows}</tbody></table>
+<div class="tot">Grand Total: ${fmt(total)}</div>
+<div class="footer"><span>Received by: _______________</span><span>Authorized by: _______________</span></div>
+</body></html>`;
+      openPrintWin(html);
+    };
+    return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); setViewPurchase(null); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
+        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+        </div>
+        <span style={{ fontSize: 14, color: T.gray400 }}>{list.length}</span>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+      </div>
+      <div style={{ padding: '8px 12px', display: 'flex', gap: 10, flexWrap: 'wrap', background: T.tealLight, borderBottom: `1px solid ${T.gray200}` }}>
+        {[
+          { label: t('totalPurchases') || 'Total Purchases', value: String(list.length), color: T.teal },
+          { label: t('totalPurchase') || 'Total Spend', value: fmt(totalSpend), color: T.green },
+          { label: t('products') || 'Product Lines', value: String(totalItems), color: '#7C3AED' },
+          { label: t('quantity') || 'Total Qty', value: String(totalQty), color: '#D97706' },
+          { label: t('suppliers') || 'Suppliers', value: String(suppliersSet.size), color: '#2563EB' },
+        ].map((s, i) => (
+          <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '6px 12px', minWidth: 120 }}>
+            <div style={{ fontSize: 11, color: T.gray400 }}>{s.label}</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: s.color }}>{s.value}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ flex: 1, overflow: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {list.length === 0 ? (
+          <div style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noPurchaseRecords')}</div>
+        ) : list.map((p: any) => {
+          const items = p.items || [];
+          const qty = items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0);
+          const total = p.total || items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0);
+          const isOpen = selected && selected.id === p.id;
+          return (
+            <div key={p.id} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 12, overflow: 'hidden' }}>
+              <div onClick={() => setViewPurchase(isOpen ? null : p)} style={{ padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: isOpen ? T.tealLight : T.white }}>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 800, color: T.teal, fontSize: 14, fontFamily: 'monospace' }}>{p.id}</span>
+                  <span style={{ fontSize: 13, color: T.gray500 }}><i className="fas fa-calendar" style={{marginRight: 4}}></i>{p.date ? new Date(p.date).toLocaleString() : '-'}</span>
+                  <span style={{ fontSize: 13, color: T.gray500 }}><i className="fas fa-building" style={{marginRight: 4}}></i>{p.supplier || '-'}</span>
+                  <span style={{ fontSize: 13, color: T.gray500 }}>{items.length} {t('products')} | {qty} {t('quantity')}</span>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <span style={{ fontWeight: 800, color: T.green, fontSize: 15 }}>{fmt(total)}</span>
+                  <button style={{ ...btn('ghost', 'sm') }} onClick={(e: any) => { e.stopPropagation(); printPurchaseInvoice(p); }} title={t('print')}><i className="fas fa-print"></i></button>
+                  <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`} style={{ color: T.gray400, fontSize: 12 }}></i>
+                </div>
+              </div>
+              {isOpen && (
+                <div style={{ borderTop: `1px solid ${T.gray200}`, overflow: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead><tr style={{ background: T.gray50 }}>
+                      {[t('productName'), t('code'), t('quantity'), t('purchasePrice'), t('total')].map((h, hi) => (
+                        <th key={hi} style={{ padding: '8px 12px', textAlign: hi >= 2 ? 'right' : 'left', fontSize: 13, fontWeight: 700, color: T.gray600 }}>{h}</th>
+                      ))}
+                    </tr></thead>
+                    <tbody>
+                      {items.length === 0 ? (
+                        <tr><td colSpan={5} style={{ padding: 20, textAlign: 'center', color: T.gray400 }}>{t('noPurchaseRecords')}</td></tr>
+                      ) : items.map((it: any, ii: number) => {
+                        const lineQty = it.quantity || it.stock || 0;
+                        const lineTot = lineQty * (it.costPrice || 0);
+                        return (
+                          <tr key={ii} style={{ borderBottom: `1px solid ${T.gray100}` }}>
+                            <td style={{ padding: '8px 12px', fontSize: 14, fontWeight: 600 }}>{it.name}</td>
+                            <td style={{ padding: '8px 12px', fontSize: 13, fontFamily: 'monospace', color: T.gray500 }}>{it.code || '-'}</td>
+                            <td style={{ padding: '8px 12px', textAlign: 'right', fontSize: 14 }}>{lineQty} {it.unit || ''}</td>
+                            <td style={{ padding: '8px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(it.costPrice || 0)}</td>
+                            <td style={{ padding: '8px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.green }}>{fmt(lineTot)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ background: T.tealLight }}>
+                        <td colSpan={4} style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800, color: T.teal }}>{t('total')}</td>
+                        <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800, color: T.green, fontSize: 15 }}>{fmt(total)}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+    );
+  };
+
   const renderPriceHistory = () => {
     const rows = stockHistory.filter((h: any) => h.type === 'price');
     return (
@@ -9100,6 +9268,8 @@ body{font-family:Arial,sans-serif;width:210mm}
 
                   <button onClick={() => { setProductTab('priceHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {t('priceHistory')}</button>
 
+                  <button onClick={() => { setProductTab('purchaseHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-truck" style={{marginRight: 4}}></i> {t('purchaseHistory')}</button>
+
                   <button onClick={() => { setProductTab('deleteHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</button>
 
 
@@ -10320,6 +10490,8 @@ body{font-family:Arial,sans-serif;width:210mm}
         {!viewProduct && productTab === 'priceHistory' && renderPriceHistory()}
 
         {!viewProduct && productTab === 'deleteHistory' && renderDeleteHistory()}
+
+        {!viewProduct && productTab === 'purchaseHistory' && renderPurchaseHistory()}
 
 
 
