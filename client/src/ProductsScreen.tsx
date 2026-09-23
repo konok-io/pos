@@ -7678,6 +7678,7 @@ body{font-family:Arial,sans-serif;width:210mm}
     );
   };
   
+    
     const renderPurchaseHistory = () => {
     const q = (search || '').toLowerCase();
     const list = (purchases || []).filter((p: any) => {
@@ -7686,12 +7687,14 @@ body{font-family:Arial,sans-serif;width:210mm}
         || (p.supplier || '').toLowerCase().includes(q)
         || String(p.date || '').toLowerCase().includes(q)
         || (p.items || []).some((it: any) => (it.name || '').toLowerCase().includes(q) || (it.code || '').toLowerCase().includes(q));
-    });
+    }).sort((a: any, b: any) => String(b.date || b.created_at || '').localeCompare(String(a.date || a.created_at || '')));
     const totalSpend = list.reduce((s: number, p: any) => s + (p.total || (p.items || []).reduce((x: number, i: any) => x + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0)), 0);
     const totalItems = list.reduce((s: number, p: any) => s + (p.items || []).length, 0);
     const totalQty = list.reduce((s: number, p: any) => s + (p.items || []).reduce((x: number, i: any) => x + (i.quantity || i.stock || 0), 0), 0);
     const suppliersSet = new Set(list.map((p: any) => p.supplier || '-').filter(Boolean));
+    const avgOrder = list.length ? totalSpend / list.length : 0;
     const selected = viewPurchase ? list.find((p: any) => p.id === viewPurchase.id) || viewPurchase : null;
+
     const exportPurchaseCsv = () => {
       const headers = [t('purchaseId'), t('date'), t('supplier'), t('products'), t('quantity'), t('purchasePrice'), t('total')];
       const lines = [headers.join(',')];
@@ -7714,6 +7717,7 @@ body{font-family:Arial,sans-serif;width:210mm}
       a.click();
       URL.revokeObjectURL(a.href);
     };
+
     const printPurchaseInvoice = (p: any) => {
       const items = p.items || [];
       const rows = items.map((it: any, i: number) => {
@@ -7755,93 +7759,223 @@ tr:nth-child(even){background:#F8FAFC}
 </body></html>`;
       openPrintWin(html);
     };
+
+    const stats = [
+      { icon: 'fas fa-boxes-stacked', label: t('totalPurchases') || 'Total Purchases', value: String(list.length), color: T.teal, bg: T.tealLight },
+      { icon: 'fas fa-sack-dollar', label: t('totalPurchase') || 'Total Spend', value: fmt(totalSpend), color: T.green, bg: '#DCFCE7' },
+      { icon: 'fas fa-box', label: t('products') || 'Product Lines', value: String(totalItems), color: '#7C3AED', bg: '#EDE9FE' },
+      { icon: 'fas fa-cubes', label: t('quantity') || 'Total Qty', value: String(totalQty), color: '#D97706', bg: '#FEF3C7' },
+      { icon: 'fas fa-building', label: t('suppliers') || 'Suppliers', value: String(suppliersSet.size), color: '#2563EB', bg: '#DBEAFE' },
+      { icon: 'fas fa-chart-line', label: t('avgOrder') || 'Avg Order', value: fmt(avgOrder), color: '#0369A1', bg: '#E0F2FE' },
+    ];
+
+    const selectedItems = selected ? (selected.items || []) : [];
+    const selectedQty = selectedItems.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0);
+    const selectedTotal = selected ? (selected.total || selectedItems.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0)) : 0;
+
     return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); setViewPurchase(null); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
-        </div>
-        <span style={{ fontSize: 14, color: T.gray400 }}>{list.length}</span>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
-      </div>
-      <div style={{ padding: '8px 12px', display: 'flex', gap: 10, flexWrap: 'wrap', background: T.tealLight, borderBottom: `1px solid ${T.gray200}` }}>
-        {[
-          { label: t('totalPurchases') || 'Total Purchases', value: String(list.length), color: T.teal },
-          { label: t('totalPurchase') || 'Total Spend', value: fmt(totalSpend), color: T.green },
-          { label: t('products') || 'Product Lines', value: String(totalItems), color: '#7C3AED' },
-          { label: t('quantity') || 'Total Qty', value: String(totalQty), color: '#D97706' },
-          { label: t('suppliers') || 'Suppliers', value: String(suppliersSet.size), color: '#2563EB' },
-        ].map((s, i) => (
-          <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '6px 12px', minWidth: 120 }}>
-            <div style={{ fontSize: 11, color: T.gray400 }}>{s.label}</div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: s.color }}>{s.value}</div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
+        {/* Top bar */}
+        <div style={{ padding: '10px 16px', display: 'flex', gap: 10, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+          <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); setViewPurchase(null); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
+          <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('purchaseHistory')}</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ position: 'relative', width: 240 }}>
+              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+            </div>
+            <span style={{ fontSize: 14, color: T.gray400 }}>{list.length}</span>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
           </div>
-        ))}
-      </div>
-      <div style={{ flex: 1, overflow: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {list.length === 0 ? (
-          <div style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noPurchaseRecords')}</div>
-        ) : list.map((p: any) => {
-          const items = p.items || [];
-          const qty = items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0);
-          const total = p.total || items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0);
-          const isOpen = selected && selected.id === p.id;
-          return (
-            <div key={p.id} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 12, overflow: 'hidden' }}>
-              <div onClick={() => setViewPurchase(isOpen ? null : p)} style={{ padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: isOpen ? T.tealLight : T.white }}>
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 800, color: T.teal, fontSize: 14, fontFamily: 'monospace' }}>{p.id}</span>
-                  <span style={{ fontSize: 13, color: T.gray500 }}><i className="fas fa-calendar" style={{marginRight: 4}}></i>{p.date ? new Date(p.date).toLocaleString() : '-'}</span>
-                  <span style={{ fontSize: 13, color: T.gray500 }}><i className="fas fa-building" style={{marginRight: 4}}></i>{p.supplier || '-'}</span>
-                  <span style={{ fontSize: 13, color: T.gray500 }}>{items.length} {t('products')} | {qty} {t('quantity')}</span>
+        </div>
+
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          {/* Gradient header */}
+          <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+              <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                <i className="fas fa-truck"></i>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('purchaseHistory')}</div>
+                <div style={{ fontSize: 13, opacity: 0.9 }}>
+                  {list.length} {t('totalPurchases') || 'purchases'} · {suppliersSet.size} {t('suppliers')} · {fmt(totalSpend)}
                 </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <span style={{ fontWeight: 800, color: T.green, fontSize: 15 }}>{fmt(total)}</span>
-                  <button style={{ ...btn('ghost', 'sm') }} onClick={(e: any) => { e.stopPropagation(); printPurchaseInvoice(p); }} title={t('print')}><i className="fas fa-print"></i></button>
-                  <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`} style={{ color: T.gray400, fontSize: 12 }}></i>
+                <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                  <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                    <i className="fas fa-boxes-stacked" style={{ marginRight: 6 }}></i>{list.length} {t('purchases')}
+                  </span>
+                  <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                    <i className="fas fa-building" style={{ marginRight: 6 }}></i>{suppliersSet.size} {t('suppliers')}
+                  </span>
+                  <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                    <i className="fas fa-sack-dollar" style={{ marginRight: 6 }}></i>{fmt(totalSpend)}
+                  </span>
                 </div>
               </div>
-              {isOpen && (
-                <div style={{ borderTop: `1px solid ${T.gray200}`, overflow: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead><tr style={{ background: T.gray50 }}>
-                      {[t('productName'), t('code'), t('quantity'), t('purchasePrice'), t('total')].map((h, hi) => (
-                        <th key={hi} style={{ padding: '8px 12px', textAlign: hi >= 2 ? 'right' : 'left', fontSize: 13, fontWeight: 700, color: T.gray600 }}>{h}</th>
-                      ))}
-                    </tr></thead>
-                    <tbody>
-                      {items.length === 0 ? (
-                        <tr><td colSpan={5} style={{ padding: 20, textAlign: 'center', color: T.gray400 }}>{t('noPurchaseRecords')}</td></tr>
-                      ) : items.map((it: any, ii: number) => {
-                        const lineQty = it.quantity || it.stock || 0;
-                        const lineTot = lineQty * (it.costPrice || 0);
-                        return (
-                          <tr key={ii} style={{ borderBottom: `1px solid ${T.gray100}` }}>
-                            <td style={{ padding: '8px 12px', fontSize: 14, fontWeight: 600 }}>{it.name}</td>
-                            <td style={{ padding: '8px 12px', fontSize: 13, fontFamily: 'monospace', color: T.gray500 }}>{it.code || '-'}</td>
-                            <td style={{ padding: '8px 12px', textAlign: 'right', fontSize: 14 }}>{lineQty} {it.unit || ''}</td>
-                            <td style={{ padding: '8px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(it.costPrice || 0)}</td>
-                            <td style={{ padding: '8px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.green }}>{fmt(lineTot)}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                    <tfoot>
-                      <tr style={{ background: T.tealLight }}>
-                        <td colSpan={4} style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800, color: T.teal }}>{t('total')}</td>
-                        <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 800, color: T.green, fontSize: 15 }}>{fmt(total)}</td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-              )}
+              <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportPurchaseCsv}>
+                <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
+              </button>
             </div>
-          );
-        })}
+          </div>
+
+          {/* Stats grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
+            {stats.map((s, i) => (
+              <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className={s.icon}></i>
+                  </div>
+                  <div style={{ fontSize: 12, color: T.gray400, fontWeight: 600 }}>{s.label}</div>
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Detail panel when selected */}
+          {selected && (
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 8px' }}>
+              <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+                <div style={{ background: `linear-gradient(135deg, ${T.tealLight || '#F0FDFA'} 0%, ${T.white} 100%)`, padding: '16px 20px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                  <div>
+                    <div style={{ fontSize: 11, color: T.gray400, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('purchaseId')}</div>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: T.teal, fontFamily: 'monospace' }}>{selected.id}</div>
+                    <div style={{ fontSize: 13, color: T.gray500, marginTop: 4 }}>
+                      <i className="fas fa-calendar" style={{ marginRight: 6 }}></i>{selected.date ? new Date(selected.date).toLocaleString() : '-'}
+                      <span style={{ margin: '0 8px', color: T.gray300 }}>|</span>
+                      <i className="fas fa-building" style={{ marginRight: 6 }}></i>{selected.supplier || '-'}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <div style={{ textAlign: 'right', marginRight: 8 }}>
+                      <div style={{ fontSize: 11, color: T.gray400 }}>{t('total')}</div>
+                      <div style={{ fontSize: 20, fontWeight: 800, color: T.green }}>{fmt(selectedTotal)}</div>
+                    </div>
+                    <button style={{ ...btn('ghost', 'sm') }} onClick={() => printPurchaseInvoice(selected)}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                    <button style={{ ...btn('ghost', 'sm') }} onClick={() => setViewPurchase(null)}><i className="fas fa-xmark"></i></button>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10, padding: '14px 20px', borderBottom: `1px solid ${T.gray100}`, background: '#FAFAFA' }}>
+                  {[
+                    { label: t('products'), value: String(selectedItems.length) },
+                    { label: t('quantity'), value: String(selectedQty) },
+                    { label: t('supplier'), value: selected.supplier || '-' },
+                    { label: t('date'), value: selected.date ? new Date(selected.date).toLocaleDateString() : '-' },
+                    { label: t('purchaseId'), value: selected.id },
+                  ].map((f, fi) => (
+                    <div key={fi}>
+                      <div style={{ fontSize: 11, color: T.gray400, fontWeight: 600 }}>{f.label}</div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600, fontFamily: fi === 4 ? 'monospace' : 'inherit' }}>{f.value}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: T.tealLight }}>
+                      {['#', t('productName'), t('code'), t('quantity'), t('purchasePrice'), t('total')].map((h, hi) => (
+                        <th key={hi} style={{ padding: '10px 14px', textAlign: hi >= 3 ? 'right' : 'left', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedItems.length === 0 ? (
+                      <tr><td colSpan={6} style={{ padding: 32, textAlign: 'center', color: T.gray400 }}>{t('noPurchaseRecords')}</td></tr>
+                    ) : selectedItems.map((it: any, ii: number) => {
+                      const lineQty = it.quantity || it.stock || 0;
+                      const lineTot = lineQty * (it.costPrice || 0);
+                      return (
+                        <tr key={ii} style={{ background: ii % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                          <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray400 }}>{ii + 1}</td>
+                          <td style={{ padding: '10px 14px', fontSize: 14, fontWeight: 600 }}>{it.name}</td>
+                          <td style={{ padding: '10px 14px', fontSize: 13, fontFamily: 'monospace', color: T.gray500 }}>{it.code || '-'}</td>
+                          <td style={{ padding: '10px 14px', textAlign: 'right', fontSize: 14 }}>{lineQty} {it.unit || ''}</td>
+                          <td style={{ padding: '10px 14px', textAlign: 'right', fontSize: 14 }}>{fmt(it.costPrice || 0)}</td>
+                          <td style={{ padding: '10px 14px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.green }}>{fmt(lineTot)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                  <tfoot>
+                    <tr style={{ background: T.tealLight }}>
+                      <td colSpan={5} style={{ padding: '12px 14px', textAlign: 'right', fontWeight: 800, color: T.teal, fontSize: 14 }}>{t('total')}</td>
+                      <td style={{ padding: '12px 14px', textAlign: 'right', fontWeight: 800, color: T.green, fontSize: 16 }}>{fmt(selectedTotal)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Purchase list */}
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: selected ? '8px 24px 24px' : '0 24px 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: T.gray500, padding: '4px 0' }}>
+              {selected ? t('purchases') : `${list.length} ${t('purchases')}`}
+            </div>
+            {list.length === 0 ? (
+              <div style={{ padding: 48, textAlign: 'center', color: T.gray400, background: T.white, borderRadius: 14, border: `1px dashed ${T.gray200}` }}>
+                <i className="fas fa-box-open" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
+                {t('noPurchaseRecords')}
+              </div>
+            ) : list.map((p: any) => {
+              const items = p.items || [];
+              const qty = items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0);
+              const total = p.total || items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0);
+              const isOpen = selected && selected.id === p.id;
+              return (
+                <div key={p.id} onClick={() => setViewPurchase(isOpen ? null : p)} style={{
+                  background: T.white,
+                  border: isOpen ? `2px solid ${T.teal}` : `1px solid ${T.gray200}`,
+                  borderRadius: 14,
+                  padding: '14px 18px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: 12,
+                  boxShadow: isOpen ? '0 4px 16px rgba(15,118,110,0.12)' : '0 1px 4px rgba(0,0,0,0.04)',
+                  transition: 'all 0.15s ease',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0, flexWrap: 'wrap' }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 12, background: isOpen ? T.teal : T.tealLight, color: isOpen ? T.white : T.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <i className="fas fa-truck"></i>
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                        <span style={{ fontWeight: 800, color: T.teal, fontSize: 14, fontFamily: 'monospace' }}>{p.id}</span>
+                        <span style={{ fontSize: 12, background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>
+                          {items.length} {t('products')}
+                        </span>
+                        <span style={{ fontSize: 12, background: '#FEF3C7', color: '#B45309', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>
+                          {qty} {t('quantity')}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 13, color: T.gray500, marginTop: 4 }}>
+                        <i className="fas fa-calendar" style={{ marginRight: 5, fontSize: 11 }}></i>{p.date ? new Date(p.date).toLocaleString() : '-'}
+                        <span style={{ margin: '0 6px', color: T.gray300 }}>·</span>
+                        <i className="fas fa-building" style={{ marginRight: 5, fontSize: 11 }}></i>{p.supplier || '-'}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexShrink: 0 }}>
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ fontSize: 11, color: T.gray400 }}>{t('total')}</div>
+                      <div style={{ fontWeight: 800, color: T.green, fontSize: 16 }}>{fmt(total)}</div>
+                    </div>
+                    <button style={{ ...btn('ghost', 'sm') }} onClick={(e: any) => { e.stopPropagation(); printPurchaseInvoice(p); }} title={t('print')}>
+                      <i className="fas fa-print"></i>
+                    </button>
+                    <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`} style={{ color: T.gray400, fontSize: 12 }}></i>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </div>
     );
   };
 
