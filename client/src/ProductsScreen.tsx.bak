@@ -22,7 +22,7 @@ import { useLanguage } from './i18n';
 
 
 
-import { api } from './api';
+import { api, setToken } from './api';
 
 
 
@@ -610,7 +610,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [products, setProducts] = useState<any[]>(_initProducts || []);
+  const [products, setProducts] = useState<any[]>([]);
 
 
 
@@ -622,7 +622,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [suppliers, setSuppliers] = useState<any[]>(_initSuppliers || []);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
 
 
 
@@ -634,7 +634,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [categories, setCategories] = useState<any[]>(_initCategories || []);
+  const [categories, setCategories] = useState<any[]>([]);
 
 
 
@@ -731,7 +731,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [showDeleteHistory, setShowDeleteHistory] = useState(false);
-  const [deleteHistory, setDeleteHistory] = useState<any[]>([]);
 
 
 
@@ -1253,9 +1252,53 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
         const token = localStorage.getItem('pos_api_token');
+
+
+
+
+
+
+
+
+
+
+
         if (!token) {
-          // No hardcoded fallback login — App session provides auth
-          throw new Error('No auth token');
+
+
+
+
+
+
+
+
+
+
+
+          const res = await api.login('admin@pos.test', 'admin123');
+
+
+
+
+
+
+
+
+
+
+
+          setToken(res.token);
+
+
+
+
+
+
+
+
+
+
+
         }
 
 
@@ -1844,40 +1887,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    const latestForPrice = products.find((p: any) => p.id === editProduct.id);
-    api.updateProduct(editProduct.id, {
-      ...(latestForPrice || editProduct),
-      costPrice: editProduct.costPrice,
-      sellPrice: editProduct.sellPrice,
-    }).catch(() => {});
-    if (latestForPrice && (
-      latestForPrice.costPrice !== editProduct.costPrice ||
-      latestForPrice.sellPrice !== editProduct.sellPrice
-    )) {
-      api.addStockHistory({
-        productId: editProduct.id,
-        productName: editProduct.name || latestForPrice.name,
-        type: 'price',
-        quantity: 0,
-        oldStock: latestForPrice.sellPrice || 0,
-        newStock: editProduct.sellPrice || 0,
-        reason: `Cost ${latestForPrice.costPrice || 0}→${editProduct.costPrice || 0}, Sell ${latestForPrice.sellPrice || 0}→${editProduct.sellPrice || 0}`,
-      }).then((res: any) => {
-        setStockHistory(prev => [{
-          id: res.id,
-          productId: editProduct.id,
-          productName: editProduct.name || latestForPrice.name,
-          type: 'price',
-          quantity: 0,
-          oldPrice: latestForPrice.sellPrice || 0,
-          newPrice: editProduct.sellPrice || 0,
-          oldStock: latestForPrice.sellPrice || 0,
-          newStock: editProduct.sellPrice || 0,
-          reason: res.reason || '',
-          created_at: new Date().toISOString(),
-        }, ...prev]);
-      }).catch(() => {});
-    }
+    api.updateProduct(editProduct.id, { ...editProduct, costPrice: editProduct.costPrice, sellPrice: editProduct.sellPrice }).catch(() => {});
 
 
 
@@ -2416,41 +2426,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    const latestFull = products.find((p: any) => p.id === editFullProduct.id);
-    const payloadFull = { ...(latestFull || editFullProduct), ...editFullProduct, id: editFullProduct.id };
-    if (latestFull && (latestFull.costPrice !== editFullProduct.costPrice || latestFull.sellPrice !== editFullProduct.sellPrice)) {
-      // keep live stock from latestFull if form stock stale
-      payloadFull.stock = latestFull.stock;
-    }
-    api.updateProduct(editFullProduct.id, payloadFull).catch(() => {});
-    if (latestFull && (
-      latestFull.costPrice !== editFullProduct.costPrice ||
-      latestFull.sellPrice !== editFullProduct.sellPrice
-    )) {
-      api.addStockHistory({
-        productId: editFullProduct.id,
-        productName: editFullProduct.name || latestFull.name,
-        type: 'price',
-        quantity: 0,
-        oldStock: latestFull.sellPrice || 0,
-        newStock: editFullProduct.sellPrice || 0,
-        reason: `Cost ${latestFull.costPrice || 0}→${editFullProduct.costPrice || 0}, Sell ${latestFull.sellPrice || 0}→${editFullProduct.sellPrice || 0}`,
-      }).then((res: any) => {
-        setStockHistory(prev => [{
-          id: res.id,
-          productId: editFullProduct.id,
-          productName: editFullProduct.name || latestFull.name,
-          type: 'price',
-          quantity: 0,
-          oldPrice: latestFull.sellPrice || 0,
-          newPrice: editFullProduct.sellPrice || 0,
-          oldStock: latestFull.sellPrice || 0,
-          newStock: editFullProduct.sellPrice || 0,
-          reason: res.reason || '',
-          created_at: new Date().toISOString(),
-        }, ...prev]);
-      }).catch(() => {});
-    }
+    api.updateProduct(editFullProduct.id, editFullProduct).catch(() => {});
 
 
 
@@ -2547,15 +2523,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
     const updated = products.filter((p: any) => p.id !== id);
-    setDeleteHistory(prev => [{
-      id: product.id,
-      name: product.name,
-      code: product.code || '',
-      stock: product.stock || 0,
-      costPrice: product.costPrice || 0,
-      sellPrice: product.sellPrice || 0,
-      deletedAt: new Date().toISOString(),
-    }, ...prev].slice(0, 200));
 
 
 
@@ -4415,23 +4382,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-      const valid: any[] = [];
-      for (const item of items) {
-        if (!item.name) continue;
-        const existing = products.find((ep: any) =>
-          ((ep.code || '').toLowerCase() === (item.code || '').toLowerCase() && item.code) ||
-          ((ep.name || '').toLowerCase() === (item.name || '').toLowerCase() && !item.code)
-        );
-        if (existing && item.code) {
-          const newStock = (existing.stock || 0) + (item.stock || 0);
-          const merged = { ...existing, stock: newStock };
-          setProducts(prev => prev.map(p => p.id === existing.id ? merged : p));
-          setProductsParent(products.map(p => p.id === existing.id ? merged : p));
-          api.updateProduct(existing.id, merged).catch(() => {});
-        } else if (!existing) {
-          valid.push(item);
-        }
-      }
+      const valid = items.filter(i => i.name);
 
 
 
@@ -4695,25 +4646,135 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    // Save stock change to MySQL API (server also writes stock_history)
+    // Save stock change to MySQL API
     api.adjustStock({
       productId: stockAdjustProduct.id,
       productName: stockAdjustProduct.name,
       quantity: qty,
       type: stockAdjustType,
       reason: stockAdjustReason,
+    }).catch(() => {});
+
+    api.addStockHistory({
+
+
+
+
+
+
+
+
+
+
+
+      productId: stockAdjustProduct.id,
+
+
+
+
+
+
+
+
+
+
+
+      productName: stockAdjustProduct.name,
+
+
+
+
+
+
+
+
+
+
+
+      type: stockAdjustType === 'add' ? 'add' : 'remove',
+
+
+
+
+
+
+
+
+
+
+
+      quantity: qty,
+
+
+
+
+
+
+
+
+
+
+
+      oldStock,
+
+
+
+
+
+
+
+
+
+
+
+      newStock,
+
+
+
+
+
+
+
+
+
+
+
+      reason: stockAdjustReason,
+
+
+
+
+
+
+
+
+
+
+
     }).then((res: any) => {
-      setStockHistory(prev => [{
-        id: `local-${Date.now()}`,
-        productId: stockAdjustProduct.id,
-        productName: stockAdjustProduct.name,
-        type: stockAdjustType === 'add' ? 'add' : 'remove',
-        quantity: qty,
-        oldStock: res.oldStock ?? oldStock,
-        newStock: res.newStock ?? newStock,
-        reason: stockAdjustReason,
-        created_at: new Date().toISOString(),
-      }, ...prev]);
+
+
+
+
+
+
+
+
+
+
+
+      setStockHistory(prev => [{ id: res.id, productId: stockAdjustProduct.id, productName: stockAdjustProduct.name, type: stockAdjustType === 'add' ? 'add' : 'remove', quantity: qty, oldStock, newStock, reason: stockAdjustReason, created_at: new Date().toISOString() }, ...prev]);
+
+
+
+
+
+
+
+
+
+
+
     }).catch(() => {});
 
 
@@ -10358,7 +10419,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-          <div key={i} style={{ padding: 10, background: T.gray50, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}><div><strong>{h.productName}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.created_at).toLocaleString()}</div></div><div style={{ textAlign: 'right' }}>{(h.oldPrice !== undefined || h.oldStock !== undefined || h.type === 'price') && <div style={{ textDecoration: 'line-through', color: T.red }}>{fmt((h.oldPrice ?? h.oldStock ?? 0))}</div>}{(h.newPrice ?? h.newStock) && <div style={{ color: T.green, fontWeight: 700 }}>{fmt(h.newPrice ?? h.newStock ?? 0)}</div>}</div></div>
+          <div key={i} style={{ padding: 10, background: T.gray50, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}><div><strong>{h.productName}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.created_at).toLocaleString()}</div></div><div style={{ textAlign: 'right' }}>{h.oldPrice && <div style={{ textDecoration: 'line-through', color: T.red }}>{fmt(h.oldPrice)}</div>}{h.newPrice && <div style={{ color: T.green, fontWeight: 700 }}>{fmt(h.newPrice)}</div>}</div></div>
 
 
 
@@ -10407,22 +10468,29 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
       {showDeleteHistory && overlayModal(`<i className="fas fa-trash"></i> ${t('deleteHistory')}`, () => setShowDeleteHistory(false), (
-        <div>
-          {deleteHistory.length === 0 ? (
-            <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noDeleteHistory')}</p>
-          ) : deleteHistory.map((h: any) => (
-            <div key={h.id + h.deletedAt} style={{ padding: 10, background: T.redLight, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-              <div>
-                <strong>{h.name}</strong>
-                <div style={{ fontSize: 12, color: T.gray500 }}>{h.code || '-'} · {new Date(h.deletedAt).toLocaleString()}</div>
-              </div>
-              <div style={{ textAlign: 'right', fontSize: 13 }}>
-                <div>{fmt(h.sellPrice)}</div>
-                <div style={{ color: T.gray500 }}>stock {h.stock}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+
+
+
+
+
+
+
+
+
+
+
+        <div><p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noDeleteHistory')}</p></div>
+
+
+
+
+
+
+
+
+
+
+
       ))}
 
 
