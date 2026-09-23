@@ -1585,23 +1585,30 @@ export default function App() {
   };
 
   // Calculate totals
-  const subtotal = cart.reduce((sum, item) => sum + item.sellPrice * item.quantity, 0);
+  const subtotal = parseFloat(cart.reduce((sum, item) => sum + item.sellPrice * item.quantity, 0).toFixed(2));
   const discountAmount = parseFloat(discount) || 0;
   const afterDiscount = Math.max(0, subtotal - discountAmount);
   const vatRate = parseFloat(vatPercent) || 0;
   const vatAmount = parseFloat((afterDiscount * vatRate / 100).toFixed(2));
-  const total = afterDiscount + vatAmount;
+  const total = parseFloat((afterDiscount + vatAmount).toFixed(2));
   const paid = parseFloat(paidAmount) || 0;
-  const due = total - paid;
-  const change = paid > total ? paid - total : 0;
+  const totalCents = Math.round(total * 100);
+  const paidCents = Math.round(paid * 100);
+  const due = parseFloat((Math.max(0, totalCents - paidCents) / 100).toFixed(2));
+  const change = paidCents > totalCents ? parseFloat(((paidCents - totalCents) / 100).toFixed(2)) : 0;
+  const isPaidInFull = paidCents >= totalCents;
   const dueSalesEnabled = settings.dueSalesEnabled !== false;
 
   // Checkout
   // POS Barcode Enter handler
   const handlePosBarcodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && posBarcode.trim()) {
-      const barcode = posBarcode.trim();
-      const found = products.find(p => p.barcode === barcode || p.code === barcode);
+      const barcode = posBarcode.trim().toLowerCase();
+      const found = products.find(p =>
+        (p.barcode || '').toLowerCase() === barcode ||
+        (p.code || '').toLowerCase() === barcode ||
+        (p.id || '').toLowerCase() === barcode
+      );
       if (found) {
         addToCart(found);
         setPosBarcode('');
@@ -1890,6 +1897,19 @@ export default function App() {
     if (due > 0 && !selectedCustomer) {
       alert(t('payFullRequired'));
       return;
+    }
+
+    // Re-validate live stock (another device may have sold the same product)
+    for (const item of cart) {
+      const live = products.find(p => p.id === item.productId);
+      if (!live) {
+        alert(`${t('productNotFound')}: ${item.name}`);
+        return;
+      }
+      if (live.stock < item.quantity) {
+        alert(`${t('maxStock')}: ${live.name} (${live.stock} ${live.unit})`);
+        return;
+      }
     }
 
     // B2B/B2C detection: customer has VAT number = B2B
@@ -2675,7 +2695,13 @@ export default function App() {
                               <div>
                                 <span style={{ fontSize: 11, color: '#6B7280' }}>{t('total')}: </span>
                                 <span style={{ fontSize: 16, fontWeight: 700, color: '#115E59' }}>
-                                  {fmt(sale.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0))}
+                                  {fmt((() => {
+                                    const holdSub = sale.items.reduce((sum, item) => sum + (item.sellPrice * item.quantity), 0);
+                                    const holdDisc = parseFloat(sale.discount || '') || 0;
+                                    const holdAfter = Math.max(0, holdSub - holdDisc);
+                                    const holdVatRate = parseFloat(sale.vatPercent || '') || 0;
+                                    return parseFloat((holdAfter + holdAfter * holdVatRate / 100).toFixed(2));
+                                  })())}
                                 </span>
                               </div>
                               <button 
@@ -3445,7 +3471,7 @@ export default function App() {
                     const canComplete = cart.length > 0 && (
                       dueSalesEnabled && selectedCustomer
                         ? true
-                        : paid >= total
+                        : isPaidInFull
                     );
                     return (
                     <button onClick={handleCheckout}
