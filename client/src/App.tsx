@@ -3377,6 +3377,7 @@ export default function App() {
               </div>
             </div>
           </div>
+          )
         )}
 
         {currentTab === 'pos' && (
@@ -3386,7 +3387,6 @@ export default function App() {
             onClose={() => setIsAddCustomerModalOpen(false)}
             onSave={handleAddCustomerFromPOS}
           />
-        )
         )}
 
         {currentTab === 'products' && (
