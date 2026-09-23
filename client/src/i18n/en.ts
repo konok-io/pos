@@ -425,6 +425,7 @@ export const en: Record<string, string> = {
   deleteCompanyConfirm: 'Are you sure you want to delete this company?',
   deleteCategoryConfirm: 'Are you sure you want to delete this category?',
 clearCartConfirm: 'Clear the cart?',
+  copies: 'Copies',
   allStockBarcode: 'All Stock Barcode',
   manualCountBarcode: 'Manual Count Barcode',
   allStockBarcodeHint: 'Print barcode labels for stock products',

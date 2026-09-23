@@ -3346,9 +3346,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   };
 
   const barcodeLabelHtml = (product: any): string => {
-    const svg = code128Svg(product.code || product.id || '000', 55, 2);
-    return `<div class="barcode-item"><h4>${product.name}</h4>${svg}<div class="price">${fmt(product.sellPrice)}</div>${product.unit ? `<div class="unit">/ ${product.unit}</div>` : ''}</div>`;
-  };
+    const svg = code128Svg(product.code || product.id || '000', 48, 2);
+    return `<div class="barcode-item"><h4>${product.name}</h4><div class="bc">${svg}</div><div class="price">${fmt(product.sellPrice)}</div></div>`;
+  };;
 
   const openPrintWin = (html: string) => {
     const win = window.open('', '_blank', 'width=800,height=600');
@@ -3359,21 +3359,87 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     }
   };
 
-  const printAllStockBarcodes = (product?: any) => {
-    const list = product ? [product] : products.filter((p: any) => (+p.stock || 0) > 0);
+  const printAllStockBarcodes = () => {
+    const list = products.filter((p: any) => (+p.stock || 0) > 0);
     const items = list.map((p: any) => barcodeLabelHtml(p)).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:8mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:8px;padding:8px}.barcode-item{border:1px dashed #999;padding:8px;text-align:center;width:180px;border-radius:4px}.barcode-item h4{font-size:11px;margin-bottom:4px;word-break:break-word}.barcode-item .price{font-size:12px;color:#333;margin-top:4px;font-weight:700}.barcode-item .unit{font-size:10px;color:#888}.barcode-item svg{max-width:100%}</style></head><body>${items || '<p>No products with stock</p>'}</body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4;margin:4mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;width:210mm}
+.sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
+.barcode-item{width:50mm;height:30mm;border:0.3mm dashed #bbb;padding:1mm 1.5mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:space-between;overflow:hidden;page-break-inside:avoid}
+.barcode-item h4{font-size:8pt;margin:0;line-height:1.1;max-height:2.4em;overflow:hidden;width:100%;font-weight:700}
+.barcode-item .bc{flex:1;display:flex;align-items:center;justify-content:center;width:100%;min-height:0}
+.barcode-item .bc svg{max-width:100%;height:auto;max-height:16mm}
+.barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0}
+.barcode-item .unit{font-size:7pt;color:#666;line-height:1;margin:0}
+.summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
+</style></head><body>
+<div class="summary">All Stock Barcodes | ${list.length} labels | ${new Date().toLocaleDateString()}</div>
+<div class="sheet">${items || '<p style="padding:10mm">No products with stock</p>'}</div>
+</body></html>`;
     openPrintWin(html);
     setBarcodePopup(null);
   };
 
-  const printManualCountBarcode = (product?: any) => {
-    const list = product ? [product] : products.filter((p: any) => (+p.stock || 0) > 0);
+  const printManualCountBarcode = (qtyPer: number) => {
+    const list = products.filter((p: any) => (+p.stock || 0) > 0);
+    const copies = Math.max(1, Math.min(50, parseInt(String(qtyPer)) || 1));
+    let totalLabels = 0;
     const rows = list.map((p: any, i: number) => {
-      const svg = code128Svg(p.code || p.id || '0', 36, 1);
-      return `<tr><td>${i + 1}</td><td>${p.name}<br/><span class="code">${p.code || '-'}</span></td><td class="bc">${svg}</td><td class="count"></td></tr>`;
+      const svg = code128Svg(p.code || p.id || '0', 30, 1);
+      const qty = p.stock || 0;
+      totalLabels += qty;
+      return `<tr>
+        <td class="num">${i + 1}</td>
+        <td class="prod"><strong>${p.name}</strong><div class="code">${p.code || '-'}</div></td>
+        <td class="bc">${svg}</td>
+        <td class="expected">${qty} ${p.unit || ''}</td>
+        <td class="count"></td>
+        <td class="diff"></td>
+      </tr>`;
     }).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:12px}.header{text-align:center;margin-bottom:12px;border-bottom:2px solid #0F766E;padding-bottom:8px}.header h1{color:#0F766E;font-size:18px}.meta{display:flex;justify-content:space-between;font-size:11px;color:#555;margin-bottom:10px}table{width:100%;border-collapse:collapse}th{background:#F0FDFA;border:1px solid #99f6e4;padding:6px;color:#0F766E;font-size:11px}td{border:1px solid #e5e7eb;padding:6px;vertical-align:middle}.code{font-family:monospace;font-size:10px;color:#666}.bc svg{display:block}.count{width:80px;background:#fff;min-height:36px}</style></head><body><div class="header"><h1>Manual Stock Count</h1></div><div class="meta"><span>Date: ${new Date().toLocaleDateString()}</span><span>Items: ${list.length}</span></div><table><thead><tr><th>#</th><th>Product</th><th>Barcode</th><th>Count Qty</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4 landscape;margin:8mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+.header{display:flex;justify-content:space-between;align-items:center;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
+.header h1{color:#0F766E;font-size:14pt}
+.header .meta{font-size:9pt;color:#555;text-align:right}
+.stats{display:flex;gap:6mm;margin-bottom:3mm}
+.stat{background:#F0FDFA;border:0.4mm solid #99f6e4;border-radius:2mm;padding:2mm 4mm;text-align:center}
+.stat .label{font-size:8pt;color:#0F766E;text-transform:uppercase}
+.stat .val{font-size:14pt;font-weight:800;color:#0F766E}
+table{width:100%;border-collapse:collapse}
+th{background:#0F766E;color:#fff;padding:2mm 2mm;font-size:8pt;text-align:left;border:0.3mm solid #0F766E}
+td{border:0.3mm solid #cbd5e1;padding:1.5mm 2mm;vertical-align:middle}
+tr:nth-child(even){background:#F8FAFC}
+.num{width:8mm;text-align:center;color:#64748b}
+.prod{width:55mm}
+.prod .code{font-family:monospace;font-size:8pt;color:#64748b}
+.bc{width:45mm;text-align:center}
+.bc svg{display:inline-block;max-width:42mm}
+.expected{width:20mm;text-align:center;font-weight:700;color:#0F766E}
+.count{width:28mm;background:#FEF3C7}
+.diff{width:22mm;background:#ECFDF5}
+.footer{margin-top:4mm;font-size:8pt;color:#64748b;display:flex;justify-content:space-between}
+</style></head><body>
+<div class="header">
+  <h1>Manual Stock Count Barcode Sheet</h1>
+  <div class="meta">Date: ${new Date().toLocaleDateString()}<br/>Time: ${new Date().toLocaleTimeString()}</div>
+</div>
+<div class="stats">
+  <div class="stat"><div class="label">Products</div><div class="val">${list.length}</div></div>
+  <div class="stat"><div class="label">Total Expected Qty</div><div class="val">${totalLabels}</div></div>
+  <div class="stat"><div class="label">Sheets / Copies</div><div class="val">${copies}</div></div>
+  <div class="stat"><div class="label">Barcode Labels</div><div class="val">${list.length * copies}</div></div>
+</div>
+<table>
+<thead><tr><th>#</th><th>Product / Code</th><th>Barcode</th><th>Expected</th><th>Actual Count</th><th>Diff (+/-)</th></tr></thead>
+<tbody>${rows}</tbody>
+</table>
+<div class="footer"><span>Counted by: _____________________</span><span>Verified by: _____________________</span></div>
+</body></html>`;
     openPrintWin(html);
     setBarcodePopup(null);
   };
@@ -10321,13 +10387,18 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         <div style={overlay} onClick={() => setBarcodePopup(null)}>
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 440, maxWidth: '92vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 6px', color: T.teal }}><i className="fas fa-barcode" style={{marginRight: 6}}></i>{t('barcode')}</h3>
-            <div style={{ fontSize: 14, color: T.gray600, marginBottom: 16, fontWeight: 600 }}>{barcodePopup.name}</div>
+            <div style={{ fontSize: 14, color: T.gray600, marginBottom: 4, fontWeight: 600 }}>{barcodePopup.name}</div>
+            <div style={{ fontSize: 13, color: T.gray400, marginBottom: 14 }}>{(() => { const listCount = products.filter((pp: any) => (+pp.stock || 0) > 0).length; return `${listCount} ${t('products') || 'products'} ${t('inStock') || 'in stock'}`; })()}</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <button onClick={() => printAllStockBarcodes(barcodePopup)} style={{ ...btn('primary'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4 }}>
+              <button onClick={() => printAllStockBarcodes()} style={{ ...btn('primary'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4 }}>
                 <span style={{ fontSize: 15, fontWeight: 700 }}><i className="fas fa-boxes-stacked" style={{marginRight: 6}}></i>{t('allStockBarcode') || 'All Stock Barcode'}</span>
                 <span style={{ fontSize: 12, opacity: 0.9, fontWeight: 400 }}>{t('allStockBarcodeHint') || 'Print barcode label for stock'}</span>
               </button>
-              <button onClick={() => printManualCountBarcode(barcodePopup)} style={{ ...btn('ghost'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4, borderColor: T.teal, color: T.teal }}>
+              <button onClick={() => {
+                  const listCount = products.filter((pp: any) => (+pp.stock || 0) > 0).length;
+                  const raw = window.prompt(`${t('manualCountBarcode') || 'Manual Count Barcode'}\n${listCount} ${t('products') || 'products'}\n\n${t('copies') || 'Copies per product'} (1-50):`, '1');
+                  if (raw !== null) printManualCountBarcode(parseInt(raw) || 1);
+                }} style={{ ...btn('ghost'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4, borderColor: T.teal, color: T.teal }}>
                 <span style={{ fontSize: 15, fontWeight: 700 }}><i className="fas fa-clipboard-list" style={{marginRight: 6}}></i>{t('manualCountBarcode') || 'Manual Count Barcode'}</span>
                 <span style={{ fontSize: 12, opacity: 0.8, fontWeight: 400 }}>{t('manualCountBarcodeHint') || 'Print count sheet with barcode'}</span>
               </button>

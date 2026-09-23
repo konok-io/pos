@@ -395,6 +395,7 @@ export const bn: Record<string, string> = {
   deleteCompanyConfirm: 'আপনি কি এই কোম্পানি মুছে ফেলতে চান?',
   deleteCategoryConfirm: 'আপনি কি এই ক্যাটাগরি মুছে ফেলতে চান?',
 clearCartConfirm: 'কার্ট পরিষ্কার করবেন?',
+  copies: 'কপি',
   allStockBarcode: 'অল স্টক বারকোড',
   manualCountBarcode: 'ম্যানুয়াল কাউন্ট বারকোড',
   allStockBarcodeHint: 'স্টক প্রোডাক্টের বারকোড লেবেল প্রিন্ট',
