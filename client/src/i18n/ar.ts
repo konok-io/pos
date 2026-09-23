@@ -390,6 +390,8 @@ export const ar: Record<string, string> = {
   deleteCompanyConfirm: 'هل أنت متأكد أنك تريد حذف هذه الشركة؟',
   deleteCategoryConfirm: 'هل أنت متأكد أنك تريد حذف هذا الفئة؟',
 clearCartConfirm: 'مسح السلة؟',
+  fromDate: 'من تاريخ',
+  toDate: 'إلى تاريخ',
   avgOrder: 'متوسط الطلب',
   howManyBarcodes: 'كمية الباركود؟',
   copies: 'نسخ',

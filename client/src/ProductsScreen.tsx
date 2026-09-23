@@ -997,6 +997,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [purchaseBarcodeId, setPurchaseBarcodeId] = useState('');
+  const [filterFrom, setFilterFrom] = useState('');
+  const [filterTo, setFilterTo] = useState('');
 
 
 
@@ -7681,7 +7683,19 @@ body{font-family:Arial,sans-serif;width:210mm}
     
     const renderPurchaseHistory = () => {
     const q = (search || '').toLowerCase();
+    const inDateRange = (p: any): boolean => {
+      if (!filterFrom && !filterTo) return true;
+      const d = p.date || p.created_at;
+      if (!d) return false;
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return false;
+      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      if (filterFrom && day < filterFrom) return false;
+      if (filterTo && day > filterTo) return false;
+      return true;
+    };
     const list = (purchases || []).filter((p: any) => {
+      if (!inDateRange(p)) return false;
       if (!q) return true;
       return (p.id || '').toLowerCase().includes(q)
         || (p.supplier || '').toLowerCase().includes(q)
@@ -7780,10 +7794,23 @@ tr:nth-child(even){background:#F8FAFC}
           <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); setViewPurchase(null); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
           <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('purchaseHistory')}</span>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div style={{ position: 'relative', width: 240 }}>
+            <div style={{ position: 'relative', width: 200 }}>
               <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
             </div>
+            <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <i className="fas fa-calendar" style={{ color: T.teal }}></i>
+              <input type="date" value={filterFrom} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+            </label>
+            <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
+            <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <input type="date" value={filterTo} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+            </label>
+            {(filterFrom || filterTo) ? (
+              <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}>
+                <i className="fas fa-xmark"></i>
+              </button>
+            ) : null}
             <span style={{ fontSize: 14, color: T.gray400 }}>{list.length}</span>
             <button style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
           </div>
@@ -7799,7 +7826,7 @@ tr:nth-child(even){background:#F8FAFC}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('purchaseHistory')}</div>
                 <div style={{ fontSize: 13, opacity: 0.9 }}>
-                  {list.length} {t('totalPurchases') || 'purchases'} · {suppliersSet.size} {t('suppliers')} · {fmt(totalSpend)}
+                  {list.length} {t('totalPurchases') || 'purchases'} · {suppliersSet.size} {t('suppliers')} · {fmt(totalSpend)}{filterFrom || filterTo ? ` · ${filterFrom || '…'} → ${filterTo || '…'}` : ''}
                 </div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
                   <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>

@@ -387,6 +387,8 @@ export const hi: Record<string, string> = {
   deleteCompanyConfirm: 'क्या आप वाकई इस कंपनी को हटाना चाहते हैं?',
   deleteCategoryConfirm: 'क्या आप वाकई इस श्रेणी को हटाना चाहते हैं?',
 clearCartConfirm: 'कार्ट साफ़ करें?',
+  fromDate: 'तारीख से',
+  toDate: 'तारीख तक',
   avgOrder: 'औसत ऑर्डर',
   howManyBarcodes: 'कितने बारकोड?',
   copies: 'प्रतियाँ',

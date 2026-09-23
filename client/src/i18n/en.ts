@@ -425,6 +425,8 @@ export const en: Record<string, string> = {
   deleteCompanyConfirm: 'Are you sure you want to delete this company?',
   deleteCategoryConfirm: 'Are you sure you want to delete this category?',
 clearCartConfirm: 'Clear the cart?',
+  fromDate: 'From Date',
+  toDate: 'To Date',
   avgOrder: 'Avg Order',
   howManyBarcodes: 'How many barcodes?',
   copies: 'Copies',
