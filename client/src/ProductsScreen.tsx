@@ -7730,12 +7730,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
               )}
             </div>
 
-            {/* Bottom actions */}
-            <div style={{ marginTop: 20, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button onClick={() => setViewProduct(null)} style={{ ...btn('ghost') }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
-              <button onClick={() => { setViewProduct(null); setEditProduct({ ...p }); }} style={{ ...btn() }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || 'Edit'}</button>
-            </div>
-          </div>
+                      </div>
         </div>
       </div>
     );
