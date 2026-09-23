@@ -1633,9 +1633,14 @@ export default function App() {
     // Items HTML
     let itemsHtml = '';
     sale.items.forEach((item: any) => {
+      const qty = +item.quantity || 0;
+      const price = +item.price || 0;
+      const lineTotal = +item.total || price * qty;
       itemsHtml += `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;">
-        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.name} x${item.quantity}</span>
-        <span style="width:70px;text-align:right;">${cur} ${(+item.total || 0).toLocaleString('en-IN')}</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:4px;">${item.name}</span>
+        <span style="width:25px;text-align:center;">${qty}</span>
+        <span style="width:45px;text-align:right;">${(+price).toFixed(2)}</span>
+        <span style="width:60px;text-align:right;">${(+lineTotal).toFixed(2)}</span>
       </div>`;
     });
 
@@ -1683,7 +1688,7 @@ export default function App() {
           label = 'ZATCA ' + (zatcaPhase === 'phase2' ? 'Phase 2' : 'Phase 1');
         } else {
           // Normal QR - structured invoice info
-          const itemCount = (sale.items || []).reduce((sum: number, it: any) => sum + (it.qty || 1), 0);
+          const itemCount = (sale.items || []).reduce((sum: number, it: any) => sum + (+it.quantity || 1), 0);
           const productCount = (sale.items || []).length;
           const saleDate = new Date(sale.date || Date.now());
           const dateStr = saleDate.toLocaleDateString('en-GB');
@@ -1761,7 +1766,7 @@ export default function App() {
   <!-- Invoice Info -->
   <div style="font-size:10px;margin:4px 0;">
     <div><strong>Invoice:</strong> ${sale.invoiceNo}</div>
-    <div><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'})} ${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
+    <div><strong>Date:</strong> ${new Date(sale.date || Date.now()).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'})} ${new Date(sale.date || Date.now()).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
                     ${zatcaPhase === 'phase2' ? 'ZATCA Phase 2' : zatcaPhase === 'phase1' ? 'ZATCA Phase 1' : ''}
   </div>
 
@@ -1812,7 +1817,7 @@ export default function App() {
   <!-- Footer -->
   <div class="footer" style="border-top:1px dashed #ccc;padding-top:6px;margin-top:8px;">
     <div style="font-size:9px;color:#666;margin-top:2px;">Thanks for shopping!</div>
-    <div style="font-size:9px;color:#666;">${new Date().toLocaleDateString('en-GB')}</div>
+    <div style="font-size:9px;color:#666;">${new Date(sale.date || Date.now()).toLocaleDateString('en-GB')}</div>
   </div>
 </body>
 </html>`;
@@ -1855,7 +1860,7 @@ export default function App() {
         posPaidRef.current?.select();
       } else if (e.key === 'Escape') {
         if (cart.length > 0 && (inField ? e.currentTarget !== target : true)) {
-          if (window.confirm(t('clearCart') || 'Clear cart?')) {
+          if (window.confirm(t('clearCartConfirm'))) {
             setCart([]);
             setDiscount('');
             setPaidAmount('');
@@ -1875,7 +1880,7 @@ export default function App() {
       alert(t('cartEmpty'));
       return;
     }
-    if (!window.confirm(t('confirmCompleteSale') || 'Complete this sale?')) return;
+    if (!window.confirm(t('confirmCompleteSale'))) return;
 
     // Check due sales permission
     if (due > 0 && !dueSalesEnabled) {
