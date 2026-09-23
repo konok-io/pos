@@ -387,6 +387,7 @@ export const hi: Record<string, string> = {
   deleteCompanyConfirm: 'क्या आप वाकई इस कंपनी को हटाना चाहते हैं?',
   deleteCategoryConfirm: 'क्या आप वाकई इस श्रेणी को हटाना चाहते हैं?',
 clearCartConfirm: 'कार्ट साफ़ करें?',
+printBlocked: 'प्रिंट विंडो ब्लॉक है! रसीद प्रिंट करने के लिए पॉपअप की अनुमति दें।',
   confirmCompleteSale: 'इस बिक्री को पूरा करें?',
   clearCart: 'कार्ट साफ़ करें?',
   yes: 'हाँ',

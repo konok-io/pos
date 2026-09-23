@@ -425,6 +425,7 @@ export const en: Record<string, string> = {
   deleteCompanyConfirm: 'Are you sure you want to delete this company?',
   deleteCategoryConfirm: 'Are you sure you want to delete this category?',
 clearCartConfirm: 'Clear the cart?',
+printBlocked: 'Print window blocked! Allow popups to print receipt.',
   confirmCompleteSale: 'Complete this sale?',
   clearCart: 'Clear cart?',
   yes: 'Yes',

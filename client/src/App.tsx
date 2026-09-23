@@ -694,6 +694,8 @@ interface HeldSale {
   vatPercent?: string;
   paidAmount?: string;
   paymentMethod?: string;
+  customerId?: string;
+  customerName?: string;
 }
 
 interface Category {
@@ -1562,15 +1564,18 @@ export default function App() {
 
   // Update quantity
   const updateQuantity = (productId: string, delta: number) => {
+    const live = products.find(p => p.id === productId);
+    const liveMax = live ? live.stock : undefined;
     setCart(prev => prev.map(item => {
       if (item.productId === productId) {
         const newQty = item.quantity + delta;
         if (newQty < 1) return item;
-        if (newQty > item.maxStock) {
-          alert(`${t('maxStock')}: ${item.maxStock}`);
+        const cap = liveMax !== undefined ? liveMax : item.maxStock;
+        if (newQty > cap) {
+          alert(`${t('maxStock')}: ${cap}`);
           return item;
         }
-        return { ...item, quantity: newQty };
+        return { ...item, quantity: newQty, maxStock: cap };
       }
       return item;
     }).filter(item => item.quantity > 0));
@@ -1834,6 +1839,8 @@ export default function App() {
       printWindow.document.write(html);
       printWindow.document.close();
       setTimeout(() => { printWindow.print(); }, 500);
+    } else {
+      alert(t('printBlocked') || 'Print window blocked! Allow popups to print receipt.');
     }
   };
 
@@ -1854,12 +1861,14 @@ export default function App() {
       } else if (e.key === 'F4') {
         e.preventDefault();
         if (cart.length > 0) {
-          setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], createdAt: new Date().toISOString(), discount: discount || '', vatPercent: String(vatPercent), paidAmount: paidAmount || '', paymentMethod }]);
+          setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], createdAt: new Date().toISOString(), discount: discount || '', vatPercent: String(vatPercent), paidAmount: paidAmount || '', paymentMethod, customerId: selectedCustomer?.id || '', customerName: selectedCustomer?.name || '' }]);
           setCart([]);
           setDiscount('');
           setPaidAmount('');
           setVatPercent(String(defaultVatPercent));
           setPaymentMethod('cash');
+          setSelectedCustomer(null);
+          setCartCustomerInput('');
         }
       } else if (e.key === 'F8') {
         e.preventDefault();
@@ -1873,6 +1882,7 @@ export default function App() {
             setPaidAmount('');
             setVatPercent(String(defaultVatPercent));
             setSelectedCustomer(null);
+            setCartCustomerInput('');
             setPaymentMethod('cash');
           }
         }
@@ -2015,6 +2025,7 @@ export default function App() {
     setPaidAmount('');
     setVatPercent(String(defaultVatPercent));
     setSelectedCustomer(null);
+    setCartCustomerInput('');
     setPaymentMethod('cash');
     setSearchQuery('');
     setCustomerSearch('');
@@ -2736,6 +2747,13 @@ export default function App() {
                                   if (sale.vatPercent !== undefined) setVatPercent(String(sale.vatPercent));
                                   if (sale.paidAmount !== undefined) setPaidAmount(String(sale.paidAmount || ''));
                                   if (sale.paymentMethod) setPaymentMethod(sale.paymentMethod);
+                                  if (sale.customerId) {
+                                    const heldCust = customers.find(c => c.id === sale.customerId);
+                                    if (heldCust) {
+                                      setSelectedCustomer(heldCust);
+                                      setCartCustomerInput(heldCust.name);
+                                    }
+                                  }
                                   const newHeld = [...heldSales];
                                   newHeld.splice(idx, 1);
                                   setHeldSales(newHeld);
@@ -3434,6 +3452,8 @@ export default function App() {
                         setPaidAmount('');
                         setVatPercent(String(defaultVatPercent));
                         setPaymentMethod('cash');
+                        setSelectedCustomer(null);
+                        setCartCustomerInput('');
                       }
                     }}
                     disabled={cart.length === 0}
@@ -3449,12 +3469,14 @@ export default function App() {
                   <button 
                     onClick={() => {
                       if (cart.length > 0) {
-                        setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], createdAt: new Date().toISOString(), discount: discount || '', vatPercent: String(vatPercent), paidAmount: paidAmount || '', paymentMethod }]);
+                        setHeldSales([...heldSales, { id: `hold-${Date.now()}`, items: [...cart], createdAt: new Date().toISOString(), discount: discount || '', vatPercent: String(vatPercent), paidAmount: paidAmount || '', paymentMethod, customerId: selectedCustomer?.id || '', customerName: selectedCustomer?.name || '' }]);
                         setCart([]);
                         setDiscount('');
                         setPaidAmount('');
                         setVatPercent(String(defaultVatPercent));
                         setPaymentMethod('cash');
+                        setSelectedCustomer(null);
+                        setCartCustomerInput('');
                       }
                     }}
                     disabled={cart.length === 0}
