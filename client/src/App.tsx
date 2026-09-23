@@ -2098,21 +2098,6 @@ export default function App() {
             {/* Date & Time */}
             <TimeDisplay language={language} />
             
-            {/* Sync Status & Button */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 6, fontSize: 11, fontWeight: 600, 
-                background: dataSyncStatus === 'synced' ? '#ECFDF5' : dataSyncStatus === 'offline' ? '#FEF2F2' : '#FFFBE6',
-                color: dataSyncStatus === 'synced' ? '#059669' : dataSyncStatus === 'offline' ? '#DC2626' : '#D97706',
-                border: dataSyncStatus === 'synced' ? '1px solid #A7F3D0' : dataSyncStatus === 'offline' ? '1px solid #FECACA' : '1px solid #FDE68A' }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', 
-                  background: dataSyncStatus === 'synced' ? '#059669' : dataSyncStatus === 'offline' ? '#DC2626' : '#F59E0B' }}></span>
-                <span>{dataSyncStatus === 'synced' ? 'Synced' : dataSyncStatus === 'offline' ? 'Offline' : 'Syncing...'}</span>
-                {dataLastSyncTime && <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.7 }}>({dataLastSyncTime})</span>}
-              </div>
-              <button onClick={syncAllData} disabled={dataSyncStatus === 'pending'} style={{ padding: '6px 10px', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: dataSyncStatus === 'pending' ? 'not-allowed' : 'pointer', background: '#115E59', color: '#fff', opacity: dataSyncStatus === 'pending' ? 0.6 : 1, transition: 'all 0.2s' }}>
-                <i className={dataSyncStatus === 'pending' ? 'fas fa-spinner fa-spin' : 'fas fa-sync'} style={{ marginRight: 4 }}></i> Sync
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -3522,6 +3507,9 @@ export default function App() {
             setPurchases={setPurchases}
             users={users}
             setUsers={setUsers}
+            syncAllData={syncAllData}
+            dataSyncStatus={dataSyncStatus}
+            dataLastSyncTime={dataLastSyncTime}
           />
           )
         )}
@@ -7023,10 +7011,13 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 }
 
 // SettingsScreen Component - extracted from pages/SettingsScreen.tsx
-export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, setProducts, setCustomers, setSales, setSuppliers, setCategories, setPurchases, users, setUsers }: { 
+export function SettingsScreen({ products, customers, sales, suppliers, categories, purchases, setProducts, setCustomers, setSales, setSuppliers, setCategories, setPurchases, users, setUsers, syncAllData, dataSyncStatus, dataLastSyncTime }: { 
   products: any[]; customers: any[]; sales: any[]; suppliers: any[]; categories: any[]; purchases: any[];
   setProducts: any; setCustomers: any; setSales: any; setSuppliers: any; setCategories: any; setPurchases: any;
   users: User[]; setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+  syncAllData: () => Promise<void>;
+  dataSyncStatus: 'synced' | 'pending' | 'offline';
+  dataLastSyncTime: string | null;
 }) {
   const { t } = useLanguage();
 
@@ -7311,7 +7302,20 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
           ))}
         </div>
 
-        {/* Save Button - Right */}
+        {/* Sync + Save - Right */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 6, fontSize: 11, fontWeight: 600, 
+            background: dataSyncStatus === 'synced' ? '#ECFDF5' : dataSyncStatus === 'offline' ? '#FEF2F2' : '#FFFBE6',
+            color: dataSyncStatus === 'synced' ? '#059669' : dataSyncStatus === 'offline' ? '#DC2626' : '#D97706',
+            border: dataSyncStatus === 'synced' ? '1px solid #A7F3D0' : dataSyncStatus === 'offline' ? '1px solid #FECACA' : '1px solid #FDE68A' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', 
+              background: dataSyncStatus === 'synced' ? '#059669' : dataSyncStatus === 'offline' ? '#DC2626' : '#F59E0B' }}></span>
+            <span>{dataSyncStatus === 'synced' ? 'Synced' : dataSyncStatus === 'offline' ? 'Offline' : 'Syncing...'}</span>
+            {dataLastSyncTime && <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.7 }}>({dataLastSyncTime})</span>}
+          </div>
+          <button onClick={syncAllData} disabled={dataSyncStatus === 'pending'} style={{ padding: '6px 10px', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: dataSyncStatus === 'pending' ? 'not-allowed' : 'pointer', background: '#115E59', color: '#fff', opacity: dataSyncStatus === 'pending' ? 0.6 : 1, transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 4 }}>
+            <i className={dataSyncStatus === 'pending' ? 'fas fa-spinner fa-spin' : 'fas fa-sync'}></i> Sync
+          </button>
         <button onClick={save} style={{
           padding: '8px 16px',
           background: saved ? '#059669' : '#115E59',
@@ -7328,6 +7332,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         }}>
           {saved ? <><i className="fas fa-check" style={{marginRight: 4}}></i> {t('saved')}</> : <><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveSettings')}</>}
         </button>
+        </div>
       </div>
 
       {/* Content */}
