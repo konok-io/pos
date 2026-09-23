@@ -7454,6 +7454,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('allProducts')}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
@@ -7490,6 +7491,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('allProducts')}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
@@ -8543,7 +8545,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    { id: 'priceHistory', icon: <i className="fas fa-clock-rotate-left"></i>, label: t('priceHistory') },
 
 
 
@@ -8556,7 +8557,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    { id: 'deleteHistory', icon: <i className="fas fa-trash"></i>, label: t('deleteHistory') },
 
 
 
@@ -8857,6 +8857,10 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
                   <button onClick={() => { exportProductsCsv(); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+
+                  <button onClick={() => { setProductTab('priceHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {t('priceHistory')}</button>
+
+                  <button onClick={() => { setProductTab('deleteHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</button>
 
 
 
