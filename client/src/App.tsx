@@ -1150,7 +1150,9 @@ export default function App() {
   const [showHeldSales, setShowHeldSales] = useState(false);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
   const [lastSale, setLastSale] = useState<Sale | null>(null);
-  const [currency, setCurrency] = useState('৳'); // Currency symbol
+  const [currency, setCurrency] = useState('৳');
+  const [dataSyncStatus, setDataSyncStatus] = useState<'synced' | 'pending' | 'offline'>('synced');
+  const [dataLastSyncTime, setDataLastSyncTime] = useState<string | null>(null);
   const fmt = (n: number) => `${currency} ${(+n || 0).toLocaleString('en-IN')}`;
   
   // Load settings from localDB on startup
@@ -1328,6 +1330,58 @@ export default function App() {
       setIsLoading(false);
     };
     initApp();
+  }, []);
+
+  // Sync all local data to server
+  const syncAllData = async () => {
+    setDataSyncStatus('pending');
+    try {
+      const localCustomers = await db.getAll<any>('customers');
+      if (localCustomers && localCustomers.length > 0) {
+        for (const customer of localCustomers) {
+          if (!customer.id.startsWith('CUST')) {
+            await api.addCustomer(customer).catch(() => {});
+          }
+        }
+      }
+      const localProducts = await db.getAll<any>('products');
+      if (localProducts && localProducts.length > 0) {
+        for (const product of localProducts) {
+          if (!product.id.startsWith('auto-')) {
+            await api.addProduct(product).catch(() => {});
+          }
+        }
+      }
+      const localSales = await db.getAll<any>('sales');
+      if (localSales && localSales.length > 0) {
+        for (const sale of localSales) {
+          await api.addSale(sale).catch(() => {});
+        }
+      }
+      setDataSyncStatus('synced');
+      setDataLastSyncTime(new Date().toLocaleString());
+      console.log('Auto-sync completed');
+    } catch (e) {
+      console.error('Sync failed:', e);
+      setDataSyncStatus('pending');
+    }
+  };
+
+  // Auto-sync when online
+  useEffect(() => {
+    const handleOnline = () => {
+      setDataSyncStatus('pending');
+      syncAllData();
+    };
+    const handleOffline = () => {
+      setDataSyncStatus('offline');
+    };
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   // Save cart state to IndexedDB whenever it changes (only after initial load)
@@ -2043,6 +2097,22 @@ export default function App() {
 
             {/* Date & Time */}
             <TimeDisplay language={language} />
+            
+            {/* Sync Status & Button */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', borderRadius: 6, fontSize: 11, fontWeight: 600, 
+                background: dataSyncStatus === 'synced' ? '#ECFDF5' : dataSyncStatus === 'offline' ? '#FEF2F2' : '#FFFBE6',
+                color: dataSyncStatus === 'synced' ? '#059669' : dataSyncStatus === 'offline' ? '#DC2626' : '#D97706',
+                border: dataSyncStatus === 'synced' ? '1px solid #A7F3D0' : dataSyncStatus === 'offline' ? '1px solid #FECACA' : '1px solid #FDE68A' }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', 
+                  background: dataSyncStatus === 'synced' ? '#059669' : dataSyncStatus === 'offline' ? '#DC2626' : '#F59E0B' }}></span>
+                <span>{dataSyncStatus === 'synced' ? 'Synced' : dataSyncStatus === 'offline' ? 'Offline' : 'Syncing...'}</span>
+                {dataLastSyncTime && <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.7 }}>({dataLastSyncTime})</span>}
+              </div>
+              <button onClick={syncAllData} disabled={dataSyncStatus === 'pending'} style={{ padding: '6px 10px', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: dataSyncStatus === 'pending' ? 'not-allowed' : 'pointer', background: '#115E59', color: '#fff', opacity: dataSyncStatus === 'pending' ? 0.6 : 1, transition: 'all 0.2s' }}>
+                <i className={dataSyncStatus === 'pending' ? 'fas fa-spinner fa-spin' : 'fas fa-sync'} style={{ marginRight: 4 }}></i> Sync
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -8018,7 +8088,7 @@ export function TranslationSettings() {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
   const [saving, setSaving] = useState(false);
-  const [syncStatus, setSyncStatus] = useState<string>('');
+  const [transSyncStatus, setTransSyncStatus] = useState<string>('');
 
   // Get all translation keys from default translations
   const allKeys = Object.keys(defaultTranslations.en);
@@ -8049,10 +8119,10 @@ export function TranslationSettings() {
   };
 
   const handleSync = async () => {
-    setSyncStatus('syncing');
+    setTransSyncStatus('syncing');
     await syncTranslations();
-    setSyncStatus('Synced!');
-    setTimeout(() => setSyncStatus(''), 2000);
+    setTransSyncStatus('Synced!');
+    setTimeout(() => setTransSyncStatus(''), 2000);
   };
 
   // Get display value for a key
@@ -8072,18 +8142,18 @@ export function TranslationSettings() {
         <h2 style={{ margin: 0 }}><i className="fas fa-globe" style={{marginRight: 4}}></i> Translation Settings</h2>
         <button
           onClick={handleSync}
-          disabled={syncStatus === 'syncing'}
+          disabled={transSyncStatus === 'syncing'}
           style={{
             padding: '8px 16px',
-            background: syncStatus ? '#22C55E' : '#0F766E',
+            background: transSyncStatus ? '#22C55E' : '#0F766E',
             color: 'white',
             border: 'none',
             borderRadius: 8,
-            cursor: syncStatus ? 'default' : 'pointer',
+            cursor: transSyncStatus ? 'default' : 'pointer',
             fontWeight: 600,
           }}
         >
-          {syncStatus === 'syncing' ? t('syncing') : syncStatus || t('syncFromCode')}
+          {transSyncStatus === 'syncing' ? t('syncing') : transSyncStatus || t('syncFromCode')}
         </button>
       </div>
 
