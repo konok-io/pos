@@ -8,33 +8,6 @@ import { initDatabase } from './services/localDb';
 import { initializeLocalData } from './services/offlineApi';
 import { useAuthStore } from './store/authStore';
 
-// Loading screen component
-function LoadingScreen() {
-  return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100vh',
-      background: '#0F766E',
-      color: 'white',
-      fontFamily: 'system-ui, sans-serif'
-    }}>
-      <div style={{ fontSize: '48px', marginBottom: '20px' }}>🏪</div>
-      <div style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '10px' }}>POS Management</div>
-      <div style={{ fontSize: '16px', opacity: 0.8 }}>অফলাইনে কাজ করতে প্রস্তুত...</div>
-      <div style={{ marginTop: '30px', fontSize: '40px', animation: 'pulse 1s infinite' }}>⏳</div>
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
-        }
-      `}</style>
-    </div>
-  );
-}
-
 // Simple error boundary component
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -113,10 +86,6 @@ function AppWrapper() {
   const checkAuth = useAuthStore(state => state.checkAuth);
 
   useEffect(() => {
-    dismissBootPreloader();
-  }, []);
-
-  useEffect(() => {
     async function initialize() {
       try {
         // Initialize IndexedDB
@@ -138,8 +107,15 @@ function AppWrapper() {
     initialize();
   }, [checkAuth]);
 
+  // Finance-style: hide HTML boot loader only when app is ready
+  useEffect(() => {
+    if (isReady) {
+      dismissBootPreloader();
+    }
+  }, [isReady]);
+
   if (!isReady) {
-    return <LoadingScreen />;
+    return null; // HTML #preloader in index.html stays visible
   }
 
   return <App />;

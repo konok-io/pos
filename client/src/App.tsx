@@ -741,18 +741,6 @@ interface Sale {
 }
 
 // Loading Screen
-function LoadingScreen() {
-  const { t } = useLanguage();
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F766E', color: 'white', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
-      <div style={{ width: 50, height: 50, border: '4px solid rgba(255,255,255,0.2)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
-      <h3 style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>{t('posManagementSystem')}</h3>
-      <p style={{ marginTop: 8, opacity: 0.8 }}>{t('loading')}</p>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-}
-
 // Login Screen
 function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [username, setUsername] = useState('admin');
@@ -986,14 +974,31 @@ function TimeDisplay({ language }: { language: string }) {
 
 function TabLoader({ text }: { text?: string }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', background: '#F9FAFB', borderRadius: 12, margin: 16, minHeight: 200 }}>
-      <div style={{
-        width: 40, height: 40, border: '4px solid #E5E7EB', borderTopColor: '#115E59',
-        borderRadius: '50%', animation: 'spin 0.8s linear infinite',
-      }} />
-      <div style={{ marginTop: 16, fontSize: 15, color: '#6B7280', fontWeight: 500 }}>
-        {text || 'Loading...'}
+    <div style={{ padding: '24px 16px', minHeight: 320 }} aria-busy="true" aria-live="polite">
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+        <div style={{ width: 36, height: 36, borderRadius: 10, background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 18, height: 18, border: '3px solid rgba(255,255,255,0.35)', borderTopColor: '#fff', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+        </div>
+        <div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>{text || 'Loading data...'}</div>
+          <div style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>Please wait while we load this section</div>
+        </div>
       </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 14 }}>
+        {[0,1,2,3,4,5].map(i => (
+          <div key={i} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, padding: 16 }}>
+            <div className="pos-skel" style={{ height: 14, width: '55%', borderRadius: 6, marginBottom: 12 }} />
+            <div className="pos-skel" style={{ height: 28, width: '40%', borderRadius: 6, marginBottom: 14 }} />
+            <div className="pos-skel" style={{ height: 10, width: '85%', borderRadius: 6, marginBottom: 8 }} />
+            <div className="pos-skel" style={{ height: 10, width: '70%', borderRadius: 6 }} />
+          </div>
+        ))}
+      </div>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .pos-skel { background: linear-gradient(90deg, #EEF2F7 25%, #F8FAFC 50%, #EEF2F7 75%); background-size: 200% 100%; animation: pos-shimmer 1.2s ease-in-out infinite; }
+        @keyframes pos-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+      `}</style>
     </div>
   );
 }
@@ -1003,6 +1008,7 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false); // Prevent save before initial load
+  const [tabLoading, setTabLoading] = useState(false); // Show skeleton on every tab click
   const [currentTab, setCurrentTab] = useState(() => {
     // Load saved tab from localStorage
     const savedTab = localStorage.getItem('pos_current_tab');
@@ -1024,6 +1030,14 @@ export default function App() {
     if (isInitialized) {
       localStorage.setItem('pos_current_tab', currentTab);
     }
+  }, [currentTab, isInitialized]);
+
+  // Finance-style: show data-loading skeleton on every tab switch
+  useEffect(() => {
+    if (!isInitialized) return;
+    setTabLoading(true);
+    const timer = window.setTimeout(() => setTabLoading(false), 420);
+    return () => window.clearTimeout(timer);
   }, [currentTab, isInitialized]);
 
   // Language state
@@ -1931,7 +1945,7 @@ export default function App() {
     setPaymentMethod('cash');
   };
 
-  if (isLoading) return <LoadingScreen />;
+  if (isLoading) return null;
   if (!isLoggedIn) return <LoginScreen onLogin={handleLogin} />;
 
   return (
@@ -2092,6 +2106,7 @@ export default function App() {
       {/* Content */}
       <div style={{ flex: 1, overflow: 'hidden', width: '100%' }}>
         {currentTab === 'pos' && (
+          (isInitialized && tabLoading) ? <TabLoader /> : (
           <div style={{ display: 'flex', height: '100%', overflow: 'hidden', width: '100%', background: '#F9FAFB' }}>
             {/* -- LEFT: Products -- */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', minWidth: 0, position: 'relative' }}>
@@ -3371,10 +3386,11 @@ export default function App() {
             onClose={() => setIsAddCustomerModalOpen(false)}
             onSave={handleAddCustomerFromPOS}
           />
+        )
         )}
 
         {currentTab === 'products' && (
-          (!isInitialized ? <TabLoader /> : <ProductsScreen
+          (!isInitialized || tabLoading ? <TabLoader /> : <ProductsScreen
             products={products}
             suppliers={suppliers}
             categories={categories}
@@ -3390,7 +3406,7 @@ export default function App() {
         )}
 
         {currentTab === 'customers' && (
-          (!isInitialized ? <TabLoader /> : <CustomerManagement
+          (!isInitialized || tabLoading ? <TabLoader /> : <CustomerManagement
             customers={customers}
             setCustomers={setCustomers}
             sales={sales}
@@ -3401,7 +3417,7 @@ export default function App() {
         )}
 
         {currentTab === 'reports' && (
-          (!isInitialized ? <TabLoader /> : <div>
+          (!isInitialized || tabLoading ? <TabLoader /> : <div>
             <h2 style={{ marginBottom: 16 }}><i className="fas fa-chart-line" style={{marginRight: 4}}></i> {t('reports')}</h2>
             <div className="stats-grid">
               <div className="stat-card">
@@ -3479,7 +3495,7 @@ export default function App() {
         )}
 
         {currentTab === 'settings' && (
-          (!isInitialized ? <TabLoader /> : <SettingsScreen 
+          (!isInitialized || tabLoading ? <TabLoader /> : <SettingsScreen 
             products={products}
             customers={customers}
             sales={sales}
@@ -3502,7 +3518,7 @@ export default function App() {
         )}
 
         {currentTab === 'newproduct' && (
-          (!isInitialized ? <TabLoader /> : <NewProductTab 
+          (!isInitialized || tabLoading ? <TabLoader /> : <NewProductTab 
             products={products} 
             suppliers={suppliers}
             categories={categories}
@@ -3554,7 +3570,7 @@ export default function App() {
         )}
 
         {currentTab === 'barcode' && (
-          (!isInitialized ? <TabLoader /> : <div>
+          (!isInitialized || tabLoading ? <TabLoader /> : <div>
             <h2 style={{ marginBottom: 16 }}><i className="fas fa-barcode" style={{marginRight: 4}}></i> {t('barcode')}</h2>
             <div className="card" style={{ maxWidth: 500 }}>
               <div className="form-group">
@@ -3572,7 +3588,7 @@ export default function App() {
         )}
 
         {currentTab === 'suppliers' && (
-          (!isInitialized ? <TabLoader /> : <SuppliersScreen 
+          (!isInitialized || tabLoading ? <TabLoader /> : <SuppliersScreen 
             suppliers={suppliers}
             setSuppliers={setSuppliers}
             categories={categories}
@@ -3586,7 +3602,7 @@ export default function App() {
         )}
 
         {currentTab === 'inventory' && (
-          (!isInitialized ? <TabLoader /> : <div>
+          (!isInitialized || tabLoading ? <TabLoader /> : <div>
             <h2 style={{ marginBottom: 16 }}><i className="fas fa-warehouse" style={{marginRight: 4}}></i> {t('stock')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
@@ -3616,7 +3632,7 @@ export default function App() {
         )}
 
         {currentTab === 'income' && (
-          (!isInitialized ? <TabLoader /> : <div>
+          (!isInitialized || tabLoading ? <TabLoader /> : <div>
             <h2 style={{ marginBottom: 16 }}><i className="fas fa-money-bill" style={{marginRight: 4}}></i> {t('incomeExpenses')}</h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
               <div className="card" style={{ background: '#F0FDF4', border: '1px solid #BBF7D0' }}>
