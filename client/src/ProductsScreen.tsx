@@ -7459,6 +7459,78 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+  const renderViewProduct = () => {
+    if (!viewProduct) return null;
+    const p = viewProduct;
+    const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
+    const profit = (p.sellPrice || 0) - (p.costPrice || 0);
+    const low = p.stock > 0 && p.stock <= (p.minStock || 5);
+    const fields: [string, any][] = [
+      [t('productName'), p.name || '-'],
+      [t('barcode'), p.code || '-'],
+      [t('company'), p.company || '-'],
+      [t('category'), p.cat || '-'],
+      [t('purchasePrice'), fmt(p.costPrice)],
+      [t('sellPrice'), fmt(p.sellPrice)],
+      [t('profit'), `${fmt(profit)} (${pct}%)`],
+      [t('stock'), `${p.stock ?? 0} ${p.unit || ''}`],
+      [t('minStock'), `${p.minStock || 5} ${p.unit || ''}`],
+      [t('unit'), p.unit || '-'],
+      [t('expiryDate'), p.expiryDate || '-'],
+      [t('vat'), p.vat != null ? `${p.vat}%` : '-'],
+      [t('supplier') || t('suppliers'), p.company || p.supplierId || '-'],
+      [t('description') || 'Description', p.description || '-'],
+    ];
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+          <button style={{ ...btn('ghost', 'sm') }} onClick={() => setViewProduct(null)}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
+          <span style={{ fontWeight: 700, fontSize: 16, color: T.teal }}><i className="fas fa-clipboard-list" style={{marginRight: 6}}></i> {t('productDetails')}</span>
+          <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{p.name}</span>
+        </div>
+        <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
+          <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, padding: 20, maxWidth: 900 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20, paddingBottom: 16, borderBottom: `1px solid ${T.gray100}` }}>
+              <div style={{ width: 56, height: 56, borderRadius: 12, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <i className="fas fa-box" style={{ color: T.teal, fontSize: 24 }}></i>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: 20, color: T.gray900 }}>{p.name}</div>
+                <div style={{ fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{p.code || '-'}</div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontWeight: 700, fontSize: 22, color: T.teal }}>{fmt(p.sellPrice)}</div>
+                <div style={{ fontSize: 13, color: profit > 0 ? T.green : profit < 0 ? T.red : T.gray400 }}>{t('profit')}: {fmt(profit)} ({pct}%)</div>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 14 }}>
+              {fields.map(([label, value]) => (
+                <div key={label} style={{ padding: '10px 12px', background: T.gray50, borderRadius: 8 }}>
+                  <div style={{ fontSize: 12, color: T.gray400, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.4 }}>{label}</div>
+                  <div style={{ fontWeight: 600, fontSize: 15, color: T.gray900, wordBreak: 'break-word' }}>{value}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 18, display: 'flex', gap: 10 }}>
+              <span style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 700, background: p.stock <= 0 ? T.redLight : low ? '#FEF3C7' : '#DCFCE7', color: p.stock <= 0 ? T.red : low ? '#B45309' : T.green }}>
+                {p.stock <= 0 ? t('outOfStock') || 'Out of Stock' : low ? t('lowStock') || 'Low Stock' : t('inStock') || 'In Stock'}
+              </span>
+              {p.expiryDate && isExpiringSoon(p.expiryDate) && (
+                <span style={{ padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 700, background: '#FFF1F2', color: '#E11D48' }}>
+                  <i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i>{t('expiryDate')}: {p.expiryDate}
+                </span>
+              )}
+            </div>
+            <div style={{ marginTop: 20, display: 'flex', gap: 10 }}>
+              <button onClick={() => { setViewProduct(null); setEditFullProduct({ ...p }); }} style={{ ...btn() }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || t('editProduct')}</button>
+              <button onClick={() => setViewProduct(null)} style={{ ...btn('ghost') }}>{t('close')}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderPriceHistory = () => {
     const rows = stockHistory.filter((h: any) => h.type === 'price');
     return (
@@ -9747,7 +9819,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-        {productTab === 'allProducts' && renderAllProducts()}
+                {viewProduct && renderViewProduct()}
+
+{!viewProduct && productTab === 'allProducts' && renderAllProducts()}
 
 
 
@@ -9759,7 +9833,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-        {productTab === 'newProduct' && (
+        {!viewProduct && productTab === 'newProduct' && (
           <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
             {/* LEFT: Supplier + Category + Product Form */}
             <div style={{ flex: '0 0 420px', borderRight: `1px solid ${T.gray200}`, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: T.white }}>
@@ -10059,7 +10133,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           </div>
         )}
 
-        {productTab === 'suppliers' && renderSupplier()}
+        {!viewProduct && productTab === 'suppliers' && renderSupplier()}
 
 
 
@@ -10071,7 +10145,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-        {productTab === 'categories' && renderCategory()}
+        {!viewProduct && productTab === 'categories' && renderCategory()}
 
 
 
@@ -10083,7 +10157,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-        {productTab === 'barcode' && renderBarcode()}
+        {!viewProduct && productTab === 'barcode' && renderBarcode()}
 
 
 
@@ -10095,11 +10169,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-        {productTab === 'stock' && renderStock()}
+        {!viewProduct && productTab === 'stock' && renderStock()}
 
-        {productTab === 'priceHistory' && renderPriceHistory()}
+        {!viewProduct && productTab === 'priceHistory' && renderPriceHistory()}
 
-        {productTab === 'deleteHistory' && renderDeleteHistory()}
+        {!viewProduct && productTab === 'deleteHistory' && renderDeleteHistory()}
 
 
 
@@ -10279,151 +10353,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-      {viewProduct && (
-
-
-
-
-
-
-
-
-
-
-
-        <div style={overlay} onClick={() => setViewProduct(null)}>
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-
-
-
-
-
-
-
-
-
-
-
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-clipboard-list" style={{marginRight: 4}}></i> {t('productDetails')}</h3>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
-
-
-
-
-
-
-
-
-
-
-
-              {[[t('productName'), viewProduct.name], [t('barcode'), viewProduct.code || '-'], [t('company'), viewProduct.company || '-'], [t('category'), viewProduct.cat || '-'], [t('purchasePrice'), fmt(viewProduct.costPrice)], [t('sellPrice'), fmt(viewProduct.sellPrice)], [t('stock'), `${viewProduct.stock} ${viewProduct.unit}`], [t('minStock'), `${viewProduct.minStock || 5} ${viewProduct.unit}`]].map(([label, value]) => (
-
-
-
-
-
-
-
-
-
-
-
-                <div key={label}><div style={{ fontSize: 13, color: T.gray400, marginBottom: 4 }}>{label}</div><div style={{ fontWeight: 600, fontSize: 14 }}>{value}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-              ))}
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <button onClick={() => setViewProduct(null)} style={{ ...btn(), width: '100%' }}>{t('close')}</button>
-
-
-
-
-
-
-
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-      )}
+      
 
 
 
