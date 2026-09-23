@@ -1159,8 +1159,6 @@ export default function App() {
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
   const [heldSales, setHeldSales] = useState<HeldSale[]>([]);
   const [showHeldSales, setShowHeldSales] = useState(false);
-  const [showReceiptModal, setShowReceiptModal] = useState(false);
-  const [lastSale, setLastSale] = useState<Sale | null>(null);
   const [currency, setCurrency] = useState('৳');
   const [dataSyncStatus, setDataSyncStatus] = useState<'synced' | 'pending' | 'offline'>('synced');
   const [dataLastSyncTime, setDataLastSyncTime] = useState<string | null>(null);
@@ -1911,8 +1909,7 @@ export default function App() {
     }
 
     setSales(prev => [...prev, sale]);
-    setLastSale(sale);
-    setShowReceiptModal(true);
+    // No popup: print directly to thermal printer
 
     // Submit to ZATCA if Phase 2 configured
     if (settings.zatcaPhase === 'phase2') {
@@ -3672,78 +3669,6 @@ export default function App() {
         )}
       </div>
 
-      {/* Receipt Modal */}
-      {showReceiptModal && lastSale && (
-        <div className="modal-overlay" onClick={() => setShowReceiptModal(false)}>
-          <div className="modal" style={{ maxWidth: 400 }} onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3><i className="fas fa-check" style={{marginRight: 4}}></i> {t('saleComplete')}</h3>
-              <button className="modal-close" onClick={() => setShowReceiptModal(false)}><i className="fas fa-xmark"></i></button>
-            </div>
-            <div className="modal-body">
-              <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <div style={{ fontSize: 48 }}><i className="fas fa-check"></i></div>
-                <p style={{ fontSize: 14, color: '#6B7280' }}>{t('invoice')}: {lastSale.invoiceNo}</p>
-              </div>
-              <div style={{ borderBottom: '1px dashed #E5E7EB', paddingBottom: 12, marginBottom: 12 }}>
-                <p style={{ margin: 0, fontWeight: 600 }}>{t('customer')}: {lastSale.customerName}</p>
-              </div>
-              {lastSale.items.map((item: any, i: number) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0' }}>
-                  <span>{item.name} × {item.quantity}</span>
-                  <span>{fmt(item.total)}</span>
-                </div>
-              ))}
-              <div style={{ borderTop: '2px solid #E5E7EB', marginTop: 12, paddingTop: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>{t('subtotal')}:</span>
-                  <span>{fmt(lastSale.subtotal)}</span>
-                </div>
-                {lastSale.discount > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>{t('discount')}:</span>
-                    <span>-{fmt(lastSale.discount)}</span>
-                  </div>
-                )}
-                {lastSale.vatAmount > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>{t('vat')} ({lastSale.vatPercent}%):</span>
-                    <span>{fmt(lastSale.vatAmount)}</span>
-                  </div>
-                )}
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 18, marginTop: 8 }}>
-                  <span>{t('total')}:</span>
-                  <span style={{ color: '#115E59' }}>{fmt(lastSale.total)}</span>
-                </div>
-                {lastSale.paid > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span>{t('paid')}:</span>
-                    <span>{fmt(lastSale.paid)}</span>
-                  </div>
-                )}
-                {lastSale.change > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#10B981' }}>
-                    <span>{t('change')}:</span>
-                    <span>{fmt(lastSale.change)}</span>
-                  </div>
-                )}
-                {lastSale.due > 0 && (
-                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#EF4444' }}>
-                    <span>{t('due')}:</span>
-                    <span>{fmt(lastSale.due)}</span>
-                  </div>
-                )}
-              </div>
-              <button className="btn btn-lg btn-block" style={{ marginTop: 10, background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, padding: '12px 0', fontSize: 14, fontWeight: 600, cursor: 'pointer', width: '100%' }} onClick={async () => { if (lastSale) await printReceipt(lastSale); }}>
-                <i className="fas fa-print" style={{marginRight: 4}}></i> Print Receipt
-              </button>
-              <button className="btn btn-primary btn-lg btn-block" style={{ marginTop: 20 }} onClick={() => setShowReceiptModal(false)}>
-                <i className="fas fa-check" style={{marginRight: 4}}></i> {t('finish')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
