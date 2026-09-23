@@ -731,7 +731,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [deleteHistory, setDeleteHistory] = useState<any[]>([]);
+  const [deleteHistory] = useState<any[]>([]);
 
 
 
@@ -2495,112 +2495,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const deleteProduct = (id: string) => {
-
-
-
-
-
-
-
-
-
-
-
-    const product = products.find((p: any) => p.id === id);
-
-
-
-
-
-
-
-
-
-
-
-    if (!product) return;
-
-
-
-
-
-
-
-
-
-
-
-    if (!window.confirm(`"${product.name}" ${t('confirmDelete')}`)) return;
-
-
-
-
-
-
-
-
-
-
-
-    const updated = products.filter((p: any) => p.id !== id);
-    setDeleteHistory(prev => [{
-      id: product.id,
-      name: product.name,
-      code: product.code || '',
-      stock: product.stock || 0,
-      costPrice: product.costPrice || 0,
-      sellPrice: product.sellPrice || 0,
-      deletedAt: new Date().toISOString(),
-    }, ...prev].slice(0, 200));
-
-
-
-
-
-
-
-
-
-
-
-    setProducts(updated);
-
-
-
-
-
-
-
-
-
-
-
-    setProductsParent(updated);
-
-
-
-
-
-
-
-
-
-
-
-    api.deleteProduct(id).catch(() => {});
-
-
-
-
-
-
-
-
-
-
-
-  };
+  
 
 
 
@@ -5207,7 +5102,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                    {p.stock <= 0 ? <button style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => deleteProduct(p.id)}><i className="fas fa-trash"></i></button> : <button disabled style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: 0.4, cursor: 'not-allowed' }}><i className="fas fa-lock"></i></button>}
+                    
 
 
 
