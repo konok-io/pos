@@ -1275,40 +1275,38 @@ export default function App() {
               }
       }
       
-      // Load all data from MySQL API first, fallback to IndexedDB
-      try {
-        const [apiProducts, apiCategories, apiSuppliers, apiCustomers, apiSales] = await Promise.all([
-          api.getProducts().catch((e) => { console.error('getProducts failed:', e); return []; }),
-          api.getCategories().catch((e) => { console.error('getCategories failed:', e); return []; }),
-          api.getSuppliers().catch((e) => { console.error('getSuppliers failed:', e); return []; }),
-          api.getCustomers().catch((e) => { console.error('getCustomers failed:', e); return []; }),
-          api.getSales().catch((e) => { console.error('getSales failed:', e); return []; }),
-        ]);
-
-        if (apiProducts && apiProducts.length > 0) setProducts(apiProducts);
-        if (apiCategories && apiCategories.length > 0) setCategories(apiCategories);
-        if (apiSuppliers && apiSuppliers.length > 0) setSuppliers(apiSuppliers);
-        if (apiSales && apiSales.length > 0) setSales(apiSales);
-
-        if (apiCustomers && apiCustomers.length > 0) {
-          const savedTransactions = await db.getAll<any>('transactions').catch(() => []);
-          const customersWithTransactions = apiCustomers.map((customer: any) => {
-            const customerTransactions = savedTransactions.filter((tx: any) => tx.customerId === customer.id);
-            return { ...customer, transactions: customerTransactions.length > 0 ? customerTransactions : (customer.transactions || []) };
-          });
-          setCustomers(customersWithTransactions);
+      // Load all data from MySQL API first; fall back to IndexedDB only when API fails
+      const loadOrFallback = async <T,>(loader: () => Promise<T[] | any>, store: string): Promise<T[]> => {
+        try {
+          const data = await loader();
+          return (Array.isArray(data) ? data : []) as T[];
+        } catch (e) {
+          console.error(`API failed for ${store}, loading IndexedDB fallback:`, e);
+          const local = await db.getAll<any>(store).catch(() => []);
+          return (local || []) as T[];
         }
-      } catch (e) {
-        console.error('API load failed, falling back to IndexedDB:', e);
-        // Fallback to IndexedDB
-        const savedProducts = await db.getAll<any>('products');
-        if (savedProducts && savedProducts.length > 0) setProducts(savedProducts);
-        const savedCategories = await db.getAll<any>('categories');
-        if (savedCategories && savedCategories.length > 0) setCategories(savedCategories);
-        const savedCustomers = await db.getAll<any>('customers');
-        if (savedCustomers && savedCustomers.length > 0) setCustomers(savedCustomers);
-        const savedSales = await db.getAll<any>('sales');
-        if (savedSales && savedSales.length > 0) setSales(savedSales);
+      };
+
+      const [apiProducts, apiCategories, apiSuppliers, apiCustomers, apiSales] = await Promise.all([
+        loadOrFallback<Product>(() => api.getProducts(), 'products'),
+        loadOrFallback<Category>(() => api.getCategories(), 'categories'),
+        loadOrFallback<any>(() => api.getSuppliers(), 'suppliers'),
+        loadOrFallback<Customer>(() => api.getCustomers(), 'customers'),
+        loadOrFallback<Sale>(() => api.getSales(), 'sales'),
+      ]);
+
+      if (apiProducts.length > 0) setProducts(apiProducts);
+      if (apiCategories.length > 0) setCategories(apiCategories);
+      if (apiSuppliers.length > 0) setSuppliers(apiSuppliers);
+      if (apiSales.length > 0) setSales(apiSales);
+
+      if (apiCustomers.length > 0) {
+        const savedTransactions = await db.getAll<any>('transactions').catch(() => []);
+        const customersWithTransactions = apiCustomers.map((customer: any) => {
+          const customerTransactions = savedTransactions.filter((tx: any) => tx.customerId === customer.id);
+          return { ...customer, transactions: customerTransactions.length > 0 ? customerTransactions : (customer.transactions || []) };
+        });
+        setCustomers(customersWithTransactions);
       }
 
       // Ensure General Customer exists

@@ -30,25 +30,8 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Do NOT precache HTML - always fetch fresh from network on navigation
-        globPatterns: ['**/*.{js,css,ico,png,svg}'],
-        navigateFallback: null,
-        skipWaiting: true,
-        clientsClaim: true,
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         runtimeCaching: [
-          {
-            // HTML navigations: network first, fallback to cache only when offline
-            urlPattern: ({ url }) => url.pathname === '/' || url.pathname.endsWith('.html'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'html-pages',
-              networkTimeoutSeconds: 3,
-              expiration: {
-                maxEntries: 5,
-                maxAgeSeconds: 60 * 60 * 24,
-              },
-            },
-          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -59,10 +42,6 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 365,
               },
             },
-          },
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/'),
-            handler: 'NetworkOnly',
           },
         ],
       },
