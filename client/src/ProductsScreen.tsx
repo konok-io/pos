@@ -2658,7 +2658,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const exportProductsCsv = () => {
     const headers = ['Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Profit', 'Stock', 'MinStock', 'ExpiryDate'];
-    const srcList = filteredProducts;
+    const apFrom3 = filterFrom || '';
+    const apTo3 = filterTo || '';
+    const srcList = filteredProducts.filter((p: any) => {
+      if (!apFrom3 && !apTo3) return true;
+      const raw = p.createdAt || p.created_at || '';
+      if (!raw) return false;
+      const dt = new Date(raw);
+      if (isNaN(dt.getTime())) return false;
+      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      if (apFrom3 && day < apFrom3) return false;
+      if (apTo3 && day > apTo3) return false;
+      return true;
+    });
     const rows = srcList.map((p: any) => {
       const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
       return [p.name, p.code || '', p.company || '', p.cat || '', p.unit, p.costPrice, p.sellPrice, ((+p.sellPrice || 0) - (+p.costPrice || 0)), p.stock, p.minStock || 5, p.expiryDate || ''].map(esc).join(',');
@@ -3242,7 +3254,19 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const printProductList = () => {
-    const list = filteredProducts;
+    const apFrom2 = filterFrom || '';
+    const apTo2 = filterTo || '';
+    const list = filteredProducts.filter((p: any) => {
+      if (!apFrom2 && !apTo2) return true;
+      const raw = p.createdAt || p.created_at || '';
+      if (!raw) return false;
+      const dt = new Date(raw);
+      if (isNaN(dt.getTime())) return false;
+      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      if (apFrom2 && day < apFrom2) return false;
+      if (apTo2 && day > apTo2) return false;
+      return true;
+    });
     const rows = list.map((p: any) => {
       const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
       return `<tr><td>${p.name}${p.code ? ` (${p.code})` : ''}</td><td>${p.company || '-'}</td><td>${p.cat || '-'}</td><td>${fmt(p.costPrice)}</td><td>${fmt(p.sellPrice)}</td><td>${fmt(p.sellPrice - p.costPrice)} (${pct}%)</td><td>${p.stock}</td><td>${p.unit}</td><td>${p.expiryDate || '-'}</td></tr>`;
@@ -4493,114 +4517,44 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-  const renderAllProducts = () => (
-
-
-
-
-
-
-
-
-
-
-
+  const renderAllProducts = () => {
+    const apFrom = filterFrom || '';
+    const apTo = filterTo || '';
+    const inApDate = (p: any): boolean => {
+      if (!apFrom && !apTo) return true;
+      const raw = p.createdAt || p.created_at || p.updatedAt || '';
+      if (!raw) return false;
+      const dt = new Date(raw);
+      if (isNaN(dt.getTime())) return false;
+      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      if (apFrom && day < apFrom) return false;
+      if (apTo && day > apTo) return false;
+      return true;
+    };
+    const dateFiltered = filteredProducts.filter(inApDate);
+    return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-
-
-
-
-
-
-
-
-
-
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
+      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-
-
-
-
-
-
-
-
-
-
-
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-
-
-
-
-
-
-
-
-
-
-
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
-
-
-
-
-
-
-
-
-
-
-
         </div>
-
-
-
-
-
-
-
-
-
-
-
-        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredProducts.length}</span>
-
-
-
-
-
-
-
-
-
-
-
+        <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <i className="fas fa-calendar" style={{ color: T.teal }}></i>
+          <input type="date" value={apFrom} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+        </label>
+        <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
+        <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <input type="date" value={apTo} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+        </label>
+        {(apFrom || apTo) ? (
+          <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}>
+            <i className="fas fa-xmark"></i>
+          </button>
+        ) : null}
+        <span style={{ fontSize: 14, color: T.gray400 }}>{dateFiltered.length}</span>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={exportProductsCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
         <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-
-
-
-
-
-
-
-
-
-
-
       </div>
 
 
@@ -4709,7 +4663,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-            {filteredProducts.length === 0 ? (
+            {dateFiltered.length === 0 ? (
 
 
 
@@ -4733,7 +4687,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-            ) : filteredProducts.map((p: any, i: number) => {
+            ) : dateFiltered.map((p: any, i: number) => {
 
 
 
@@ -5038,30 +4992,10 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   );
+  };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  const renderSupplier = () => (
+const renderSupplier = () => (
 
 
 
