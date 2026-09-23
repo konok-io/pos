@@ -1522,29 +1522,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const filteredProducts = products.filter((p: any) => {
-
-
-
-
-
-
-
-
-
-
-
+    if ((+p.stock || 0) <= 0) return false;
     return !search || (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.company || '').toLowerCase().includes(search.toLowerCase()) || (p.code || '').toLowerCase().includes(search.toLowerCase()) || (p.cat || '').toLowerCase().includes(search.toLowerCase());
-
-
-
-
-
-
-
-
-
-
-
   }).sort((a: any, b: any) => {
 
 
@@ -5204,7 +5183,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                    <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setEditFullProduct({ ...p })}><i className="fas fa-pen"></i></button>
+                    <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setEditProduct({ ...p })}><i className="fas fa-pen"></i></button>
 
 
 
@@ -7597,7 +7576,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 <div style={{ fontSize: 28, fontWeight: 800 }}>{fmt(p.sellPrice)}</div>
                 <div style={{ fontSize: 13, opacity: 0.9 }}>{t('sellPrice')}</div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                  <button onClick={() => { setViewProduct(null); setEditFullProduct({ ...p }); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)' }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || 'Edit'}</button>
+                  <button onClick={() => { setViewProduct(null); setEditProduct({ ...p }); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)' }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || 'Edit'}</button>
                 </div>
               </div>
             </div>
@@ -7754,7 +7733,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
             {/* Bottom actions */}
             <div style={{ marginTop: 20, display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
               <button onClick={() => setViewProduct(null)} style={{ ...btn('ghost') }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
-              <button onClick={() => { setViewProduct(null); setEditFullProduct({ ...p }); }} style={{ ...btn() }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || 'Edit'}</button>
+              <button onClick={() => { setViewProduct(null); setEditProduct({ ...p }); }} style={{ ...btn() }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || 'Edit'}</button>
             </div>
           </div>
         </div>
