@@ -97,10 +97,24 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
   }
 }
 
+// Dismiss HTML boot preloader as soon as React mounts (not window.load)
+function dismissBootPreloader() {
+  const loader = document.getElementById('preloader');
+  if (!loader) return;
+  loader.style.transition = 'opacity 0.3s ease';
+  loader.style.opacity = '0';
+  loader.style.pointerEvents = 'none';
+  window.setTimeout(() => loader.remove(), 300);
+}
+
 // App wrapper that handles initialization
 function AppWrapper() {
   const [isReady, setIsReady] = useState(false);
   const checkAuth = useAuthStore(state => state.checkAuth);
+
+  useEffect(() => {
+    dismissBootPreloader();
+  }, []);
 
   useEffect(() => {
     async function initialize() {

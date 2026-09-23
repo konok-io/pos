@@ -744,7 +744,7 @@ interface Sale {
 function LoadingScreen() {
   const { t } = useLanguage();
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#115E59', color: 'white', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#0F766E', color: 'white', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }}>
       <div style={{ width: 50, height: 50, border: '4px solid rgba(255,255,255,0.2)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
       <h3 style={{ marginTop: 16, fontSize: 18, fontWeight: 700 }}>{t('posManagementSystem')}</h3>
       <p style={{ marginTop: 8, opacity: 0.8 }}>{t('loading')}</p>
@@ -1183,6 +1183,7 @@ export default function App() {
   // Check auth and load settings on mount
   useEffect(() => {
     const initApp = async () => {
+      try {
       // Check if user was logged in
       const isLoggedInSetting = await db.get<boolean>('settings', 'isLoggedIn');
       if (isLoggedInSetting) {
@@ -1325,7 +1326,12 @@ export default function App() {
       api.addCustomer(genCust).catch(() => {});
       
       setIsInitialized(true); // Mark as initialized before enabling saves
-      setIsLoading(false);
+      } catch (e) {
+        console.error('initApp failed:', e);
+        setIsInitialized(true);
+      } finally {
+        setIsLoading(false);
+      }
     };
     initApp();
   }, []);
