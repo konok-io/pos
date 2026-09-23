@@ -395,6 +395,7 @@ export const bn: Record<string, string> = {
   deleteCompanyConfirm: 'আপনি কি এই কোম্পানি মুছে ফেলতে চান?',
   deleteCategoryConfirm: 'আপনি কি এই ক্যাটাগরি মুছে ফেলতে চান?',
 clearCartConfirm: 'কার্ট পরিষ্কার করবেন?',
+  deletedAt: 'মুছেছে',
 printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়েছে! রিসিট প্রিন্ট করতে পপ-আপ অনুমোদন দিন।',
   confirmCompleteSale: 'এই বিক্রয় সম্পন্ন করবেন?',
   clearCart: 'কার্ট পরিষ্কার করবেন?',

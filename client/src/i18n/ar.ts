@@ -390,6 +390,7 @@ export const ar: Record<string, string> = {
   deleteCompanyConfirm: 'هل أنت متأكد أنك تريد حذف هذه الشركة؟',
   deleteCategoryConfirm: 'هل أنت متأكد أنك تريد حذف هذا الفئة؟',
 clearCartConfirm: 'مسح السلة؟',
+  deletedAt: 'حُذف في',
 printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ المنبثقة لطباعة الإيصال.',
   confirmCompleteSale: 'إتمام هذا البيع؟',
   clearCart: 'مسح السلة؟',

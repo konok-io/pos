@@ -718,19 +718,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [showPriceHistory, setShowPriceHistory] = useState(false);
-
-
-
-
-
-
-
-
-
-
-
-  const [showDeleteHistory, setShowDeleteHistory] = useState(false);
   const [deleteHistory, setDeleteHistory] = useState<any[]>([]);
 
 
@@ -7462,6 +7449,79 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+  const renderPriceHistory = () => {
+    const rows = stockHistory.filter((h: any) => h.type === 'price');
+    return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+        </div>
+        <span style={{ fontSize: 14, color: T.gray400 }}>{rows.length}</span>
+      </div>
+      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
+          <thead><tr style={{ background: T.tealLight }}>
+            {[t('productName'), t('date'), t('oldPrice'), t('newPrice'), t('reason')].map((h, i) => (
+              <th key={i} style={{ padding: '10px 12px', textAlign: i >= 2 && i <= 3 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody>
+            {rows.length === 0 ? (
+              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noPriceHistory')}</td></tr>
+            ) : rows.filter((h: any) => !search || (h.productName || '').toLowerCase().includes(search.toLowerCase())).map((h: any, i: number) => (
+              <tr key={h.id || i} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{h.productName}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500 }}>{h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td>
+                <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}><span style={{ textDecoration: 'line-through', color: T.red }}>{fmt(h.oldPrice ?? h.oldStock ?? 0)}</span></td>
+                <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 700, color: T.green }}>{fmt(h.newPrice ?? h.newStock ?? 0)}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray600 }}>{h.reason || '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    );
+  };
+
+  const renderDeleteHistory = () => {
+    return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+        </div>
+        <span style={{ fontSize: 14, color: T.gray400 }}>{deleteHistory.length}</span>
+      </div>
+      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
+          <thead><tr style={{ background: T.redLight }}>
+            {[t('productName'), t('code'), t('stock'), t('sellPrice'), t('deletedAt')].map((h, i) => (
+              <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 || i === 3 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.red }}>{h}</th>
+            ))}
+          </tr></thead>
+          <tbody>
+            {deleteHistory.length === 0 ? (
+              <tr><td colSpan={5} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noDeleteHistory')}</td></tr>
+            ) : deleteHistory.filter((h: any) => !search || (h.name || '').toLowerCase().includes(search.toLowerCase()) || (h.code || '').toLowerCase().includes(search.toLowerCase())).map((h: any, i: number) => (
+              <tr key={h.id + h.deletedAt} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{h.name}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{h.code || '-'}</td>
+                <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, color: T.gray600 }}>{h.stock}</td>
+                <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 600 }}>{fmt(h.sellPrice)}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500 }}>{h.deletedAt ? new Date(h.deletedAt).toLocaleString() : '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    );
+  };
+
   const renderStock = () => (
 
 
@@ -8482,6 +8542,33 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+
+    { id: 'priceHistory', icon: <i className="fas fa-clock-rotate-left"></i>, label: t('priceHistory') },
+
+
+
+
+
+
+
+
+
+
+
+
+    { id: 'deleteHistory', icon: <i className="fas fa-trash"></i>, label: t('deleteHistory') },
+
+
+
+
+
+
+
+
+
+
+
+
   ];
 
 
@@ -8781,7 +8868,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                  <button onClick={() => { setShowPriceHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {t('priceHistory')}</button>
 
 
 
@@ -8793,7 +8879,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-                  <button onClick={() => { setShowDeleteHistory(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</button>
 
 
 
@@ -9986,6 +10071,10 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
         {productTab === 'stock' && renderStock()}
 
+        {productTab === 'priceHistory' && renderPriceHistory()}
+
+        {productTab === 'deleteHistory' && renderDeleteHistory()}
+
 
 
 
@@ -10332,96 +10421,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-      {showPriceHistory && overlayModal(`<i className="fas fa-clock-rotate-left"></i> ${t('priceHistory')}`, () => setShowPriceHistory(false), (
-
-
-
-
-
-
-
-
-
-
-
-        <div>{stockHistory.length === 0 ? <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noPriceHistory')}</p> : stockHistory.filter((h: any) => h.type === 'price').map((h: any, i: number) => (
-
-
-
-
-
-
-
-
-
-
-
-          <div key={i} style={{ padding: 10, background: T.gray50, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}><div><strong>{h.productName}</strong><div style={{ fontSize: 12, color: T.gray500 }}>{new Date(h.created_at).toLocaleString()}</div></div><div style={{ textAlign: 'right' }}>{(h.oldPrice !== undefined || h.oldStock !== undefined || h.type === 'price') && <div style={{ textDecoration: 'line-through', color: T.red }}>{fmt((h.oldPrice ?? h.oldStock ?? 0))}</div>}{(h.newPrice ?? h.newStock) && <div style={{ color: T.green, fontWeight: 700 }}>{fmt(h.newPrice ?? h.newStock ?? 0)}</div>}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-        ))}</div>
-
-
-
-
-
-
-
-
-
-
-
-      ))}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      {showDeleteHistory && overlayModal(`<i className="fas fa-trash"></i> ${t('deleteHistory')}`, () => setShowDeleteHistory(false), (
-        <div>
-          {deleteHistory.length === 0 ? (
-            <p style={{ textAlign: 'center', color: T.gray400, padding: 20 }}>{t('noDeleteHistory')}</p>
-          ) : deleteHistory.map((h: any) => (
-            <div key={h.id + h.deletedAt} style={{ padding: 10, background: T.redLight, borderRadius: 8, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
-              <div>
-                <strong>{h.name}</strong>
-                <div style={{ fontSize: 12, color: T.gray500 }}>{h.code || '-'} · {new Date(h.deletedAt).toLocaleString()}</div>
-              </div>
-              <div style={{ textAlign: 'right', fontSize: 13 }}>
-                <div>{fmt(h.sellPrice)}</div>
-                <div style={{ color: T.gray500 }}>stock {h.stock}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ))}
+      
 
 
 
