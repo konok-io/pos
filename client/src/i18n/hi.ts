@@ -94,6 +94,8 @@ export const hi: Record<string, string> = {
   addProduct: 'उत्पाद जोड़ें',
   editProduct: 'उत्पाद संपादित करें',
   productName: 'उत्पाद का नाम',
+  prev: 'पिछला',
+  next: 'अगला',
   productCode: 'उत्पाद कोड',
   enterProductName: 'उत्पाद का नाम दर्ज करें',
   enterProductCode: 'उत्पाद कोड दर्ज करें',

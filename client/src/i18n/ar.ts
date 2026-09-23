@@ -94,6 +94,8 @@ export const ar: Record<string, string> = {
   addProduct: 'إضافة منتج',
   editProduct: 'تعديل منتج',
   productName: 'اسم المنتج',
+  prev: 'السابق',
+  next: 'التالي',
   productCode: 'كود المنتج',
   enterProductName: 'أدخل اسم المنتج',
   enterProductCode: 'أدخل كود المنتج',

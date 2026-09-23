@@ -491,6 +491,7 @@ interface ProductsScreenProps {
 
 
   setProducts: React.Dispatch<React.SetStateAction<any[]>>;
+  setPurchases: React.Dispatch<React.SetStateAction<any[]>>;
 
 
 
@@ -574,7 +575,7 @@ interface ProductsScreenProps {
 
 
 
-export default function ProductsScreen({ products: _initProducts, suppliers: _initSuppliers, categories: _initCategories, purchases, productHistory: _productHistory, setProducts: setProductsParent, setSuppliers: setSuppliersParent, setCategories: setCategoriesParent, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
+export default function ProductsScreen({ products: _initProducts, suppliers: _initSuppliers, categories: _initCategories, purchases, productHistory: _productHistory, setProducts: setProductsParent, setSuppliers: setSuppliersParent, setCategories: setCategoriesParent, setPurchases: setPurchasesParent, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
 
 
 
@@ -985,6 +986,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [purchaseBarcodeId, setPurchaseBarcodeId] = useState('');
+  const [apPage, setApPage] = useState(1);
   const [filterFrom, setFilterFrom] = useState('');
   const [filterTo, setFilterTo] = useState('');
 
@@ -2217,7 +2219,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     const results: any[] = [];
     const purchaseIds: string[] = [];
 
-    for (const [, group] of Object.entries(companyGroups)) {
+    const purchasesCreated: any[] = [];
+    for (const [company, group] of Object.entries(companyGroups)) {
       const purchaseId = genUniqueId();
       purchaseIds.push(purchaseId);
       const groupResults = await Promise.allSettled(
@@ -2234,6 +2237,27 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         })
       );
       results.push(...groupResults);
+      const items = group.map((pp: any) => {
+        const ep = products.find((e: any) => (e.code || '').toLowerCase() === (pp.code || '').toLowerCase());
+        return { productId: ep ? ep.id : pp.id, name: pp.name, code: pp.code || '', quantity: +pp.stock || 0, costPrice: +pp.costPrice || 0 };
+      });
+      const total = items.reduce((x: number, it: any) => x + it.quantity * it.costPrice, 0);
+      const purchase = { id: purchaseId, supplier: company === 'unknown' ? '' : company, date: new Date().toISOString(), items, total };
+      api.addPurchase(purchase).catch(() => {});
+      purchasesCreated.push(purchase);
+      items.forEach((it: any) => {
+        if (!it.productId) return;
+        const ep = products.find((e: any) => e.id === it.productId);
+        api.addStockHistory({
+          productId: it.productId,
+          productName: it.name,
+          type: 'purchase',
+          quantity: it.quantity,
+          oldStock: ep ? (+ep.stock || 0) : 0,
+          newStock: (ep ? (+ep.stock || 0) : 0) + it.quantity,
+          reason: `Purchase: ${purchaseId}`,
+        }).catch(() => {});
+      });
     }
 
     const succeeded = results.filter(r => r.status === 'fulfilled').length;
@@ -2260,7 +2284,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    const [prods] = await Promise.all([api.getProducts()]);
+    const [prods, hist] = await Promise.all([api.getProducts(), api.getStockHistory()]);
+    setStockHistory(hist);
+    if (purchasesCreated.length > 0) setPurchasesParent((prev: any[]) => [...prev, ...purchasesCreated]);
 
 
 
@@ -2657,23 +2683,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const exportProductsCsv = () => {
-    const headers = ['Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Profit', 'Stock', 'MinStock', 'ExpiryDate'];
-    const apFrom3 = filterFrom || '';
-    const apTo3 = filterTo || '';
-    const srcList = filteredProducts.filter((p: any) => {
-      if (!apFrom3 && !apTo3) return true;
-      const raw = p.createdAt || p.created_at || '';
-      if (!raw) return false;
-      const dt = new Date(raw);
-      if (isNaN(dt.getTime())) return false;
-      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
-      if (apFrom3 && day < apFrom3) return false;
-      if (apTo3 && day > apTo3) return false;
-      return true;
-    });
-    const rows = srcList.map((p: any) => {
+    const headers = ['SL', 'Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Profit', 'Stock', 'MinStock', 'ExpiryDate'];
+    const srcList = filteredProducts;
+    const rows = srcList.map((p: any, i: number) => {
       const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-      return [p.name, p.code || '', p.company || '', p.cat || '', p.unit, p.costPrice, p.sellPrice, ((+p.sellPrice || 0) - (+p.costPrice || 0)), p.stock, p.minStock || 5, p.expiryDate || ''].map(esc).join(',');
+      return [i + 1, p.name, p.code || '', p.company || '', p.cat || '', p.unit, p.costPrice, p.sellPrice, ((+p.sellPrice || 0) - (+p.costPrice || 0)), p.stock, p.minStock || 5, p.expiryDate || ''].map(esc).join(',');
     });
     const csv = [headers.join(','), ...rows].join('\n');
     downloadCsv(csv, 'products.csv');
@@ -3254,22 +3268,10 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const printProductList = () => {
-    const apFrom2 = filterFrom || '';
-    const apTo2 = filterTo || '';
-    const list = filteredProducts.filter((p: any) => {
-      if (!apFrom2 && !apTo2) return true;
-      const raw = p.createdAt || p.created_at || '';
-      if (!raw) return false;
-      const dt = new Date(raw);
-      if (isNaN(dt.getTime())) return false;
-      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
-      if (apFrom2 && day < apFrom2) return false;
-      if (apTo2 && day > apTo2) return false;
-      return true;
-    });
-    const rows = list.map((p: any) => {
+    const list = filteredProducts;
+    const rows = list.map((p: any, i: number) => {
       const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
-      return `<tr><td>${p.name}${p.code ? ` (${p.code})` : ''}</td><td>${p.company || '-'}</td><td>${p.cat || '-'}</td><td>${fmt(p.costPrice)}</td><td>${fmt(p.sellPrice)}</td><td>${fmt(p.sellPrice - p.costPrice)} (${pct}%)</td><td>${p.stock}</td><td>${p.unit}</td><td>${p.expiryDate || '-'}</td></tr>`;
+      return `<tr><td style="text-align:center">${i + 1}</td><td>${p.name}${p.code ? ` (${p.code})` : ''}</td><td>${p.company || '-'}</td><td>${p.cat || '-'}</td><td>${fmt(p.costPrice)}</td><td>${fmt(p.sellPrice)}</td><td>${fmt(p.sellPrice - p.costPrice)} (${pct}%)</td><td>${p.stock}</td><td>${p.unit}</td><td>${p.expiryDate || '-'}</td></tr>`;
     }).join('');
 
 
@@ -3282,7 +3284,12 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:6px 5px;text-align:left;font-size:10px;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:6px 5px;font-size:11px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('productList')}</h1><p>${new Date().toLocaleDateString()} | ${list.length} ${t('products')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('company')}</th><th>${t('category')}</th><th>${t('purchasePrice')}</th><th>${t('sellPrice')}</th><th>${t('profit')}</th><th>${t('stock')}</th><th>${t('unit')}</th><th>${t('expiryDate')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const totStock = list.reduce((x: number, p: any) => x + (+p.stock || 0), 0);
+    const totBuyVal = list.reduce((x: number, p: any) => x + (+p.costPrice || 0) * (+p.stock || 0), 0);
+    const totSellVal = list.reduce((x: number, p: any) => x + (+p.sellPrice || 0) * (+p.stock || 0), 0);
+    const totProfitVal = totSellVal - totBuyVal;
+    const totRow = `<tr style="background:#00897b;color:#fff;font-weight:700"><td colspan="3" style="text-align:center">${t('total') || 'Total'}</td><td>${fmt(totBuyVal)}</td><td>${fmt(totSellVal)}</td><td>${fmt(totProfitVal)}</td><td style="text-align:center">${totStock}</td><td colspan="2"></td></tr>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@import url('https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap');@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla','Noto Sans Bengali',serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:6px 5px;text-align:left;font-size:10px;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:6px 5px;font-size:11px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('productList')}</h1><p>${new Date().toLocaleDateString()} | ${list.length} ${t('products')}</p></div><table><thead><tr><th style="text-align:center">#</th><th>${t('name')}</th><th>${t('company')}</th><th>${t('category')}</th><th>${t('purchasePrice')}</th><th>${t('sellPrice')}</th><th>${t('profit')}</th><th>${t('stock')}</th><th>${t('unit')}</th><th>${t('expiryDate')}</th></tr></thead><tbody>${rows}${totRow}</tbody></table></body></html>`;
 
 
 
@@ -4518,42 +4525,19 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const renderAllProducts = () => {
-    const apFrom = filterFrom || '';
-    const apTo = filterTo || '';
-    const inApDate = (p: any): boolean => {
-      if (!apFrom && !apTo) return true;
-      const raw = p.createdAt || p.created_at || p.updatedAt || '';
-      if (!raw) return false;
-      const dt = new Date(raw);
-      if (isNaN(dt.getTime())) return false;
-      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
-      if (apFrom && day < apFrom) return false;
-      if (apTo && day > apTo) return false;
-      return true;
-    };
-    const dateFiltered = filteredProducts.filter(inApDate);
+    const AP_PAGE = 50;
+    const apTotalPages = Math.max(1, Math.ceil(filteredProducts.length / AP_PAGE));
+    const apCur = Math.min(Math.max(1, apPage), apTotalPages);
+    const apItems = filteredProducts.slice((apCur - 1) * AP_PAGE, apCur * AP_PAGE);
+    const apBtn = (dis: boolean): React.CSSProperties => ({ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.gray200}`, background: dis ? T.gray100 : T.white, color: dis ? T.gray400 : T.gray600, fontSize: 13, fontWeight: 600, cursor: dis ? 'not-allowed' : 'pointer' });
     return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
+      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+          <input value={search} onChange={e => { setSearch(e.target.value); setApPage(1); }} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
         </div>
-        <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <i className="fas fa-calendar" style={{ color: T.teal }}></i>
-          <input type="date" value={apFrom} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
-        </label>
-        <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
-        <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <input type="date" value={apTo} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
-        </label>
-        {(apFrom || apTo) ? (
-          <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}>
-            <i className="fas fa-xmark"></i>
-          </button>
-        ) : null}
-        <span style={{ fontSize: 14, color: T.gray400 }}>{dateFiltered.length}</span>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={exportProductsCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredProducts.length}</span>
         <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
       </div>
 
@@ -4603,7 +4587,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-            {[t('productName'), t('company'), t('category'), t('purchasePrice'), t('sellPrice'), t('profit'), t('stock'), t('unit'), t('expiryDate'), t('actions')].map((h, i) => (
+            {['#', t('productName'), t('company'), t('category'), t('purchasePrice'), t('sellPrice'), t('profit'), t('stock'), t('unit'), t('expiryDate'), t('actions')].map((h, i) => (
 
 
 
@@ -4615,7 +4599,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-              <th key={i} style={{ padding: '10px 12px', textAlign: i >= 3 && i <= 5 ? 'right' : i >= 6 ? 'center' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+              <th key={i} style={{ padding: i === 0 ? '10px 6px' : '10px 12px', width: i === 0 ? 48 : undefined, textAlign: i === 0 ? 'center' : i >= 4 && i <= 6 ? 'right' : i >= 7 ? 'center' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
 
 
 
@@ -4663,7 +4647,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-            {dateFiltered.length === 0 ? (
+            {filteredProducts.length === 0 ? (
 
 
 
@@ -4675,7 +4659,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-              <tr><td colSpan={10} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noProductsYet')}</td></tr>
+              <tr><td colSpan={11} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noProductsYet')}</td></tr>
 
 
 
@@ -4687,7 +4671,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-            ) : dateFiltered.map((p: any, i: number) => {
+            ) : apItems.map((p: any, i: number) => {
 
 
 
@@ -4747,6 +4731,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
+                  <td style={{ padding: '10px 6px', textAlign: 'center', fontSize: 13, color: T.gray400 }}>{(apCur - 1) * AP_PAGE + i + 1}</td>
                   <td style={{ padding: '10px 12px' }}><div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>{p.code && <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div>}</td>
 
 
@@ -4956,6 +4941,13 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
         </table>
+        {apTotalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, padding: '14px 0 4px' }}>
+            <button style={apBtn(apCur <= 1)} disabled={apCur <= 1} onClick={() => setApPage(apCur - 1)}><i className="fas fa-chevron-left" style={{marginRight: 4}}></i>{t('prev')}</button>
+            <span style={{ fontSize: 13, color: T.gray600, fontWeight: 600 }}>{apCur} / {apTotalPages} · {(apCur - 1) * AP_PAGE + 1}-{Math.min(apCur * AP_PAGE, filteredProducts.length)} / {filteredProducts.length}</span>
+            <button style={apBtn(apCur >= apTotalPages)} disabled={apCur >= apTotalPages} onClick={() => setApPage(apCur + 1)}>{t('next')}<i className="fas fa-chevron-right" style={{marginLeft: 4}}></i></button>
+          </div>
+        )}
 
 
 
@@ -4992,10 +4984,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   );
-  };
-
-
-const renderSupplier = () => (
+  };  const renderSupplier = () => (
 
 
 
@@ -7107,9 +7096,110 @@ const renderSupplier = () => (
 
 
 
-  const renderViewProduct = () => {
+  const exportViewProductHistory = (p: any) => {
+      const apFrom = filterFrom || '';
+      const apTo = filterTo || '';
+      const inRange = (d: any): boolean => {
+        if (!apFrom && !apTo) return true;
+        if (!d) return false;
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return false;
+        const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        if (apFrom && day < apFrom) return false;
+        if (apTo && day > apTo) return false;
+        return true;
+      };
+      const headers = ['Type', 'Date', 'Qty', 'Price', 'Total', 'Ref'];
+      const lines = [headers.join(',')];
+      const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+      const hist = (stockHistory || []).filter((h: any) =>
+        (p.id && h.productId === p.id) || ((p.name || '').toLowerCase() === ((h.productName || h.product_name || '').toLowerCase()))
+      ).filter((h: any) => inRange(h.created_at));
+      hist.forEach((h: any) => {
+        lines.push([esc(h.type || ''), esc(h.created_at || ''), esc(h.quantity || 0), esc(h.newStock ?? h.new_stock ?? ''), esc(''), esc(h.reason || '')].map((x, i) => i === 0 ? x : x).join(','));
+      });
+      const productSales = (sales || []).filter((s: any) => (s.items || []).some((it: any) => (p.id && it.productId === p.id) || (p.code && it.barcode === p.code))).filter((s: any) => inRange(s.date || s.created_at));
+      productSales.forEach((s: any) => {
+        (s.items || []).forEach((it: any) => {
+          const match = (p.id && it.productId === p.id) || (p.code && it.barcode === p.code) || ((p.name || '').toLowerCase() === (it.name || '').toLowerCase());
+          if (!match) return;
+          const qty = +it.quantity || 0;
+          const price = +it.price || 0;
+          lines.push([esc('sale'), esc(s.date || s.created_at || ''), esc(qty), esc(price), esc(qty * price), esc(s.invoiceNo || s.id || '')].join(','));
+        });
+      });
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `product-${(p.code || p.id || 'export')}-history.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    const printViewProduct = (p: any) => {
+      const apFrom = filterFrom || '';
+      const apTo = filterTo || '';
+      const inRange = (d: any): boolean => {
+        if (!apFrom && !apTo) return true;
+        if (!d) return false;
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return false;
+        const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        if (apFrom && day < apFrom) return false;
+        if (apTo && day > apTo) return false;
+        return true;
+      };
+      const hist = (stockHistory || []).filter((h: any) =>
+        (p.id && h.productId === p.id) || ((p.name || '').toLowerCase() === ((h.productName || h.product_name || '').toLowerCase()))
+      ).filter((h: any) => inRange(h.created_at));
+      const rows = hist.map((h: any, i: number) => `<tr><td>${i+1}</td><td>${h.type || '-'}</td><td>${h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td><td>${h.quantity || 0}</td><td>${h.reason || '-'}</td></tr>`).join('');
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4;margin:12mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
+.header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:3mm;margin-bottom:4mm}
+.header h1{color:#0F766E;font-size:16pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+.card{background:#F0FDFA;border:0.4mm solid #99f6e4;border-radius:2mm;padding:3mm;margin-bottom:3mm;display:flex;gap:6mm;flex-wrap:wrap}
+.lbl{font-size:8pt;color:#0F766E;text-transform:uppercase}
+.val{font-weight:700;font-size:12pt}
+table{width:100%;border-collapse:collapse;margin-top:2mm}
+th{background:#0F766E;color:#fff;padding:2.5mm;text-align:left;font-size:9pt}
+td{border:0.3mm solid #cbd5e1;padding:2mm;font-size:10pt}
+tr:nth-child(even){background:#F8FAFC}
+.footer{margin-top:8mm;font-size:9pt;color:#64748b}
+</style></head><body>
+<div class="header"><h1>Product Report</h1><div class="meta">${apFrom || '…'} → ${apTo || '…'}<br/>${new Date().toLocaleString()}</div></div>
+<div class="card">
+  <div><div class="lbl">Name</div><div class="val">${p.name}</div></div>
+  <div><div class="lbl">Code</div><div class="val">${p.code || '-'}</div></div>
+  <div><div class="lbl">Stock</div><div class="val">${p.stock} ${p.unit || ''}</div></div>
+  <div><div class="lbl">Cost</div><div class="val">${fmt(p.costPrice)}</div></div>
+  <div><div class="lbl">Sell</div><div class="val">${fmt(p.sellPrice)}</div></div>
+  <div><div class="lbl">Supplier</div><div class="val">${p.company || '-'}</div></div>
+</div>
+<table><thead><tr><th>#</th><th>Type</th><th>Date</th><th>Qty</th><th>Reason</th></tr></thead><tbody>${rows || '<tr><td colspan="5" style="text-align:center;padding:6mm">No records in range</td></tr>'}</tbody></table>
+<div class="footer">POS · ${hist.length} history records · ${apFrom || ''} ${apTo ? '→ ' + apTo : ''}</div>
+</body></html>`;
+      openPrintWin(html);
+    };
+
+    const renderViewProduct = () => {
     if (!viewProduct) return null;
     const p = viewProduct;
+    const q = (search || '').toLowerCase();
+    const phFrom = filterFrom || '';
+    const phTo = filterTo || '';
+    const inPhDate = (d: any): boolean => {
+      if (!phFrom && !phTo) return true;
+      if (!d) return false;
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return false;
+      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      if (phFrom && day < phFrom) return false;
+      if (phTo && day > phTo) return false;
+      return true;
+    };
     const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
     const unitProfit = (p.sellPrice || 0) - (p.costPrice || 0);
     const low = p.stock > 0 && p.stock <= (p.minStock || 5);
@@ -7122,7 +7212,7 @@ const renderSupplier = () => (
         (p.code && it.barcode === p.code) ||
         ((p.name || '').toLowerCase() === (it.name || '').toLowerCase())
       )
-    ).sort((a: any, b: any) => {
+    ).filter((s: any) => inPhDate(s.date || s.created_at)).filter((s: any) => !q || String(s.id || '').toLowerCase().includes(q) || String(s.customer || s.customerName || '').toLowerCase().includes(q) || String(s.date || s.created_at || '').toLowerCase().includes(q)).sort((a: any, b: any) => {
       const da = a.date || a.created_at || 0;
       const db = b.date || b.created_at || 0;
       return (Number(db) || 0) - (Number(da) || 0);
@@ -7150,7 +7240,7 @@ const renderSupplier = () => (
     const productStockHist = (stockHistory || []).filter((h: any) =>
       (p.id && h.productId === p.id) ||
       ((p.name || '').toLowerCase() === (h.productName || '').toLowerCase())
-    ).sort((a: any, b: any) => {
+    ).filter((h: any) => inPhDate(h.created_at)).filter((h: any) => !q || String(h.type || '').toLowerCase().includes(q) || String(h.reason || '').toLowerCase().includes(q)).sort((a: any, b: any) => {
       const da = a.created_at || 0;
       const db = b.created_at || 0;
       return String(db).localeCompare(String(da));
@@ -7202,9 +7292,31 @@ const renderSupplier = () => (
     return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
         {/* Top bar */}
-        <div style={{ padding: '10px 16px', display: 'flex', gap: 10, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+        <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
           <button style={{ ...btn('ghost', 'sm') }} onClick={() => setViewProduct(null)}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
           <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('productDetails')}</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', width: 180 }}>
+              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+            </div>
+            <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <i className="fas fa-calendar" style={{ color: T.teal }}></i>
+              <input type="date" value={filterFrom || ''} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+            </label>
+            <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
+            <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <input type="date" value={filterTo || ''} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+            </label>
+            {(filterFrom || filterTo) ? (
+              <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}>
+                <i className="fas fa-xmark"></i>
+              </button>
+            ) : null}
+            <span style={{ fontSize: 14, color: T.gray400 }}>{productSales.length + productStockHist.length}</span>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => exportViewProductHistory(viewProduct)}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => printViewProduct(viewProduct)}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+          </div>
         </div>
 
         <div style={{ flex: 1, overflow: 'auto' }}>

@@ -95,6 +95,8 @@ export const bn: Record<string, string> = {
   addProduct: 'পণ্য যোগ করুন',
   editProduct: 'পণ্য সম্পাদনা',
   productName: 'পণ্যের নাম',
+  prev: 'পূর্ববর্তী',
+  next: 'পরবর্তী',
   productCode: 'পণ্যের কোড',
   enterProductName: 'পণ্যের নাম লিখুন',
   enterProductCode: 'পণ্যের কোড লিখুন',

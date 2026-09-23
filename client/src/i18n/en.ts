@@ -94,6 +94,8 @@ export const en: Record<string, string> = {
   addProduct: 'Add Product',
   editProduct: 'Edit Product',
   productName: 'Product Name',
+  prev: 'Prev',
+  next: 'Next',
   productCode: 'Product Code',
   enterProductName: 'Enter product name',
   enterProductCode: 'Enter product code',

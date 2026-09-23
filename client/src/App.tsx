@@ -1289,18 +1289,22 @@ export default function App() {
         }
       };
 
-      const [apiProducts, apiCategories, apiSuppliers, apiCustomers, apiSales] = await Promise.all([
+      const [apiProducts, apiCategories, apiSuppliers, apiCustomers, apiSales, apiPurchases, apiStockHistory] = await Promise.all([
         loadOrFallback<Product>(() => api.getProducts(), 'products'),
         loadOrFallback<Category>(() => api.getCategories(), 'categories'),
         loadOrFallback<any>(() => api.getSuppliers(), 'suppliers'),
         loadOrFallback<Customer>(() => api.getCustomers(), 'customers'),
         loadOrFallback<Sale>(() => api.getSales(), 'sales'),
+        loadOrFallback<any>(() => api.getPurchases(), 'purchases'),
+        loadOrFallback<any>(() => api.getStockHistory(), 'stock_history'),
       ]);
 
       if (apiProducts.length > 0) setProducts(apiProducts);
       if (apiCategories.length > 0) setCategories(apiCategories);
       if (apiSuppliers.length > 0) setSuppliers(apiSuppliers);
       if (apiSales.length > 0) setSales(apiSales);
+      if (apiPurchases && apiPurchases.length > 0) setPurchases(apiPurchases);
+      if (apiStockHistory && apiStockHistory.length > 0) _setProductHistory(apiStockHistory);
 
       if (apiCustomers.length > 0) {
         const savedTransactions = await db.getAll<any>('transactions').catch(() => []);
@@ -3534,6 +3538,7 @@ export default function App() {
             setProducts={setProducts}
             setSuppliers={setSuppliers}
             setCategories={setCategories}
+            setPurchases={setPurchases}
             settings={settings}
             currentUser={currentUser}
           />
