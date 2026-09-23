@@ -10414,17 +10414,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
       {editProduct && (
-
-
-
-
-
-
-
-
-
-
-
         <div style={overlay} onClick={() => setEditProduct(null)}>
 
 
@@ -10497,7 +10486,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}><button onClick={() => setEditProduct(null)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button><button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveChanges')}</button></div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}><button onClick={() => setEditProduct(null)} style={{ ...btn('ghost'), flex: 1, textAlign: 'center' }}>{t('cancel')}</button><button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2, textAlign: 'center' }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveChanges')}</button></div>
 
 
 
