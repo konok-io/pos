@@ -7576,7 +7576,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 <div style={{ fontSize: 28, fontWeight: 800 }}>{fmt(p.sellPrice)}</div>
                 <div style={{ fontSize: 13, opacity: 0.9 }}>{t('sellPrice')}</div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                  <button onClick={() => { setViewProduct(null); setEditProduct({ ...p }); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)' }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || 'Edit'}</button>
+                  <button onClick={() => { setEditProduct({ ...p }); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)' }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || 'Edit'}</button>
                 </div>
               </div>
             </div>
@@ -10486,7 +10486,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}><button onClick={() => setEditProduct(null)} style={{ ...btn('ghost'), flex: 1, textAlign: 'center' }}>{t('cancel')}</button><button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2, textAlign: 'center' }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveChanges')}</button></div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}><button onClick={() => setEditProduct(null)} style={{ ...btn('ghost'), flex: 1, justifyContent: 'center', textAlign: 'center' }}>{t('cancel')}</button><button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2, justifyContent: 'center', textAlign: 'center' }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveChanges')}</button></div>
 
 
 
