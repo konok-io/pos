@@ -4455,6 +4455,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           company: supplierForm.name.trim()
         };
         setSuppliers(prev => prev.map(s => s.id === editingSupplier.id ? updated : s));
+        api.updateSupplier(editingSupplier.id, updated).catch((e: any) => alert(t('errorOccurred') + ': ' + e.message));
         alert(t('supplierUpdated'));
       } else {
         const newSupplier: Supplier = {
@@ -4469,6 +4470,11 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           company: supplierForm.name.trim()
         };
         setSuppliers(prev => [...prev, newSupplier]);
+        api.addSupplier(newSupplier).then((saved: any) => {
+          if (saved && saved.id && saved.id !== newSupplier.id) {
+            setSuppliers(prev => prev.map(s => s.id === newSupplier.id ? { ...s, ...saved } : s));
+          }
+        }).catch((e: any) => alert(t('errorOccurred') + ': ' + e.message));
         alert(t('supplierUpdated') + '\n' + t('supplierCode') + ': ' + codeToUse);
       }
       
@@ -4493,6 +4499,9 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     try {
       setSuppliers(prev => prev.filter(s => s.id !== supplier.id));
       setViewSupplier(null);
+      if (!supplier.isAuto && !String(supplier.id || '').startsWith('auto-')) {
+        api.deleteSupplier(supplier.id).catch((e: any) => alert(t('deleteFailed') + ': ' + e.message));
+      }
     } catch (error) {
       alert(t('deleteFailed'));
     }
@@ -4509,6 +4518,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       if (editingCategory) {
         const updated: SupplierCategory = { ...editingCategory, name: categoryForm.name.trim() };
         setCategories(prev => prev.map(c => c.id === editingCategory.id ? updated : c));
+        api.updateCategory(editingCategory.id, updated).catch(() => {});
         alert(t('categoryUpdated'));
       } else {
         const newCategory: SupplierCategory = {
@@ -4516,6 +4526,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           name: categoryForm.name.trim()
         };
         setCategories(prev => [...prev, newCategory]);
+        api.addCategory(newCategory).catch(() => {});
         alert(t('categoryAdded'));
       }
       
@@ -4540,6 +4551,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     try {
       setCategories(prev => prev.filter(c => c.id !== cat.id));
       setViewCategory(null);
+      api.deleteCategory(cat.id).catch(() => {});
     } catch (error) {
     }
   };
@@ -4556,7 +4568,9 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       let catId = categories.find(c => (c.name || '').toLowerCase() === (productForm.cat || '').toLowerCase())?.id;
       if (!catId) {
         catId = genId();
-        setCategories(prev => [...prev, { id: catId!, name: productForm.cat.trim() }]);
+        const createdCat = { id: catId!, name: productForm.cat.trim() };
+        setCategories(prev => [...prev, createdCat]);
+        api.addCategory(createdCat).catch(() => {});
       }
       
       const newProduct = {
@@ -4577,6 +4591,23 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       };
       
       setProducts(prev => [...prev, newProduct]);
+      api.addProduct({
+        id: newProduct.id,
+        name: newProduct.name,
+        code: newProduct.code,
+        company: newProduct.company,
+        cat: newProduct.cat,
+        barcode: newProduct.barcode,
+        unit: newProduct.unit,
+        costPrice: newProduct.buyPrice,
+        sellPrice: newProduct.sellPrice,
+        stock: newProduct.stock,
+        minStock: newProduct.minStock
+      }).then((saved: any) => {
+        if (saved && saved.id && saved.id !== newProduct.id) {
+          setProducts(prev => prev.map(p => p.id === newProduct.id ? { ...p, ...saved } : p));
+        }
+      }).catch((e: any) => alert(t('errorOccurred') + ': ' + e.message));
       
       // Also add as supplier if not exists
       const supplierExists = suppliers.some(s => (s.name || '').toLowerCase() === (productForm.company || '').toLowerCase());
@@ -4588,6 +4619,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           phone: '', email: '', address: '', crNumber: '', vatNumber: '', company: productForm.company.trim()
         };
         setSuppliers(prev => [...prev, newSupplier]);
+        api.addSupplier(newSupplier).catch(() => {});
       }
       
       alert(t('productAdded'));
