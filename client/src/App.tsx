@@ -4703,6 +4703,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     filteredSuppliers.forEach((sup: any) => {
       const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
       const pc = getSupplierPurchases(sup.name || '');
+      const spend = pc.reduce((sum: number, p: any) => sum + (+p.total || 0), 0);
       lines.push([esc(sup.id || ''), esc(sup.name || ''), esc(sup.phone || ''), esc(sup.email || ''), esc(sup.address || ''), esc(getProductsCount(sup.name || '')), esc(pc.length), esc(spend)].join(','));
     });
     const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
