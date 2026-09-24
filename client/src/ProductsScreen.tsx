@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 
 
@@ -1078,6 +1078,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+  const [isPosting, setIsPosting] = useState(false);
 
 
 
@@ -1915,6 +1916,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
+  const purchaseSeqTodayRef = useRef<string[]>([]);
   const genPurchaseId = () => {
     const d = new Date();
     const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
@@ -1926,7 +1928,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         if (!Number.isNaN(n) && n > max) max = n;
       }
     });
-    purchaseSeqToday.forEach((id: string) => {
+    purchaseSeqTodayRef.current.forEach((id: string) => {
       if (id.startsWith(ymd) && id.length >= ymd.length + 4) {
         const n = parseInt(id.slice(ymd.length), 10);
         if (!Number.isNaN(n) && n > max) max = n;
@@ -1934,7 +1936,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     });
     return `${ymd}${String(max + 1).padStart(4, '0')}`;
   };
-  const purchaseSeqToday: string[] = [];
 
   const handleAddProduct = async () => {
 
@@ -2082,98 +2083,34 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const handleAddToTempList = () => {
-
-
-
-
-
-
-
-
-
-
-
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
     if (!(Number(productForm.sellPrice) > 0)) { alert(t('sellPriceRequired')); return; }
     if (Number(productForm.costPrice) < 0 || Number(productForm.sellPrice) < 0) { alert(t('invalid')); return; }
+    const stockIn = Math.max(0, Math.floor(Number(productForm.stock) || 0));
     const nameL = productForm.name.trim().toLowerCase();
-    const dupName = products.find((p: any) => (p.name || '').trim().toLowerCase() === nameL) || tempProducts.find((p: any) => (p.name || '').trim().toLowerCase() === nameL);
-    if (dupName) { alert(t('duplicateName')); return; }
-    if ((productForm.code || '').trim()) {
-      const codeL = productForm.code.trim().toLowerCase();
-      const dupCode = products.find((p: any) => (p.code || '').trim() && (p.code || '').trim().toLowerCase() === codeL) || tempProducts.find((p: any) => (p.code || '').trim() && (p.code || '').trim().toLowerCase() === codeL);
-      if (dupCode) { alert(t('duplicateCode')); return; }
+    const codeL = (productForm.code || '').trim().toLowerCase();
+
+    const tempIdx = tempProducts.findIndex((p: any) => {
+      const tCode = (p.code || '').trim().toLowerCase();
+      const tName = (p.name || '').trim().toLowerCase();
+      return (codeL !== '' && tCode === codeL) || (nameL !== '' && tName === nameL);
+    });
+    if (tempIdx >= 0) {
+      setTempProducts(prev => prev.map((p, i) => i === tempIdx ? {
+        ...p,
+        stock: Math.max(0, (p.stock || 0)) + stockIn,
+        sellPrice: Number(productForm.sellPrice) > 0 ? Number(productForm.sellPrice) : p.sellPrice,
+        costPrice: Number(productForm.costPrice) >= 0 && Number(productForm.costPrice) !== 0 ? Number(productForm.costPrice) : p.costPrice,
+      } : p));
+      setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId, vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+      alert(t('stockMerged'));
+      return;
     }
 
-
-
-
-
-
-
-
-
-
-
-    const tempProduct = { id: genId(), ...productForm, _temp: true };
-
-
-
-
-
-
-
-
-
-
-
+    const tempProduct = { id: genId(), ...productForm, stock: stockIn, _temp: true };
     setTempProducts(prev => [...prev, tempProduct]);
-
-
-
-
-
-
-
-
-
-
-
     setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId, vat: _settings?.vatPercent ?? 0, expiryDate: '' });
-
-
-
-
-
-
-
-
-
-
-
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const handleRemoveTempProduct = (id: string) => {
 
@@ -2230,240 +2167,146 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const handlePostTempProducts = async () => {
-
-
-
-
-
-
-
-
-
-
-
+    if (isPosting) return;
     if (tempProducts.length === 0) { alert(t('addAtLeastOne')); return; }
+    setIsPosting(true);
+    try {
+      const merged: any[] = [];
+      for (const p of tempProducts) {
+        const pCode = (p.code || '').trim().toLowerCase();
+        const pName = (p.name || '').trim().toLowerCase();
+        const hit = merged.find((m: any) => {
+          const mCode = (m.code || '').trim().toLowerCase();
+          const mName = (m.name || '').trim().toLowerCase();
+          return (pCode !== '' && mCode === pCode) || (pName !== '' && mName === pName);
+        });
+        if (hit) {
+          hit.stock = Math.max(0, hit.stock || 0) + Math.max(0, p.stock || 0);
+        } else {
+          merged.push({ ...p, stock: Math.max(0, p.stock || 0) });
+        }
+      }
 
-
-
-
-
-
-
-
-
-
-
-    const companyGroups: Record<string, any[]> = {};
-    tempProducts.forEach((p: any) => {
-      const key = p.company || p.supplierId || 'unknown';
-      if (!companyGroups[key]) companyGroups[key] = [];
-      companyGroups[key].push(p);
-    });
-
-    const results: any[] = [];
-    const purchaseIds: string[] = [];
-
-    const purchasesCreated: any[] = [];
-    for (const [company, group] of Object.entries(companyGroups)) {
-      const purchaseId = genPurchaseId();
-      purchaseSeqToday.push(purchaseId);
-      purchaseIds.push(purchaseId);
-      const groupResults = await Promise.allSettled(
-        group.map((p: any) => {
-          const pCode = (p.code || '').trim().toLowerCase();
-          const existingProd = pCode ? products.find((ep: any) => (ep.code || '').trim().toLowerCase() === pCode) : null;
-          if (existingProd) {
-            const newStock = (existingProd.stock || 0) + (p.stock || 0);
-            delete p._temp;
-            return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock });
-          }
-          const product = { ...p, purchaseId };
-          delete product._temp;
-          return api.addProduct(product);
-        })
-      );
-      results.push(...groupResults);
-      const items = group.map((pp: any) => {
-        const ppCode = (pp.code || '').trim().toLowerCase();
-        const ep = ppCode ? products.find((e: any) => (e.code || '').trim().toLowerCase() === ppCode) : null;
-        return { productId: ep ? ep.id : pp.id, name: pp.name, code: pp.code || '', quantity: +pp.stock || 0, costPrice: +pp.costPrice || 0 };
+      const companyGroups: Record<string, any[]> = {};
+      merged.forEach((p: any) => {
+        const key = p.company || p.supplierId || 'unknown';
+        if (!companyGroups[key]) companyGroups[key] = [];
+        companyGroups[key].push(p);
       });
-      const total = items.reduce((x: number, it: any) => x + it.quantity * it.costPrice, 0);
-      const purchase = { id: purchaseId, supplier: company === 'unknown' ? '' : company, date: new Date().toISOString(), items, total };
-      api.addPurchase(purchase).catch(() => {});
-      purchasesCreated.push(purchase);
-      items.forEach((it: any) => {
-        if (!it.productId) return;
-        const ep = products.find((e: any) => e.id === it.productId);
-        api.addStockHistory({
-          productId: it.productId,
-          productName: it.name,
-          type: 'purchase',
-          quantity: it.quantity,
-          oldStock: ep ? (+ep.stock || 0) : 0,
-          newStock: (ep ? (+ep.stock || 0) : 0) + it.quantity,
-          reason: `Purchase: ${purchaseId}`,
-        }).catch(() => {});
-      });
+
+      const results: any[] = [];
+      const purchaseIds: string[] = [];
+      const purchasesCreated: any[] = [];
+      const historyPlan: any[] = [];
+      let workingProducts = [...products];
+
+      for (const group of Object.values(companyGroups)) {
+        const purchaseId = genPurchaseId();
+        purchaseSeqTodayRef.current.push(purchaseId);
+        purchaseIds.push(purchaseId);
+
+        const groupResults = await Promise.allSettled(
+          group.map((p: any) => {
+            const pCode = (p.code || '').trim().toLowerCase();
+            const pName = (p.name || '').trim().toLowerCase();
+            const existingProd = workingProducts.find((ep: any) => {
+              const eCode = (ep.code || '').trim().toLowerCase();
+              const eName = (ep.name || '').trim().toLowerCase();
+              return (pCode !== '' && eCode === pCode) || (pName !== '' && eName === pName);
+            });
+            const qty = Math.max(0, +p.stock || 0);
+            const clean: any = { ...p };
+            delete clean._temp;
+            if (existingProd) {
+              const oldStock = +existingProd.stock || 0;
+              const newStock = oldStock + qty;
+              historyPlan.push({ matchCode: pCode, matchName: pName, productName: existingProd.name, quantity: qty, oldStock, newStock, purchaseId });
+              workingProducts = workingProducts.map(w => w.id === existingProd.id ? { ...w, stock: newStock } : w);
+              return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock });
+            }
+            historyPlan.push({ matchCode: pCode, matchName: pName, productName: p.name, quantity: qty, oldStock: 0, newStock: qty, purchaseId });
+            return api.addProduct({ ...clean, purchaseId, stock: qty });
+          })
+        );
+        results.push(...groupResults);
+      }
+
+      const succeeded = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+
+      const [prods, hist] = await Promise.all([api.getProducts(), api.getStockHistory()]);
+
+      const byGroup: Record<string, any[]> = {};
+      for (const h of historyPlan) {
+        const k = h.purchaseId;
+        if (!byGroup[k]) byGroup[k] = [];
+        byGroup[k].push(h);
+      }
+      for (const [purchaseId, hs] of Object.entries(byGroup)) {
+        const items = hs.map((h: any) => {
+          const ep = prods.find((e: any) => {
+            const eCode = (e.code || '').trim().toLowerCase();
+            const eName = (e.name || '').trim().toLowerCase();
+            return (h.matchCode !== '' && eCode === h.matchCode) || (h.matchName !== '' && eName === h.matchName);
+          });
+          return { productId: ep ? ep.id : '', name: h.productName, code: h.matchCode || '', quantity: h.quantity, costPrice: 0 };
+        });
+        let total = 0;
+        for (const h of hs) {
+          const ep = prods.find((e: any) => {
+            const eCode = (e.code || '').trim().toLowerCase();
+            const eName = (e.name || '').trim().toLowerCase();
+            return (h.matchCode !== '' && eCode === h.matchCode) || (h.matchName !== '' && eName === h.matchName);
+          });
+          const cp = ep ? (+ep.costPrice || 0) : 0;
+          total += h.quantity * cp;
+          const it = items.find((x: any) => x.productId === (ep ? ep.id : ''));
+          if (it) it.costPrice = cp;
+        }
+        const groupKey = Object.keys(companyGroups).find(ck => {
+          const anyH = hs[0];
+          return companyGroups[ck].some((pp: any) => {
+            const pCode = (pp.code || '').trim().toLowerCase();
+            const pName = (pp.name || '').trim().toLowerCase();
+            return (anyH.matchCode !== '' && pCode === anyH.matchCode) || (anyH.matchName !== '' && pName === anyH.matchName);
+          });
+        }) || 'unknown';
+        const purchase = { id: purchaseId, supplier: groupKey === 'unknown' ? '' : groupKey, date: new Date().toISOString(), items, total };
+        api.addPurchase(purchase).catch(() => {});
+        purchasesCreated.push(purchase);
+
+        for (const h of hs) {
+          const ep = prods.find((e: any) => {
+            const eCode = (e.code || '').trim().toLowerCase();
+            const eName = (e.name || '').trim().toLowerCase();
+            return (h.matchCode !== '' && eCode === h.matchCode) || (h.matchName !== '' && eName === h.matchName);
+          });
+          if (!ep) continue;
+          api.addStockHistory({
+            productId: ep.id,
+            productName: h.productName,
+            type: 'purchase',
+            quantity: h.quantity,
+            oldStock: h.oldStock,
+            newStock: +ep.stock || h.newStock,
+            reason: `Purchase: ${purchaseId}`,
+          }).catch(() => {});
+        }
+      }
+
+      setStockHistory(hist);
+      if (purchasesCreated.length > 0) setPurchasesParent((prev: any[]) => [...prev, ...purchasesCreated]);
+      setProducts(prods);
+      setProductsParent(prods);
+      setTempProducts([]);
+      setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+      alert(`${purchaseIds.length} Purchase IDs created: ${purchaseIds.join(', ')} | ${succeeded} ${t('saved')}${failed ? `, ${failed} failed` : ''}`);
+    } catch (e: any) {
+      alert(t('invalid'));
+    } finally {
+      setIsPosting(false);
     }
-
-    const succeeded = results.filter(r => r.status === 'fulfilled').length;
-
-
-
-
-
-
-
-
-
-
-
-    const failed = results.filter(r => r.status === 'rejected').length;
-
-
-
-
-
-
-
-
-
-
-
-    const [prods, hist] = await Promise.all([api.getProducts(), api.getStockHistory()]);
-    setStockHistory(hist);
-    if (purchasesCreated.length > 0) setPurchasesParent((prev: any[]) => [...prev, ...purchasesCreated]);
-
-
-
-
-
-
-
-
-
-
-
-    setProducts(prods);
-
-
-
-
-
-
-
-
-
-
-
-    setProductsParent(prods);
-
-
-
-
-
-
-
-
-
-
-
-    setTempProducts([]);
-
-
-
-
-
-
-
-
-
-
-
-    alert(`${purchaseIds.length} Purchase IDs created: ${purchaseIds.join(', ')} | ${succeeded} ${t('saved')}${failed ? `, ${failed} failed` : ''}`);
-
-
-
-
-
-
-
-
-
-
-
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const deleteSupplier = (name: string) => {
 
@@ -10315,19 +10158,28 @@ tr:nth-child(even){background:#F8FAFC}
               <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('newProduct')}</span>
               <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 13, color: T.gray400 }}>{tempProducts.length} {t('productList')}</span>
-                <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = (() => { const s = headers.findIndex((h: string) => h.includes('sell')); if (s >= 0) return s; return headers.findIndex((h: string) => (h.includes('sellprice') || h.includes('sell_price') || (h.includes('price') && !h.includes('cost') && !h.includes('purchase')))); })(); const stockIdx = headers.findIndex((h: string) => h.includes('stock') && !h.includes('min')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const minStockIdx = headers.findIndex((h: string) => h.includes('minstock') || h.includes('min_stock') || h === 'min'); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); const expiryIdx = headers.findIndex((h: string) => h.includes('expir')); const imported: any[] = []; const errors: string[] = []; const stockUpdated: string[] = []; for (let i = 1; i < lines2.length; i++) { const cols = lines2[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const companyName = companyIdx >= 0 ? cols[companyIdx] : ''; let supplierId = ''; if (companyName) { const matched = suppliers.find((s: any) => (s.name || '').toLowerCase() === companyName.toLowerCase()); if (matched) { supplierId = matched.id; } else { errors.push(`Row ${i+1}: "${companyName}" - ${t('supplierNotFound')}`); continue; } } const existingIdx = tempProducts.findIndex((t: any) => (t.code || '').toLowerCase() === (codeIdx >= 0 ? cols[codeIdx] : '').toLowerCase());
+                <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = (() => { const s = headers.findIndex((h: string) => h.includes('sell')); if (s >= 0) return s; return headers.findIndex((h: string) => (h.includes('sellprice') || h.includes('sell_price') || (h.includes('price') && !h.includes('cost') && !h.includes('purchase')))); })(); const stockIdx = headers.findIndex((h: string) => h.includes('stock') && !h.includes('min')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const minStockIdx = headers.findIndex((h: string) => h.includes('minstock') || h.includes('min_stock') || h === 'min'); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); const expiryIdx = headers.findIndex((h: string) => h.includes('expir')); const imported: any[] = []; const errors: string[] = []; const stockUpdated: string[] = []; for (let i = 1; i < lines2.length; i++) { const cols = lines2[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const companyName = companyIdx >= 0 ? cols[companyIdx] : ''; let supplierId = ''; if (companyName) { const matched = suppliers.find((s: any) => (s.name || '').toLowerCase() === companyName.toLowerCase()); if (matched) { supplierId = matched.id; } else { errors.push(`Row ${i+1}: "${companyName}" - ${t('supplierNotFound')}`); continue; } } const rowCode = (codeIdx >= 0 ? cols[codeIdx] : '').trim().toLowerCase();
+                      const existingIdx = tempProducts.findIndex((t: any) => {
+                        const tCode = (t.code || '').trim().toLowerCase();
+                        const tName = (t.name || '').trim().toLowerCase();
+                        return (rowCode !== '' && tCode === rowCode) || tName === name.trim().toLowerCase();
+                      });
                       if (existingIdx >= 0) {
-                        setTempProducts((prev: any[]) => prev.map((t: any, idx: number) => idx === existingIdx ? { ...t, name: name || t.name, cat: (catIdx >= 0 && cols[catIdx]) ? cols[catIdx] : t.cat, costPrice: costIdx >= 0 && cols[costIdx] !== '' && cols[costIdx] !== undefined ? (parseFloat(cols[costIdx]) || t.costPrice) : t.costPrice, sellPrice: sellIdx >= 0 && cols[sellIdx] !== '' && cols[sellIdx] !== undefined ? (parseFloat(cols[sellIdx]) || t.sellPrice) : t.sellPrice, unit: (unitIdx >= 0 && cols[unitIdx]) ? cols[unitIdx] : t.unit, company: companyName || t.company, supplierId: supplierId || t.supplierId, minStock: minStockIdx >= 0 && cols[minStockIdx] !== '' && cols[minStockIdx] !== undefined ? (parseInt(cols[minStockIdx], 10) || t.minStock) : t.minStock, vat: vatIdx >= 0 && cols[vatIdx] !== '' && cols[vatIdx] !== undefined ? (parseFloat(cols[vatIdx]) || t.vat) : t.vat, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : t.expiryDate, stock: (t.stock || 0) + (stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0) } : t));
+                        setTempProducts((prev: any[]) => prev.map((t: any, idx: number) => idx === existingIdx ? { ...t, name: name || t.name, cat: (catIdx >= 0 && cols[catIdx]) ? cols[catIdx] : t.cat, costPrice: costIdx >= 0 && cols[costIdx] !== '' && cols[costIdx] !== undefined ? Math.max(0, parseFloat(cols[costIdx]) || t.costPrice || 0) : t.costPrice, sellPrice: sellIdx >= 0 && cols[sellIdx] !== '' && cols[sellIdx] !== undefined ? Math.max(0, parseFloat(cols[sellIdx]) || t.sellPrice || 0) : t.sellPrice, unit: (unitIdx >= 0 && cols[unitIdx]) ? cols[unitIdx] : t.unit, company: companyName || t.company, supplierId: supplierId || t.supplierId, minStock: minStockIdx >= 0 && cols[minStockIdx] !== '' && cols[minStockIdx] !== undefined ? (parseInt(cols[minStockIdx], 10) || t.minStock) : t.minStock, vat: vatIdx >= 0 && cols[vatIdx] !== '' && cols[vatIdx] !== undefined ? (parseFloat(cols[vatIdx]) || t.vat) : t.vat, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : t.expiryDate, stock: Math.max(0, t.stock || 0) + (stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0) } : t));
                       } else {
-                        const existingDb = products.find((p: any) => (p.code || '').toLowerCase() === (codeIdx >= 0 ? cols[codeIdx] : '').toLowerCase());
+                        const existingDb = products.find((p: any) => {
+                          const pCode = (p.code || '').trim().toLowerCase();
+                          const pName = (p.name || '').trim().toLowerCase();
+                          return (rowCode !== '' && pCode === rowCode) || pName === name.trim().toLowerCase();
+                        });
                         if (existingDb) {
-                          const addStk = stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0;
+                          const addStk = stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0;
                           const newStk = (existingDb.stock || 0) + addStk;
                           api.updateProduct(existingDb.id, { ...existingDb, stock: newStk }).catch(() => {});
                           if (addStk !== 0) api.addStockHistory({ productId: existingDb.id, productName: existingDb.name, type: 'purchase', quantity: addStk, oldStock: existingDb.stock || 0, newStock: newStk, reason: 'CSV import' }).catch(() => {});
                           stockUpdated.push(`${existingDb.name} +${addStk}`);
                         } else {
-                          imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? parseFloat(cols[costIdx]) || 0 : 0, sellPrice: sellIdx >= 0 ? parseFloat(cols[sellIdx]) || 0 : 0, stock: stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyName, minStock: minStockIdx >= 0 ? parseInt(cols[minStockIdx]) || 5 : 5, supplierId, vat: vatIdx >= 0 ? parseFloat(cols[vatIdx]) || 0 : 0, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : '', _temp: true }); } } } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); } const msg = []; if (imported.length > 0) msg.push(`${imported.length} ${t('products')} imported!`); if (stockUpdated.length > 0) msg.push(`Stock updated:\n${stockUpdated.join('\n')}`); if (errors.length > 0) msg.push(`${errors.length} errors:\n${errors.join('\n')}`); if (msg.length) alert(msg.join('\n\n')); }; reader.readAsText(file); e.target.value = ''; }} />
+                          imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? Math.max(0, parseFloat(cols[costIdx]) || 0) : 0, sellPrice: sellIdx >= 0 ? Math.max(0, parseFloat(cols[sellIdx]) || 0) : 0, stock: stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyName, minStock: minStockIdx >= 0 ? Math.max(0, parseInt(cols[minStockIdx]) || 5) : 5, supplierId, vat: vatIdx >= 0 ? parseFloat(cols[vatIdx]) || 0 : 0, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : '', _temp: true }); } } } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); } const msg = []; if (imported.length > 0) msg.push(`${imported.length} ${t('products')} imported!`); if (stockUpdated.length > 0) msg.push(`Stock updated:\n${stockUpdated.join('\n')}`); if (errors.length > 0) msg.push(`${errors.length} errors:\n${errors.join('\n')}`); if (msg.length) alert(msg.join('\n\n')); }; reader.readAsText(file); e.target.value = ''; }} />
                 <button title="CSV Upload" onClick={() => document.getElementById('csv-upload-input')?.click()} style={{ ...btn('ghost', 'sm') }}>
                   <i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> CSV
                 </button>
@@ -10337,8 +10189,8 @@ tr:nth-child(even){background:#F8FAFC}
                 <button onClick={handleClearTempProducts} disabled={tempProducts.length === 0} style={{ ...btn('ghost', 'sm'), opacity: tempProducts.length ? 1 : 0.5 }}>
                   <i className="fas fa-trash-can" style={{ marginRight: 4 }}></i> {t('clear')}
                 </button>
-                <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0} style={{ ...btn('primary', 'sm'), opacity: tempProducts.length ? 1 : 0.5 }}>
-                  <i className="fas fa-paper-plane" style={{ marginRight: 4 }}></i> {t('post')}
+                <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0 || isPosting} style={{ ...btn('primary', 'sm'), opacity: tempProducts.length && !isPosting ? 1 : 0.5 }}>
+                  <i className={isPosting ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'} style={{ marginRight: 4 }}></i> {isPosting ? t('posting') : t('post')}
                 </button>
               </div>
             </div>
@@ -10526,7 +10378,7 @@ tr:nth-child(even){background:#F8FAFC}
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('productName')} *</label>
                     <div style={{ position: 'relative' }}>
                       <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-tag" style={{ fontSize: 13 }}></i></div>
-                      <input value={productForm.name} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, name: val }); }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.name && products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) ? '#F0FDFA' : T.gray50, borderColor: productForm.name && products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) ? T.teal : T.gray200, height: 40 }} placeholder={`${t('productName')}...`} />
+                      <input value={productForm.name} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, name: val }); }} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddToTempList(); } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.name && products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) ? '#F0FDFA' : T.gray50, borderColor: productForm.name && products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) ? T.teal : T.gray200, height: 40 }} placeholder={`${t('productName')}...`} />
                       {productForm.name && products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase())).length > 0 && !products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) && (
                         <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
                           {products.filter((p: any) => (p.name || '').toLowerCase().includes(productForm.name.toLowerCase())).slice(0, 8).map((p: any) => (
@@ -10596,11 +10448,11 @@ tr:nth-child(even){background:#F8FAFC}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('purchasePrice')} ({_settings?.currencySymbol})</label>
-                    <input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#15803D' }} />
+                    <input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#15803D' }} />
                   </div>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('sellPrice')} ({_settings?.currencySymbol})</label>
-                    <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#B91C1C' }} />
+                    <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#B91C1C' }} />
                   </div>
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
@@ -10658,7 +10510,7 @@ tr:nth-child(even){background:#F8FAFC}
                         <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('stock')}</label>
                         <div style={{ position: 'relative' }}>
                           <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-cubes" style={{ fontSize: 11 }}></i></div>
-                          <input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
+                          <input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: Math.max(0, parseInt(e.target.value) || 0) })} min={0} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
                         </div>
                       </div>
                       <div>
@@ -10929,7 +10781,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editProduct.costPrice} onChange={e => setEditProduct({ ...editProduct, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editProduct.costPrice} onChange={e => setEditProduct({ ...editProduct, costPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={inputStyle} /></div>
 
 
 
@@ -10941,7 +10793,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editProduct.sellPrice} onChange={e => setEditProduct({ ...editProduct, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editProduct.sellPrice} onChange={e => setEditProduct({ ...editProduct, sellPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={inputStyle} /></div>
 
 
 
@@ -12813,7 +12665,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <div><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('purchasePrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={inputStyle} /></div>
 
 
 
@@ -12825,7 +12677,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <div><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={inputStyle} /></div>
 
 
 
@@ -12837,7 +12689,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <div><label style={labelStyle}>{t('stock')}</label><input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: parseInt(e.target.value) || 0 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('stock')}</label><input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: Math.max(0, parseInt(e.target.value) || 0) })} min={0} style={inputStyle} /></div>
 
 
 
