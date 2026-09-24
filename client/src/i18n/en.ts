@@ -698,5 +698,6 @@ printBlocked: 'Print window blocked! Allow popups to print receipt.',
   dueSalesDisabledDesc: 'All sales must be paid upfront',
   totalSuppliers: 'Total Suppliers',
   withProducts: 'With Products',
+  totalSpend: 'Total Spend',
   totalCategories: 'Total Categories',
 };

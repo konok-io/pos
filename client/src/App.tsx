@@ -1337,11 +1337,11 @@ export default function App() {
         } catch { return apiData || []; }
       };
 
-      await migrateLocal(apiProducts, 'products', (x) => api.addProduct(x), (v) => setProducts(v as any), (x) => String(x.id || '').startsWith('auto-'));
+      await migrateLocal(apiProducts, 'products', (x) => { const id = String(x?.id || ''); const payload = (!id || id.startsWith('auto-')) ? { ...x, id: undefined } : x; return api.addProduct(payload); }, (v) => setProducts(v as any));
       if (apiProducts.length > 0) setProducts(apiProducts);
       await migrateLocal(apiCategories, 'categories', (x) => api.addCategory(x), (v) => setCategories(v as any));
       if (apiCategories.length > 0) setCategories(apiCategories);
-      await migrateLocal(apiSuppliers, 'suppliers', (x) => api.addSupplier(x), (v) => setSuppliers(v as any), (x) => String(x.id || '').startsWith('auto-'));
+      await migrateLocal(apiSuppliers, 'suppliers', (x) => { const id = String(x?.id || ''); const payload = (/^\d{8}\d{4}$/.test(id) || (id && !id.startsWith('auto-'))) ? x : { ...x, id: undefined }; return api.addSupplier(payload); }, (v) => setSuppliers(v as any));
       if (apiSuppliers.length > 0) setSuppliers(apiSuppliers);
       if (apiSales.length > 0) setSales(apiSales);
       else {
@@ -1515,6 +1515,40 @@ export default function App() {
     };
     saveProducts();
   }, [isInitialized, products]);
+
+  // Save suppliers to IndexedDB whenever it changes (only after initial load)
+  useEffect(() => {
+    if (!isInitialized) return;
+    const saveSuppliers = async () => {
+      const existing = await db.getAll('suppliers').catch(() => []);
+      const existingIds = new Set((existing || []).map((s: any) => s.id));
+      const currentIds = new Set(suppliers.filter((s: any) => s?.id).map((s: any) => s.id));
+      for (const id of existingIds) {
+        if (!currentIds.has(id)) await db.delete('suppliers', id).catch(() => {});
+      }
+      for (const supplier of suppliers) {
+        if (supplier?.id) await db.put('suppliers', supplier.id, supplier).catch(() => {});
+      }
+    };
+    saveSuppliers();
+  }, [isInitialized, suppliers]);
+
+  // Save purchases to IndexedDB whenever it changes (only after initial load)
+  useEffect(() => {
+    if (!isInitialized) return;
+    const savePurchases = async () => {
+      const existing = await db.getAll('purchases').catch(() => []);
+      const existingIds = new Set((existing || []).map((p: any) => p.id));
+      const currentIds = new Set(purchases.filter((p: any) => p?.id).map((p: any) => p.id));
+      for (const id of existingIds) {
+        if (!currentIds.has(id)) await db.delete('purchases', id).catch(() => {});
+      }
+      for (const purchase of purchases) {
+        if (purchase?.id) await db.put('purchases', purchase.id, purchase).catch(() => {});
+      }
+    };
+    savePurchases();
+  }, [isInitialized, purchases]);
 
   // Save categories to IndexedDB whenever it changes (only after initial load)
   useEffect(() => {
@@ -3847,6 +3881,7 @@ export default function App() {
             products={products}
             setProducts={setProducts}
             purchases={purchases}
+            setPurchases={setPurchases}
             settings={settings}
           />
           )
@@ -4405,8 +4440,9 @@ interface SuppliersScreenProps {
   setProducts: React.Dispatch<React.SetStateAction<any[]>>;
   purchases: any[];
   settings: any;
+  setPurchases?: React.Dispatch<React.SetStateAction<any[]>>;
 }
-function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, products, setProducts, purchases, settings }: SuppliersScreenProps) {
+function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, products, setProducts, purchases, setPurchases, settings }: SuppliersScreenProps) {
   const { t } = useLanguage();
   
   const [search, setSearch] = useState('');
@@ -4491,19 +4527,17 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       alert(t('enterSupplierName'));
       return;
     }
-    
+
     const nameLower = supplierForm.name.trim().toLowerCase();
-    
-    // Check duplicate
-    const exists = suppliers.some(s => 
+
+    const exists = suppliers.some(s =>
       s.id !== editingSupplier?.id && (s.name || '').toLowerCase().trim() === nameLower
     );
     if (exists) {
       alert(t('supplierNameExists'));
       return;
     }
-    
-    // Generate code if not provided
+
     let codeToUse = supplierForm.code?.trim();
     if (!codeToUse) {
       const maxCode = suppliers.reduce((max, s) => {
@@ -4512,17 +4546,51 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       }, 0);
       codeToUse = `C-${String(maxCode + 1).padStart(5, '0')}`;
     }
-    
+
+    const prevSuppliers = suppliers;
+    const prevProducts = products;
+    const prevPurchases = purchases;
+
     try {
       if (editingSupplier) {
+        const oldName = editingSupplier.name || '';
+        const newName = supplierForm.name.trim();
         const updated: Supplier = {
           ...editingSupplier,
           ...supplierForm,
+          name: newName,
           code: codeToUse,
-          company: supplierForm.name.trim()
+          company: newName
         };
-        setSuppliers(prev => prev.map(s => s.id === editingSupplier.id ? updated : s));
-        api.updateSupplier(editingSupplier.id, updated).catch((e: any) => alert(t('errorOccurred') + ': ' + e.message));
+        const nextSuppliers = prevSuppliers.map(s => s.id === editingSupplier.id ? updated : s);
+        setSuppliers(nextSuppliers);
+
+        if (oldName && oldName.toLowerCase() !== newName.toLowerCase()) {
+          const nameLc = oldName.toLowerCase();
+          const nextProducts = prevProducts.map((p: any) =>
+            (p.company || '').toLowerCase() === nameLc ? { ...p, company: newName } : p
+          );
+          const nextPurchases = prevPurchases.map((p: any) =>
+            (p.supplier || '').toLowerCase() === nameLc ? { ...p, supplier: newName } : p
+          );
+          setProducts(nextProducts);
+          setPurchases?.(nextPurchases);
+          for (const p of nextProducts) {
+            if (prevProducts.find((x: any) => x.id === p.id && (x.company || '') !== (p.company || ''))) {
+              api.updateProduct(p.id, p).catch(() => {});
+            }
+          }
+        }
+
+        try {
+          await api.updateSupplier(editingSupplier.id, updated);
+        } catch (e: any) {
+          setSuppliers(prevSuppliers);
+          setProducts(prevProducts);
+          setPurchases?.(prevPurchases);
+          alert(t('errorOccurred') + ': ' + e.message);
+          return;
+        }
         alert(t('supplierUpdated'));
       } else {
         const newSupplier: Supplier = {
@@ -4537,18 +4605,27 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
           company: supplierForm.name.trim()
         };
         setSuppliers(prev => [...prev, newSupplier]);
-        api.addSupplier(newSupplier).then((saved: any) => {
+        try {
+          const saved: any = await api.addSupplier(newSupplier);
           if (saved && saved.id && saved.id !== newSupplier.id) {
             setSuppliers(prev => prev.map(s => s.id === newSupplier.id ? { ...s, ...saved } : s));
           }
-        }).catch((e: any) => alert(t('errorOccurred') + ': ' + e.message));
+          if (saved && saved.code && !newSupplier.code) {
+            setSuppliers(prev => prev.map(s => s.id === newSupplier.id ? { ...s, code: saved.code } : s));
+          }
+        } catch (e: any) {
+          setSuppliers(prevSuppliers);
+          alert(t('errorOccurred') + ': ' + e.message);
+          return;
+        }
         alert(t('supplierUpdated') + '\n' + t('supplierCode') + ': ' + codeToUse);
       }
-      
+
       setShowSupplierModal(false);
       setEditingSupplier(null);
       setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' });
     } catch (error) {
+      setSuppliers(prevSuppliers);
       alert(t('errorOccurred'));
     }
   };
@@ -4560,17 +4637,19 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       alert(t('companyHasProducts'));
       return;
     }
-    
+
     if (!confirm(t('confirmDeleteCompany'))) return;
-    
+
+    const prevSuppliers = suppliers;
     try {
       setSuppliers(prev => prev.filter(s => s.id !== supplier.id));
       setViewSupplier(null);
       if (!supplier.isAuto && !String(supplier.id || '').startsWith('auto-')) {
-        api.deleteSupplier(supplier.id).catch((e: any) => alert(t('deleteFailed') + ': ' + e.message));
+        await api.deleteSupplier(supplier.id);
       }
-    } catch (error) {
-      alert(t('deleteFailed'));
+    } catch (error: any) {
+      setSuppliers(prevSuppliers);
+      alert(t('deleteFailed') + ': ' + (error?.message || ''));
     }
   };
   
@@ -4681,7 +4760,10 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       if (!supplierExists) {
         const newSupplier: Supplier = {
           id: genSupplierId(suppliers),
-          code: `C-${Date.now().toString().slice(-5)}`,
+          code: `C-${String(suppliers.reduce((max, s) => {
+            const match = s.code?.match(/C-(\d+)/);
+            return match ? Math.max(max, parseInt(match[1])) : max;
+          }, 0) + 1).padStart(5, '0')}`,
           name: productForm.company.trim(),
           phone: '', email: '', address: '', crNumber: '', vatNumber: '', company: productForm.company.trim()
         };
@@ -4698,7 +4780,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   };
 
   const exportSuppliersCsv = () => {
-    const headers = [t('supplierCode') || 'ID', t('companyName') || t('suppliers'), t('phone'), t('email'), t('address'), t('products'), t('totalPurchases') || 'Purchases'];
+    const headers = [t('supplierCode') || 'ID', t('companyName') || t('suppliers'), t('phone'), t('email'), t('address'), t('products'), t('totalPurchases') || 'Purchases', t('totalSpend') || t('total')];
     const lines = [headers.join(',')];
     filteredSuppliers.forEach((sup: any) => {
       const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
@@ -7522,6 +7604,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       api.deleteAllSales().catch(() => {}),
       api.deleteAllCustomers().catch(() => {}),
       api.deleteAllPurchases().catch(() => {}),
+      (api as any).deleteAllStockHistory?.().catch(() => {}),
+      (api as any).deleteAllPriceHistory?.().catch(() => {}),
     ];
     await Promise.all(apiCalls);
 
@@ -7535,12 +7619,18 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
     // Clear all IndexedDB stores
     try {
-      const storeNames = ['products', 'categories', 'suppliers', 'customers', 'sales', 'purchases', 'transactions', 'stock_history', 'price_history', 'cart', 'heldSales', 'settings'];
+      const storeNames = ['products', 'categories', 'suppliers', 'customers', 'sales', 'purchases', 'transactions', 'stock_history', 'price_history'];
       for (const sn of storeNames) {
         try {
-          const all = await db.getAll(sn);
-          for (const item of all as any[]) { await db.delete(sn, item.id).catch(() => {}); }
+          const all = await db.getAll(sn).catch(() => []);
+          for (const item of all as any[]) {
+            const key = (item as any)?.id;
+            if (key !== undefined && key !== null && key !== '') await db.delete(sn, key).catch(() => {});
+          }
         } catch {}
+      }
+      for (const sn of ['cart', 'heldSales', 'settings']) {
+        try { await db.clear(sn).catch(() => {}); } catch {}
       }
     } catch {}
 

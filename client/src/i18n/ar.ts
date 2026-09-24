@@ -698,5 +698,6 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   dueSalesDisabledDesc: 'جميع المبيعات يجب أن تُدفع مقدماً',
   totalSuppliers: 'إجمالي الموردين',
   withProducts: 'مع منتجات',
+  totalSpend: 'إجمالي الصرف',
   totalCategories: 'إجمالي الفئات',
 };

@@ -153,6 +153,8 @@ export const api = {
   deleteAllSales: () => request('/sales/all', { method: 'DELETE' }),
   deleteAllCustomers: () => request('/customers/all', { method: 'DELETE' }),
   deleteAllPurchases: () => request('/purchases/all', { method: 'DELETE' }),
+  deleteAllStockHistory: () => request('/stock-history/all', { method: 'DELETE' }),
+  deleteAllPriceHistory: () => request('/price-history/all', { method: 'DELETE' }),
 
   // Customers CRUD
   getCustomers: async () => { const data = await request('/customers'); return Array.isArray(data) ? data.map(mapCustomer) : data; },

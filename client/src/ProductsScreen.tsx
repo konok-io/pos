@@ -2362,113 +2362,24 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   };
 
   const deleteSupplier = (name: string) => {
-
-
-
-
-
-
-
-
-
-
-
     const supplierProducts = products.filter((p: any) => (p.company || '').toLowerCase() === name.toLowerCase());
-
-
-
-
-
-
-
-
-
-
-
-    const msg = supplierProducts.length > 0 ? `\n\n${t('products')}: ${supplierProducts.length}` : '';
-
-
-
-
-
-
-
-
-
-
-
-    if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
-
-
-
-
-
-
-
-
-
-
-
+    if (supplierProducts.length > 0) {
+      alert(t('companyHasProducts'));
+      return;
+    }
+    if (!window.confirm(`"${name}" ${t('confirmDelete')}`)) return;
     const supplier = suppliers.find((s: any) => s.name === name);
-
-
-
-
-
-
-
-
-
-
-
+    if (!supplier) return;
+    const prevSuppliers = suppliers;
     const updated = suppliers.filter((s: any) => s.name !== name);
-
-
-
-
-
-
-
-
-
-
-
     setSuppliers(updated);
-
-
-
-
-
-
-
-
-
-
-
     setSuppliersParent(updated);
-
-
-
-
-
-
-
-
-
-
-
-    if (supplier) api.deleteSupplier(supplier.id).catch(() => {});
-
-
-
-
-
-
-
-
-
-
-
+    if (String(supplier.id || '').startsWith('auto-')) return;
+    api.deleteSupplier(supplier.id).catch((e: any) => {
+      setSuppliers(prevSuppliers);
+      setSuppliersParent(prevSuppliers);
+      alert(t('deleteFailed') + ': ' + e.message);
+    });
   };
 
 
@@ -2637,65 +2548,30 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   };
 
   const exportSuppliersCsv = () => {
-
-
-
-
-
-
-
-
-
-
-
-    const headers = ['Name', 'Phone', 'Email', 'Address', 'CR Number', 'VAT Number'];
-
-
-
-
-
-
-
-
-
-
-
-    const rows = suppliers.map((s: any) => [s.name, s.phone || '', s.email || '', s.address || '', s.crNumber || '', s.vatNumber || ''].join(','));
-
-
-
-
-
-
-
-
-
-
-
-    const csv = [headers.join(','), ...rows].join('\n');
-
-
-
-
-
-
-
-
-
-
-
-    downloadCsv(csv, 'suppliers.csv');
-
-
-
-
-
-
-
-
-
-
-
+    const headers = [t('supplierCode') || 'ID', t('companyName') || t('suppliers'), t('phone'), t('email'), t('address'), t('products'), t('stock'), t('totalPurchase')];
+    const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const lines = [headers.join(',')];
+    const list = typeof filteredSuppliers !== 'undefined' ? filteredSuppliers : [];
+    const nameList: string[] = Array.isArray(list) && list.length && typeof list[0] === 'string'
+      ? (list as string[])
+      : suppliers.map((s: any) => s.name).filter(Boolean);
+    nameList.forEach((company: string) => {
+      const supplier = suppliers.find((s: any) => s.name === company);
+      const supplierProducts = products.filter((p: any) => (p.company || '').toLowerCase() === company.toLowerCase());
+      const stock = supplierProducts.reduce((a: number, p: any) => a + (p.stock || 0), 0);
+      const value = supplierProducts.reduce((a: number, p: any) => a + (p.stock || 0) * (p.costPrice || 0), 0);
+      lines.push([
+        esc(supplier?.id || ''),
+        esc(company),
+        esc(supplier?.phone || ''),
+        esc(supplier?.email || ''),
+        esc(supplier?.address || ''),
+        esc(supplierProducts.length),
+        esc(stock),
+        esc(value)
+      ].join(','));
+    });
+    downloadCsv(lines.join('\n'), `suppliers-${new Date().toISOString().slice(0, 10)}.csv`);
   };
 
 
@@ -5080,7 +4956,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                      <button disabled={hasProducts} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: hasProducts ? 0.3 : 1, cursor: hasProducts ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingSupplier(supplier); setSupplierForm(supplier); setShowSupplierModal(true); }}><i className="fas fa-pen"></i></button>
+                      <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: hasProducts ? 0.3 : 1, cursor: hasProducts ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingSupplier(supplier); setSupplierForm(supplier); setShowSupplierModal(true); }}><i className="fas fa-pen"></i></button>
 
 
 
@@ -5398,7 +5274,58 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { const payload = { ...supplierForm, code: supplierForm.code || editingSupplier.code || '' }; const updated = suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...payload } : s); setSuppliers(updated); setSuppliersParent(updated); api.updateSupplier(editingSupplier.id, payload).catch(() => {}); } else { const maxCode = suppliers.reduce((max, x: any) => { const m = (x.code || '').match(/C-(\d+)/); return m ? Math.max(max, parseInt(m[1])) : max; }, 0); const autoCode = supplierForm.code || `C-${String(maxCode + 1).padStart(5, '0')}`; const newSupplier = { ...supplierForm, code: autoCode }; const updated = [...suppliers, newSupplier]; setSuppliers(updated); setSuppliersParent(updated); api.addSupplier(newSupplier).catch(() => {}); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
+              <button onClick={() => {
+              if (!supplierForm.name.trim()) { alert(t('enterName')); return; }
+              const nameLower = supplierForm.name.trim().toLowerCase();
+              const dup = suppliers.some((s: any) => s.id !== editingSupplier?.id && (s.name || '').toLowerCase().trim() === nameLower);
+              if (dup) { alert(t('supplierNameExists')); return; }
+              const prevSuppliers = suppliers;
+              const prevProducts = products;
+              const prevPurchases = purchases;
+              if (editingSupplier) {
+                const oldName = editingSupplier.name || '';
+                const newName = supplierForm.name.trim();
+                const payload = { ...supplierForm, name: newName, code: supplierForm.code || editingSupplier.code || '' };
+                const updated = suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...payload } : s);
+                setSuppliers(updated);
+                setSuppliersParent(updated);
+                if (oldName && oldName.toLowerCase() !== newName.toLowerCase()) {
+                  const nameLc = oldName.toLowerCase();
+                  const nextProducts = products.map((p: any) => (p.company || '').toLowerCase() === nameLc ? { ...p, company: newName } : p);
+                  const nextPurchases = purchases.map((p: any) => (p.supplier || '').toLowerCase() === nameLc ? { ...p, supplier: newName } : p);
+                  setProducts(nextProducts);
+                  setProductsParent(nextProducts);
+                  setPurchasesParent(nextPurchases);
+                  for (const p of nextProducts) {
+                    if (prevProducts.find((x: any) => x.id === p.id && (x.company || '') !== (p.company || ''))) {
+                      api.updateProduct(p.id, p).catch(() => {});
+                    }
+                  }
+                }
+                api.updateSupplier(editingSupplier.id, payload).catch((e: any) => {
+                  setSuppliers(prevSuppliers);
+                  setSuppliersParent(prevSuppliers);
+                  setProducts(prevProducts);
+                  setProductsParent(prevProducts);
+                  setPurchasesParent(prevPurchases);
+                  alert(t('errorOccurred') + ': ' + e.message);
+                });
+              } else {
+                const maxCode = suppliers.reduce((max, x: any) => { const m = (x.code || '').match(/C-(\d+)/); return m ? Math.max(max, parseInt(m[1])) : max; }, 0);
+                const autoCode = supplierForm.code || `C-${String(maxCode + 1).padStart(5, '0')}`;
+                const newId = supplierForm.id || genSupplierId(suppliers);
+                const newSupplier = { ...supplierForm, id: newId, code: autoCode };
+                const updated = [...suppliers, newSupplier];
+                setSuppliers(updated);
+                setSuppliersParent(updated);
+                api.addSupplier(newSupplier).catch((e: any) => {
+                  setSuppliers(prevSuppliers);
+                  setSuppliersParent(prevSuppliers);
+                  alert(t('errorOccurred') + ': ' + e.message);
+                });
+              }
+              setShowSupplierModal(false);
+            }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
 
 
 
@@ -9242,7 +9169,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
               )}
-                  <input id="supplier-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); const phoneIdx = headers.findIndex((h: string) => h.includes('phone')); const emailIdx = headers.findIndex((h: string) => h.includes('email')); const addressIdx = headers.findIndex((h: string) => h.includes('address')); const crIdx = headers.findIndex((h: string) => h.includes('cr')); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); let imported = 0; for (let k = 1; k < lines2.length; k++) { const cols = lines2[k].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const newS = { id: genUniqueId(), name, phone: phoneIdx >= 0 ? cols[phoneIdx] || '' : '', email: emailIdx >= 0 ? cols[emailIdx] || '' : '', address: addressIdx >= 0 ? cols[addressIdx] || '' : '', crNumber: crIdx >= 0 ? cols[crIdx] || '' : '', vatNumber: vatIdx >= 0 ? cols[vatIdx] || '' : '' }; const exists = suppliers.find((s: any) => (s.name || '').toLowerCase() === name.toLowerCase()); if (!exists) { setSuppliers((prev: any[]) => [...prev, newS]); setSuppliersParent((prev: any[]) => [...prev, newS]); api.addSupplier(newS).catch(() => {}); imported++; } } alert(`${imported} ${t('suppliers')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
+                  <input id="supplier-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); const phoneIdx = headers.findIndex((h: string) => h.includes('phone')); const emailIdx = headers.findIndex((h: string) => h.includes('email')); const addressIdx = headers.findIndex((h: string) => h.includes('address')); const crIdx = headers.findIndex((h: string) => h.includes('cr')); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); let imported = 0; for (let k = 1; k < lines2.length; k++) { const cols = lines2[k].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const newS = { id: genSupplierId(suppliers), name, phone: phoneIdx >= 0 ? cols[phoneIdx] || '' : '', email: emailIdx >= 0 ? cols[emailIdx] || '' : '', address: addressIdx >= 0 ? cols[addressIdx] || '' : '', crNumber: crIdx >= 0 ? cols[crIdx] || '' : '', vatNumber: vatIdx >= 0 ? cols[vatIdx] || '' : '' }; const exists = suppliers.find((s: any) => (s.name || '').toLowerCase() === name.toLowerCase()); if (!exists) { setSuppliers((prev: any[]) => [...prev, newS]); setSuppliersParent((prev: any[]) => [...prev, newS]); api.addSupplier(newS).catch(() => {}); imported++; } } alert(`${imported} ${t('suppliers')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
 
 
 

@@ -698,5 +698,6 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   dueSalesDisabledDesc: 'सभी बिक्री का भुगतान अग्रिम में करना होगा',
   totalSuppliers: 'कुल आपूर्तिकर्ता',
   withProducts: 'उत्पादों के साथ',
+  totalSpend: 'कुल खर्च',
   totalCategories: 'कुल श्रेणियाँ',
 };
