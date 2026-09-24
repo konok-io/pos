@@ -1,5 +1,75 @@
 <!DOCTYPE html>
-<html lang="bn"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>অফলাইন - POS</title>
-<style>body{margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:#0F766E;color:#fff;font-family:-apple-system,'Hind Siliguri',sans-serif;text-align:center}h1{font-size:22px;margin:0 0 8px}p{opacity:.85;margin:0 0 18px}button{background:#fff;color:#0F766E;border:none;padding:10px 22px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer}</style>
-</head><body><div><h1>🔌 ইন্টারনেট সংযোগ নেই</h1><p>অ্যাপটি অফলাইনেও পূর্ববর্তী ডেটা দেখাতে পারে। সংযোগ ফিরলে রিলোড করুন।</p><button onclick="location.reload()">পুনরায় চেষ্টা করুন</button></div></body></html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>No internet connection</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans Bengali", "Noto Sans Arabic", "Noto Sans Devanagari", sans-serif; background: #0F766E; min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .box { text-align: center; padding: 32px 24px; max-width: 420px; }
+  .icon { font-size: 48px; margin-bottom: 16px; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+  p { font-size: 15px; line-height: 1.55; opacity: 0.92; margin-bottom: 24px; }
+  button { background: #fff; color: #0F766E; border: none; border-radius: 10px; padding: 12px 28px; font-size: 15px; font-weight: 700; cursor: pointer; }
+  button:hover { background: #F0FDFA; }
+  .hint { margin-top: 16px; font-size: 12px; opacity: 0.7; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="icon">🔌</div>
+  <h1 id="title">No internet connection</h1>
+  <p id="body">The app can show previous data offline. Reload when the connection is back.</p>
+  <button onclick="location.reload()" id="btn">Try again</button>
+  <div class="hint" id="hint">Auto reloads when you are back online</div>
+</div>
+<script>
+(function () {
+  var dict = {
+    en: {
+      title: 'No internet connection',
+      body: 'The app can show previous data offline. Reload when the connection is back.',
+      btn: 'Try again',
+      hint: 'Auto reloads when you are back online',
+      docTitle: 'No internet connection'
+    },
+    bn: {
+      title: 'ইন্টারনেট সংযোগ নেই',
+      body: 'অ্যাপটি অফলাইনেও পূর্ববর্তী ডেটা দেখাতে পারে। সংযোগ ফিরলে রিলোড করুন।',
+      btn: 'পুনরায় চেষ্টা করুন',
+      hint: 'অনলাইন হলে স্বয়ংক্রিয়ভাবে রিলোড হবে',
+      docTitle: 'ইন্টারনেট সংযোগ নেই'
+    },
+    ar: {
+      title: 'لا يوجد اتصال بالإنترنت',
+      body: 'يمكن للتطبيق عرض البيانات السابقة دون اتصال. أعد التحميل عند عودة الاتصال.',
+      btn: 'حاول مرة أخرى',
+      hint: 'سيتم إعادة التحميل تلقائياً عند عودة الاتصال',
+      docTitle: 'لا يوجد اتصال بالإنترنت'
+    },
+    hi: {
+      title: 'इंटरनेट कनेक्शन नहीं है',
+      body: 'ऐप बिना इंटरनेट के पिछला डेटा दिखा सकता है। कनेक्शन वापस आने पर रीलोड करें।',
+      btn: 'फिर से कोशिश करें',
+      hint: 'ऑनलाइन आते ही स्वतः रीलोड होगा',
+      docTitle: 'इंटरनेट कनेक्शन नहीं है'
+    }
+  };
+  var lang = 'en';
+  try {
+    lang = localStorage.getItem('pos_lang') || localStorage.getItem('language') || (navigator.language || 'en').slice(0, 2);
+  } catch (e) {}
+  if (!dict[lang]) lang = 'en';
+  var d = dict[lang];
+  document.getElementById('title').textContent = d.title;
+  document.getElementById('body').textContent = d.body;
+  document.getElementById('btn').textContent = d.btn;
+  document.getElementById('hint').textContent = d.hint;
+  document.title = d.docTitle;
+  document.documentElement.lang = lang;
+  window.addEventListener('online', function () { location.reload(); });
+})();
+</script>
+</body>
+</html>

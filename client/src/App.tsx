@@ -1516,7 +1516,7 @@ export default function App() {
     const iv = window.setInterval(() => {
       if (Date.now() - last >= 5 * 60 * 1000) {
         handleLogout();
-        try { window.dispatchEvent(new CustomEvent('pos:api-error', { detail: '৫ মিনিট নিষ্ক্রিয় — অটো লগআউট হয়েছে' })); } catch {}
+        try { window.dispatchEvent(new CustomEvent('pos:api-error', { detail: typeof t === 'function' ? t('autoLogout5min') : 'Inactive 5 min — auto logged out' })); } catch {}
       }
     }, 30 * 1000);
     return () => { evs.forEach(e => window.removeEventListener(e, bump)); window.clearInterval(iv); };
@@ -7429,7 +7429,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
             border: dataSyncStatus === 'synced' ? '1px solid #A7F3D0' : dataSyncStatus === 'offline' ? '1px solid #FECACA' : '1px solid #FDE68A' }}>
             <span style={{ width: 6, height: 6, borderRadius: '50%', 
               background: dataSyncStatus === 'synced' ? '#059669' : dataSyncStatus === 'offline' ? '#DC2626' : '#F59E0B' }}></span>
-            <span>{dataSyncStatus === 'synced' ? 'Synced' : dataSyncStatus === 'offline' ? 'Offline' : 'Syncing...'}</span>
+            <span>{dataSyncStatus === 'synced' ? t('synced') : dataSyncStatus === 'offline' ? t('offline') : t('syncing')}</span>
             {dataLastSyncTime && <span style={{ marginLeft: 6, fontSize: 10, opacity: 0.7 }}>({dataLastSyncTime})</span>}
           </div>
           <button onClick={syncAllData} disabled={dataSyncStatus === 'pending'} style={{ padding: '6px 10px', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: dataSyncStatus === 'pending' ? 'not-allowed' : 'pointer', background: '#115E59', color: '#fff', opacity: dataSyncStatus === 'pending' ? 0.6 : 1, transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -8245,7 +8245,7 @@ export function TranslationSettings() {
   const handleSync = async () => {
     setTransSyncStatus('syncing');
     await syncTranslations();
-    setTransSyncStatus('Synced!');
+    setTransSyncStatus(t('synced') + '!');
     setTimeout(() => setTransSyncStatus(''), 2000);
   };
 

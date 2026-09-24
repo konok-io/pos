@@ -2,6 +2,45 @@ const API_URL = '/api';
 
 let authToken = localStorage.getItem('pos_api_token') || '';
 
+
+// Lightweight i18n for non-React modules (reads active language like the app)
+const posI18nDict: Record<string, Record<string, string>> = {
+  en: {
+    apiOffline: 'No API connection (offline)',
+    serverUnreachable: 'Could not reach server (network/server error)',
+    serverBadResponse: 'Server bad response (HTTP {code})',
+    sessionExpired: 'Login session ended — please log in again',
+  },
+  bn: {
+    apiOffline: 'API সংযোগ নেই (অফলাইন)',
+    serverUnreachable: 'সার্ভারে পৌঁছানো যায়নি (নেটওয়ার্ক/সার্ভার ত্রুটি)',
+    serverBadResponse: 'সার্ভার ভুল রেসপন্স (HTTP {code})',
+    sessionExpired: 'লগইন সেশন শেষ — আবার লগইন করুন',
+  },
+  ar: {
+    apiOffline: 'لا يوجد اتصال بالـ API (غير متصل)',
+    serverUnreachable: 'تعذر الوصول إلى الخادم (خطأ في الشبكة/الخادم)',
+    serverBadResponse: 'استجابة خادم غير صالحة (HTTP {code})',
+    sessionExpired: 'انتهت جلسة تسجيل الدخول — يرجى تسجيل الدخول مرة أخرى',
+  },
+  hi: {
+    apiOffline: 'API कनेक्शन नहीं है (ऑफ़लाइन)',
+    serverUnreachable: 'सर्वर तक नहीं पहुंच सका (नेटवर्क/सर्वर त्रुटि)',
+    serverBadResponse: 'सर्वर की गलत प्रतिक्रिया (HTTP {code})',
+    sessionExpired: 'लॉगिन सत्र समाप्त — कृपया फिर से लॉगिन करें',
+  },
+};
+function posApiT(key: string, vars?: Record<string, string | number>): string {
+  let lang = 'en';
+  try {
+    lang = localStorage.getItem('pos_lang') || localStorage.getItem('language') || navigator.language.slice(0, 2) || 'en';
+  } catch {}
+  const dict = posI18nDict[lang] || posI18nDict.en;
+  let s = dict[key] || posI18nDict.en[key] || key;
+  if (vars) Object.keys(vars).forEach(k => { s = s.replace('{' + k + '}', String(vars[k])); });
+  return s;
+}
+
 export function setToken(token: string) {
   authToken = token;
   localStorage.setItem('pos_api_token', token);
@@ -43,20 +82,20 @@ async function request(path: string, options: RequestInit = {}) {
   try {
     res = await fetch(`${API_URL}${path}`, { ...options, headers });
   } catch (e: any) {
-    const msg = !navigator.onLine ? 'API সংযোগ নেই (অফলাইন)' : 'সার্ভারে পৌঁছানো যায়নি (নেটওয়ার্ক/সার্ভার ত্রুটি)';
+    const msg = !navigator.onLine ? posApiT('apiOffline') : posApiT('serverUnreachable');
     emitApiError(msg);
     throw new Error(msg);
   }
   if (res.status === 401) {
     clearToken();
     try { window.dispatchEvent(new CustomEvent('pos:unauthorized')); } catch {}
-    throw new Error('লগইন সেশন শেষ — আবার লগইন করুন');
+    throw new Error(posApiT('sessionExpired'));
   }
   let data: any;
   try {
     data = await res.json();
   } catch {
-    const msg = `সার্ভার ভুল রেসপন্স (HTTP ${res.status})`;
+    const msg = posApiT('serverBadResponse', { code: res.status });
     emitApiError(msg);
     throw new Error(msg);
   }
