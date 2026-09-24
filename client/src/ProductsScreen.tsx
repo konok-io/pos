@@ -10704,14 +10704,7 @@ tr:nth-child(even){background:#F8FAFC}
                           <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t('productList')}</span>
                           <span style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 700 }}>{tempProducts.length}</span>
                         </div>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <button onClick={handleClearTempProducts} disabled={tempProducts.length === 0} style={{ padding: '7px 10px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)', color: tempProducts.length > 0 ? '#DC2626' : 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: 13, cursor: tempProducts.length > 0 ? 'pointer' : 'default', display: 'flex', alignItems: 'center' }}>
-                            <i className="fas fa-trash-can"></i>
-                          </button>
-                          <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? '#fff' : 'rgba(255,255,255,0.2)', color: tempProducts.length > 0 ? T.teal : 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: 12, cursor: tempProducts.length > 0 ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <i className="fas fa-paper-plane"></i> {t('post')}
-                          </button>
-                        </div>
+                        
                       </div>
                       <div style={{ maxHeight: 320, overflow: 'auto', background: T.gray50 }}>
                         {tempProducts.length === 0 ? (
