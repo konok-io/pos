@@ -1915,7 +1915,29 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const handleAddProduct = () => {
+  const genPurchaseId = () => {
+    const d = new Date();
+    const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+    const prefix = `PUR-${ymd}-`;
+    let max = 0;
+    (purchases || []).forEach((p: any) => {
+      const id = String(p?.id || '');
+      if (id.startsWith(prefix)) {
+        const n = parseInt(id.slice(prefix.length), 10);
+        if (!Number.isNaN(n) && n > max) max = n;
+      }
+    });
+    purchaseSeqToday.forEach((id: string) => {
+      if (id.startsWith(prefix)) {
+        const n = parseInt(id.slice(prefix.length), 10);
+        if (!Number.isNaN(n) && n > max) max = n;
+      }
+    });
+    return `${prefix}${String(max + 1).padStart(4, '0')}`;
+  };
+  const purchaseSeqToday: string[] = [];
+
+  const handleAddProduct = async () => {
 
 
 
@@ -1928,6 +1950,14 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
+    if (!(Number(productForm.sellPrice) > 0)) { alert(t('sellPriceRequired')); return; }
+    if (Number(productForm.costPrice) < 0 || Number(productForm.sellPrice) < 0) { alert(t('invalid')); return; }
+    const dupName = products.find((p: any) => (p.name || '').trim().toLowerCase() === productForm.name.trim().toLowerCase());
+    if (dupName) { alert(t('duplicateName')); return; }
+    if ((productForm.code || '').trim()) {
+      const dupCode = products.find((p: any) => (p.code || '').trim() && (p.code || '').trim().toLowerCase() === productForm.code.trim().toLowerCase());
+      if (dupCode) { alert(t('duplicateCode')); return; }
+    }
 
 
 
@@ -1987,7 +2017,12 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    api.addProduct(newProduct).catch(() => {});
+    try {
+      await api.addProduct(newProduct);
+    } catch (err: any) {
+      alert(`${t('failed') || 'Save failed'}: ${err?.message || err}`);
+      return;
+    }
 
 
 
@@ -2060,6 +2095,16 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
+    if (!(Number(productForm.sellPrice) > 0)) { alert(t('sellPriceRequired')); return; }
+    if (Number(productForm.costPrice) < 0 || Number(productForm.sellPrice) < 0) { alert(t('invalid')); return; }
+    const nameL = productForm.name.trim().toLowerCase();
+    const dupName = products.find((p: any) => (p.name || '').trim().toLowerCase() === nameL) || tempProducts.find((p: any) => (p.name || '').trim().toLowerCase() === nameL);
+    if (dupName) { alert(t('duplicateName')); return; }
+    if ((productForm.code || '').trim()) {
+      const codeL = productForm.code.trim().toLowerCase();
+      const dupCode = products.find((p: any) => (p.code || '').trim() && (p.code || '').trim().toLowerCase() === codeL) || tempProducts.find((p: any) => (p.code || '').trim() && (p.code || '').trim().toLowerCase() === codeL);
+      if (dupCode) { alert(t('duplicateCode')); return; }
+    }
 
 
 
@@ -2221,11 +2266,13 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
     const purchasesCreated: any[] = [];
     for (const [company, group] of Object.entries(companyGroups)) {
-      const purchaseId = genUniqueId();
+      const purchaseId = genPurchaseId();
+      purchaseSeqToday.push(purchaseId);
       purchaseIds.push(purchaseId);
       const groupResults = await Promise.allSettled(
         group.map((p: any) => {
-          const existingProd = products.find((ep: any) => (ep.code || '').toLowerCase() === (p.code || '').toLowerCase());
+          const pCode = (p.code || '').trim().toLowerCase();
+          const existingProd = pCode ? products.find((ep: any) => (ep.code || '').trim().toLowerCase() === pCode) : null;
           if (existingProd) {
             const newStock = (existingProd.stock || 0) + (p.stock || 0);
             delete p._temp;
@@ -2238,7 +2285,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       );
       results.push(...groupResults);
       const items = group.map((pp: any) => {
-        const ep = products.find((e: any) => (e.code || '').toLowerCase() === (pp.code || '').toLowerCase());
+        const ppCode = (pp.code || '').trim().toLowerCase();
+        const ep = ppCode ? products.find((e: any) => (e.code || '').trim().toLowerCase() === ppCode) : null;
         return { productId: ep ? ep.id : pp.id, name: pp.name, code: pp.code || '', quantity: +pp.stock || 0, costPrice: +pp.costPrice || 0 };
       });
       const total = items.reduce((x: number, it: any) => x + it.quantity * it.costPrice, 0);
@@ -10270,7 +10318,7 @@ tr:nth-child(even){background:#F8FAFC}
                   <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('suppliers')}</label>
                   <div style={{ position: 'relative' }}>
                     <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-building" style={{ fontSize: 13 }}></i></div>
-                    <input value={productForm.company || productForm.supplierId} onChange={e => { const val = e.target.value; const found = suppliers.find((s: any) => s.id === val || s.name.toLowerCase() === val.toLowerCase()); if (found) { setProductForm({ ...productForm, supplierId: found.id, company: found.name }); } else { setProductForm({ ...productForm, supplierId: val, company: '' }); } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.company ? '#F0F9FF' : T.gray50, borderColor: productForm.company ? '#0369A1' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
+                    <input value={productForm.company || productForm.supplierId} onChange={e => { const val = e.target.value; const found = suppliers.find((s: any) => s.id === val || s.name.toLowerCase() === val.toLowerCase()); if (found) { setProductForm({ ...productForm, supplierId: found.id, company: found.name }); } else { setProductForm({ ...productForm, supplierId: '', company: val }); } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.company ? '#F0F9FF' : T.gray50, borderColor: productForm.company ? '#0369A1' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
                     {productForm.supplierId && !productForm.company && suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).length > 0 && (
                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
                         {suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).map((s: any) => (
@@ -10316,7 +10364,7 @@ tr:nth-child(even){background:#F8FAFC}
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('expiryDate')}</label>
                     <div style={{ position: 'relative' }}>
                       <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-calendar-alt" style={{ fontSize: 13 }}></i></div>
-                      <input value={productForm.expiryDate || ''} onChange={e => setProductForm({ ...productForm, expiryDate: e.target.value })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.expiryDate ? '#FFF1F2' : T.gray50, borderColor: productForm.expiryDate ? '#E11D48' : T.gray200, height: 40 }} placeholder="DD-MM-YYYY" />
+                      <input type="date" value={productForm.expiryDate || ''} onChange={e => setProductForm({ ...productForm, expiryDate: e.target.value })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.expiryDate ? '#FFF1F2' : T.gray50, borderColor: productForm.expiryDate ? '#E11D48' : T.gray200, height: 40 }} />
                     </div>
                   </div>
                 </div>
@@ -10397,7 +10445,7 @@ tr:nth-child(even){background:#F8FAFC}
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('minStock')}</label>
                     <div style={{ position: 'relative' }}>
                       <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-layer-group" style={{ fontSize: 12 }}></i></div>
-                      <input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 30, height: 38 }} />
+                      <input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : parseInt(e.target.value, 10)) })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 30, height: 38 }} />
                     </div>
                   </div>
                 </div>
@@ -10458,7 +10506,7 @@ tr:nth-child(even){background:#F8FAFC}
                 })()}
                 {/* Buttons */}
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
+                  <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
                   <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-plus" style={{marginRight: 6}}></i> {t('add')}</button>
                 </div>
               </div>
@@ -10477,21 +10525,24 @@ tr:nth-child(even){background:#F8FAFC}
                   </div>
                 </div>
                 <div style={{ border: `2px dashed ${T.gray300}`, borderRadius: 10, padding: '16px 12px', textAlign: 'center', background: T.white, cursor: 'pointer', position: 'relative' }} onClick={() => document.getElementById('csv-upload-input')?.click()}>
-                  <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = headers.findIndex((h: string) => h.includes('sell') || h.includes('price')); const stockIdx = headers.findIndex((h: string) => h.includes('stock') && !h.includes('min')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const minStockIdx = headers.findIndex((h: string) => h.includes('minstock') || h.includes('min_stock') || h === 'min'); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); const imported: any[] = []; const errors: string[] = []; for (let i = 1; i < lines2.length; i++) { const cols = lines2[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const companyName = companyIdx >= 0 ? cols[companyIdx] : ''; let supplierId = ''; if (companyName) { const matched = suppliers.find((s: any) => (s.name || '').toLowerCase() === companyName.toLowerCase()); if (matched) { supplierId = matched.id; } else { errors.push(`Row ${i+1}: "${companyName}" - ${t('supplierNotFound')}`); continue; } } const existingIdx = tempProducts.findIndex((t: any) => (t.code || '').toLowerCase() === (codeIdx >= 0 ? cols[codeIdx] : '').toLowerCase());
+                  <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = (() => { const s = headers.findIndex((h: string) => h.includes('sell')); if (s >= 0) return s; return headers.findIndex((h: string) => (h.includes('sellprice') || h.includes('sell_price') || (h.includes('price') && !h.includes('cost') && !h.includes('purchase')))); })(); const stockIdx = headers.findIndex((h: string) => h.includes('stock') && !h.includes('min')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const minStockIdx = headers.findIndex((h: string) => h.includes('minstock') || h.includes('min_stock') || h === 'min'); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); const expiryIdx = headers.findIndex((h: string) => h.includes('expir')); const imported: any[] = []; const errors: string[] = []; const stockUpdated: string[] = []; for (let i = 1; i < lines2.length; i++) { const cols = lines2[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const companyName = companyIdx >= 0 ? cols[companyIdx] : ''; let supplierId = ''; if (companyName) { const matched = suppliers.find((s: any) => (s.name || '').toLowerCase() === companyName.toLowerCase()); if (matched) { supplierId = matched.id; } else { errors.push(`Row ${i+1}: "${companyName}" - ${t('supplierNotFound')}`); continue; } } const existingIdx = tempProducts.findIndex((t: any) => (t.code || '').toLowerCase() === (codeIdx >= 0 ? cols[codeIdx] : '').toLowerCase());
                     if (existingIdx >= 0) {
-                      setTempProducts((prev: any[]) => prev.map((t: any, idx: number) => idx === existingIdx ? { ...t, stock: (t.stock || 0) + (stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0) } : t));
+                      setTempProducts((prev: any[]) => prev.map((t: any, idx: number) => idx === existingIdx ? { ...t, name: name || t.name, cat: (catIdx >= 0 && cols[catIdx]) ? cols[catIdx] : t.cat, costPrice: costIdx >= 0 && cols[costIdx] !== '' && cols[costIdx] !== undefined ? (parseFloat(cols[costIdx]) || t.costPrice) : t.costPrice, sellPrice: sellIdx >= 0 && cols[sellIdx] !== '' && cols[sellIdx] !== undefined ? (parseFloat(cols[sellIdx]) || t.sellPrice) : t.sellPrice, unit: (unitIdx >= 0 && cols[unitIdx]) ? cols[unitIdx] : t.unit, company: companyName || t.company, supplierId: supplierId || t.supplierId, minStock: minStockIdx >= 0 && cols[minStockIdx] !== '' && cols[minStockIdx] !== undefined ? (parseInt(cols[minStockIdx], 10) || t.minStock) : t.minStock, vat: vatIdx >= 0 && cols[vatIdx] !== '' && cols[vatIdx] !== undefined ? (parseFloat(cols[vatIdx]) || t.vat) : t.vat, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : t.expiryDate, stock: (t.stock || 0) + (stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0) } : t));
                     } else {
                       const existingDb = products.find((p: any) => (p.code || '').toLowerCase() === (codeIdx >= 0 ? cols[codeIdx] : '').toLowerCase());
                       if (existingDb) {
-                        api.updateProduct(existingDb.id, { ...existingDb, stock: (existingDb.stock || 0) + (stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0) }).catch(() => {});
-                        alert(`${existingDb.name} stock updated +${stockIdx >= 0 ? cols[stockIdx] : 0}`);
+                        const addStk = stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0;
+                        const newStk = (existingDb.stock || 0) + addStk;
+                        api.updateProduct(existingDb.id, { ...existingDb, stock: newStk }).catch(() => {});
+                        if (addStk !== 0) api.addStockHistory({ productId: existingDb.id, productName: existingDb.name, type: 'purchase', quantity: addStk, oldStock: existingDb.stock || 0, newStock: newStk, reason: 'CSV import' }).catch(() => {});
+                        stockUpdated.push(`${existingDb.name} +${addStk}`);
                       } else {
-                        imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? parseFloat(cols[costIdx]) || 0 : 0, sellPrice: sellIdx >= 0 ? parseFloat(cols[sellIdx]) || 0 : 0, stock: stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyName, minStock: minStockIdx >= 0 ? parseInt(cols[minStockIdx]) || 5 : 5, supplierId, vat: vatIdx >= 0 ? parseFloat(cols[vatIdx]) || 0 : 0, expiryDate: '', _temp: true }); } } } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); } const msg = []; if (imported.length > 0) msg.push(`${imported.length} ${t('products')} imported!`); if (errors.length > 0) msg.push(`${errors.length} errors:\n${errors.join('\n')}`); alert(msg.join('\n\n')); }; reader.readAsText(file); e.target.value = ''; }} />
+                        imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? parseFloat(cols[costIdx]) || 0 : 0, sellPrice: sellIdx >= 0 ? parseFloat(cols[sellIdx]) || 0 : 0, stock: stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyName, minStock: minStockIdx >= 0 ? parseInt(cols[minStockIdx]) || 5 : 5, supplierId, vat: vatIdx >= 0 ? parseFloat(cols[vatIdx]) || 0 : 0, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : '', _temp: true }); } } } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); } const msg = []; if (imported.length > 0) msg.push(`${imported.length} ${t('products')} imported!`); if (stockUpdated.length > 0) msg.push(`Stock updated:\n${stockUpdated.join('\n')}`); if (errors.length > 0) msg.push(`${errors.length} errors:\n${errors.join('\n')}`); if (msg.length) alert(msg.join('\n\n')); }; reader.readAsText(file); e.target.value = ''; }} />
                   <i className="fas fa-cloud-arrow-up" style={{ fontSize: 24, color: T.gray300, marginBottom: 8 }}></i>
                   <div style={{ fontSize: 12, color: T.gray500, fontWeight: 500 }}>Click to upload CSV</div>
                   <div style={{ fontSize: 10, color: T.gray400, marginTop: 4 }}>name, code, category, costPrice, sellPrice, stock, minStock, vat, unit, company</div>
                 </div>
-                <button onClick={() => { const headers = ['Name', 'Code', 'Category', 'CostPrice', 'SellPrice', 'Stock', 'Unit', 'Company']; const demo = [headers.join(','), 'Rice Basmati,1001,Groceries,80,120,50,5,15,kg,ABC Traders', 'Samsung Galaxy S24,2001,Electronics,45000,55000,10,2,12,pcs,Mobile World', 'Notebook A4,3001,Stationery,25,40,200,10,5,pcs,Paper House'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'products_template.csv'; a.click(); URL.revokeObjectURL(url); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px 0', marginTop: 8, border: `1px solid ${T.gray200}`, borderRadius: 8, background: T.white, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: T.gray600 }}><i className="fas fa-download" style={{ fontSize: 12 }}></i> {t('demoCsv')}</button>
+                <button onClick={() => { const headers = ['Name', 'Code', 'Category', 'CostPrice', 'SellPrice', 'Stock', 'MinStock', 'VAT', 'Unit', 'Company', 'ExpiryDate']; const demo = [headers.join(','), 'Rice Basmati,1001,Groceries,80,120,50,5,15,kg,ABC Traders,2027-06-30', 'Samsung Galaxy S24,2001,Electronics,45000,55000,10,2,12,pcs,Mobile World,2028-12-31', 'Notebook A4,3001,Stationery,25,40,200,10,5,pcs,Paper House,'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'products_template.csv'; a.click(); URL.revokeObjectURL(url); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px 0', marginTop: 8, border: `1px solid ${T.gray200}`, borderRadius: 8, background: T.white, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: T.gray600 }}><i className="fas fa-download" style={{ fontSize: 12 }}></i> {t('demoCsv')}</button>
               </div>
               {/* Purchase History */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -12580,7 +12631,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: parseInt(e.target.value) || 5 })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : parseInt(e.target.value, 10)) })} style={inputStyle} /></div>
 
 
 
