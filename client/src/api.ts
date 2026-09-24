@@ -49,7 +49,8 @@ async function request(path: string, options: RequestInit = {}) {
   }
   if (res.status === 401) {
     clearToken();
-    throw new Error('Unauthorized');
+    try { window.dispatchEvent(new CustomEvent('pos:unauthorized')); } catch {}
+    throw new Error('লগইন সেশন শেষ — আবার লগইন করুন');
   }
   let data: any;
   try {
@@ -71,6 +72,8 @@ async function request(path: string, options: RequestInit = {}) {
 export const api = {
   login: (email: string, password: string) =>
     request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+
+  logout: () => request('/auth/logout', { method: 'POST' }),
 
   // Products
   getProducts: () => request('/products').then((d: any) => Array.isArray(d) ? d.map(mapProduct) : d),

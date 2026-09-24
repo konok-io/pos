@@ -1,5 +1,5 @@
 import ProductsScreen from "./ProductsScreen";
-import { api, zatcaApi } from "./api";
+import { api, zatcaApi, setToken, clearToken } from "./api";
 import { useState, useEffect, useRef } from 'react';
 import './index.css';
 import { useLanguage, languages, defaultTranslations, Language } from './i18n';
@@ -748,7 +748,7 @@ interface Sale {
 
 // Loading Screen
 // Login Screen
-function LoginScreen({ onLogin }: { onLogin: () => void }) {
+function LoginScreen({ onLogin }: { onLogin: (user?: any) => void }) {
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
@@ -762,10 +762,18 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
     setError('');
     setLoading(true);
 
-    if ((username === 'admin' || username === 'admin@konok.io') && password === 'admin123') {
-      onLogin();
-    } else {
-      setError(t('invalidCredentials'));
+    try {
+      const email = username === 'admin' || username === 'admin@konok.io' ? 'admin@pos.test' : username;
+      const res: any = await api.login(email, password);
+      if (res && res.token) {
+        setToken(res.token);
+        localStorage.setItem('pos_current_user', JSON.stringify(res.user));
+        onLogin(res.user);
+      } else {
+        setError(t('invalidCredentials'));
+      }
+    } catch (err: any) {
+      setError(err?.message || t('invalidCredentials'));
     }
     setLoading(false);
   };
@@ -1187,8 +1195,12 @@ export default function App() {
       try {
       // Check if user was logged in
       const isLoggedInSetting = await db.get<boolean>('settings', 'isLoggedIn');
-      if (isLoggedInSetting) {
+      const hasToken = !!localStorage.getItem('pos_api_token');
+      if (isLoggedInSetting && hasToken) {
         setIsLoggedIn(true);
+        try { const cu = JSON.parse(localStorage.getItem('pos_current_user') || ''); if (cu) _setCurrentUser(cu); } catch {}
+      } else if (isLoggedInSetting && !hasToken) {
+        await db.delete('settings', 'isLoggedIn');
       }
       
       // Load settings from API first, fallback to localDb
@@ -1488,14 +1500,46 @@ export default function App() {
     if (sales.length > 0) saveSales();
   }, [isInitialized, sales]);
 
-  const handleLogin = async () => {
+  const handleLogin = async (user?: any) => {
     await db.put('settings', 'isLoggedIn', true);
+    if (user) _setCurrentUser(user);
     setIsLoggedIn(true);
   };
 
+  // ===== 5-minute inactivity auto-logout (client side, server also enforces via DB sessions) =====
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    let last = Date.now();
+    const bump = () => { last = Date.now(); };
+    const evs: (keyof WindowEventMap)[] = ['pointerdown', 'keydown', 'pointermove'];
+    evs.forEach(e => window.addEventListener(e, bump, { passive: true }));
+    const iv = window.setInterval(() => {
+      if (Date.now() - last >= 5 * 60 * 1000) {
+        handleLogout();
+        try { window.dispatchEvent(new CustomEvent('pos:api-error', { detail: '৫ মিনিট নিষ্ক্রিয় — অটো লগআউট হয়েছে' })); } catch {}
+      }
+    }, 30 * 1000);
+    return () => { evs.forEach(e => window.removeEventListener(e, bump)); window.clearInterval(iv); };
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    const onUnauthorized = () => {
+      localStorage.removeItem('pos_current_user');
+      db.delete('settings', 'isLoggedIn').catch(() => {});
+      setIsLoggedIn(false);
+      _setCurrentUser(DEFAULT_ADMIN);
+    };
+    window.addEventListener('pos:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('pos:unauthorized', onUnauthorized);
+  }, []);
+
   const handleLogout = async () => {
+    try { await api.logout(); } catch {}
+    clearToken();
+    localStorage.removeItem('pos_current_user');
     await db.delete('settings', 'isLoggedIn');
     setIsLoggedIn(false);
+    _setCurrentUser(DEFAULT_ADMIN);
   };
 
   const handleFullscreen = () => {
