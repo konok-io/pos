@@ -696,4 +696,7 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   dueSalesEnabled: 'مبيعات الآجل مفعلة',
   dueSalesEnabledDesc: 'السماح للعملاء بالشراء بالآجل',
   dueSalesDisabledDesc: 'جميع المبيعات يجب أن تُدفع مقدماً',
+  totalSuppliers: 'إجمالي الموردين',
+  withProducts: 'مع منتجات',
+  totalCategories: 'إجمالي الفئات',
 };

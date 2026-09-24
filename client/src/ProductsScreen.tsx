@@ -394,6 +394,20 @@ const genUniqueId = () => {
 
 
 
+const genSupplierId = (suppliersList: any[]) => {
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  let max = 0;
+  (suppliersList || []).forEach((x: any) => {
+    const id = String(x?.id || '');
+    if (id.startsWith(ymd) && id.length >= ymd.length + 4) {
+      const n = parseInt(id.slice(ymd.length), 10);
+      if (!Number.isNaN(n) && n > max) max = n;
+    }
+  });
+  return `${ymd}${String(max + 1).padStart(4, '0')}`;
+};
+
 const fmtN = (n: number) => (+n || 0).toLocaleString('en-IN');
 
 
@@ -1491,7 +1505,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const totalStockValue = products.reduce((s: number, p: any) => s + p.stock * p.costPrice, 0);
+  const totalStockValue = products.reduce((s: number, p: any) => {
+    const stock = +p.stock || 0;
+    const free = Math.min(+p.freeQty || 0, stock);
+    return s + (stock - free) * (+p.costPrice || 0);
+  }, 0);
 
 
 
@@ -1761,7 +1779,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    const updated = products.map((p: any) => p.id === editProduct.id ? { ...p, costPrice: editProduct.costPrice, sellPrice: editProduct.sellPrice } : p);
+    const updated = products.map((p: any) => p.id === editProduct.id ? { ...p, costPrice: editProduct.costPrice, sellPrice: editProduct.sellPrice, foc: !!editProduct.foc, freeQty: editProduct.freeQty ?? p.freeQty } : p);
 
 
 
@@ -1802,6 +1820,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       ...(latestForPrice || editProduct),
       costPrice: editProduct.costPrice,
       sellPrice: editProduct.sellPrice,
+      foc: !!editProduct.foc,
+      freeQty: editProduct.freeQty ?? (latestForPrice && latestForPrice.freeQty) ?? 0,
     }).catch(() => {});
     if (latestForPrice && (
       latestForPrice.costPrice !== editProduct.costPrice ||
@@ -2165,8 +2185,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           hit.stock = Math.max(0, hit.stock || 0) + paid + free;
           if (unitCost > 0) hit.costPrice = unitCost;
           if (p.foc) hit.foc = true;
+          hit._srcIds = [...(hit._srcIds || [hit.id]), p.id];
         } else {
-          merged.push({ ...p, paidQty: paid, freeQty: free, stock: paid + free, costPrice: unitCost, foc: !!p.foc });
+          merged.push({ ...p, paidQty: paid, freeQty: free, stock: paid + free, costPrice: unitCost, foc: !!p.foc, _srcIds: [p.id] });
         }
       }
 
@@ -2181,6 +2202,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       const purchaseIds: string[] = [];
       const purchasesCreated: any[] = [];
       const historyPlan: any[] = [];
+      const succeededSrcIds = new Set<string>();
       let workingProducts = [...products];
 
       for (const group of Object.values(companyGroups)) {
@@ -2212,24 +2234,34 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
               const oldStock = +existingProd.stock || 0;
               const newStock = oldStock + qty;
               const newCost = paid > 0 ? unitCost : (+existingProd.costPrice || 0);
-              historyPlan.push({
+              const newFree = (+existingProd.freeQty || 0) + free;
+              const plan = {
                 matchCode: pCode, matchName: pName, productName: existingProd.name,
                 quantity: qty, paidQty: paid, freeQty: free, unitCost, paidTotal, freeValue,
                 oldStock, newStock, purchaseId,
+              };
+              workingProducts = workingProducts.map(w => w.id === existingProd.id ? { ...w, stock: newStock, costPrice: newCost, freeQty: newFree } : w);
+              return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock, costPrice: newCost, foc: existingProd.foc || !!p.foc, freeQty: newFree }).then((res: any) => {
+                historyPlan.push(plan);
+                (p._srcIds || [p.id]).forEach((id: string) => succeededSrcIds.add(id));
+                return res;
               });
-              workingProducts = workingProducts.map(w => w.id === existingProd.id ? { ...w, stock: newStock, costPrice: newCost } : w);
-              return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock, costPrice: newCost, foc: existingProd.foc || !!p.foc });
             }
             const newCost = paid > 0 ? unitCost : 0;
             clean.costPrice = newCost;
             clean.stock = qty;
             clean.foc = !!p.foc;
-            historyPlan.push({
+            clean.freeQty = free;
+            const plan = {
               matchCode: pCode, matchName: pName, productName: p.name,
               quantity: qty, paidQty: paid, freeQty: free, unitCost, paidTotal, freeValue,
               oldStock: 0, newStock: qty, purchaseId,
+            };
+            return api.addProduct({ ...clean, purchaseId, stock: qty, costPrice: newCost, foc: !!p.foc, freeQty: free }).then((res: any) => {
+              historyPlan.push(plan);
+              (p._srcIds || [p.id]).forEach((id: string) => succeededSrcIds.add(id));
+              return res;
             });
-            return api.addProduct({ ...clean, purchaseId, stock: qty, costPrice: newCost, foc: !!p.foc });
           })
         );
         results.push(...groupResults);
@@ -2310,9 +2342,16 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       if (purchasesCreated.length > 0) setPurchasesParent((prev: any[]) => [...prev, ...purchasesCreated]);
       setProducts(prods);
       setProductsParent(prods);
-      setTempProducts([]);
-      setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
-      alert(`${purchaseIds.length} Purchase IDs created: ${purchaseIds.join(', ')} | ${succeeded} ${t('saved')}${failed ? `, ${failed} failed` : ''}`);
+      setTempProducts(prev => prev.filter((tp: any) => !succeededSrcIds.has(tp.id)));
+      if (failed === 0) {
+        setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+      }
+      const usedPurchaseIds = [...new Set(historyPlan.map((h: any) => h.purchaseId))];
+      if (succeeded === 0) {
+        alert(`${failed} failed — ${t('invalid')}`);
+      } else {
+        alert(`${usedPurchaseIds.length} Purchase IDs created: ${usedPurchaseIds.join(', ')} | ${succeeded} ${t('saved')}${failed ? `, ${failed} failed (kept in list)` : ''}`);
+      }
     } catch (e: any) {
       alert(t('invalid'));
     } finally {
@@ -9546,7 +9585,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ id: genUniqueId(), name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setShowSupplierModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addSupplier')}</button>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ id: genSupplierId(suppliers), name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setShowSupplierModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addSupplier')}</button>
 
 
 
@@ -10881,15 +10920,13 @@ tr:nth-child(even){background:#F8FAFC}
 
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('sellPrice')} ({_settings?.currencySymbol || '৳'})</label><input type="number" value={editProduct.sellPrice} onChange={e => setEditProduct({ ...editProduct, sellPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={inputStyle} /></div>
 
-
-
-
-
-
-
-
-
-
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: editProduct.foc ? '#B45309' : T.gray600, background: editProduct.foc ? '#FEF3C7' : T.gray100, border: `1px solid ${editProduct.foc ? '#FCD34D' : T.gray200}`, borderRadius: 8, padding: '10px 14px' }}>
+                <input type="checkbox" checked={!!editProduct.foc} onChange={e => setEditProduct({ ...editProduct, foc: e.target.checked })} style={{ accentColor: '#D97706' }} />
+                <i className="fas fa-gift" style={{ fontSize: 12 }}></i>
+                {t('foc')}
+              </label>
+            </div>
 
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}><button onClick={() => setEditProduct(null)} style={{ ...btn('ghost'), flex: 1, justifyContent: 'center', textAlign: 'center' }}>{t('cancel')}</button><button onClick={handleEditProduct} style={{ ...btn('primary'), flex: 2, justifyContent: 'center', textAlign: 'center' }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('saveChanges')}</button></div>
 
@@ -11107,7 +11144,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                const totalCost = (p.items || []).reduce((s: number, i: any) => s + (i.stock || 0) * (i.costPrice || 0), 0);
+                const totalCost = (p.items || []).reduce((s: number, i: any) => { const paid = i.paidQty != null ? i.paidQty : (i.stock || 0); return s + paid * (i.unitCost != null ? i.unitCost : (i.costPrice || 0)); }, 0);
 
 
 

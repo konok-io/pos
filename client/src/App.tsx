@@ -648,6 +648,19 @@ const DEFAULT_ADMIN = {
 
 // Helper functions
 const genId = () => { const now = new Date(); const y = now.getFullYear(); const m = String(now.getMonth() + 1).padStart(2, '0'); const d = String(now.getDate()).padStart(2, '0'); const unique = String(Math.floor(10000 + Math.random() * 90000)); return `${y}${m}${d}${unique}`; };
+const genSupplierId = (suppliersList: any[]) => {
+    const d = new Date();
+    const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+    let max = 0;
+    (suppliersList || []).forEach((x: any) => {
+      const id = String(x?.id || '');
+      if (id.startsWith(ymd) && id.length >= ymd.length + 4) {
+        const n = parseInt(id.slice(ymd.length), 10);
+        if (!Number.isNaN(n) && n > max) max = n;
+      }
+    });
+    return `${ymd}${String(max + 1).padStart(4, '0')}`;
+  };
 const now = () => new Date().toISOString();
 
 // Types
@@ -1311,12 +1324,40 @@ export default function App() {
         loadOrFallback<any>(() => api.getStockHistory(), 'stock_history'),
       ]);
 
+      // Local -> API migration: if API empty but browser IndexedDB has data, push it up
+      const migrateLocal = async (apiData: any[], store: string, push: (x: any) => Promise<any>, setState?: (v: any[]) => void, skip?: (x: any) => boolean): Promise<any[]> => {
+        if (apiData && apiData.length > 0) return apiData;
+        try {
+          const local = await db.getAll<any>(store).catch(() => []);
+          const items = (local || []).filter((x: any) => x && x.id && !(skip && skip(x)));
+          if (items.length === 0) return apiData || [];
+          for (const item of items) { await push(item).catch(() => {}); }
+          if (setState) setState(items);
+          return items;
+        } catch { return apiData || []; }
+      };
+
+      await migrateLocal(apiProducts, 'products', (x) => api.addProduct(x), (v) => setProducts(v as any), (x) => String(x.id || '').startsWith('auto-'));
       if (apiProducts.length > 0) setProducts(apiProducts);
+      await migrateLocal(apiCategories, 'categories', (x) => api.addCategory(x), (v) => setCategories(v as any));
       if (apiCategories.length > 0) setCategories(apiCategories);
+      await migrateLocal(apiSuppliers, 'suppliers', (x) => api.addSupplier(x), (v) => setSuppliers(v as any), (x) => String(x.id || '').startsWith('auto-'));
       if (apiSuppliers.length > 0) setSuppliers(apiSuppliers);
       if (apiSales.length > 0) setSales(apiSales);
+      else {
+        const localSales = await db.getAll<any>('sales').catch(() => []);
+        if (localSales.length > 0) { for (const sale of localSales) await api.addSale(sale).catch(() => {}); setSales(localSales); }
+      }
       if (apiPurchases && apiPurchases.length > 0) setPurchases(apiPurchases);
+      else {
+        const localPur = await db.getAll<any>('purchases').catch(() => []);
+        if (localPur.length > 0) { for (const pur of localPur) await api.addPurchase(pur).catch(() => {}); setPurchases(localPur); }
+      }
       if (apiStockHistory && apiStockHistory.length > 0) _setProductHistory(apiStockHistory);
+      else {
+        const localSh = await db.getAll<any>('stock_history').catch(() => []);
+        if (localSh.length > 0) { for (const h of localSh) await api.addStockHistory(h).catch(() => {}); _setProductHistory(localSh); }
+      }
 
       if (apiCustomers.length > 0) {
         const savedTransactions = await db.getAll<any>('transactions').catch(() => []);
@@ -1377,6 +1418,32 @@ export default function App() {
       if (localSales && localSales.length > 0) {
         for (const sale of localSales) {
           await api.addSale(sale).catch(() => {});
+        }
+      }
+      const localSuppliers = await db.getAll<any>('suppliers');
+      if (localSuppliers && localSuppliers.length > 0) {
+        for (const sup of localSuppliers) {
+          if (!String(sup.id || '').startsWith('auto-')) {
+            await api.addSupplier(sup).catch(() => {});
+          }
+        }
+      }
+      const localCategories = await db.getAll<any>('categories');
+      if (localCategories && localCategories.length > 0) {
+        for (const cat of localCategories) {
+          await api.addCategory(cat).catch(() => {});
+        }
+      }
+      const localPurchases = await db.getAll<any>('purchases');
+      if (localPurchases && localPurchases.length > 0) {
+        for (const pur of localPurchases) {
+          await api.addPurchase(pur).catch(() => {});
+        }
+      }
+      const localStock = await db.getAll<any>('stock_history');
+      if (localStock && localStock.length > 0) {
+        for (const h of localStock) {
+          await api.addStockHistory(h).catch(() => {});
         }
       }
       setDataSyncStatus('synced');
@@ -4459,7 +4526,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         alert(t('supplierUpdated'));
       } else {
         const newSupplier: Supplier = {
-          id: genId(),
+          id: genSupplierId(suppliers),
           code: codeToUse,
           name: supplierForm.name.trim(),
           phone: supplierForm.phone || '',
@@ -4613,7 +4680,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       const supplierExists = suppliers.some(s => (s.name || '').toLowerCase() === (productForm.company || '').toLowerCase());
       if (!supplierExists) {
         const newSupplier: Supplier = {
-          id: genId(),
+          id: genSupplierId(suppliers),
           code: `C-${Date.now().toString().slice(-5)}`,
           name: productForm.company.trim(),
           phone: '', email: '', address: '', crNumber: '', vatNumber: '', company: productForm.company.trim()
@@ -4630,112 +4697,254 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     }
   };
 
+  const exportSuppliersCsv = () => {
+    const headers = [t('supplierCode') || 'ID', t('companyName') || t('suppliers'), t('phone'), t('email'), t('address'), t('products'), t('totalPurchases') || 'Purchases'];
+    const lines = [headers.join(',')];
+    filteredSuppliers.forEach((sup: any) => {
+      const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+      const pc = getSupplierPurchases(sup.name || '');
+      lines.push([esc(sup.id || ''), esc(sup.name || ''), esc(sup.phone || ''), esc(sup.email || ''), esc(sup.address || ''), esc(getProductsCount(sup.name || '')), esc(pc.length), esc(spend)].join(','));
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `suppliers-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const printSuppliers = () => {
+    const trs = filteredSuppliers.map((sup: any, i: number) => {
+      const pc = getSupplierPurchases(sup.name || '');
+      return `<tr><td>${i + 1}</td><td>${sup.id || '-'}</td><td>${sup.name || '-'}</td><td>${sup.phone || '-'}</td><td>${getProductsCount(sup.name || '')}</td><td>${pc.length}</td></tr>`;
+    }).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4 landscape;margin:10mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+.header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
+.header h1{color:#0F766E;font-size:14pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+.stats{display:flex;gap:4mm;margin-bottom:3mm}
+.stat{background:#F0FDFA;border:0.4mm solid #99f6e4;border-radius:2mm;padding:2mm 4mm;text-align:center}
+.stat .lbl{font-size:7pt;color:#0F766E;text-transform:uppercase}
+.stat .val{font-size:12pt;font-weight:800;color:#0F766E}
+table{width:100%;border-collapse:collapse}
+th{background:#0F766E;color:#fff;padding:2mm;text-align:left;font-size:8pt}
+td{border:0.3mm solid #cbd5e1;padding:1.5mm 2mm;font-size:9pt}
+tr:nth-child(even){background:#F8FAFC}
+.footer{margin-top:4mm;font-size:8pt;color:#64748b}
+</style></head><body>
+<div class="header"><h1>Suppliers</h1><div class="meta">${new Date().toLocaleString()}</div></div>
+<div class="stats">
+  <div class="stat"><div class="lbl">${t('totalSuppliers')}</div><div class="val">${filteredSuppliers.length}</div></div>
+  <div class="stat"><div class="lbl">${t('withProducts')}</div><div class="val">${filteredSuppliers.filter((x: any) => getProductsCount(x.name || '') > 0).length}</div></div>
+  <div class="stat"><div class="lbl">${t('products')}</div><div class="val">${products.length}</div></div>
+</div>
+<table><thead><tr><th>#</th><th>ID</th><th>${t('companyName') || t('suppliers')}</th><th>${t('phone')}</th><th>${t('products')}</th><th>${t('purchaseHistory')}</th></tr></thead><tbody>${trs || '<tr><td colspan="6" style="text-align:center;padding:8mm">No suppliers</td></tr>'}</tbody></table>
+<div class="footer">Generated by POS · ${filteredSuppliers.length} suppliers</div>
+</body></html>`;
+    const w = window.open('', '_blank');
+    if (w) { w.document.write(html); w.document.close(); w.focus(); setTimeout(() => w.print(), 300); }
+  };
+
   return (
-    <div style={{ padding: 16 }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#1F2937' }}>
-          <i className="fas fa-building" style={{marginRight: 4}}></i> {t('suppliers')}
-        </h2>
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button
-            onClick={() => { setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setEditingSupplier(null); setShowSupplierModal(true); }}
-            style={{ padding: '8px 14px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            <i className="fas fa-plus" style={{marginRight: 4}}></i> {t('newCompany')}
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
+      {/* Top bar */}
+      <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
+        <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}><i className="fas fa-building" style={{ marginRight: 6, color: T.teal }}></i>{t('suppliers')}</span>
+        <div style={{ position: 'relative', width: 200 }}>
+          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchSupplierCategory')} style={{ width: '100%', padding: '6px 10px 6px 32px', border: `1px solid ${T.gray200}`, borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
+        </div>
+        <div style={{ display: 'flex', gap: 4, background: T.gray100, borderRadius: 10, padding: 3 }}>
+          <button onClick={() => setActiveTab('companies')} style={{ padding: '6px 14px', background: activeTab === 'companies' ? T.teal : 'transparent', color: activeTab === 'companies' ? T.white : T.gray600, border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+            <i className="fas fa-building" style={{ marginRight: 4 }}></i>{t('suppliers')} ({allSuppliers.length})
           </button>
-          <button
-            onClick={() => { setCategoryForm({ name: '' }); setEditingCategory(null); setShowCategoryModal(true); }}
-            style={{ padding: '8px 14px', background: '#F3F4F6', color: '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            <i className="fas fa-folder" style={{marginRight: 4}}></i> {t('categories')}
-          </button>
-          <button
-            onClick={() => setShowProductModal(true)}
-            style={{ padding: '8px 14px', background: '#EA580C', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>
-            {t('products')} {t('products')}
+          <button onClick={() => setActiveTab('categories')} style={{ padding: '6px 14px', background: activeTab === 'categories' ? T.teal : 'transparent', color: activeTab === 'categories' ? T.white : T.gray600, border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+            <i className="fas fa-folder" style={{ marginRight: 4 }}></i>{t('categories')} ({categories.length})
           </button>
         </div>
-      </div>
-      
-      {/* Search */}
-      <div style={{ marginBottom: 16 }}>
-        <input
-          type="text"
-          placeholder={t("searchSupplierCategory")}
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: '100%', padding: '10px 14px', border: '1px solid #E5E7EB', borderRadius: 10, fontSize: 14, boxSizing: 'border-box' }}
-        />
-      </div>
-      
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-        <button
-          onClick={() => setActiveTab('companies')}
-          style={{ padding: '8px 16px', background: activeTab === 'companies' ? '#115E59' : '#F3F4F6', color: activeTab === 'companies' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
-          <i className="fas fa-building" style={{marginRight: 4}}></i> {t('suppliers')} ({allSuppliers.length})
+        <span style={{ fontSize: 14, color: T.gray400, marginLeft: 'auto' }}>{activeTab === 'companies' ? filteredSuppliers.length : filteredCategories.length}</span>
+        <button onClick={() => { setSupplierForm({ name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setEditingSupplier(null); setShowSupplierModal(true); }} style={{ padding: '7px 12px', background: T.teal, color: T.white, border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+          <i className="fas fa-plus" style={{ marginRight: 4 }}></i>{t('newCompany')}
         </button>
-        <button
-          onClick={() => setActiveTab('categories')}
-          style={{ padding: '8px 16px', background: activeTab === 'categories' ? '#115E59' : '#F3F4F6', color: activeTab === 'categories' ? '#fff' : '#4B5563', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600 }}>
-          <i className="fas fa-folder" style={{marginRight: 4}}></i> {t('categories')} ({categories.length})
+        <button onClick={() => { setCategoryForm({ name: '' }); setEditingCategory(null); setShowCategoryModal(true); }} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+          <i className="fas fa-folder" style={{ marginRight: 4 }}></i>{t('categories')}
+        </button>
+        <button onClick={() => setShowProductModal(true)} style={{ padding: '7px 12px', background: T.orange, color: T.white, border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+          <i className="fas fa-box" style={{ marginRight: 4 }}></i>{t('products')}
+        </button>
+        <button onClick={exportSuppliersCsv} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+          <i className="fas fa-file-csv" style={{ marginRight: 4 }}></i>{t('exportCsv')}
+        </button>
+        <button onClick={printSuppliers} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+          <i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}
         </button>
       </div>
-      
-      {/* Content */}
-      {activeTab === 'companies' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 12 }}>
-          {filteredSuppliers.length === 0 ? (
-            <div style={{ gridColumn: '1/-1', padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
-              {t('noProductsAdded')}
+
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        {/* Gradient header */}
+        <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+            <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+              <i className="fas fa-building"></i>
             </div>
-          ) : filteredSuppliers.map(s => (
-            <div
-              key={s.id}
-              onClick={() => setViewSupplier(s)}
-              style={{ background: '#fff', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB', cursor: 'pointer', transition: 'all 0.15s' }}
-              onMouseOver={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)')}
-              onMouseOut={e => (e.currentTarget.style.boxShadow = 'none')}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}>
-                    <i className="fas fa-building" style={{marginRight: 4}}></i> {s.name}
-                    {s.isAuto && <span style={{ fontSize: 10, background: '#FEF3C7', color: '#D97706', padding: '2px 6px', borderRadius: 4, marginLeft: 6 }}>Auto</span>}
-                  </div>
-                  {s.code && <div style={{ fontSize: 12, color: '#6B7280', marginTop: 2 }}>{t('supplierCode')}: {s.code}</div>}
-                  {s.phone && <div style={{ fontSize: 13, color: '#6B7280', marginTop: 4 }}><i className="fas fa-phone" style={{marginRight: 4}}></i> {s.phone}</div>}
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: '#115E59' }}>{getProductsCount(s.name)}</div>
-                  <div style={{ fontSize: 11, color: '#9CA3AF' }}>{t('products')}</div>
-                </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('suppliers')}</div>
+              <div style={{ fontSize: 13, opacity: 0.9 }}>
+                {allSuppliers.length} {t('totalSuppliers')} · {categories.length} {t('totalCategories')} · {products.length} {t('products')}
+              </div>
+              <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                  <i className="fas fa-boxes-stacked" style={{ marginRight: 6 }}></i>{allSuppliers.filter(x => getProductsCount(x.name || '') > 0).length} {t('withProducts')}
+                </span>
+                <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                  <i className="fas fa-cart-flatbed" style={{ marginRight: 6 }}></i>{purchases.length} {t('totalPurchases') || 'Purchases'}
+                </span>
+                {search ? (
+                  <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                    <i className="fas fa-magnifying-glass" style={{ marginRight: 6 }}></i>{search}
+                  </span>
+                ) : null}
               </div>
             </div>
-          ))}
+            <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportSuppliersCsv}>
+              <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
+            </button>
+          </div>
         </div>
-      )}
-      
-      {activeTab === 'categories' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12 }}>
-          {filteredCategories.length === 0 ? (
-            <div style={{ gridColumn: '1/-1', padding: 40, textAlign: 'center', color: '#9CA3AF' }}>
-              {t('noProductsAdded')}
+
+        {activeTab === 'companies' && (() => {
+          const stats = [
+            { icon: 'fas fa-building', label: t('totalSuppliers'), value: String(allSuppliers.length), color: T.teal, bg: T.tealLight },
+            { icon: 'fas fa-boxes-stacked', label: t('withProducts'), value: String(allSuppliers.filter(x => getProductsCount(x.name || '') > 0).length), color: '#7C3AED', bg: '#EDE9FE' },
+            { icon: 'fas fa-box', label: t('products'), value: String(products.length), color: T.green, bg: T.greenLight },
+            { icon: 'fas fa-folder', label: t('totalCategories'), value: String(categories.length), color: T.orange, bg: T.orangeLight },
+            { icon: 'fas fa-cart-flatbed', label: t('totalPurchases') || 'Purchases', value: String(purchases.length), color: '#0369A1', bg: '#E0F2FE' },
+            { icon: 'fas fa-receipt', label: t('totalSpend') || t('total'), value: (purchases.reduce((sum: number, p: any) => sum + (+p.total || 0), 0)).toLocaleString('en-IN'), color: T.amber, bg: T.amberLight },
+          ];
+          return (
+            <>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
+                {stats.map((st, i) => (
+                  <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: st.bg, color: st.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className={st.icon}></i>
+                      </div>
+                      <div style={{ fontSize: 12, color: T.gray400, fontWeight: 600 }}>{st.label}</div>
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: st.color }}>{st.value}</div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
+                <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+                  <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600 }}>
+                      <i className="fas fa-list" style={{ marginRight: 6, color: T.teal }}></i>{t('suppliers')} · {filteredSuppliers.length}
+                    </div>
+                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: T.tealLight }}>
+                        {['#', 'ID', t('companyName') || t('suppliers'), t('supplierCode'), t('phone'), t('products'), t('purchaseHistory'), ''].map((h, hi) => (
+                          <th key={hi} style={{ padding: '10px 14px', textAlign: hi === 0 || hi === 5 || hi === 6 ? 'center' : 'left', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredSuppliers.length === 0 ? (
+                        <tr>
+                          <td colSpan={8} style={{ padding: 48, textAlign: 'center', color: T.gray400 }}>
+                            <i className="fas fa-building" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
+                            {t('noSuppliers') || t('noProductsAdded')}
+                          </td>
+                        </tr>
+                      ) : filteredSuppliers.map((sup, i) => (
+                        <tr key={sup.id || i} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}`, cursor: 'pointer' }} onClick={() => setViewSupplier(sup)}>
+                          <td style={{ padding: '10px 14px', textAlign: 'center', color: T.gray400, fontWeight: 600 }}>{i + 1}</td>
+                          <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: 13, color: T.teal, fontWeight: 700 }}>{sup.id || '-'}</td>
+                          <td style={{ padding: '10px 14px' }}>
+                            <div style={{ fontWeight: 600, fontSize: 14 }}>{sup.name}{sup.isAuto ? <span style={{ fontSize: 10, background: T.amberLight, color: T.amber, padding: '2px 6px', borderRadius: 4, marginLeft: 6 }}>Auto</span> : null}</div>
+                            {sup.address ? <div style={{ fontSize: 12, color: T.gray400, marginTop: 2 }}><i className="fas fa-location-dot" style={{ marginRight: 4 }}></i>{sup.address}</div> : null}
+                          </td>
+                          <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontSize: 13, color: T.gray500 }}>{sup.code || '-'}</td>
+                          <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray600 }}>{sup.phone || '-'}</td>
+                          <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                            <span style={{ background: T.tealLight, color: T.teal, fontWeight: 700, padding: '3px 10px', borderRadius: 12, fontSize: 13 }}>{getProductsCount(sup.name || '')}</span>
+                          </td>
+                          <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                            <span style={{ background: '#E0F2FE', color: '#0369A1', fontWeight: 700, padding: '3px 10px', borderRadius: 12, fontSize: 13 }}>{getSupplierPurchases(sup.name || '').length}</span>
+                          </td>
+                          <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }} onClick={e => e.stopPropagation()}>
+                            <button title={t('purchaseHistory')} onClick={() => setShowPurchaseHistory(sup)} style={{ width: 28, height: 28, border: 'none', borderRadius: 6, background: T.orangeLight, color: T.orange, cursor: 'pointer', marginRight: 4 }}><i className="fas fa-clock-rotate-left"></i></button>
+                            {!sup.isAuto && !String(sup.id || '').startsWith('auto-') ? (
+                              <>
+                                <button title={t('edit')} onClick={() => { setSupplierForm(sup); setEditingSupplier(sup); setShowSupplierModal(true); }} style={{ width: 28, height: 28, border: 'none', borderRadius: 6, background: T.gray100, color: T.gray600, cursor: 'pointer', marginRight: 4 }}><i className="fas fa-pen"></i></button>
+                                <button title={t('deleteAction')} onClick={() => deleteSupplier(sup)} style={{ width: 28, height: 28, border: 'none', borderRadius: 6, background: T.redLight, color: T.red, cursor: 'pointer' }}><i className="fas fa-trash"></i></button>
+                              </>
+                            ) : null}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          );
+        })()}
+
+        {activeTab === 'categories' && (
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px 24px' }}>
+            <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+              <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600 }}>
+                  <i className="fas fa-folder" style={{ marginRight: 6, color: T.teal }}></i>{t('categories')} · {filteredCategories.length}
+                </div>
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: T.tealLight }}>
+                    {['#', t('categoryName'), t('products'), ''].map((h, hi) => (
+                      <th key={hi} style={{ padding: '10px 14px', textAlign: hi === 0 || hi === 2 ? 'center' : 'left', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredCategories.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} style={{ padding: 48, textAlign: 'center', color: T.gray400 }}>
+                        <i className="fas fa-folder" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
+                        {t('noProductsAdded')}
+                      </td>
+                    </tr>
+                  ) : filteredCategories.map((c, i) => {
+                    const cnt = products.filter(p => (p.cat || '').toLowerCase() === (c.name || '').toLowerCase()).length;
+                    return (
+                      <tr key={c.id || i} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}`, cursor: 'pointer' }} onClick={() => setViewCategory(c)}>
+                        <td style={{ padding: '10px 14px', textAlign: 'center', color: T.gray400, fontWeight: 600 }}>{i + 1}</td>
+                        <td style={{ padding: '10px 14px', fontWeight: 600, fontSize: 14 }}><i className="fas fa-folder" style={{ marginRight: 6, color: T.orange }}></i>{c.name}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                          <span style={{ background: T.tealLight, color: T.teal, fontWeight: 700, padding: '3px 10px', borderRadius: 12, fontSize: 13 }}>{cnt}</span>
+                        </td>
+                        <td style={{ padding: '10px 14px', whiteSpace: 'nowrap' }} onClick={e => e.stopPropagation()}>
+                          <button title={t('edit')} onClick={() => { setCategoryForm(c); setEditingCategory(c); setShowCategoryModal(true); }} style={{ width: 28, height: 28, border: 'none', borderRadius: 6, background: T.gray100, color: T.gray600, cursor: 'pointer', marginRight: 4 }}><i className="fas fa-pen"></i></button>
+                          <button title={t('deleteAction')} onClick={() => deleteCategory(c)} style={{ width: 28, height: 28, border: 'none', borderRadius: 6, background: T.redLight, color: T.red, cursor: 'pointer' }}><i className="fas fa-trash"></i></button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
-          ) : filteredCategories.map(c => (
-            <div
-              key={c.id}
-              onClick={() => setViewCategory(c)}
-              style={{ background: '#fff', borderRadius: 12, padding: 16, border: '1px solid #E5E7EB', cursor: 'pointer', transition: 'all 0.15s' }}
-              onMouseOver={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)')}
-              onMouseOut={e => (e.currentTarget.style.boxShadow = 'none')}
-            >
-              <div style={{ fontSize: 16, fontWeight: 700, color: '#1F2937' }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {c.name}</div>
-              <div style={{ fontSize: 12, color: '#6B7280', marginTop: 4 }}>{products.filter(p => (p.cat || '').toLowerCase() === (c.name || '').toLowerCase()).length} {t('products')}</div>
-            </div>
-          ))}
-        </div>
-      )}
-      
+          </div>
+        )}
+      </div>
+
       {/* Supplier Detail Modal */}
       {viewSupplier && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>

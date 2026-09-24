@@ -697,4 +697,7 @@ printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়�
   dueSalesEnabled: 'বকেয় বিক্রয় সক্রিয়',
   dueSalesEnabledDesc: 'গ্রাহকদের বকেয়ে কেনার অনুমতি দিন',
   dueSalesDisabledDesc: 'সব বিক্রয় অগ্রিম পরিশোধ করতে হবে',
+  totalSuppliers: 'মোট সাপ্লাইয়ার',
+  withProducts: 'পণ্যসহ',
+  totalCategories: 'মোট ক্যাটাগরি',
 };

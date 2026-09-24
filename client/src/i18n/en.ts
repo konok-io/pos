@@ -696,4 +696,7 @@ printBlocked: 'Print window blocked! Allow popups to print receipt.',
   dueSalesEnabled: 'Due Sales Enabled',
   dueSalesEnabledDesc: 'Allow customers to purchase on credit (due)',
   dueSalesDisabledDesc: 'All sales must be paid upfront',
+  totalSuppliers: 'Total Suppliers',
+  withProducts: 'With Products',
+  totalCategories: 'Total Categories',
 };

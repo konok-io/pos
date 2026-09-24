@@ -696,4 +696,7 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   dueSalesEnabled: 'उधार बिक्री सक्रिय',
   dueSalesEnabledDesc: 'ग्राहकों को उधार में खरीदने की अनुमति दें',
   dueSalesDisabledDesc: 'सभी बिक्री का भुगतान अग्रिम में करना होगा',
+  totalSuppliers: 'कुल आपूर्तिकर्ता',
+  withProducts: 'उत्पादों के साथ',
+  totalCategories: 'कुल श्रेणियाँ',
 };
