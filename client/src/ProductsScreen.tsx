@@ -10373,9 +10373,18 @@ tr:nth-child(even){background:#F8FAFC}
                               <i className="fas fa-building" style={{ marginRight: 4 }}></i>{productForm.company}
                             </span>
                           )}
-                          <span style={{ padding: '3px 10px', borderRadius: 12, background: (productForm.stock || 0) <= 0 ? '#DC2626' : (productForm.stock || 0) <= (productForm.minStock || 0) ? '#D97706' : '#16A34A', fontWeight: 700, fontSize: 13 }}>
-                            {(productForm.stock || 0) <= 0 ? t('outOfStock') : (productForm.stock || 0) <= (productForm.minStock || 0) ? t('lowStock') : t('inStock')}
-                          </span>
+                          {(() => {
+                            const listQty = tempProducts.reduce((s: number, it: any) => s + (it.stock || 0), 0);
+                            const listMin = tempProducts.reduce((s: number, it: any) => s + (it.minStock || 0), 0);
+                            const useList = tempProducts.length > 0;
+                            const qty = useList ? listQty : (productForm.stock || 0);
+                            const min = useList ? listMin : (productForm.minStock || 0);
+                            return (
+                              <span style={{ padding: '3px 10px', borderRadius: 12, background: qty <= 0 ? '#DC2626' : qty <= min ? '#D97706' : '#16A34A', fontWeight: 700, fontSize: 13 }}>
+                                {qty <= 0 ? t('outOfStock') : qty <= min ? t('lowStock') : t('inStock')}
+                              </span>
+                            );
+                          })()}
                           {productForm.expiryDate && (
                             <span style={{ padding: '3px 10px', borderRadius: 12, background: '#E11D48', fontWeight: 700, fontSize: 13 }}>
                               <i className="fas fa-calendar" style={{ marginRight: 4 }}></i>{productForm.expiryDate}
@@ -10391,9 +10400,8 @@ tr:nth-child(even){background:#F8FAFC}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ fontSize: 28, fontWeight: 800 }}>{_settings?.currencySymbol} {productForm.sellPrice || 0}</div>
-                    <div style={{ fontSize: 13, opacity: 0.9 }}>{t('sellPrice')}</div>
-                    
+                    <div style={{ fontSize: 28, fontWeight: 800 }}>{_settings?.currencySymbol} {tempProducts.length > 0 ? tempProducts.reduce((s: number, it: any) => s + (it.sellPrice || 0) * (it.stock || 0), 0).toLocaleString() : (productForm.sellPrice || 0)}</div>
+                    <div style={{ fontSize: 13, opacity: 0.9 }}>{tempProducts.length > 0 ? t('productList') : t('sellPrice')}</div>
                   </div>
                 </div>
               </div>
@@ -10402,18 +10410,28 @@ tr:nth-child(even){background:#F8FAFC}
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 40px' }}>
                 {/* Stat cards */}
                 {(() => {
-                  const profit = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
-                  const cp = productForm.costPrice || 0;
+                  const listCost = tempProducts.reduce((s: number, it: any) => s + (it.costPrice || 0) * (it.stock || 0), 0);
+                  const listValue = tempProducts.reduce((s: number, it: any) => s + (it.sellPrice || 0) * (it.stock || 0), 0);
+                  const profit = listValue - listCost;
+                  const cp = listCost;
                   const marginPct = cp > 0 ? Math.round(profit / cp * 100) : 0;
-                  const stockValue = (productForm.stock || 0) * cp;
+                  const stockValue = listCost;
                   const filled = (productForm.name ? 1 : 0)
                     + ((productForm.sellPrice || 0) > 0 ? 1 : 0)
                     + (productForm.code ? 1 : 0)
                     + (productForm.cat ? 1 : 0)
-                    + (cp > 0 ? 1 : 0)
+                    + ((productForm.costPrice || 0) > 0 ? 1 : 0)
                     + (productForm.expiryDate ? 1 : 0);
-                  const progress = Math.round((filled / 6) * 100);
-                  const listValue = tempProducts.reduce((s: number, it: any) => s + (it.sellPrice || 0) * (it.stock || 0), 0);
+                  const formProgress = Math.round((filled / 6) * 100);
+                  const listFilled = tempProducts.reduce((s: number, it: any) => s + ((it.name ? 1 : 0)
+                    + ((it.sellPrice || 0) > 0 ? 1 : 0)
+                    + (it.code ? 1 : 0)
+                    + (it.cat ? 1 : 0)
+                    + ((it.costPrice || 0) > 0 ? 1 : 0)
+                    + ((it.stock || 0) > 0 ? 1 : 0)), 0);
+                  const progress = tempProducts.length > 0
+                    ? Math.round((listFilled / (tempProducts.length * 6)) * 100)
+                    : formProgress;
                   const stats = [
                     { label: t('formProgress'), value: `${progress}%`, icon: 'fas fa-list-check', color: progress >= 100 ? '#16A34A' : '#D97706', bg: progress >= 100 ? '#DCFCE7' : '#FEF3C7' },
                     { label: t('profit'), value: `${_settings?.currencySymbol} ${profit}`, icon: 'fas fa-arrow-trend-up', color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray500, bg: profit > 0 ? '#DCFCE7' : profit < 0 ? T.redLight : T.gray100 },
