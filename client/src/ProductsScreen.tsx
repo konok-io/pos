@@ -5021,6 +5021,18 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
+        <button style={{ ...btn('ghost', 'sm') }} onClick={exportSuppliersCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+
+
+
+
+
+
+
+
+
+
+
         <button style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
 
 
@@ -5045,18 +5057,65 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-
-
-
-
-
-
-
-
-
-
-
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        {(() => {
+          const withProd = filteredSuppliers.filter((c: string) => products.some((p: any) => (p.company || '').toLowerCase() === c.toLowerCase())).length;
+          const allSp = products.filter((p: any) => filteredSuppliers.some((c: string) => (p.company || '').toLowerCase() === c.toLowerCase()));
+          const totalStock = allSp.reduce((a: number, p: any) => a + (p.stock || 0), 0);
+          const totalValue = allSp.reduce((a: number, p: any) => a + (p.stock || 0) * (p.costPrice || 0), 0);
+          const stats = [
+            { icon: 'fas fa-building', label: t('totalSuppliers'), value: String(filteredSuppliers.length), color: T.teal, bg: T.tealLight },
+            { icon: 'fas fa-boxes-stacked', label: t('withProducts'), value: String(withProd), color: '#7C3AED', bg: '#EDE9FE' },
+            { icon: 'fas fa-box', label: t('products'), value: String(allSp.length), color: T.green, bg: T.greenLight },
+            { icon: 'fas fa-layer-group', label: t('stock'), value: String(totalStock), color: T.orange, bg: '#FFF7ED' },
+            { icon: 'fas fa-sack-dollar', label: t('totalPurchase'), value: fmt(totalValue), color: '#0369A1', bg: '#E0F2FE' },
+            { icon: 'fas fa-folder', label: t('categories'), value: String([...new Set(allSp.map((p: any) => p.cat).filter(Boolean))].length), color: T.amber, bg: T.amberLight },
+          ];
+          return (
+            <>
+              <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+                  <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                    <i className="fas fa-building"></i>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('suppliers')}</div>
+                    <div style={{ fontSize: 13, opacity: 0.9 }}>
+                      {filteredSuppliers.length} {t('totalSuppliers')} · {withProd} {t('withProducts')} · {allSp.length} {t('products')}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                      <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                        <i className="fas fa-boxes-stacked" style={{ marginRight: 6 }}></i>{withProd} {t('withProducts')}
+                      </span>
+                      <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                        <i className="fas fa-sack-dollar" style={{ marginRight: 6 }}></i>{fmt(totalValue)}
+                      </span>
+                      {supplierSearch ? (
+                        <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                          <i className="fas fa-magnifying-glass" style={{ marginRight: 6 }}></i>{supplierSearch}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                  <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportSuppliersCsv}>
+                    <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
+                  </button>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
+                {stats.map((st, i) => (
+                  <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: st.bg, color: st.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className={st.icon}></i>
+                      </div>
+                      <div style={{ fontSize: 12, color: T.gray400, fontWeight: 600 }}>{st.label}</div>
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: st.color }}>{st.value}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
         {filteredSuppliers.length === 0 ? (
 
 
@@ -5069,7 +5128,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-building"></i></div><p>{t('noSuppliers')}</p></div>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-building"></i></div><p>{t('noSuppliers')}</p></div>
 
 
 
@@ -5490,29 +5549,11 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
         )}
-
-
-
-
-
-
-
-
-
-
-
+              </div>
+            </>
+          );
+        })()}
       </div>
-
-
-
-
-
-
-
-
-
-
-
       {showSupplierModal && (
 
 
@@ -10685,7 +10726,6 @@ tr:nth-child(even){background:#F8FAFC}
                             <i className="fas fa-list-check" style={{ color: '#fff', fontSize: 14 }}></i>
                           </div>
                           <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t('productList')}</span>
-                          <span style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 700 }}>{tempProducts.length}</span>
                         </div>
                         
                       </div>
