@@ -28,6 +28,10 @@ const mapProduct = (p: any) => {
   return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '' };
 }
 
+function emitApiError(msg: string) {
+  try { window.dispatchEvent(new CustomEvent('pos:api-error', { detail: msg })); } catch {}
+}
+
 async function request(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -35,13 +39,31 @@ async function request(path: string, options: RequestInit = {}) {
   };
   if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
 
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  let res: Response;
+  try {
+    res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  } catch (e: any) {
+    const msg = !navigator.onLine ? 'API সংযোগ নেই (অফলাইন)' : 'সার্ভারে পৌঁছানো যায়নি (নেটওয়ার্ক/সার্ভার ত্রুটি)';
+    emitApiError(msg);
+    throw new Error(msg);
+  }
   if (res.status === 401) {
     clearToken();
     throw new Error('Unauthorized');
   }
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
+  let data: any;
+  try {
+    data = await res.json();
+  } catch {
+    const msg = `সার্ভার ভুল রেসপন্স (HTTP ${res.status})`;
+    emitApiError(msg);
+    throw new Error(msg);
+  }
+  if (!res.ok) {
+    const msg = data.error || 'Request failed';
+    emitApiError(msg);
+    throw new Error(msg);
+  }
   return data;
 }
 

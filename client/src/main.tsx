@@ -130,5 +130,60 @@ root.render(
   </ErrorBoundary>
 );
 
+// ===== API error toast (visible alerts for silent failures) =====
+(function apiErrorToast() {
+  let last = '';
+  window.addEventListener('pos:api-error', ((e: any) => {
+    const msg = String(e.detail || '');
+    if (!msg || msg === last) return;
+    last = msg;
+    setTimeout(() => { last = ''; }, 4000);
+    const el = document.createElement('div');
+    el.textContent = `⚠ ${msg}`;
+    el.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:99999;background:#B91C1C;color:#fff;padding:12px 18px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:340px;opacity:0;transition:opacity .25s';
+    document.body.appendChild(el);
+    requestAnimationFrame(() => { el.style.opacity = '1'; });
+    setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 4500);
+  }) as EventListener);
+})();
+
 // Initialize font detection for Bengali/English dynamic switching
 initFontDetection();
+
+// ===== Auto cache clear: detect new deploy, wipe caches, reload =====
+(function autoCacheClear() {
+  let reloading = false;
+  const bundleName = () => {
+    for (const s of Array.from(document.querySelectorAll('script[src]'))) {
+      const src = s.getAttribute('src') || '';
+      const m = src.match(/index-[A-Za-z0-9_-]{8,}\.js/);
+      if (m) return m[0];
+    }
+    return '';
+  };
+  async function check() {
+    if (reloading || !navigator.onLine) return;
+    try {
+      const cur = bundleName();
+      if (!cur) return;
+      const res = await fetch(`/?_r=${Date.now()}`, { cache: 'no-store' });
+      if (!res.ok) return;
+      const html = await res.text();
+      const m = html.match(/index-[A-Za-z0-9_-]{8,}\.js/);
+      if (!m || m[0] === cur) return;
+      reloading = true;
+      try {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      } catch {}
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.update()));
+      } catch {}
+      window.location.reload();
+    } catch {}
+  }
+  window.addEventListener('load', () => { setTimeout(check, 3000); });
+  setInterval(check, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+})();

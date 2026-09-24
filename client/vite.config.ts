@@ -46,23 +46,17 @@ export default defineConfig({
       },
       workbox: {
         // Do NOT precache HTML - always fetch fresh from network on navigation
-        globPatterns: ['**/*.{js,css,ico,png,svg}'],
-        navigateFallback: null,
+        globPatterns: ['**/*.{js,css,ico,png,svg,html}'],
+        globIgnores: ['index.html'],
+        navigateFallback: '/offline.html',
         skipWaiting: true,
         clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
-            // HTML navigations: network first, fallback to cache only when offline
-            urlPattern: ({ url }) => url.pathname === '/' || url.pathname.endsWith('.html'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'html-pages',
-              networkTimeoutSeconds: 3,
-              expiration: {
-                maxEntries: 5,
-                maxAgeSeconds: 60 * 60 * 24,
-              },
-            },
+            // HTML navigations: ALWAYS network (fresh deploy = fresh app), offline falls back to offline.html
+            urlPattern: ({ request }) => request.mode === 'navigate' || request.destination === 'document',
+            handler: 'NetworkOnly',
           },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
