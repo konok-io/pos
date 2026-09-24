@@ -21,7 +21,7 @@
   <div class="icon">🔌</div>
   <h1 id="title">No internet connection</h1>
   <p id="body">The app can show previous data offline. Reload when the connection is back.</p>
-  <button onclick="location.reload()" id="btn">Try again</button>
+  <button onclick="tryReload()" id="btn">Try again</button>
   <div class="hint" id="hint">Auto reloads when you are back online</div>
 </div>
 <script>
@@ -70,6 +70,12 @@
   document.documentElement.lang = lang;
   window.addEventListener('online', function () { location.reload(); });
 })();
+function tryReload() {
+    try { window.location.replace(window.location.pathname + '?_r=' + Date.now()); }
+    catch (e) { window.location.reload(); }
+  }
+  window.tryReload = tryReload;
+  window.addEventListener('online', function () { tryReload(); });
 </script>
 </body>
 </html>

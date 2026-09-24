@@ -51,6 +51,23 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Navigations: network first; offline.html only if network fails
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request)
+                .then((networkResponse) => {
+                    if (networkResponse && networkResponse.ok) {
+                        const responseClone = networkResponse.clone();
+                        caches.open(CACHE_NAME)
+                            .then((cache) => cache.put(event.request, responseClone));
+                    }
+                    return networkResponse;
+                })
+                .catch(() => caches.match('/offline.html'))
+        );
+        return;
+    }
+
     // For other requests, try cache first
     event.respondWith(
         caches.match(event.request)

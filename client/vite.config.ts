@@ -45,19 +45,15 @@ export default defineConfig({
         ],
       },
       workbox: {
+        importScripts: ['sw-nav.js'],
+        navigateFallback: null,
         // Do NOT precache HTML - always fetch fresh from network on navigation
         globPatterns: ['**/*.{js,css,ico,png,svg,html}'],
         globIgnores: ['index.html'],
-        navigateFallback: '/offline.html',
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         runtimeCaching: [
-          {
-            // HTML navigations: ALWAYS network (fresh deploy = fresh app), offline falls back to offline.html
-            urlPattern: ({ request }) => request.mode === 'navigate' || request.destination === 'document',
-            handler: 'NetworkOnly',
-          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
