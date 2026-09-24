@@ -10393,20 +10393,7 @@ tr:nth-child(even){background:#F8FAFC}
                   <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <div style={{ fontSize: 28, fontWeight: 800 }}>{_settings?.currencySymbol} {productForm.sellPrice || 0}</div>
                     <div style={{ fontSize: 13, opacity: 0.9 }}>{t('sellPrice')}</div>
-                    <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                      <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 13 }}>
-                        <i className="fas fa-arrow-trend-up" style={{ marginRight: 4 }}></i>
-                        {_settings?.currencySymbol} {((productForm.sellPrice || 0) - (productForm.costPrice || 0))}
-                      </span>
-                      <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 13 }}>
-                        {(() => {
-                          const pr = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
-                          const cp = productForm.costPrice || 0;
-                          const pct = cp > 0 ? Math.round(pr / cp * 100) : 0;
-                          return `${cp === 0 && pr > 0 ? '∞' : pct}%`;
-                        })()}
-                      </span>
-                    </div>
+                    
                   </div>
                 </div>
               </div>
@@ -10433,6 +10420,7 @@ tr:nth-child(even){background:#F8FAFC}
                     { label: `${t('profit')} %`, value: `${cp === 0 && profit > 0 ? '∞' : marginPct}%`, icon: 'fas fa-percent', color: marginPct > 0 ? '#16A34A' : T.gray500, bg: marginPct > 0 ? '#DCFCE7' : T.gray100 },
                     { label: t('stockValue'), value: `${_settings?.currencySymbol} ${stockValue.toLocaleString()}`, icon: 'fas fa-boxes-stacked', color: T.teal, bg: T.tealLight },
                     { label: `${t('productList')} (${tempProducts.length})`, value: `${_settings?.currencySymbol} ${listValue.toLocaleString()}`, icon: 'fas fa-cart-shopping', color: '#7C3AED', bg: '#EDE9FE' },
+                    { label: t('totalQuantity') || 'Total Qty', value: `${tempProducts.reduce((s: number, it: any) => s + (it.stock || 0), 0)}`, icon: 'fas fa-cubes', color: '#0369A1', bg: '#E0F2FE' },
                   ];
                   return (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 12, marginBottom: 22 }}>
