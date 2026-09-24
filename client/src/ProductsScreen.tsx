@@ -1918,22 +1918,21 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const genPurchaseId = () => {
     const d = new Date();
     const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-    const prefix = `PUR-${ymd}-`;
     let max = 0;
     (purchases || []).forEach((p: any) => {
       const id = String(p?.id || '');
-      if (id.startsWith(prefix)) {
-        const n = parseInt(id.slice(prefix.length), 10);
+      if (id.startsWith(ymd) && id.length >= ymd.length + 4) {
+        const n = parseInt(id.slice(ymd.length), 10);
         if (!Number.isNaN(n) && n > max) max = n;
       }
     });
     purchaseSeqToday.forEach((id: string) => {
-      if (id.startsWith(prefix)) {
-        const n = parseInt(id.slice(prefix.length), 10);
+      if (id.startsWith(ymd) && id.length >= ymd.length + 4) {
+        const n = parseInt(id.slice(ymd.length), 10);
         if (!Number.isNaN(n) && n > max) max = n;
       }
     });
-    return `${prefix}${String(max + 1).padStart(4, '0')}`;
+    return `${ymd}${String(max + 1).padStart(4, '0')}`;
   };
   const purchaseSeqToday: string[] = [];
 
