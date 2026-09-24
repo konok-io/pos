@@ -1303,10 +1303,15 @@ export default function App() {
       }
       
       // Load all data from MySQL API first; fall back to IndexedDB only when API fails
+      const apiEmptyStores = new Set<string>();
       const loadOrFallback = async <T,>(loader: () => Promise<T[] | any>, store: string): Promise<T[]> => {
         try {
           const data = await loader();
-          return (Array.isArray(data) ? data : []) as T[];
+          const arr = (Array.isArray(data) ? data : []) as T[];
+          if (arr.length > 0) return arr;
+          apiEmptyStores.add(store);
+          const local = await db.getAll<any>(store).catch(() => []);
+          return ((local && local.length > 0) ? local : arr) as T[];
         } catch (e) {
           console.error(`API failed for ${store}, loading IndexedDB fallback:`, e);
           const local = await db.getAll<any>(store).catch(() => []);
@@ -1326,12 +1331,15 @@ export default function App() {
 
       // Local -> API migration: if API empty but browser IndexedDB has data, push it up
       const migrateLocal = async (apiData: any[], store: string, push: (x: any) => Promise<any>, setState?: (v: any[]) => void, skip?: (x: any) => boolean): Promise<any[]> => {
-        if (apiData && apiData.length > 0) return apiData;
+        const apiReallyHadData = !apiEmptyStores.has(store);
+        if (apiReallyHadData && apiData && apiData.length > 0) return apiData;
         try {
           const local = await db.getAll<any>(store).catch(() => []);
           const items = (local || []).filter((x: any) => x && x.id && !(skip && skip(x)));
           if (items.length === 0) return apiData || [];
-          for (const item of items) { await push(item).catch(() => {}); }
+          if (!apiReallyHadData) {
+            for (const item of items) { await push(item).catch(() => {}); }
+          }
           if (setState) setState(items);
           return items;
         } catch { return apiData || []; }
@@ -4737,6 +4745,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       };
       
       setProducts(prev => [...prev, newProduct]);
+      const supForProduct = suppliers.find((x: any) => (x.name || '').toLowerCase() === (productForm.company || '').toLowerCase());
       api.addProduct({
         id: newProduct.id,
         name: newProduct.name,
@@ -4748,7 +4757,9 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
         costPrice: newProduct.buyPrice,
         sellPrice: newProduct.sellPrice,
         stock: newProduct.stock,
-        minStock: newProduct.minStock
+        minStock: newProduct.minStock,
+        supplier: productForm.company,
+        supplierId: supForProduct?.id || ''
       }).then((saved: any) => {
         if (saved && saved.id && saved.id !== newProduct.id) {
           setProducts(prev => prev.map(p => p.id === newProduct.id ? { ...p, ...saved } : p));

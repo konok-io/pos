@@ -66,7 +66,7 @@ const mapCustomer = (c: any) => {
 const mapSupplier = (s: any) => ({ ...s, code: s.code || '', phone: s.phone || '', email: s.email || '', address: s.address || '', crNumber: s.cr_number || '', vatNumber: s.vat_number || '', company: s.company || s.name || '' });
 
 const mapProduct = (p: any) => {
-  return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '', foc: p.foc === 1 || p.foc === true || p.foc === '1', freeQty: parseInt(p.free_qty) || 0 };
+  return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '', supplierId: p.supplier_id || '', foc: p.foc === 1 || p.foc === true || p.foc === '1', freeQty: parseInt(p.free_qty) || 0 };
 }
 
 function emitApiError(msg: string) {

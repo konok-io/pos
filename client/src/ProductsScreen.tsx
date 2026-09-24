@@ -1818,12 +1818,14 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
     const latestForPrice = products.find((p: any) => p.id === editProduct.id);
+    const supEdit = suppliers.find((x: any) => (x.name || '').toLowerCase() === String((editProduct as any).company || (latestForPrice && latestForPrice.company) || '').toLowerCase());
     api.updateProduct(editProduct.id, {
       ...(latestForPrice || editProduct),
       costPrice: editProduct.costPrice,
       sellPrice: editProduct.sellPrice,
       foc: !!editProduct.foc,
       freeQty: editProduct.freeQty ?? (latestForPrice && latestForPrice.freeQty) ?? 0,
+      supplierId: (editProduct as any).supplierId || (supEdit && supEdit.id) || '',
     }).catch(() => {});
     if (latestForPrice && (
       latestForPrice.costPrice !== editProduct.costPrice ||
@@ -1953,7 +1955,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    const newProduct = { id: genId(), ...productForm };
+    const supResolve = suppliers.find((x: any) => (x.name || '').toLowerCase() === String(productForm.company || '').toLowerCase());
+    const newProduct = { id: genId(), ...productForm, supplierId: productForm.supplierId || supResolve?.id || '' };
 
 
 
@@ -2312,9 +2315,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
             return (anyH.matchCode !== '' && pCode === anyH.matchCode) || (anyH.matchName !== '' && pName === anyH.matchName);
           });
         }) || 'unknown';
+        const supForPurchase = suppliers.find((s: any) => (s.name || '').toLowerCase() === String(groupKey || '').toLowerCase());
         const purchase = {
           id: purchaseId,
           supplier: groupKey === 'unknown' ? '' : groupKey,
+          supplierId: groupKey === 'unknown' ? '' : (supForPurchase?.id || ''),
           date: new Date().toISOString(),
           items,
           total,
