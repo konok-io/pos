@@ -781,7 +781,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [supplierForm, setSupplierForm] = useState({ id: '', name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' });
+  const [supplierForm, setSupplierForm] = useState({ id: '', name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' });
 
 
 
@@ -5716,7 +5716,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { const updated = suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...supplierForm } : s); setSuppliers(updated); setSuppliersParent(updated); api.updateSupplier(editingSupplier.id, supplierForm).catch(() => {}); } else { const newSupplier = { ...supplierForm }; const updated = [...suppliers, newSupplier]; setSuppliers(updated); setSuppliersParent(updated); api.addSupplier(newSupplier).catch(() => {}); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
+              <button onClick={() => { if (!supplierForm.name.trim()) { alert(t('enterName')); return; } if (editingSupplier) { const payload = { ...supplierForm, code: supplierForm.code || editingSupplier.code || '' }; const updated = suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...payload } : s); setSuppliers(updated); setSuppliersParent(updated); api.updateSupplier(editingSupplier.id, payload).catch(() => {}); } else { const maxCode = suppliers.reduce((max, x: any) => { const m = (x.code || '').match(/C-(\d+)/); return m ? Math.max(max, parseInt(m[1])) : max; }, 0); const autoCode = supplierForm.code || `C-${String(maxCode + 1).padStart(5, '0')}`; const newSupplier = { ...supplierForm, code: autoCode }; const updated = [...suppliers, newSupplier]; setSuppliers(updated); setSuppliersParent(updated); api.addSupplier(newSupplier).catch(() => {}); } setShowSupplierModal(false); }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
 
 
 
@@ -9577,7 +9577,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ id: genUniqueId(), name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '' }); setShowSupplierModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addSupplier')}</button>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ id: genUniqueId(), name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setShowSupplierModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addSupplier')}</button>
 
 
 
