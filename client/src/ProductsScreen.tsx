@@ -10694,50 +10694,6 @@ tr:nth-child(even){background:#F8FAFC}
 
                   {/* RIGHT: Live Preview + Product List + CSV + History */}
                   <div>
-                    {/* Live Preview Card */}
-                    <div style={{ borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}`, marginBottom: 16, background: T.white }}>
-                      <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '16px 20px', color: T.white, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.85, marginBottom: 4, fontWeight: 700 }}>
-                            <i className="fas fa-eye" style={{ marginRight: 4 }}></i>{t('livePreview')}
-                          </div>
-                          <div style={{ fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {productForm.name || t('enterProductName')}
-                          </div>
-                          <div style={{ fontSize: 12, opacity: 0.9, marginTop: 2 }}>{productForm.code || '-'}</div>
-                          <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-                            <span style={{ padding: '3px 10px', borderRadius: 12, background: (productForm.stock || 0) <= 0 ? '#DC2626' : (productForm.stock || 0) <= (productForm.minStock || 0) ? '#D97706' : '#16A34A', fontWeight: 700, fontSize: 11 }}>
-                              {(productForm.stock || 0) <= 0 ? t('outOfStock') : (productForm.stock || 0) <= (productForm.minStock || 0) ? t('lowStock') : t('inStock')}
-                            </span>
-                            {productForm.cat && (
-                              <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 11 }}>{productForm.cat}</span>
-                            )}
-                          </div>
-                        </div>
-                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ fontSize: 24, fontWeight: 800 }}>{_settings?.currencySymbol} {productForm.sellPrice || 0}</div>
-                          <div style={{ fontSize: 12, opacity: 0.9 }}>{t('sellPrice')}</div>
-                        </div>
-                      </div>
-                      <div style={{ padding: '12px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                        {[
-                          { ok: !!productForm.name, label: t('productName') },
-                          { ok: (productForm.sellPrice || 0) > 0, label: t('sellPrice') },
-                          { ok: (productForm.costPrice || 0) > 0, label: t('purchasePrice') },
-                          { ok: !!productForm.cat, label: t('categories') },
-                          { ok: !!productForm.code, label: t('barcode') },
-                          { ok: (productForm.stock || 0) > 0, label: t('stock') },
-                        ].map((c) => (
-                          <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: c.ok ? '#15803D' : T.gray400, fontWeight: c.ok ? 600 : 400 }}>
-                            <span style={{ width: 18, height: 18, borderRadius: 5, background: c.ok ? '#DCFCE7' : T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <i className={c.ok ? 'fas fa-check' : 'fas fa-minus'} style={{ fontSize: 9, color: c.ok ? '#16A34A' : T.gray400 }}></i>
-                            </span>
-                            {c.label}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
                     {/* Product List Cart */}
                     <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 16 }}>
                       <div style={{ padding: '12px 16px', background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
