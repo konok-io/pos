@@ -1077,7 +1077,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+  const [productForm, setProductForm] = useState({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
   const [isPosting, setIsPosting] = useState(false);
 
 
@@ -2046,7 +2046,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+    setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
 
 
 
@@ -2086,7 +2086,10 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
     if (!(Number(productForm.sellPrice) > 0)) { alert(t('sellPriceRequired')); return; }
     if (Number(productForm.costPrice) < 0 || Number(productForm.sellPrice) < 0) { alert(t('invalid')); return; }
-    const stockIn = Math.max(0, Math.floor(Number(productForm.stock) || 0));
+    const paidIn = Math.max(0, Math.floor(Number(productForm.paidQty) || 0));
+    const freeIn = Math.max(0, Math.floor(Number(productForm.freeQty) || 0));
+    if (paidIn + freeIn <= 0) { alert(t('enterName')); return; }
+    const unitCost = Math.max(0, Number(productForm.costPrice) || 0);
     const nameL = productForm.name.trim().toLowerCase();
     const codeL = (productForm.code || '').trim().toLowerCase();
 
@@ -2098,18 +2101,29 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     if (tempIdx >= 0) {
       setTempProducts(prev => prev.map((p, i) => i === tempIdx ? {
         ...p,
-        stock: Math.max(0, (p.stock || 0)) + stockIn,
+        paidQty: Math.max(0, p.paidQty || 0) + paidIn,
+        freeQty: Math.max(0, p.freeQty || 0) + freeIn,
+        stock: Math.max(0, p.stock || 0) + paidIn + freeIn,
         sellPrice: Number(productForm.sellPrice) > 0 ? Number(productForm.sellPrice) : p.sellPrice,
-        costPrice: Number(productForm.costPrice) >= 0 && Number(productForm.costPrice) !== 0 ? Number(productForm.costPrice) : p.costPrice,
+        costPrice: unitCost > 0 ? unitCost : p.costPrice,
+        foc: productForm.foc || p.foc || false,
       } : p));
-      setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId, vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+      setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: productForm.supplierId, vat: _settings?.vatPercent ?? 0, expiryDate: '' });
       alert(t('stockMerged'));
       return;
     }
 
-    const tempProduct = { id: genId(), ...productForm, stock: stockIn, _temp: true };
+    const tempProduct = {
+      id: genId(),
+      ...productForm,
+      paidQty: paidIn,
+      freeQty: freeIn,
+      stock: paidIn + freeIn,
+      costPrice: unitCost,
+      _temp: true,
+    };
     setTempProducts(prev => [...prev, tempProduct]);
-    setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: productForm.supplierId, vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+    setProductForm({ name: '', code: '', company: productForm.company, cat: productForm.cat, unit: productForm.unit, costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: productForm.supplierId, vat: _settings?.vatPercent ?? 0, expiryDate: '' });
   };
 
   const handleRemoveTempProduct = (id: string) => {
@@ -2180,10 +2194,17 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           const mName = (m.name || '').trim().toLowerCase();
           return (pCode !== '' && mCode === pCode) || (pName !== '' && mName === pName);
         });
+        const paid = Math.max(0, p.paidQty || 0) || Math.max(0, p.stock || 0);
+        const free = Math.max(0, p.freeQty || 0);
+        const unitCost = Math.max(0, p.costPrice || 0);
         if (hit) {
-          hit.stock = Math.max(0, hit.stock || 0) + Math.max(0, p.stock || 0);
+          hit.paidQty = Math.max(0, hit.paidQty || 0) + paid;
+          hit.freeQty = Math.max(0, hit.freeQty || 0) + free;
+          hit.stock = Math.max(0, hit.stock || 0) + paid + free;
+          if (unitCost > 0) hit.costPrice = unitCost;
+          if (p.foc) hit.foc = true;
         } else {
-          merged.push({ ...p, stock: Math.max(0, p.stock || 0) });
+          merged.push({ ...p, paidQty: paid, freeQty: free, stock: paid + free, costPrice: unitCost, foc: !!p.foc });
         }
       }
 
@@ -2214,18 +2235,39 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
               const eName = (ep.name || '').trim().toLowerCase();
               return (pCode !== '' && eCode === pCode) || (pName !== '' && eName === pName);
             });
-            const qty = Math.max(0, +p.stock || 0);
+            const paid = Math.max(0, p.paidQty || 0);
+            const free = Math.max(0, p.freeQty || 0);
+            const qty = paid + free;
+            const unitCost = Math.max(0, p.costPrice || 0);
+            const freeValue = free * unitCost;
+            const paidTotal = paid * unitCost;
             const clean: any = { ...p };
             delete clean._temp;
+            delete clean.paidQty;
+            delete clean.freeQty;
             if (existingProd) {
               const oldStock = +existingProd.stock || 0;
+              const oldCost = +existingProd.costPrice || 0;
               const newStock = oldStock + qty;
-              historyPlan.push({ matchCode: pCode, matchName: pName, productName: existingProd.name, quantity: qty, oldStock, newStock, purchaseId });
-              workingProducts = workingProducts.map(w => w.id === existingProd.id ? { ...w, stock: newStock } : w);
-              return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock });
+              const newCost = newStock > 0 ? ((oldStock * oldCost) + paidTotal) / newStock : unitCost;
+              historyPlan.push({
+                matchCode: pCode, matchName: pName, productName: existingProd.name,
+                quantity: qty, paidQty: paid, freeQty: free, unitCost, paidTotal, freeValue,
+                oldStock, newStock, purchaseId,
+              });
+              workingProducts = workingProducts.map(w => w.id === existingProd.id ? { ...w, stock: newStock, costPrice: newCost } : w);
+              return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock, costPrice: newCost, foc: existingProd.foc || !!p.foc });
             }
-            historyPlan.push({ matchCode: pCode, matchName: pName, productName: p.name, quantity: qty, oldStock: 0, newStock: qty, purchaseId });
-            return api.addProduct({ ...clean, purchaseId, stock: qty });
+            const newCost = qty > 0 ? paidTotal / qty : unitCost;
+            clean.costPrice = newCost;
+            clean.stock = qty;
+            clean.foc = !!p.foc;
+            historyPlan.push({
+              matchCode: pCode, matchName: pName, productName: p.name,
+              quantity: qty, paidQty: paid, freeQty: free, unitCost, paidTotal, freeValue,
+              oldStock: 0, newStock: qty, purchaseId,
+            });
+            return api.addProduct({ ...clean, purchaseId, stock: qty, costPrice: newCost, foc: !!p.foc });
           })
         );
         results.push(...groupResults);
@@ -2238,31 +2280,34 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
       const byGroup: Record<string, any[]> = {};
       for (const h of historyPlan) {
-        const k = h.purchaseId;
-        if (!byGroup[k]) byGroup[k] = [];
-        byGroup[k].push(h);
+        if (!byGroup[h.purchaseId]) byGroup[h.purchaseId] = [];
+        byGroup[h.purchaseId].push(h);
       }
       for (const [purchaseId, hs] of Object.entries(byGroup)) {
-        const items = hs.map((h: any) => {
-          const ep = prods.find((e: any) => {
-            const eCode = (e.code || '').trim().toLowerCase();
-            const eName = (e.name || '').trim().toLowerCase();
-            return (h.matchCode !== '' && eCode === h.matchCode) || (h.matchName !== '' && eName === h.matchName);
-          });
-          return { productId: ep ? ep.id : '', name: h.productName, code: h.matchCode || '', quantity: h.quantity, costPrice: 0 };
+        const findEp = (h: any) => prods.find((e: any) => {
+          const eCode = (e.code || '').trim().toLowerCase();
+          const eName = (e.name || '').trim().toLowerCase();
+          return (h.matchCode !== '' && eCode === h.matchCode) || (h.matchName !== '' && eName === h.matchName);
         });
         let total = 0;
-        for (const h of hs) {
-          const ep = prods.find((e: any) => {
-            const eCode = (e.code || '').trim().toLowerCase();
-            const eName = (e.name || '').trim().toLowerCase();
-            return (h.matchCode !== '' && eCode === h.matchCode) || (h.matchName !== '' && eName === h.matchName);
-          });
-          const cp = ep ? (+ep.costPrice || 0) : 0;
-          total += h.quantity * cp;
-          const it = items.find((x: any) => x.productId === (ep ? ep.id : ''));
-          if (it) it.costPrice = cp;
-        }
+        let freeTotal = 0;
+        const items = hs.map((h: any) => {
+          const ep = findEp(h);
+          total += h.paidTotal || 0;
+          freeTotal += h.freeValue || 0;
+          return {
+            productId: ep ? ep.id : '',
+            name: h.productName,
+            code: h.matchCode || '',
+            quantity: h.quantity,
+            paidQty: h.paidQty,
+            freeQty: h.freeQty,
+            unitCost: h.unitCost,
+            paidTotal: h.paidTotal,
+            freeValue: h.freeValue,
+            costPrice: h.unitCost,
+          };
+        });
         const groupKey = Object.keys(companyGroups).find(ck => {
           const anyH = hs[0];
           return companyGroups[ck].some((pp: any) => {
@@ -2271,16 +2316,19 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
             return (anyH.matchCode !== '' && pCode === anyH.matchCode) || (anyH.matchName !== '' && pName === anyH.matchName);
           });
         }) || 'unknown';
-        const purchase = { id: purchaseId, supplier: groupKey === 'unknown' ? '' : groupKey, date: new Date().toISOString(), items, total };
+        const purchase = {
+          id: purchaseId,
+          supplier: groupKey === 'unknown' ? '' : groupKey,
+          date: new Date().toISOString(),
+          items,
+          total,
+          freeTotal,
+        };
         api.addPurchase(purchase).catch(() => {});
         purchasesCreated.push(purchase);
 
         for (const h of hs) {
-          const ep = prods.find((e: any) => {
-            const eCode = (e.code || '').trim().toLowerCase();
-            const eName = (e.name || '').trim().toLowerCase();
-            return (h.matchCode !== '' && eCode === h.matchCode) || (h.matchName !== '' && eName === h.matchName);
-          });
+          const ep = findEp(h);
           if (!ep) continue;
           api.addStockHistory({
             productId: ep.id,
@@ -2289,7 +2337,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
             quantity: h.quantity,
             oldStock: h.oldStock,
             newStock: +ep.stock || h.newStock,
-            reason: `Purchase: ${purchaseId}`,
+            reason: h.freeQty > 0
+              ? `Purchase: ${purchaseId} (paid ${h.paidQty} + free ${h.freeQty})`
+              : `Purchase: ${purchaseId}`,
           }).catch(() => {});
         }
       }
@@ -2299,7 +2349,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       setProducts(prods);
       setProductsParent(prods);
       setTempProducts([]);
-      setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
+      setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' });
       alert(`${purchaseIds.length} Purchase IDs created: ${purchaseIds.join(', ')} | ${succeeded} ${t('saved')}${failed ? `, ${failed} failed` : ''}`);
     } catch (e: any) {
       alert(t('invalid'));
@@ -7417,6 +7467,7 @@ tr:nth-child(even){background:#F8FAFC}
         || (p.items || []).some((it: any) => (it.name || '').toLowerCase().includes(q) || (it.code || '').toLowerCase().includes(q));
     }).sort((a: any, b: any) => String(b.date || b.created_at || '').localeCompare(String(a.date || a.created_at || '')));
     const totalSpend = list.reduce((s: number, p: any) => s + (p.total || (p.items || []).reduce((x: number, i: any) => x + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0)), 0);
+    const freeValueTotal = list.reduce((sum: number, p: any) => sum + (p.freeTotal || (p.items || []).reduce((a: number, i: any) => a + (i.freeValue || (i.freeQty || 0) * (i.unitCost || i.costPrice || 0)), 0)), 0);
     const totalItems = list.reduce((s: number, p: any) => s + (p.items || []).length, 0);
     const totalQty = list.reduce((s: number, p: any) => s + (p.items || []).reduce((x: number, i: any) => x + (i.quantity || i.stock || 0), 0), 0);
     const suppliersSet = new Set(list.map((p: any) => p.supplier || '-').filter(Boolean));
@@ -7424,18 +7475,25 @@ tr:nth-child(even){background:#F8FAFC}
     const selected = viewPurchase ? list.find((p: any) => p.id === viewPurchase.id) || viewPurchase : null;
 
     const exportPurchaseCsv = () => {
-      const headers = [t('purchaseId'), t('date'), t('supplier'), t('products'), t('quantity'), t('purchasePrice'), t('total')];
+      const headers = [t('purchaseId'), t('date'), t('supplier'), t('products'), t('quantity'), t('paidQty'), t('freeQty'), t('purchasePrice'), t('total'), t('freeValue')];
       const lines = [headers.join(',')];
       list.forEach((p: any) => {
         const items = p.items || [];
         const qty = items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0);
-        const tot = p.total || items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0);
+        const paidSum = items.reduce((s: number, i: any) => s + (i.paidQty || i.quantity || i.stock || 0), 0);
+        const freeSum = items.reduce((s: number, i: any) => s + (i.freeQty || 0), 0);
+        const tot = p.total || items.reduce((s: number, i: any) => s + ((i.paidQty != null ? i.paidQty : (i.quantity || i.stock || 0)) * (i.unitCost || i.costPrice || 0)), 0);
+        const freeTot = p.freeTotal || items.reduce((s: number, i: any) => s + (i.freeValue || (i.freeQty || 0) * (i.unitCost || i.costPrice || 0)), 0);
         const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-        lines.push([esc(p.id), esc(p.date), esc(p.supplier), esc(items.length), esc(qty), esc(tot), esc(tot)].join(','));
+        lines.push([esc(p.id), esc(p.date), esc(p.supplier), esc(items.length), esc(qty), esc(paidSum), esc(freeSum), esc(tot), esc(tot), esc(freeTot)].join(','));
         items.forEach((it: any) => {
           const lineQty = it.quantity || it.stock || 0;
-          const lineTot = lineQty * (it.costPrice || 0);
-          lines.push(['', '', '', esc(it.name), esc(lineQty), esc(it.costPrice || 0), esc(lineTot)].join(','));
+          const linePaid = it.paidQty != null ? it.paidQty : lineQty;
+          const lineFree = it.freeQty || 0;
+          const unit = it.unitCost != null ? it.unitCost : (it.costPrice || 0);
+          const lineTot = linePaid * unit;
+          const lineFreeVal = it.freeValue != null ? it.freeValue : lineFree * unit;
+          lines.push(['', '', '', esc(it.name), esc(lineQty), esc(linePaid), esc(lineFree), esc(unit), esc(lineTot), esc(lineFreeVal)].join(','));
         });
       });
       const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
@@ -7491,6 +7549,7 @@ tr:nth-child(even){background:#F8FAFC}
     const stats = [
       { icon: 'fas fa-boxes-stacked', label: t('totalPurchases') || 'Total Purchases', value: String(list.length), color: T.teal, bg: T.tealLight },
       { icon: 'fas fa-sack-dollar', label: t('totalPurchase') || 'Total Spend', value: fmt(totalSpend), color: T.green, bg: '#DCFCE7' },
+      { icon: 'fas fa-gift', label: t('freeValue'), value: `${_settings?.currencySymbol} ${freeValueTotal.toLocaleString()}`, color: '#B45309', bg: '#FEF3C7' },
       { icon: 'fas fa-box', label: t('products') || 'Product Lines', value: String(totalItems), color: '#7C3AED', bg: '#EDE9FE' },
       { icon: 'fas fa-cubes', label: t('quantity') || 'Total Qty', value: String(totalQty), color: '#D97706', bg: '#FEF3C7' },
       { icon: 'fas fa-building', label: t('suppliers') || 'Suppliers', value: String(suppliersSet.size), color: '#2563EB', bg: '#DBEAFE' },
@@ -10237,6 +10296,11 @@ tr:nth-child(even){background:#F8FAFC}
                               </span>
                             );
                           })()}
+                          {productForm.foc && (
+                            <span style={{ padding: '3px 10px', borderRadius: 12, background: '#D97706', fontWeight: 700, fontSize: 13 }}>
+                              <i className="fas fa-gift" style={{ marginRight: 4 }}></i>{t('foc')}
+                            </span>
+                          )}
                           {productForm.expiryDate && (
                             <span style={{ padding: '3px 10px', borderRadius: 12, background: '#E11D48', fontWeight: 700, fontSize: 13 }}>
                               <i className="fas fa-calendar" style={{ marginRight: 4 }}></i>{productForm.expiryDate}
@@ -10262,7 +10326,7 @@ tr:nth-child(even){background:#F8FAFC}
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 40px' }}>
                 {/* Stat cards */}
                 {(() => {
-                  const listCost = tempProducts.reduce((s: number, it: any) => s + (it.costPrice || 0) * (it.stock || 0), 0);
+                  const listCost = tempProducts.reduce((s: number, it: any) => s + (it.costPrice || 0) * ((it.paidQty != null ? it.paidQty : it.stock) || 0), 0);
                   const listValue = tempProducts.reduce((s: number, it: any) => s + (it.sellPrice || 0) * (it.stock || 0), 0);
                   const profit = listValue - listCost;
                   const cp = listCost;
@@ -10507,10 +10571,10 @@ tr:nth-child(even){background:#F8FAFC}
                       <div style={{ padding: 16 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                       <div>
-                        <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('stock')}</label>
+                        <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('paidQty')}</label>
                         <div style={{ position: 'relative' }}>
                           <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-cubes" style={{ fontSize: 11 }}></i></div>
-                          <input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: Math.max(0, parseInt(e.target.value) || 0) })} min={0} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
+                          <input type="number" value={productForm.paidQty} onChange={e => { const v = Math.max(0, parseInt(e.target.value) || 0); setProductForm({ ...productForm, paidQty: v, stock: v + (productForm.freeQty || 0) }); }} min={0} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
                         </div>
                       </div>
                       <div>
@@ -10518,6 +10582,19 @@ tr:nth-child(even){background:#F8FAFC}
                         <div style={{ position: 'relative' }}>
                           <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-layer-group" style={{ fontSize: 12 }}></i></div>
                           <input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : parseInt(e.target.value, 10)) })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 30, height: 38 }} />
+                        </div>
+
+                        <div><label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('freeQty')}</label>
+                          <input type="number" value={productForm.freeQty} onChange={e => { const v = Math.max(0, parseInt(e.target.value) || 0); setProductForm({ ...productForm, freeQty: v, stock: (productForm.paidQty || 0) + v }); }} min={0} style={{ ...inputStyle, fontSize: 13, height: 38 }} />
+                        </div>
+                        <div><label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('totalIn')}</label>
+                          <div style={{ ...inputStyle, fontSize: 13, height: 38, display: 'flex', alignItems: 'center', background: T.gray100, fontWeight: 700 }}>{(productForm.paidQty || 0) + (productForm.freeQty || 0)}</div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 2 }}>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: productForm.foc ? '#B45309' : T.gray600, background: productForm.foc ? '#FEF3C7' : T.gray100, border: `1px solid ${productForm.foc ? '#FCD34D' : T.gray200}`, borderRadius: 8, padding: '8px 12px' }}>
+                            <input type="checkbox" checked={!!productForm.foc} onChange={e => setProductForm({ ...productForm, foc: e.target.checked })} style={{ accentColor: '#D97706' }} />
+                            {t('foc')}
+                          </label>
                         </div>
                       </div>
                     </div>
@@ -10545,7 +10622,7 @@ tr:nth-child(even){background:#F8FAFC}
 
                     {/* Buttons */}
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
+                      <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
                       <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-plus" style={{marginRight: 6}}></i> {t('add')}</button>
                     </div>
                   </div>
@@ -10585,7 +10662,7 @@ tr:nth-child(even){background:#F8FAFC}
                                 </div>
                                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                                   <div style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol} {item.sellPrice}</div>
-                                  <div style={{ fontSize: 11, color: T.gray500 }}>x{item.stock}</div>
+                                  <div style={{ fontSize: 11, color: T.gray500 }}>x{item.stock}{(item.freeQty || 0) > 0 ? ` (+${item.freeQty} ${t('freeQty')})` : ''}</div>
                                 </div>
                                 <button onClick={() => handleRemoveTempProduct(item.id)} style={{ width: 24, height: 24, border: 'none', borderRadius: 6, background: T.redLight, color: T.red, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}><i className="fas fa-xmark"></i></button>
                               </div>

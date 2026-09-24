@@ -64,7 +64,7 @@ const mapCustomer = (c: any) => {
 };
 
 const mapProduct = (p: any) => {
-  return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '' };
+  return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '', foc: p.foc === 1 || p.foc === true || p.foc === '1' };
 }
 
 function emitApiError(msg: string) {
