@@ -68,14 +68,32 @@
   document.getElementById('hint').textContent = d.hint;
   document.title = d.docTitle;
   document.documentElement.lang = lang;
-  window.addEventListener('online', function () { location.reload(); });
-})();
-function tryReload() {
+
+  var tries = 0;
+  function tryReload() {
+    tries++;
     try { window.location.replace(window.location.pathname + '?_r=' + Date.now()); }
     catch (e) { window.location.reload(); }
   }
   window.tryReload = tryReload;
+
+  // Already online (false offline) — go back immediately
+  if (navigator.onLine) {
+    setTimeout(function () { if (tries === 0) tryReload(); }, 300);
+  }
+
   window.addEventListener('online', function () { tryReload(); });
+
+  // Poll: navigator.onLine can stay true while page was served offline;
+  // periodically probe the origin so we recover without an online event
+  setInterval(function () {
+    if (tries > 0) return;
+    if (!navigator.onLine) return;
+    fetch(window.location.pathname + '?_ping=' + Date.now(), { cache: 'no-store' })
+      .then(function (res) { if (res && res.ok) tryReload(); })
+      .catch(function () {});
+  }, 2500);
+})();
 </script>
 </body>
 </html>
