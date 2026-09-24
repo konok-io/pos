@@ -10308,117 +10308,137 @@ tr:nth-child(even){background:#F8FAFC}
 
 
         {!viewProduct && productTab === 'newProduct' && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            {/* Profile-style Gradient Header */}
-            <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '28px 24px 24px', color: T.white, flexShrink: 0 }}>
-              <div style={{ maxWidth: 1400, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, width: '100%' }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>
-                    <i className="fas fa-plus-circle" style={{ marginRight: 8, opacity: 0.9 }}></i>
-                    {t('newProduct')}
-                  </div>
-                  <div style={{ fontSize: 13, opacity: 0.9, marginBottom: 12 }}>{t('addProductDesc')}</div>
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                    {productForm.name && (
-                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 12, maxWidth: 220, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        <i className="fas fa-tag" style={{ marginRight: 4 }}></i>{productForm.name}
-                      </span>
-                    )}
-                    {productForm.code && (
-                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 12 }}>
-                        <i className="fas fa-barcode" style={{ marginRight: 4 }}></i>{productForm.code}
-                      </span>
-                    )}
-                    {productForm.cat && (
-                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 12 }}>
-                        <i className="fas fa-folder" style={{ marginRight: 4 }}></i>{productForm.cat}
-                      </span>
-                    )}
-                    {productForm.expiryDate && (
-                      <span style={{ padding: '3px 10px', borderRadius: 12, background: '#E11D48', fontWeight: 700, fontSize: 12 }}>
-                        <i className="fas fa-calendar" style={{ marginRight: 4 }}></i>{productForm.expiryDate}
-                      </span>
-                    )}
-                    {productForm.name && products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) && (
-                      <span style={{ padding: '3px 10px', borderRadius: 12, background: '#F59E0B', fontWeight: 700, fontSize: 12, color: '#78350F' }}>
-                        <i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{t('duplicateName')}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ fontSize: 28, fontWeight: 800 }}>{_settings?.currencySymbol} {productForm.sellPrice || 0}</div>
-                  <div style={{ fontSize: 13, opacity: 0.9 }}>{t('sellPrice')}</div>
-                  <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                    <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 13 }}>
-                      <i className="fas fa-arrow-trend-up" style={{ marginRight: 4 }}></i>
-                      {(() => {
-                        const pr = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
-                        return `${_settings?.currencySymbol} ${pr}`;
-                      })()}
-                    </span>
-                    <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 13 }}>
-                      {(() => {
-                        const pr = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
-                        const cp = productForm.costPrice || 0;
-                        const pct = cp > 0 ? Math.round(pr / cp * 100) : 0;
-                        return `${cp === 0 && pr > 0 ? '∞' : pct}%`;
-                      })()}
-                    </span>
-                  </div>
-                </div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
+            {/* Top bar — Product View style */}
+            <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap', flexShrink: 0 }}>
+              <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('newProduct')}</span>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 13, color: T.gray400 }}>{tempProducts.length} {t('productList')}</span>
+                <button onClick={handleClearTempProducts} disabled={tempProducts.length === 0} style={{ ...btn('ghost', 'sm'), opacity: tempProducts.length ? 1 : 0.5 }}>
+                  <i className="fas fa-trash-can" style={{ marginRight: 4 }}></i> {t('clear')}
+                </button>
+                <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0} style={{ ...btn('primary', 'sm'), opacity: tempProducts.length ? 1 : 0.5 }}>
+                  <i className="fas fa-paper-plane" style={{ marginRight: 4 }}></i> {t('post')}
+                </button>
               </div>
             </div>
 
-            {/* Stat cards */}
-            <div style={{ maxWidth: 1400, margin: '0 auto', padding: '16px 24px 0', width: '100%', flexShrink: 0 }}>
-              {(() => {
-                const profit = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
-                const cp = productForm.costPrice || 0;
-                const marginPct = cp > 0 ? Math.round(profit / cp * 100) : 0;
-                const stockValue = (productForm.stock || 0) * cp;
-                const filled = (productForm.name ? 1 : 0)
-                  + ((productForm.sellPrice || 0) > 0 ? 1 : 0)
-                  + (productForm.code ? 1 : 0)
-                  + (productForm.cat ? 1 : 0)
-                  + (cp > 0 ? 1 : 0)
-                  + (productForm.expiryDate ? 1 : 0);
-                const progress = Math.round((filled / 6) * 100);
-                const listValue = tempProducts.reduce((s: number, it: any) => s + (it.sellPrice || 0) * (it.stock || 0), 0);
-                const stats = [
-                  { label: t('formProgress'), value: `${progress}%`, icon: 'fas fa-list-check', color: progress >= 100 ? '#16A34A' : '#D97706', bg: progress >= 100 ? '#DCFCE7' : '#FEF3C7' },
-                  { label: t('profit'), value: `${_settings?.currencySymbol} ${profit}`, icon: 'fas fa-arrow-trend-up', color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray500, bg: profit > 0 ? '#DCFCE7' : profit < 0 ? T.redLight : T.gray100 },
-                  { label: `${t('profit')} %`, value: `${cp === 0 && profit > 0 ? '∞' : marginPct}%`, icon: 'fas fa-percent', color: marginPct > 0 ? '#16A34A' : T.gray500, bg: marginPct > 0 ? '#DCFCE7' : T.gray100 },
-                  { label: t('stockValue'), value: `${_settings?.currencySymbol} ${stockValue.toLocaleString()}`, icon: 'fas fa-boxes-stacked', color: T.teal, bg: T.tealLight },
-                  { label: `${t('productList')} (${tempProducts.length})`, value: `${_settings?.currencySymbol} ${listValue.toLocaleString()}`, icon: 'fas fa-cart-shopping', color: '#7C3AED', bg: '#EDE9FE' },
-                ];
-                return (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, marginBottom: 18 }}>
-                    {stats.map((s) => (
-                      <div key={s.label} style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, padding: '14px 16px' }}>
-                        <div style={{ width: 38, height: 38, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                          <i className={s.icon} style={{ color: s.color, fontSize: 16 }}></i>
-                        </div>
-                        <div style={{ fontSize: 12, color: T.gray400, marginBottom: 4 }}>{s.label}</div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: s.color, wordBreak: 'break-word' }}>{s.value}</div>
+            {/* Page scroll area — Product View style */}
+            <div style={{ flex: 1, overflow: 'auto' }}>
+              {/* Gradient Header */}
+              <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+                <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, width: '100%' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <div style={{ width: 64, height: 64, borderRadius: 16, background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid rgba(255,255,255,0.35)', flexShrink: 0 }}>
+                        <i className="fas fa-plus" style={{ fontSize: 26 }}></i>
                       </div>
-                    ))}
+                      <div>
+                        <div style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.2 }}>
+                          {productForm.name || t('newProduct')}
+                        </div>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8, alignItems: 'center' }}>
+                          {productForm.code && (
+                            <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13, fontFamily: 'monospace' }}>
+                              <i className="fas fa-barcode" style={{ marginRight: 4 }}></i>{productForm.code}
+                            </span>
+                          )}
+                          {productForm.cat && (
+                            <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}>
+                              <i className="fas fa-folder" style={{ marginRight: 4 }}></i>{productForm.cat}
+                            </span>
+                          )}
+                          {productForm.company && (
+                            <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}>
+                              <i className="fas fa-building" style={{ marginRight: 4 }}></i>{productForm.company}
+                            </span>
+                          )}
+                          <span style={{ padding: '3px 10px', borderRadius: 12, background: (productForm.stock || 0) <= 0 ? '#DC2626' : (productForm.stock || 0) <= (productForm.minStock || 0) ? '#D97706' : '#16A34A', fontWeight: 700, fontSize: 13 }}>
+                            {(productForm.stock || 0) <= 0 ? t('outOfStock') : (productForm.stock || 0) <= (productForm.minStock || 0) ? t('lowStock') : t('inStock')}
+                          </span>
+                          {productForm.expiryDate && (
+                            <span style={{ padding: '3px 10px', borderRadius: 12, background: '#E11D48', fontWeight: 700, fontSize: 13 }}>
+                              <i className="fas fa-calendar" style={{ marginRight: 4 }}></i>{productForm.expiryDate}
+                            </span>
+                          )}
+                          {productForm.name && products.some((p: any) => (p.name || '').toLowerCase() === productForm.name.toLowerCase()) && (
+                            <span style={{ padding: '3px 10px', borderRadius: 12, background: '#F59E0B', fontWeight: 700, fontSize: 13, color: '#78350F' }}>
+                              <i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{t('duplicateName')}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                );
-              })()}
-            </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ fontSize: 28, fontWeight: 800 }}>{_settings?.currencySymbol} {productForm.sellPrice || 0}</div>
+                    <div style={{ fontSize: 13, opacity: 0.9 }}>{t('sellPrice')}</div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                      <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 13 }}>
+                        <i className="fas fa-arrow-trend-up" style={{ marginRight: 4 }}></i>
+                        {_settings?.currencySymbol} {((productForm.sellPrice || 0) - (productForm.costPrice || 0))}
+                      </span>
+                      <span style={{ padding: '4px 12px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 13 }}>
+                        {(() => {
+                          const pr = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
+                          const cp = productForm.costPrice || 0;
+                          const pct = cp > 0 ? Math.round(pr / cp * 100) : 0;
+                          return `${cp === 0 && pr > 0 ? '∞' : pct}%`;
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-            {/* Body */}
-            <div style={{ flex: 1, display: 'flex', overflow: 'hidden', maxWidth: 1400, margin: '0 auto', width: '100%', borderTop: `1px solid ${T.gray200}`, background: T.white }}>
-            {/* LEFT: Supplier + Category + Product Form */}
-            <div style={{ flex: '0 0 440px', borderRight: `1px solid ${T.gray200}`, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: T.white }}>
-              <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px' }}>
-                {/* Basic Information Card */}
-                <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 14 }}>
-                  <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight }}>
-                    <i className="fas fa-circle-info" style={{ marginRight: 6 }}></i>{t('basicInfo')}
-                  </div>
-                  <div style={{ padding: 16 }}>
+              {/* Content */}
+              <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 40px' }}>
+                {/* Stat cards */}
+                {(() => {
+                  const profit = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
+                  const cp = productForm.costPrice || 0;
+                  const marginPct = cp > 0 ? Math.round(profit / cp * 100) : 0;
+                  const stockValue = (productForm.stock || 0) * cp;
+                  const filled = (productForm.name ? 1 : 0)
+                    + ((productForm.sellPrice || 0) > 0 ? 1 : 0)
+                    + (productForm.code ? 1 : 0)
+                    + (productForm.cat ? 1 : 0)
+                    + (cp > 0 ? 1 : 0)
+                    + (productForm.expiryDate ? 1 : 0);
+                  const progress = Math.round((filled / 6) * 100);
+                  const listValue = tempProducts.reduce((s: number, it: any) => s + (it.sellPrice || 0) * (it.stock || 0), 0);
+                  const stats = [
+                    { label: t('formProgress'), value: `${progress}%`, icon: 'fas fa-list-check', color: progress >= 100 ? '#16A34A' : '#D97706', bg: progress >= 100 ? '#DCFCE7' : '#FEF3C7' },
+                    { label: t('profit'), value: `${_settings?.currencySymbol} ${profit}`, icon: 'fas fa-arrow-trend-up', color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray500, bg: profit > 0 ? '#DCFCE7' : profit < 0 ? T.redLight : T.gray100 },
+                    { label: `${t('profit')} %`, value: `${cp === 0 && profit > 0 ? '∞' : marginPct}%`, icon: 'fas fa-percent', color: marginPct > 0 ? '#16A34A' : T.gray500, bg: marginPct > 0 ? '#DCFCE7' : T.gray100 },
+                    { label: t('stockValue'), value: `${_settings?.currencySymbol} ${stockValue.toLocaleString()}`, icon: 'fas fa-boxes-stacked', color: T.teal, bg: T.tealLight },
+                    { label: `${t('productList')} (${tempProducts.length})`, value: `${_settings?.currencySymbol} ${listValue.toLocaleString()}`, icon: 'fas fa-cart-shopping', color: '#7C3AED', bg: '#EDE9FE' },
+                  ];
+                  return (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))', gap: 12, marginBottom: 22 }}>
+                      {stats.map((s) => (
+                        <div key={s.label} style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, padding: '14px 16px' }}>
+                          <div style={{ width: 38, height: 38, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                            <i className={s.icon} style={{ color: s.color, fontSize: 16 }}></i>
+                          </div>
+                          <div style={{ fontSize: 12, color: T.gray400, marginBottom: 4 }}>{s.label}</div>
+                          <div style={{ fontSize: 18, fontWeight: 800, color: s.color, wordBreak: 'break-word' }}>{s.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+
+                {/* Two-column: Form | Preview+List — Product View grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 22 }}>
+                  {/* LEFT: Form sections (Basic + Pricing + Inventory) */}
+                  <div>
+                    {/* Basic Information Card */}
+                    <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 16 }}>
+                      <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight }}>
+                        <i className="fas fa-circle-info" style={{ marginRight: 6 }}></i>{t('basicInfo')}
+                      </div>
+                      <div style={{ padding: 16 }}>
                 {/* Supplier */}
                 <div style={{ marginBottom: 12 }}>
                   <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('suppliers')}</label>
@@ -10538,16 +10558,15 @@ tr:nth-child(even){background:#F8FAFC}
                     <input type="number" value={productForm.vat ?? _settings?.vatPercent ?? 0} onChange={e => setProductForm({ ...productForm, vat: e.target.value === '' ? 0 : parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#7C3AED' }} />
                   </div>
                 </div>
-                  </div>
-                </div>
+                      </div>
+                    </div>
 
-                {/* Pricing Card */}
-                <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 14 }}>
-                  <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight }}>
-                    <i className="fas fa-coins" style={{ marginRight: 6 }}></i>{t('pricingInfo')}
-                  </div>
-                  <div style={{ padding: 16 }}>
-                {/* Purchase Price + Sell Price */}
+                    {/* Pricing Card */}
+                    <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 16 }}>
+                      <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight }}>
+                        <i className="fas fa-coins" style={{ marginRight: 6 }}></i>{t('pricingInfo')}
+                      </div>
+                      <div style={{ padding: 16 }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('purchasePrice')} ({_settings?.currencySymbol})</label>
@@ -10558,7 +10577,6 @@ tr:nth-child(even){background:#F8FAFC}
                     <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#B91C1C' }} />
                   </div>
                 </div>
-                {/* Profit + Profit % */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} ({_settings?.currencySymbol})</label>
@@ -10584,7 +10602,6 @@ tr:nth-child(even){background:#F8FAFC}
                     })()}
                   </div>
                 </div>
-                {/* VAT included Sales Price */}
                 {(() => {
                   const vat = productForm.vat || _settings?.vatPercent || 0;
                   const sellPrice = productForm.sellPrice || 0;
@@ -10601,16 +10618,15 @@ tr:nth-child(even){background:#F8FAFC}
                     </div>
                   );
                 })()}
-                  </div>
-                </div>
+                      </div>
+                    </div>
 
-                {/* Inventory Card */}
-                <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 14 }}>
-                  <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight }}>
-                    <i className="fas fa-warehouse" style={{ marginRight: 6 }}></i>{t('inventoryInfo')}
-                  </div>
-                  <div style={{ padding: 16 }}>
-                    {/* Stock + Min Stock */}
+                    {/* Inventory Card */}
+                    <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 16 }}>
+                      <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight }}>
+                        <i className="fas fa-warehouse" style={{ marginRight: 6 }}></i>{t('inventoryInfo')}
+                      </div>
+                      <div style={{ padding: 16 }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                       <div>
                         <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('stock')}</label>
@@ -10627,7 +10643,6 @@ tr:nth-child(even){background:#F8FAFC}
                         </div>
                       </div>
                     </div>
-                    {/* Stock status hint */}
                     {(() => {
                       const stock = productForm.stock || 0;
                       const min = productForm.minStock || 0;
@@ -10647,79 +10662,152 @@ tr:nth-child(even){background:#F8FAFC}
                         </div>
                       );
                     })()}
-                  </div>
-                </div>
-
-                {/* Buttons */}
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
-                  <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-plus" style={{marginRight: 6}}></i> {t('add')}</button>
-                </div>
-              </div>
-            </div>
-            {/* MIDDLE: Live Preview + CSV + Purchase History */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: T.gray50, overflow: 'hidden' }}>
-              <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
-                {/* Live Preview Card - Product View profile style */}
-                <div style={{ borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}`, marginBottom: 16, background: T.white }}>
-                  <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '16px 20px', color: T.white, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{ minWidth: 0 }}>
-                      <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.85, marginBottom: 4, fontWeight: 700 }}>
-                        <i className="fas fa-eye" style={{ marginRight: 4 }}></i>{t('livePreview')}
-                      </div>
-                      <div style={{ fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {productForm.name || t('enterProductName')}
-                      </div>
-                      <div style={{ fontSize: 12, opacity: 0.9, marginTop: 2 }}>{productForm.code || '-'}</div>
-                      <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
-                        <span style={{ padding: '3px 10px', borderRadius: 12, background: (productForm.stock || 0) <= 0 ? '#DC2626' : (productForm.stock || 0) <= (productForm.minStock || 0) ? '#D97706' : '#16A34A', fontWeight: 700, fontSize: 11 }}>
-                          {(productForm.stock || 0) <= 0 ? t('outOfStock') : (productForm.stock || 0) <= (productForm.minStock || 0) ? t('lowStock') : t('inStock')}
-                        </span>
-                        {productForm.cat && (
-                          <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 11 }}>{productForm.cat}</span>
-                        )}
-                        {productForm.expiryDate && (
-                          <span style={{ padding: '3px 10px', borderRadius: 12, background: '#E11D48', fontWeight: 700, fontSize: 11 }}>
-                            <i className="fas fa-calendar" style={{ marginRight: 3 }}></i>{productForm.expiryDate}
-                          </span>
-                        )}
                       </div>
                     </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: 24, fontWeight: 800 }}>{_settings?.currencySymbol} {productForm.sellPrice || 0}</div>
-                      <div style={{ fontSize: 12, opacity: 0.9 }}>{t('sellPrice')}</div>
+
+                    {/* Buttons */}
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
+                      <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-plus" style={{marginRight: 6}}></i> {t('add')}</button>
                     </div>
                   </div>
-                  {/* Checklist */}
-                  <div style={{ padding: '12px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                    {[
-                      { ok: !!productForm.name, label: t('productName') },
-                      { ok: (productForm.sellPrice || 0) > 0, label: t('sellPrice') },
-                      { ok: (productForm.costPrice || 0) > 0, label: t('purchasePrice') },
-                      { ok: !!productForm.cat, label: t('categories') },
-                      { ok: !!productForm.code, label: t('barcode') },
-                      { ok: (productForm.stock || 0) > 0, label: t('stock') },
-                    ].map((c) => (
-                      <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: c.ok ? '#15803D' : T.gray400, fontWeight: c.ok ? 600 : 400 }}>
-                        <span style={{ width: 18, height: 18, borderRadius: 5, background: c.ok ? '#DCFCE7' : T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                          <i className={c.ok ? 'fas fa-check' : 'fas fa-minus'} style={{ fontSize: 9, color: c.ok ? '#16A34A' : T.gray400 }}></i>
-                        </span>
-                        {c.label}
-                      </div>
-                    ))}
-                  </div>
-                </div>
 
-                {/* CSV Upload */}
-                <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 16 }}>
-                  <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight, display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <i className="fas fa-file-csv" style={{ color: '#7C3AED' }}></i>
-                    <span>{t('csvUpload')}</span>
-                    <span style={{ fontSize: 11, color: T.gray500, fontWeight: 500, marginLeft: 4 }}>{t('csvUploadDesc')}</span>
-                  </div>
-                  <div style={{ padding: 16 }}>
-                    <div style={{ border: `2px dashed ${T.gray300}`, borderRadius: 10, padding: '16px 12px', textAlign: 'center', background: T.gray50, cursor: 'pointer', position: 'relative' }} onClick={() => document.getElementById('csv-upload-input')?.click()}>
-                      <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = (() => { const s = headers.findIndex((h: string) => h.includes('sell')); if (s >= 0) return s; return headers.findIndex((h: string) => (h.includes('sellprice') || h.includes('sell_price') || (h.includes('price') && !h.includes('cost') && !h.includes('purchase')))); })(); const stockIdx = headers.findIndex((h: string) => h.includes('stock') && !h.includes('min')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const minStockIdx = headers.findIndex((h: string) => h.includes('minstock') || h.includes('min_stock') || h === 'min'); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); const expiryIdx = headers.findIndex((h: string) => h.includes('expir')); const imported: any[] = []; const errors: string[] = []; const stockUpdated: string[] = []; for (let i = 1; i < lines2.length; i++) { const cols = lines2[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const companyName = companyIdx >= 0 ? cols[companyIdx] : ''; let supplierId = ''; if (companyName) { const matched = suppliers.find((s: any) => (s.name || '').toLowerCase() === companyName.toLowerCase()); if (matched) { supplierId = matched.id; } else { errors.push(`Row ${i+1}: "${companyName}" - ${t('supplierNotFound')}`); continue; } } const existingIdx = tempProducts.findIndex((t: any) => (t.code || '').toLowerCase() === (codeIdx >= 0 ? cols[codeIdx] : '').toLowerCase());
+                  {/* RIGHT: Live Preview + Product List + CSV + History */}
+                  <div>
+                    {/* Live Preview Card */}
+                    <div style={{ borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}`, marginBottom: 16, background: T.white }}>
+                      <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '16px 20px', color: T.white, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, opacity: 0.85, marginBottom: 4, fontWeight: 700 }}>
+                            <i className="fas fa-eye" style={{ marginRight: 4 }}></i>{t('livePreview')}
+                          </div>
+                          <div style={{ fontSize: 18, fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {productForm.name || t('enterProductName')}
+                          </div>
+                          <div style={{ fontSize: 12, opacity: 0.9, marginTop: 2 }}>{productForm.code || '-'}</div>
+                          <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+                            <span style={{ padding: '3px 10px', borderRadius: 12, background: (productForm.stock || 0) <= 0 ? '#DC2626' : (productForm.stock || 0) <= (productForm.minStock || 0) ? '#D97706' : '#16A34A', fontWeight: 700, fontSize: 11 }}>
+                              {(productForm.stock || 0) <= 0 ? t('outOfStock') : (productForm.stock || 0) <= (productForm.minStock || 0) ? t('lowStock') : t('inStock')}
+                            </span>
+                            {productForm.cat && (
+                              <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.2)', fontWeight: 700, fontSize: 11 }}>{productForm.cat}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                          <div style={{ fontSize: 24, fontWeight: 800 }}>{_settings?.currencySymbol} {productForm.sellPrice || 0}</div>
+                          <div style={{ fontSize: 12, opacity: 0.9 }}>{t('sellPrice')}</div>
+                        </div>
+                      </div>
+                      <div style={{ padding: '12px 16px', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                        {[
+                          { ok: !!productForm.name, label: t('productName') },
+                          { ok: (productForm.sellPrice || 0) > 0, label: t('sellPrice') },
+                          { ok: (productForm.costPrice || 0) > 0, label: t('purchasePrice') },
+                          { ok: !!productForm.cat, label: t('categories') },
+                          { ok: !!productForm.code, label: t('barcode') },
+                          { ok: (productForm.stock || 0) > 0, label: t('stock') },
+                        ].map((c) => (
+                          <div key={c.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: c.ok ? '#15803D' : T.gray400, fontWeight: c.ok ? 600 : 400 }}>
+                            <span style={{ width: 18, height: 18, borderRadius: 5, background: c.ok ? '#DCFCE7' : T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <i className={c.ok ? 'fas fa-check' : 'fas fa-minus'} style={{ fontSize: 9, color: c.ok ? '#16A34A' : T.gray400 }}></i>
+                            </span>
+                            {c.label}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Product List Cart */}
+                    <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 16 }}>
+                      <div style={{ padding: '12px 16px', background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <i className="fas fa-list-check" style={{ color: '#fff', fontSize: 14 }}></i>
+                          </div>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t('productList')}</span>
+                          <span style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 700 }}>{tempProducts.length}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button onClick={handleClearTempProducts} disabled={tempProducts.length === 0} style={{ padding: '7px 10px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)', color: tempProducts.length > 0 ? '#DC2626' : 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: 13, cursor: tempProducts.length > 0 ? 'pointer' : 'default', display: 'flex', alignItems: 'center' }}>
+                            <i className="fas fa-trash-can"></i>
+                          </button>
+                          <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? '#fff' : 'rgba(255,255,255,0.2)', color: tempProducts.length > 0 ? T.teal : 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: 12, cursor: tempProducts.length > 0 ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <i className="fas fa-paper-plane"></i> {t('post')}
+                          </button>
+                        </div>
+                      </div>
+                      <div style={{ maxHeight: 320, overflow: 'auto', background: T.gray50 }}>
+                        {tempProducts.length === 0 ? (
+                          <div style={{ textAlign: 'center', padding: '48px 20px', color: T.gray400 }}>
+                            <div style={{ width: 64, height: 64, borderRadius: 16, background: T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                              <i className="fas fa-cart-shopping" style={{ fontSize: 28, color: T.gray300 }}></i>
+                            </div>
+                            <div style={{ fontSize: 14, fontWeight: 600, color: T.gray500, marginBottom: 4 }}>{t('cartEmpty')}</div>
+                            <div style={{ fontSize: 12 }}>{t('addProductsFromLeft')}</div>
+                          </div>
+                        ) : (
+                          <div style={{ padding: '8px 12px' }}>
+                            {tempProducts.map((item, i) => (
+                              <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: T.white, borderRadius: 10, border: `1px solid ${T.gray100}`, marginBottom: 6, boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
+                                <div style={{ width: 30, height: 30, borderRadius: 8, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: T.teal, flexShrink: 0 }}>{i + 1}</div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontWeight: 600, fontSize: 13, color: T.gray800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
+                                  <div style={{ fontSize: 11, color: T.gray400 }}>{item.company || '-'} {item.cat ? `| ${item.cat}` : ''}</div>
+                                  {item.expiryDate && <div style={{ fontSize: 10, color: '#E11D48' }}>{item.expiryDate}</div>}
+                                </div>
+                                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol} {item.sellPrice}</div>
+                                  <div style={{ fontSize: 11, color: T.gray500 }}>x{item.stock}</div>
+                                </div>
+                                <button onClick={() => handleRemoveTempProduct(item.id)} style={{ width: 24, height: 24, border: 'none', borderRadius: 6, background: T.redLight, color: T.red, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}><i className="fas fa-xmark"></i></button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {tempProducts.length > 0 && (
+                        <div style={{ borderTop: `1px solid ${T.gray200}`, padding: '12px 16px', background: T.white }}>
+                          {(() => {
+                            const totalQty = tempProducts.reduce((s: number, it: any) => s + (it.stock || 0), 0);
+                            const totalCost = tempProducts.reduce((s: number, it: any) => s + (it.costPrice || 0) * (it.stock || 0), 0);
+                            const totalSell = tempProducts.reduce((s: number, it: any) => s + (it.sellPrice || 0) * (it.stock || 0), 0);
+                            const totalProfit = totalSell - totalCost;
+                            return (
+                              <div style={{ display: 'grid', gap: 6, fontSize: 13 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: T.gray500 }}>
+                                  <span>{t('totalQuantity') || 'Total Qty'}</span>
+                                  <strong style={{ color: T.gray800 }}>{totalQty}</strong>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: T.gray500 }}>
+                                  <span>{t('purchasePrice')}</span>
+                                  <strong style={{ color: '#15803D' }}>{_settings?.currencySymbol} {totalCost.toLocaleString()}</strong>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: T.gray500 }}>
+                                  <span>{t('totalValue')}</span>
+                                  <strong style={{ color: T.teal }}>{_settings?.currencySymbol} {totalSell.toLocaleString()}</strong>
+                                </div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6, borderTop: `1px dashed ${T.gray200}` }}>
+                                  <span style={{ fontWeight: 700, color: T.gray600 }}>{t('potentialProfit')}</span>
+                                  <strong style={{ color: totalProfit >= 0 ? '#16A34A' : '#DC2626', fontSize: 14 }}>{_settings?.currencySymbol} {totalProfit.toLocaleString()}</strong>
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* CSV Upload */}
+                    <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden', marginBottom: 16 }}>
+                      <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <i className="fas fa-file-csv" style={{ color: '#7C3AED' }}></i>
+                        <span>{t('csvUpload')}</span>
+                        <span style={{ fontSize: 11, color: T.gray500, fontWeight: 500, marginLeft: 4 }}>{t('csvUploadDesc')}</span>
+                      </div>
+                      <div style={{ padding: 16 }}>
+                        <div style={{ border: `2px dashed ${T.gray300}`, borderRadius: 10, padding: '16px 12px', textAlign: 'center', background: T.gray50, cursor: 'pointer', position: 'relative' }} onClick={() => document.getElementById('csv-upload-input')?.click()}>
+                          <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = (() => { const s = headers.findIndex((h: string) => h.includes('sell')); if (s >= 0) return s; return headers.findIndex((h: string) => (h.includes('sellprice') || h.includes('sell_price') || (h.includes('price') && !h.includes('cost') && !h.includes('purchase')))); })(); const stockIdx = headers.findIndex((h: string) => h.includes('stock') && !h.includes('min')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const minStockIdx = headers.findIndex((h: string) => h.includes('minstock') || h.includes('min_stock') || h === 'min'); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); const expiryIdx = headers.findIndex((h: string) => h.includes('expir')); const imported: any[] = []; const errors: string[] = []; const stockUpdated: string[] = []; for (let i = 1; i < lines2.length; i++) { const cols = lines2[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const companyName = companyIdx >= 0 ? cols[companyIdx] : ''; let supplierId = ''; if (companyName) { const matched = suppliers.find((s: any) => (s.name || '').toLowerCase() === companyName.toLowerCase()); if (matched) { supplierId = matched.id; } else { errors.push(`Row ${i+1}: "${companyName}" - ${t('supplierNotFound')}`); continue; } } const existingIdx = tempProducts.findIndex((t: any) => (t.code || '').toLowerCase() === (codeIdx >= 0 ? cols[codeIdx] : '').toLowerCase());
                       if (existingIdx >= 0) {
                         setTempProducts((prev: any[]) => prev.map((t: any, idx: number) => idx === existingIdx ? { ...t, name: name || t.name, cat: (catIdx >= 0 && cols[catIdx]) ? cols[catIdx] : t.cat, costPrice: costIdx >= 0 && cols[costIdx] !== '' && cols[costIdx] !== undefined ? (parseFloat(cols[costIdx]) || t.costPrice) : t.costPrice, sellPrice: sellIdx >= 0 && cols[sellIdx] !== '' && cols[sellIdx] !== undefined ? (parseFloat(cols[sellIdx]) || t.sellPrice) : t.sellPrice, unit: (unitIdx >= 0 && cols[unitIdx]) ? cols[unitIdx] : t.unit, company: companyName || t.company, supplierId: supplierId || t.supplierId, minStock: minStockIdx >= 0 && cols[minStockIdx] !== '' && cols[minStockIdx] !== undefined ? (parseInt(cols[minStockIdx], 10) || t.minStock) : t.minStock, vat: vatIdx >= 0 && cols[vatIdx] !== '' && cols[vatIdx] !== undefined ? (parseFloat(cols[vatIdx]) || t.vat) : t.vat, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : t.expiryDate, stock: (t.stock || 0) + (stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0) } : t));
                       } else {
@@ -10732,104 +10820,27 @@ tr:nth-child(even){background:#F8FAFC}
                           stockUpdated.push(`${existingDb.name} +${addStk}`);
                         } else {
                           imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? parseFloat(cols[costIdx]) || 0 : 0, sellPrice: sellIdx >= 0 ? parseFloat(cols[sellIdx]) || 0 : 0, stock: stockIdx >= 0 ? parseInt(cols[stockIdx]) || 0 : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyName, minStock: minStockIdx >= 0 ? parseInt(cols[minStockIdx]) || 5 : 5, supplierId, vat: vatIdx >= 0 ? parseFloat(cols[vatIdx]) || 0 : 0, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : '', _temp: true }); } } } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); } const msg = []; if (imported.length > 0) msg.push(`${imported.length} ${t('products')} imported!`); if (stockUpdated.length > 0) msg.push(`Stock updated:\n${stockUpdated.join('\n')}`); if (errors.length > 0) msg.push(`${errors.length} errors:\n${errors.join('\n')}`); if (msg.length) alert(msg.join('\n\n')); }; reader.readAsText(file); e.target.value = ''; }} />
-                      <i className="fas fa-cloud-arrow-up" style={{ fontSize: 24, color: T.gray300, marginBottom: 8 }}></i>
-                      <div style={{ fontSize: 12, color: T.gray500, fontWeight: 500 }}>Click to upload CSV</div>
-                      <div style={{ fontSize: 10, color: T.gray400, marginTop: 4 }}>name, code, category, costPrice, sellPrice, stock, minStock, vat, unit, company, expiryDate</div>
+                          <i className="fas fa-cloud-arrow-up" style={{ fontSize: 24, color: T.gray300, marginBottom: 8 }}></i>
+                          <div style={{ fontSize: 12, color: T.gray500, fontWeight: 500 }}>Click to upload CSV</div>
+                          <div style={{ fontSize: 10, color: T.gray400, marginTop: 4 }}>name, code, category, costPrice, sellPrice, stock, minStock, vat, unit, company, expiryDate</div>
+                        </div>
+                        <button onClick={() => { const headers = ['Name', 'Code', 'Category', 'CostPrice', 'SellPrice', 'Stock', 'MinStock', 'VAT', 'Unit', 'Company', 'ExpiryDate']; const demo = [headers.join(','), 'Rice Basmati,1001,Groceries,80,120,50,5,15,kg,ABC Traders,2027-06-30', 'Samsung Galaxy S24,2001,Electronics,45000,55000,10,2,12,pcs,Mobile World,2028-12-31', 'Notebook A4,3001,Stationery,25,40,200,10,5,pcs,Paper House,'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'products_template.csv'; a.click(); URL.revokeObjectURL(url); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px 0', marginTop: 8, border: `1px solid ${T.gray200}`, borderRadius: 8, background: T.white, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: T.gray600 }}><i className="fas fa-download" style={{ fontSize: 12 }}></i> {t('demoCsv')}</button>
+                      </div>
                     </div>
-                    <button onClick={() => { const headers = ['Name', 'Code', 'Category', 'CostPrice', 'SellPrice', 'Stock', 'MinStock', 'VAT', 'Unit', 'Company', 'ExpiryDate']; const demo = [headers.join(','), 'Rice Basmati,1001,Groceries,80,120,50,5,15,kg,ABC Traders,2027-06-30', 'Samsung Galaxy S24,2001,Electronics,45000,55000,10,2,12,pcs,Mobile World,2028-12-31', 'Notebook A4,3001,Stationery,25,40,200,10,5,pcs,Paper House,'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'products_template.csv'; a.click(); URL.revokeObjectURL(url); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, width: '100%', padding: '8px 0', marginTop: 8, border: `1px solid ${T.gray200}`, borderRadius: 8, background: T.white, cursor: 'pointer', fontSize: 12, fontWeight: 500, color: T.gray600 }}><i className="fas fa-download" style={{ fontSize: 12 }}></i> {t('demoCsv')}</button>
-                  </div>
-                </div>
 
-                {/* Purchase History */}
-                <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden' }}>
-                  <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight, display: 'flex', justifyContent: 'space-between' }}>
-                    <span><i className="fas fa-clock-rotate-left" style={{ marginRight: 6 }}></i>{t('purchaseHistory')}</span>
-                    <span style={{ fontSize: 13, color: T.gray500, fontWeight: 600 }}>{products.filter((p: any) => p.purchaseId).length > 0 ? `${new Set(products.filter((p: any) => p.purchaseId).map((p: any) => p.purchaseId)).size}` : '0'}</span>
-                  </div>
-                  <div style={{ padding: 12, maxHeight: 280, overflow: 'auto' }}>
-                    {(() => { const purchaseMap: Record<string, { items: any[], totalAmount: number, date: string }> = {}; products.filter((p: any) => p.purchaseId).forEach((p: any) => { if (!purchaseMap[p.purchaseId]) purchaseMap[p.purchaseId] = { items: [], totalAmount: 0, date: '' }; purchaseMap[p.purchaseId].items.push(p); purchaseMap[p.purchaseId].totalAmount += (p.costPrice || 0) * (p.stock || 0); }); const purchases = Object.entries(purchaseMap).sort((a, b) => b[1].items.length - a[1].items.length); if (purchases.length === 0) return <div style={{ textAlign: 'center', padding: '32px 16px', color: T.gray400 }}><div style={{ width: 56, height: 56, borderRadius: 14, background: T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}><i className="fas fa-receipt" style={{ fontSize: 22, color: T.gray300 }}></i></div><div style={{ fontSize: 13, fontWeight: 500 }}>No purchase history</div></div>; return purchases.map(([pid, data]) => (<div key={pid} style={{ background: T.gray50, borderRadius: 10, border: `1px solid ${T.gray100}`, marginBottom: 8, overflow: 'hidden' }}><div style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><div><div style={{ fontSize: 12, fontWeight: 700, color: T.teal }}>{pid}</div><div style={{ fontSize: 11, color: T.gray400 }}>{data.items.length} {t('products')}</div></div><div style={{ textAlign: 'right' }}><div style={{ fontSize: 14, fontWeight: 700, color: '#15803D' }}>{_settings?.currencySymbol} {data.totalAmount.toLocaleString()}</div></div></div><div style={{ padding: '0 12px 8px' }}>{data.items.slice(0, 3).map((item: any, idx: number) => (<div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: T.gray500, padding: '3px 0', borderBottom: idx < Math.min(data.items.length, 3) - 1 ? `1px solid ${T.gray100}` : 'none' }}><span>{item.name}</span><span style={{ color: T.gray600 }}>x{item.stock}</span></div>))}{data.items.length > 3 && <div style={{ fontSize: 10, color: T.gray400, marginTop: 4 }}>+{data.items.length - 3} more...</div>}</div></div>)); })()}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* RIGHT: Product List Cart */}
-            <div style={{ width: 340, display: 'flex', flexDirection: 'column', background: T.white, flexShrink: 0, borderLeft: `1px solid ${T.gray200}` }}>
-              <div style={{ padding: '12px 16px', background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <i className="fas fa-list-check" style={{ color: '#fff', fontSize: 14 }}></i>
-                  </div>
-                  <span style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t('productList')}</span>
-                  <span style={{ background: 'rgba(255,255,255,0.2)', color: '#fff', padding: '2px 10px', borderRadius: 12, fontSize: 13, fontWeight: 700 }}>{tempProducts.length}</span>
-                </div>
-                <button onClick={handleClearTempProducts} disabled={tempProducts.length === 0} style={{ padding: '7px 10px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.2)', color: tempProducts.length > 0 ? '#DC2626' : 'rgba(255,255,255,0.5)', fontWeight: 600, fontSize: 13, cursor: tempProducts.length > 0 ? 'pointer' : 'default', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <i className="fas fa-trash-can"></i>
-                </button>
-                <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0} style={{ padding: '7px 16px', borderRadius: 8, border: 'none', background: tempProducts.length > 0 ? '#fff' : 'rgba(255,255,255,0.2)', color: tempProducts.length > 0 ? T.teal : 'rgba(255,255,255,0.5)', fontWeight: 700, fontSize: 12, cursor: tempProducts.length > 0 ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <i className="fas fa-paper-plane"></i> {t('post')}
-                </button>
-              </div>
-              <div style={{ flex: 1, overflow: 'auto', background: T.gray50 }}>
-                {tempProducts.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '48px 20px', color: T.gray400 }}>
-                    <div style={{ width: 64, height: 64, borderRadius: 16, background: T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-                      <i className="fas fa-cart-shopping" style={{ fontSize: 28, color: T.gray300 }}></i>
+                    {/* Purchase History */}
+                    <div style={{ background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}`, overflow: 'hidden' }}>
+                      <div style={{ padding: '12px 16px', borderBottom: `1px solid ${T.gray100}`, fontWeight: 700, fontSize: 14, color: T.teal, background: T.tealLight, display: 'flex', justifyContent: 'space-between' }}>
+                        <span><i className="fas fa-clock-rotate-left" style={{ marginRight: 6 }}></i>{t('purchaseHistory')}</span>
+                        <span style={{ fontSize: 13, color: T.gray500, fontWeight: 600 }}>{products.filter((p: any) => p.purchaseId).length > 0 ? `${new Set(products.filter((p: any) => p.purchaseId).map((p: any) => p.purchaseId)).size}` : '0'}</span>
+                      </div>
+                      <div style={{ padding: 12, maxHeight: 280, overflow: 'auto' }}>
+                        {(() => { const purchaseMap: Record<string, { items: any[], totalAmount: number, date: string }> = {}; products.filter((p: any) => p.purchaseId).forEach((p: any) => { if (!purchaseMap[p.purchaseId]) purchaseMap[p.purchaseId] = { items: [], totalAmount: 0, date: '' }; purchaseMap[p.purchaseId].items.push(p); purchaseMap[p.purchaseId].totalAmount += (p.costPrice || 0) * (p.stock || 0); }); const purchases = Object.entries(purchaseMap).sort((a, b) => b[1].items.length - a[1].items.length); if (purchases.length === 0) return <div style={{ textAlign: 'center', padding: '32px 16px', color: T.gray400 }}><div style={{ width: 56, height: 56, borderRadius: 14, background: T.gray100, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}><i className="fas fa-receipt" style={{ fontSize: 22, color: T.gray300 }}></i></div><div style={{ fontSize: 13, fontWeight: 500 }}>No purchase history</div></div>; return purchases.map(([pid, data]) => (<div key={pid} style={{ background: T.gray50, borderRadius: 10, border: `1px solid ${T.gray100}`, marginBottom: 8, overflow: 'hidden' }}><div style={{ padding: '10px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}><div><div style={{ fontSize: 12, fontWeight: 700, color: T.teal }}>{pid}</div><div style={{ fontSize: 11, color: T.gray400 }}>{data.items.length} {t('products')}</div></div><div style={{ textAlign: 'right' }}><div style={{ fontSize: 14, fontWeight: 700, color: '#15803D' }}>{_settings?.currencySymbol} {data.totalAmount.toLocaleString()}</div></div></div><div style={{ padding: '0 12px 8px' }}>{data.items.slice(0, 3).map((item: any, idx: number) => (<div key={idx} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: T.gray500, padding: '3px 0', borderBottom: idx < Math.min(data.items.length, 3) - 1 ? `1px solid ${T.gray100}` : 'none' }}><span>{item.name}</span><span style={{ color: T.gray600 }}>x{item.stock}</span></div>))}{data.items.length > 3 && <div style={{ fontSize: 10, color: T.gray400, marginTop: 4 }}>+{data.items.length - 3} more...</div>}</div></div>)); })()}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: T.gray500, marginBottom: 4 }}>{t('cartEmpty')}</div>
-                    <div style={{ fontSize: 12 }}>{t('addProductsFromLeft')}</div>
                   </div>
-                ) : (
-                  <div style={{ padding: '8px 12px' }}>
-                    {tempProducts.map((item, i) => (
-                      <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 12px', background: T.white, borderRadius: 10, border: `1px solid ${T.gray100}`, marginBottom: 6, boxShadow: '0 1px 2px rgba(0,0,0,0.04)' }}>
-                        <div style={{ width: 30, height: 30, borderRadius: 8, background: T.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: T.teal, flexShrink: 0 }}>{i + 1}</div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontWeight: 600, fontSize: 13, color: T.gray800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
-                          <div style={{ fontSize: 11, color: T.gray400 }}>{item.company || '-'} {item.cat ? `| ${item.cat}` : ''}</div>
-                          {item.expiryDate && <div style={{ fontSize: 10, color: '#E11D48' }}>{item.expiryDate}</div>}
-                        </div>
-                        <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>{_settings?.currencySymbol} {item.sellPrice}</div>
-                          <div style={{ fontSize: 11, color: T.gray500 }}>x{item.stock}</div>
-                        </div>
-                        <button onClick={() => handleRemoveTempProduct(item.id)} style={{ width: 24, height: 24, border: 'none', borderRadius: 6, background: T.redLight, color: T.red, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, flexShrink: 0 }}><i className="fas fa-xmark"></i></button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {/* Cart footer summary */}
-              {tempProducts.length > 0 && (
-                <div style={{ borderTop: `1px solid ${T.gray200}`, padding: '12px 16px', background: T.white }}>
-                  {(() => {
-                    const totalQty = tempProducts.reduce((s: number, it: any) => s + (it.stock || 0), 0);
-                    const totalCost = tempProducts.reduce((s: number, it: any) => s + (it.costPrice || 0) * (it.stock || 0), 0);
-                    const totalSell = tempProducts.reduce((s: number, it: any) => s + (it.sellPrice || 0) * (it.stock || 0), 0);
-                    const totalProfit = totalSell - totalCost;
-                    return (
-                      <div style={{ display: 'grid', gap: 6, fontSize: 13 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: T.gray500 }}>
-                          <span>{t('totalQuantity') || 'Total Qty'}</span>
-                          <strong style={{ color: T.gray800 }}>{totalQty}</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: T.gray500 }}>
-                          <span>{t('purchasePrice')}</span>
-                          <strong style={{ color: '#15803D' }}>{_settings?.currencySymbol} {totalCost.toLocaleString()}</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: T.gray500 }}>
-                          <span>{t('totalValue')}</span>
-                          <strong style={{ color: T.teal }}>{_settings?.currencySymbol} {totalSell.toLocaleString()}</strong>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6, borderTop: `1px dashed ${T.gray200}` }}>
-                          <span style={{ fontWeight: 700, color: T.gray600 }}>{t('potentialProfit')}</span>
-                          <strong style={{ color: totalProfit >= 0 ? '#16A34A' : '#DC2626', fontSize: 14 }}>{_settings?.currencySymbol} {totalProfit.toLocaleString()}</strong>
-                        </div>
-                      </div>
-                    );
-                  })()}
                 </div>
-              )}
-            </div>
+              </div>
             </div>
           </div>
         )}
