@@ -961,7 +961,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [stockFilter, setStockFilter] = useState<'all' | 'available' | 'out' | 'low'>('all');
+  const [stockFilter, setStockFilter] = useState<'all' | 'available' | 'out' | 'low' | 'foc'>('all');
 
 
 
@@ -1693,51 +1693,13 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const stockProducts = products.filter((p: any) => {
 
-
-
-
-
-
-
-
-
-
-
     if (stockFilter === 'out') return p.stock <= 0;
-
-
-
-
-
-
-
-
-
-
 
     if (stockFilter === 'low') return p.stock > 0 && p.stock <= (p.minStock || 5);
 
-
-
-
-
-
-
-
-
-
-
     if (stockFilter === 'available') return p.stock > (p.minStock || 5);
 
-
-
-
-
-
-
-
-
-
+    if (stockFilter === 'foc') return !!p.foc;
 
     return true;
 
@@ -8597,7 +8559,14 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <div style={{ fontWeight: 700, fontSize: 15 }}>{stockAdjustProduct.name}</div>
+              <div style={{ fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span>{stockAdjustProduct.name}</span>
+                {!!stockAdjustProduct.foc && (
+                  <span style={{ padding: '2px 8px', borderRadius: 10, background: '#FEF3C7', color: '#B45309', fontSize: 11, fontWeight: 800, border: '1px solid #FCD34D' }}>
+                    <i className="fas fa-gift" style={{ marginRight: 4, fontSize: 10 }}></i>{t('foc')}
+                  </span>
+                )}
+              </div>
 
 
 
@@ -10060,6 +10029,8 @@ tr:nth-child(even){background:#F8FAFC}
 
 
                   <button onClick={() => { setStockFilter('low'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'low' ? T.amberLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('stockLow')}</button>
+
+                  <button onClick={() => { setStockFilter('foc'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'foc' ? '#FEF3C7' : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-gift" style={{marginRight: 4}}></i> {t('stockLow')}</button>
 
 
 

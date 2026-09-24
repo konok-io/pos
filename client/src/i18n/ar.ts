@@ -424,6 +424,7 @@ export const ar: Record<string, string> = {
   paidQty: 'الكمية المدفوعة',
   freeQty: 'الكمية المجانية',
   foc: 'FOC',
+  focOnly: 'فقط FOC',
   freeValue: 'القيمة المجانية',
   invoiceTotal: 'إجمالي الفاتورة',
   stockPrice: 'سعر المخزون',

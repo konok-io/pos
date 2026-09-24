@@ -450,6 +450,7 @@ export const en: Record<string, string> = {
   paidQty: 'Paid Qty',
   freeQty: 'Free Qty',
   foc: 'FOC',
+  focOnly: 'FOC only',
   freeValue: 'Free Value',
   invoiceTotal: 'Invoice Total',
   stockPrice: 'Stock Price',

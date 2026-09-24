@@ -420,6 +420,7 @@ export const hi: Record<string, string> = {
   paidQty: 'भुगतान मात्रा',
   freeQty: 'निःशुल्क मात्रा',
   foc: 'FOC',
+  focOnly: 'केवल FOC',
   freeValue: 'निःशुल्क मूल्य',
   invoiceTotal: 'चालान कुल',
   stockPrice: 'स्टॉक मूल्य',
