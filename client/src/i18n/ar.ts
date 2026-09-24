@@ -425,6 +425,8 @@ export const ar: Record<string, string> = {
   freeQty: 'الكمية المجانية',
   foc: 'FOC',
   freeValue: 'القيمة المجانية',
+  invoiceTotal: 'إجمالي الفاتورة',
+  stockPrice: 'سعر المخزون',
   totalIn: 'الإجمالي',
   invalid: 'قيمة غير صالحة',
   clearAll: 'مسح جميع المنتجات من القائمة؟',

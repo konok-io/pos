@@ -421,6 +421,8 @@ export const hi: Record<string, string> = {
   freeQty: 'निःशुल्क मात्रा',
   foc: 'FOC',
   freeValue: 'निःशुल्क मूल्य',
+  invoiceTotal: 'चालान कुल',
+  stockPrice: 'स्टॉक मूल्य',
   totalIn: 'कुल इनपुट',
   invalid: 'अमान्य मान',
   clearAll: 'सूची से सभी उत्पाद हटाएँ?',

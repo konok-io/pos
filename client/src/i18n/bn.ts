@@ -429,6 +429,8 @@ export const bn: Record<string, string> = {
   freeQty: 'ফ্রি পরিমাণ',
   foc: 'FOC',
   freeValue: 'ফ্রি মূল্য',
+  invoiceTotal: 'ইনভয়েস মোট',
+  stockPrice: 'স্টক প্রাইস',
   totalIn: 'মোট যাবে',
   invalid: 'ভুল মান',
   clearAll: 'লিস্ট থেকে সব প্রোডাক্ট মুছবেন?',

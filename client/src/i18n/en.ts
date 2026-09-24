@@ -451,6 +451,8 @@ export const en: Record<string, string> = {
   freeQty: 'Free Qty',
   foc: 'FOC',
   freeValue: 'Free Value',
+  invoiceTotal: 'Invoice Total',
+  stockPrice: 'Stock Price',
   totalIn: 'Total In',
   invalid: 'Invalid value',
   clearAll: 'Clear all products from list?',

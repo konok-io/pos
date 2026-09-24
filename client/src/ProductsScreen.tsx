@@ -2247,9 +2247,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
             delete clean.freeQty;
             if (existingProd) {
               const oldStock = +existingProd.stock || 0;
-              const oldCost = +existingProd.costPrice || 0;
               const newStock = oldStock + qty;
-              const newCost = newStock > 0 ? ((oldStock * oldCost) + paidTotal) / newStock : unitCost;
+              const newCost = paid > 0 ? unitCost : (+existingProd.costPrice || 0);
               historyPlan.push({
                 matchCode: pCode, matchName: pName, productName: existingProd.name,
                 quantity: qty, paidQty: paid, freeQty: free, unitCost, paidTotal, freeValue,
@@ -2258,7 +2257,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
               workingProducts = workingProducts.map(w => w.id === existingProd.id ? { ...w, stock: newStock, costPrice: newCost } : w);
               return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock, costPrice: newCost, foc: existingProd.foc || !!p.foc });
             }
-            const newCost = qty > 0 ? paidTotal / qty : unitCost;
+            const newCost = paid > 0 ? unitCost : 0;
             clean.costPrice = newCost;
             clean.stock = qty;
             clean.foc = !!p.foc;
@@ -10617,14 +10616,13 @@ tr:nth-child(even){background:#F8FAFC}
                       const unit = productForm.costPrice || 0;
                       const paidTotal = paid * unit;
                       const totalIn = paid + free;
-                      const avgCost = totalIn > 0 ? paidTotal / totalIn : 0;
                       const freeVal = free * unit;
                       if (totalIn <= 0) return null;
                       return (
                         <div style={{ background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)', border: '1px solid #FCD34D', borderRadius: 10, padding: '10px 12px', marginBottom: 12, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 12 }}>
-                          <div><span style={{ color: T.gray500 }}>{t('total')}:</span> <strong style={{ color: '#92400E' }}>{_settings?.currencySymbol} {paidTotal.toFixed(2)}</strong> <span style={{ color: T.gray400 }}>({paid} × {unit})</span></div>
+                          <div><span style={{ color: T.gray500 }}>{t('invoiceTotal') || t('total')}:</span> <strong style={{ color: '#92400E' }}>{_settings?.currencySymbol} {paidTotal.toFixed(2)}</strong> <span style={{ color: T.gray400 }}>({paid} × {unit})</span></div>
                           <div><span style={{ color: T.gray500 }}>{t('totalIn')}:</span> <strong style={{ color: T.teal }}>{totalIn}</strong></div>
-                          <div><span style={{ color: T.gray500 }}>{t('purchasePrice')}:</span> <strong style={{ color: '#15803D' }}>{_settings?.currencySymbol} {avgCost.toFixed(2)}</strong></div>
+                          <div><span style={{ color: T.gray500 }}>{t('stockPrice') || t('purchasePrice')}:</span> <strong style={{ color: '#15803D' }}>{_settings?.currencySymbol} {unit.toFixed(2)}</strong></div>
                           <div><span style={{ color: T.gray500 }}>{t('freeValue')}:</span> <strong style={{ color: '#B45309' }}>{_settings?.currencySymbol} {freeVal.toFixed(2)}</strong> {free > 0 ? `(+${free})` : ''}</div>
                         </div>
                       );
