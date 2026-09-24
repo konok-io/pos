@@ -538,6 +538,7 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   totalPurchase: 'إجمالي المشتريات',
   number: 'رقم',
   enterName: 'أدخل الاسم',
+  enterStock: 'أدخل الكمية المدفوعة أو المجانية',
   sellPriceRequired: 'أدخل سعر بيع صحيحًا',
   duplicateName: 'اسم المنتج موجود بالفعل',
   duplicateCode: 'رمز المنتج موجود بالفعل',

@@ -2088,7 +2088,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     if (Number(productForm.costPrice) < 0 || Number(productForm.sellPrice) < 0) { alert(t('invalid')); return; }
     const paidIn = Math.max(0, Math.floor(Number(productForm.paidQty) || 0));
     const freeIn = Math.max(0, Math.floor(Number(productForm.freeQty) || 0));
-    if (paidIn + freeIn <= 0) { alert(t('enterName')); return; }
+    if (paidIn + freeIn <= 0) { alert(t('enterStock')); return; }
     const unitCost = Math.max(0, Number(productForm.costPrice) || 0);
     const nameL = productForm.name.trim().toLowerCase();
     const codeL = (productForm.code || '').trim().toLowerCase();
@@ -2194,7 +2194,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
           const mName = (m.name || '').trim().toLowerCase();
           return (pCode !== '' && mCode === pCode) || (pName !== '' && mName === pName);
         });
-        const paid = Math.max(0, p.paidQty || 0) || Math.max(0, p.stock || 0);
+        const paid = Math.max(0, p.paidQty || 0);
         const free = Math.max(0, p.freeQty || 0);
         const unitCost = Math.max(0, p.costPrice || 0);
         if (hit) {
@@ -2245,6 +2245,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
             delete clean._temp;
             delete clean.paidQty;
             delete clean.freeQty;
+            clean.supplier = p.company || p.supplierId || '';
             if (existingProd) {
               const oldStock = +existingProd.stock || 0;
               const newStock = oldStock + qty;
@@ -7484,7 +7485,7 @@ tr:nth-child(even){background:#F8FAFC}
         const tot = p.total || items.reduce((s: number, i: any) => s + ((i.paidQty != null ? i.paidQty : (i.quantity || i.stock || 0)) * (i.unitCost || i.costPrice || 0)), 0);
         const freeTot = p.freeTotal || items.reduce((s: number, i: any) => s + (i.freeValue || (i.freeQty || 0) * (i.unitCost || i.costPrice || 0)), 0);
         const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-        lines.push([esc(p.id), esc(p.date), esc(p.supplier), esc(items.length), esc(qty), esc(paidSum), esc(freeSum), esc(tot), esc(tot), esc(freeTot)].join(','));
+        const unitAvg = paidSum > 0 ? tot / paidSum : 0; lines.push([esc(p.id), esc(p.date), esc(p.supplier), esc(items.length), esc(qty), esc(paidSum), esc(freeSum), esc(unitAvg.toFixed(2)), esc(tot), esc(freeTot)].join(','));
         items.forEach((it: any) => {
           const lineQty = it.quantity || it.stock || 0;
           const linePaid = it.paidQty != null ? it.paidQty : lineQty;
@@ -7506,11 +7507,19 @@ tr:nth-child(even){background:#F8FAFC}
     const printPurchaseInvoice = (p: any) => {
       const items = p.items || [];
       const rows = items.map((it: any, i: number) => {
-        const qty = it.quantity || it.stock || 0;
-        const tot = qty * (it.costPrice || 0);
-        return `<tr><td>${i+1}</td><td>${it.name || ''}</td><td>${it.code || ''}</td><td>${qty} ${it.unit || ''}</td><td>${fmt(it.costPrice || 0)}</td><td>${fmt(tot)}</td></tr>`;
+        const paid = it.paidQty != null ? it.paidQty : (it.quantity || it.stock || 0);
+        const free = it.freeQty || 0;
+        const qty = it.quantity || (paid + free) || it.stock || 0;
+        const unit = it.unitCost != null ? it.unitCost : (it.costPrice || 0);
+        const tot = paid * unit;
+        const qtyLabel = free > 0 ? `${paid}+${free}free` : `${qty}`;
+        return `<tr><td>${i+1}</td><td>${it.name || ''}</td><td>${it.code || ''}</td><td>${qtyLabel} ${it.unit || ''}</td><td>${fmt(unit)}</td><td>${fmt(tot)}</td></tr>`;
       }).join('');
-      const total = p.total || items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0) * (i.costPrice || 0), 0);
+      const total = p.total || items.reduce((s: number, i: any) => {
+        const paid = i.paidQty != null ? i.paidQty : (i.quantity || i.stock || 0);
+        const unit = i.unitCost != null ? i.unitCost : (i.costPrice || 0);
+        return s + paid * unit;
+      }, 0);
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
 @page{size:A4;margin:12mm}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -10466,7 +10475,7 @@ tr:nth-child(even){background:#F8FAFC}
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('barcode')}</label>
                     <div style={{ position: 'relative' }}>
                       <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-barcode" style={{ fontSize: 13 }}></i></div>
-                      <input value={productForm.code} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, code: val }); }} onKeyDown={e => { if (e.key === 'Enter') { const found = products.find((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()); if (found) { setProductForm({ ...productForm, name: found.name, code: found.code || '', cat: found.cat || '', unit: found.unit || 'pcs', costPrice: found.costPrice, sellPrice: found.sellPrice, stock: found.stock || 0, minStock: found.minStock || 5, company: found.company || '', supplierId: found.supplierId || '', vat: found.vat || 0 }); } } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 30, background: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? '#F0FDFA' : T.gray50, borderColor: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? T.teal : T.gray200, height: 40 }} placeholder="0000000000000" />
+                      <input value={productForm.code} onChange={e => { const val = e.target.value; setProductForm({ ...productForm, code: val }); }} onKeyDown={e => { if (e.key === 'Enter') { const found = products.find((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()); if (found) { setProductForm({ ...productForm, name: found.name, code: found.code || '', cat: found.cat || '', unit: found.unit || 'pcs', costPrice: found.costPrice, sellPrice: found.sellPrice, stock: 0, paidQty: 0, freeQty: 0, minStock: found.minStock || 5, company: found.company || '', supplierId: found.supplierId || '', vat: found.vat || 0 }); } } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 30, background: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? '#F0FDFA' : T.gray50, borderColor: productForm.code && products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) ? T.teal : T.gray200, height: 40 }} placeholder="0000000000000" />
                       {productForm.code && products.filter((p: any) => (p.code || '').toLowerCase().includes(productForm.code.toLowerCase())).length > 0 && !products.some((p: any) => (p.code || '').toLowerCase() === productForm.code.toLowerCase()) && (
                         <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
                           {products.filter((p: any) => (p.code || '').toLowerCase().includes(productForm.code.toLowerCase())).slice(0, 8).map((p: any) => (
@@ -10594,7 +10603,7 @@ tr:nth-child(even){background:#F8FAFC}
                         <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('minStock')}</label>
                         <div style={{ position: 'relative' }}>
                           <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-layer-group" style={{ fontSize: 11 }}></i></div>
-                          <input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : parseInt(e.target.value, 10)) })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
+                          <input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : Math.max(0, parseInt(e.target.value, 10))) })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
                         </div>
                       </div>
                     </div>
@@ -12759,7 +12768,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : parseInt(e.target.value, 10)) })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>{t('minStock')}</label><input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : Math.max(0, parseInt(e.target.value, 10))) })} style={inputStyle} /></div>
 
 
 
@@ -12795,7 +12804,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <div><label style={labelStyle}>{t('stock')}</label><input type="number" value={productForm.stock} onChange={e => setProductForm({ ...productForm, stock: Math.max(0, parseInt(e.target.value) || 0) })} min={0} style={inputStyle} /></div>
+              
 
 
 

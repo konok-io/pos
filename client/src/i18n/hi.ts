@@ -534,6 +534,7 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   totalPurchase: 'कुल खरीद',
   number: 'नंबर',
   enterName: 'कृपया नाम दर्ज करें',
+  enterStock: 'भुगतान या निःशुल्क मात्रा दर्ज करें',
   sellPriceRequired: 'मान्य विक्रय मूल्य दर्ज करें',
   duplicateName: 'उत्पाद का नाम पहले से मौजूद है',
   duplicateCode: 'उत्पाद कोड पहले से मौजूद है',

@@ -542,6 +542,7 @@ printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়�
   totalPurchase: 'মোট ক্রয়',
   number: 'নম্বর',
   enterName: 'নাম দিন',
+  enterStock: 'পেইড বা ফ্রি পরিমাণ দিন',
   sellPriceRequired: 'সঠিক বিক্রয় মূল্য দিন',
   duplicateName: 'প্রোডাক্টের নাম আগে থেকেই আছে',
   duplicateCode: 'প্রোডাক্ট কোড আগে থেকেই আছে',
