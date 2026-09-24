@@ -1001,6 +1001,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const [purchaseBarcodeId, setPurchaseBarcodeId] = useState('');
   const [apPage, setApPage] = useState(1);
+  const [apMenuId, setApMenuId] = useState<string | null>(null);
   const [filterFrom, setFilterFrom] = useState('');
   const [filterTo, setFilterTo] = useState('');
 
@@ -1075,6 +1076,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         setShowCategoryMoreMenu(false);
         setShowStockMoreMenu(false);
         setShowSupplierMoreMenu(false);
+        setApMenuId(null);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -4493,437 +4495,75 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-
-
-
-
-
-
-
-
-
-
-
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
-          <thead><tr style={{ background: T.tealLight }}>
-
-
-
-
-
-
-
-
-
-
-
-            {['#', t('productName'), t('company'), t('category'), t('purchasePrice'), t('sellPrice'), t('profit'), t('stock'), t('unit'), t('expiryDate'), t('actions')].map((h, i) => (
-
-
-
-
-
-
-
-
-
-
-
-              <th key={i} style={{ padding: i === 0 ? '10px 6px' : '10px 12px', width: i === 0 ? 48 : undefined, textAlign: i === 0 ? 'center' : i >= 4 && i <= 6 ? 'right' : i >= 7 ? 'center' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
-
-
-
-
-
-
-
-
-
-
-
-            ))}
-
-
-
-
-
-
-
-
-
-
-
-          </tr></thead>
-
-
-
-
-
-
-
-
-
-
-
-          <tbody>
-
-
-
-
-
-
-
-
-
-
-
-            {filteredProducts.length === 0 ? (
-
-
-
-
-
-
-
-
-
-
-
-              <tr><td colSpan={11} style={{ padding: 40, textAlign: 'center', color: T.gray400 }}>{t('noProductsYet')}</td></tr>
-
-
-
-
-
-
-
-
-
-
-
-            ) : apItems.map((p: any, i: number) => {
-
-
-
-
-
-
-
-
-
-
-
-              const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
-
-
-
-
-
-
-
-
-
-
-
-              const low = p.stock > 0 && p.stock <= (p.minStock || 5);
-
-
-
-
-
-
-
-
-
-
-
-              return (
-
-
-
-
-
-
-
-
-
-
-
-                <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 6px', textAlign: 'center', fontSize: 13, color: T.gray400 }}>{(apCur - 1) * AP_PAGE + i + 1}</td>
-                  <td style={{ padding: '10px 12px' }}><div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>{p.code && <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div>}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{p.company || '-'}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{p.cat || '-'}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', fontSize: 14, textAlign: 'right' }}>{fmt(p.costPrice)}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', fontWeight: 700, fontSize: 14, textAlign: 'right' }}>{fmt(p.sellPrice)}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', textAlign: 'right' }}><span style={{ fontSize: 13, fontWeight: 600, color: (p.sellPrice - p.costPrice) > 0 ? T.green : (p.sellPrice - p.costPrice) < 0 ? T.red : T.gray400 }}>{fmt(p.sellPrice - p.costPrice)} ({pct === 0 && p.costPrice === 0 && (p.sellPrice - p.costPrice) > 0 ? '∞' : pct}%)</span></td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ fontWeight: 700, fontSize: 15, color: p.stock <= 0 ? T.red : low ? T.amber : T.gray900 }}>{fmtN(p.stock)}</span>{low && <i className="fas fa-triangle-exclamation" style={{color:'#F59E0B',marginRight:4}}></i>}{p.stock <= 0 && <i className="fas fa-xmark" style={{color:T.red,marginLeft:4}}></i>}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray400, textAlign: 'center' }}>{p.unit}</td>
-
-                  <td style={{ padding: '10px 12px', fontSize: 13, textAlign: 'center', color: p.expiryDate ? (isExpiringSoon(p.expiryDate) ? '#E11D48' : T.gray600) : T.gray400, fontWeight: p.expiryDate && isExpiringSoon(p.expiryDate) ? 700 : 400 }}>{p.expiryDate || '-'}</td>
-
-                  <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
-                    <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewProduct(p)}><i className="fas fa-eye"></i></button>
-
-
-
-
-
-
-
-
-
-
-
-                    <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setEditProduct({ ...p })}><i className="fas fa-pen"></i></button>
-
-
-
-
-
-
-
-
-
-
-
-                    <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => printBarcode(p)}><i className="fas fa-barcode"></i></button>
-
-
-
-
-
-
-
-
-
-
-
-                    
-
-
-
-
-
-
-
-
-
-
-
-                  </td>
-
-
-
-
-
-
-
-
-
-
-
-                </tr>
-
-
-
-
-
-
-
-
-
-
-
-              );
-
-
-
-
-
-
-
-
-
-
-
-            })}
-
-
-
-
-
-
-
-
-
-
-
-          </tbody>
-
-
-
-
-
-
-
-
-
-
-
-        </table>
+        <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+          <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600 }}>
+              <i className="fas fa-list" style={{ marginRight: 6, color: T.teal }}></i>{t('allProducts')} · {filteredProducts.length}
+            </div>
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: T.tealLight }}>
+                {['#', t('productName'), t('company'), t('category'), t('purchasePrice'), t('sellPrice'), t('profit'), t('stock'), t('unit'), t('expiryDate'), t('actions')].map((h, i) => (
+                  <th key={i} style={{ padding: '10px 14px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.length === 0 ? (
+                <tr><td colSpan={11} style={{ padding: 48, textAlign: 'center', color: T.gray400 }}>
+                  <i className="fas fa-box-open" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
+                  {t('noProductsYet')}
+                </td></tr>
+              ) : apItems.map((p: any, i: number) => {
+                const pct = p.costPrice > 0 ? Math.round((p.sellPrice - p.costPrice) / p.costPrice * 100) : 0;
+                const low = p.stock > 0 && p.stock <= (p.minStock || 5);
+                return (
+                  <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                    <td style={{ padding: '10px 14px', textAlign: 'center', fontSize: 13, color: T.gray400 }}>{(apCur - 1) * AP_PAGE + i + 1}</td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>
+                      {p.code && <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div>}
+                    </td>
+                    <td style={{ padding: '10px 14px', fontSize: 14, color: T.gray600, textAlign: 'center' }}>{p.company || '-'}</td>
+                    <td style={{ padding: '10px 14px', fontSize: 14, color: T.gray600, textAlign: 'center' }}>{p.cat || '-'}</td>
+                    <td style={{ padding: '10px 14px', fontSize: 14, textAlign: 'center' }}>{fmt(p.costPrice)}</td>
+                    <td style={{ padding: '10px 14px', fontWeight: 700, fontSize: 14, textAlign: 'center' }}>{fmt(p.sellPrice)}</td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: (p.sellPrice - p.costPrice) > 0 ? T.green : (p.sellPrice - p.costPrice) < 0 ? T.red : T.gray400 }}>{fmt(p.sellPrice - p.costPrice)} ({pct === 0 && p.costPrice === 0 && (p.sellPrice - p.costPrice) > 0 ? '∞' : pct}%)</span>
+                    </td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                      <span style={{ fontWeight: 700, fontSize: 15, color: p.stock <= 0 ? T.red : low ? T.amber : T.gray900 }}>{fmtN(p.stock)}</span>
+                      {low && <i className="fas fa-triangle-exclamation" style={{ color: '#F59E0B', marginRight: 4 }}></i>}
+                      {p.stock <= 0 && <i className="fas fa-xmark" style={{ color: T.red, marginLeft: 4 }}></i>}
+                    </td>
+                    <td style={{ padding: '10px 14px', fontSize: 14, color: T.gray400, textAlign: 'center' }}>{p.unit}</td>
+                    <td style={{ padding: '10px 14px', fontSize: 13, textAlign: 'center', color: p.expiryDate ? (isExpiringSoon(p.expiryDate) ? '#E11D48' : T.gray600) : T.gray400, fontWeight: p.expiryDate && isExpiringSoon(p.expiryDate) ? 700 : 400 }}>{p.expiryDate || '-'}</td>
+                    <td style={{ padding: '10px 14px', position: 'relative', textAlign: 'center' }}>
+                      <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setApMenuId(apMenuId === p.id ? null : p.id)} title={t('actions')}><i className="fas fa-ellipsis-vertical"></i></button>
+                      {apMenuId === p.id && (
+                        <div data-menu="ap" style={{ position: 'absolute', top: '100%', right: 8, zIndex: 50, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: 140, overflow: 'hidden' }}>
+                          <button onClick={() => { setViewProduct(p); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', borderBottom: `1px solid ${T.gray100}`, fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-eye" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('view') || 'View'}</button>
+                          <button onClick={() => { setEditProduct({ ...p }); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', borderBottom: `1px solid ${T.gray100}`, fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-pen" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('edit')}</button>
+                          <button onClick={() => { printBarcode(p); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-barcode" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('barcode')}</button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
         {apTotalPages > 1 && (
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, padding: '14px 0 4px' }}>
-            <button style={apBtn(apCur <= 1)} disabled={apCur <= 1} onClick={() => setApPage(apCur - 1)}><i className="fas fa-chevron-left" style={{marginRight: 4}}></i>{t('prev')}</button>
+            <button style={apBtn(apCur <= 1)} disabled={apCur <= 1} onClick={() => setApPage(apCur - 1)}><i className="fas fa-chevron-left" style={{ marginRight: 4 }}></i>{t('prev')}</button>
             <span style={{ fontSize: 13, color: T.gray600, fontWeight: 600 }}>{apCur} / {apTotalPages} · {(apCur - 1) * AP_PAGE + 1}-{Math.min(apCur * AP_PAGE, filteredProducts.length)} / {filteredProducts.length}</span>
-            <button style={apBtn(apCur >= apTotalPages)} disabled={apCur >= apTotalPages} onClick={() => setApPage(apCur + 1)}>{t('next')}<i className="fas fa-chevron-right" style={{marginLeft: 4}}></i></button>
+            <button style={apBtn(apCur >= apTotalPages)} disabled={apCur >= apTotalPages} onClick={() => setApPage(apCur + 1)}>{t('next')}<i className="fas fa-chevron-right" style={{ marginLeft: 4 }}></i></button>
           </div>
         )}
-
-
-
-
-
-
-
-
-
-
-
       </div>
-
-
-
-
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
-
-
-
-
   );
   };  const renderSupplier = () => (
 
