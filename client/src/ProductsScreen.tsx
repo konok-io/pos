@@ -964,18 +964,40 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const [customBarcodeProducts, setCustomBarcodeProducts] = useState<any[]>([]);
   const LABEL_SIZE_KEYS = ['50x25', '38x25', '50x40', '50x30', '40x30'];
   const PAPER_KEYS = ['a4', 'roll58', 'roll80'];
-  const readLabelSetting = (k: string): string => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
-  const [labelSize, setLabelSize] = useState(() => { const v = readLabelSetting('pos_label_size'); return LABEL_SIZE_KEYS.indexOf(v) >= 0 ? v : '50x25'; });
-  const [labelShowName, setLabelShowName] = useState(() => readLabelSetting('pos_label_show_name') !== '0');
-  const [labelShowPrice, setLabelShowPrice] = useState(() => readLabelSetting('pos_label_show_price') !== '0');
-  const [labelShowCompany, setLabelShowCompany] = useState(() => readLabelSetting('pos_label_show_company') === '1');
-  const [labelPaper, setLabelPaper] = useState(() => { const v = readLabelSetting('pos_label_paper'); return PAPER_KEYS.indexOf(v) >= 0 ? v : 'a4'; });
+  const [labelSize, setLabelSize] = useState('50x25');
+  const [labelShowName, setLabelShowName] = useState(true);
+  const [labelShowPrice, setLabelShowPrice] = useState(true);
+  const [labelShowCompany, setLabelShowCompany] = useState(false);
+  const [labelPaper, setLabelPaper] = useState('a4');
+  const labelSettingsReady = useRef(false);
   useEffect(() => {
-    localStorage.setItem('pos_label_size', labelSize);
-    localStorage.setItem('pos_label_show_name', labelShowName ? '1' : '0');
-    localStorage.setItem('pos_label_show_price', labelShowPrice ? '1' : '0');
-    localStorage.setItem('pos_label_show_company', labelShowCompany ? '1' : '0');
-    localStorage.setItem('pos_label_paper', labelPaper);
+    let alive = true;
+    (async () => {
+      try {
+        const s: any = await api.getSettings();
+        if (alive && s) {
+          const sz = String(s.pos_label_size || '');
+          if (LABEL_SIZE_KEYS.indexOf(sz) >= 0) setLabelSize(sz);
+          if (s.pos_label_show_name !== undefined) setLabelShowName(s.pos_label_show_name !== '0');
+          if (s.pos_label_show_price !== undefined) setLabelShowPrice(s.pos_label_show_price !== '0');
+          if (s.pos_label_show_company !== undefined) setLabelShowCompany(s.pos_label_show_company === '1');
+          const pp = String(s.pos_label_paper || '');
+          if (PAPER_KEYS.indexOf(pp) >= 0) setLabelPaper(pp);
+        }
+      } catch {}
+      if (alive) labelSettingsReady.current = true;
+    })();
+    return () => { alive = false; };
+  }, []);
+  useEffect(() => {
+    if (!labelSettingsReady.current) return;
+    api.updateSettings({
+      pos_label_size: labelSize,
+      pos_label_show_name: labelShowName ? '1' : '0',
+      pos_label_show_price: labelShowPrice ? '1' : '0',
+      pos_label_show_company: labelShowCompany ? '1' : '0',
+      pos_label_paper: labelPaper,
+    }).catch(() => {});
   }, [labelSize, labelShowName, labelShowPrice, labelShowCompany, labelPaper]);
   const [purchaseSelIds, setPurchaseSelIds] = useState<string[]>([]);
   const [purchaseSearch, setPurchaseSearch] = useState('');
@@ -1017,9 +1039,42 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [tempProducts, setTempProducts] = useState<any[]>(() => { try { const d = localStorage.getItem('pos_temp_products'); return d ? JSON.parse(d) : []; } catch { return []; } });
-
-  useEffect(() => { localStorage.setItem('pos_temp_products', JSON.stringify(tempProducts)); }, [tempProducts]);
+  const [tempProducts, setTempProducts] = useState<any[]>([]);
+  const tempProductsReady = useRef(false);
+  const tempProductsDirty = useRef(false);
+  const tempProductsRef = useRef<any[]>([]);
+  const tempProductsTimer = useRef<any>(null);
+  tempProductsRef.current = tempProducts;
+  const saveTempProducts = (list: any[]) => {
+    api.updateSettings({ pos_temp_products: JSON.stringify(list) }).catch(() => {});
+  };
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const s: any = await api.getSettings();
+        if (alive && s && s.pos_temp_products) {
+          const parsed = JSON.parse(String(s.pos_temp_products));
+          if (Array.isArray(parsed)) {
+            tempProductsRef.current = parsed;
+            if (parsed.length > 0) setTempProducts(parsed);
+          }
+        }
+      } catch {}
+      if (alive) tempProductsReady.current = true;
+    })();
+    return () => { alive = false; };
+  }, []);
+  useEffect(() => {
+    if (!tempProductsReady.current) return;
+    tempProductsDirty.current = true;
+    if (tempProductsTimer.current) clearTimeout(tempProductsTimer.current);
+    tempProductsTimer.current = setTimeout(() => { tempProductsTimer.current = null; saveTempProducts(tempProductsRef.current); }, 500);
+  }, [tempProducts]);
+  useEffect(() => () => {
+    if (tempProductsTimer.current) { clearTimeout(tempProductsTimer.current); tempProductsTimer.current = null; }
+    if (tempProductsDirty.current) saveTempProducts(tempProductsRef.current);
+  }, []);
 
   // Close dropdown menus when clicking outside
   useEffect(() => {
@@ -2894,10 +2949,11 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     return s.w;
   };
 
-  const labelItemCss = (sizeKey: string, widthMm?: number): string => {
+  const labelItemCss = (sizeKey: string, widthMm?: number, paper?: string): string => {
     const s = LABEL_SIZES[sizeKey] || LABEL_SIZES['50x25'];
     const w = Number(widthMm) > 0 ? Number(widthMm) : s.w;
-    return `.barcode-item{width:${w}mm;height:${s.h}mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;page-break-inside:avoid;gap:0}
+    const cutGuide = paper === 'roll58' || paper === 'roll80' ? 'none' : '0.3mm dashed #bbb';
+    return `.barcode-item{width:${w}mm;height:${s.h}mm;border:${cutGuide};padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;page-break-inside:avoid;gap:0}
 .barcode-item .bname{font-size:${s.nameFs}pt;font-weight:700;color:#333;line-height:1.15;margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .barcode-item .bcomp{font-size:6.5pt;color:#777;line-height:1.1;margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .barcode-item .bcode{font-family:monospace;font-size:8pt;font-weight:700;color:#111;line-height:1;margin:0.4mm 0 0 0;width:100%;overflow:hidden;white-space:nowrap}
@@ -2912,9 +2968,9 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       return `@page{size:${w}mm auto;margin:0}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;width:${w}mm;margin:0}
-.summary{font-size:8pt;color:#444;padding:1mm 2mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.summary{display:none}
 .sheet{display:block;width:${w}mm;gap:0;padding:0}
-` + labelItemCss(sizeKey, w) + `
+` + labelItemCss(sizeKey, w, paper) + `
 .sheet .barcode-item{margin:0 auto}`;
     }
     return `@page{size:A4;margin:4mm}
@@ -3510,10 +3566,17 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const rec = (purchases || []).find((x: any) => String(x.id || '').toLowerCase() === id);
     if (!rec) return map;
     for (const it of purchaseItemsOf(rec)) {
-      if (!it || !it.productId) continue;
+      if (!it) continue;
       const raw = it.quantity != null ? it.quantity : ((Number(it.paidQty) || 0) + (Number(it.freeQty) || 0));
       const q = Math.round(Number(raw) || 0);
-      if (q > 0) map[String(it.productId)] = (map[String(it.productId)] || 0) + q;
+      if (q <= 0) continue;
+      const code = String(it.code || '').toLowerCase();
+      const name = String(it.name || '').toLowerCase();
+      const hit = products.find((p: any) => (it.productId && String(p.id) === String(it.productId))
+        || (!!p.code && !!code && String(p.code).toLowerCase() === code)
+        || (!!p.name && !!name && String(p.name || '').toLowerCase() === name));
+      if (!hit) continue;
+      map[String(hit.id)] = (map[String(hit.id)] || 0) + q;
     }
     return map;
   };
@@ -5295,7 +5358,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-boxes-stacked" style={{ marginRight: 4 }}></i>{withCode.length} {t(withCode.length === 1 ? 'barcode' : 'barcodes')}</span>
                       <span style={{ padding: '3px 10px', borderRadius: 12, background: selectedCount > 0 ? '#16A34A' : 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-check" style={{ marginRight: 4 }}></i>{selectedCount} {t('selected')}</span>
                       <span style={{ padding: '3px 10px', borderRadius: 12, background: missingCount > 0 ? '#DC2626' : 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{missingCount} {t('missingBarcode')}</span>
-                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13, fontFamily: 'monospace' }}>{labelSize.replace('x', ' × ')} mm</span>
+                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13, fontFamily: 'monospace' }}>{labelWidthMm(labelSize, labelPaper)} × {(LABEL_SIZES[labelSize] || LABEL_SIZES['50x25']).h} mm</span>
                     </div>
                   </div>
                 </div>
@@ -5399,7 +5462,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                           <i className={added ? 'fas fa-circle-check' : 'fas fa-plus-circle'} style={{ color: added ? T.teal : T.gray400, fontSize: 14, flexShrink: 0 }}></i>
                           <div style={{ minWidth: 0, flex: 1 }}>
                             <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
-                            <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p)}</div>
+                            <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p) || t('missingBarcode')}</div>
                           </div>
                           <div style={{ fontSize: 12, color: T.gray500, flexShrink: 0 }}>{p.stock ?? 0}</div>
                         </div>
@@ -5413,7 +5476,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       <div key={String(p.id)} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', alignItems: 'center', gap: 8, background: T.tealLight }}>
                         <div style={{ minWidth: 0, flex: 1 }}>
                           <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
-                          <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p)}</div>
+                          <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p) || t('missingBarcode')}</div>
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 700, color: T.gray500, flexShrink: 0 }}>{t('qty')}</span>
                         <input type="number" min={1} max={500} value={clampQty(customQty[String(p.id)])} onChange={e => { const v = Math.max(1, Math.min(500, parseInt(e.target.value, 10) || 1)); setCustomQty(prev => ({ ...prev, [String(p.id)]: v })); }} style={{ ...inputStyle, width: 72, textAlign: 'center', flexShrink: 0 }} />
@@ -5435,7 +5498,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 {missingCount > 0 && <div style={{ fontSize: 12, color: '#B91C1C', marginTop: 8 }}><i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{missingCount} {t('missingBarcode')}</div>}
               </div>
               <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
-                {cardHead('fas fa-sliders', t('labelOptions'), t('labelSize'))}
+                {cardHead('fas fa-sliders', t('labelOptions'), `${t('labelSize')} / ${t('labelPaper')}`)}
                 <div style={{ marginTop: 10 }}>
                   <label style={{ fontSize: 12, fontWeight: 700, color: T.gray500, display: 'block', marginBottom: 4 }}>{t('labelSize')}</label>
                   <select value={labelSize} onChange={e => setLabelSize(e.target.value)} style={{ ...inputStyle, width: '100%' }}>
@@ -5469,7 +5532,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   <div style={{ fontSize: 12, fontWeight: 700, color: T.gray500, marginBottom: 6 }}><i className="fas fa-eye" style={{ marginRight: 4 }}></i>{t('preview')}</div>
                   {previewProduct ? (
                     <div style={{ border: `1px dashed ${T.gray300}`, borderRadius: 10, padding: 14, background: '#FAFAFA', display: 'flex', justifyContent: 'center' }}>
-                      <style dangerouslySetInnerHTML={{ __html: labelItemCss(labelSize, labelWidthMm(labelSize, labelPaper)) }} />
+                      <style dangerouslySetInnerHTML={{ __html: labelItemCss(labelSize, labelWidthMm(labelSize, labelPaper), labelPaper) }} />
                       <div dangerouslySetInnerHTML={{ __html: barcodeLabelHtml(previewProduct, labelOpts()) }} />
                     </div>
                   ) : (
