@@ -1094,6 +1094,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [showStockHistoryModal, setShowStockHistoryModal] = useState(false);
+  const [showDeleteHistory, setShowDeleteHistory] = useState(false);
+  const [deletedProducts, setDeletedProducts] = useState<any[]>([]);
 
 
 
@@ -1859,6 +1861,33 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const purchaseSeqTodayRef = useRef<string[]>([]);
+  const openDeleteHistory = async () => {
+    try {
+      const d: any = await api.getDeletedProducts();
+      setDeletedProducts(Array.isArray(d) ? d : []);
+    } catch {
+      setDeletedProducts([]);
+    }
+    setShowDeleteHistory(true);
+    setShowStockMoreMenu(false);
+  };
+
+  const handleDeleteProduct = async (p: any) => {
+    if (!p || (p.stock || 0) > 0) return;
+    if (!window.confirm(t('deleteProductConfirm'))) return;
+    try {
+      await api.deleteProduct(p.id);
+      const next = products.filter((x: any) => x.id !== p.id);
+      setProducts(next);
+      setProductsParent(next);
+      if (viewProduct && viewProduct.id === p.id) setViewProduct(null);
+      if (editProduct && editProduct.id === p.id) setEditProduct(null);
+      setApMenuId(null);
+    } catch {
+      alert(t('failed'));
+    }
+  };
+
   const genPurchaseId = () => {
     const d = new Date();
     const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
@@ -3922,6 +3951,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                           <button onClick={() => { setViewProduct(p); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', borderBottom: `1px solid ${T.gray100}`, fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-eye" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('view') || 'View'}</button>
                           <button onClick={() => { setEditProduct({ ...p }); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', borderBottom: `1px solid ${T.gray100}`, fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-pen" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('edit')}</button>
                           <button onClick={() => { printBarcode(p); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-barcode" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('barcode')}</button>
+                          {p.stock <= 0 && <button onClick={() => { handleDeleteProduct(p); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: T.red, cursor: 'pointer' }}><i className="fas fa-trash" style={{ marginRight: 8, width: 14, color: T.red }}></i>{t('delete')}</button>}
                         </div>
                       )}
                     </td>
@@ -5695,6 +5725,7 @@ tr:nth-child(even){background:#F8FAFC}
                 <div style={{ fontSize: 13, opacity: 0.9 }}>{t('sellPrice')}</div>
                 <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                   <button onClick={() => { setEditProduct({ ...p }); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)' }}><i className="fas fa-pen" style={{marginRight: 4}}></i> {t('edit') || 'Edit'}</button>
+                  {p.stock <= 0 && <button onClick={() => { handleDeleteProduct(p); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)' }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('delete')}</button>}
                 </div>
               </div>
             </div>
@@ -8483,6 +8514,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
                   <button onClick={() => { setStockHistoryFilter('remove'); setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stock')} - {t('history')}</button>
+                  <button onClick={() => { openDeleteHistory(); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</button>
 
 
 
@@ -11558,6 +11590,36 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
+      )}
+
+      {showDeleteHistory && (
+        <div style={overlay} onClick={() => setShowDeleteHistory(false)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 540, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</h3>
+            <div style={{ maxHeight: 380, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {deletedProducts.length === 0 ? (
+                <p style={{ textAlign: 'center', color: T.gray400, padding: '28px 8px' }}>{t('noDeleteHistory')}</p>
+              ) : deletedProducts.map((d: any, i: number) => (
+                <div key={d.id || i} style={{ padding: '10px 12px', background: T.redLight, borderRadius: 10, display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: T.gray900 }}>{d.name || '-'}</div>
+                    <div style={{ fontSize: 12, color: T.gray500, fontFamily: 'monospace' }}>{d.code || '-'}</div>
+                    <div style={{ fontSize: 12, color: T.gray500 }}>{d.company || '-'} · {d.cat || '-'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: T.red }}>{fmtN(d.stock)} {d.unit || ''}</div>
+                    <div style={{ fontSize: 13, color: T.gray600 }}>{fmt(d.sell_price)}</div>
+                    <div style={{ fontSize: 11, color: T.gray400 }}>{d.deleted_at ? new Date(d.deleted_at).toLocaleString() : '-'}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+              <button onClick={() => { if (deletedProducts.length === 0) return; if (!window.confirm(t('clearDeleteHistoryConfirm'))) return; api.clearDeletedProducts().then(() => setDeletedProducts([])).catch(() => alert(t('failed'))); }} style={{ ...btn('ghost'), flex: 1, opacity: deletedProducts.length === 0 ? 0.5 : 1 }}><i className="fas fa-broom" style={{ marginRight: 4 }}></i>{t('clear')}</button>
+              <button onClick={() => setShowDeleteHistory(false)} style={{ ...btn(), flex: 1 }}>{t('close')}</button>
+            </div>
+          </div>
+        </div>
       )}
 
 

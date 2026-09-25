@@ -577,6 +577,7 @@ printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়�
   more: 'আরও কার্যক্রম',
   priceHistory: 'দামের ইতিহাস',
   deleteHistory: 'ডিলিট হিস্ট্রি',
+  clearDeleteHistoryConfirm: "ডিলিট করা পণ্যের হিস্ট্রি মুছে ফেলবেন? এটি ফেরানো যাবে না।",
   purchaseBarcode: 'পারচেজ বারকোড',
   customBarcode: 'কাস্টম বারকোড',
   enterPurchaseId: 'সেই পারচেজ এর সব পণ্যের বারকোড প্রিন্ট করতে পারচেজ আইডি দিন',

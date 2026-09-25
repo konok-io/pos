@@ -573,6 +573,7 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   more: ' المزيد',
   priceHistory: 'سجل الأسعار',
   deleteHistory: 'سجل الحذف',
+  clearDeleteHistoryConfirm: "هل تريد مسح سجل المنتجات المحذوفة؟ لا يمكن التراجع عن هذا.",
   purchaseBarcode: 'باركود الشراء',
   customBarcode: 'باركود مخصص',
   enterPurchaseId: 'أدخل رقم الشراء لطباعة باركود جميع المنتجات في هذا الشراء',

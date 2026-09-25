@@ -569,6 +569,7 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   more: 'और अधिक',
   priceHistory: 'मूल्य इतिहास',
   deleteHistory: 'हटाएं इतिहास',
+  clearDeleteHistoryConfirm: "क्या हटाए गए उत्पादों का इतिहास साफ़ करें? इसे पूर्ववत नहीं किया जा सकता।",
   purchaseBarcode: 'खरीद बारकोड',
   customBarcode: 'कस्टम बारकोड',
   enterPurchaseId: 'उस खरीद के सभी उत्पादों का बारकोड प्रिंट करने के लिए खरीद आईडी दर्ज करें',

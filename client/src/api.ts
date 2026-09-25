@@ -141,6 +141,8 @@ export const api = {
 
   // Price History
   getPriceHistory: () => request('/price-history'),
+  getDeletedProducts: () => request('/deleted-products'),
+  clearDeletedProducts: () => request('/deleted-products/all', { method: 'DELETE' }),
 
   // Settings
   getSettings: () => request('/settings'),
