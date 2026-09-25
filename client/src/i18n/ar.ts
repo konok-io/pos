@@ -589,6 +589,7 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   selectAll: 'تحديد الكل',
   labelOptions: 'خيارات الملصق',
   labelSize: 'حجم الملصق',
+  labelPaper: "الورق",
   showName: 'إظهار الاسم',
   showPrice: 'إظهار السعر',
   showCompany: 'إظهار الشركة',

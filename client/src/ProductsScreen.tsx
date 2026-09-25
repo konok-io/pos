@@ -963,17 +963,20 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const [customBarcodeProducts, setCustomBarcodeProducts] = useState<any[]>([]);
   const LABEL_SIZE_KEYS = ['50x25', '38x25', '50x40', '50x30', '40x30'];
+  const PAPER_KEYS = ['a4', 'roll58', 'roll80'];
   const readLabelSetting = (k: string): string => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
   const [labelSize, setLabelSize] = useState(() => { const v = readLabelSetting('pos_label_size'); return LABEL_SIZE_KEYS.indexOf(v) >= 0 ? v : '50x25'; });
   const [labelShowName, setLabelShowName] = useState(() => readLabelSetting('pos_label_show_name') !== '0');
   const [labelShowPrice, setLabelShowPrice] = useState(() => readLabelSetting('pos_label_show_price') !== '0');
   const [labelShowCompany, setLabelShowCompany] = useState(() => readLabelSetting('pos_label_show_company') === '1');
+  const [labelPaper, setLabelPaper] = useState(() => { const v = readLabelSetting('pos_label_paper'); return PAPER_KEYS.indexOf(v) >= 0 ? v : 'a4'; });
   useEffect(() => {
     localStorage.setItem('pos_label_size', labelSize);
     localStorage.setItem('pos_label_show_name', labelShowName ? '1' : '0');
     localStorage.setItem('pos_label_show_price', labelShowPrice ? '1' : '0');
     localStorage.setItem('pos_label_show_company', labelShowCompany ? '1' : '0');
-  }, [labelSize, labelShowName, labelShowPrice, labelShowCompany]);
+    localStorage.setItem('pos_label_paper', labelPaper);
+  }, [labelSize, labelShowName, labelShowPrice, labelShowCompany, labelPaper]);
   const [purchaseSelIds, setPurchaseSelIds] = useState<string[]>([]);
   const [purchaseSearch, setPurchaseSearch] = useState('');
   const [purchasePage, setPurchasePage] = useState(0);
@@ -2884,10 +2887,17 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     '50x30': { w: 50, h: 30, svgMax: 13, nameFs: 7.5 },
     '40x30': { w: 40, h: 30, svgMax: 13, nameFs: 7 },
   };
-
-  const labelItemCss = (sizeKey: string): string => {
+  const labelWidthMm = (sizeKey: string, paper?: string): number => {
+    if (paper === 'roll58') return 58;
+    if (paper === 'roll80') return 80;
     const s = LABEL_SIZES[sizeKey] || LABEL_SIZES['50x25'];
-    return `.barcode-item{width:${s.w}mm;height:${s.h}mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;page-break-inside:avoid;gap:0}
+    return s.w;
+  };
+
+  const labelItemCss = (sizeKey: string, widthMm?: number): string => {
+    const s = LABEL_SIZES[sizeKey] || LABEL_SIZES['50x25'];
+    const w = Number(widthMm) > 0 ? Number(widthMm) : s.w;
+    return `.barcode-item{width:${w}mm;height:${s.h}mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;page-break-inside:avoid;gap:0}
 .barcode-item .bname{font-size:${s.nameFs}pt;font-weight:700;color:#333;line-height:1.15;margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .barcode-item .bcomp{font-size:6.5pt;color:#777;line-height:1.1;margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .barcode-item .bcode{font-family:monospace;font-size:8pt;font-weight:700;color:#111;line-height:1;margin:0.4mm 0 0 0;width:100%;overflow:hidden;white-space:nowrap}
@@ -2896,12 +2906,24 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 .barcode-item .price{font-size:8pt;font-weight:800;color:#111;line-height:1;margin:0.4mm 0 0 0}`;
   };
 
-  const labelSheetCss = (sizeKey: string): string => `@page{size:A4;margin:4mm}
+  const labelSheetCss = (sizeKey: string, paper?: string): string => {
+    const w = labelWidthMm(sizeKey, paper);
+    if (paper === 'roll58' || paper === 'roll80') {
+      return `@page{size:${w}mm auto;margin:0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;width:${w}mm;margin:0}
+.summary{font-size:8pt;color:#444;padding:1mm 2mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet{display:block;width:${w}mm;gap:0;padding:0}
+` + labelItemCss(sizeKey, w) + `
+.sheet .barcode-item{margin:0 auto}`;
+    }
+    return `@page{size:A4;margin:4mm}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;width:202mm;margin:0}
 .summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
 ` + labelItemCss(sizeKey);
+  };
 
   const barcodeLabelHtml = (product: any, opts?: any): string => {
     const o = { showName: true, showPrice: true, showCompany: false, ...(opts || {}) };
@@ -2943,16 +2965,15 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     }
   };
 
-  const labelOpts = () => ({ size: labelSize, showName: labelShowName, showPrice: labelShowPrice, showCompany: labelShowCompany });
+  const labelOpts = () => ({ size: labelSize, paper: labelPaper, showName: labelShowName, showPrice: labelShowPrice, showCompany: labelShowCompany });
 
   const clampQty = (v: any): number => Math.max(1, Math.min(500, Math.round(Number(v) || 1)));
 
-  const moduleSmall = (code: any, sizeKey: string): boolean => {
+  const moduleSmall = (code: any, sizeKey: string, paper?: string): boolean => {
     const c = String(code || '');
     if (!c) return false;
-    const sz = LABEL_SIZES[sizeKey] || LABEL_SIZES['50x25'];
     const mods = 11 * (c.length + 2) + 33;
-    return (sz.w - 2.6) / mods < 0.25;
+    return (labelWidthMm(sizeKey, paper) - 2.6) / mods < 0.25;
   };
 
   const purchaseItemsOf = (pur: any): any[] => {
@@ -2985,7 +3006,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const printable = list.filter((p: any) => codeOf(p) !== '').slice(0, 500);
     if (printable.length === 0) { alert(t('missingBarcode')); return; }
     const items = printable.map((p: any) => barcodeLabelHtml(p, o)).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${labelSheetCss(o.size)}</style></head><body><div class="summary">${escHtml(summary)}</div><div class="sheet">${items}</div></body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${labelSheetCss(o.size, o.paper)}</style></head><body><div class="summary">${escHtml(summary)}</div><div class="sheet">${items}</div></body></html>`;
     openPrintWin(html);
   };
 
@@ -5219,7 +5240,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const customTotalLabels = customBarcodeProducts.reduce((s: number, p: any) => s + clampQty(customQty[String(p.id)]), 0);
     const totalLabels = purchaseTotalLabels + customTotalLabels;
     const previewProduct = customBarcodeProducts[0] || selectedPurchaseProducts[0] || pProducts[0] || withCode[0] || products[0];
-    const barcodeWarn = selectedCount > 0 && [...selectedPurchaseProducts, ...customBarcodeProducts].some((p: any) => moduleSmall(codeOf(p), labelSize));
+    const barcodeWarn = selectedCount > 0 && [...selectedPurchaseProducts, ...customBarcodeProducts].some((p: any) => moduleSmall(codeOf(p), labelSize, labelPaper));
     const statCard = (icon: string, label: string, value: any, color: string, bg: string) => (
       <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
         <div style={{ width: 40, height: 40, borderRadius: 10, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={icon} style={{ fontSize: 16 }}></i></div>
@@ -5425,6 +5446,15 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                     <option value="40x30">40 × 30 mm</option>
                   </select>
                 </div>
+
+                <div style={{ marginTop: 10 }}>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: T.gray500, display: 'block', marginBottom: 4 }}>{t('labelPaper')}</label>
+                  <select value={labelPaper} onChange={e => setLabelPaper(e.target.value)} style={{ ...inputStyle, width: '100%' }}>
+                    <option value="a4">A4 Sheet</option>
+                    <option value="roll58">Roll 58 mm</option>
+                    <option value="roll80">Roll 80 mm</option>
+                  </select>
+                </div>
                 {barcodeWarn && (
                   <div style={{ marginTop: 8, fontSize: 12, fontWeight: 600, color: '#B91C1C', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 8, padding: '8px 10px' }}>
                     <i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{t('barcodeTooSmall')}
@@ -5439,7 +5469,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   <div style={{ fontSize: 12, fontWeight: 700, color: T.gray500, marginBottom: 6 }}><i className="fas fa-eye" style={{ marginRight: 4 }}></i>{t('preview')}</div>
                   {previewProduct ? (
                     <div style={{ border: `1px dashed ${T.gray300}`, borderRadius: 10, padding: 14, background: '#FAFAFA', display: 'flex', justifyContent: 'center' }}>
-                      <style dangerouslySetInnerHTML={{ __html: labelItemCss(labelSize) }} />
+                      <style dangerouslySetInnerHTML={{ __html: labelItemCss(labelSize, labelWidthMm(labelSize, labelPaper)) }} />
                       <div dangerouslySetInnerHTML={{ __html: barcodeLabelHtml(previewProduct, labelOpts()) }} />
                     </div>
                   ) : (

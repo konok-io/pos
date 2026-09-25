@@ -593,6 +593,7 @@ printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়�
   selectAll: 'সব সিলেক্ট করুন',
   labelOptions: 'লেবেল অপশন',
   labelSize: 'লেবেল সাইজ',
+  labelPaper: "কাগজ",
   showName: 'নাম দেখান',
   showPrice: 'দাম দেখান',
   showCompany: 'কোম্পানি দেখান',

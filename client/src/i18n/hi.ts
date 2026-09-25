@@ -585,6 +585,7 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   selectAll: 'सभी चुনें',
   labelOptions: 'लेबल विकल्प',
   labelSize: 'लेबल आकार',
+  labelPaper: "कागज",
   showName: 'नाम दिखाएँ',
   showPrice: 'कीमत दिखाएँ',
   showCompany: 'कंपनी दिखाएँ',
