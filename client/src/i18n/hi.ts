@@ -548,6 +548,7 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   added: 'सफलतापूर्वक जोड़ा गया',
   searchCategory: 'श्रेणियाँ खोजें...',
   noCategories: 'कोई श्रेणी नहीं मिली',
+  noResults: 'कोई परिणाम नहीं मिला',
   totalValue: 'कुल मूल्य',
   enterCategoryName: 'श्रेणी का नाम दर्ज करें',
   searchBarcode: 'बारकोड या उत्पाद का नाम खोजें...',

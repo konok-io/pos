@@ -2350,15 +2350,29 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     const msg = catProducts.length > 0 ? `\n\n${t('products')}: ${catProducts.length}\n${t('productsUncat')}` : '';
     if (!window.confirm(`"${name}" ${t('confirmDeleteCat')}${msg}`)) return;
     const cat = categories.find((c: any) => norm(c.name) === target);
+    const prevCats = categories;
+    const prevProds = products;
     const updated = categories.filter((c: any) => norm(c.name) !== target);
+    const cleared = products.map((p: any) => norm(p.cat) === target ? { ...p, cat: '' } : p);
     setCategories(updated);
     setCategoriesParent(updated);
-    if (cat) api.deleteCategory(cat.id).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
-    if (catProducts.length > 0) {
-      const cleared = products.map((p: any) => norm(p.cat) === target ? { ...p, cat: '' } : p);
+    if (cat) {
+      api.deleteCategory(cat.id).then(() => {
+        if (catProducts.length > 0) { setProducts(cleared); setProductsParent(cleared); }
+      }).catch((e: any) => {
+        setCategories(prevCats); setCategoriesParent(prevCats);
+        alert(`${t('failed')}: ${e?.message || e}`);
+      });
+    } else if (catProducts.length > 0) {
       setProducts(cleared);
       setProductsParent(cleared);
-      catProducts.forEach((p: any) => api.updateProduct(p.id, { ...p, cat: '' }).catch(() => {}));
+      let restored = false;
+      catProducts.forEach((p: any) => api.updateProduct(p.id, { ...p, cat: '' }).catch((e: any) => {
+        if (restored) return;
+        restored = true;
+        setProducts(prevProds); setProductsParent(prevProds);
+        alert(`${t('failed')}: ${e?.message || e}`);
+      }));
     }
   };
 
@@ -5321,11 +5335,18 @@ body{font-family:Arial,sans-serif;width:210mm}
               </div>
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
         {filteredCategories.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400, background: T.white, borderRadius: 14, border: `1px dashed ${T.gray200}` }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-folder"></i></div>
-            <p>{t('noCategories')}</p>
-            <button style={{ ...btn('primary', 'sm'), marginTop: 8 }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genCategoryId(categories), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{ marginRight: 4 }}></i> {t('addCategory')}</button>
-          </div>
+          categorySearch ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400, background: T.white, borderRadius: 14, border: `1px dashed ${T.gray200}` }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-magnifying-glass"></i></div>
+              <p>{t('noResults')}</p>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400, background: T.white, borderRadius: 14, border: `1px dashed ${T.gray200}` }}>
+              <div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-folder"></i></div>
+              <p>{t('noCategories')}</p>
+              <button style={{ ...btn('primary', 'sm'), marginTop: 8 }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genCategoryId(categories), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{ marginRight: 4 }}></i> {t('addCategory')}</button>
+            </div>
+          )
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
             <thead><tr style={{ background: T.tealLight }}>
@@ -5380,10 +5401,24 @@ body{font-family:Arial,sans-serif;width:210mm}
                 const dup = categories.find((c: any) => (editingId ? c.id !== editingId : true) && norm(c.name) === norm(name));
                 if (dup) { alert(t('duplicateNameCat')); return; }
                 if (editingCategory) {
+                  const prevCatsR = categories;
+                  const doCascade = () => {
+                    if (oldName && norm(oldName) !== norm(name)) {
+                      const toRename = products.filter((p: any) => norm(p.cat) === norm(oldName));
+                      if (toRename.length) {
+                        const renamed = products.map((p: any) => norm(p.cat) === norm(oldName) ? { ...p, cat: name } : p);
+                        setProducts(renamed); setProductsParent(renamed);
+                        toRename.forEach((p: any) => api.updateProduct(p.id, { ...p, cat: name }).catch(() => {}));
+                      }
+                    }
+                  };
                   if (editingId) {
                     const updated = categories.map((c: any) => c.id === editingId ? { ...c, name } : c);
                     setCategories(updated); setCategoriesParent(updated);
-                    api.updateCategory(editingId, { name }).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
+                    api.updateCategory(editingId, { name }).then(doCascade).catch((e: any) => {
+                      setCategories(prevCatsR); setCategoriesParent(prevCatsR);
+                      alert(`${t('failed')}: ${e?.message || e}`);
+                    });
                   } else {
                     const startId = categoryForm.id && !categories.some((c: any) => c.id === categoryForm.id) ? categoryForm.id : genCategoryId(categories);
                     const newCat = { id: startId, name };
@@ -5394,19 +5429,12 @@ body{font-family:Arial,sans-serif;width:210mm}
                         setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
                         setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
                       }
+                      doCascade();
                     }).catch((e: any) => {
                       setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
                       setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
                       alert(`${t('failed')}: ${e?.message || e}`);
                     });
-                  }
-                  if (oldName && norm(oldName) !== norm(name)) {
-                    const toRename = products.filter((p: any) => norm(p.cat) === norm(oldName));
-                    if (toRename.length) {
-                      const renamed = products.map((p: any) => norm(p.cat) === norm(oldName) ? { ...p, cat: name } : p);
-                      setProducts(renamed); setProductsParent(renamed);
-                      toRename.forEach((p: any) => api.updateProduct(p.id, { ...p, cat: name }).catch(() => {}));
-                    }
                   }
                 } else {
                   const startId = categoryForm.id && !categories.some((c: any) => c.id === categoryForm.id) ? categoryForm.id : genCategoryId(categories);

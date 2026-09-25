@@ -552,6 +552,7 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   added: 'تمت الإضافة بنجاح',
   searchCategory: 'ابحث عن الفئات...',
   noCategories: 'لا توجد فئات',
+  noResults: 'لم يتم العثور على نتائج',
   totalValue: 'القيمة الإجمالية',
   enterCategoryName: 'أدخل اسم الفئة',
   searchBarcode: 'ابحث بالباركود أو اسم المنتج...',

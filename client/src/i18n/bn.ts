@@ -556,6 +556,7 @@ printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়�
   added: 'যোগ হয়েছে',
   searchCategory: 'ক্যাটাগরি খুঁজুন...',
   noCategories: 'কোনো ক্যাটাগরি নেই',
+  noResults: 'কোন ফলাফল পাওয়া যায়নি',
   totalValue: 'মোট মূল্য',
   enterCategoryName: 'ক্যাটাগরির নাম লিখুন',
   searchBarcode: 'বারকোড বা পণ্যের নাম লিখুন...',
