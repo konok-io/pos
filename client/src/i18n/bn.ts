@@ -579,6 +579,8 @@ printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়�
   purchaseBarcode: 'পারচেজ বারকোড',
   customBarcode: 'কাস্টম বারকোড',
   enterPurchaseId: 'সেই পারচেজ এর সব পণ্যের বারকোড প্রিন্ট করতে পারচেজ আইডি দিন',
+  searchPurchaseId: 'পারচেজ আইডি সার্চ',
+  labels: 'লেবেল',
   selectProductsForBarcode: 'বারকোড প্রিন্ট করতে পণ্য নির্বাচন করুন',
   selected: 'নির্বাচিত',
   selectAll: 'সব সিলেক্ট করুন',

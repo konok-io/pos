@@ -571,6 +571,8 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   purchaseBarcode: 'खरीद बारकोड',
   customBarcode: 'कस्टम बारकोड',
   enterPurchaseId: 'उस खरीद के सभी उत्पादों का बारकोड प्रिंट करने के लिए खरीद आईडी दर्ज करें',
+  searchPurchaseId: 'खरीद आईडी खोजें',
+  labels: 'लेबल',
   selectProductsForBarcode: 'बारकोड प्रिंट करने के लिए उत्पाद चुनें',
   selected: 'चयनित',
   selectAll: 'सभी चुনें',

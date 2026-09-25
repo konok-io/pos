@@ -575,6 +575,8 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   purchaseBarcode: 'باركود الشراء',
   customBarcode: 'باركود مخصص',
   enterPurchaseId: 'أدخل رقم الشراء لطباعة باركود جميع المنتجات في هذا الشراء',
+  searchPurchaseId: 'ابحث عن معرّف الشراء',
+  labels: 'ملصقات',
   selectProductsForBarcode: 'اختر المنتجات للطباعة',
   selected: 'محدد',
   selectAll: 'تحديد الكل',
