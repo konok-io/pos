@@ -518,6 +518,14 @@ interface ProductsScreenProps {
 
 
 
+const printableAscii = (s: any): string => Array.from(String(s ?? '')).filter((ch: string) => { const c = ch.charCodeAt(0); return c >= 32 && c <= 126; }).join('');
+
+const codeOf = (p: any): string => {
+  const raw = String((p && p.code) || '').trim();
+  const clean = printableAscii(raw);
+  return clean !== '' && clean === raw ? clean : '';
+};
+
 export default function ProductsScreen({ products: _initProducts, suppliers: _initSuppliers, categories: _initCategories, purchases, productHistory: _productHistory, setProducts: setProductsParent, setSuppliers: setSuppliersParent, setCategories: setCategoriesParent, setPurchases: setPurchasesParent, settings: _settings, currentUser: _currentUser }: ProductsScreenProps) {
 
 
@@ -961,6 +969,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const [purchaseSelIds, setPurchaseSelIds] = useState<string[]>([]);
   const [purchaseSearch, setPurchaseSearch] = useState('');
   const [purchasePage, setPurchasePage] = useState(0);
+  const [generatingBarcodes, setGeneratingBarcodes] = useState(false);
   const [customQty, setCustomQty] = useState<Record<string, number>>({});
 
 
@@ -1638,7 +1647,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const customBarcodeFiltered = products.filter((p: any) => p.code && (!customBarcodeSearch || (p.name || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(customBarcodeSearch.toLowerCase())));
+  const customBarcodeFiltered = products.filter((p: any) => codeOf(p) !== '' && (!customBarcodeSearch || (p.name || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(customBarcodeSearch.toLowerCase())));
 
 
 
@@ -2805,8 +2814,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   // Real Code128-B SVG barcode (pure, no deps) - scannable by standard scanners
   const CODE128_PATTERNS = ['212222','222122','222221','121223','121322','131222','122213','122312','132212','221213','221312','231212','112232','122132','122231','113222','123122','123221','223211','221132','221231','213212','223112','312131','311222','321122','321221','312212','322112','322211','212123','212321','232121','111323','131123','131321','112313','132113','132311','211313','231113','231311','112133','112331','132131','113123','113321','133121','313121','211331','231131','213113','213311','213131','311123','311321','331121','312113','312311','332111','314111','221411','431111','111224','111422','121124','121421','141122','141221','112214','112412','122114','122411','142112','142211','241211','221114','413111','241112','134111','111242','121142','121241','114212','124112','124211','411212','421112','421211','212141','214121','412121','111143','111341','131141','114113','114311','411113','411311','113141','114131','311141','411131','211412','211214','211232','2331112'];
 
-  const printableAscii = (s: any): string => Array.from(String(s ?? '')).filter((ch: string) => { const c = ch.charCodeAt(0); return c >= 32 && c <= 126; }).join('');
-
   const escHtml = (s: any): string => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   const code128Svg = (value: string, height: number = 50, moduleWidth: number = 2): string => {
@@ -2852,16 +2859,10 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const labelSheetCss = (sizeKey: string): string => `@page{size:A4;margin:4mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;width:210mm}
+body{font-family:Arial,sans-serif;width:202mm;margin:0}
 .summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
 ` + labelItemCss(sizeKey);
-
-  const codeOf = (p: any): string => {
-    const raw = String((p && p.code) || '');
-    const clean = printableAscii(raw);
-    return clean !== '' && clean === raw ? clean : '';
-  };
 
   const barcodeLabelHtml = (product: any, opts?: any): string => {
     const o = { showName: true, showPrice: true, showCompany: false, ...(opts || {}) };
@@ -2879,12 +2880,21 @@ body{font-family:Arial,sans-serif;width:210mm}
 
   const openPrintWin = (html: string) => {
     const win = window.open('', '_blank', 'width=800,height=600');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-      setTimeout(() => { if (!win.closed) win.print(); }, 600);
+    if (!win) { alert(t('popupBlocked')); return; }
+    let done = false;
+    const doPrint = () => {
+      if (done || win.closed) return;
+      done = true;
+      win.focus();
+      win.print();
+    };
+    win.document.write(html);
+    win.document.close();
+    if (win.document.readyState === 'complete') {
+      setTimeout(doPrint, 400);
     } else {
-      alert(t('popupBlocked'));
+      win.addEventListener('load', () => { setTimeout(doPrint, 300); });
+      setTimeout(doPrint, 8000);
     }
   };
 
@@ -2927,7 +2937,9 @@ body{font-family:Arial,sans-serif;width:210mm}
 
   const printBarcodeSheet = (list: any[], summary: string, opts?: any) => {
     const o = { size: '50x25', showName: true, showPrice: true, showCompany: false, ...(opts || {}) };
-    const items = list.map((p: any) => barcodeLabelHtml(p, o)).join('');
+    const printable = list.filter((p: any) => codeOf(p) !== '').slice(0, 500);
+    if (printable.length === 0) { alert(t('missingBarcode')); return; }
+    const items = printable.map((p: any) => barcodeLabelHtml(p, o)).join('');
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${labelSheetCss(o.size)}</style></head><body><div class="summary">${escHtml(summary)}</div><div class="sheet">${items}</div></body></html>`;
     openPrintWin(html);
   };
@@ -2937,7 +2949,7 @@ body{font-family:Arial,sans-serif;width:210mm}
     if (codeOf(p) === '') { alert(t('missingBarcode')); return; }
     const stockQty = Math.max(0, parseInt(String(p.stock), 10) || 0);
     const qty = Math.min(500, Math.max(1, stockQty));
-    printBarcodeSheet(Array(qty).fill(p), `${p.name} | Stock: ${stockQty} ${p.unit || ''} | ${qty} barcode labels | ${new Date().toLocaleDateString()}`, labelOpts());
+    printBarcodeSheet(Array(qty).fill(p), `${p.name} | ${t('stock')}: ${stockQty} ${p.unit || ''} | ${qty} ${t('labels')} | ${new Date().toLocaleDateString()}`, labelOpts());
     setBarcodePopup(null);
   };
 
@@ -2951,7 +2963,7 @@ body{font-family:Arial,sans-serif;width:210mm}
     );
     if (raw === null) return;
     const qty = Math.max(1, Math.min(500, parseInt(raw, 10) || 1));
-    printBarcodeSheet(Array(qty).fill(p), `Manual Count | ${p.name} | ${qty} barcode labels | Stock: ${p.stock} ${p.unit || ''} | ${new Date().toLocaleDateString()}`, labelOpts());
+    printBarcodeSheet(Array(qty).fill(p), `${t('manualCountBarcode')} | ${p.name} | ${qty} ${t('labels')} | ${t('stock')}: ${p.stock} ${p.unit || ''} | ${new Date().toLocaleDateString()}`, labelOpts());
     setBarcodePopup(null);
   };
 
@@ -5068,11 +5080,12 @@ body{font-family:Arial,sans-serif;width:210mm}
   );
 
   const generateMissingBarcodes = async () => {
+    if (generatingBarcodes) return;
     const targets = products.filter((p: any) => codeOf(p) === '');
     if (targets.length === 0) { alert(t('noProductsFound')); return; }
     if (!window.confirm(`${t('generateBarcodes')} (${targets.length})?`)) return;
     const used = new Set<string>();
-    for (const p of products) { const c = String(p.code || '').trim(); if (c) used.add(c); }
+    for (const p of products) { const c = codeOf(p); if (c) used.add(c.toLowerCase()); }
     let n = 1000000000000;
     for (const c of used) {
       if (/^\d+$/.test(c)) { const v = Number(c); if (Number.isFinite(v) && v >= 1000000000000 && v > n) n = v; }
@@ -5080,27 +5093,37 @@ body{font-family:Arial,sans-serif;width:210mm}
     const plan: { p: any; code: string }[] = [];
     for (const p of targets) {
       let code = '';
-      do { n += 1; code = String(n); } while (used.has(code));
-      used.add(code);
+      do { n += 1; code = String(n); } while (used.has(code.toLowerCase()));
+      used.add(code.toLowerCase());
       plan.push({ p, code });
     }
-    let failed = 0;
-    for (const item of plan) {
-      try { await api.updateProduct(item.p.id, { ...item.p, code: item.code }); }
-      catch (_e) { failed += 1; }
+    setGeneratingBarcodes(true);
+    try {
+      let failed = 0;
+      const gen = new Map<string, string>();
+      for (let i = 0; i < plan.length; i += 10) {
+        const batch = plan.slice(i, i + 10);
+        const res = await Promise.all(batch.map(item =>
+          api.updateProduct(item.p.id, { ...item.p, code: item.code })
+            .then(() => item)
+            .catch(() => { failed += 1; return null; })));
+        for (const ok of res) {
+          if (ok) gen.set(String(ok.p.id), ok.code);
+        }
+      }
+      const updated = products.map((p: any) => (gen.has(String(p.id)) ? { ...p, code: gen.get(String(p.id)) } : p));
+      setProducts(updated);
+      setProductsParent(updated);
+      const failPart = failed > 0 ? ' | ' + t('failed') + ': ' + failed : '';
+      alert(t('generateBarcodes') + ': ' + gen.size + ' / ' + plan.length + failPart);
+    } finally {
+      setGeneratingBarcodes(false);
     }
-    const gen = new Map<string, string>();
-    for (const item of plan) gen.set(String(item.p.id), item.code);
-    const updated = products.map((p: any) => (gen.has(String(p.id)) ? { ...p, code: gen.get(String(p.id)) } : p));
-    setProducts(updated);
-    setProductsParent(updated);
-    if (failed > 0) alert(`${failed} / ${plan.length}`);
   };
 
   const renderBarcode = () => {
     const withCode = products.filter((p: any) => codeOf(p) !== '');
     const missingCount = products.length - withCode.length;
-    const selectedCount = customBarcodeProducts.length + purchaseSelIds.length;
     const pProducts = getPurchaseProducts(purchaseBarcodeId);
     const purchaseRows = (purchases || []).filter((pur: any) => {
       const q = purchaseSearch.trim().toLowerCase();
@@ -5119,10 +5142,11 @@ body{font-family:Arial,sans-serif;width:210mm}
     const purchasePageRows = purchaseRows.slice(purchasePageSafe * purchasePerPage, purchasePageSafe * purchasePerPage + purchasePerPage);
     const selectedPurchaseProducts = pProducts.filter((p: any) => purchaseSelIds.includes(p.id));
     const purchaseTotalLabels = selectedPurchaseProducts.reduce((s: number, p: any) => s + purchaseLabelCount(p), 0);
+    const selectedCount = customBarcodeProducts.length + selectedPurchaseProducts.length;
     const customTotalLabels = customBarcodeProducts.reduce((s: number, p: any) => s + clampQty(customQty[String(p.id)]), 0);
     const totalLabels = purchaseTotalLabels + customTotalLabels;
     const previewProduct = customBarcodeProducts[0] || selectedPurchaseProducts[0] || pProducts[0] || withCode[0] || products[0];
-    const barcodeWarn = [previewProduct, ...selectedPurchaseProducts, ...customBarcodeProducts].filter(Boolean).some((p: any) => moduleSmall(p.code, labelSize));
+    const barcodeWarn = [previewProduct, ...selectedPurchaseProducts, ...customBarcodeProducts].filter(Boolean).some((p: any) => moduleSmall(codeOf(p), labelSize));
     const statCard = (icon: string, label: string, value: any, color: string, bg: string) => (
       <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
         <div style={{ width: 40, height: 40, borderRadius: 10, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={icon} style={{ fontSize: 16 }}></i></div>
@@ -5144,7 +5168,7 @@ body{font-family:Arial,sans-serif;width:210mm}
         <input type="checkbox" checked={checked} readOnly style={{ width: 16, height: 16, flexShrink: 0 }} />
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
-          <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code || t('missingBarcode')}</div>
+          <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p) || t('missingBarcode')}</div>
         </div>
         <div style={{ fontSize: 12, color: T.gray500, flexShrink: 0 }}>{right !== undefined ? right : (p.stock ?? 0)}</div>
       </div>
@@ -5197,7 +5221,7 @@ body{font-family:Arial,sans-serif;width:210mm}
             </div>
             {missingCount > 0 && (
               <div style={{ marginBottom: 16 }}>
-                <button type="button" onClick={generateMissingBarcodes} style={{ ...btn('primary') }}><i className="fas fa-wand-magic-sparkles" style={{ marginRight: 6 }}></i>{t('generateBarcodes')} ({missingCount})</button>
+                <button type="button" onClick={generateMissingBarcodes} disabled={generatingBarcodes} style={{ ...btn('primary'), opacity: generatingBarcodes ? 0.6 : 1, cursor: generatingBarcodes ? 'wait' : 'pointer' }}><i className={generatingBarcodes ? 'fas fa-spinner fa-spin' : 'fas fa-wand-magic-sparkles'} style={{ marginRight: 6 }}></i>{generatingBarcodes ? t('loading') : t('generateBarcodes') + ' (' + missingCount + ')'}</button>
               </div>
             )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 16, marginBottom: 16 }}>
@@ -5223,10 +5247,11 @@ body{font-family:Arial,sans-serif;width:210mm}
                           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                             <button type="button" onClick={() => setPurchaseSelIds(pProducts.map((p: any) => p.id))} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
                             <button type="button" onClick={() => setPurchaseSelIds([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
+                            <button type="button" onClick={() => { setPurchaseBarcodeId(''); setPurchaseSelIds([]); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-xmark" style={{ marginRight: 4 }}></i>{t('deselectPurchase')}</button>
                           </div>
                           <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginLeft: 'auto' }}>
-                            <span style={{ fontSize: 13, color: T.gray500 }}>{purchaseSelIds.length} {t('products')} {t('selected')} · {purchaseTotalLabels} {t('labels')}</span>
-                            <button type="button" onClick={printPurchaseBarcode} disabled={purchaseSelIds.length === 0 || purchaseTotalLabels === 0} style={{ ...btn('primary', 'sm'), opacity: purchaseSelIds.length === 0 || purchaseTotalLabels === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                            <span style={{ fontSize: 13, color: T.gray500 }}>{selectedPurchaseProducts.length} {t('products')} {t('selected')} · {purchaseTotalLabels} {t('labels')}</span>
+                            <button type="button" onClick={printPurchaseBarcode} disabled={selectedPurchaseProducts.length === 0 || purchaseTotalLabels === 0} style={{ ...btn('primary', 'sm'), opacity: selectedPurchaseProducts.length === 0 || purchaseTotalLabels === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
                           </div>
                         </div>
                       </div>
