@@ -573,6 +573,7 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   enterPurchaseId: 'उस खरीद के सभी उत्पादों का बारकोड प्रिंट करने के लिए खरीद आईडी दर्ज करें',
   selectProductsForBarcode: 'बारकोड प्रिंट करने के लिए उत्पाद चुनें',
   selected: 'चयनित',
+  selectAll: 'सभी चुনें',
   stockFilters: 'स्टॉक फ़िल्टर',
   exportCsv: 'CSV निर्यात',
   csvMinRows: 'CSV में कम से कम 2 पंक्तियाँ होनी चाहिए',

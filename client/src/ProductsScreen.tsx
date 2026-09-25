@@ -1633,7 +1633,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const barcodeProducts = products.filter((p: any) => !barcodeSearch || (p.code || '').toLowerCase().includes(barcodeSearch.toLowerCase()) || (p.name || '').toLowerCase().includes(barcodeSearch.toLowerCase()));
+  const barcodeProducts = products.filter((p: any) => !barcodeSearch || (p.code || '').toLowerCase().includes(barcodeSearch.toLowerCase()) || (p.name || '').toLowerCase().includes(barcodeSearch.toLowerCase()) || (p.company || '').toLowerCase().includes(barcodeSearch.toLowerCase()));
+  const customBarcodeFiltered = products.filter((p: any) => p.code && (!customBarcodeSearch || (p.name || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(customBarcodeSearch.toLowerCase())));
 
 
 
@@ -2180,7 +2181,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
                 oldStock, newStock, purchaseId,
               };
               workingProducts = workingProducts.map(w => w.id === existingProd.id ? { ...w, stock: newStock, costPrice: newCost, freeQty: newFree } : w);
-              return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock, costPrice: newCost, foc: existingProd.foc || !!p.foc, freeQty: newFree }).then((res: any) => {
+              return api.updateProduct(existingProd.id, { ...existingProd, stock: newStock, costPrice: newCost, foc: existingProd.foc || !!p.foc, freeQty: newFree, purchaseId }).then((res: any) => {
                 historyPlan.push(plan);
                 (p._srcIds || [p.id]).forEach((id: string) => succeededSrcIds.add(id));
                 return res;
@@ -2797,43 +2798,53 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  // Code128 SVG barcode (pure, no deps)
-  const code128Svg = (value: string, height: number = 50, width: number = 2): string => {
-    
-    // Simplified visual barcode: map each char to bar pattern for display
-    const visual = (s: string): string => {
-      let bars = '';
-      for (let ci = 0; ci < s.length; ci++) {
-        const code = s.charCodeAt(ci);
-        // generate 11-module pattern from char code
-        const bits = (code * 2654435761 >>> 0).toString(2).padStart(16, '0').slice(0, 11);
-        for (let b = 0; b < bits.length; b++) {
-          bars += bits[b] === '1' ? '1' : '0';
-        }
-        bars += '0'; // inter-character gap
-      }
-      return bars;
-    };
-    const clean = String(value || '').replace(/[^A-Za-z0-9]/g, '') || 'N/A';
-    const bits = visual(clean);
-    let x = 10;
+  // Real Code128-B SVG barcode (pure, no deps) - scannable by standard scanners
+  const CODE128_PATTERNS = ['212222','222122','222221','121223','121322','131222','122213','122312','132212','221213','221312','231212','112232','122132','122231','113222','123122','123221','223211','221132','221231','213212','223112','312131','311222','321122','321221','312212','322112','322211','212123','212321','232121','111323','131123','131321','112313','132113','132311','211313','231113','231311','112133','112331','132131','113123','113321','133121','313121','211331','231131','213113','213311','213131','311123','311321','331121','312113','312311','332111','314111','221411','431111','111224','111422','121124','121421','141122','141221','112214','112412','122114','122411','142112','142211','241211','221114','413111','241112','134111','111242','121142','121241','114212','124112','124211','411212','421112','421211','212141','214121','412121','111143','111341','131141','114113','114311','411113','411311','113141','114131','311141','411131','211412','211214','211232','2331112'];
+
+  const printableAscii = (s: any): string => Array.from(String(s ?? '')).filter((ch: string) => { const c = ch.charCodeAt(0); return c >= 32 && c <= 126; }).join('');
+
+  const escHtml = (s: any): string => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  const code128Svg = (value: string, height: number = 50, moduleWidth: number = 2): string => {
+    const clean = printableAscii(value) || '000';
+    const codes: number[] = [104];
+    for (let i = 0; i < clean.length; i++) codes.push(clean.charCodeAt(i) - 32);
+    let sum = codes[0];
+    for (let i = 1; i < codes.length; i++) sum += codes[i] * i;
+    codes.push(sum % 103);
+    codes.push(106);
+    let x = 10 * moduleWidth;
     let rects = '';
-    for (let i = 0; i < bits.length; i++) {
-      if (bits[i] === '1') {
-        rects += `<rect x="${x}" y="0" width="${width}" height="${height}" fill="#000"/>`;
-        x += width;
-      } else {
-        x += width;
+    for (const c of codes) {
+      const pat = CODE128_PATTERNS[c] || CODE128_PATTERNS[0];
+      let bar = true;
+      for (const d of pat) {
+        const w = parseInt(d, 10) * moduleWidth;
+        if (bar) rects += `<rect x="${x}" y="0" width="${w}" height="${height}" fill="#000"/>`;
+        x += w;
+        bar = !bar;
       }
     }
-    const totalW = x + 10;
+    const totalW = x + 10 * moduleWidth;
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${height}" viewBox="0 0 ${totalW} ${height}">${rects}</svg>`;
   };
 
+  const LABEL_SHEET_CSS = `@page{size:A4;margin:4mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;width:210mm}
+.summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
+.sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
+.barcode-item{width:50mm;height:28mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;page-break-inside:avoid;gap:0}
+.barcode-item .bname{font-size:7.5pt;font-weight:700;color:#333;line-height:1.15;margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barcode-item .bcode{font-family:monospace;font-size:8pt;font-weight:700;color:#111;line-height:1;margin:0.4mm 0 0 0;width:100%;overflow:hidden;white-space:nowrap}
+.barcode-item .bc{display:flex;align-items:flex-start;justify-content:center;width:100%;line-height:0;margin:0.3mm 0 0 0}
+.barcode-item .bc svg{max-width:100%;height:auto;max-height:13mm;display:block}
+.barcode-item .price{font-size:8pt;font-weight:800;color:#111;line-height:1;margin:0.4mm 0 0 0}`;
+
   const barcodeLabelHtml = (product: any): string => {
-    const code = String(product.code || product.id || '000');
-    const svg = code128Svg(code, 48, 2);
-    return `<div class="barcode-item"><div class="bcode">${code}</div><div class="bc">${svg}</div><div class="price">${fmt(product.sellPrice)}</div></div>`;
+    const clean = printableAscii(product.code || product.id) || '000';
+    const svg = code128Svg(clean, 44, 2);
+    return `<div class="barcode-item"><div class="bname">${escHtml(product.name)}</div><div class="bcode">${escHtml(clean)}</div><div class="bc">${svg}</div><div class="price">${fmt(product.sellPrice)}</div></div>`;
   };
 
   const openPrintWin = (html: string) => {
@@ -2845,65 +2856,42 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     }
   };
 
-  const printAllStockBarcodes = (product: any) => {
-    // Print labels = THIS product's stock qty (dynamic)
-    const p = product;
-    const qty = Math.max(1, parseInt(String(p.stock)) || 1);
-    const label = barcodeLabelHtml(p);
-    const items = Array(qty).fill(label).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4;margin:4mm}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;width:210mm}
-.summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
-.sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
-.barcode-item{width:50mm;height:28mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;page-break-inside:avoid;gap:0}
-.barcode-item .bcode{font-family:monospace;font-size:9pt;font-weight:700;color:#111;line-height:1;margin:0 0 0.5mm 0;width:100%;overflow:hidden;white-space:nowrap;padding-top:0}
-.barcode-item .bc{display:flex;align-items:flex-start;justify-content:center;width:100%;line-height:0;margin:0}
-.barcode-item .bc svg{max-width:100%;height:auto;max-height:15mm;display:block}
-.barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0.5mm 0 0 0}
-</style></head><body>
-<div class="summary">${p.name} | Stock: ${qty} ${p.unit || ''} | ${qty} barcode labels | ${new Date().toLocaleDateString()}</div>
-<div class="sheet">${items}</div>
-</body></html>`;
+  const printBarcodeSheet = (list: any[], summary: string) => {
+    const items = list.map((p: any) => barcodeLabelHtml(p)).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${LABEL_SHEET_CSS}</style></head><body><div class="summary">${escHtml(summary)}</div><div class="sheet">${items}</div></body></html>`;
     openPrintWin(html);
+  };
+
+  const printAllStockBarcodes = (product: any) => {
+    const p = product;
+    const stockQty = Math.max(0, parseInt(String(p.stock), 10) || 0);
+    const qty = Math.min(500, Math.max(1, stockQty));
+    printBarcodeSheet(Array(qty).fill(p), `${p.name} | Stock: ${stockQty} ${p.unit || ''} | ${qty} barcode labels | ${new Date().toLocaleDateString()}`);
     setBarcodePopup(null);
   };
 
   const printManualCountBarcode = (product: any) => {
-    // Prompt for count, print that many labels for THIS product
     const p = product;
-    const def = Math.max(1, parseInt(String(p.stock)) || 1);
+    const def = Math.min(500, Math.max(1, parseInt(String(p.stock), 10) || 1));
     const raw = window.prompt(
       `${p.name}\n${t('manualCountBarcode') || 'Manual Count Barcode'}\n\n${t('howManyBarcodes') || 'How many barcodes?'} (1-500):`,
       String(def)
     );
     if (raw === null) return;
-    const qty = Math.max(1, Math.min(500, parseInt(raw) || 1));
-    const label = barcodeLabelHtml(p);
-    const items = Array(qty).fill(label).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4;margin:4mm}
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;width:210mm}
-.summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
-.sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
-.barcode-item{width:50mm;height:28mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;page-break-inside:avoid;gap:0}
-.barcode-item .bcode{font-family:monospace;font-size:9pt;font-weight:700;color:#111;line-height:1;margin:0 0 0.5mm 0;width:100%;overflow:hidden;white-space:nowrap;padding-top:0}
-.barcode-item .bc{display:flex;align-items:flex-start;justify-content:center;width:100%;line-height:0;margin:0}
-.barcode-item .bc svg{max-width:100%;height:auto;max-height:15mm;display:block}
-.barcode-item .price{font-size:9pt;font-weight:800;color:#111;line-height:1;margin:0.5mm 0 0 0}
-</style></head><body>
-<div class="summary">Manual Count | ${p.name} | ${qty} barcode labels | Stock: ${p.stock} ${p.unit || ''} | ${new Date().toLocaleDateString()}</div>
-<div class="sheet">${items}</div>
-</body></html>`;
-    openPrintWin(html);
+    const qty = Math.max(1, Math.min(500, parseInt(raw, 10) || 1));
+    printBarcodeSheet(Array(qty).fill(p), `Manual Count | ${p.name} | ${qty} barcode labels | Stock: ${p.stock} ${p.unit || ''} | ${new Date().toLocaleDateString()}`);
     setBarcodePopup(null);
   };
 
   const printBarcode = (product: any) => {
     setBarcodePopup(product);
-  };;
+  };
+
+  const printBarcodeTabList = () => {
+    if (barcodeProducts.length === 0) { alert(t('noResults')); return; }
+    if (barcodeProducts.length > 20 && !window.confirm(`${barcodeProducts.length} ${t('products')} -> ${t('print')}?`)) return;
+    printBarcodeSheet(barcodeProducts, `${barcodeProducts.length} ${t('products')} | ${new Date().toLocaleDateString()}`);
+  };
 
 
 
@@ -3371,125 +3359,30 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const printPurchaseBarcode = () => {
-
-
-
-
-
-
-
-
-
-
-
-    if (!purchaseBarcodeId.trim()) { alert(t('enterName')); return; }
-
-
-
-
-
-
-
-
-
-
-
-    const matchedProducts = products.filter((p: any) => (p.purchaseId || '').toLowerCase() === purchaseBarcodeId.trim().toLowerCase());
-
-
-
-
-
-
-
-
-
-
-
+    const pid = purchaseBarcodeId.trim();
+    if (!pid) { alert(t('enterPurchaseId')); return; }
+    const pidLc = pid.toLowerCase();
+    const rec = (purchases || []).find((x: any) => String(x.id || '').toLowerCase() === pidLc);
+    let matchedProducts: any[] = [];
+    if (rec) {
+      let recItems: any[] = [];
+      if (Array.isArray(rec.items)) {
+        recItems = rec.items;
+      } else if (typeof rec.items === 'string') {
+        try { const parsed = JSON.parse(rec.items); if (Array.isArray(parsed)) recItems = parsed; } catch (_err) { recItems = []; }
+      }
+      const ids = new Set(recItems.map((it: any) => (it && it.productId) || '').filter(Boolean));
+      const codes = new Set(recItems.map((it: any) => String((it && it.code) || '').toLowerCase()).filter(Boolean));
+      const names = new Set(recItems.map((it: any) => String((it && it.name) || '').toLowerCase()).filter(Boolean));
+      matchedProducts = products.filter((p: any) => ids.has(p.id) || (!!p.code && codes.has(String(p.code).toLowerCase())) || (!!p.name && names.has(String(p.name || '').toLowerCase())));
+    }
+    if (matchedProducts.length === 0) {
+      matchedProducts = products.filter((p: any) => String(p.purchaseId || '').toLowerCase() === pidLc);
+    }
     if (matchedProducts.length === 0) { alert(t('noProductsFound')); return; }
-
-
-
-
-
-
-
-
-
-
-
-    const items = matchedProducts.map((p: any) => `<div class="barcode-item"><div class="bcode">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join('');
-
-
-
-
-
-
-
-
-
-
-
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item .bcode{font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
-
-
-
-
-
-
-
-
-
-
-
-    const win = window.open('', '_blank', 'width=800,height=600');
-
-
-
-
-
-
-
-
-
-
-
-    if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); }
-
-
-
-
-
-
-
-
-
-
-
+    printBarcodeSheet(matchedProducts, `${t('purchaseBarcode')} ${pid} | ${matchedProducts.length} ${t('products')} | ${new Date().toLocaleDateString()}`);
     setShowPurchaseBarcodeModal(false);
-
-
-
-
-
-
-
-
-
-
-
     setPurchaseBarcodeId('');
-
-
-
-
-
-
-
-
-
-
-
   };
 
 
@@ -3515,101 +3408,11 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const printCustomBarcode = () => {
-
-
-
-
-
-
-
-
-
-
-
     if (customBarcodeProducts.length === 0) { alert(t('noProductsFound')); return; }
-
-
-
-
-
-
-
-
-
-
-
-    const items = customBarcodeProducts.map((p: any) => `<div class="barcode-item"><div class="bcode">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join('');
-
-
-
-
-
-
-
-
-
-
-
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item .bcode{font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`;
-
-
-
-
-
-
-
-
-
-
-
-    const win = window.open('', '_blank', 'width=800,height=600');
-
-
-
-
-
-
-
-
-
-
-
-    if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); }
-
-
-
-
-
-
-
-
-
-
-
+    printBarcodeSheet(customBarcodeProducts, `${t('customBarcode')} | ${customBarcodeProducts.length} ${t('products')} | ${new Date().toLocaleDateString()}`);
     setShowCustomBarcodeModal(false);
-
-
-
-
-
-
-
-
-
-
-
     setCustomBarcodeProducts([]);
-
-
-
-
-
-
-
-
-
-
-
+    setCustomBarcodeSearch('');
   };
 
 
@@ -3635,345 +3438,85 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const handleCsvImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-
-
-
-
-
-
-
-
-
-
-
     const file = e.target.files?.[0];
-
-
-
-
-
-
-
-
-
-
-
     if (!file) return;
-
-
-
-
-
-
-
-
-
-
-
     const reader = new FileReader();
-
-
-
-
-
-
-
-
-
-
-
     reader.onload = (event) => {
-
-
-
-
-
-
-
-
-
-
-
       const text = event.target?.result as string;
-
-
-
-
-
-
-
-
-
-
-
       const lines = text.split('\n').filter(line => line.trim() && !line.trim().startsWith('#'));
-
-
-
-
-
-
-
-
-
-
-
       if (lines.length < 2) { alert(t('csvMinRows')); return; }
-
-
-
-
-
-
-
-
-
-
-
       const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-
-
-
-
-
-
-
-
-
-
-
       const items: any[] = [];
-
-
-
-
-
-
-
-
-
-
-
       for (let i = 1; i < lines.length; i++) {
-
-
-
-
-
-
-
-
-
-
-
         const values = lines[i].split(',').map(v => v.trim());
-
-
-
-
-
-
-
-
-
-
-
         const row: Record<string, string> = {};
-
-
-
-
-
-
-
-
-
-
-
         headers.forEach((h, idx) => { row[h] = values[idx] || ''; });
-
-
-
-
-
-
-
-
-
-
-
-        items.push({ id: genId(), name: row['name'] || '', code: row['barcode'] || '', company: row['company'] || '', cat: row['category'] || '', unit: row['unit'] || 'pcs', costPrice: parseFloat(row['buyprice'] || '0'), sellPrice: parseFloat(row['sellprice'] || '0'), stock: parseFloat(row['stock'] || '0'), minStock: parseFloat(row['minstock'] || '5'), image: '', supplier: row['company'] || '', categoryId: '' });
-
-
-
-
-
-
-
-
-
-
-
+        const name = (row['name'] || '').trim();
+        if (!name) continue;
+        items.push({ id: genId(), name, code: (row['barcode'] || '').trim(), company: row['company'] || '', cat: row['category'] || '', unit: row['unit'] || 'pcs', costPrice: parseFloat(row['buyprice'] || '0') || 0, sellPrice: parseFloat(row['sellprice'] || '0') || 0, stock: parseFloat(row['stock'] || '0') || 0, minStock: parseFloat(row['minstock'] || '5') || 5, image: '', supplier: row['company'] || '', categoryId: '' });
       }
-
-
-
-
-
-
-
-
-
-
-
-      const valid: any[] = [];
+      if (items.length === 0) { alert(t('csvMinRows')); return; }
+      const local: any[] = products.map((p: any) => ({ ...p }));
+      const added: any[] = [];
+      const mergedIds = new Set<string>();
+      const seen = new Set<string>();
       for (const item of items) {
-        if (!item.name) continue;
-        const existing = products.find((ep: any) =>
-          ((ep.code || '').toLowerCase() === (item.code || '').toLowerCase() && item.code) ||
-          ((ep.name || '').toLowerCase() === (item.name || '').toLowerCase() && !item.code)
+        const codeKey = (item.code || '').toLowerCase();
+        const nameKey = (item.name || '').toLowerCase();
+        const key = codeKey !== '' ? 'c:' + codeKey : 'n:' + nameKey;
+        if (seen.has(key)) continue;
+        const idx = local.findIndex((ep: any) =>
+          (codeKey !== '' && (ep.code || '').toLowerCase() === codeKey) ||
+          (codeKey === '' && nameKey !== '' && (ep.name || '').toLowerCase() === nameKey)
         );
-        if (existing && item.code) {
-          const newStock = (existing.stock || 0) + (item.stock || 0);
-          const merged = { ...existing, stock: newStock };
-          setProducts(prev => prev.map(p => p.id === existing.id ? merged : p));
-          setProductsParent(products.map(p => p.id === existing.id ? merged : p));
-          api.updateProduct(existing.id, merged).catch(() => {});
-        } else if (!existing) {
-          valid.push(item);
+        if (idx >= 0) {
+          local[idx] = { ...local[idx], stock: Math.max(0, (+local[idx].stock || 0)) + item.stock };
+          mergedIds.add(String(local[idx].id));
+        } else {
+          local.push(item);
+          added.push(item);
         }
+        seen.add(key);
       }
-
-
-
-
-
-
-
-
-
-
-
-      if (valid.length > 0) {
-
-
-
-
-
-
-
-
-
-
-
-        const updated = [...products, ...valid];
-
-
-
-
-
-
-
-
-
-
-
-        setProducts(updated);
-
-
-
-
-
-
-
-
-
-
-
-        setProductsParent(updated);
-
-
-
-
-
-
-
-
-
-
-
-        valid.forEach((p: any) => api.addProduct(p).catch(() => {}));
-
-
-
-
-
-
-
-
-
-
-
-        alert(`${valid.length} ${t('productsAdded')}`);
-
-
-
-
-
-
-
-
-
-
-
-      }
-
-
-
-
-
-
-
-
-
-
-
+      const applyLocal = (next: any[]) => { setProducts(next); setProductsParent(next); };
+      applyLocal([...local]);
+      let addFailed = 0;
+      let mergeFailed = 0;
+      const jobs: Promise<any>[] = [];
+      added.forEach((item) => {
+        jobs.push(api.addProduct(item).catch(() => {
+          addFailed++;
+          const next = local.filter((p: any) => p.id !== item.id);
+          local.length = 0;
+          local.push(...next);
+        }));
+      });
+      mergedIds.forEach((mid) => {
+        const target = local.find((p: any) => String(p.id) === mid);
+        if (!target) return;
+        const before = products.find((p: any) => String(p.id) === mid);
+        jobs.push(api.updateProduct(target.id, target).catch(() => {
+          mergeFailed++;
+          if (before) {
+            const next = local.map((p: any) => String(p.id) === mid ? before : p);
+            local.length = 0;
+            local.push(...next);
+          }
+        }));
+      });
+      Promise.all(jobs).then(() => {
+        applyLocal([...local]);
+        const parts: string[] = [];
+        const addedOk = added.length - addFailed;
+        const mergedOk = mergedIds.size - mergeFailed;
+        if (addedOk > 0) parts.push(`${addedOk} ${t('productsAdded')}`);
+        if (mergedOk > 0) parts.push(`${t('stockMerged')}: ${mergedOk}`);
+        if (addFailed + mergeFailed > 0) parts.push(`${addFailed + mergeFailed} ${t('failed')}`);
+        alert(parts.length > 0 ? parts.join(' | ') : t('failed'));
+      });
     };
-
-
-
-
-
-
-
-
-
-
-
     reader.readAsText(file);
-
-
-
-
-
-
-
-
-
-
-
     e.target.value = '';
-
-
-
-
-
-
-
-
-
-
-
   };
 
 
@@ -5521,7 +5064,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-          <input value={barcodeSearch} onChange={e => setBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
+          <input autoFocus value={barcodeSearch} onChange={e => setBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
 
 
 
@@ -5557,7 +5100,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-        <button style={{ ...btn('ghost', 'sm') }} onClick={() => { const items = barcodeProducts.map((p: any) => `<div class="barcode-item"><div class="bcode">${p.code || 'N/A'}</div><div class="price">${fmt(p.sellPrice)}</div></div>`).join(''); const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;display:flex;flex-wrap:wrap;gap:10px;padding:10px}.barcode-item{border:1px solid #ccc;padding:8px;text-align:center;width:200px}.barcode-item .bcode{font-family:monospace;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:4px}.barcode-item .code{font-family:monospace;font-size:14px;letter-spacing:2px}.barcode-item .price{font-size:12px;color:#666;margin-top:4px}</style></head><body>${items}</body></html>`; const win = window.open('', '_blank', 'width=800,height=600'); if (win) { win.document.write(html); win.document.close(); setTimeout(() => { if (!win.closed) win.print(); }, 500); } }}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+        <button style={{ ...btn('ghost', 'sm') }} onClick={printBarcodeTabList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
 
 
 
@@ -5605,7 +5148,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-barcode"></i></div><p>{t('noProductsYet')}</p></div>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-barcode"></i></div><p>{barcodeSearch ? t('noResults') : t('noProductsYet')}</p></div>
 
 
 
@@ -5653,7 +5196,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-              {[t('productName'), t('company'), t('barcode'), t('purchasePrice'), t('sellPrice'), t('actions')].map((h, i) => (
+              {[t('productName'), t('company'), t('barcode'), t('stock'), t('purchasePrice'), t('sellPrice'), t('actions')].map((h, i) => (
 
 
 
@@ -5665,7 +5208,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                <th key={i} style={{ padding: '10px 12px', textAlign: i >= 3 && i <= 4 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+                <th key={i} style={{ padding: '10px 12px', textAlign: i >= 3 && i <= 5 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
 
 
 
@@ -5762,6 +5305,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
                   <td style={{ padding: '10px 12px' }}><span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, background: T.gray50, padding: '2px 8px', borderRadius: 4, border: `1px dashed ${T.gray300}` }}>{p.code || 'N/A'}</span></td>
+                  <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 600, color: (p.stock || 0) <= 0 ? '#DC2626' : T.gray600 }}>{p.stock || 0}</td>
 
 
 
@@ -8290,6 +7834,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
                   <button onClick={() => { exportProductsCsv(); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button onClick={() => { setShowImportModal(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvUpload')}</button>
 
                   <button onClick={() => { setProductTab('priceHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {t('priceHistory')}</button>
 
@@ -10579,7 +10124,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <input value={purchaseBarcodeId} onChange={e => setPurchaseBarcodeId(e.target.value)} placeholder={t('purchaseId')} style={inputStyle} />
+              <input value={purchaseBarcodeId} onChange={e => setPurchaseBarcodeId(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') printPurchaseBarcode(); }} placeholder={t('purchaseId')} style={inputStyle} />
 
 
 
@@ -10819,7 +10364,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              {products.filter((p: any) => p.code && (!customBarcodeSearch || (p.name || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()) || (p.code || '').toLowerCase().includes(customBarcodeSearch.toLowerCase()))).map((p: any) => {
+              {customBarcodeFiltered.map((p: any) => {
 
 
 
@@ -10951,6 +10496,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
+              <button type="button" onClick={() => setCustomBarcodeProducts(customBarcodeFiltered)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{marginRight: 4}}></i> {t('selectAll')}</button>
               <span style={{ fontSize: 14, color: T.gray500 }}>{customBarcodeProducts.length} {t('products')} {t('selected')}</span>
 
 

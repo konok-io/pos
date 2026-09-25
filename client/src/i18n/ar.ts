@@ -577,6 +577,7 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   enterPurchaseId: 'أدخل رقم الشراء لطباعة باركود جميع المنتجات في هذا الشراء',
   selectProductsForBarcode: 'اختر المنتجات للطباعة',
   selected: 'محدد',
+  selectAll: 'تحديد الكل',
   stockFilters: 'فلاتر المخزون',
   exportCsv: 'تصدير CSV',
   csvMinRows: 'يجب أن يحتوي CSV على صفوفين على الأقل',

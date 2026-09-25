@@ -581,6 +581,7 @@ printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়�
   enterPurchaseId: 'সেই পারচেজ এর সব পণ্যের বারকোড প্রিন্ট করতে পারচেজ আইডি দিন',
   selectProductsForBarcode: 'বারকোড প্রিন্ট করতে পণ্য নির্বাচন করুন',
   selected: 'নির্বাচিত',
+  selectAll: 'সব সিলেক্ট করুন',
   stockFilters: 'স্টক ফিল্টার',
   exportCsv: 'CSV এক্সপোর্ট',
   csvMinRows: 'CSV তে কমপক্ষে ২ টি লাইন থাকতে হবে (হেডার + ১ টি ডেটা)',
