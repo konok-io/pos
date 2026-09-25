@@ -250,7 +250,7 @@ const btn = (type: string = 'default', size: string = 'md') => {
 
 
 
-const inputStyle: React.CSSProperties = { padding: '9px 12px', border: `1px solid ${T.gray200}`, borderRadius: 7, fontSize: 14, outline: 'none', width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', background: T.white, height: '34px' };
+const inputStyle: React.CSSProperties = { padding: '0 12px', border: `1px solid ${T.gray200}`, borderRadius: 7, fontSize: 14, outline: 'none', width: '100%', boxSizing: 'border-box', fontFamily: 'inherit', background: T.white, height: '34px' };
 
 
 
@@ -5059,9 +5059,10 @@ body{font-family:Arial,sans-serif;width:210mm}
       </div>
     );
     const modeToggle = (checked: boolean, onCh: (e: any) => void, icon: string, label: string) => (
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: checked ? T.teal : T.gray600, background: checked ? T.tealLight : T.gray100, border: `1px solid ${checked ? T.teal : T.gray200}`, borderRadius: 8, padding: '8px 12px', flex: 1, minWidth: 0 }}>
-        <input type="checkbox" checked={checked} onChange={onCh} style={{ accentColor: T.teal, flexShrink: 0 }} />
-        <i className={icon} style={{ fontSize: 12 }}></i>{label}
+      <label style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: checked ? T.teal : T.gray600, background: checked ? T.tealLight : T.white, border: `1px solid ${checked ? T.teal : T.gray200}`, borderRadius: 8, padding: '8px 10px', width: '100%', boxSizing: 'border-box', whiteSpace: 'nowrap' }}>
+        <span style={{ width: 22, height: 22, borderRadius: 6, background: checked ? T.teal : T.gray100, color: checked ? T.white : T.gray500, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={icon} style={{ fontSize: 10 }}></i></span>
+        <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>
+        <input type="checkbox" checked={checked} onChange={onCh} style={{ accentColor: T.teal, flexShrink: 0, width: 15, height: 15, margin: 0 }} />
       </label>
     );
     const selRow = (p: any, checked: boolean, onToggle: () => void) => (
@@ -5131,21 +5132,32 @@ body{font-family:Arial,sans-serif;width:210mm}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 16, marginBottom: 16 }}>
               <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
                 {cardHead('fas fa-box', t('purchaseBarcode'), t('enterPurchaseId'))}
-                <select value={purchaseBarcodeId} onChange={e => { const v = e.target.value; setPurchaseBarcodeId(v); setPurchaseSelIds(getPurchaseProducts(v).map((p: any) => p.id)); }} style={{ ...inputStyle, width: '100%', marginTop: 10 }}>
-                  <option value="">{t('choosePurchase')}</option>
-                  {(purchases || []).map((pur: any) => (<option key={pur.id} value={pur.id}>{pur.id} · {pur.date ? new Date(pur.date).toLocaleDateString() : '-'} · {pur.supplier || '-'} · {purchaseItemsOf(pur).length} {t('products')}</option>))}
-                </select>
-                {(purchases || []).length === 0 && <div style={{ fontSize: 13, color: T.gray400, marginTop: 8 }}>{t('noPurchaseRecords')}</div>}
+                {(purchases || []).length === 0 ? (
+                  <div style={{ marginTop: 10, border: `1px dashed ${T.gray300}`, borderRadius: 10, padding: '26px 14px', textAlign: 'center', background: '#FAFAFA' }}>
+                    <i className="fas fa-inbox" style={{ fontSize: 24, color: T.gray300, display: 'block', marginBottom: 8 }}></i>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: T.gray500 }}>{t('noPurchaseRecords')}</div>
+                  </div>
+                ) : (
+                  <select value={purchaseBarcodeId} onChange={e => { const v = e.target.value; setPurchaseBarcodeId(v); setPurchaseSelIds(getPurchaseProducts(v).map((p: any) => p.id)); }} style={{ ...inputStyle, width: '100%', marginTop: 10 }}>
+                    <option value="">{t('choosePurchase')}</option>
+                    {(purchases || []).map((pur: any) => (<option key={pur.id} value={pur.id}>{pur.id} · {pur.date ? new Date(pur.date).toLocaleDateString() : '-'} · {pur.supplier || '-'} · {purchaseItemsOf(pur).length} {t('products')}</option>))}
+                  </select>
+                )}
+                {(purchases || []).length > 0 && <div style={{ fontSize: 12, color: T.gray400, marginTop: 6 }}>{(purchases || []).length} {t('purchases')}</div>}
                 {purchaseBarcodeId !== '' && (
                   <div style={{ marginTop: 10 }}>
                     {pProducts.length === 0 ? (
                       <div style={{ fontSize: 13, color: T.gray400, padding: '10px 0' }}>{t('noProductsFound')}</div>
                     ) : listBox(pProducts.map((p: any) => selRow(p, purchaseSelIds.includes(p.id), () => setPurchaseSelIds(prev => prev.includes(p.id) ? prev.filter((x: string) => x !== p.id) : [...prev, p.id]))))}
                     <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
-                      <button type="button" onClick={() => setPurchaseSelIds(pProducts.map((p: any) => p.id))} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
-                      <button type="button" onClick={() => setPurchaseSelIds([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
-                      <span style={{ fontSize: 13, color: T.gray500, marginLeft: 'auto' }}>{purchaseSelIds.length} {t('products')} {t('selected')}</span>
-                      <button type="button" onClick={printPurchaseBarcode} disabled={purchaseSelIds.length === 0} style={{ ...btn('primary', 'sm'), opacity: purchaseSelIds.length === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                        <button type="button" onClick={() => setPurchaseSelIds(pProducts.map((p: any) => p.id))} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
+                        <button type="button" onClick={() => setPurchaseSelIds([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
+                      </div>
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginLeft: 'auto' }}>
+                        <span style={{ fontSize: 13, color: T.gray500 }}>{purchaseSelIds.length} {t('products')} {t('selected')}</span>
+                        <button type="button" onClick={printPurchaseBarcode} disabled={purchaseSelIds.length === 0} style={{ ...btn('primary', 'sm'), opacity: purchaseSelIds.length === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -5159,12 +5171,16 @@ body{font-family:Arial,sans-serif;width:210mm}
                 {listBox(customBarcodeFiltered.length === 0 ? (
                   <div style={{ padding: 14, fontSize: 13, color: T.gray400 }}>{customBarcodeSearch !== '' ? t('noResults') : t('noProductsYet')}</div>
                 ) : customBarcodeFiltered.map((p: any) => selRow(p, customBarcodeProducts.some((cp: any) => cp.id === p.id), () => setCustomBarcodeProducts(prev => prev.some((cp: any) => cp.id === p.id) ? prev.filter((cp: any) => cp.id !== p.id) : [...prev, p]))))}
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
-                  <button type="button" onClick={() => setCustomBarcodeProducts(customBarcodeFiltered)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
-                  <button type="button" onClick={() => setCustomBarcodeProducts([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
-                  <span style={{ fontSize: 13, color: T.gray500, marginLeft: 'auto' }}>{customBarcodeProducts.length} {t('products')} {t('selected')}</span>
-                  <button type="button" onClick={printCustomBarcode} disabled={customBarcodeProducts.length === 0} style={{ ...btn('primary', 'sm'), opacity: customBarcodeProducts.length === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
-                </div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <button type="button" onClick={() => setCustomBarcodeProducts(customBarcodeFiltered)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
+                    <button type="button" onClick={() => setCustomBarcodeProducts([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
+                      </div>
+                      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginLeft: 'auto' }}>
+                    <span style={{ fontSize: 13, color: T.gray500 }}>{customBarcodeProducts.length} {t('products')} {t('selected')}</span>
+                    <button type="button" onClick={printCustomBarcode} disabled={customBarcodeProducts.length === 0} style={{ ...btn('primary', 'sm'), opacity: customBarcodeProducts.length === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                      </div>
+                    </div>
                 {missingCount > 0 && <div style={{ fontSize: 12, color: '#B91C1C', marginTop: 8 }}><i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{missingCount} {t('missingBarcode')}</div>}
               </div>
               <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
@@ -5183,7 +5199,7 @@ body{font-family:Arial,sans-serif;width:210mm}
                     <input type="number" min={1} max={500} value={labelCopies} onChange={e => setLabelCopies(Math.max(1, Math.min(500, parseInt(e.target.value) || 1)))} style={{ ...inputStyle, width: '100%' }} />
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
                   {modeToggle(labelShowName, () => setLabelShowName(v => !v), 'fas fa-font', t('showName'))}
                   {modeToggle(labelShowPrice, () => setLabelShowPrice(v => !v), 'fas fa-tag', t('showPrice'))}
                   {modeToggle(labelShowCompany, () => setLabelShowCompany(v => !v), 'fas fa-building', t('showCompany'))}
