@@ -2434,7 +2434,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-    const headers = ['Name', 'Products', 'Stock', 'TotalValue'];
+    const headers = ['ID', 'Name', 'Products', 'Stock', 'TotalValue'];
 
 
 
@@ -2470,7 +2470,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-      return ['"' + String(c).replace(/"/g, '""') + '"', catProducts.length, catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0), catProducts.reduce((s: number, p: any) => s + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0)].join(',');
+      const pid = (categories.find((cx: any) => String(cx.name || '').trim().toLowerCase() === c.trim().toLowerCase()) || {}).id || '';
+      return ['"' + String(pid).replace(/"/g, '""') + '"', '"' + String(c).replace(/"/g, '""') + '"', catProducts.length, catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0), catProducts.reduce((s: number, p: any) => s + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0)].join(',');
 
 
 
@@ -5384,10 +5385,20 @@ body{font-family:Arial,sans-serif;width:210mm}
                     setCategories(updated); setCategoriesParent(updated);
                     api.updateCategory(editingId, { name }).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
                   } else {
-                    const newCat = { id: categoryForm.id || genCategoryId(categories), name };
-                    const updated = [...categories, newCat];
-                    setCategories(updated); setCategoriesParent(updated);
-                    api.addCategory(newCat).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
+                    const startId = categoryForm.id && !categories.some((c: any) => c.id === categoryForm.id) ? categoryForm.id : genCategoryId(categories);
+                    const newCat = { id: startId, name };
+                    setCategories((prev: any[]) => [...prev, newCat]);
+                    setCategoriesParent((prev: any[]) => [...prev, newCat]);
+                    api.addCategory(newCat).then((res: any) => {
+                      if (res && res.id && res.id !== newCat.id) {
+                        setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
+                        setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
+                      }
+                    }).catch((e: any) => {
+                      setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
+                      setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
+                      alert(`${t('failed')}: ${e?.message || e}`);
+                    });
                   }
                   if (oldName && norm(oldName) !== norm(name)) {
                     const toRename = products.filter((p: any) => norm(p.cat) === norm(oldName));
@@ -5398,15 +5409,20 @@ body{font-family:Arial,sans-serif;width:210mm}
                     }
                   }
                 } else {
-                  const newCat = { id: categoryForm.id || genCategoryId(categories), name };
-                  const updated = [...categories, newCat];
-                  setCategories(updated); setCategoriesParent(updated);
+                  const startId = categoryForm.id && !categories.some((c: any) => c.id === categoryForm.id) ? categoryForm.id : genCategoryId(categories);
+                  const newCat = { id: startId, name };
+                  setCategories((prev: any[]) => [...prev, newCat]);
+                  setCategoriesParent((prev: any[]) => [...prev, newCat]);
                   api.addCategory(newCat).then((res: any) => {
                     if (res && res.id && res.id !== newCat.id) {
-                      const fixed = updated.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c);
-                      setCategories(fixed); setCategoriesParent(fixed);
+                      setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
+                      setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
                     }
-                  }).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
+                  }).catch((e: any) => {
+                    setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
+                    setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
+                    alert(`${t('failed')}: ${e?.message || e}`);
+                  });
                 }
                 setShowCategoryModal(false);
               }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
@@ -8607,8 +8623,7 @@ tr:nth-child(even){background:#F8FAFC}
                     out.push(cur);
                     return out;
                   };
-                  const headers = parseLine(lines2[0]).map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); let imported = 0;
-                  for (let k = 1; k < lines2.length; k++) { const cols = parseLine(lines2[k]).map((c: string) => c.trim()); const name = (nameIdx >= 0 ? cols[nameIdx] : '').trim(); if (!name) continue; const exists = categories.find((ca: any) => String(ca.name || '').trim().toLowerCase() === name.toLowerCase()); if (!exists) { const newCat = { id: genCategoryId(categories), name }; setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); api.addCategory(newCat).catch(() => {}); imported++; } } alert(`${imported} ${t('categories')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
+                  const headers = parseLine(lines2[0]).map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); let imported = 0; let failed = 0; const localCats: any[] = [...categories]; const jobs: Promise<void>[] = []; for (let k = 1; k < lines2.length; k++) { const cols = parseLine(lines2[k]).map((c: string) => c.trim()); const name = (nameIdx >= 0 ? cols[nameIdx] : '').trim(); if (!name) continue; const exists = localCats.find((ca: any) => String(ca.name || '').trim().toLowerCase() === name.toLowerCase()); if (exists) continue; const newCat = { id: genCategoryId(localCats), name }; localCats.push(newCat); setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); imported++; jobs.push(api.addCategory(newCat).then((res: any) => { if (res && res.id && res.id !== newCat.id) { setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c)); setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c)); } }).catch(() => { failed++; setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id)); setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id)); })); } Promise.all(jobs).finally(() => alert(`${imported} ${t('categories')} imported!${failed ? ` (${failed} ${t('failed')})` : ''}`)); }; reader.readAsText(file); e.target.value = ''; }} />
 
 
 
