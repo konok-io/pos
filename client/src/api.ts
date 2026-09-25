@@ -30,12 +30,15 @@ const posI18nDict: Record<string, Record<string, string>> = {
     sessionExpired: 'लॉगिन सत्र समाप्त — कृपया फिर से लॉगिन करें',
   },
 };
+let apiLang = 'en';
+try { apiLang = (navigator.language || 'en').slice(0, 2) || 'en'; } catch {}
+
+export function setApiLang(lang: string) {
+  if (lang) apiLang = lang;
+}
+
 function posApiT(key: string, vars?: Record<string, string | number>): string {
-  let lang = 'en';
-  try {
-    lang = localStorage.getItem('pos_lang') || localStorage.getItem('language') || navigator.language.slice(0, 2) || 'en';
-  } catch {}
-  const dict = posI18nDict[lang] || posI18nDict.en;
+  const dict = posI18nDict[apiLang] || posI18nDict.en;
   let s = dict[key] || posI18nDict.en[key] || key;
   if (vars) Object.keys(vars).forEach(k => { s = s.replace('{' + k + '}', String(vars[k])); });
   return s;
@@ -67,6 +70,11 @@ const mapSupplier = (s: any) => ({ ...s, code: s.code || '', phone: s.phone || '
 
 const mapProduct = (p: any) => {
   return { ...p, costPrice: parseFloat(p.cost_price) || 0, sellPrice: parseFloat(p.sell_price) || 0, minStock: parseInt(p.min_stock) || 5, categoryId: p.category_id || '', expiryDate: p.expiry_date || '', purchaseId: p.purchase_id || '', supplierId: p.supplier_id || '', foc: p.foc === 1 || p.foc === true || p.foc === '1', freeQty: parseInt(p.free_qty) || 0 };
+}
+
+const mapUser = (u: any) => {
+  const active = u.isActive === true || u.isActive === 1 || u.is_active === 1 || u.is_active === true;
+  return { ...u, isActive: active, createdAt: u.createdAt || u.created_at || '' };
 }
 
 function emitApiError(msg: string) {
@@ -115,6 +123,17 @@ export const api = {
     request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
 
   logout: () => request('/auth/logout', { method: 'POST' }),
+
+  // Session / users (stored in the database, never in the browser)
+  me: () => request('/auth/me'),
+  getUsers: () => request('/users').then((d: any) => Array.isArray(d) ? d.map(mapUser) : d),
+  addUser: (u: any) => request('/users', { method: 'POST', body: JSON.stringify(u) }),
+  updateUser: (id: string, u: any) => request(`/users/${id}`, { method: 'PUT', body: JSON.stringify(u) }),
+  deleteUser: (id: string) => request(`/users/${id}`, { method: 'DELETE' }),
+
+  // Customer transactions (due / deposit) - stored in the database
+  getTransactions: () => request('/transactions'),
+  addTransaction: (tx: any) => request('/transactions', { method: 'POST', body: JSON.stringify(tx) }),
 
   // Products
   getProducts: () => request('/products').then((d: any) => Array.isArray(d) ? d.map(mapProduct) : d),

@@ -4,9 +4,6 @@ import './index.css';
 import App from './App.jsx';
 import { LanguageProvider } from './i18n';
 import { initFontDetection } from './utils/fontDetect';
-import { initDatabase } from './services/localDb';
-import { initializeLocalData } from './services/offlineApi';
-import { useAuthStore } from './store/authStore';
 
 // Simple error boundary component
 interface ErrorBoundaryProps {
@@ -83,29 +80,19 @@ function dismissBootPreloader() {
 // App wrapper that handles initialization
 function AppWrapper() {
   const [isReady, setIsReady] = useState(false);
-  const checkAuth = useAuthStore(state => state.checkAuth);
 
   useEffect(() => {
     async function initialize() {
       try {
-        // Initialize IndexedDB
-        await initDatabase();
-        
-        // Add demo data if empty
-        await initializeLocalData();
-        
-        // Check for existing auth
-        await checkAuth();
-        
         setIsReady(true);
       } catch (error) {
         console.error('Initialization error:', error);
         setIsReady(true); // Still show app even if initialization fails
       }
     }
-    
+
     initialize();
-  }, [checkAuth]);
+  }, []);
 
   // Finance-style: hide HTML boot loader only when app is ready
   useEffect(() => {

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { en } from './en';
-import { db } from '../utils/db';
+import { api, setApiLang } from '../api';
 
 // Types
 export type Language = 'en' | 'bn' | 'ar' | 'hi';
@@ -55,20 +55,23 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   });
   const [isDbReady, setIsDbReady] = useState(false);
 
-  // Initialize from IndexedDB
+  // Initialize language + custom translations from the database
   useEffect(() => {
     const initLanguage = async () => {
       try {
-        // Get saved language
-        const savedLang = await db.get<Language>('settings', 'language');
-        if (savedLang) {
+        const s: any = await api.getSettings();
+        const savedLang = (s && s.language) as Language | undefined;
+        if (savedLang && defaultTranslations[savedLang]) {
           setLanguageState(savedLang);
+          setApiLang(savedLang);
+        } else {
+          setApiLang(navigator.language.slice(0, 2) || 'en');
         }
 
-        // Get custom translations
-        const savedTranslations = await db.get<Record<Language, Record<string, string>>>('translations', 'custom');
-        if (savedTranslations) {
-          setCustomTranslations(savedTranslations);
+        let savedTranslations: any = null;
+        try { savedTranslations = s && s.translations ? JSON.parse(String(s.translations)) : null; } catch {}
+        if (savedTranslations && typeof savedTranslations === 'object') {
+          setCustomTranslations({ en: {}, bn: {}, ar: {}, hi: {}, ...savedTranslations });
         }
       } catch (error) {
         console.error('Failed to load language settings:', error);
@@ -80,21 +83,37 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     initLanguage();
   }, []);
 
-  // Save custom translations to IndexedDB
+  // Re-read language + translations whenever a session starts
+  useEffect(() => {
+    const reload = async () => {
+      try {
+        const s: any = await api.getSettings();
+        const savedLang = (s && s.language) as Language | undefined;
+        if (savedLang && defaultTranslations[savedLang]) {
+          setLanguageState(savedLang);
+          setApiLang(savedLang);
+        }
+      } catch {}
+    };
+    window.addEventListener('pos:session', reload);
+    return () => window.removeEventListener('pos:session', reload);
+  }, []);
+
+  // Save custom translations to the database
   const saveCustomTranslationsToDb = async (translations: Record<Language, Record<string, string>>) => {
     try {
-      await db.put('translations', 'custom', translations);
+      await api.updateSettings({ translations: JSON.stringify(translations) });
     } catch (error) {
       console.error('Failed to save translations:', error);
     }
   };
 
-  // Sync translations
+  // Sync translations (they are already read from the database on mount)
   const syncTranslations = async () => {
-    // No-op since using IndexedDB
+    // no-op
   };
 
-  // Save a custom translation to IndexedDB
+  // Save a custom translation to the database
   const saveTranslation = async (lang: Language, key: string, value: string) => {
     const newTranslations = {
       ...customTranslations,
@@ -109,8 +128,9 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const setLanguage = async (lang: Language) => {
     setLanguageState(lang);
+    setApiLang(lang);
     try {
-      await db.put('settings', 'language', lang);
+      await api.updateSettings({ language: lang });
     } catch (error) {
       console.error('Failed to save language:', error);
     }

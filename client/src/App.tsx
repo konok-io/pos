@@ -4,8 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import './index.css';
 import { useLanguage, languages, defaultTranslations, Language } from './i18n';
 import { QR } from './qrCode';
-import { db } from './utils/db';
-import { localDb, initDatabase } from './services';
+// All application data lives in the database behind the API - no browser storage
 
 // Design Tokens
 const T = {
@@ -83,24 +82,14 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
     confirmPassword: ''
   });
 
-  // Load users from localStorage on mount
+  // Load users from the database on mount
   useEffect(() => {
-    const savedUsers = localStorage.getItem('pos_users');
-    if (savedUsers) {
-      try {
-        const parsedUsers = JSON.parse(savedUsers);
-        if (parsedUsers.length > 0) {
-          setUsers(parsedUsers);
-        }
-      } catch (e) {
-          }
-    }
+    api.getUsers().then((list: any) => {
+      if (Array.isArray(list) && list.length > 0) setUsers(list);
+    }).catch(() => {});
   }, []);
 
-  // Save users to localStorage when changed
-  useEffect(() => {
-    localStorage.setItem('pos_users', JSON.stringify(users));
-  }, [users]);
+  // Users are persisted through the API when they are created, updated or deleted
 
   const filteredUsers = users.filter(user =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -127,12 +116,14 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
 
   const handleDeleteUser = (user: User) => {
     if (window.confirm(t('confirmDeleteUser'))) {
-      setUsers(prev => prev.filter(u => u.id !== user.id));
-      alert(t('userDeleted'));
+      api.deleteUser(user.id).then(() => {
+        setUsers(prev => prev.filter(u => u.id !== user.id));
+        alert(t('userDeleted'));
+      }).catch((err: any) => alert(err?.message || t('error')));
     }
   };
 
-  const handleSaveUser = () => {
+  const handleSaveUser = async () => {
     if (!form.name.trim()) {
       alert(t('userNameRequired'));
       return;
@@ -150,36 +141,53 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
       return;
     }
 
-    if (editingUser) {
-      // Update existing user
-      setUsers(prev => prev.map(u => 
-        u.id === editingUser.id 
-          ? { 
-              ...u, 
-              name: form.name, 
-              email: form.email, 
-              role: form.role, 
-              isActive: form.isActive,
-              ...(form.password ? { password: form.password } : {})
-            }
-          : u
-      ));
-      alert(t('userUpdated'));
-    } else {
-      // Add new user
-      const newUser: User = {
-        id: genId(),
-        name: form.name,
-        email: form.email,
-        password: form.password,
-        role: form.role,
-        isActive: form.isActive,
-        createdAt: new Date().toISOString()
-      };
-      setUsers(prev => [...prev, newUser]);
-      alert(t('userAdded'));
+    try {
+      if (editingUser) {
+        const payload: any = {
+          name: form.name,
+          email: form.email,
+          role: form.role,
+          isActive: form.isActive,
+        };
+        if (form.password) payload.password = form.password;
+        await api.updateUser(editingUser.id, payload);
+        setUsers(prev => prev.map(u =>
+          u.id === editingUser.id
+            ? {
+                ...u,
+                name: form.name,
+                email: form.email,
+                role: form.role,
+                isActive: form.isActive,
+                ...(form.password ? { password: form.password } : {})
+              }
+            : u
+        ));
+        alert(t('userUpdated'));
+      } else {
+        const created: any = await api.addUser({
+          name: form.name,
+          email: form.email,
+          password: form.password,
+          role: form.role,
+          isActive: form.isActive,
+        });
+        const newUser: User = (created && created.id) ? created : {
+          id: genId(),
+          name: form.name,
+          email: form.email,
+          password: form.password,
+          role: form.role,
+          isActive: form.isActive,
+          createdAt: new Date().toISOString()
+        };
+        setUsers(prev => [...prev, newUser]);
+        alert(t('userAdded'));
+      }
+      setShowModal(false);
+    } catch (err: any) {
+      alert(err?.message || t('error'));
     }
-    setShowModal(false);
   };
 
   const handleChangePassword = (user: User) => {
@@ -188,26 +196,31 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
     setShowPasswordModal(true);
   };
 
-  const handleSavePassword = () => {
+  const handleSavePassword = async () => {
     if (!selectedUser) return;
-    
+
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       alert(t('passwordMismatch'));
       return;
     }
-    
+
     if (passwordForm.newPassword.length < 6) {
       alert(t('passwordMinLength'));
       return;
     }
 
-    setUsers(prev => prev.map(u => 
-      u.id === selectedUser.id 
-        ? { ...u, password: passwordForm.newPassword }
-        : u
-    ));
-    alert(t('passwordChanged'));
-    setShowPasswordModal(false);
+    try {
+      await api.updateUser(selectedUser.id, { password: passwordForm.newPassword });
+      setUsers(prev => prev.map(u =>
+        u.id === selectedUser.id
+          ? { ...u, password: passwordForm.newPassword }
+          : u
+      ));
+      alert(t('passwordChanged'));
+      setShowPasswordModal(false);
+    } catch (err: any) {
+      alert(err?.message || t('error'));
+    }
   };
 
   const getRoleBadge = (role: string) => {
@@ -780,7 +793,7 @@ function LoginScreen({ onLogin }: { onLogin: (user?: any) => void }) {
       const res: any = await api.login(email, password);
       if (res && res.token) {
         setToken(res.token);
-        localStorage.setItem('pos_current_user', JSON.stringify(res.user));
+        // Session profile is restored from api.me() on boot
         onLogin(res.user);
       } else {
         setError(t('invalidCredentials'));
@@ -1036,11 +1049,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false); // Prevent save before initial load
   const [tabLoading, setTabLoading] = useState(false); // Show skeleton on every tab click
-  const [currentTab, setCurrentTab] = useState(() => {
-    // Load saved tab from localStorage
-    const savedTab = localStorage.getItem('pos_current_tab');
-    return savedTab || 'pos';
-  });
+  const [currentTab, setCurrentTab] = useState<string>('pos');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Listen for fullscreen changes
@@ -1052,11 +1061,10 @@ export default function App() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // Save current tab to localStorage when it changes
+  // Persist the last active tab in the database settings
   useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('pos_current_tab', currentTab);
-    }
+    if (!isInitialized) return;
+    api.updateSettings({ pos_current_tab: currentTab }).catch(() => {});
   }, [currentTab, isInitialized]);
 
   // Finance-style: show data-loading skeleton on every tab switch
@@ -1114,10 +1122,8 @@ export default function App() {
     return 'fa-box';
   };
 
-  // Product images from internet
-  const [productImages, setProductImages] = useState<Record<string, string>>(() => {
-    try { return JSON.parse(localStorage.getItem('pos_product_images') || '{}'); } catch { return {}; }
-  });
+  // Product images from internet (derived in memory - never persisted)
+  const [productImages, setProductImages] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const cache = { ...productImages };
@@ -1130,10 +1136,7 @@ export default function App() {
       cache[name] = `https://source.unsplash.com/featured/200x200/?${query}`;
       changed = true;
     });
-    if (changed) {
-      setProductImages(cache);
-      try { localStorage.setItem('pos_product_images', JSON.stringify(cache)); } catch {}
-    }
+    if (changed) setProductImages(cache);
   }, [products]);
 
   // Tabs configuration
@@ -1206,17 +1209,14 @@ export default function App() {
   useEffect(() => {
     const initApp = async () => {
       try {
-      // Check if user was logged in
-      const isLoggedInSetting = await db.get<boolean>('settings', 'isLoggedIn');
+      // Session is the API token; restore the user profile from the database
       const hasToken = !!localStorage.getItem('pos_api_token');
-      if (isLoggedInSetting && hasToken) {
+      if (hasToken) {
         setIsLoggedIn(true);
-        try { const cu = JSON.parse(localStorage.getItem('pos_current_user') || ''); if (cu) _setCurrentUser(cu); } catch {}
-      } else if (isLoggedInSetting && !hasToken) {
-        await db.delete('settings', 'isLoggedIn');
+        try { const me: any = await api.me(); if (me && me.id) _setCurrentUser(me); } catch {}
       }
-      
-      // Load settings from API first, fallback to localDb
+
+      // Load settings from the database
       let apiSettings: any = null;
       try {
         apiSettings = await api.getSettings();
@@ -1227,7 +1227,12 @@ export default function App() {
         if (apiSettings && apiSettings[key] !== undefined && apiSettings[key] !== null) {
           return String(apiSettings[key]);
         }
-        return (await localDb.getSetting<string>(key)) ?? null;
+        return null;
+      };
+      const getJsonSetting = async (key: string): Promise<any> => {
+        const raw = await getSetting(key);
+        if (!raw) return null;
+        try { return JSON.parse(raw); } catch { return null; }
       };
 
       const savedVat = await getSetting('vatPercent');
@@ -1252,29 +1257,33 @@ export default function App() {
       if (savedCurrencySymbol) {
         _setSettings((prev: any) => ({ ...prev, currencySymbol: savedCurrencySymbol }));
 
-      // Load company info for receipt
-      const savedName = await getSetting('name');
-      if (savedName) _setSettings((prev: any) => ({ ...prev, name: savedName }));
-      const savedPhone = await getSetting('phone');
-      if (savedPhone) _setSettings((prev: any) => ({ ...prev, phone: savedPhone }));
-      const savedAddress = await getSetting('address');
-      if (savedAddress) _setSettings((prev: any) => ({ ...prev, address: savedAddress }));
-      const savedEmail = await getSetting('email');
-      if (savedEmail) _setSettings((prev: any) => ({ ...prev, email: savedEmail }));
-      const savedTaxId = await getSetting('taxId');
-      if (savedTaxId) _setSettings((prev: any) => ({ ...prev, taxId: savedTaxId }));
-      const savedCrNumber = await getSetting('crNumber');
-      if (savedCrNumber) _setSettings((prev: any) => ({ ...prev, crNumber: savedCrNumber }));
-      const savedZatka = await getSetting('zatkaEnabled');
-      if (savedZatka !== null) _setSettings((prev: any) => ({ ...prev, zatkaEnabled: isTruthy(savedZatka) }));
-      const savedZatcaPhase = await getSetting('zatcaPhase');
-      if (savedZatcaPhase) _setSettings((prev: any) => ({ ...prev, zatcaPhase: savedZatcaPhase }));
-      const savedReceiptFooter = await getSetting('receiptFooter');
-      if (savedReceiptFooter) _setSettings((prev: any) => ({ ...prev, receiptFooter: savedReceiptFooter }));
+        // Load company info for receipt
+        const savedName = await getSetting('name');
+        if (savedName) _setSettings((prev: any) => ({ ...prev, name: savedName }));
+        const savedPhone = await getSetting('phone');
+        if (savedPhone) _setSettings((prev: any) => ({ ...prev, phone: savedPhone }));
+        const savedAddress = await getSetting('address');
+        if (savedAddress) _setSettings((prev: any) => ({ ...prev, address: savedAddress }));
+        const savedEmail = await getSetting('email');
+        if (savedEmail) _setSettings((prev: any) => ({ ...prev, email: savedEmail }));
+        const savedTaxId = await getSetting('taxId');
+        if (savedTaxId) _setSettings((prev: any) => ({ ...prev, taxId: savedTaxId }));
+        const savedCrNumber = await getSetting('crNumber');
+        if (savedCrNumber) _setSettings((prev: any) => ({ ...prev, crNumber: savedCrNumber }));
+        const savedZatka = await getSetting('zatkaEnabled');
+        if (savedZatka !== null) _setSettings((prev: any) => ({ ...prev, zatkaEnabled: isTruthy(savedZatka) }));
+        const savedZatcaPhase = await getSetting('zatcaPhase');
+        if (savedZatcaPhase) _setSettings((prev: any) => ({ ...prev, zatcaPhase: savedZatcaPhase }));
+        const savedReceiptFooter = await getSetting('receiptFooter');
+        if (savedReceiptFooter) _setSettings((prev: any) => ({ ...prev, receiptFooter: savedReceiptFooter }));
       }
-      
-      // Load cart state from IndexedDB
-      const savedCart = await db.get<any>('cart', 'cartData');
+
+      // Restore the last active tab from settings
+      const savedTab = await getSetting('pos_current_tab');
+      if (savedTab) setCurrentTab(savedTab);
+
+      // Restore cart state from settings
+      const savedCart = await getJsonSetting('pos_cart');
       if (savedCart) {
         try {
           if (savedCart.cart) setCart(savedCart.cart);
@@ -1284,100 +1293,49 @@ export default function App() {
           if (savedCart.vatPercent !== undefined) setVatPercent(String(savedCart.vatPercent));
           if (savedCart.paidAmount !== undefined) setPaidAmount(savedCart.paidAmount);
           if (savedCart.paymentMethod) setPaymentMethod(savedCart.paymentMethod);
-        } catch (e) {
-              }
+        } catch (e) {}
       }
-      
-      // Load held sales from IndexedDB
-      const savedHeldSales = await db.get<any>('heldSales', 'heldSales');
-      if (savedHeldSales) {
+
+      // Restore held sales from settings
+      const savedHeldSales = await getJsonSetting('pos_held_sales');
+      if (Array.isArray(savedHeldSales)) {
         try {
-          // Parse items if stored as JSON string
-          const parsed = Array.isArray(savedHeldSales) ? savedHeldSales.map((s: any) => ({
+          setHeldSales(savedHeldSales.map((s: any) => ({
             ...s,
             items: typeof s.items === 'string' ? JSON.parse(s.items) : s.items || [],
-          })) : [];
-          setHeldSales(parsed);
-        } catch (e) {
-              }
+          })));
+        } catch (e) {}
       }
-      
-      // Load all data from MySQL API first; fall back to IndexedDB only when API fails
-      const apiEmptyStores = new Set<string>();
-      const loadOrFallback = async <T,>(loader: () => Promise<T[] | any>, store: string): Promise<T[]> => {
-        try {
-          const data = await loader();
-          const arr = (Array.isArray(data) ? data : []) as T[];
-          if (arr.length > 0) return arr;
-          apiEmptyStores.add(store);
-          const local = await db.getAll<any>(store).catch(() => []);
-          return ((local && local.length > 0) ? local : arr) as T[];
-        } catch (e) {
-          console.error(`API failed for ${store}, loading IndexedDB fallback:`, e);
-          const local = await db.getAll<any>(store).catch(() => []);
-          return (local || []) as T[];
-        }
-      };
 
-      const [apiProducts, apiCategories, apiSuppliers, apiCustomers, apiSales, apiPurchases, apiStockHistory] = await Promise.all([
-        loadOrFallback<Product>(() => api.getProducts(), 'products'),
-        loadOrFallback<Category>(() => api.getCategories(), 'categories'),
-        loadOrFallback<any>(() => api.getSuppliers(), 'suppliers'),
-        loadOrFallback<Customer>(() => api.getCustomers(), 'customers'),
-        loadOrFallback<Sale>(() => api.getSales(), 'sales'),
-        loadOrFallback<any>(() => api.getPurchases(), 'purchases'),
-        loadOrFallback<any>(() => api.getStockHistory(), 'stock_history'),
+      // Load everything from the database
+      const [apiProducts, apiCategories, apiSuppliers, apiCustomers, apiSales, apiPurchases, apiStockHistory, apiTransactions] = await Promise.all([
+        api.getProducts().catch(() => []),
+        api.getCategories().catch(() => []),
+        api.getSuppliers().catch(() => []),
+        api.getCustomers().catch(() => []),
+        api.getSales().catch(() => []),
+        api.getPurchases().catch(() => []),
+        api.getStockHistory().catch(() => []),
+        api.getTransactions().catch(() => []),
       ]);
 
-      // Local -> API migration: if API empty but browser IndexedDB has data, push it up
-      const migrateLocal = async (apiData: any[], store: string, push: (x: any) => Promise<any>, setState?: (v: any[]) => void, skip?: (x: any) => boolean): Promise<any[]> => {
-        const apiReallyHadData = !apiEmptyStores.has(store);
-        if (apiReallyHadData && apiData && apiData.length > 0) return apiData;
-        try {
-          const local = await db.getAll<any>(store).catch(() => []);
-          const items = (local || []).filter((x: any) => x && x.id && !(skip && skip(x)));
-          if (items.length === 0) return apiData || [];
-          if (!apiReallyHadData) {
-            for (const item of items) { await push(item).catch(() => {}); }
-          }
-          if (setState) setState(items);
-          return items;
-        } catch { return apiData || []; }
-      };
+      if (Array.isArray(apiProducts) && apiProducts.length > 0) setProducts(apiProducts as any);
+      if (Array.isArray(apiCategories) && apiCategories.length > 0) setCategories(apiCategories as any);
+      if (Array.isArray(apiSuppliers) && apiSuppliers.length > 0) setSuppliers(apiSuppliers as any);
+      if (Array.isArray(apiSales) && apiSales.length > 0) setSales(apiSales as any);
+      if (Array.isArray(apiPurchases) && apiPurchases.length > 0) setPurchases(apiPurchases as any);
+      if (Array.isArray(apiStockHistory) && apiStockHistory.length > 0) _setProductHistory(apiStockHistory as any);
 
-      await migrateLocal(apiProducts, 'products', (x) => { const id = String(x?.id || ''); const payload = (!id || id.startsWith('auto-')) ? { ...x, id: undefined } : x; return api.addProduct(payload); }, (v) => setProducts(v as any));
-      if (apiProducts.length > 0) setProducts(apiProducts);
-      await migrateLocal(apiCategories, 'categories', (x) => api.addCategory(x), (v) => setCategories(v as any));
-      if (apiCategories.length > 0) setCategories(apiCategories);
-      await migrateLocal(apiSuppliers, 'suppliers', (x) => { const id = String(x?.id || ''); const payload = (/^\d{8}\d{4}$/.test(id) || (id && !id.startsWith('auto-'))) ? x : { ...x, id: undefined }; return api.addSupplier(payload); }, (v) => setSuppliers(v as any));
-      if (apiSuppliers.length > 0) setSuppliers(apiSuppliers);
-      if (apiSales.length > 0) setSales(apiSales);
-      else {
-        const localSales = await db.getAll<any>('sales').catch(() => []);
-        if (localSales.length > 0) { for (const sale of localSales) await api.addSale(sale).catch(() => {}); setSales(localSales); }
-      }
-      if (apiPurchases && apiPurchases.length > 0) setPurchases(apiPurchases);
-      else {
-        const localPur = await db.getAll<any>('purchases').catch(() => []);
-        if (localPur.length > 0) { for (const pur of localPur) await api.addPurchase(pur).catch(() => {}); setPurchases(localPur); }
-      }
-      if (apiStockHistory && apiStockHistory.length > 0) _setProductHistory(apiStockHistory);
-      else {
-        const localSh = await db.getAll<any>('stock_history').catch(() => []);
-        if (localSh.length > 0) { for (const h of localSh) await api.addStockHistory(h).catch(() => {}); _setProductHistory(localSh); }
-      }
-
-      if (apiCustomers.length > 0) {
-        const savedTransactions = await db.getAll<any>('transactions').catch(() => []);
+      const transactions: any[] = Array.isArray(apiTransactions) ? apiTransactions : [];
+      if (Array.isArray(apiCustomers) && apiCustomers.length > 0) {
         const customersWithTransactions = apiCustomers.map((customer: any) => {
-          const customerTransactions = savedTransactions.filter((tx: any) => tx.customerId === customer.id);
+          const customerTransactions = transactions.filter((tx: any) => tx.customerId === customer.id);
           return { ...customer, transactions: customerTransactions.length > 0 ? customerTransactions : (customer.transactions || []) };
         });
         setCustomers(customersWithTransactions);
       }
 
       // Ensure General Customer exists
-      // Always ensure general customer after load
       const genCust: Customer = {
         id: generateGeneralCustomerId(),
         name: 'General Customer',
@@ -1387,10 +1345,10 @@ export default function App() {
         if (prev.some((c: any) => c.isSystem)) return prev;
         return [genCust, ...prev];
       });
-      
+
       // Ensure General Customer exists in DB
       api.addCustomer(genCust).catch(() => {});
-      
+
       setIsInitialized(true); // Mark as initialized before enabling saves
       } catch (e) {
         console.error('initApp failed:', e);
@@ -1402,58 +1360,26 @@ export default function App() {
     initApp();
   }, []);
 
-  // Sync all local data to server
+  // Re-read everything from the database (all data already lives server-side)
   const syncAllData = async () => {
     setDataSyncStatus('pending');
     try {
-      const localCustomers = await db.getAll<any>('customers');
-      if (localCustomers && localCustomers.length > 0) {
-        for (const customer of localCustomers) {
-          if (!customer.id.startsWith('CUST')) {
-            await api.addCustomer(customer).catch(() => {});
-          }
-        }
-      }
-      const localProducts = await db.getAll<any>('products');
-      if (localProducts && localProducts.length > 0) {
-        for (const product of localProducts) {
-          if (!product.id.startsWith('auto-')) {
-            await api.addProduct(product).catch(() => {});
-          }
-        }
-      }
-      const localSales = await db.getAll<any>('sales');
-      if (localSales && localSales.length > 0) {
-        for (const sale of localSales) {
-          await api.addSale(sale).catch(() => {});
-        }
-      }
-      const localSuppliers = await db.getAll<any>('suppliers');
-      if (localSuppliers && localSuppliers.length > 0) {
-        for (const sup of localSuppliers) {
-          if (!String(sup.id || '').startsWith('auto-')) {
-            await api.addSupplier(sup).catch(() => {});
-          }
-        }
-      }
-      const localCategories = await db.getAll<any>('categories');
-      if (localCategories && localCategories.length > 0) {
-        for (const cat of localCategories) {
-          await api.addCategory(cat).catch(() => {});
-        }
-      }
-      const localPurchases = await db.getAll<any>('purchases');
-      if (localPurchases && localPurchases.length > 0) {
-        for (const pur of localPurchases) {
-          await api.addPurchase(pur).catch(() => {});
-        }
-      }
-      const localStock = await db.getAll<any>('stock_history');
-      if (localStock && localStock.length > 0) {
-        for (const h of localStock) {
-          await api.addStockHistory(h).catch(() => {});
-        }
-      }
+      const [p, cat, sup, cust, sal, pur, sh] = await Promise.all([
+        api.getProducts().catch(() => []),
+        api.getCategories().catch(() => []),
+        api.getSuppliers().catch(() => []),
+        api.getCustomers().catch(() => []),
+        api.getSales().catch(() => []),
+        api.getPurchases().catch(() => []),
+        api.getStockHistory().catch(() => []),
+      ]);
+      if (Array.isArray(p)) setProducts(p as any);
+      if (Array.isArray(cat)) setCategories(cat as any);
+      if (Array.isArray(sup)) setSuppliers(sup as any);
+      if (Array.isArray(cust) && cust.length > 0) setCustomers(cust as any);
+      if (Array.isArray(sal)) setSales(sal as any);
+      if (Array.isArray(pur)) setPurchases(pur as any);
+      if (Array.isArray(sh)) _setProductHistory(sh as any);
       setDataSyncStatus('synced');
       setDataLastSyncTime(new Date().toLocaleString());
       console.log('Auto-sync completed');
@@ -1480,139 +1406,38 @@ export default function App() {
     };
   }, []);
 
-  // Save cart state to IndexedDB whenever it changes (only after initial load)
+  // Persist cart state in the database whenever it changes (only after initial load)
   useEffect(() => {
     if (!isInitialized) return;
-    const saveCartData = async () => {
-      const cartData = {
-        cart,
-        selectedCustomer,
-        customerSearch,
-        discount,
-        vatPercent,
-        paidAmount,
-        paymentMethod,
-      };
-      await db.put('cart', 'cartData', cartData);
-    };
-    saveCartData();
+    const timer = window.setTimeout(() => {
+      api.updateSettings({
+        pos_cart: JSON.stringify({ cart, selectedCustomer, customerSearch, discount, vatPercent, paidAmount, paymentMethod }),
+      }).catch(() => {});
+    }, 400);
+    return () => window.clearTimeout(timer);
   }, [isInitialized, cart, selectedCustomer, customerSearch, discount, vatPercent, paidAmount, paymentMethod]);
 
-  // Save held sales to IndexedDB whenever it changes (only after initial load)
+  // Persist held sales in the database whenever it changes (only after initial load)
   useEffect(() => {
     if (!isInitialized) return;
-    const saveHeldSales = async () => {
-      await db.put('heldSales', 'heldSales', heldSales);
-    };
-    saveHeldSales();
+    const timer = window.setTimeout(() => {
+      api.updateSettings({ pos_held_sales: JSON.stringify(heldSales) }).catch(() => {});
+    }, 400);
+    return () => window.clearTimeout(timer);
   }, [isInitialized, heldSales]);
 
-  // Save products to IndexedDB whenever it changes (only after initial load)
-  useEffect(() => {
-    if (!isInitialized) return;
-    const saveProducts = async () => {
-      const existing = await db.getAll('products');
-      const existingIds = new Set(existing.map((p: any) => p.id));
-      const currentIds = new Set(products.filter((p: any) => p?.id).map((p: any) => p.id));
-      for (const id of existingIds) {
-        if (!currentIds.has(id)) await db.delete('products', id);
-      }
-      for (const product of products) {
-        if (product?.id) await db.put('products', product.id, product);
-      }
-    };
-    saveProducts();
-  }, [isInitialized, products]);
+  // Products, suppliers, purchases, categories, customers and sales are written
+  // straight to the database by their own API calls - no local mirror is kept.
 
-  // Save suppliers to IndexedDB whenever it changes (only after initial load)
-  useEffect(() => {
-    if (!isInitialized) return;
-    const saveSuppliers = async () => {
-      const existing = await db.getAll('suppliers').catch(() => []);
-      const existingIds = new Set((existing || []).map((s: any) => s.id));
-      const currentIds = new Set(suppliers.filter((s: any) => s?.id).map((s: any) => s.id));
-      for (const id of existingIds) {
-        if (!currentIds.has(id)) await db.delete('suppliers', id).catch(() => {});
-      }
-      for (const supplier of suppliers) {
-        if (supplier?.id) await db.put('suppliers', supplier.id, supplier).catch(() => {});
-      }
-    };
-    saveSuppliers();
-  }, [isInitialized, suppliers]);
-
-  // Save purchases to IndexedDB whenever it changes (only after initial load)
-  useEffect(() => {
-    if (!isInitialized) return;
-    const savePurchases = async () => {
-      const existing = await db.getAll('purchases').catch(() => []);
-      const existingIds = new Set((existing || []).map((p: any) => p.id));
-      const currentIds = new Set(purchases.filter((p: any) => p?.id).map((p: any) => p.id));
-      for (const id of existingIds) {
-        if (!currentIds.has(id)) await db.delete('purchases', id).catch(() => {});
-      }
-      for (const purchase of purchases) {
-        if (purchase?.id) await db.put('purchases', purchase.id, purchase).catch(() => {});
-      }
-    };
-    savePurchases();
-  }, [isInitialized, purchases]);
-
-  // Save categories to IndexedDB whenever it changes (only after initial load)
-  useEffect(() => {
-    if (!isInitialized) return;
-    const saveCategories = async () => {
-      const existing = await db.getAll('categories');
-      const existingIds = new Set(existing.map((c: any) => c.id));
-      const currentIds = new Set(categories.filter((c: any) => c?.id).map((c: any) => c.id));
-      for (const id of existingIds) {
-        if (!currentIds.has(id)) await db.delete('categories', id);
-      }
-      for (const category of categories) {
-        if (category?.id) await db.put('categories', category.id, category);
-      }
-    };
-    saveCategories();
-  }, [isInitialized, categories]);
-
-  // Save customers to IndexedDB whenever it changes (only after initial load)
-  useEffect(() => {
-    if (!isInitialized) return;
-    const saveCustomers = async () => {
-      for (const customer of customers) {
-        if (customer?.id) {
-          await db.put('customers', customer.id, customer);
-        }
-      }
-    };
-    if (customers.length > 0) saveCustomers();
-  }, [isInitialized, customers]);
-
-  // Delete customer from IndexedDB
-  const handleDeleteCustomerFromDB = async (customer: Customer) => {
-    try {
-      await db.delete('customers', customer.id);
-    } catch (err) {
-      }
-  };
-
-  // Save sales to IndexedDB whenever it changes (only after initial load)
-  useEffect(() => {
-    if (!isInitialized) return;
-    const saveSales = async () => {
-      for (const sale of sales) {
-        if (sale?.id) {
-          await db.put('sales', sale.id, sale);
-        }
-      }
-    };
-    if (sales.length > 0) saveSales();
-  }, [isInitialized, sales]);
+  // The customer row is removed by the API; there is nothing left to clean up locally
+  const handleDeleteCustomerFromDB = async (_customer: Customer) => {};
 
   const handleLogin = async (user?: any) => {
-    await db.put('settings', 'isLoggedIn', true);
     if (user) _setCurrentUser(user);
     setIsLoggedIn(true);
+    // Let the language provider know a session just started so it can load
+    // the saved language from the database.
+    try { window.dispatchEvent(new CustomEvent('pos:session')); } catch {}
   };
 
   // ===== 5-minute inactivity auto-logout (client side, server also enforces via DB sessions) =====
@@ -1633,8 +1458,6 @@ export default function App() {
 
   useEffect(() => {
     const onUnauthorized = () => {
-      localStorage.removeItem('pos_current_user');
-      db.delete('settings', 'isLoggedIn').catch(() => {});
       setIsLoggedIn(false);
       _setCurrentUser(DEFAULT_ADMIN);
     };
@@ -1645,8 +1468,6 @@ export default function App() {
   const handleLogout = async () => {
     try { await api.logout(); } catch {}
     clearToken();
-    localStorage.removeItem('pos_current_user');
-    await db.delete('settings', 'isLoggedIn');
     setIsLoggedIn(false);
     _setCurrentUser(DEFAULT_ADMIN);
   };
@@ -4454,17 +4275,24 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const { t } = useLanguage();
   
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState<'companies' | 'categories'>(() => 
-    (localStorage.getItem('pos_suppliers_tab') as 'companies' | 'categories') || 'companies'
-  );
+  const [activeTab, setActiveTab] = useState<'companies' | 'categories'>('companies');
   const [viewSupplier, setViewSupplier] = useState<Supplier | null>(null);
   const [viewCategory, setViewCategory] = useState<SupplierCategory | null>(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState<Supplier | null>(null);
 
-  // Save activeTab to localStorage when it changes
+  const [suppliersTabReady, setSuppliersTabReady] = useState(false);
   useEffect(() => {
-    localStorage.setItem('pos_suppliers_tab', activeTab);
-  }, [activeTab]);
+    api.getSettings().then((s: any) => {
+      const v = s?.pos_suppliers_tab;
+      if (v === 'companies' || v === 'categories') setActiveTab(v);
+    }).catch(() => {}).finally(() => setSuppliersTabReady(true));
+  }, []);
+
+  // Persist the active suppliers tab in the database settings
+  useEffect(() => {
+    if (!suppliersTabReady) return;
+    api.updateSettings({ pos_suppliers_tab: activeTab }).catch(() => {});
+  }, [suppliersTabReady, activeTab]);
   
   // Form states
   const [showSupplierModal, setShowSupplierModal] = useState(false);
@@ -6014,23 +5842,27 @@ function CustomerModal({ isOpen, mode, customer, onClose, onSave }: CustomerModa
 
 export function CustomerManagement({ customers, setCustomers, sales, onDeleteCustomer, settings }: CustomerManagementProps) {
   const { t, isRTL } = useLanguage();
-  const [view, setView] = useState<ViewType>(() => (localStorage.getItem('pos_customer_view') as ViewType) || 'dashboard');
+  const [view, setView] = useState<ViewType>('dashboard');
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
   const [isEditCustomerModalOpen, setIsEditCustomerModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<TabType>(() => (localStorage.getItem('pos_customer_tab') as TabType) || 'all');
-  
-  // Save view to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem('pos_customer_view', view);
-  }, [view]);
+  const [activeTab, setActiveTab] = useState<TabType>('all');
 
-  // Save activeTab to localStorage when it changes
+  const [customerReady, setCustomerReady] = useState(false);
   useEffect(() => {
-    localStorage.setItem('pos_customer_tab', activeTab);
-  }, [activeTab]);
+    api.getSettings().then((s: any) => {
+      if (s?.pos_customer_view) setView(s.pos_customer_view as ViewType);
+      if (s?.pos_customer_tab) setActiveTab(s.pos_customer_tab as TabType);
+    }).catch(() => {}).finally(() => setCustomerReady(true));
+  }, []);
+
+  // Persist customer screen preferences in the database settings
+  useEffect(() => {
+    if (!customerReady) return;
+    api.updateSettings({ pos_customer_view: view, pos_customer_tab: activeTab }).catch(() => {});
+  }, [customerReady, view, activeTab]);
   
   // Add Due/Deposit Modal states
   const [isAddDueModalOpen, setIsAddDueModalOpen] = useState(false);
@@ -6087,8 +5919,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
       // Save to MySQL API
       api.updateCustomer(selectedCustomer.id, { ...selectedCustomer, balance: newBalance, deposit: newDeposit }).catch(() => {});
       
-      // Save transaction to DB
-      await db.put('transactions', newTransaction.id, { ...newTransaction, customerId: selectedCustomer.id });
+      // Save transaction to the database
+      api.addTransaction({ ...newTransaction, customerId: selectedCustomer.id }).catch(() => {});
       
       setCustomers(prev => prev.map(c => 
         c.id === selectedCustomer.id 
@@ -6347,8 +6179,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
       // Save to MySQL API
       api.updateCustomer(selectedCustomer.id, { ...selectedCustomer, balance: newBalance }).catch(() => {});
       
-      // Save transaction to DB
-      await db.put('transactions', newTransaction.id, { ...newTransaction, customerId: selectedCustomer.id });
+      // Save transaction to the database
+      api.addTransaction({ ...newTransaction, customerId: selectedCustomer.id }).catch(() => {});
       
       setCustomers(prev => prev.map(c => 
         c.id === selectedCustomer.id 
@@ -6554,7 +6386,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
     setIsEditCustomerModalOpen(true);
   };
 
-  // Handle delete customer (with IndexedDB cleanup)
+  // Handle delete customer (the API removes the row)
   const handleDeleteCustomer = (customer: Customer) => {
     if (window.confirm(t('confirmDelete'))) {
       api.deleteCustomer(customer.id).catch(() => {});
@@ -7619,8 +7451,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         if (alive && Array.isArray(rows)) { setPriceHistoryCount(rows.length); return; }
       } catch {}
       try {
-        const local = await db.getAll('price_history').catch(() => []);
-        if (alive) setPriceHistoryCount((local || []).length);
+        // Price history count comes from the API only
       } catch {}
     })();
     return () => { alive = false; };
@@ -7648,29 +7479,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       }
     } catch {}
 
-    // Fallback to localDb
-    const keys = Object.keys(form);
-    const loaded: Record<string, any> = {};
-    for (const key of keys) {
-      const value = await localDb.getSetting(key);
-      if (value !== null) {
-        if (value === 'true' || value === '1') loaded[key] = true;
-        else if (value === 'false' || value === '0') loaded[key] = false;
-        else if (!isNaN(Number(value)) && value !== '') loaded[key] = Number(value);
-        else loaded[key] = value;
-      }
-    }
-    if (Object.keys(loaded).length > 0) {
-      setForm(prev => ({ ...prev, ...loaded }));
-    }
   };
 
   const save = async () => {
     try {
-      for (const [key, value] of Object.entries(form)) {
-        await localDb.saveSetting(key, String(value));
-      }
-      // Also save to MySQL API
+      // Save to the database (the API merges individual keys)
       await api.updateSettings(form).catch(() => {});
       // Save ZATCA config to backend if Phase 2
       if (form.zatcaPhase === 'phase2') {
@@ -7725,22 +7538,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       }
     } catch {}
 
-    // Clear all IndexedDB stores
-    try {
-      const storeNames = ['products', 'categories', 'suppliers', 'customers', 'sales', 'purchases', 'transactions', 'stock_history', 'price_history'];
-      for (const sn of storeNames) {
-        try {
-          const all = await db.getAll(sn).catch(() => []);
-          for (const item of all as any[]) {
-            const key = (item as any)?.id;
-            if (key !== undefined && key !== null && key !== '') await db.delete(sn, key).catch(() => {});
-          }
-        } catch {}
-      }
-      for (const sn of ['cart', 'heldSales', 'settings']) {
-        try { await db.clear(sn).catch(() => {}); } catch {}
-      }
-    } catch {}
+    // Nothing local to wipe - all data lives in the database
 
     // Clear React state
     setProducts([]);
@@ -7779,12 +7577,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       else if (storeName === 'sales') await api.deleteAllSales().catch(() => {});
       else if (storeName === 'purchases') await api.deleteAllPurchases().catch(() => {});
       else if (storeName === 'price_history') await api.deleteAllPriceHistory().catch(() => {});
-      try {
-        const validStores = ['products', 'categories', 'suppliers', 'sales', 'purchases', 'price_history'];
-        const sn = validStores.includes(storeName) ? storeName : null;
-        if (sn) { const all = await db.getAll(sn); for (const item of all as any[]) { await db.delete(sn, (item as any).id).catch(() => {}); } }
-      } catch {}
       setItems([]);
+
       alert(translate('dataDeletedSuccessfully'));
       window.location.reload();
     } catch (error) {
@@ -7802,7 +7596,6 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     if (!confirm(translate('warningPermanentDelete'))) return;
     try {
       await api.deleteAllCustomers().catch(() => {});
-      try { const all = await db.getAll('customers'); for (const item of all as any[]) { await db.delete('customers', item.id).catch(() => {}); } } catch {}
       alert(translate('dataDeletedSuccessfully'));
       window.location.reload();
     } catch (error) {
@@ -8945,12 +8738,11 @@ export function DatabaseSettings() {
 
   const loadDbInfo = async () => {
     try {
-      await initDatabase();
-      const products = await localDb.getProducts();
-      const sales = await localDb.getSales();
-      const customers = await localDb.getCustomers();
-      const categories = await localDb.getCategories();
-      setDocCount(products.length + sales.length + customers.length + categories.length);
+      const [p, s, c, cat] = await Promise.all([
+        api.getProducts(), api.getSales(), api.getCustomers(), api.getCategories(),
+      ]);
+      const n = (x: any) => (Array.isArray(x) ? x.length : 0);
+      setDocCount(n(p) + n(s) + n(c) + n(cat));
     } catch (error) {
     }
   };
@@ -8959,17 +8751,18 @@ export function DatabaseSettings() {
     try {
       setMessage(t('exporting') || 'Exporting data...');
       setMessageType('info');
-      
+
       const data = {
         exportedAt: new Date().toISOString(),
         version: '2.0',
-        products: await localDb.getProducts(),
-        sales: await localDb.getSales(),
-        customers: await localDb.getCustomers(),
-        categories: await localDb.getCategories(),
-        currencies: await localDb.getCurrencies(),
+        products: await api.getProducts().catch(() => []),
+        sales: await api.getSales().catch(() => []),
+        customers: await api.getCustomers().catch(() => []),
+        categories: await api.getCategories().catch(() => []),
+        suppliers: await api.getSuppliers().catch(() => []),
+        purchases: await api.getPurchases().catch(() => []),
       };
-      
+
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -8979,7 +8772,7 @@ export function DatabaseSettings() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      
+
       setMessage(t('exportSuccess') || 'Export successful!');
       setMessageType('success');
     } catch (error) {
@@ -9008,41 +8801,37 @@ export function DatabaseSettings() {
       const text = await importFile.text();
       const data = JSON.parse(text);
 
-      // Save products to IndexedDB + MySQL API
+      // Save products to the database API
       if (data.products) {
         for (const product of data.products) {
-          await localDb.saveProduct(product);
           api.addProduct(product).catch(() => {});
         }
       }
 
-      // Save categories to IndexedDB + MySQL API
+      // Save categories to the database API
       if (data.categories) {
         for (const category of data.categories) {
-          await localDb.saveCategory(category);
           api.addCategory(category).catch(() => {});
         }
       }
 
-      // Save customers to IndexedDB + MySQL API
+      // Save customers to the database API
       if (data.customers) {
         for (const customer of data.customers) {
-          await localDb.saveCustomer(customer);
           api.addCustomer(customer).catch(() => {});
         }
       }
 
-      // Save suppliers to IndexedDB + MySQL API
+      // Save suppliers to the database API
       if (data.suppliers) {
         for (const supplier of data.suppliers) {
           api.addSupplier(supplier).catch(() => {});
         }
       }
 
-      // Save sales to IndexedDB + MySQL API
+      // Save sales to the database API
       if (data.sales) {
         for (const sale of data.sales) {
-          await db.put('sales', sale.id, sale).catch(() => {});
           api.addSale(sale).catch(() => {});
         }
       }
@@ -9080,7 +8869,7 @@ export function DatabaseSettings() {
           </div>
           <div style={{ background: '#F0FDFA', padding: 12, borderRadius: 8, textAlign: 'center' }}>
             <div style={{ fontSize: 24, fontWeight: 700, color: '#115E59' }}>
-              IndexedDB
+              MySQL
             </div>
             <div style={{ fontSize: 12, color: '#6B7280' }}>{t('localDatabase')}</div>
           </div>
