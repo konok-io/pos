@@ -358,7 +358,7 @@ const genUniqueId = () => {
 
 
 
-  const unique = String(Math.floor(10000 + Math.random() * 90000));
+  const unique = String(Math.floor(100000 + Math.random() * 900000));
 
 
 
@@ -1675,7 +1675,12 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const allCategories = [...new Set([...categories.map((c: any) => c.name).filter(Boolean), ...products.map((p: any) => p.cat).filter(Boolean)])].sort();
+  const _catSeen = new Map<string, string>();
+  [...categories.map((c: any) => c.name), ...products.map((p: any) => p.cat)].filter(Boolean).forEach((n: any) => {
+    const trimmed = String(n).trim();
+    if (trimmed && !_catSeen.has(trimmed.toLowerCase())) _catSeen.set(trimmed.toLowerCase(), trimmed);
+  });
+  const allCategories = [..._catSeen.values()].sort((a, b) => a.localeCompare(b));
 
 
 
@@ -2410,136 +2415,23 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const deleteCategory = (name: string) => {
-
-
-
-
-
-
-
-
-
-
-
-    const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === name.toLowerCase());
-
-
-
-
-
-
-
-
-
-
-
-    const msg = catProducts.length > 0 ? `\n\n${t('products')}: ${catProducts.length}` : '';
-
-
-
-
-
-
-
-
-
-
-
-    if (!window.confirm(`"${name}" ${t('confirmDelete')}${msg}`)) return;
-
-
-
-
-
-
-
-
-
-
-
-    const cat = categories.find((c: any) => c.name === name);
-
-
-
-
-
-
-
-
-
-
-
-    const updated = categories.filter((c: any) => c.name !== name);
-
-
-
-
-
-
-
-
-
-
-
+    const norm = (s: any) => String(s || '').trim().toLowerCase();
+    const target = norm(name);
+    const catProducts = products.filter((p: any) => norm(p.cat) === target);
+    const msg = catProducts.length > 0 ? `\n\n${t('products')}: ${catProducts.length}\n${t('productsUncat')}` : '';
+    if (!window.confirm(`"${name}" ${t('confirmDeleteCat')}${msg}`)) return;
+    const cat = categories.find((c: any) => norm(c.name) === target);
+    const updated = categories.filter((c: any) => norm(c.name) !== target);
     setCategories(updated);
-
-
-
-
-
-
-
-
-
-
-
     setCategoriesParent(updated);
-
-
-
-
-
-
-
-
-
-
-
-    if (cat) api.deleteCategory(cat.id).catch(() => {});
-
-
-
-
-
-
-
-
-
-
-
+    if (cat) api.deleteCategory(cat.id).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
+    if (catProducts.length > 0) {
+      const cleared = products.map((p: any) => norm(p.cat) === target ? { ...p, cat: '' } : p);
+      setProducts(cleared);
+      setProductsParent(cleared);
+      catProducts.forEach((p: any) => api.updateProduct(p.id, { ...p, cat: '' }).catch(() => {}));
+    }
   };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const exportProductsCsv = () => {
     const headers = ['SL', 'Name', 'Barcode', 'Company', 'Category', 'Unit', 'BuyPrice', 'SellPrice', 'Profit', 'Stock', 'MinStock', 'ExpiryDate'];
@@ -2637,7 +2529,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-      const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === c.toLowerCase());
+      const catProducts = products.filter((p: any) => String(p.cat || '').trim().toLowerCase() === String(c).trim().toLowerCase());
 
 
 
@@ -2649,7 +2541,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-      return [c, catProducts.length, catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0), catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0)].join(',');
+      return ['"' + String(c).replace(/"/g, '""') + '"', catProducts.length, catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0), catProducts.reduce((s: number, p: any) => s + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0)].join(',');
 
 
 
@@ -3329,7 +3221,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-      const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === c.toLowerCase());
+      const catProducts = products.filter((p: any) => String(p.cat || '').trim().toLowerCase() === String(c).trim().toLowerCase());
 
 
 
@@ -3353,7 +3245,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-      const totalV = catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0);
+      const totalV = catProducts.reduce((s: number, p: any) => s + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0);
 
 
 
@@ -3365,7 +3257,8 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-      return `<tr><td>${c}</td><td>${catProducts.length}</td><td>${totalStock}</td><td>${fmt(totalV)}</td></tr>`;
+      const pid = (categories.find((cx: any) => String(cx.name || '').trim().toLowerCase() === c.trim().toLowerCase()) || {}).id || '-';
+      return `<tr><td>${pid}</td><td>${c}</td><td>${catProducts.length}</td><td>${totalStock}</td><td>${fmt(totalV)}</td></tr>`;
 
 
 
@@ -3389,7 +3282,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('categories')}</h1><p>${new Date().toLocaleDateString()} | ${filteredCategories.length} ${t('categories')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('products')}</th><th>${t('stock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('categories')}</h1><p>${new Date().toLocaleDateString()} | ${filteredCategories.length} ${t('categories')}</p></div><table><thead><tr><th>${t('id')}</th><th>${t('name')}</th><th>${t('products')}</th><th>${t('stock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
 
 
 
@@ -5559,29 +5452,9 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
         {filteredCategories.length === 0 ? (
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-folder"></i></div><p>{t('noCategories')}</p></div>
-
-
-
-
-
-
-
-
-
-
-
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-folder"></i></div><p>{t('noCategories')}</p>
+            <button style={{ ...btn('primary', 'sm'), marginTop: 8 }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genUniqueId(), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{ marginRight: 4 }}></i> {t('addCategory')}</button>
+          </div>
         ) : (
 
 
@@ -5690,7 +5563,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                const catObj = categories.find((c: any) => c.name === cat);
+                const catObj = categories.find((c: any) => String(c.name || '').trim().toLowerCase() === cat.trim().toLowerCase());
 
 
 
@@ -5714,7 +5587,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                const catProducts = products.filter((p: any) => (p.cat || '').toLowerCase() === cat.toLowerCase());
+                const catProducts = products.filter((p: any) => String(p.cat || '').trim().toLowerCase() === cat.trim().toLowerCase());
 
 
 
@@ -5738,7 +5611,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                const totalValue = catProducts.reduce((s: number, p: any) => s + p.stock * p.sellPrice, 0);
+                const totalValue = catProducts.reduce((s: number, p: any) => s + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0);
 
 
 
@@ -5846,7 +5719,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                      <button disabled={catProducts.length > 0} style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13, opacity: catProducts.length > 0 ? 0.3 : 1, cursor: catProducts.length > 0 ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingCategory(catObj); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
+                      <button title={t('edit')} style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => { setEditingCategory(catObj || { id: '', name: cat }); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
 
 
 
@@ -5870,7 +5743,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                      <button disabled={catProducts.length > 0} style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13, opacity: catProducts.length > 0 ? 0.3 : 1, cursor: catProducts.length > 0 ? 'not-allowed' : 'pointer' }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
+                      <button title={t('delete') || t('confirmDelete')} style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
 
 
 
@@ -6074,7 +5947,46 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-              <button onClick={() => { if (!categoryForm.name.trim()) { alert(t('enterName')); return; } if (editingCategory) { const updated = categories.map((c: any) => c.id === editingCategory.id ? { ...c, name: categoryForm.name } : c); setCategories(updated); setCategoriesParent(updated); api.updateCategory(editingCategory.id, { name: categoryForm.name }).catch(() => {}); } else { const newCat = { id: categoryForm.id || genUniqueId(), name: categoryForm.name }; const updated = [...categories, newCat]; setCategories(updated); setCategoriesParent(updated); api.addCategory(newCat).catch(() => {}); } setShowCategoryModal(false); }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
+              <button onClick={() => {
+                const name = categoryForm.name.trim();
+                if (!name) { alert(t('enterName')); return; }
+                const editingId = editingCategory?.id || '';
+                const oldName = String(editingCategory?.name || '').trim();
+                const norm = (s: any) => String(s || '').trim().toLowerCase();
+                const dup = categories.find((c: any) => (editingId ? c.id !== editingId : true) && norm(c.name) === norm(name));
+                if (dup) { alert(t('duplicateNameCat')); return; }
+                if (editingCategory) {
+                  if (editingId) {
+                    const updated = categories.map((c: any) => c.id === editingId ? { ...c, name } : c);
+                    setCategories(updated); setCategoriesParent(updated);
+                    api.updateCategory(editingId, { name }).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
+                  } else {
+                    const newCat = { id: categoryForm.id || genUniqueId(), name };
+                    const updated = [...categories, newCat];
+                    setCategories(updated); setCategoriesParent(updated);
+                    api.addCategory(newCat).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
+                  }
+                  if (oldName && norm(oldName) !== norm(name)) {
+                    const toRename = products.filter((p: any) => norm(p.cat) === norm(oldName));
+                    if (toRename.length) {
+                      const renamed = products.map((p: any) => norm(p.cat) === norm(oldName) ? { ...p, cat: name } : p);
+                      setProducts(renamed); setProductsParent(renamed);
+                      toRename.forEach((p: any) => api.updateProduct(p.id, { ...p, cat: name }).catch(() => {}));
+                    }
+                  }
+                } else {
+                  const newCat = { id: categoryForm.id || genUniqueId(), name };
+                  const updated = [...categories, newCat];
+                  setCategories(updated); setCategoriesParent(updated);
+                  api.addCategory(newCat).then((res: any) => {
+                    if (res && res.id && res.id !== newCat.id) {
+                      const fixed = updated.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c);
+                      setCategories(fixed); setCategoriesParent(fixed);
+                    }
+                  }).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
+                }
+                setShowCategoryModal(false);
+              }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
 
 
 
@@ -9306,7 +9218,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button onClick={() => { document.getElementById('category-csv-input')?.click(); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('categories')}</button>
+                  <button onClick={() => { document.getElementById('category-csv-input')?.click(); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('categories')}</button>
                   <button onClick={() => { const headers = ['Name']; const demo = [headers.join(','), 'Electronics', 'Groceries', 'Clothing', 'Stationery'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'categories_template.csv'; a.click(); URL.revokeObjectURL(url); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
 
 
@@ -9344,7 +9256,24 @@ tr:nth-child(even){background:#F8FAFC}
 
 
               )}
-                  <input id="category-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); let imported = 0; for (let k = 1; k < lines2.length; k++) { const cols = lines2[k].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const exists = categories.find((ca: any) => (ca.name || '').toLowerCase() === name.toLowerCase()); if (!exists) { const newCat = { id: genUniqueId(), name }; setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); api.addCategory(newCat).catch(() => {}); imported++; } } alert(`${imported} ${t('categories')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
+                  <input id="category-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim());
+                  const parseLine = (line: string): string[] => {
+                    const out: string[] = []; let cur = ''; let inQ = false;
+                    for (let ci = 0; ci < line.length; ci++) {
+                      const ch = line[ci];
+                      if (inQ) {
+                        if (ch === '"' && line[ci + 1] === '"') { cur += '"'; ci++; }
+                        else if (ch === '"') inQ = false;
+                        else cur += ch;
+                      } else if (ch === '"') inQ = true;
+                      else if (ch === ',') { out.push(cur); cur = ''; }
+                      else cur += ch;
+                    }
+                    out.push(cur);
+                    return out;
+                  };
+                  const headers = parseLine(lines2[0]).map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); let imported = 0;
+                  for (let k = 1; k < lines2.length; k++) { const cols = parseLine(lines2[k]).map((c: string) => c.trim()); const name = (nameIdx >= 0 ? cols[nameIdx] : '').trim(); if (!name) continue; const exists = categories.find((ca: any) => String(ca.name || '').trim().toLowerCase() === name.toLowerCase()); if (!exists) { const newCat = { id: genUniqueId(), name }; setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); api.addCategory(newCat).catch(() => {}); imported++; } } alert(`${imported} ${t('categories')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
 
 
 
@@ -12964,7 +12893,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                <div key={p.id} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div key={p.id} onClick={() => { setViewProduct(p); setViewCategory(null); }} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
 
 
 
