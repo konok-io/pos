@@ -4490,14 +4490,14 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const [catQ] = useState('');
   
   // All unique companies from products
-  const allCompanies = [...new Set(products.map(p => p.company).filter(Boolean))];
+  const allCompanies = useMemo(() => [...new Set(products.map(p => p.company).filter(Boolean))], [products]);
   
   // Combined list of suppliers + auto companies
-  const allSuppliers = [
+  const allSuppliers = useMemo(() => [
     ...suppliers,
     ...allCompanies.filter(c => !suppliers.find(s => (s.name || '').toLowerCase() === (c || '').toLowerCase()))
       .map(c => ({ id: `auto-${c}`, name: c, code: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', company: c, isAuto: true }))
-  ];
+  ], [suppliers, allCompanies]);
   
   // Get products count for a company
   const getProductsCount = (company: string) => 
@@ -4891,6 +4891,11 @@ tr:nth-child(even){background:#F8FAFC}
     if (w) { w.document.write(html); w.document.close(); w.focus(); setTimeout(() => w.print(), 300); }
   };
 
+  // Products of currently viewed supplier (for modal list)
+  const viewSupplierProducts = useMemo(() => viewSupplier
+    ? products.filter((x: any) => (x.company || '').toLowerCase() === (viewSupplier.name || '').toLowerCase())
+    : [], [products, viewSupplier]);
+
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
       {/* Top bar */}
@@ -5107,12 +5112,9 @@ tr:nth-child(even){background:#F8FAFC}
               <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProducts')}</div>
             </div>
             
-            {(() => {
-              const vp = products.filter((x: any) => (x.company || '').toLowerCase() === (viewSupplier.name || '').toLowerCase());
-              if (!vp.length) return null;
-              return (
+            {viewSupplierProducts.length > 0 && (
                 <div style={{ maxHeight: 160, overflow: 'auto', marginBottom: 16, border: '1px solid #E5E7EB', borderRadius: 10 }}>
-                  {vp.map((x: any) => (
+                  {viewSupplierProducts.map((x: any) => (
                     <div key={x.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderBottom: '1px solid #F3F4F6' }}>
                       <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{x.name}</div>
                       <button
@@ -5133,8 +5135,7 @@ tr:nth-child(even){background:#F8FAFC}
                     </div>
                   ))}
                 </div>
-              );
-            })()}
+              )}
             
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
               <button
