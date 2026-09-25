@@ -5076,7 +5076,7 @@ body{font-family:Arial,sans-serif;width:210mm}
       </div>
     );
     const listBox = (children: any) => (
-      <div style={{ maxHeight: 240, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 10, background: T.white }}>{children}</div>
+      <div style={{ marginTop: 10, maxHeight: 240, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 10, background: T.white }}>{children}</div>
     );
     const cardHead = (icon: string, title: string, sub: string) => (
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 4 }}>
@@ -5145,7 +5145,7 @@ body{font-family:Arial,sans-serif;width:210mm}
                 )}
                 {(purchases || []).length > 0 && <div style={{ fontSize: 12, color: T.gray400, marginTop: 6 }}>{(purchases || []).length} {t('purchases')}</div>}
                 {purchaseBarcodeId !== '' && (
-                  <div style={{ marginTop: 10 }}>
+                  <div style={{ marginTop: 0 }}>
                     {pProducts.length === 0 ? (
                       <div style={{ fontSize: 13, color: T.gray400, padding: '10px 0' }}>{t('noProductsFound')}</div>
                     ) : listBox(pProducts.map((p: any) => selRow(p, purchaseSelIds.includes(p.id), () => setPurchaseSelIds(prev => prev.includes(p.id) ? prev.filter((x: string) => x !== p.id) : [...prev, p.id]))))}
