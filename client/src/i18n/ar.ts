@@ -458,6 +458,7 @@ export const ar: Record<string, string> = {
   totalInvoices: 'الفواتير',
   unitProfit: 'ربح الوحدة',
   salesHistory: 'سجل المبيعات',
+  invoices: 'فواتير',
   stockHistory: 'نشاط المخزون',
   lastStockAdd: 'آخر إضافة مخزون',
   noStockHistory: 'لا يوجد نشاط مخزون بعد',

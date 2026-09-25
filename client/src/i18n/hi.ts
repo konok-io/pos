@@ -454,6 +454,7 @@ export const hi: Record<string, string> = {
   totalInvoices: 'चालान',
   unitProfit: 'इकाई लाभ',
   salesHistory: 'बिक्री इतिहास',
+  invoices: 'चालान',
   stockHistory: 'स्टॉक गतिविधि',
   lastStockAdd: 'अंतिम स्टॉक जोड़ा गया',
   noStockHistory: 'अभी कोई स्टॉक गतिविधि नहीं',

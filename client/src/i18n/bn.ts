@@ -462,6 +462,7 @@ export const bn: Record<string, string> = {
   totalInvoices: 'ইনভয়েস',
   unitProfit: 'একক লাভ',
   salesHistory: 'বিক্রি ইতিহাস',
+  invoices: 'ইনভয়েস',
   stockHistory: 'স্টক কার্যক্রম',
   lastStockAdd: 'সর্বশেষ স্টক যোগ',
   noStockHistory: 'এখনও কোনো স্টক কার্যক্রম নেই',

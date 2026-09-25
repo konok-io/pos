@@ -484,6 +484,7 @@ export const en: Record<string, string> = {
   totalInvoices: 'Invoices',
   unitProfit: 'Unit Profit',
   salesHistory: 'Sales History',
+  invoices: 'invoices',
   stockHistory: 'Stock Activity',
   lastStockAdd: 'Last stock added',
   noStockHistory: 'No stock activity yet',
