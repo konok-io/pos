@@ -34,6 +34,7 @@ export const hi: Record<string, string> = {
 
   // POS Screen
   barcode: 'बारकोड',
+  barcodes: "बारकोड",
   barcodePlaceholder: 'बारकोड स्कैन करें...',
   searchProduct: 'उत्पाद खोजें...',
   searchProductBarcode: 'उत्पाद का नाम या बारकोड द्वारा खोजें',

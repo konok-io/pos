@@ -3449,10 +3449,12 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const skipped = selected.length - printable.length;
     if (skipped > 0) alert(`${skipped} ${t('missingBarcode')}`);
     if (printable.length === 0) return;
+    let total = 0;
+    for (const p of printable) total += purchaseLabelCount(p);
+    if (total === 0) { alert(t('noProductsFound')); return; }
+    if (total > 500) { alert(t('maxLabels')); return; }
     const list: any[] = [];
     for (const p of printable) { const n = purchaseLabelCount(p); for (let i = 0; i < n; i++) list.push(p); }
-    if (list.length === 0) { alert(t('noProductsFound')); return; }
-    if (list.length > 500) { alert(t('maxLabels')); return; }
     printBarcodeSheet(list, `${t('purchaseBarcode')} ${pid} | ${printable.length} ${t('products')} | ${t('total')}: ${list.length} | ${new Date().toLocaleDateString()}`, labelOpts());
   };
 
@@ -3484,9 +3486,11 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const skipped = customBarcodeProducts.length - printable.length;
     if (skipped > 0) alert(`${skipped} ${t('missingBarcode')}`);
     if (printable.length === 0) return;
+    let total = 0;
+    for (const p of printable) total += clampQty(customQty[String(p.id)]);
+    if (total > 500) { alert(t('maxLabels')); return; }
     const list: any[] = [];
     for (const p of printable) { const n = clampQty(customQty[String(p.id)]); for (let i = 0; i < n; i++) list.push(p); }
-    if (list.length > 500) { alert(t('maxLabels')); return; }
     printBarcodeSheet(list, `${t('customBarcode')} | ${printable.length} ${t('products')} | ${t('total')}: ${list.length} | ${new Date().toLocaleDateString()}`, labelOpts());
   };
 
@@ -5088,12 +5092,14 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     for (const p of products) { const c = codeOf(p); if (c) used.add(c.toLowerCase()); }
     let n = 1000000000000;
     for (const c of used) {
-      if (/^\d+$/.test(c)) { const v = Number(c); if (Number.isFinite(v) && v >= 1000000000000 && v > n) n = v; }
+      if (/^\d+$/.test(c)) { const v = Number(c); if (Number.isSafeInteger(v) && v >= 1000000000000 && v > n) n = v; }
     }
     const plan: { p: any; code: string }[] = [];
     for (const p of targets) {
       let code = '';
-      do { n += 1; code = String(n); } while (used.has(code.toLowerCase()));
+      let tries = 0;
+      do { n += 1; code = String(n); tries += 1; } while (used.has(code.toLowerCase()) && tries < 100000);
+      if (used.has(code.toLowerCase())) code = `BC${Date.now().toString(36)}${tries}`;
       used.add(code.toLowerCase());
       plan.push({ p, code });
     }
@@ -5146,7 +5152,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const customTotalLabels = customBarcodeProducts.reduce((s: number, p: any) => s + clampQty(customQty[String(p.id)]), 0);
     const totalLabels = purchaseTotalLabels + customTotalLabels;
     const previewProduct = customBarcodeProducts[0] || selectedPurchaseProducts[0] || pProducts[0] || withCode[0] || products[0];
-    const barcodeWarn = [previewProduct, ...selectedPurchaseProducts, ...customBarcodeProducts].filter(Boolean).some((p: any) => moduleSmall(codeOf(p), labelSize));
+    const barcodeWarn = selectedCount > 0 && [...selectedPurchaseProducts, ...customBarcodeProducts].some((p: any) => moduleSmall(codeOf(p), labelSize));
     const statCard = (icon: string, label: string, value: any, color: string, bg: string) => (
       <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
         <div style={{ width: 40, height: 40, borderRadius: 10, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={icon} style={{ fontSize: 16 }}></i></div>
@@ -5164,7 +5170,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
       </label>
     );
     const selRow = (p: any, checked: boolean, onToggle: () => void, right?: any) => (
-      <div key={p.id} onClick={onToggle} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, background: checked ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div key={p.id} role="button" tabIndex={0} onClick={onToggle} onKeyDown={(e: any) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, background: checked ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
         <input type="checkbox" checked={checked} readOnly style={{ width: 16, height: 16, flexShrink: 0 }} />
         <div style={{ minWidth: 0, flex: 1 }}>
           <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
@@ -5198,7 +5204,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   <div>
                     <div style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.2 }}>{t('barcode')}</div>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8, alignItems: 'center' }}>
-                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-boxes-stacked" style={{ marginRight: 4 }}></i>{withCode.length} {t('barcode')}</span>
+                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-boxes-stacked" style={{ marginRight: 4 }}></i>{withCode.length} {t(withCode.length === 1 ? 'barcode' : 'barcodes')}</span>
                       <span style={{ padding: '3px 10px', borderRadius: 12, background: selectedCount > 0 ? '#16A34A' : 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-check" style={{ marginRight: 4 }}></i>{selectedCount} {t('selected')}</span>
                       <span style={{ padding: '3px 10px', borderRadius: 12, background: missingCount > 0 ? '#DC2626' : 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{missingCount} {t('missingBarcode')}</span>
                       <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13, fontFamily: 'monospace' }}>{labelSize.replace('x', ' × ')} mm</span>
@@ -5236,7 +5242,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   <div style={{ marginTop: 10 }}>
                     <div style={{ position: 'relative' }}>
                       <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-                      <input autoFocus value={purchaseSearch} onChange={e => { setPurchaseSearch(e.target.value); setPurchasePage(0); }} placeholder={t('searchPurchaseId')} style={{ ...inputStyle, paddingLeft: 32 }} />
+                      <input value={purchaseSearch} onChange={e => { setPurchaseSearch(e.target.value); setPurchasePage(0); }} placeholder={t('searchPurchaseId')} style={{ ...inputStyle, paddingLeft: 32 }} />
                     </div>
                     {purchaseBarcodeId !== '' && (
                       <div style={{ marginTop: 10 }}>
@@ -5244,7 +5250,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                           <div style={{ fontSize: 13, color: T.gray400, padding: '10px 0' }}>{t('noProductsFound')}</div>
                         ) : listBox(pProducts.map((p: any) => selRow(p, purchaseSelIds.includes(p.id), () => setPurchaseSelIds(prev => prev.includes(p.id) ? prev.filter((x: string) => x !== p.id) : [...prev, p.id]), `\u00d7${purchaseLabelCount(p)}`)))}
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
-                          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                             <button type="button" onClick={() => setPurchaseSelIds(pProducts.map((p: any) => p.id))} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
                             <button type="button" onClick={() => setPurchaseSelIds([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
                             <button type="button" onClick={() => { setPurchaseBarcodeId(''); setPurchaseSelIds([]); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-xmark" style={{ marginRight: 4 }}></i>{t('deselectPurchase')}</button>
@@ -5262,8 +5268,9 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       <div style={{ marginTop: 10, maxHeight: 320, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 10, background: T.white }}>
                         {purchasePageRows.map((pur: any) => {
                           const active = String(purchaseBarcodeId) === String(pur.id);
+                          const activate = () => { const v = String(pur.id); setPurchaseBarcodeId(v); setPurchaseSelIds(getPurchaseProducts(v).map((p: any) => p.id)); };
                           return (
-                            <div key={String(pur.id)} onClick={() => { const v = String(pur.id); setPurchaseBarcodeId(v); setPurchaseSelIds(getPurchaseProducts(v).map((p: any) => p.id)); }} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, background: active ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div key={String(pur.id)} role="button" tabIndex={0} onClick={activate} onKeyDown={(e: any) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } }} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, background: active ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
                               <i className={active ? 'fas fa-circle-check' : 'fas fa-receipt'} style={{ color: active ? T.teal : T.gray300, fontSize: 14, flexShrink: 0 }}></i>
                               <div style={{ minWidth: 0, flex: 1 }}>
                                 <div style={{ fontWeight: 700, fontSize: 13, fontFamily: 'monospace', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pur.id}</div>
@@ -5298,12 +5305,13 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       <div style={{ padding: 14, fontSize: 13, color: T.gray400 }}>{t('noResults')}</div>
                     ) : customBarcodeFiltered.slice(0, 50).map((p: any) => {
                       const added = customBarcodeProducts.some((cp: any) => cp.id === p.id);
+                      const toggleAdd = () => { if (!added) { setCustomBarcodeProducts(prev => [...prev, p]); setCustomQty(prev => ({ ...prev, [String(p.id)]: prev[String(p.id)] || 1 })); } };
                       return (
-                        <div key={String(p.id)} onClick={() => { if (!added) { setCustomBarcodeProducts(prev => [...prev, p]); setCustomQty(prev => ({ ...prev, [String(p.id)]: prev[String(p.id)] || 1 })); } }} style={{ padding: '8px 12px', cursor: added ? 'default' : 'pointer', borderBottom: `1px solid ${T.gray100}`, background: added ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div key={String(p.id)} role="button" tabIndex={0} onClick={toggleAdd} onKeyDown={(e: any) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleAdd(); } }} style={{ padding: '8px 12px', cursor: added ? 'default' : 'pointer', borderBottom: `1px solid ${T.gray100}`, background: added ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
                           <i className={added ? 'fas fa-circle-check' : 'fas fa-plus-circle'} style={{ color: added ? T.teal : T.gray400, fontSize: 14, flexShrink: 0 }}></i>
                           <div style={{ minWidth: 0, flex: 1 }}>
                             <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
-                            <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div>
+                            <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p)}</div>
                           </div>
                           <div style={{ fontSize: 12, color: T.gray500, flexShrink: 0 }}>{p.stock ?? 0}</div>
                         </div>
@@ -5317,7 +5325,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       <div key={String(p.id)} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', alignItems: 'center', gap: 8, background: T.tealLight }}>
                         <div style={{ minWidth: 0, flex: 1 }}>
                           <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
-                          <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div>
+                          <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p)}</div>
                         </div>
                         <span style={{ fontSize: 11, fontWeight: 700, color: T.gray500, flexShrink: 0 }}>{t('qty')}</span>
                         <input type="number" min={1} max={500} value={clampQty(customQty[String(p.id)])} onChange={e => { const v = Math.max(1, Math.min(500, parseInt(e.target.value, 10) || 1)); setCustomQty(prev => ({ ...prev, [String(p.id)]: v })); }} style={{ ...inputStyle, width: 72, textAlign: 'center', flexShrink: 0 }} />
@@ -5327,7 +5335,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   </div>
                 )}
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                     <button type="button" disabled={customBarcodeSearch.trim() === ''} onClick={() => { const add = customBarcodeFiltered.filter((p: any) => !customBarcodeProducts.some((cp: any) => cp.id === p.id)); if (add.length) { setCustomBarcodeProducts(prev => [...prev, ...add]); setCustomQty(prev => { const n = { ...prev }; for (const p of add) n[String(p.id)] = n[String(p.id)] || 1; return n; }); } }} style={{ ...btn('ghost', 'sm'), opacity: customBarcodeSearch.trim() === '' ? 0.5 : 1 }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
                     <button type="button" onClick={() => { setCustomBarcodeProducts([]); setCustomQty({}); }} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
                   </div>

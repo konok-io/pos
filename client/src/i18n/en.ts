@@ -33,6 +33,7 @@ export const en: Record<string, string> = {
 
   // POS Screen
   barcode: 'Barcode',
+  barcodes: "barcodes",
   barcodePlaceholder: 'Scan barcode...',
   searchProduct: 'Search product...',
   searchProductBarcode: 'Search by product name or barcode',

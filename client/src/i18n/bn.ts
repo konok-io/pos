@@ -34,6 +34,7 @@ export const bn: Record<string, string> = {
 
   // POS Screen
   barcode: 'বারকোড',
+  barcodes: "বারকোড",
   barcodePlaceholder: 'বারকোড স্ক্যান করুন...',
   searchProduct: 'পণ্যের নাম লিখুন...',
   searchProductBarcode: 'পণ্যের নাম বা বারকোড দিয়ে খুঁজুন',

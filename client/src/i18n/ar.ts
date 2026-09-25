@@ -34,6 +34,7 @@ export const ar: Record<string, string> = {
 
   // POS Screen
   barcode: 'الباركود',
+  barcodes: "باركود",
   barcodePlaceholder: 'امسح الباركود...',
   searchProduct: 'ابحث عن منتج...',
   searchProductBarcode: 'ابحث باسم المنتج أو الباركود',
