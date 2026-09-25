@@ -1,6 +1,6 @@
 import ProductsScreen from "./ProductsScreen";
 import { api, zatcaApi, setToken, clearToken } from "./api";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import './index.css';
 import { useLanguage, languages, defaultTranslations, Language } from './i18n';
 import { QR } from './qrCode';
@@ -4484,6 +4484,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5'
   });
   
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
   const [showCompanyDrop, setShowCompanyDrop] = useState(false);
   const [showCatDrop, setShowCatDrop] = useState(false);
   const [catQ] = useState('');
@@ -4507,18 +4508,18 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     purchases.filter(p => (p.supplier || '').toLowerCase() === (name || '').toLowerCase());
   
   // Filter suppliers
-  const filteredSuppliers = allSuppliers
+  const filteredSuppliers = useMemo(() => allSuppliers
     .filter(s => 
       !search || 
       (s.name || '').toLowerCase().includes(search.toLowerCase()) ||
       (s.phone || '').includes(search) ||
       (s.code || '').toLowerCase().includes(search.toLowerCase())
     )
-    .sort((a, b) => getProductsCount(b.name) - getProductsCount(a.name));
+    .sort((a, b) => getProductsCount(b.name) - getProductsCount(a.name)), [allSuppliers, search, products]);
   
   // Filter categories
-  const filteredCategories = categories
-    .filter(c => !search || (c.name || '').toLowerCase().includes(search.toLowerCase()));
+  const filteredCategories = useMemo(() => categories
+    .filter(c => !search || (c.name || '').toLowerCase().includes(search.toLowerCase())), [categories, search]);
   
   // Filter companies for dropdown
   const filteredCompanies = suppliers;
@@ -4718,6 +4719,53 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     }
     
     try {
+      if (editingProductId) {
+        const prevProducts = products;
+        const existing = prevProducts.find((x: any) => x.id === editingProductId);
+        let editCatId = categories.find(c => (c.name || '').toLowerCase() === (productForm.cat || '').toLowerCase())?.id;
+        if (!editCatId) {
+          editCatId = genId();
+          const createdCat = { id: editCatId!, name: productForm.cat.trim() };
+          setCategories(prev => [...prev, createdCat]);
+          api.addCategory(createdCat).catch(() => {});
+        }
+        const updatedProduct = {
+          ...existing,
+          name: productForm.name.trim(),
+          company: productForm.company.trim(),
+          cat: productForm.cat.trim(),
+          catId: editCatId!,
+          barcode: productForm.barcode || '',
+          unit: productForm.unit || 'pcs',
+          buyPrice: parseFloat(productForm.buyP) || 0,
+          sellPrice: parseFloat(productForm.sellP) || 0,
+          stock: parseInt(productForm.stock) || 0,
+          minStock: parseInt(productForm.minStock) || 5
+        };
+        setProducts(prev => prev.map(x => x.id === editingProductId ? updatedProduct : x));
+        const supForProduct = suppliers.find((x: any) => (x.name || '').toLowerCase() === (productForm.company || '').toLowerCase());
+        api.updateProduct(editingProductId, {
+          name: updatedProduct.name,
+          company: updatedProduct.company,
+          cat: updatedProduct.cat,
+          barcode: updatedProduct.barcode,
+          unit: updatedProduct.unit,
+          costPrice: updatedProduct.buyPrice,
+          sellPrice: updatedProduct.sellPrice,
+          stock: updatedProduct.stock,
+          minStock: updatedProduct.minStock,
+          supplier: productForm.company,
+          supplierId: supForProduct?.id || ''
+        }).catch((e: any) => {
+          setProducts(prevProducts);
+          alert(t('errorOccurred') + ': ' + e.message);
+        });
+        alert(t('updated'));
+        setEditingProductId(null);
+        setShowProductModal(false);
+        setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5' });
+        return;
+      }
       // Check if category exists, create if not
       let catId = categories.find(c => (c.name || '').toLowerCase() === (productForm.cat || '').toLowerCase())?.id;
       if (!catId) {
@@ -4784,6 +4832,7 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       
       alert(t('productAdded'));
       setShowProductModal(false);
+      setEditingProductId(null);
       setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5' });
     } catch (error) {
       alert(t('errorOccurred'));
@@ -4866,7 +4915,7 @@ tr:nth-child(even){background:#F8FAFC}
         <button onClick={() => { setCategoryForm({ name: '' }); setEditingCategory(null); setShowCategoryModal(true); }} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
           <i className="fas fa-folder" style={{ marginRight: 4 }}></i>{t('categories')}
         </button>
-        <button onClick={() => setShowProductModal(true)} style={{ padding: '7px 12px', background: T.orange, color: T.white, border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+        <button onClick={() => { setEditingProductId(null); setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5' }); setShowProductModal(true); }} style={{ padding: '7px 12px', background: T.orange, color: T.white, border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
           <i className="fas fa-box" style={{ marginRight: 4 }}></i>{t('products')}
         </button>
         <button onClick={exportSuppliersCsv} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
@@ -5058,6 +5107,35 @@ tr:nth-child(even){background:#F8FAFC}
               <div style={{ fontSize: 13, color: '#6B7280' }}>{t('totalProducts')}</div>
             </div>
             
+            {(() => {
+              const vp = products.filter((x: any) => (x.company || '').toLowerCase() === (viewSupplier.name || '').toLowerCase());
+              if (!vp.length) return null;
+              return (
+                <div style={{ maxHeight: 160, overflow: 'auto', marginBottom: 16, border: '1px solid #E5E7EB', borderRadius: 10 }}>
+                  {vp.map((x: any) => (
+                    <div key={x.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderBottom: '1px solid #F3F4F6' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{x.name}</div>
+                      <button
+                        onClick={() => {
+                          setEditingProductId(x.id);
+                          setProductForm({
+                            company: x.company || '', cat: x.cat || '', name: x.name || '', barcode: x.barcode || '',
+                            unit: x.unit || 'pcs', buyP: String(x.buyPrice ?? ''), sellP: String(x.sellPrice ?? ''),
+                            stock: String(x.stock ?? 0), minStock: String(x.minStock ?? 5)
+                          });
+                          setViewSupplier(null);
+                          setShowProductModal(true);
+                        }}
+                        style={{ width: 28, height: 28, border: 'none', borderRadius: 6, background: '#F3F4F6', color: '#6B7280', cursor: 'pointer', flexShrink: 0 }}
+                        title={t('edit')}>
+                        <i className="fas fa-pen"></i>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+            
             <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
               <button
                 onClick={() => { setShowPurchaseHistory(viewSupplier); setViewSupplier(null); }}
@@ -5234,7 +5312,7 @@ tr:nth-child(even){background:#F8FAFC}
       {showProductModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 450, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>{t('products')} {t('newProductForm')}</h3>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: 18, fontWeight: 700 }}>{editingProductId ? t('edit') : ''} {t('products')} {editingProductId ? '' : t('newProductForm')}</h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               {/* Company Dropdown */}
@@ -5358,7 +5436,7 @@ tr:nth-child(even){background:#F8FAFC}
             </div>
             
             <div style={{ display: 'flex', gap: 12, marginTop: 20, justifyContent: 'center' }}>
-              <button onClick={() => setShowProductModal(false)} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
+              <button onClick={() => { setShowProductModal(false); setEditingProductId(null); }} style={{ flex: 1, padding: '12px', background: '#F3F4F6', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 600, color: '#4B5563' }}>
                 {t('cancel')}
               </button>
               <button onClick={saveProduct} style={{ flex: 1, padding: '12px', background: '#115E59', color: '#fff', border: 'none', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>

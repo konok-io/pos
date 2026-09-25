@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 
 
 
@@ -1580,7 +1580,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const allCompanies = [...new Set([...suppliers.map((s: any) => s.name).filter(Boolean), ...products.map((p: any) => p.company).filter(Boolean)])].sort();
+  const allCompanies = useMemo(() => [...new Set([...suppliers.map((s: any) => s.name).filter(Boolean), ...products.map((p: any) => p.company).filter(Boolean)])].sort(), [suppliers, products]);
 
 
 
@@ -1592,7 +1592,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const filteredSuppliers = allCompanies.filter(c => !supplierSearch || (c || '').toLowerCase().includes(supplierSearch.toLowerCase()));
+  const filteredSuppliers = useMemo(() => allCompanies.filter(c => !supplierSearch || (c || '').toLowerCase().includes(supplierSearch.toLowerCase())), [allCompanies, supplierSearch]);
 
 
 
@@ -2382,7 +2382,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       ? (list as string[])
       : suppliers.map((s: any) => s.name).filter(Boolean);
     nameList.forEach((company: string) => {
-      const supplier = suppliers.find((s: any) => s.name === company);
+      const supplier = suppliers.find((s: any) => (s.name || '').toLowerCase() === (company || '').toLowerCase());
       const supplierProducts = products.filter((p: any) => (p.company || '').toLowerCase() === company.toLowerCase());
       const stock = supplierProducts.reduce((a: number, p: any) => a + (p.stock || 0), 0);
       const value = supplierProducts.reduce((a: number, p: any) => a + (p.stock || 0) * (p.costPrice || 0), 0);
@@ -4591,7 +4591,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                const supplier = suppliers.find((s: any) => s.name === company);
+                const supplier = suppliers.find((s: any) => (s.name || '').toLowerCase() === (company || '').toLowerCase());
 
 
 
