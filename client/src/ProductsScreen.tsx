@@ -916,7 +916,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [showPurchaseBarcodeModal, setShowPurchaseBarcodeModal] = useState(false);
 
 
 
@@ -944,7 +943,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [showCustomBarcodeModal, setShowCustomBarcodeModal] = useState(false);
 
 
 
@@ -957,6 +955,12 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [customBarcodeProducts, setCustomBarcodeProducts] = useState<any[]>([]);
+  const [labelSize, setLabelSize] = useState('50x25');
+  const [labelCopies, setLabelCopies] = useState(1);
+  const [labelShowName, setLabelShowName] = useState(true);
+  const [labelShowPrice, setLabelShowPrice] = useState(true);
+  const [labelShowCompany, setLabelShowCompany] = useState(false);
+  const [purchaseSelIds, setPurchaseSelIds] = useState<string[]>([]);
 
 
 
@@ -2829,22 +2833,38 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${height}" viewBox="0 0 ${totalW} ${height}">${rects}</svg>`;
   };
 
-  const LABEL_SHEET_CSS = `@page{size:A4;margin:4mm}
+  const LABEL_SIZES: Record<string, { w: number; h: number; svgMax: number; nameFs: number }> = {
+    '50x25': { w: 50, h: 25, svgMax: 10, nameFs: 7 },
+    '38x25': { w: 38, h: 25, svgMax: 10, nameFs: 6.5 },
+    '50x40': { w: 50, h: 40, svgMax: 16, nameFs: 8 },
+  };
+
+  const labelItemCss = (sizeKey: string): string => {
+    const s = LABEL_SIZES[sizeKey] || LABEL_SIZES['50x25'];
+    return `.barcode-item{width:${s.w}mm;height:${s.h}mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;page-break-inside:avoid;gap:0}
+.barcode-item .bname{font-size:${s.nameFs}pt;font-weight:700;color:#333;line-height:1.15;margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barcode-item .bcomp{font-size:6.5pt;color:#777;line-height:1.1;margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barcode-item .bcode{font-family:monospace;font-size:8pt;font-weight:700;color:#111;line-height:1;margin:0.4mm 0 0 0;width:100%;overflow:hidden;white-space:nowrap}
+.barcode-item .bc{display:flex;align-items:flex-start;justify-content:center;width:100%;line-height:0;margin:0.3mm 0 0 0}
+.barcode-item .bc svg{max-width:100%;height:auto;max-height:${s.svgMax}mm;display:block}
+.barcode-item .price{font-size:8pt;font-weight:800;color:#111;line-height:1;margin:0.4mm 0 0 0}`;
+  };
+
+  const labelSheetCss = (sizeKey: string): string => `@page{size:A4;margin:4mm}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;width:210mm}
 .summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
-.barcode-item{width:50mm;height:28mm;border:0.3mm dashed #bbb;padding:0.5mm 1mm;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow:hidden;page-break-inside:avoid;gap:0}
-.barcode-item .bname{font-size:7.5pt;font-weight:700;color:#333;line-height:1.15;margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.barcode-item .bcode{font-family:monospace;font-size:8pt;font-weight:700;color:#111;line-height:1;margin:0.4mm 0 0 0;width:100%;overflow:hidden;white-space:nowrap}
-.barcode-item .bc{display:flex;align-items:flex-start;justify-content:center;width:100%;line-height:0;margin:0.3mm 0 0 0}
-.barcode-item .bc svg{max-width:100%;height:auto;max-height:13mm;display:block}
-.barcode-item .price{font-size:8pt;font-weight:800;color:#111;line-height:1;margin:0.4mm 0 0 0}`;
+` + labelItemCss(sizeKey);
 
-  const barcodeLabelHtml = (product: any): string => {
+  const barcodeLabelHtml = (product: any, opts?: any): string => {
+    const o = { showName: true, showPrice: true, showCompany: false, ...(opts || {}) };
     const clean = printableAscii(product.code || product.id) || '000';
     const svg = code128Svg(clean, 44, 2);
-    return `<div class="barcode-item"><div class="bname">${escHtml(product.name)}</div><div class="bcode">${escHtml(clean)}</div><div class="bc">${svg}</div><div class="price">${fmt(product.sellPrice)}</div></div>`;
+    const nameDiv = o.showName ? `<div class="bname">${escHtml(product.name)}</div>` : '';
+    const compDiv = o.showCompany && product.company ? `<div class="bcomp">${escHtml(product.company)}</div>` : '';
+    const priceDiv = o.showPrice ? `<div class="price">${fmt(product.sellPrice)}</div>` : '';
+    return `<div class="barcode-item">${nameDiv}${compDiv}<div class="bcode">${escHtml(clean)}</div><div class="bc">${svg}</div>${priceDiv}</div>`;
   };
 
   const openPrintWin = (html: string) => {
@@ -2856,9 +2876,44 @@ body{font-family:Arial,sans-serif;width:210mm}
     }
   };
 
-  const printBarcodeSheet = (list: any[], summary: string) => {
-    const items = list.map((p: any) => barcodeLabelHtml(p)).join('');
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${LABEL_SHEET_CSS}</style></head><body><div class="summary">${escHtml(summary)}</div><div class="sheet">${items}</div></body></html>`;
+  const labelOpts = () => ({ size: labelSize, showName: labelShowName, showPrice: labelShowPrice, showCompany: labelShowCompany });
+
+  const expandCopies = (list: any[]): any[] => {
+    const n = Math.max(1, Math.min(500, parseInt(String(labelCopies), 10) || 1));
+    const out: any[] = [];
+    for (const p of list) { for (let i = 0; i < n; i++) out.push(p); }
+    return out;
+  };
+
+  const purchaseItemsOf = (pur: any): any[] => {
+    if (!pur) return [];
+    if (Array.isArray(pur.items)) return pur.items;
+    if (typeof pur.items === 'string') {
+      try { const parsed = JSON.parse(pur.items); if (Array.isArray(parsed)) return parsed; } catch (_err) { return []; }
+    }
+    return [];
+  };
+
+  const getPurchaseProducts = (pid: string): any[] => {
+    const id = String(pid || '').trim();
+    if (!id) return [];
+    const idLc = id.toLowerCase();
+    const rec = (purchases || []).find((x: any) => String(x.id || '').toLowerCase() === idLc);
+    if (rec) {
+      const recItems = purchaseItemsOf(rec);
+      const ids = new Set(recItems.map((it: any) => (it && it.productId) || '').filter(Boolean));
+      const codes = new Set(recItems.map((it: any) => String((it && it.code) || '').toLowerCase()).filter(Boolean));
+      const names = new Set(recItems.map((it: any) => String((it && it.name) || '').toLowerCase()).filter(Boolean));
+      const matched = products.filter((p: any) => ids.has(p.id) || (!!p.code && codes.has(String(p.code).toLowerCase())) || (!!p.name && names.has(String(p.name || '').toLowerCase())));
+      if (matched.length > 0) return matched;
+    }
+    return products.filter((p: any) => String(p.purchaseId || '').toLowerCase() === idLc);
+  };
+
+  const printBarcodeSheet = (list: any[], summary: string, opts?: any) => {
+    const o = { size: '50x25', showName: true, showPrice: true, showCompany: false, ...(opts || {}) };
+    const items = list.map((p: any) => barcodeLabelHtml(p, o)).join('');
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${labelSheetCss(o.size)}</style></head><body><div class="summary">${escHtml(summary)}</div><div class="sheet">${items}</div></body></html>`;
     openPrintWin(html);
   };
 
@@ -2866,7 +2921,7 @@ body{font-family:Arial,sans-serif;width:210mm}
     const p = product;
     const stockQty = Math.max(0, parseInt(String(p.stock), 10) || 0);
     const qty = Math.min(500, Math.max(1, stockQty));
-    printBarcodeSheet(Array(qty).fill(p), `${p.name} | Stock: ${stockQty} ${p.unit || ''} | ${qty} barcode labels | ${new Date().toLocaleDateString()}`);
+    printBarcodeSheet(Array(qty).fill(p), `${p.name} | Stock: ${stockQty} ${p.unit || ''} | ${qty} barcode labels | ${new Date().toLocaleDateString()}`, labelOpts());
     setBarcodePopup(null);
   };
 
@@ -2879,7 +2934,7 @@ body{font-family:Arial,sans-serif;width:210mm}
     );
     if (raw === null) return;
     const qty = Math.max(1, Math.min(500, parseInt(raw, 10) || 1));
-    printBarcodeSheet(Array(qty).fill(p), `Manual Count | ${p.name} | ${qty} barcode labels | Stock: ${p.stock} ${p.unit || ''} | ${new Date().toLocaleDateString()}`);
+    printBarcodeSheet(Array(qty).fill(p), `Manual Count | ${p.name} | ${qty} barcode labels | Stock: ${p.stock} ${p.unit || ''} | ${new Date().toLocaleDateString()}`, labelOpts());
     setBarcodePopup(null);
   };
 
@@ -2889,8 +2944,9 @@ body{font-family:Arial,sans-serif;width:210mm}
 
   const printBarcodeTabList = () => {
     if (barcodeProducts.length === 0) { alert(t('noResults')); return; }
-    if (barcodeProducts.length > 20 && !window.confirm(`${barcodeProducts.length} ${t('products')} -> ${t('print')}?`)) return;
-    printBarcodeSheet(barcodeProducts, `${barcodeProducts.length} ${t('products')} | ${new Date().toLocaleDateString()}`);
+    const list = expandCopies(barcodeProducts);
+    if (list.length > 500) { alert(t('maxLabels')); return; }
+    printBarcodeSheet(list, `${barcodeProducts.length} ${t('products')} x ${labelCopies} | ${new Date().toLocaleDateString()}`, labelOpts());
   };
 
 
@@ -3361,28 +3417,12 @@ body{font-family:Arial,sans-serif;width:210mm}
   const printPurchaseBarcode = () => {
     const pid = purchaseBarcodeId.trim();
     if (!pid) { alert(t('enterPurchaseId')); return; }
-    const pidLc = pid.toLowerCase();
-    const rec = (purchases || []).find((x: any) => String(x.id || '').toLowerCase() === pidLc);
-    let matchedProducts: any[] = [];
-    if (rec) {
-      let recItems: any[] = [];
-      if (Array.isArray(rec.items)) {
-        recItems = rec.items;
-      } else if (typeof rec.items === 'string') {
-        try { const parsed = JSON.parse(rec.items); if (Array.isArray(parsed)) recItems = parsed; } catch (_err) { recItems = []; }
-      }
-      const ids = new Set(recItems.map((it: any) => (it && it.productId) || '').filter(Boolean));
-      const codes = new Set(recItems.map((it: any) => String((it && it.code) || '').toLowerCase()).filter(Boolean));
-      const names = new Set(recItems.map((it: any) => String((it && it.name) || '').toLowerCase()).filter(Boolean));
-      matchedProducts = products.filter((p: any) => ids.has(p.id) || (!!p.code && codes.has(String(p.code).toLowerCase())) || (!!p.name && names.has(String(p.name || '').toLowerCase())));
-    }
-    if (matchedProducts.length === 0) {
-      matchedProducts = products.filter((p: any) => String(p.purchaseId || '').toLowerCase() === pidLc);
-    }
-    if (matchedProducts.length === 0) { alert(t('noProductsFound')); return; }
-    printBarcodeSheet(matchedProducts, `${t('purchaseBarcode')} ${pid} | ${matchedProducts.length} ${t('products')} | ${new Date().toLocaleDateString()}`);
-    setShowPurchaseBarcodeModal(false);
-    setPurchaseBarcodeId('');
+    const matched = getPurchaseProducts(pid);
+    const selected = matched.filter((p: any) => purchaseSelIds.includes(p.id));
+    if (selected.length === 0) { alert(t('noProductsFound')); return; }
+    const list = expandCopies(selected);
+    if (list.length > 500) { alert(t('maxLabels')); return; }
+    printBarcodeSheet(list, `${t('purchaseBarcode')} ${pid} | ${selected.length} ${t('products')} x ${labelCopies} | ${new Date().toLocaleDateString()}`, labelOpts());
   };
 
 
@@ -3409,10 +3449,9 @@ body{font-family:Arial,sans-serif;width:210mm}
 
   const printCustomBarcode = () => {
     if (customBarcodeProducts.length === 0) { alert(t('noProductsFound')); return; }
-    printBarcodeSheet(customBarcodeProducts, `${t('customBarcode')} | ${customBarcodeProducts.length} ${t('products')} | ${new Date().toLocaleDateString()}`);
-    setShowCustomBarcodeModal(false);
-    setCustomBarcodeProducts([]);
-    setCustomBarcodeSearch('');
+    const list = expandCopies(customBarcodeProducts);
+    if (list.length > 500) { alert(t('maxLabels')); return; }
+    printBarcodeSheet(list, `${t('customBarcode')} | ${customBarcodeProducts.length} ${t('products')} x ${labelCopies} | ${new Date().toLocaleDateString()}`, labelOpts());
   };
 
 
@@ -5004,464 +5043,196 @@ body{font-family:Arial,sans-serif;width:210mm}
     </div>
   );
 
-  const renderBarcode = () => (
-
-
-
-
-
-
-
-
-
-
-
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-
-
-
-
-
-
-
-
-
-
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-
-
-
-
-
-
-
-
-
-
-
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-
-
-
-
-
-
-
-
-
-
-
-          <input autoFocus value={barcodeSearch} onChange={e => setBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
-
-
-
-
-
-
-
-
-
-
-
+  const renderBarcode = () => {
+    const withCode = products.filter((p: any) => !!(p.code || '').trim());
+    const missingCount = products.length - withCode.length;
+    const selectedCount = customBarcodeProducts.length + purchaseSelIds.length;
+    const pProducts = getPurchaseProducts(purchaseBarcodeId);
+    const previewProduct = customBarcodeProducts[0] || pProducts.find((p: any) => purchaseSelIds.includes(p.id)) || pProducts[0] || barcodeProducts[0] || withCode[0] || products[0];
+    const statCard = (icon: string, label: string, value: any, color: string, bg: string) => (
+      <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 10, background: bg, color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={icon} style={{ fontSize: 16 }}></i></div>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 20, fontWeight: 800, color: T.gray900, lineHeight: 1.1 }}>{value}</div>
+          <div style={{ fontSize: 12, color: T.gray500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</div>
         </div>
-
-
-
-
-
-
-
-
-
-
-
-        <span style={{ fontSize: 14, color: T.gray400 }}>{barcodeProducts.length}</span>
-
-
-
-
-
-
-
-
-
-
-
-        <button style={{ ...btn('ghost', 'sm') }} onClick={printBarcodeTabList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-
-
-
-
-
-
-
-
-
-
-
       </div>
-
-
-
-
-
-
-
-
-
-
-
-      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-
-
-
-
-
-
-
-
-
-
-
-        {barcodeProducts.length === 0 ? (
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-barcode"></i></div><p>{barcodeSearch ? t('noResults') : t('noProductsYet')}</p></div>
-
-
-
-
-
-
-
-
-
-
-
-        ) : (
-
-
-
-
-
-
-
-
-
-
-
+    );
+    const modeToggle = (checked: boolean, onCh: (e: any) => void, icon: string, label: string) => (
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: checked ? T.teal : T.gray600, background: checked ? T.tealLight : T.gray100, border: `1px solid ${checked ? T.teal : T.gray200}`, borderRadius: 8, padding: '8px 12px', flex: 1, minWidth: 0 }}>
+        <input type="checkbox" checked={checked} onChange={onCh} style={{ accentColor: T.teal, flexShrink: 0 }} />
+        <i className={icon} style={{ fontSize: 12 }}></i>{label}
+      </label>
+    );
+    const selRow = (p: any, checked: boolean, onToggle: () => void) => (
+      <div key={p.id} onClick={onToggle} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, background: checked ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <input type="checkbox" checked={checked} readOnly style={{ width: 16, height: 16, flexShrink: 0 }} />
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
+          <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code || t('missingBarcode')}</div>
+        </div>
+        <div style={{ fontSize: 12, color: T.gray500, flexShrink: 0 }}>{p.stock ?? 0}</div>
+      </div>
+    );
+    const listBox = (children: any) => (
+      <div style={{ maxHeight: 240, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 10, background: T.white }}>{children}</div>
+    );
+    const cardHead = (icon: string, title: string, sub: string) => (
+      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 4 }}>
+        <div style={{ width: 38, height: 38, borderRadius: 10, background: T.tealLight, color: T.teal, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={icon} style={{ fontSize: 16 }}></i></div>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontWeight: 800, fontSize: 15, color: T.gray900 }}>{title}</div>
+          <div style={{ fontSize: 12, color: T.gray500 }}>{sub}</div>
+        </div>
+      </div>
+    );
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
+        <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexShrink: 0 }}>
+          <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+            <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+            <input autoFocus value={barcodeSearch} onChange={e => setBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
+          </div>
+          <span style={{ fontSize: 14, color: T.gray400 }}>{barcodeProducts.length}</span>
+          <button style={{ ...btn('ghost', 'sm') }} onClick={printBarcodeTabList}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
+        </div>
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, width: '100%', flexWrap: 'wrap' }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <div style={{ width: 64, height: 64, borderRadius: 16, background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid rgba(255,255,255,0.35)', flexShrink: 0 }}>
+                    <i className="fas fa-barcode" style={{ fontSize: 26 }}></i>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 24, fontWeight: 800, lineHeight: 1.2 }}>{t('barcode')}</div>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8, alignItems: 'center' }}>
+                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-boxes-stacked" style={{ marginRight: 4 }}></i>{withCode.length} {t('barcode')}</span>
+                      <span style={{ padding: '3px 10px', borderRadius: 12, background: selectedCount > 0 ? '#16A34A' : 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-check" style={{ marginRight: 4 }}></i>{selectedCount} {t('selected')}</span>
+                      <span style={{ padding: '3px 10px', borderRadius: 12, background: missingCount > 0 ? '#DC2626' : 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13 }}><i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{missingCount} {t('missingBarcode')}</span>
+                      <span style={{ padding: '3px 10px', borderRadius: 12, background: 'rgba(255,255,255,0.18)', fontWeight: 700, fontSize: 13, fontFamily: 'monospace' }}>{labelSize.replace('x', ' × ')} mm</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <div style={{ fontSize: 28, fontWeight: 800 }}>{selectedCount * labelCopies}</div>
+                <div style={{ fontSize: 13, opacity: 0.9 }}>{t('labelOptions')} · {t('copies')}: {labelCopies}</div>
+              </div>
+            </div>
+          </div>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 40px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12, marginBottom: 16 }}>
+              {statCard('fas fa-box', t('products'), products.length, '#0369A1', '#E0F2FE')}
+              {statCard('fas fa-barcode', t('barcode'), withCode.length, T.teal, T.tealLight)}
+              {statCard('fas fa-check-double', t('selected'), selectedCount, '#16A34A', '#DCFCE7')}
+              {statCard('fas fa-triangle-exclamation', t('missingBarcode'), missingCount, '#DC2626', '#FEE2E2')}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 16, marginBottom: 16 }}>
+              <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                {cardHead('fas fa-box', t('purchaseBarcode'), t('enterPurchaseId'))}
+                <select value={purchaseBarcodeId} onChange={e => { const v = e.target.value; setPurchaseBarcodeId(v); setPurchaseSelIds(getPurchaseProducts(v).map((p: any) => p.id)); }} style={{ ...inputStyle, width: '100%', marginTop: 10 }}>
+                  <option value="">{t('choosePurchase')}</option>
+                  {(purchases || []).map((pur: any) => (<option key={pur.id} value={pur.id}>{pur.id} · {pur.date ? new Date(pur.date).toLocaleDateString() : '-'} · {pur.supplier || '-'} · {purchaseItemsOf(pur).length} {t('products')}</option>))}
+                </select>
+                {(purchases || []).length === 0 && <div style={{ fontSize: 13, color: T.gray400, marginTop: 8 }}>{t('noPurchaseRecords')}</div>}
+                {purchaseBarcodeId !== '' && (
+                  <div style={{ marginTop: 10 }}>
+                    {pProducts.length === 0 ? (
+                      <div style={{ fontSize: 13, color: T.gray400, padding: '10px 0' }}>{t('noProductsFound')}</div>
+                    ) : listBox(pProducts.map((p: any) => selRow(p, purchaseSelIds.includes(p.id), () => setPurchaseSelIds(prev => prev.includes(p.id) ? prev.filter((x: string) => x !== p.id) : [...prev, p.id]))))}
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+                      <button type="button" onClick={() => setPurchaseSelIds(pProducts.map((p: any) => p.id))} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
+                      <button type="button" onClick={() => setPurchaseSelIds([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
+                      <span style={{ fontSize: 13, color: T.gray500, marginLeft: 'auto' }}>{purchaseSelIds.length} {t('products')} {t('selected')}</span>
+                      <button type="button" onClick={printPurchaseBarcode} disabled={purchaseSelIds.length === 0} style={{ ...btn('primary', 'sm'), opacity: purchaseSelIds.length === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                {cardHead('fas fa-barcode', t('customBarcode'), t('selectProductsForBarcode'))}
+                <div style={{ position: 'relative', marginTop: 10 }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                  <input value={customBarcodeSearch} onChange={e => setCustomBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
+                </div>
+                {listBox(customBarcodeFiltered.length === 0 ? (
+                  <div style={{ padding: 14, fontSize: 13, color: T.gray400 }}>{customBarcodeSearch !== '' ? t('noResults') : t('noProductsYet')}</div>
+                ) : customBarcodeFiltered.map((p: any) => selRow(p, customBarcodeProducts.some((cp: any) => cp.id === p.id), () => setCustomBarcodeProducts(prev => prev.some((cp: any) => cp.id === p.id) ? prev.filter((cp: any) => cp.id !== p.id) : [...prev, p]))))}
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+                  <button type="button" onClick={() => setCustomBarcodeProducts(customBarcodeFiltered)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
+                  <button type="button" onClick={() => setCustomBarcodeProducts([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
+                  <span style={{ fontSize: 13, color: T.gray500, marginLeft: 'auto' }}>{customBarcodeProducts.length} {t('products')} {t('selected')}</span>
+                  <button type="button" onClick={printCustomBarcode} disabled={customBarcodeProducts.length === 0} style={{ ...btn('primary', 'sm'), opacity: customBarcodeProducts.length === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                </div>
+                {missingCount > 0 && <div style={{ fontSize: 12, color: '#B91C1C', marginTop: 8 }}><i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{missingCount} {t('missingBarcode')}</div>}
+              </div>
+              <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                {cardHead('fas fa-sliders', t('labelOptions'), `${t('labelSize')} · ${t('copies')}`)}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: T.gray500, display: 'block', marginBottom: 4 }}>{t('labelSize')}</label>
+                    <select value={labelSize} onChange={e => setLabelSize(e.target.value)} style={{ ...inputStyle, width: '100%' }}>
+                      <option value="50x25">50 × 25 mm</option>
+                      <option value="38x25">38 × 25 mm</option>
+                      <option value="50x40">50 × 40 mm</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: T.gray500, display: 'block', marginBottom: 4 }}>{t('copies')}</label>
+                    <input type="number" min={1} max={500} value={labelCopies} onChange={e => setLabelCopies(Math.max(1, Math.min(500, parseInt(e.target.value) || 1)))} style={{ ...inputStyle, width: '100%' }} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+                  {modeToggle(labelShowName, () => setLabelShowName(v => !v), 'fas fa-font', t('showName'))}
+                  {modeToggle(labelShowPrice, () => setLabelShowPrice(v => !v), 'fas fa-tag', t('showPrice'))}
+                  {modeToggle(labelShowCompany, () => setLabelShowCompany(v => !v), 'fas fa-building', t('showCompany'))}
+                </div>
+                <div style={{ marginTop: 12 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: T.gray500, marginBottom: 6 }}><i className="fas fa-eye" style={{ marginRight: 4 }}></i>{t('preview')}</div>
+                  {previewProduct ? (
+                    <div style={{ border: `1px dashed ${T.gray300}`, borderRadius: 10, padding: 14, background: '#FAFAFA', display: 'flex', justifyContent: 'center' }}>
+                      <style dangerouslySetInnerHTML={{ __html: labelItemCss(labelSize) }} />
+                      <div dangerouslySetInnerHTML={{ __html: barcodeLabelHtml(previewProduct, labelOpts()) }} />
+                    </div>
+                  ) : (
+                    <div style={{ border: `1px dashed ${T.gray300}`, borderRadius: 10, padding: 14, background: '#FAFAFA', textAlign: 'center', fontSize: 13, color: T.gray400 }}>{t('noProductsYet')}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+            {barcodeProducts.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400, background: T.white, borderRadius: 14, border: `1px solid ${T.gray200}` }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-barcode"></i></div><p>{barcodeSearch !== '' ? t('noResults') : t('noProductsYet')}</p></div>
+            ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
             <thead><tr style={{ background: T.tealLight }}>
-
-
-
-
-
-
-
-
-
-
-
               {[t('productName'), t('company'), t('barcode'), t('stock'), t('purchasePrice'), t('sellPrice'), t('actions')].map((h, i) => (
-
-
-
-
-
-
-
-
-
-
-
                 <th key={i} style={{ padding: '10px 12px', textAlign: i >= 3 && i <= 5 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
-
-
-
-
-
-
-
-
-
-
-
               ))}
-
-
-
-
-
-
-
-
-
-
-
             </tr></thead>
-
-
-
-
-
-
-
-
-
-
-
             <tbody>
-
-
-
-
-
-
-
-
-
-
-
               {barcodeProducts.map((p: any, i: number) => (
-
-
-
-
-
-
-
-
-
-
-
                 <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
-
-
-
-
-
-
-
-
-
-
-
                   <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{p.name}</td>
-
-
-
-
-
-
-
-
-
-
-
                   <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{p.company || '-'}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px' }}><span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, background: T.gray50, padding: '2px 8px', borderRadius: 4, border: `1px dashed ${T.gray300}` }}>{p.code || 'N/A'}</span></td>
+                  <td style={{ padding: '10px 12px' }}>
+                    {p.code ? <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, background: T.gray50, padding: '2px 8px', borderRadius: 4, border: `1px dashed ${T.gray300}` }}>{p.code}</span> : <span style={{ fontSize: 12, fontWeight: 700, background: '#FEE2E2', color: '#B91C1C', padding: '3px 8px', borderRadius: 4 }}><i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{t('missingBarcode')}</span>}</td>
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 600, color: (p.stock || 0) <= 0 ? '#DC2626' : T.gray600 }}>{p.stock || 0}</td>
-
-
-
-
-
-
-
-
-
-
-
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(p.costPrice)}</td>
-
-
-
-
-
-
-
-
-
-
-
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.teal }}>{fmt(p.sellPrice)}</td>
-
-
-
-
-
-
-
-
-
-
-
                   <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
                     <button style={{ ...btn('primary', 'sm') }} onClick={() => printBarcode(p)}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-
-
-
-
-
-
-
-
-
-
-
                   </td>
-
-
-
-
-
-
-
-
-
-
-
                 </tr>
-
-
-
-
-
-
-
-
-
-
-
               ))}
-
-
-
-
-
-
-
-
-
-
-
             </tbody>
-
-
-
-
-
-
-
-
-
-
-
           </table>
-
-
-
-
-
-
-
-
-
-
-
-        )}
-
-
-
-
-
-
-
-
-
-
-
+            )}
+          </div>
+        </div>
       </div>
-
-
-
-
-
-
-
-
-
-
-
-    </div>
-
-
-
-
-
-
-
-
-
-
-
-  );
+    );
+  };
 
 
 
@@ -8256,67 +8027,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-        {productTab === 'barcode' && (
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
-
-
-
-
-
-
-
-
-
-
-
-            <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowPurchaseBarcodeModal(true)}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('purchaseBarcode')}</button>
-
-
-
-
-
-
-
-
-
-
-
-            <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setShowCustomBarcodeModal(true); setCustomBarcodeSearch(''); setCustomBarcodeProducts([]); }}><i className="fas fa-barcode" style={{marginRight: 4}}></i> {t('customBarcode')}</button>
-
-
-
-
-
-
-
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-
-
-
-        )}
 
 
 
@@ -10052,7 +9762,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-      {showPurchaseBarcodeModal && (
 
 
 
@@ -10064,7 +9773,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-        <div style={overlay} onClick={() => setShowPurchaseBarcodeModal(false)}>
 
 
 
@@ -10076,524 +9784,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
 
-
-
-
-
-
-
-
-
-
-
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('purchaseBarcode')}</h3>
-
-
-
-
-
-
-
-
-
-
-
-            <p style={{ fontSize: 14, color: T.gray600, marginBottom: 12 }}>{t('enterPurchaseId')}</p>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ marginBottom: 16 }}>
-
-
-
-
-
-
-
-
-
-
-
-              <input value={purchaseBarcodeId} onChange={e => setPurchaseBarcodeId(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') printPurchaseBarcode(); }} placeholder={t('purchaseId')} style={inputStyle} />
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
-              <button onClick={() => setShowPurchaseBarcodeModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-
-
-
-
-
-
-
-
-
-
-
-              <button onClick={printPurchaseBarcode} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-      )}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      {showCustomBarcodeModal && (
-
-
-
-
-
-
-
-
-
-
-
-        <div style={overlay} onClick={() => setShowCustomBarcodeModal(false)}>
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-
-
-
-
-
-
-
-
-
-
-
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-barcode" style={{marginRight: 4}}></i> {t('customBarcode')}</h3>
-
-
-
-
-
-
-
-
-
-
-
-            <p style={{ fontSize: 14, color: T.gray600, marginBottom: 12 }}>{t('selectProductsForBarcode')}</p>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ position: 'relative', marginBottom: 12 }}>
-
-
-
-
-
-
-
-
-
-
-
-              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-
-
-
-
-
-
-
-
-
-
-
-              <input value={customBarcodeSearch} onChange={e => setCustomBarcodeSearch(e.target.value)} placeholder={t('searchBarcode')} style={{ ...inputStyle, paddingLeft: 32 }} />
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ maxHeight: 300, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 8, marginBottom: 16 }}>
-
-
-
-
-
-
-
-
-
-
-
-              {customBarcodeFiltered.map((p: any) => {
-
-
-
-
-
-
-
-
-
-
-
-                const isSelected = customBarcodeProducts.some((cp: any) => cp.id === p.id);
-
-
-
-
-
-
-
-
-
-
-
-                return (
-
-
-
-
-
-
-
-
-
-
-
-                  <div key={p.id} onClick={() => { setCustomBarcodeProducts(isSelected ? customBarcodeProducts.filter((cp: any) => cp.id !== p.id) : [...customBarcodeProducts, p]); }} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, background: isSelected ? T.tealLight : T.white, display: 'flex', alignItems: 'center', gap: 8 }}>
-
-
-
-
-
-
-
-
-
-
-
-                    <input type="checkbox" checked={isSelected} readOnly style={{ width: 16, height: 16 }} />
-
-
-
-
-
-
-
-
-
-
-
-                    <div><div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div><div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{p.code}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-                  </div>
-
-
-
-
-
-
-
-
-
-
-
-                );
-
-
-
-
-
-
-
-
-
-
-
-              })}
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-
-
-
-
-
-
-
-
-
-
-
-              <button type="button" onClick={() => setCustomBarcodeProducts(customBarcodeFiltered)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{marginRight: 4}}></i> {t('selectAll')}</button>
-              <span style={{ fontSize: 14, color: T.gray500 }}>{customBarcodeProducts.length} {t('products')} {t('selected')}</span>
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
-              <button onClick={() => setShowCustomBarcodeModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-
-
-
-
-
-
-
-
-
-
-
-              <button onClick={printCustomBarcode} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-      )}
 
 
 
