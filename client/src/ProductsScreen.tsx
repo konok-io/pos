@@ -298,91 +298,6 @@ const genId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
 
 
 
-const genUniqueId = () => {
-
-
-
-
-
-
-
-
-
-
-
-  const now = new Date();
-
-
-
-
-
-
-
-
-
-
-
-  const y = now.getFullYear();
-
-
-
-
-
-
-
-
-
-
-
-  const m = String(now.getMonth() + 1).padStart(2, '0');
-
-
-
-
-
-
-
-
-
-
-
-  const d = String(now.getDate()).padStart(2, '0');
-
-
-
-
-
-
-
-
-
-
-
-  const unique = String(Math.floor(100000 + Math.random() * 900000));
-
-
-
-
-
-
-
-
-
-
-
-  return `${y}${m}${d}${unique}`;
-
-
-
-
-
-
-
-
-
-
-
-};
 
 
 
@@ -399,6 +314,20 @@ const genSupplierId = (suppliersList: any[]) => {
   const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
   let max = 0;
   (suppliersList || []).forEach((x: any) => {
+    const id = String(x?.id || '');
+    if (id.startsWith(ymd) && id.length >= ymd.length + 4) {
+      const n = parseInt(id.slice(ymd.length), 10);
+      if (!Number.isNaN(n) && n > max) max = n;
+    }
+  });
+  return `${ymd}${String(max + 1).padStart(4, '0')}`;
+};
+
+const genCategoryId = (categoriesList: any[]) => {
+  const d = new Date();
+  const ymd = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  let max = 0;
+  (categoriesList || []).forEach((x: any) => {
     const id = String(x?.id || '');
     if (id.startsWith(ymd) && id.length >= ymd.length + 4) {
       const n = parseInt(id.slice(ymd.length), 10);
@@ -5320,633 +5249,127 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
   const renderCategory = () => (
-
-
-
-
-
-
-
-
-
-
-
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-
-
-
-
-
-
-
-
-
-
       <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
         <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-
-
-
-
-
-
-
-
-
-
-
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-
-
-
-
-
-
-
-
-
-
-
           <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
-
-
-
-
-
-
-
-
-
-
-
         </div>
-
-
-
-
-
-
-
-
-
-
-
         <span style={{ fontSize: 14, color: T.gray400 }}>{filteredCategories.length}</span>
-
-
-
-
-
-
-
-
-
-
-
+        <button style={{ ...btn('ghost', 'sm') }} onClick={exportCategoriesCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
         <button style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-
-
-
-
-
-
-
-
-
-
-
       </div>
-
-
-
-
-
-
-
-
-
-
-
-      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-
-
-
-
-
-
-
-
-
-
-
+      <div style={{ flex: 1, overflow: 'auto' }}>
+        {(() => {
+          const withProducts = filteredCategories.filter((cat: string) => products.some((p: any) => String(p.cat || '').trim().toLowerCase() === cat.trim().toLowerCase())).length;
+          const catProds = products.filter((p: any) => filteredCategories.some((cat: string) => String(p.cat || '').trim().toLowerCase() === cat.trim().toLowerCase()));
+          const totalStock = catProds.reduce((a: number, p: any) => a + (p.stock || 0), 0);
+          const totalValue = catProds.reduce((a: number, p: any) => a + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0);
+          const supCount = [...new Set(catProds.map((p: any) => (p.company || '').trim().toLowerCase()).filter(Boolean))].length;
+          const stats = [
+            { icon: 'fas fa-folder', label: t('totalCategories'), value: String(filteredCategories.length), color: T.teal, bg: T.tealLight },
+            { icon: 'fas fa-layer-group', label: t('withProducts'), value: String(withProducts), color: '#7C3AED', bg: '#EDE9FE' },
+            { icon: 'fas fa-box', label: t('products'), value: String(catProds.length), color: T.green, bg: T.greenLight },
+            { icon: 'fas fa-boxes-stacked', label: t('stock'), value: String(totalStock), color: T.orange, bg: '#FFF7ED' },
+            { icon: 'fas fa-sack-dollar', label: t('totalValue'), value: fmt(totalValue), color: '#0369A1', bg: '#E0F2FE' },
+            { icon: 'fas fa-truck', label: t('suppliers'), value: String(supCount), color: T.amber, bg: T.amberLight },
+          ];
+          return (
+            <>
+              <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+                  <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                    <i className="fas fa-folder"></i>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('categories')}</div>
+                    <div style={{ fontSize: 13, opacity: 0.9 }}>
+                      {filteredCategories.length} {t('totalCategories')} · {withProducts} {t('withProducts')} · {catProds.length} {t('products')}
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                      <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                        <i className="fas fa-boxes-stacked" style={{ marginRight: 6 }}></i>{totalStock} {t('stock')}
+                      </span>
+                      <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                        <i className="fas fa-sack-dollar" style={{ marginRight: 6 }}></i>{fmt(totalValue)}
+                      </span>
+                      {categorySearch ? (
+                        <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                          <i className="fas fa-magnifying-glass" style={{ marginRight: 6 }}></i>{categorySearch}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                  <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportCategoriesCsv}>
+                    <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
+                  </button>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
+                {stats.map((st, i) => (
+                  <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: st.bg, color: st.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <i className={st.icon}></i>
+                      </div>
+                      <div style={{ fontSize: 12, color: T.gray400, fontWeight: 600 }}>{st.label}</div>
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: st.color }}>{st.value}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
         {filteredCategories.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400 }}><div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-folder"></i></div><p>{t('noCategories')}</p>
-            <button style={{ ...btn('primary', 'sm'), marginTop: 8 }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genUniqueId(), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{ marginRight: 4 }}></i> {t('addCategory')}</button>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400, background: T.white, borderRadius: 14, border: `1px dashed ${T.gray200}` }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}><i className="fas fa-folder"></i></div>
+            <p>{t('noCategories')}</p>
+            <button style={{ ...btn('primary', 'sm'), marginTop: 8 }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genCategoryId(categories), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{ marginRight: 4 }}></i> {t('addCategory')}</button>
           </div>
         ) : (
-
-
-
-
-
-
-
-
-
-
-
           <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
             <thead><tr style={{ background: T.tealLight }}>
-
-
-
-
-
-
-
-
-
-
-
               {[t('id'), t('categoryName'), t('products'), t('stock'), t('totalValue'), t('actions')].map((h, i) => (
-
-
-
-
-
-
-
-
-
-
-
-                <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 ? 'center' : i === 3 ? 'center' : i === 4 ? 'right' : i === 5 ? 'center' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
-
-
-
-
-
-
-
-
-
-
-
+                <th key={i} style={{ padding: '10px 12px', textAlign: i === 1 ? 'left' : i === 2 || i === 3 || i === 5 ? 'center' : i === 4 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
               ))}
-
-
-
-
-
-
-
-
-
-
-
             </tr></thead>
-
-
-
-
-
-
-
-
-
-
-
             <tbody>
-
-
-
-
-
-
-
-
-
-
-
               {filteredCategories.map((cat: string, i: number) => {
-
-
-
-
-
-
-
-
-
-
-
                 const catObj = categories.find((c: any) => String(c.name || '').trim().toLowerCase() === cat.trim().toLowerCase());
-
-
-
-
-
-
-
-
-
-
-
                 const catId = catObj?.id || '-';
-
-
-
-
-
-
-
-
-
-
-
                 const catProducts = products.filter((p: any) => String(p.cat || '').trim().toLowerCase() === cat.trim().toLowerCase());
-
-
-
-
-
-
-
-
-
-
-
                 const totalStock = catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
-
-
-
-
-
-
-
-
-
-
-
                 const totalValue = catProducts.reduce((s: number, p: any) => s + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0);
-
-
-
-
-
-
-
-
-
-
-
                 return (
-
-
-
-
-
-
-
-
-
-
-
                   <tr key={cat} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
-
-
-
-
-
-
-
-
-
-
-
                     <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{catId}</td>
-
-
-
-
-
-
-
-
-
-
-
-                    <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, color: T.teal, cursor: 'pointer' }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-folder" style={{marginRight: 4}}></i> {cat}</td>
-
-
-
-
-
-
-
-
-
-
-
+                    <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14, color: T.teal, cursor: 'pointer', minWidth: 180 }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-folder" style={{marginRight: 4}}></i> {cat}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catProducts.length}</span></td>
-
-
-
-
-
-
-
-
-
-
-
                     <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{totalStock}</td>
-
-
-
-
-
-
-
-
-
-
-
-                    <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14 }}>{fmt(totalValue)}</td>
-
-
-
-
-
-
-
-
-
-
-
+                    <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.green }}>{fmt(totalValue)}</td>
                     <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
-                      <button title={t('edit')} style={{ ...btn('ghost', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => { setEditingCategory(catObj || { id: '', name: cat }); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
-
-
-
-
-
-
-
-
-
-
-
+                      <button title={t('edit')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => { setEditingCategory(catObj || { id: '', name: cat }); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
                       <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-eye"></i></button>
-
-
-
-
-
-
-
-
-
-
-
-                      <button title={t('delete') || t('confirmDelete')} style={{ ...btn('danger', 'sm'), padding: '4px 8px', fontSize: 13 }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
-
-
-
-
-
-
-
-
-
-
-
+                      <button title={t('delete') || t('confirmDelete')} style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
                     </td>
-
-
-
-
-
-
-
-
-
-
-
                   </tr>
-
-
-
-
-
-
-
-
-
-
-
                 );
-
-
-
-
-
-
-
-
-
-
-
               })}
-
-
-
-
-
-
-
-
-
-
-
             </tbody>
-
-
-
-
-
-
-
-
-
-
-
           </table>
-
-
-
-
-
-
-
-
-
-
-
         )}
-
-
-
-
-
-
-
-
-
-
-
+              </div>
+            </>
+          );
+        })()}
       </div>
-
-
-
-
-
-
-
-
-
-
-
       {showCategoryModal && (
-
-
-
-
-
-
-
-
-
-
-
         <div style={overlay} onClick={() => setShowCategoryModal(false)}>
-
-
-
-
-
-
-
-
-
-
-
           <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-
-
-
-
-
-
-
-
-
-
-
             <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {editingCategory ? t('edit') : t('addCategory')}</h3>
-
-
-
-
-
-
-
-
-
-
-
             <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('id')}</label><input value={categoryForm.id} readOnly style={{ ...inputStyle, background: T.gray50, fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }} /></div>
-
-
-
-
-
-
-
-
-
-
-
             <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
-
-
-
-
-
-
-
-
-
-
-
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
               <button onClick={() => setShowCategoryModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-
-
-
-
-
-
-
-
-
-
-
               <button onClick={() => {
                 const name = categoryForm.name.trim();
                 if (!name) { alert(t('enterName')); return; }
@@ -5961,7 +5384,7 @@ body{font-family:Arial,sans-serif;width:210mm}
                     setCategories(updated); setCategoriesParent(updated);
                     api.updateCategory(editingId, { name }).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
                   } else {
-                    const newCat = { id: categoryForm.id || genUniqueId(), name };
+                    const newCat = { id: categoryForm.id || genCategoryId(categories), name };
                     const updated = [...categories, newCat];
                     setCategories(updated); setCategoriesParent(updated);
                     api.addCategory(newCat).catch((e: any) => alert(`${t('failed')}: ${e?.message || e}`));
@@ -5975,7 +5398,7 @@ body{font-family:Arial,sans-serif;width:210mm}
                     }
                   }
                 } else {
-                  const newCat = { id: categoryForm.id || genUniqueId(), name };
+                  const newCat = { id: categoryForm.id || genCategoryId(categories), name };
                   const updated = [...categories, newCat];
                   setCategories(updated); setCategoriesParent(updated);
                   api.addCategory(newCat).then((res: any) => {
@@ -5987,100 +5410,12 @@ body{font-family:Arial,sans-serif;width:210mm}
                 }
                 setShowCategoryModal(false);
               }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
-
-
-
-
-
-
-
-
-
-
-
             </div>
-
-
-
-
-
-
-
-
-
-
-
           </div>
-
-
-
-
-
-
-
-
-
-
-
         </div>
-
-
-
-
-
-
-
-
-
-
-
       )}
-
-
-
-
-
-
-
-
-
-
-
     </div>
-
-
-
-
-
-
-
-
-
-
-
   );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   const renderBarcode = () => (
 
@@ -9273,7 +8608,7 @@ tr:nth-child(even){background:#F8FAFC}
                     return out;
                   };
                   const headers = parseLine(lines2[0]).map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); let imported = 0;
-                  for (let k = 1; k < lines2.length; k++) { const cols = parseLine(lines2[k]).map((c: string) => c.trim()); const name = (nameIdx >= 0 ? cols[nameIdx] : '').trim(); if (!name) continue; const exists = categories.find((ca: any) => String(ca.name || '').trim().toLowerCase() === name.toLowerCase()); if (!exists) { const newCat = { id: genUniqueId(), name }; setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); api.addCategory(newCat).catch(() => {}); imported++; } } alert(`${imported} ${t('categories')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
+                  for (let k = 1; k < lines2.length; k++) { const cols = parseLine(lines2[k]).map((c: string) => c.trim()); const name = (nameIdx >= 0 ? cols[nameIdx] : '').trim(); if (!name) continue; const exists = categories.find((ca: any) => String(ca.name || '').trim().toLowerCase() === name.toLowerCase()); if (!exists) { const newCat = { id: genCategoryId(categories), name }; setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); api.addCategory(newCat).catch(() => {}); imported++; } } alert(`${imported} ${t('categories')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
 
 
 
@@ -9297,7 +8632,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genUniqueId(), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCategory')}</button>
+            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genCategoryId(categories), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCategory')}</button>
 
 
 
