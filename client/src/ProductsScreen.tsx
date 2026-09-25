@@ -962,10 +962,18 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [customBarcodeProducts, setCustomBarcodeProducts] = useState<any[]>([]);
-  const [labelSize, setLabelSize] = useState('50x25');
-  const [labelShowName, setLabelShowName] = useState(true);
-  const [labelShowPrice, setLabelShowPrice] = useState(true);
-  const [labelShowCompany, setLabelShowCompany] = useState(false);
+  const LABEL_SIZE_KEYS = ['50x25', '38x25', '50x40', '50x30', '40x30'];
+  const readLabelSetting = (k: string): string => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
+  const [labelSize, setLabelSize] = useState(() => { const v = readLabelSetting('pos_label_size'); return LABEL_SIZE_KEYS.indexOf(v) >= 0 ? v : '50x25'; });
+  const [labelShowName, setLabelShowName] = useState(() => readLabelSetting('pos_label_show_name') !== '0');
+  const [labelShowPrice, setLabelShowPrice] = useState(() => readLabelSetting('pos_label_show_price') !== '0');
+  const [labelShowCompany, setLabelShowCompany] = useState(() => readLabelSetting('pos_label_show_company') === '1');
+  useEffect(() => {
+    localStorage.setItem('pos_label_size', labelSize);
+    localStorage.setItem('pos_label_show_name', labelShowName ? '1' : '0');
+    localStorage.setItem('pos_label_show_price', labelShowPrice ? '1' : '0');
+    localStorage.setItem('pos_label_show_company', labelShowCompany ? '1' : '0');
+  }, [labelSize, labelShowName, labelShowPrice, labelShowCompany]);
   const [purchaseSelIds, setPurchaseSelIds] = useState<string[]>([]);
   const [purchaseSearch, setPurchaseSearch] = useState('');
   const [purchasePage, setPurchasePage] = useState(0);
@@ -2844,6 +2852,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     '50x25': { w: 50, h: 25, svgMax: 10, nameFs: 7 },
     '38x25': { w: 38, h: 25, svgMax: 10, nameFs: 6.5 },
     '50x40': { w: 50, h: 40, svgMax: 16, nameFs: 8 },
+    '50x30': { w: 50, h: 30, svgMax: 13, nameFs: 7.5 },
+    '40x30': { w: 40, h: 30, svgMax: 13, nameFs: 7 },
   };
 
   const labelItemCss = (sizeKey: string): string => {
@@ -2881,6 +2891,14 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
   const openPrintWin = (html: string) => {
     const win = window.open('', '_blank', 'width=800,height=600');
     if (!win) { alert(t('popupBlocked')); return; }
+    win.document.write(html);
+    win.document.close();
+    const ua = String(navigator.userAgent || '');
+    const touchIos = /iPhone|iPad|iPod/i.test(ua) || (String(navigator.platform || '') === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+    if (touchIos) {
+      setTimeout(() => { if (!win.closed) win.focus(); alert(t('printUnsupported')); }, 400);
+      return;
+    }
     let done = false;
     const doPrint = () => {
       if (done || win.closed) return;
@@ -2888,8 +2906,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
       win.focus();
       win.print();
     };
-    win.document.write(html);
-    win.document.close();
     if (win.document.readyState === 'complete') {
       setTimeout(doPrint, 400);
     } else {
@@ -3437,7 +3453,26 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
 
 
 
-  const purchaseLabelCount = (p: any): number => Math.max(0, Math.round(Number(p.stock) || 0));
+  const purchaseQtyMap = (): Record<string, number> => {
+    const map: Record<string, number> = {};
+    const id = String(purchaseBarcodeId || '').trim().toLowerCase();
+    if (!id) return map;
+    const rec = (purchases || []).find((x: any) => String(x.id || '').toLowerCase() === id);
+    if (!rec) return map;
+    for (const it of purchaseItemsOf(rec)) {
+      if (!it || !it.productId) continue;
+      const raw = it.quantity != null ? it.quantity : ((Number(it.paidQty) || 0) + (Number(it.freeQty) || 0));
+      const q = Math.round(Number(raw) || 0);
+      if (q > 0) map[String(it.productId)] = (map[String(it.productId)] || 0) + q;
+    }
+    return map;
+  };
+
+  const purchaseLabelCount = (p: any, qtyMap?: Record<string, number>): number => {
+    const q = qtyMap ? qtyMap[String(p.id)] : undefined;
+    if (q != null) return q;
+    return Math.max(0, Math.round(Number(p.stock) || 0));
+  };
 
   const printPurchaseBarcode = () => {
     const pid = purchaseBarcodeId.trim();
@@ -3449,12 +3484,13 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const skipped = selected.length - printable.length;
     if (skipped > 0) alert(`${skipped} ${t('missingBarcode')}`);
     if (printable.length === 0) return;
+    const qtyMap = purchaseQtyMap();
     let total = 0;
-    for (const p of printable) total += purchaseLabelCount(p);
+    for (const p of printable) total += purchaseLabelCount(p, qtyMap);
     if (total === 0) { alert(t('noProductsFound')); return; }
     if (total > 500) { alert(t('maxLabels')); return; }
     const list: any[] = [];
-    for (const p of printable) { const n = purchaseLabelCount(p); for (let i = 0; i < n; i++) list.push(p); }
+    for (const p of printable) { const n = purchaseLabelCount(p, qtyMap); for (let i = 0; i < n; i++) list.push(p); }
     printBarcodeSheet(list, `${t('purchaseBarcode')} ${pid} | ${printable.length} ${t('products')} | ${t('total')}: ${list.length} | ${new Date().toLocaleDateString()}`, labelOpts());
   };
 
@@ -5147,7 +5183,8 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const purchasePageSafe = Math.min(purchasePage, totalPurchasePages - 1);
     const purchasePageRows = purchaseRows.slice(purchasePageSafe * purchasePerPage, purchasePageSafe * purchasePerPage + purchasePerPage);
     const selectedPurchaseProducts = pProducts.filter((p: any) => purchaseSelIds.includes(p.id));
-    const purchaseTotalLabels = selectedPurchaseProducts.reduce((s: number, p: any) => s + purchaseLabelCount(p), 0);
+    const qtyMap = purchaseQtyMap();
+    const purchaseTotalLabels = selectedPurchaseProducts.reduce((s: number, p: any) => s + purchaseLabelCount(p, qtyMap), 0);
     const selectedCount = customBarcodeProducts.length + selectedPurchaseProducts.length;
     const customTotalLabels = customBarcodeProducts.reduce((s: number, p: any) => s + clampQty(customQty[String(p.id)]), 0);
     const totalLabels = purchaseTotalLabels + customTotalLabels;
@@ -5248,7 +5285,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       <div style={{ marginTop: 10 }}>
                         {pProducts.length === 0 ? (
                           <div style={{ fontSize: 13, color: T.gray400, padding: '10px 0' }}>{t('noProductsFound')}</div>
-                        ) : listBox(pProducts.map((p: any) => selRow(p, purchaseSelIds.includes(p.id), () => setPurchaseSelIds(prev => prev.includes(p.id) ? prev.filter((x: string) => x !== p.id) : [...prev, p.id]), `\u00d7${purchaseLabelCount(p)}`)))}
+                        ) : listBox(pProducts.map((p: any) => selRow(p, purchaseSelIds.includes(p.id), () => setPurchaseSelIds(prev => prev.includes(p.id) ? prev.filter((x: string) => x !== p.id) : [...prev, p.id]), `\u00d7${purchaseLabelCount(p, qtyMap)}`)))}
                         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
                           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                             <button type="button" onClick={() => setPurchaseSelIds(pProducts.map((p: any) => p.id))} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
@@ -5354,6 +5391,8 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                     <option value="50x25">50 × 25 mm</option>
                     <option value="38x25">38 × 25 mm</option>
                     <option value="50x40">50 × 40 mm</option>
+                    <option value="50x30">50 × 30 mm</option>
+                    <option value="40x30">40 × 30 mm</option>
                   </select>
                 </div>
                 {barcodeWarn && (
