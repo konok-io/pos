@@ -4368,7 +4368,7 @@ body{font-family:Arial,sans-serif;width:210mm}
 
 
 
-                    <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+                    <td style={{ padding: '10px 12px', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
 
 
 
@@ -4950,7 +4950,7 @@ body{font-family:Arial,sans-serif;width:210mm}
                     <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ background: T.tealLight, color: T.teal, padding: '2px 8px', borderRadius: 12, fontSize: 12, fontWeight: 700 }}>{catProducts.length}</span></td>
                     <td style={{ padding: '10px 12px', textAlign: 'center', fontWeight: 600, fontSize: 14 }}>{totalStock}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.green }}>{fmt(totalValue)}</td>
-                    <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+                    <td style={{ padding: '10px 12px', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                       <button title={t('edit')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => { setEditingCategory(catObj || { id: '', name: cat }); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
                       <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-eye"></i></button>
                       <button title={t('delete') || t('confirmDelete')} style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
@@ -5171,16 +5171,16 @@ body{font-family:Arial,sans-serif;width:210mm}
                 {listBox(customBarcodeFiltered.length === 0 ? (
                   <div style={{ padding: 14, fontSize: 13, color: T.gray400 }}>{customBarcodeSearch !== '' ? t('noResults') : t('noProductsYet')}</div>
                 ) : customBarcodeFiltered.map((p: any) => selRow(p, customBarcodeProducts.some((cp: any) => cp.id === p.id), () => setCustomBarcodeProducts(prev => prev.some((cp: any) => cp.id === p.id) ? prev.filter((cp: any) => cp.id !== p.id) : [...prev, p]))))}
-                    <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
-                      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                     <button type="button" onClick={() => setCustomBarcodeProducts(customBarcodeFiltered)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-check-double" style={{ marginRight: 4 }}></i>{t('selectAll')}</button>
                     <button type="button" onClick={() => setCustomBarcodeProducts([])} style={{ ...btn('ghost', 'sm') }}>{t('clear')}</button>
-                      </div>
-                      <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginLeft: 'auto' }}>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginLeft: 'auto' }}>
                     <span style={{ fontSize: 13, color: T.gray500 }}>{customBarcodeProducts.length} {t('products')} {t('selected')}</span>
                     <button type="button" onClick={printCustomBarcode} disabled={customBarcodeProducts.length === 0} style={{ ...btn('primary', 'sm'), opacity: customBarcodeProducts.length === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
-                      </div>
-                    </div>
+                  </div>
+                </div>
                 {missingCount > 0 && <div style={{ fontSize: 12, color: '#B91C1C', marginTop: 8 }}><i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{missingCount} {t('missingBarcode')}</div>}
               </div>
               <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
@@ -5236,7 +5236,7 @@ body{font-family:Arial,sans-serif;width:210mm}
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14, fontWeight: 600, color: (p.stock || 0) <= 0 ? '#DC2626' : T.gray600 }}>{p.stock || 0}</td>
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(p.costPrice)}</td>
                   <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.teal }}>{fmt(p.sellPrice)}</td>
-                  <td style={{ padding: '10px 12px', display: 'flex', gap: 4, justifyContent: 'center' }}>
+                  <td style={{ padding: '10px 12px', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                     <button style={{ ...btn('primary', 'sm') }} onClick={() => printBarcode(p)}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
                   </td>
                 </tr>
