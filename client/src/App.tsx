@@ -7602,11 +7602,29 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [priceHistoryCount, setPriceHistoryCount] = useState(0);
 
   // Load settings from PouchDB on mount
   useEffect(() => {
     loadSettings();
   }, []);
+
+  // Load price history count when Data Reset tab is open
+  useEffect(() => {
+    if (activeTab !== 3) return;
+    let alive = true;
+    (async () => {
+      try {
+        const rows = await api.getPriceHistory();
+        if (alive && Array.isArray(rows)) { setPriceHistoryCount(rows.length); return; }
+      } catch {}
+      try {
+        const local = await db.getAll('price_history').catch(() => []);
+        if (alive) setPriceHistoryCount((local || []).length);
+      } catch {}
+    })();
+    return () => { alive = false; };
+  }, [activeTab]);
 
   const loadSettings = async () => {
     // Try MySQL API first
@@ -7760,9 +7778,11 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
       else if (storeName === 'suppliers') await api.deleteAllSuppliers().catch(() => {});
       else if (storeName === 'sales') await api.deleteAllSales().catch(() => {});
       else if (storeName === 'purchases') await api.deleteAllPurchases().catch(() => {});
+      else if (storeName === 'price_history') await api.deleteAllPriceHistory().catch(() => {});
       try {
-        const sn = storeName === 'products' ? 'products' : storeName === 'categories' ? 'categories' : storeName === 'suppliers' ? 'suppliers' : storeName === 'sales' ? 'sales' : storeName === 'purchases' ? 'purchases' : null;
-        if (sn) { const all = await db.getAll(sn); for (const item of all as any[]) { await db.delete(sn, item.id).catch(() => {}); } }
+        const validStores = ['products', 'categories', 'suppliers', 'sales', 'purchases', 'price_history'];
+        const sn = validStores.includes(storeName) ? storeName : null;
+        if (sn) { const all = await db.getAll(sn); for (const item of all as any[]) { await db.delete(sn, (item as any).id).catch(() => {}); } }
       } catch {}
       setItems([]);
       alert(translate('dataDeletedSuccessfully'));
@@ -8552,10 +8572,10 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               ))}
             </div>
 
-            {/* Row 2: 1 Card + Delete All Button */}
+            {/* Row 2: 2 Cards + Delete All Button */}
             <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
-              {/* Left: 1 Card */}
-              <div style={{ flex: 1 }}>
+              {/* Left: Purchase History + Price History Cards */}
+              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div style={{ 
                   background: '#fff', 
                   borderRadius: 12, 
@@ -8584,6 +8604,40 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
                         fontSize: 12, 
                         fontWeight: 600, 
                         cursor: purchases.length === 0 ? 'not-allowed' : 'pointer',
+                      }}>
+                      {t('delete')}
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ 
+                  background: '#fff', 
+                  borderRadius: 12, 
+                  padding: 14, 
+                  border: '1px solid #e5e7eb',
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center',
+                  height: '100%',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 20 }}><i className="fas fa-tags"></i></span>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t('priceHistory')}</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{priceHistoryCount}</span>
+                    <button
+                      onClick={() => deleteAllItems('price_history', Array.from({ length: priceHistoryCount }, (_, i) => ({ id: i })), () => setPriceHistoryCount(0), t)}
+                      disabled={priceHistoryCount === 0}
+                      style={{ 
+                        padding: '6px 12px', 
+                        background: priceHistoryCount === 0 ? '#f3f4f6' : '#ef4444', 
+                        color: priceHistoryCount === 0 ? '#9ca3af' : '#fff', 
+                        border: 'none', 
+                        borderRadius: 6, 
+                        fontSize: 12, 
+                        fontWeight: 600, 
+                        cursor: priceHistoryCount === 0 ? 'not-allowed' : 'pointer',
                       }}>
                       {t('delete')}
                     </button>
