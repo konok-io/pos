@@ -6172,7 +6172,6 @@ tr:nth-child(even){background:#F8FAFC}
                 <i className="fas fa-xmark"></i>
               </button>
             ) : null}
-            <span style={{ fontSize: 14, color: T.gray400 }}>{list.length}</span>
             <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
           </div>
         </div>
@@ -6490,7 +6489,6 @@ tr:nth-child(even){background:#F8FAFC}
             <input type="date" value={fromDate} onChange={e => setFilterFrom && setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate')} />
             <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
             <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
-            <span style={{ fontSize: 14, color: T.gray400 }}>{rows.length}</span>
             <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPriceCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
             <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printPriceHistory}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
           </div>
