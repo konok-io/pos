@@ -4586,7 +4586,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
 
 
 
-                        <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: hasProducts ? 0.3 : 1, cursor: hasProducts ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingSupplier(supplier); setSupplierForm(supplier); setShowSupplierModal(true); }}><i className="fas fa-pen"></i></button>
+                        <button disabled={hasProducts} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: hasProducts ? 0.3 : 1, cursor: hasProducts ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingSupplier(supplier); setSupplierForm(supplier); setShowSupplierModal(true); }}><i className="fas fa-pen"></i></button>
 
 
 
@@ -5150,6 +5150,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 const catProducts = products.filter((p: any) => String(p.cat || '').trim().toLowerCase() === cat.trim().toLowerCase());
                 const totalStock = catProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
                 const totalValue = catProducts.reduce((s: number, p: any) => s + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0);
+                const hasCatProducts = catProducts.length > 0;
                 return (
                   <tr key={cat} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
                     <td style={{ padding: '10px 12px', fontSize: 13, color: T.gray500, fontFamily: 'monospace' }}>{catId}</td>
@@ -5159,9 +5160,9 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, fontSize: 14, color: T.green }}>{fmt(totalValue)}</td>
                     <td style={{ padding: '10px 12px', textAlign: 'center', verticalAlign: 'middle', whiteSpace: 'nowrap' }}>
                       <div style={{ display: 'flex', gap: 6, alignItems: 'center', justifyContent: 'center' }}>
-                        <button title={t('edit')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => { setEditingCategory(catObj || { id: '', name: cat }); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
+                        <button title={t('edit')} disabled={hasCatProducts} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: hasCatProducts ? 0.3 : 1, cursor: hasCatProducts ? 'not-allowed' : 'pointer' }} onClick={() => { setEditingCategory(catObj || { id: '', name: cat }); setCategoryForm({ id: catObj?.id || '', name: cat }); setShowCategoryModal(true); }}><i className="fas fa-pen"></i></button>
                         <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewCategory({ name: cat, products: catProducts, totalValue })}><i className="fas fa-eye"></i></button>
-                        <button title={t('delete') || t('confirmDelete')} style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
+                        <button title={t('delete') || t('confirmDelete')} disabled={hasCatProducts} style={{ ...btn('danger', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, opacity: hasCatProducts ? 0.3 : 1, cursor: hasCatProducts ? 'not-allowed' : 'pointer' }} onClick={() => deleteCategory(cat)}><i className="fas fa-trash"></i></button>
                       </div>
                     </td>
                   </tr>
