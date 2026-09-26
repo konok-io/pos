@@ -171,6 +171,65 @@ initFontDetection();
     } catch {}
   }
   window.addEventListener('load', () => { setTimeout(check, 3000); });
-  setInterval(check, 5 * 60 * 1000);
+  setInterval(check, 60 * 1000);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+})();
+
+
+// ===== Service-worker update: when a new deploy takes control, reload once =====
+if ('serviceWorker' in navigator) {
+  let swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (swRefreshing) return;
+    swRefreshing = true;
+    window.location.reload();
+  });
+  setInterval(() => {
+    navigator.serviceWorker.getRegistrations()
+      .then((regs) => { for (const r of regs) { r.update().catch(() => {}); } })
+      .catch(() => {});
+  }, 60 * 1000);
+}
+
+// ===== Global button loader: any button whose click starts API calls gets a
+// spinner until the requests finish. Fast/local buttons never spin, and future
+// buttons are covered automatically (no per-button code needed). =====
+(function globalButtonLoader() {
+  try {
+    const style = document.createElement('style');
+    style.textContent = [
+      'button.pos-btn-loading{position:relative!important;color:transparent!important}',
+      'button.pos-btn-loading *{visibility:hidden!important}',
+      'button.pos-btn-loading .pos-btn-spin{visibility:visible!important;position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.82);border-radius:inherit;color:#0F766E}',
+    ].join('');
+    document.head.appendChild(style);
+    const mark = (btn: HTMLButtonElement) => {
+      btn.classList.add('pos-btn-loading');
+      const sp = document.createElement('span');
+      sp.className = 'pos-btn-spin';
+      sp.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      btn.appendChild(sp);
+    };
+    const clear = (btn: HTMLButtonElement) => {
+      btn.classList.remove('pos-btn-loading');
+      const sp = btn.querySelector('.pos-btn-spin');
+      if (sp) sp.remove();
+    };
+    window.addEventListener('pos:api-idle', () => {
+      document.querySelectorAll('button.pos-btn-loading').forEach((b) => clear(b as HTMLButtonElement));
+    });
+    document.addEventListener('click', (e) => {
+      try {
+        const el = e.target as HTMLElement | null;
+        const btn = el && el.closest ? (el.closest('button') as HTMLButtonElement | null) : null;
+        if (!btn || btn.disabled || btn.classList.contains('pos-btn-loading')) return;
+        // Buttons with their own spinner or an opt-out attribute are skipped
+        if (btn.querySelector('.fa-spinner') || btn.hasAttribute('data-no-loader')) return;
+        window.setTimeout(() => {
+          if (btn.classList.contains('pos-btn-loading')) return;
+          if (((window as any).__posApiPending || 0) > 0) mark(btn);
+        }, 80);
+      } catch {}
+    });
+  } catch {}
 })();

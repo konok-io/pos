@@ -81,7 +81,33 @@ function emitApiError(msg: string) {
   try { window.dispatchEvent(new CustomEvent('pos:api-error', { detail: msg })); } catch {}
 }
 
+// ===== Global API busy counter — lets the UI spin any button while requests run =====
+let activeApiRequests = 0;
+function apiBusyStart() {
+  activeApiRequests++;
+  try {
+    (window as any).__posApiPending = activeApiRequests;
+    window.dispatchEvent(new CustomEvent('pos:api-busy'));
+  } catch {}
+}
+function apiBusyEnd() {
+  activeApiRequests = Math.max(0, activeApiRequests - 1);
+  try {
+    (window as any).__posApiPending = activeApiRequests;
+    if (activeApiRequests === 0) window.dispatchEvent(new CustomEvent('pos:api-idle'));
+  } catch {}
+}
+
 async function request(path: string, options: RequestInit = {}) {
+  apiBusyStart();
+  try {
+    return await requestInner(path, options);
+  } finally {
+    apiBusyEnd();
+  }
+}
+
+async function requestInner(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options.headers as Record<string, string> || {}),

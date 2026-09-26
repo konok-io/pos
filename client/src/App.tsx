@@ -1449,6 +1449,9 @@ export default function App() {
     // Let the language provider know a session just started so it can load
     // the saved language from the database.
     try { window.dispatchEvent(new CustomEvent('pos:session')); } catch {}
+    // Pull every dataset again so a fresh login (incl. after auto-logout)
+    // never shows the snapshot from before the session ended.
+    syncAllData();
   };
 
   // ===== 5-minute inactivity auto-logout (client side, server also enforces via DB sessions) =====
@@ -1496,6 +1499,10 @@ export default function App() {
       const names = await caches.keys();
       for (const name of names) { await caches.delete(name); }
     }
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const r of regs) { await r.update(); }
+    } catch {}
     window.location.reload();
   };
 
@@ -2099,7 +2106,7 @@ export default function App() {
                   transition: 'all 0.2s',
                   borderRadius: 6,
                 }}>
-                  <span style={{ fontSize: 16 }}><i className="fas fa-cart-shopping"></i></span>
+                  <span style={{ fontSize: 16 }}>{tabLoading && currentTab === 'pos' ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-cart-shopping"></i>}</span>
                   <span style={{ marginLeft: 6 }}>{t('sales')}</span>
                 </button>
                 {otherTabs.map((t) => (
@@ -2119,7 +2126,7 @@ export default function App() {
                     transition: 'all 0.2s',
                     borderRadius: 6,
                   }}>
-                    <span style={{ fontSize: 16 }}>{t.icon}</span>
+                    <span style={{ fontSize: 16 }}>{tabLoading && currentTab === t.id ? <i className="fas fa-spinner fa-spin"></i> : t.icon}</span>
                     <span style={{ marginLeft: 6 }}>{t.label}</span>
                   </button>
                 ))}
