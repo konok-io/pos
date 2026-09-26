@@ -8809,9 +8809,17 @@ tr:nth-child(even){background:#F8FAFC}
                    <div style={{ position: 'relative' }}>
                      <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-building" style={{ fontSize: 13 }}></i></div>
                      <input value={productForm.company || productForm.supplierId} onChange={e => { const val = e.target.value; const found = suppliers.find((s: any) => s.id === val || s.name.toLowerCase() === val.toLowerCase()); if (found) { setProductForm({ ...productForm, supplierId: found.id, company: found.name }); } else { setProductForm({ ...productForm, supplierId: '', company: val }); } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.company ? '#F0F9FF' : T.gray50, borderColor: productForm.company ? '#0369A1' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
-                     {productForm.supplierId && !productForm.company && suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).length > 0 && (
-                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
-                         {suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).map((s: any) => (
+                     {(() => {
+                       const q = String(productForm.company || productForm.supplierId || '').toLowerCase();
+                       const matches = suppliers.filter((s: any) => {
+                         const n = String(s.name || '').toLowerCase();
+                         const i = String(s.id || '').toLowerCase();
+                         return (n.includes(q) || i.includes(q)) && n !== q && i !== q;
+                       });
+                       if (!q || matches.length === 0) return null;
+                       return (
+                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 20, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
+                         {matches.map((s: any) => (
                            <div key={s.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, supplierId: s.id, company: s.name })}>
                              <div style={{ width: 28, height: 28, borderRadius: 6, background: '#E0F2FE', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                                <i className="fas fa-building" style={{ color: '#0369A1', fontSize: 11 }}></i>
@@ -8823,7 +8831,8 @@ tr:nth-child(even){background:#F8FAFC}
                            </div>
                          ))}
                        </div>
-                     )}
+                       );
+                     })()}
                    </div>
                  </div>
                   <div>
