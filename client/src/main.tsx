@@ -198,9 +198,12 @@ if ('serviceWorker' in navigator) {
   try {
     const style = document.createElement('style');
     style.textContent = [
-      '.pos-btn-loading{position:relative!important;color:transparent!important}',
-      '.pos-btn-loading *{visibility:hidden!important}',
-      '.pos-btn-loading .pos-btn-spin{visibility:visible!important;position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.82);border-radius:inherit;color:#0F766E}',
+      '@keyframes pos-btn-spin{to{transform:rotate(360deg)}}',
+      '.pos-btn-loading{position:relative!important;overflow:hidden!important}',
+      '.pos-btn-loading>*{visibility:hidden!important}',
+      '.pos-btn-loading>.pos-btn-spin{visibility:visible!important;position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:7px;padding:0 8px;background:rgba(255,255,255,0.94);color:#0F766E;font-size:12px;font-weight:700;border-radius:inherit;white-space:nowrap;overflow:hidden;box-sizing:border-box}',
+      '.pos-btn-loading>.pos-btn-spin .pos-btn-circle{width:16px;height:16px;border:3px solid rgba(15,118,110,0.25);border-top-color:#0F766E;border-radius:50%;animation:pos-btn-spin .7s linear infinite;flex-shrink:0}',
+      '.pos-btn-loading>.pos-btn-spin .pos-btn-txt{overflow:hidden;text-overflow:ellipsis}',
     ].join('');
     document.head.appendChild(style);
     const pending = () => ((window as any).__posApiPending || 0) > 0;
@@ -209,7 +212,15 @@ if ('serviceWorker' in navigator) {
       target.classList.add('pos-btn-loading');
       const sp = document.createElement('span');
       sp.className = 'pos-btn-spin';
-      sp.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      const circle = document.createElement('span');
+      circle.className = 'pos-btn-circle';
+      sp.appendChild(circle);
+      if (target.offsetWidth >= 88) {
+        const txt = document.createElement('span');
+        txt.className = 'pos-btn-txt';
+        txt.textContent = document.documentElement.lang === 'bn' ? 'লোডিং ডাটা...' : 'Loading data...';
+        sp.appendChild(txt);
+      }
       target.appendChild(sp);
       const born = Date.now();
       const tick = () => {
