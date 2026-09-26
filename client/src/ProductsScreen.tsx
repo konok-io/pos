@@ -8949,8 +8949,15 @@ tr:nth-child(even){background:#F8FAFC}
                           {t('foc')}
                         </label>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#15803D', background: '#F0FDF4', border: `1px solid #BBF7D0`, borderRadius: 8, padding: '8px 12px', minHeight: 38, boxSizing: 'border-box', justifyContent: 'center' }}>
-                        {t('salesPriceWithVat')}: {_settings?.currencySymbol} {((productForm.sellPrice || 0) + ((productForm.sellPrice || 0) * (productForm.vat || _settings?.vatPercent || 0) / 100)).toFixed(2)}
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 4, background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', border: `1px solid #BBF7D0`, borderRadius: 8, padding: '8px 12px', minHeight: 38, boxSizing: 'border-box' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: '#15803D' }}>{t('salesPriceWithVat')}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#15803D' }}>{_settings?.currencySymbol} {((productForm.sellPrice || 0) + ((productForm.sellPrice || 0) * (productForm.vat || _settings?.vatPercent || 0) / 100)).toFixed(2)}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: '#166534' }}>{t('totalPurchase')}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#166534' }}>{_settings?.currencySymbol} {((productForm.paidQty || 0) * (productForm.costPrice || 0)).toFixed(2)}</span>
+                        </div>
                       </div>
                     {(() => {
                       const stock = productForm.stock || 0;
