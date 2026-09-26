@@ -1052,6 +1052,12 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false); // Prevent save before initial load
   const [tabLoading, setTabLoading] = useState(false); // Show skeleton on every tab click
+  const [posContentLoading, setPosContentLoading] = useState(false);
+  useEffect(() => {
+    if (!posContentLoading) return;
+    const timer = window.setTimeout(() => setPosContentLoading(false), 450);
+    return () => window.clearTimeout(timer);
+  }, [posContentLoading]);
   const [currentTab, setCurrentTab] = useState<string>('pos');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -2437,7 +2443,7 @@ export default function App() {
                 }}>
                   {/* Stock Available Card */}
                   <div data-loader
-                    onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
+                    onClick={() => { setPosContentLoading(true); setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2467,7 +2473,7 @@ export default function App() {
 
                   {/* Low Stock Card */}
                   <div data-loader
-                    onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
+                    onClick={() => { setPosContentLoading(true); setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2497,7 +2503,7 @@ export default function App() {
 
                   {/* Stock Out Card */}
                   <div data-loader
-                    onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
+                    onClick={() => { setPosContentLoading(true); setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2527,7 +2533,7 @@ export default function App() {
 
                   {/* Expiry Card */}
                   <div data-loader
-                    onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); setShowHeldSales(false); setStockFilter('all'); }}
+                    onClick={() => { setPosContentLoading(true); setShowExpiryList(!showExpiryList); setShowCustomerList(false); setShowHeldSales(false); setStockFilter('all'); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2557,7 +2563,7 @@ export default function App() {
 
                   {/* Customer Card */}
                   <div data-loader
-                    onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); setShowHeldSales(false); setStockFilter('all'); }}
+                    onClick={() => { setPosContentLoading(true); setShowCustomerList(!showCustomerList); setShowExpiryList(false); setShowHeldSales(false); setStockFilter('all'); }}
                     style={{
                       cursor: 'pointer',
                       borderRadius: 12,
@@ -2588,6 +2594,7 @@ export default function App() {
                   {/* Hold Card - Right Side */}
                   <div data-loader
                     onClick={() => {
+                      setPosContentLoading(true);
                       if (showHeldSales) {
                         setShowHeldSales(false);
                       } else {
@@ -2647,6 +2654,10 @@ export default function App() {
             </div>
           </div>
                 
+                {posContentLoading ? (
+                  <TabLoader />
+                ) : (
+                <>
                 {/* Show Held Sales Only - When hold is open and no filter active */}
                 {showHeldSales && !showProductsGrid && (
                   <div>
@@ -3130,6 +3141,8 @@ export default function App() {
                     </div>
                     ) : null}
                   </>
+                )}
+                </>
                 )}
 
               </div>

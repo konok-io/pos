@@ -612,6 +612,12 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [productTab, setProductTab] = useState('allProducts');
+  const [tabContentLoading, setTabContentLoading] = useState(false);
+  useEffect(() => {
+    if (!tabContentLoading) return;
+    const timer = window.setTimeout(() => setTabContentLoading(false), 450);
+    return () => window.clearTimeout(timer);
+  }, [tabContentLoading]);
 
 
 
@@ -7518,7 +7524,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <button key={tab.id} onClick={() => setProductTab(tab.id)} data-loader style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: productTab === tab.id ? T.teal : T.white, color: productTab === tab.id ? T.white : T.gray600, fontWeight: 600, fontSize: 13, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>{tab.icon} {tab.label}</button>
+            <button key={tab.id} onClick={() => { setProductTab(tab.id); setTabContentLoading(true); }} data-loader style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: productTab === tab.id ? T.teal : T.white, color: productTab === tab.id ? T.white : T.gray600, fontWeight: 600, fontSize: 13, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>{tab.icon} {tab.label}</button>
 
 
 
@@ -7554,6 +7560,8 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
+        {tabContentLoading ? null : (
+        <>
         {productTab === 'allProducts' && (
 
 
@@ -8414,6 +8422,8 @@ tr:nth-child(even){background:#F8FAFC}
 
 
         )}
+        </>
+        )}
 
 
 
@@ -8438,6 +8448,31 @@ tr:nth-child(even){background:#F8FAFC}
 
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {tabContentLoading ? (
+          <div style={{ padding: '24px 16px', minHeight: 320 }} aria-busy="true">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: '#115E59', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: 18, height: 18, border: '3px solid rgba(255,255,255,0.35)', borderTopColor: '#fff', borderRadius: '50%', animation: 'pos-tabspin 0.7s linear infinite' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#111827' }}>Loading data...</div>
+                <div style={{ fontSize: 13, color: '#6B7280', marginTop: 2 }}>Please wait while we load this section</div>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 14 }}>
+              {[0,1,2,3,4,5].map(i => (
+                <div key={i} style={{ background: '#fff', border: '1px solid #E5E7EB', borderRadius: 12, padding: 16 }}>
+                  <div className="pos-skel" style={{ height: 14, width: '55%', borderRadius: 6, marginBottom: 12 }} />
+                  <div className="pos-skel" style={{ height: 28, width: '40%', borderRadius: 6, marginBottom: 14 }} />
+                  <div className="pos-skel" style={{ height: 10, width: '85%', borderRadius: 6, marginBottom: 8 }} />
+                  <div className="pos-skel" style={{ height: 10, width: '70%', borderRadius: 6 }} />
+                </div>
+              ))}
+            </div>
+            <style>{`@keyframes pos-tabspin { to { transform: rotate(360deg); } } .pos-skel { background: linear-gradient(90deg, #EEF2F7 25%, #F8FAFC 50%, #EEF2F7 75%); background-size: 200% 100%; animation: pos-shimmer 1.2s ease-in-out infinite; } @keyframes pos-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
+          </div>
+        ) : (
+        <>
 
 
 
@@ -8992,6 +9027,8 @@ tr:nth-child(even){background:#F8FAFC}
         
 
         {!viewProduct && !viewSupplier && !viewCategory && productTab === 'purchaseHistory' && renderPurchaseHistory()}
+        </>
+        )}
 
 
 
