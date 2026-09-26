@@ -1786,10 +1786,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
     if (!editProduct) return;
 
     const nextCode = String((editProduct as any).code || '').trim();
-    if (nextCode) {
-      const dupCode = products.find((p: any) => String(p.id) !== String(editProduct.id) && String(p.code || '').trim() && String(p.code || '').trim().toLowerCase() === nextCode.toLowerCase());
-      if (dupCode) { alert(t('duplicateCode')); return; }
-    }
 
 
 
@@ -9306,11 +9302,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
             <div style={{ marginBottom: 12 }}><div style={{ fontWeight: 600, fontSize: 15 }}>{editProduct.name}</div><div style={{ fontSize: 13, color: T.gray400 }}>{editProduct.company} - {editProduct.cat || '-'}</div></div>
-
-            <div style={{ marginBottom: 12 }}>
-              <label style={labelStyle}>{t('barcode')}</label>
-              <input value={(editProduct as any).code || ''} onChange={e => setEditProduct({ ...editProduct, code: e.target.value })} style={inputStyle} placeholder="0000000000000" />
-            </div>
 
 
 
