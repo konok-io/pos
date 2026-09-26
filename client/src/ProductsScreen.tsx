@@ -5054,15 +5054,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
 
   const renderCategory = () => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-          <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
-        </div>
-        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredCategories.length}</span>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={exportCategoriesCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-      </div>
       <div style={{ flex: 1, overflow: 'auto' }}>
         {(() => {
           const withProducts = filteredCategories.filter((cat: string) => products.some((p: any) => String(p.cat || '').trim().toLowerCase() === cat.trim().toLowerCase())).length;
@@ -5123,6 +5114,15 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 ))}
               </div>
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
+                <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                  <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
+                </div>
+                <span style={{ fontSize: 14, color: T.gray400 }}>{filteredCategories.length}</span>
+                <button style={{ ...btn('ghost', 'sm') }} onClick={exportCategoriesCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                <button style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+              </div>
         {filteredCategories.length === 0 ? (
           categorySearch ? (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: T.gray400, background: T.white, borderRadius: 14, border: `1px dashed ${T.gray200}` }}>
