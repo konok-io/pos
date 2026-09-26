@@ -1161,8 +1161,12 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [showStockHistoryModal, setShowStockHistoryModal] = useState(false);
-  const [showDeleteHistory, setShowDeleteHistory] = useState(false);
   const [deletedProducts, setDeletedProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (productTab !== 'deleteHistory') return;
+    api.getDeletedProducts().then((d: any) => setDeletedProducts(Array.isArray(d) ? d : [])).catch(() => {});
+  }, [productTab]);
 
 
 
@@ -1938,16 +1942,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const purchaseSeqTodayRef = useRef<string[]>([]);
-  const openDeleteHistory = async () => {
-    try {
-      const d: any = await api.getDeletedProducts();
-      setDeletedProducts(Array.isArray(d) ? d : []);
-    } catch {
-      setDeletedProducts([]);
-    }
-    setShowDeleteHistory(true);
-    setShowStockMoreMenu(false);
-  };
 
   const handleDeleteProduct = async (p: any) => {
     if (!p || (p.stock || 0) > 0) return;
@@ -6964,6 +6958,111 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
+  const renderDeleteHistory = () => {
+    const list = deletedProducts || [];
+    const totalQty = list.reduce((s: number, d: any) => s + (+d.stock || 0), 0);
+    const uniqueCount = new Set(list.map((d: any) => d.name || d.code).filter(Boolean)).size;
+    const lastEntry = list[0] || null;
+    const clearHistory = () => {
+      if (list.length === 0) return;
+      if (!window.confirm(t('clearDeleteHistoryConfirm'))) return;
+      api.clearDeletedProducts().then(() => setDeletedProducts([])).catch(() => alert(t('failed')));
+    };
+    const stats = [
+      { icon: 'fas fa-trash', label: t('deleteHistory'), value: String(list.length), color: T.teal, bg: T.tealLight },
+      { icon: 'fas fa-boxes-stacked', label: t('products'), value: String(uniqueCount), color: '#7C3AED', bg: '#EDE9FE' },
+      { icon: 'fas fa-box', label: t('quantity'), value: String(totalQty), color: T.red, bg: T.redLight },
+      { icon: 'fas fa-clock', label: t('lastChange'), value: lastEntry && lastEntry.deleted_at ? new Date(lastEntry.deleted_at).toLocaleDateString() : '-', color: '#0369A1', bg: '#E0F2FE' },
+    ];
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
+        {/* Top bar */}
+        <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+          <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('stock')}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
+          <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('deleteHistory')}</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button data-loader onClick={clearHistory} style={{ ...btn('ghost', 'sm'), opacity: list.length === 0 ? 0.5 : 1 }}><i className="fas fa-broom" style={{ marginRight: 4 }}></i>{t('clear')}</button>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          {/* Gradient header */}
+          <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+              <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                <i className="fas fa-trash"></i>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('deleteHistory')}</div>
+                <div style={{ fontSize: 13, opacity: 0.9 }}>
+                  {list.length} {t('deleteHistory')} · {uniqueCount} {t('products')} · {totalQty} {t('quantity')}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats grid */}
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
+              {stats.map((s, i) => (
+                <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: s.bg, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={s.icon} style={{ fontSize: 16 }}></i></div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: T.gray900, lineHeight: 1.1 }}>{s.value}</div>
+                    <div style={{ fontSize: 12, color: T.gray500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* List */}
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
+            <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+              <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600 }}>
+                  <i className="fas fa-trash" style={{ marginRight: 6, color: T.red }}></i>{t('deleteHistory')} · {list.length}
+                </div>
+              </div>
+              {list.length === 0 ? (
+                <div style={{ padding: 48, textAlign: 'center', color: T.gray400 }}>
+                  <i className="fas fa-trash" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
+                  {t('noDeleteHistory')}
+                </div>
+              ) : (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ background: T.tealLight }}>
+                      {['#', t('productName'), t('company'), t('category'), t('stock'), t('sellPrice'), t('date')].map((h, hi) => (
+                        <th key={hi} style={{ padding: '10px 14px', textAlign: hi === 0 || hi >= 4 ? 'center' : 'left', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {list.map((d: any, i: number) => (
+                      <tr key={d.id || i} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                        <td style={{ padding: '10px 14px', textAlign: 'center', color: T.gray400, fontWeight: 600 }}>{i + 1}</td>
+                        <td style={{ padding: '10px 14px' }}>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: T.gray900 }}>{d.name || '-'}</div>
+                          <div style={{ fontSize: 12, color: T.gray500, fontFamily: 'monospace' }}>{d.code || '-'}</div>
+                        </td>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray600 }}>{d.company || '-'}</td>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray600 }}>{d.cat || '-'}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 700, fontSize: 13, color: T.red }}>{fmtN(d.stock)} {d.unit || ''}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'center', fontWeight: 700, fontSize: 13, color: T.gray600 }}>{fmt(d.sell_price)}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'center', fontSize: 12, color: T.gray500 }}>{d.deleted_at ? new Date(d.deleted_at).toLocaleString() : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderStockHistoryPage = (mode: 'add' | 'remove') => {
     const title = mode === 'add' ? t('stockAddHistory') : t('stockRemoveHistory');
     const q = (search || '').toLowerCase();
@@ -7062,7 +7161,6 @@ tr:nth-child(even){background:#F8FAFC}
             <input type="date" value={fromDate} onChange={e => setFilterFrom && setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate')} />
             <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
             <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
-            <span style={{ fontSize: 14, color: T.gray400 }}>{rows.length}</span>
             <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportHistCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
             <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printHist}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
           </div>
@@ -7098,18 +7196,18 @@ tr:nth-child(even){background:#F8FAFC}
           </div>
 
           {/* Stats grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
-            {stats.map((s, i) => (
-              <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <i className={s.icon}></i>
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
+              {stats.map((s, i) => (
+                <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 10, background: s.bg, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><i className={s.icon} style={{ fontSize: 16 }}></i></div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: T.gray900, lineHeight: 1.1 }}>{s.value}</div>
+                    <div style={{ fontSize: 12, color: T.gray500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.label}</div>
                   </div>
-                  <div style={{ fontSize: 12, color: T.gray400, fontWeight: 600 }}>{s.label}</div>
                 </div>
-                <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Table */}
@@ -8364,7 +8462,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
                   <button onClick={() => { setProductTab('stockRemoveHistory'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stock')} - {t('history')}</button>
-                  <button onClick={() => { openDeleteHistory(); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</button>
+                  <button onClick={() => { setProductTab('deleteHistory'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</button>
 
 
 
@@ -9024,6 +9122,7 @@ tr:nth-child(even){background:#F8FAFC}
         {!viewProduct && !viewSupplier && !viewCategory && productTab === 'stock' && renderStock()}
         {!viewProduct && !viewSupplier && !viewCategory && productTab === 'stockAddHistory' && renderStockHistoryPage('add')}
         {!viewProduct && !viewSupplier && !viewCategory && productTab === 'stockRemoveHistory' && renderStockHistoryPage('remove')}
+        {!viewProduct && !viewSupplier && !viewCategory && productTab === 'deleteHistory' && renderDeleteHistory()}
 
         {!viewProduct && !viewSupplier && !viewCategory && productTab === 'priceHistory' && renderPriceHistory()}
 
@@ -11330,35 +11429,6 @@ tr:nth-child(even){background:#F8FAFC}
 
       )}
 
-      {showDeleteHistory && (
-        <div style={overlay} onClick={() => setShowDeleteHistory(false)}>
-          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 540, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</h3>
-            <div style={{ maxHeight: 380, overflow: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {deletedProducts.length === 0 ? (
-                <p style={{ textAlign: 'center', color: T.gray400, padding: '28px 8px' }}>{t('noDeleteHistory')}</p>
-              ) : deletedProducts.map((d: any, i: number) => (
-                <div key={d.id || i} style={{ padding: '10px 12px', background: T.redLight, borderRadius: 10, display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: T.gray900 }}>{d.name || '-'}</div>
-                    <div style={{ fontSize: 12, color: T.gray500, fontFamily: 'monospace' }}>{d.code || '-'}</div>
-                    <div style={{ fontSize: 12, color: T.gray500 }}>{d.company || '-'} · {d.cat || '-'}</div>
-                  </div>
-                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: T.red }}>{fmtN(d.stock)} {d.unit || ''}</div>
-                    <div style={{ fontSize: 13, color: T.gray600 }}>{fmt(d.sell_price)}</div>
-                    <div style={{ fontSize: 11, color: T.gray400 }}>{d.deleted_at ? new Date(d.deleted_at).toLocaleString() : '-'}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
-              <button onClick={() => { if (deletedProducts.length === 0) return; if (!window.confirm(t('clearDeleteHistoryConfirm'))) return; api.clearDeletedProducts().then(() => setDeletedProducts([])).catch(() => alert(t('failed'))); }} style={{ ...btn('ghost'), flex: 1, opacity: deletedProducts.length === 0 ? 0.5 : 1 }}><i className="fas fa-broom" style={{ marginRight: 4 }}></i>{t('clear')}</button>
-              <button onClick={() => setShowDeleteHistory(false)} style={{ ...btn(), flex: 1 }}>{t('close')}</button>
-            </div>
-          </div>
-        </div>
-      )}
 
 
 
