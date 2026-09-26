@@ -223,14 +223,20 @@ export const api = {
 };
 
 
+// ZATCA raw fetches also bump the global busy counter so buttons spin during them
+async function zfetch(...args: Parameters<typeof fetch>): Promise<Response> {
+  apiBusyStart();
+  try { return await fetch(...args); } finally { apiBusyEnd(); }
+}
+
 // === ZATCA Phase 2 API (2026 Official) ===
 export const zatcaApi = {
   getConfig: async () => {
-    const res = await fetch(`${API_URL}/zatca/config`);
+    const res = await zfetch(`${API_URL}/zatca/config`);
     return res.json();
   },
   saveIdentity: async (data: any) => {
-    const res = await fetch(`${API_URL}/zatca/identity`, {
+    const res = await zfetch(`${API_URL}/zatca/identity`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -238,11 +244,11 @@ export const zatcaApi = {
     return res.json();
   },
   generateCsr: async () => {
-    const res = await fetch(`${API_URL}/zatca/csr`, { method: 'POST' });
+    const res = await zfetch(`${API_URL}/zatca/csr`, { method: 'POST' });
     return res.json();
   },
   requestComplianceCsid: async (otp: string) => {
-    const res = await fetch(`${API_URL}/zatca/compliance-csid`, {
+    const res = await zfetch(`${API_URL}/zatca/compliance-csid`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ otp }),
@@ -250,15 +256,15 @@ export const zatcaApi = {
     return res.json();
   },
   requestProductionCsid: async () => {
-    const res = await fetch(`${API_URL}/zatca/production-csid`, { method: 'POST' });
+    const res = await zfetch(`${API_URL}/zatca/production-csid`, { method: 'POST' });
     return res.json();
   },
   renewProductionCsid: async () => {
-    const res = await fetch(`${API_URL}/zatca/renew-csid`, { method: 'POST' });
+    const res = await zfetch(`${API_URL}/zatca/renew-csid`, { method: 'POST' });
     return res.json();
   },
   submitComplianceInvoice: async (data: any) => {
-    const res = await fetch(`${API_URL}/zatca/compliance-invoice`, {
+    const res = await zfetch(`${API_URL}/zatca/compliance-invoice`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -266,7 +272,7 @@ export const zatcaApi = {
     return res.json();
   },
   processInvoice: async (invoice: any) => {
-    const res = await fetch(`${API_URL}/zatca/process-invoice`, {
+    const res = await zfetch(`${API_URL}/zatca/process-invoice`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(invoice),

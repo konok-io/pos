@@ -3984,7 +3984,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                 <input value={search} onChange={e => { setSearch(e.target.value); setApPage(1); }} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
               </div>
-              <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -4122,7 +4122,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       ) : null}
                     </div>
                   </div>
-                  <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportSuppliersCsv}>
+                  <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportSuppliersCsv}>
                     <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
                   </button>
                 </div>
@@ -4146,7 +4146,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                   <input value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder={t('searchSupplier')} style={{ ...inputStyle, paddingLeft: 32 }} />
                 </div>
-                <button style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+                <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
               </div>
         {filteredSuppliers.length === 0 ? (
 
@@ -4678,7 +4678,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       ) : null}
                     </div>
                   </div>
-                  <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportCategoriesCsv}>
+                  <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportCategoriesCsv}>
                     <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
                   </button>
                 </div>
@@ -4702,7 +4702,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                   <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
                 </div>
-                <button style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+                <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
               </div>
         {filteredCategories.length === 0 ? (
           categorySearch ? (
@@ -5040,7 +5040,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   <div style={{ display: 'flex', gap: 8, marginLeft: 'auto' }}>
                     <button type="button" onClick={() => setPurchaseSelIds([])} disabled={purchaseBarcodeId === '' || purchaseSelIds.length === 0} style={{ ...btn('ghost', 'sm'), opacity: purchaseBarcodeId === '' || purchaseSelIds.length === 0 ? 0.5 : 1 }}><i className="fas fa-ban" style={{ marginRight: 4 }}></i>{t('deselect')}</button>
                     <button type="button" onClick={() => { setCustomBarcodeProducts([]); setCustomQty({}); setPurchaseBarcodeId(''); setPurchaseSelIds([]); }} disabled={customBarcodeProducts.length === 0 && purchaseBarcodeId === '' && purchaseSelIds.length === 0} style={{ ...btn('ghost', 'sm'), opacity: customBarcodeProducts.length === 0 && purchaseBarcodeId === '' && purchaseSelIds.length === 0 ? 0.5 : 1 }}><i className="fas fa-xmark" style={{ marginRight: 4 }}></i>{t('clear')}</button>
-                    <button type="button" onClick={printSelectedBarcodes} disabled={totalLabels === 0} style={{ ...btn('primary', 'sm'), opacity: totalLabels === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                    <button data-loader type="button" onClick={printSelectedBarcodes} disabled={totalLabels === 0} style={{ ...btn('primary', 'sm'), opacity: totalLabels === 0 ? 0.5 : 1 }}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
                   </div>
                 </div>
               </div>
@@ -5333,8 +5333,8 @@ tr:nth-child(even){background:#F8FAFC}
                 <i className="fas fa-xmark"></i>
               </button>
             ) : null}
-            <button style={{ ...btn('ghost', 'sm') }} onClick={() => exportViewProductHistory(viewProduct)}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
-            <button style={{ ...btn('ghost', 'sm') }} onClick={() => printViewProduct(viewProduct)}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={() => exportViewProductHistory(viewProduct)}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={() => printViewProduct(viewProduct)}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
           </div>
         </div>
 
@@ -5657,8 +5657,8 @@ tr:nth-child(even){background:#F8FAFC}
                   <i className="fas fa-xmark"></i>
                 </button>
               ) : null}
-              <button style={{ ...btn('ghost', 'sm') }} onClick={exportViewCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
-              <button style={{ ...btn('ghost', 'sm') }} onClick={printView}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportViewCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printView}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
             </div>
           </div>
 
@@ -5897,8 +5897,8 @@ tr:nth-child(even){background:#F8FAFC}
                   <i className="fas fa-xmark"></i>
                 </button>
               ) : null}
-              <button style={{ ...btn('ghost', 'sm') }} onClick={exportViewCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
-              <button style={{ ...btn('ghost', 'sm') }} onClick={printView}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportViewCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printView}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
             </div>
           </div>
 
@@ -6162,7 +6162,7 @@ tr:nth-child(even){background:#F8FAFC}
               </button>
             ) : null}
             <span style={{ fontSize: 14, color: T.gray400 }}>{list.length}</span>
-            <button style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
           </div>
         </div>
 
@@ -6190,7 +6190,7 @@ tr:nth-child(even){background:#F8FAFC}
                   </span>
                 </div>
               </div>
-              <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportPurchaseCsv}>
+              <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportPurchaseCsv}>
                 <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
               </button>
             </div>
@@ -6230,7 +6230,7 @@ tr:nth-child(even){background:#F8FAFC}
                       <div style={{ fontSize: 11, color: T.gray400 }}>{t('total')}</div>
                       <div style={{ fontSize: 20, fontWeight: 800, color: T.green }}>{fmt(selectedTotal)}</div>
                     </div>
-                    <button style={{ ...btn('ghost', 'sm') }} onClick={() => printPurchaseInvoice(selected)}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
+                    <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={() => printPurchaseInvoice(selected)}><i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}</button>
                     <button style={{ ...btn('ghost', 'sm') }} onClick={() => setViewPurchase(null)}><i className="fas fa-xmark"></i></button>
                   </div>
                 </div>
@@ -6342,7 +6342,7 @@ tr:nth-child(even){background:#F8FAFC}
                       <div style={{ fontSize: 11, color: T.gray400 }}>{t('total')}</div>
                       <div style={{ fontWeight: 800, color: T.green, fontSize: 16 }}>{fmt(total)}</div>
                     </div>
-                    <button style={{ ...btn('ghost', 'sm') }} onClick={(e: any) => { e.stopPropagation(); printPurchaseInvoice(p); }} title={t('print')}>
+                    <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={(e: any) => { e.stopPropagation(); printPurchaseInvoice(p); }} title={t('print')}>
                       <i className="fas fa-print"></i>
                     </button>
                     <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`} style={{ color: T.gray400, fontSize: 12 }}></i>
@@ -6480,8 +6480,8 @@ tr:nth-child(even){background:#F8FAFC}
             <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
             <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
             <span style={{ fontSize: 14, color: T.gray400 }}>{rows.length}</span>
-            <button style={{ ...btn('ghost', 'sm') }} onClick={exportPriceCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
-            <button style={{ ...btn('ghost', 'sm') }} onClick={printPriceHistory}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPriceCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printPriceHistory}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
           </div>
         </div>
 
@@ -6511,7 +6511,7 @@ tr:nth-child(even){background:#F8FAFC}
                   ) : null}
                 </div>
               </div>
-              <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportPriceCsv}>
+              <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportPriceCsv}>
                 <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
               </button>
             </div>
@@ -6626,7 +6626,7 @@ tr:nth-child(even){background:#F8FAFC}
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                 <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
               </div>
-              <button style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -7054,8 +7054,8 @@ tr:nth-child(even){background:#F8FAFC}
             <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
             <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
             <span style={{ fontSize: 14, color: T.gray400 }}>{rows.length}</span>
-            <button style={{ ...btn('ghost', 'sm') }} onClick={exportHistCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
-            <button style={{ ...btn('ghost', 'sm') }} onClick={printHist}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
+            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportHistCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
+            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printHist}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
           </div>
         </div>
 
@@ -7082,7 +7082,7 @@ tr:nth-child(even){background:#F8FAFC}
                   ) : null}
                 </div>
               </div>
-              <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer' }} onClick={exportHistCsv}>
+              <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer' }} onClick={exportHistCsv}>
                 <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
               </button>
             </div>
@@ -7518,7 +7518,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <button key={tab.id} onClick={() => setProductTab(tab.id)} style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: productTab === tab.id ? T.teal : T.white, color: productTab === tab.id ? T.white : T.gray600, fontWeight: 600, fontSize: 13, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>{tab.icon} {tab.label}</button>
+            <button key={tab.id} onClick={() => setProductTab(tab.id)} data-loader style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: productTab === tab.id ? T.teal : T.white, color: productTab === tab.id ? T.white : T.gray600, fontWeight: 600, fontSize: 13, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>{tab.icon} {tab.label}</button>
 
 
 
@@ -7733,7 +7733,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button onClick={() => { exportProductsCsv(); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button data-loader onClick={() => { exportProductsCsv(); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
                   <button onClick={() => { setShowImportModal(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvUpload')}</button>
 
                   <button onClick={() => { setProductTab('priceHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {t('priceHistory')}</button>
@@ -7885,7 +7885,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button data-loader onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
 
 
 
@@ -8055,7 +8055,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button data-loader onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
 
 
 
@@ -8328,7 +8328,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button onClick={() => { exportStockCsv(); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button data-loader onClick={() => { exportStockCsv(); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
 
 
 
@@ -8612,7 +8612,7 @@ tr:nth-child(even){background:#F8FAFC}
                               stockUpdated.push(`${existingDb.name} +${addStk}`);
                             } else {
                               imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? Math.max(0, parseFloat(cols[costIdx]) || 0) : 0, sellPrice: sellIdx >= 0 ? Math.max(0, parseFloat(cols[sellIdx]) || 0) : 0, stock: stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyName, minStock: minStockIdx >= 0 ? Math.max(0, parseInt(cols[minStockIdx]) || 5) : 5, supplierId, vat: vatIdx >= 0 ? parseFloat(cols[vatIdx]) || 0 : 0, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : '', _temp: true }); } } } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); } const msg = []; if (imported.length > 0) msg.push(`${imported.length} ${t('products')} imported!`); if (stockUpdated.length > 0) msg.push(`Stock updated:\n${stockUpdated.join('\n')}`); if (errors.length > 0) msg.push(`${errors.length} errors:\n${errors.join('\n')}`); if (msg.length) alert(msg.join('\n\n')); }; reader.readAsText(file); e.target.value = ''; }} />
-                    <button title="CSV Upload" onClick={() => document.getElementById('csv-upload-input')?.click()} style={{ ...btn('ghost', 'sm') }}>
+                    <button title="CSV Upload" onClick={() => document.getElementById('csv-upload-input')?.click()} data-loader style={{ ...btn('ghost', 'sm') }}>
                       <i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> CSV
                     </button>
                     <button title="Demo CSV" onClick={() => { const headers = ['Name', 'Code', 'Category', 'CostPrice', 'SellPrice', 'Stock', 'MinStock', 'VAT', 'Unit', 'Company', 'ExpiryDate']; const demo = [headers.join(','), 'Rice Basmati,1001,Groceries,80,120,50,5,15,kg,ABC Traders,2027-06-30', 'Samsung Galaxy S24,2001,Electronics,45000,55000,10,2,12,pcs,Mobile World,2028-12-31', 'Notebook A4,3001,Stationery,25,40,200,10,5,pcs,Paper House,'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'products_template.csv'; a.click(); URL.revokeObjectURL(url); }} style={{ ...btn('ghost', 'sm') }}>
@@ -9039,11 +9039,11 @@ tr:nth-child(even){background:#F8FAFC}
               </div>
             )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <button onClick={() => printAllStockBarcodes(barcodePopup)} style={{ ...btn('primary'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4 }}>
+              <button data-loader onClick={() => printAllStockBarcodes(barcodePopup)} style={{ ...btn('primary'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4 }}>
                 <span style={{ fontSize: 15, fontWeight: 700 }}><i className="fas fa-boxes-stacked" style={{marginRight: 6}}></i>{t('allStockBarcode') || 'All Stock Barcode'}</span>
                 <span style={{ fontSize: 12, opacity: 0.9, fontWeight: 400 }}>{t('allStockBarcodeHint') || 'Print barcode label for stock'}</span>
               </button>
-              <button onClick={() => printManualCountBarcode(barcodePopup)} style={{ ...btn('ghost'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4, borderColor: T.teal, color: T.teal }}>
+              <button data-loader onClick={() => printManualCountBarcode(barcodePopup)} style={{ ...btn('ghost'), width: '100%', justifyContent: 'center', textAlign: 'center', padding: '14px 16px', flexDirection: 'column', display: 'flex', gap: 4, borderColor: T.teal, color: T.teal }}>
                 <span style={{ fontSize: 15, fontWeight: 700 }}><i className="fas fa-clipboard-list" style={{marginRight: 6}}></i>{t('manualCountBarcode') || 'Manual Count Barcode'}</span>
                 <span style={{ fontSize: 12, opacity: 0.8, fontWeight: 400 }}>{t('manualCountBarcodeHint') || 'Print count sheet with barcode'}</span>
               </button>
@@ -9688,7 +9688,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <label style={{ ...btn('primary'), cursor: 'pointer' }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {t('selectFile')}<input type="file" accept=".csv" onChange={handleCsvImport} style={{ display: 'none' }} /></label>
+            <label data-loader style={{ ...btn('primary'), cursor: 'pointer' }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {t('selectFile')}<input type="file" accept=".csv" onChange={handleCsvImport} style={{ display: 'none' }} /></label>
 
 
 

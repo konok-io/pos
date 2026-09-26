@@ -2140,7 +2140,7 @@ export default function App() {
           {/* Actions Section */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginLeft: 8 }}>
             {/* Refresh Button */}
-            <button onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title={t("hardRefresh")}><i className="fas fa-rotate"></i></button>
+            <button data-loader onClick={handleHardRefresh} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#4B5563' }} title={t("hardRefresh")}><i className="fas fa-rotate"></i></button>
             
             {/* Fullscreen Button */}
             <button onClick={handleFullscreen} style={{ width: 34, height: 34, borderRadius: 8, border: '1px solid #e5e7eb', background: '#FFFFFF', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, transition: 'all 0.2s', color: '#6B7280' }} title={isFullscreen ? t('exitFullscreen') : t('fullScreen')}>{isFullscreen ? <i className="fas fa-xmark"></i> : <i className="fas fa-expand"></i>}</button>
@@ -2436,7 +2436,7 @@ export default function App() {
                   background: '#F9FAFB'
                 }}>
                   {/* Stock Available Card */}
-                  <div
+                  <div data-loader
                     onClick={() => { setStockFilter(stockFilter === 'available' ? 'all' : 'available'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{
                       cursor: 'pointer',
@@ -2466,7 +2466,7 @@ export default function App() {
                   </div>
 
                   {/* Low Stock Card */}
-                  <div
+                  <div data-loader
                     onClick={() => { setStockFilter(stockFilter === 'low' ? 'all' : 'low'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{
                       cursor: 'pointer',
@@ -2496,7 +2496,7 @@ export default function App() {
                   </div>
 
                   {/* Stock Out Card */}
-                  <div
+                  <div data-loader
                     onClick={() => { setStockFilter(stockFilter === 'out' ? 'all' : 'out'); setShowHeldSales(false); setShowExpiryList(false); setShowCustomerList(false); }}
                     style={{
                       cursor: 'pointer',
@@ -2526,7 +2526,7 @@ export default function App() {
                   </div>
 
                   {/* Expiry Card */}
-                  <div
+                  <div data-loader
                     onClick={() => { setShowExpiryList(!showExpiryList); setShowCustomerList(false); setShowHeldSales(false); setStockFilter('all'); }}
                     style={{
                       cursor: 'pointer',
@@ -2556,7 +2556,7 @@ export default function App() {
                   </div>
 
                   {/* Customer Card */}
-                  <div
+                  <div data-loader
                     onClick={() => { setShowCustomerList(!showCustomerList); setShowExpiryList(false); setShowHeldSales(false); setStockFilter('all'); }}
                     style={{
                       cursor: 'pointer',
@@ -2586,7 +2586,7 @@ export default function App() {
                   </div>
 
                   {/* Hold Card - Right Side */}
-                  <div
+                  <div data-loader
                     onClick={() => {
                       if (showHeldSales) {
                         setShowHeldSales(false);
@@ -4789,10 +4789,10 @@ tr:nth-child(even){background:#F8FAFC}
         <button onClick={() => { setEditingProductId(null); setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5' }); setShowProductModal(true); }} style={{ padding: '7px 12px', background: T.orange, color: T.white, border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
           <i className="fas fa-box" style={{ marginRight: 4 }}></i>{t('products')}
         </button>
-        <button onClick={exportSuppliersCsv} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+        <button data-loader onClick={exportSuppliersCsv} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
           <i className="fas fa-file-csv" style={{ marginRight: 4 }}></i>{t('exportCsv')}
         </button>
-        <button onClick={printSuppliers} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
+        <button data-loader onClick={printSuppliers} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
           <i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}
         </button>
       </div>
@@ -4823,7 +4823,7 @@ tr:nth-child(even){background:#F8FAFC}
                 ) : null}
               </div>
             </div>
-            <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportSuppliersCsv}>
+            <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportSuppliersCsv}>
               <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
             </button>
           </div>
@@ -6589,7 +6589,7 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
           <button style={buttonTealStyle} onClick={() => setIsAddCustomerModalOpen(true)}>
             <span>+</span> {t('addCustomer')}
           </button>
-          <button style={buttonGrayStyle} onClick={handleCsvExport}>
+          <button data-loader style={buttonGrayStyle} onClick={handleCsvExport}>
             <span><i className="fas fa-file-export"></i></span> {t('csvExport')}
           </button>
         </div>

@@ -191,44 +191,49 @@ if ('serviceWorker' in navigator) {
   }, 60 * 1000);
 }
 
-// ===== Global button loader: any button whose click starts API calls gets a
-// spinner until the requests finish. Fast/local buttons never spin, and future
-// buttons are covered automatically (no per-button code needed). =====
+// ===== Global button loader: API buttons spin while requests run; elements
+// marked data-loader (stat cards, sub-tabs, print/export) always get a short
+// spinner. Future buttons are covered automatically (no per-button code). =====
 (function globalButtonLoader() {
   try {
     const style = document.createElement('style');
     style.textContent = [
-      'button.pos-btn-loading{position:relative!important;color:transparent!important}',
-      'button.pos-btn-loading *{visibility:hidden!important}',
-      'button.pos-btn-loading .pos-btn-spin{visibility:visible!important;position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.82);border-radius:inherit;color:#0F766E}',
+      '.pos-btn-loading{position:relative!important;color:transparent!important}',
+      '.pos-btn-loading *{visibility:hidden!important}',
+      '.pos-btn-loading .pos-btn-spin{visibility:visible!important;position:absolute;left:0;top:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.82);border-radius:inherit;color:#0F766E}',
     ].join('');
     document.head.appendChild(style);
-    const mark = (btn: HTMLButtonElement) => {
-      btn.classList.add('pos-btn-loading');
+    const pending = () => ((window as any).__posApiPending || 0) > 0;
+    const mark = (target: HTMLElement) => {
+      if (target.classList.contains('pos-btn-loading')) return;
+      target.classList.add('pos-btn-loading');
       const sp = document.createElement('span');
       sp.className = 'pos-btn-spin';
       sp.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      btn.appendChild(sp);
+      target.appendChild(sp);
+      const born = Date.now();
+      const tick = () => {
+        if (!target.classList.contains('pos-btn-loading')) return;
+        if (pending() || Date.now() - born < 650) { window.setTimeout(tick, 250); return; }
+        target.classList.remove('pos-btn-loading');
+        const s = target.querySelector('.pos-btn-spin');
+        if (s) s.remove();
+      };
+      window.setTimeout(tick, 250);
     };
-    const clear = (btn: HTMLButtonElement) => {
-      btn.classList.remove('pos-btn-loading');
-      const sp = btn.querySelector('.pos-btn-spin');
-      if (sp) sp.remove();
-    };
-    window.addEventListener('pos:api-idle', () => {
-      document.querySelectorAll('button.pos-btn-loading').forEach((b) => clear(b as HTMLButtonElement));
-    });
     document.addEventListener('click', (e) => {
       try {
         const el = e.target as HTMLElement | null;
-        const btn = el && el.closest ? (el.closest('button') as HTMLButtonElement | null) : null;
-        if (!btn || btn.disabled || btn.classList.contains('pos-btn-loading')) return;
-        // Buttons with their own spinner or an opt-out attribute are skipped
-        if (btn.querySelector('.fa-spinner') || btn.hasAttribute('data-no-loader')) return;
-        window.setTimeout(() => {
-          if (btn.classList.contains('pos-btn-loading')) return;
-          if (((window as any).__posApiPending || 0) > 0) mark(btn);
-        }, 80);
+        const target = el && el.closest ? (el.closest('button, [data-loader]') as HTMLElement | null) : null;
+        if (!target) return;
+        if ((target as HTMLButtonElement).disabled) return;
+        if (target.classList.contains('pos-btn-loading')) return;
+        // Elements with their own spinner or an opt-out attribute are skipped
+        if (target.querySelector('.fa-spinner') || target.hasAttribute('data-no-loader')) return;
+        // data-loader = always show a spinner (view switches, print, export...)
+        if (target.hasAttribute('data-loader')) { mark(target); return; }
+        // Plain buttons spin only while their API calls are in flight
+        window.setTimeout(() => { if (pending()) mark(target); }, 80);
       } catch {}
     });
   } catch {}
