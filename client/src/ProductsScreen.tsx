@@ -936,7 +936,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const [purchaseBarcodeId, setPurchaseBarcodeId] = useState('');
   const [apPage, setApPage] = useState(1);
-  const [apMenuId, setApMenuId] = useState<string | null>(null);
   const [filterFrom, setFilterFrom] = useState('');
   const [filterTo, setFilterTo] = useState('');
 
@@ -1085,7 +1084,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
         setShowCategoryMoreMenu(false);
         setShowStockMoreMenu(false);
         setShowSupplierMoreMenu(false);
-        setApMenuId(null);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -1954,7 +1952,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       setProductsParent(next);
       if (viewProduct && viewProduct.id === p.id) setViewProduct(null);
       if (editProduct && editProduct.id === p.id) setEditProduct(null);
-      setApMenuId(null);
     } catch {
       alert(t('failed'));
     }
@@ -3104,9 +3101,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     setBarcodePopup(null);
   };
 
-  const printBarcode = (product: any) => {
-    setBarcodePopup(product);
-  };
 
 
 
@@ -4042,16 +4036,11 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                     </td>
                     <td style={{ padding: '10px 14px', fontSize: 14, color: T.gray400, textAlign: 'center' }}>{p.unit}</td>
                     <td style={{ padding: '10px 14px', fontSize: 13, textAlign: 'center', color: p.expiryDate ? (isExpiringSoon(p.expiryDate) ? '#E11D48' : T.gray600) : T.gray400, fontWeight: p.expiryDate && isExpiringSoon(p.expiryDate) ? 700 : 400 }}>{p.expiryDate || '-'}</td>
-                    <td style={{ padding: '10px 14px', position: 'relative', textAlign: 'center' }}>
-                      <button style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setApMenuId(apMenuId === p.id ? null : p.id)} title={t('actions')}><i className="fas fa-ellipsis-vertical"></i></button>
-                      {apMenuId === p.id && (
-                        <div data-menu="ap" style={{ position: 'absolute', top: '100%', right: 8, zIndex: 50, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: 140, overflow: 'hidden' }}>
-                          <button onClick={() => { setViewProduct(p); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', borderBottom: `1px solid ${T.gray100}`, fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-eye" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('view') || 'View'}</button>
-                          <button onClick={() => { setEditProduct({ ...p }); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', borderBottom: `1px solid ${T.gray100}`, fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-pen" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('edit')}</button>
-                          <button onClick={() => { printBarcode(p); setApMenuId(null); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: T.gray600, cursor: 'pointer' }}><i className="fas fa-barcode" style={{ marginRight: 8, width: 14, color: T.teal }}></i>{t('barcode')}</button>
-                          {p.stock <= 0 && <button onClick={() => { handleDeleteProduct(p); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '10px 14px', background: 'none', border: 'none', fontSize: 13, fontWeight: 600, color: T.red, cursor: 'pointer' }}><i className="fas fa-trash" style={{ marginRight: 8, width: 14, color: T.red }}></i>{t('delete')}</button>}
-                        </div>
-                      )}
+                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                      <div style={{ display: 'inline-flex', gap: 6, alignItems: 'center', justifyContent: 'center' }}>
+                        <button title={t('view') || 'View'} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setViewProduct(p)}><i className="fas fa-eye"></i></button>
+                        <button title={t('edit')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setEditProduct({ ...p })}><i className="fas fa-pen"></i></button>
+                      </div>
                     </td>
                   </tr>
                 );
