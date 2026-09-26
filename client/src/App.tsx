@@ -676,6 +676,9 @@ const genSupplierId = (suppliersList: any[]) => {
   };
 const now = () => new Date().toISOString();
 
+// Tabs that exist in the current navigation menu (sanitizes the restored tab)
+const VALID_TABS = ['pos', 'products', 'customers', 'income', 'reports', 'settings'];
+
 // Types
 interface Product {
   id: string;
@@ -1180,6 +1183,14 @@ export default function App() {
   const [paidAmount, setPaidAmount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [posBarcode, setPosBarcode] = useState('');
+  const posBarcodeRef = useRef<HTMLInputElement>(null);
+  const [posNotice, setPosNotice] = useState('');
+  const posNoticeTimer = useRef<number | null>(null);
+  const showPosNotice = (msg: string) => {
+    setPosNotice(msg);
+    if (posNoticeTimer.current) window.clearTimeout(posNoticeTimer.current);
+    posNoticeTimer.current = msg ? window.setTimeout(() => setPosNotice(''), 3500) : null;
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSupplier, setSelectedSupplier] = useState('all');
@@ -1278,9 +1289,9 @@ export default function App() {
         if (savedReceiptFooter) _setSettings((prev: any) => ({ ...prev, receiptFooter: savedReceiptFooter }));
       }
 
-      // Restore the last active tab from settings
+      // Restore the last active tab from settings (only tabs that still exist in the menu)
       const savedTab = await getSetting('pos_current_tab');
-      if (savedTab) setCurrentTab(savedTab);
+      if (savedTab && VALID_TABS.indexOf(savedTab) >= 0) setCurrentTab(savedTab);
 
       // Restore cart state from settings
       const savedCart = await getJsonSetting('pos_cart');
@@ -1510,7 +1521,13 @@ export default function App() {
   // Add to cart
   const addToCart = (product: Product) => {
     if (product.stock <= 0) {
-      alert(`"${product.name}" ${t('stockFinished')}`);
+      showPosNotice(`"${product.name}" ${t('stockFinished')}`);
+      return;
+    }
+
+    const stockLine = cart.find(item => item.productId === product.id);
+    if (stockLine && stockLine.quantity >= product.stock) {
+      showPosNotice(`${t('maxStock')}: ${product.stock} ${product.unit}`);
       return;
     }
 
@@ -1518,7 +1535,6 @@ export default function App() {
       const existing = prev.find(item => item.productId === product.id);
       if (existing) {
         if (existing.quantity >= product.stock) {
-          alert(`${t('maxStock')}: ${product.stock} ${product.unit}`);
           return prev;
         }
         return prev.map(item =>
@@ -1585,21 +1601,47 @@ export default function App() {
   // Checkout
   // POS Barcode Enter handler
   const handlePosBarcodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && posBarcode.trim()) {
-      const barcode = posBarcode.trim().toLowerCase();
-      const found = products.find(p =>
-        (p.barcode || '').toLowerCase() === barcode ||
-        (p.code || '').toLowerCase() === barcode ||
-        (p.id || '').toLowerCase() === barcode
-      );
-      if (found) {
-        addToCart(found);
-        setPosBarcode('');
-      } else {
-        alert(t('productNotFound') || 'Product not found');
-      }
+    if (e.key !== 'Enter') return;
+    const raw = posBarcode.trim();
+    if (!raw) return;
+    const barcode = raw.toLowerCase();
+    const found = products.find(p =>
+      (p.code || '').toLowerCase() === barcode ||
+      (p.id || '').toLowerCase() === barcode
+    );
+    setPosBarcode('');
+    if (found) {
+      showPosNotice('');
+      addToCart(found);
+    } else {
+      showPosNotice(t('productNotFound') || 'Product not found');
     }
+    posBarcodeRef.current?.focus();
   };
+
+  // A barcode scanner must be able to type anywhere on the POS screen
+  useEffect(() => {
+    if (currentTab !== 'pos') return;
+    const onKeyDown = (ev: KeyboardEvent) => {
+      const el = ev.target as HTMLElement | null;
+      const tag = el ? el.tagName : '';
+      const editable = !!el && (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable);
+      if (editable) return;
+      if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      if ((tag === 'BUTTON' || tag === 'A' || tag === 'LABEL') && (ev.key === 'Enter' || ev.key === ' ')) return;
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        posBarcodeRef.current?.focus();
+        return;
+      }
+      if (ev.key.length !== 1) return;
+      ev.preventDefault();
+      posBarcodeRef.current?.focus();
+      setPosBarcode(prev => prev + ev.key);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [currentTab]);
   const printReceipt = async (sale: Sale) => {
     const cur = settings?.currencySymbol || '\u09f3';
     const company = settings?.name || '';
@@ -3100,6 +3142,8 @@ export default function App() {
               }}>
                 <input
                   className="barcode-input"
+                  ref={posBarcodeRef}
+                  autoFocus
                   placeholder={t('barcodePlaceholder')}
                   style={{ 
                     width: '100%', 
@@ -3120,6 +3164,11 @@ export default function App() {
                   onKeyDown={handlePosBarcodeKeyDown}
                 />
               </div>
+              {posNotice && (
+                <div style={{ padding: '6px 20px', background: '#FEF2F2', borderBottom: '1px solid #FECACA', color: '#B91C1C', fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <i className="fas fa-triangle-exclamation"></i>{posNotice}
+                </div>
+              )}
 
               {/* Cart Header */}
               <div style={{ padding: '12px 16px', borderBottom: '1px solid #e5e7eb', background: '#FFFFFF', flexShrink: 0 }}>
@@ -3643,7 +3692,7 @@ export default function App() {
               for (const item of newProducts) {
                 const itemWithBarcode = item as any;
                 const existingIndex = updatedProducts.findIndex(
-                  p => p.barcode && itemWithBarcode.barcode && p.barcode === itemWithBarcode.barcode
+                  p => p.code && itemWithBarcode.barcode && String(p.code).toLowerCase() === String(itemWithBarcode.barcode).toLowerCase()
                 );
                 
                 if (existingIndex !== -1) {
@@ -3680,24 +3729,6 @@ export default function App() {
             t={t}
             fmt={fmt}
           />
-          )
-        )}
-
-        {currentTab === 'barcode' && (
-          (!isInitialized || tabLoading ? <TabLoader /> : <div>
-            <h2 style={{ marginBottom: 16 }}><i className="fas fa-barcode" style={{marginRight: 4}}></i> {t('barcode')}</h2>
-            <div className="card" style={{ maxWidth: 500 }}>
-              <div className="form-group">
-                <label className="label">{t('code')}</label>
-                <input type="text" className="input" placeholder={t('code')} />
-              </div>
-              <button className="btn btn-primary">{t('barcode')}</button>
-              <div style={{ marginTop: 20, textAlign: 'center', padding: 20, background: '#F9FAFB', borderRadius: 8 }}>
-                <div style={{ fontSize: 48 }}><i className="fas fa-barcode"></i></div>
-                <p style={{ color: '#9CA3AF', marginTop: 8 }}>{t('barcode')} preview</p>
-              </div>
-            </div>
-          </div>
           )
         )}
 
@@ -3900,7 +3931,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
   // Handle barcode Enter key
   const handleBarcodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && barcodeVal) {
-      const found = products.find(p => p.barcode === barcodeVal);
+      const found = products.find(p => String(p.code || '').toLowerCase() === String(barcodeVal || '').toLowerCase());
       if (found) {
         const companyName = (found as any).company || '';
         const catName = (found as any).cat || '';
@@ -3911,7 +3942,7 @@ const NewProductTab: React.FC<NewProductTabProps> = ({ products, suppliers, cate
         setSupplierQ(companyName);
         setForm({
           name: found.name || '',
-          barcode: found.barcode || '',
+          barcode: found.code || '',
           company: companyName,
           cat: catName,
           unit: found.unit || 'pcs',
