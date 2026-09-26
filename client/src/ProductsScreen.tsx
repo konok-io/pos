@@ -7686,7 +7686,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowMoreMenu(!showMoreMenu)}>⋯ {t('more')}</button>
+              <button title={t('more')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setShowMoreMenu(!showMoreMenu)}><i className="fas fa-ellipsis-vertical"></i></button>
 
 
 
@@ -7836,7 +7836,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowSupplierMoreMenu(!showSupplierMoreMenu)}>⋯ {t('more')}</button>
+              <button title={t('more')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setShowSupplierMoreMenu(!showSupplierMoreMenu)}><i className="fas fa-ellipsis-vertical"></i></button>
 
 
 
@@ -8006,7 +8006,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <button style={{ ...btn('ghost', 'sm') }} onClick={() => setShowCategoryMoreMenu(!showCategoryMoreMenu)}>⋯ {t('more')}</button>
+              <button title={t('more')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setShowCategoryMoreMenu(!showCategoryMoreMenu)}><i className="fas fa-ellipsis-vertical"></i></button>
 
 
 
@@ -8218,7 +8218,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-              <button style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}>⋯ {t('more')}</button>
+              <button title={t('more')} style={{ ...btn('ghost', 'sm'), background: stockFilter !== 'all' ? T.tealLight : undefined, padding: 0, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setShowStockMoreMenu(!showStockMoreMenu)}><i className="fas fa-ellipsis-vertical"></i></button>
 
 
 
