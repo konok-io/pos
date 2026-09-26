@@ -589,6 +589,8 @@ printBlocked: 'تم حظر نافذة الطباعة! اسمح بالنوافذ 
   labels: 'ملصقات',
   selectProductsForBarcode: 'اختر المنتجات للطباعة',
   selected: 'محدد',
+  selectedProducts: 'المنتجات المحددة',
+  deselect: 'إلغاء التحديد',
   selectAll: 'تحديد الكل',
   labelOptions: 'خيارات الملصق',
   labelSize: 'حجم الملصق',

@@ -585,6 +585,8 @@ printBlocked: 'प्रिंट विंडो ब्लॉक है! रस
   labels: 'लेबल',
   selectProductsForBarcode: 'बारकोड प्रिंट करने के लिए उत्पाद चुनें',
   selected: 'चयनित',
+  selectedProducts: 'चयनित उत्पाद',
+  deselect: 'डिसिलेक्ट',
   selectAll: 'सभी चुনें',
   labelOptions: 'लेबल विकल्प',
   labelSize: 'लेबल आकार',

@@ -593,6 +593,8 @@ printBlocked: 'প্রিন্ট উইন্ডো ব্লক হয়�
   labels: 'লেবেল',
   selectProductsForBarcode: 'বারকোড প্রিন্ট করতে পণ্য নির্বাচন করুন',
   selected: 'নির্বাচিত',
+  selectedProducts: 'নির্বাচিত পণ্য',
+  deselect: 'ডিসিলেক্ট',
   selectAll: 'সব সিলেক্ট করুন',
   labelOptions: 'লেবেল অপশন',
   labelSize: 'লেবেল সাইজ',
