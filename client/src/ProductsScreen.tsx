@@ -6849,508 +6849,69 @@ tr:nth-child(even){background:#F8FAFC}
   };
 
   const renderStock = () => (
-
-
-
-
-
-
-
-
-
-
-
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-
-
-
-
-
-
-
-
-
-
-
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-
-
-
-
-
-
-
-
-
-
-
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-
-
-
-
-
-
-
-
-
-
-
-          <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-        <span style={{ fontSize: 14, color: T.gray400 }}>{stockProducts.length}</span>
-
-
-
-
-
-
-
-
-
-
-
-        <button style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-
-
-
-
-
-
-
-
-
-
-
-      </div>
-
-
-
-
-
-
-
-
-
-
-
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-
-
-
-
-
-
-
-
-
-
-
-        <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
-          <thead><tr style={{ background: T.tealLight }}>
-
-
-
-
-
-
-
-
-
-
-
-            {[t('productName'), t('company'), t('currentStock'), t('minStock'), t('totalValue'), t('status'), t('actions')].map((h, i) => (
-
-
-
-
-
-
-
-
-
-
-
-              <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 || i === 3 || i === 5 || i === 6 ? 'center' : i === 4 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
-
-
-
-
-
-
-
-
-
-
-
-            ))}
-
-
-
-
-
-
-
-
-
-
-
-          </tr></thead>
-
-
-
-
-
-
-
-
-
-
-
-          <tbody>
-
-
-
-
-
-
-
-
-
-
-
-            {stockProducts.map((p: any, i: number) => {
-
-
-
-
-
-
-
-
-
-
-
-              const low = p.stock > 0 && p.stock <= (p.minStock || 5);
-
-
-
-
-
-
-
-
-
-
-
-              const status = p.stock <= 0 ? 'out' : low ? 'low' : 'ok';
-
-
-
-
-
-
-
-
-
-
-
-              return (
-
-
-
-
-
-
-
-
-
-
-
-                <tr key={p.id} style={{ background: status === 'out' ? T.redLight : status === 'low' ? T.amberLight : i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{p.name}<div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p) || '-'}</div></td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{p.company || '-'}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ fontWeight: 700, fontSize: 18, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>{fmtN(p.stock)}</span></td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, color: T.gray500 }}>{p.minStock || 5}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(p.stock * p.costPrice)}</td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
-                    <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: status === 'out' ? T.redLight : status === 'low' ? T.amberLight : T.greenLight, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>
-
-
-
-
-
-
-
-
-
-
-
-                      {status === 'out' ? t('stockOut') : status === 'low' ? t('stockLow') : t('stockAvailable')}
-
-
-
-
-
-
-
-
-
-
-
-                    </span>
-
-
-
-
-
-
-
-
-
-
-
+        <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+          <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600, flexShrink: 0 }}>
+              <i className="fas fa-warehouse" style={{ marginRight: 6, color: T.teal }}></i>{t('stock')} {stockProducts.length}
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: '1 1 260px', minWidth: 220, justifyContent: 'flex-end' }}>
+              <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 160, maxWidth: 480 }}>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+              </div>
+              <span style={{ fontSize: 14, color: T.gray400 }}>{stockProducts.length}</span>
+              <button style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
+            </div>
+          </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: T.tealLight }}>
+                {['#', t('productName'), t('company'), t('currentStock'), t('minStock'), t('totalValue'), t('status'), t('actions')].map((h, i) => (
+                  <th key={i} style={{ padding: '10px 14px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {stockProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={8} style={{ padding: 48, textAlign: 'center', color: T.gray400 }}>
+                    <i className="fas fa-box-open" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
+                    {t('noProductsYet')}
                   </td>
-
-
-
-
-
-
-
-
-
-
-
-                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
-                    <button style={{ ...btn('primary', 'sm') }} onClick={() => { setStockAdjustProduct(p); setStockAdjustQty(''); setStockAdjustType('add'); setStockAdjustReason(''); }}><i className="fas fa-gear" style={{marginRight: 4}}></i> {t('adjust')}</button>
-
-
-
-
-
-
-
-
-
-
-
-                  </td>
-
-
-
-
-
-
-
-
-
-
-
                 </tr>
-
-
-
-
-
-
-
-
-
-
-
-              );
-
-
-
-
-
-
-
-
-
-
-
-            })}
-
-
-
-
-
-
-
-
-
-
-
-          </tbody>
-
-
-
-
-
-
-
-
-
-
-
-        </table>
-
-
-
-
-
-
-
-
-
-
-
+              ) : stockProducts.map((p: any, i: number) => {
+                const low = p.stock > 0 && p.stock <= (p.minStock || 5);
+                const status = p.stock <= 0 ? 'out' : low ? 'low' : 'ok';
+                return (
+                  <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                    <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray400, textAlign: 'center' }}>{i + 1}</td>
+                    <td style={{ padding: '10px 14px' }}>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>
+                      <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p) || '-'}</div>
+                    </td>
+                    <td style={{ padding: '10px 14px', fontSize: 14, color: T.gray600 }}>{p.company || '-'}</td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                      <span style={{ fontWeight: 700, fontSize: 15, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>{fmtN(p.stock)}</span>
+                    </td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center', fontSize: 14, color: T.gray500 }}>{p.minStock || 5}</td>
+                    <td style={{ padding: '10px 14px', textAlign: 'right', fontSize: 14 }}>{fmt(p.stock * p.costPrice)}</td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                      <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: status === 'out' ? T.redLight : status === 'low' ? T.amberLight : T.greenLight, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>
+                        {status === 'out' ? t('stockOut') : status === 'low' ? t('stockLow') : t('stockAvailable')}
+                      </span>
+                    </td>
+                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                      <button style={{ ...btn('primary', 'sm') }} onClick={() => { setStockAdjustProduct(p); setStockAdjustQty(''); setStockAdjustType('add'); setStockAdjustReason(''); }}><i className="fas fa-gear" style={{ marginRight: 4 }}></i> {t('adjust')}</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-
-
-
-
-
-
-
-
-
 
       {stockAdjustProduct && (
 
