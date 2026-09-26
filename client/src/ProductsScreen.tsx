@@ -2142,6 +2142,13 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
       expiryDate: p.expiryDate || '',
     });
   };
+  const viewSupplierRec = viewSupplier ? (suppliers.find((s: any) => (s.name || '').toLowerCase() === String(viewSupplier.name || '').toLowerCase()) || viewSupplier) : null;
+  const viewSupplierProducts = viewSupplier ? products.filter((p: any) => (p.company || '').toLowerCase() === String(viewSupplier.name || '').toLowerCase()) : [];
+  const viewSupplierPurchases = viewSupplier ? (purchases || []).filter((p: any) => (p.supplier || '').toLowerCase() === String(viewSupplier.name || '').toLowerCase()) : [];
+  const viewSupplierStock = viewSupplierProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
+  const viewCategoryProducts = viewCategory ? products.filter((p: any) => (p.cat || '').toLowerCase() === String(viewCategory.name || '').toLowerCase()) : [];
+  const viewCategoryStock = viewCategoryProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
+  const viewCategoryOut = viewCategoryProducts.filter((p: any) => (p.stock || 0) <= 0).length;
   const handleAddToTempList = () => {
     if (!productForm.name.trim()) { alert(t('enterName')); return; }
     if (!(Number(productForm.sellPrice) > 0)) { alert(t('sellPriceRequired')); return; }
@@ -10821,257 +10828,58 @@ tr:nth-child(even){background:#F8FAFC}
 
 
       {viewSupplier && (
-
-
-
-
-
-
-
-
-
-
-
         <div style={overlay} onClick={() => setViewSupplier(null)}>
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-
-
-
-
-
-
-
-
-
-
-
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-building" style={{marginRight: 4}}></i> {viewSupplier.name}</h3>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
-
-
-
-
-
-
-
-
-
-
-
-              <div><div style={{ fontSize: 13, color: T.gray400 }}>{t('products')}</div><div style={{ fontWeight: 600, fontSize: 16 }}>{viewSupplier.prodCount}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-              <div><div style={{ fontSize: 13, color: T.gray400 }}>{t('purchases')}</div><div style={{ fontWeight: 600, fontSize: 16 }}>{viewSupplier.purchaseCount}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-              <div style={{ gridColumn: 'span 2' }}><div style={{ fontSize: 13, color: T.gray400 }}>{t('totalPurchase')}</div><div style={{ fontWeight: 700, fontSize: 18, color: T.green }}>{fmt(viewSupplier.totalPurchase)}</div></div>
-
-
-
-
-
-
-
-
-
-
-
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 560, maxWidth: '90vw', maxHeight: '88vh', overflow: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 16 }}>
+              <h3 style={{ margin: 0, color: T.teal, fontSize: 18, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><i className="fas fa-building" style={{ marginRight: 6 }}></i> {viewSupplier.name}</h3>
+              <button onClick={() => setViewSupplier(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: T.gray400, lineHeight: 1 }}>&times;</button>
             </div>
-
-
-
-
-
-
-
-
-
-
-
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+              <div style={{ background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, color: T.gray400 }}>{t('products')}</div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: T.teal }}>{viewSupplier.prodCount}</div>
+              </div>
+              <div style={{ background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, color: T.gray400 }}>{t('purchases')}</div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: T.teal }}>{viewSupplierPurchases.length}</div>
+              </div>
+              <div style={{ background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, color: T.gray400 }}>{t('stock')}</div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: T.teal }}>{viewSupplierStock}</div>
+              </div>
+              <div style={{ background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, color: T.gray400 }}>{t('totalPurchase')}</div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: T.green }}>{fmt(viewSupplier.totalPurchase)}</div>
+              </div>
+            </div>
+            {(viewSupplierRec && (viewSupplierRec.crNumber || viewSupplierRec.phone || viewSupplierRec.email || viewSupplierRec.address)) ? (
+              <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 8, padding: '10px 12px', marginBottom: 16, fontSize: 13, color: '#0369A1' }}>
+                {viewSupplierRec.crNumber && <div style={{ marginBottom: 4 }}><i className="fas fa-id-card" style={{ marginRight: 6, width: 14 }}></i>{t('crNumber')}: <strong>{viewSupplierRec.crNumber}</strong></div>}
+                {viewSupplierRec.phone && <div style={{ marginBottom: 4 }}><i className="fas fa-phone" style={{ marginRight: 6, width: 14 }}></i>{t('phone')}: <strong>{viewSupplierRec.phone}</strong></div>}
+                {viewSupplierRec.email && <div style={{ marginBottom: 4 }}><i className="fas fa-envelope" style={{ marginRight: 6, width: 14 }}></i>{t('email')}: <strong>{viewSupplierRec.email}</strong></div>}
+                {viewSupplierRec.address && <div><i className="fas fa-location-dot" style={{ marginRight: 6, width: 14 }}></i>{t('address')}: <strong>{viewSupplierRec.address}</strong></div>}
+              </div>
+            ) : null}
             <h4 style={{ margin: '0 0 8px', fontSize: 14, color: T.gray600 }}>{t('products')}</h4>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ maxHeight: 200, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 8, marginBottom: 16 }}>
-
-
-
-
-
-
-
-
-
-
-
-              {products.filter((p: any) => (p.company || '').toLowerCase() === viewSupplier.name.toLowerCase()).map((p: any) => (
-
-
-
-
-
-
-
-
-
-
-
-                <div key={p.id} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between' }}>
-
-
-
-
-
-
-
-
-
-
-
-                  <span style={{ fontSize: 14 }}>{p.name}</span>
-
-
-
-
-
-
-
-
-
-
-
-                  <span style={{ fontSize: 14, color: T.gray500 }}>{fmt(p.sellPrice)}</span>
-
-
-
-
-
-
-
-
-
-
-
+            <div style={{ maxHeight: 240, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 8, marginBottom: 16 }}>
+              {viewSupplierProducts.length === 0 ? (
+                <div style={{ padding: '24px 12px', textAlign: 'center', color: T.gray400, fontSize: 13 }}>{t('noProductsYet')}</div>
+              ) : viewSupplierProducts.map((p: any) => (
+                <div key={p.id} onClick={() => { setViewProduct(p); setViewSupplier(null); }} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                    <div style={{ fontSize: 12, color: T.gray400 }}>{codeOf(p) || '-'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{fmt(p.sellPrice)}</div>
+                    <div style={{ fontSize: 12, color: (p.stock || 0) <= 0 ? T.red : T.gray500 }}>{t('stock')}: {p.stock || 0}</div>
+                  </div>
                 </div>
-
-
-
-
-
-
-
-
-
-
-
               ))}
-
-
-
-
-
-
-
-
-
-
-
             </div>
-
-
-
-
-
-
-
-
-
-
-
             <button onClick={() => setViewSupplier(null)} style={{ ...btn(), width: '100%' }}>{t('close')}</button>
-
-
-
-
-
-
-
-
-
-
-
           </div>
-
-
-
-
-
-
-
-
-
-
-
         </div>
-
-
-
-
-
-
-
-
-
-
-
       )}
 
 
@@ -11097,233 +10905,50 @@ tr:nth-child(even){background:#F8FAFC}
 
 
       {viewCategory && (
-
-
-
-
-
-
-
-
-
-
-
         <div style={overlay} onClick={() => setViewCategory(null)}>
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 500, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-
-
-
-
-
-
-
-
-
-
-
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {viewCategory.name}</h3>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ marginBottom: 16 }}>
-
-
-
-
-
-
-
-
-
-
-
-              <div style={{ fontSize: 13, color: T.gray400 }}>{t('totalValue')}</div>
-
-
-
-
-
-
-
-
-
-
-
-              <div style={{ fontWeight: 700, fontSize: 18, color: T.green }}>{fmt(viewCategory.totalValue)}</div>
-
-
-
-
-
-
-
-
-
-
-
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 560, maxWidth: '90vw', maxHeight: '88vh', overflow: 'auto', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 16 }}>
+              <h3 style={{ margin: 0, color: T.teal, fontSize: 18, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><i className="fas fa-folder" style={{ marginRight: 6 }}></i> {viewCategory.name}</h3>
+              <button onClick={() => setViewCategory(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: T.gray400, lineHeight: 1 }}>&times;</button>
             </div>
-
-
-
-
-
-
-
-
-
-
-
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+              <div style={{ background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, color: T.gray400 }}>{t('products')}</div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: T.teal }}>{viewCategoryProducts.length}</div>
+              </div>
+              <div style={{ background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, color: T.gray400 }}>{t('stock')}</div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: T.teal }}>{viewCategoryStock}</div>
+              </div>
+              <div style={{ background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, color: T.gray400 }}>{t('stockOut')}</div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: viewCategoryOut > 0 ? T.red : T.green }}>{viewCategoryOut}</div>
+              </div>
+              <div style={{ background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 8, padding: '10px 12px' }}>
+                <div style={{ fontSize: 12, color: T.gray400 }}>{t('totalValue')}</div>
+                <div style={{ fontWeight: 700, fontSize: 18, color: T.green }}>{fmt(viewCategory.totalValue)}</div>
+              </div>
+            </div>
+            <h4 style={{ margin: '0 0 8px', fontSize: 14, color: T.gray600 }}>{t('products')}</h4>
             <div style={{ maxHeight: 300, overflow: 'auto', border: `1px solid ${T.gray200}`, borderRadius: 8, marginBottom: 16 }}>
-
-
-
-
-
-
-
-
-
-
-
-              {viewCategory.products.map((p: any) => (
-
-
-
-
-
-
-
-
-
-
-
-                <div key={p.id} onClick={() => { setViewProduct(p); setViewCategory(null); }} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-
-
-
-
-
-
-
-
-
-
-
-                  <div><div style={{ fontSize: 14, fontWeight: 600 }}>{p.name}</div><div style={{ fontSize: 12, color: T.gray400 }}>{codeOf(p) || '-'}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-                  <div style={{ textAlign: 'right' }}><div style={{ fontSize: 14, fontWeight: 600 }}>{fmt(p.sellPrice)}</div><div style={{ fontSize: 12, color: T.gray500 }}>{t('stock')}: {p.stock}</div></div>
-
-
-
-
-
-
-
-
-
-
-
+              {viewCategoryProducts.length === 0 ? (
+                <div style={{ padding: '24px 12px', textAlign: 'center', color: T.gray400, fontSize: 13 }}>{t('noProductsYet')}</div>
+              ) : viewCategoryProducts.map((p: any) => (
+                <div key={p.id} onClick={() => { setViewProduct(p); setViewCategory(null); }} style={{ padding: '8px 12px', borderBottom: `1px solid ${T.gray100}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                    <div style={{ fontSize: 12, color: T.gray400 }}>{codeOf(p) || '-'}</div>
+                  </div>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>{fmt(p.sellPrice)}</div>
+                    <div style={{ fontSize: 12, color: (p.stock || 0) <= 0 ? T.red : T.gray500 }}>{t('stock')}: {p.stock || 0}</div>
+                  </div>
                 </div>
-
-
-
-
-
-
-
-
-
-
-
               ))}
-
-
-
-
-
-
-
-
-
-
-
             </div>
-
-
-
-
-
-
-
-
-
-
-
             <button onClick={() => setViewCategory(null)} style={{ ...btn(), width: '100%' }}>{t('close')}</button>
-
-
-
-
-
-
-
-
-
-
-
           </div>
-
-
-
-
-
-
-
-
-
-
-
         </div>
-
-
-
-
-
-
-
-
-
-
-
       )}
 
 
