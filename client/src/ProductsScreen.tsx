@@ -613,11 +613,6 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const [productTab, setProductTab] = useState('allProducts');
   const [tabContentLoading, setTabContentLoading] = useState(false);
-  useEffect(() => {
-    if (!tabContentLoading) return;
-    const timer = window.setTimeout(() => setTabContentLoading(false), 450);
-    return () => window.clearTimeout(timer);
-  }, [tabContentLoading]);
 
 
 
@@ -1144,6 +1139,16 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const [viewCategory, setViewCategory] = useState<any>(null);
+
+  const psLoadInit = useRef(true);
+  const psLoadTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (psLoadInit.current) { psLoadInit.current = false; return; }
+    setTabContentLoading(true);
+    if (psLoadTimer.current) window.clearTimeout(psLoadTimer.current);
+    psLoadTimer.current = window.setTimeout(() => setTabContentLoading(false), 450);
+    return () => { if (psLoadTimer.current) window.clearTimeout(psLoadTimer.current); };
+  }, [productTab, viewProduct, viewSupplier, viewCategory, stockFilter]);
 
 
 
@@ -7524,7 +7529,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <button key={tab.id} onClick={() => { setProductTab(tab.id); setTabContentLoading(true); }} data-loader style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: productTab === tab.id ? T.teal : T.white, color: productTab === tab.id ? T.white : T.gray600, fontWeight: 600, fontSize: 13, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>{tab.icon} {tab.label}</button>
+            <button key={tab.id} onClick={() => setProductTab(tab.id)} data-loader style={{ padding: '8px 14px', borderRadius: 8, border: 'none', background: productTab === tab.id ? T.teal : T.white, color: productTab === tab.id ? T.white : T.gray600, fontWeight: 600, fontSize: 13, cursor: 'pointer', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>{tab.icon} {tab.label}</button>
 
 
 

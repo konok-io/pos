@@ -1052,12 +1052,6 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false); // Prevent save before initial load
   const [tabLoading, setTabLoading] = useState(false); // Show skeleton on every tab click
-  const [posContentLoading, setPosContentLoading] = useState(false);
-  useEffect(() => {
-    if (!posContentLoading) return;
-    const timer = window.setTimeout(() => setPosContentLoading(false), 450);
-    return () => window.clearTimeout(timer);
-  }, [posContentLoading]);
   const [currentTab, setCurrentTab] = useState<string>('pos');
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -1206,6 +1200,17 @@ export default function App() {
   const [isAddCustomerModalOpen, setIsAddCustomerModalOpen] = useState(false);
   const [heldSales, setHeldSales] = useState<HeldSale[]>([]);
   const [showHeldSales, setShowHeldSales] = useState(false);
+
+  const [posContentLoading, setPosContentLoading] = useState(false);
+  const posLoadInit = useRef(true);
+  const posLoadTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (posLoadInit.current) { posLoadInit.current = false; return; }
+    setPosContentLoading(true);
+    if (posLoadTimer.current) window.clearTimeout(posLoadTimer.current);
+    posLoadTimer.current = window.setTimeout(() => setPosContentLoading(false), 450);
+    return () => { if (posLoadTimer.current) window.clearTimeout(posLoadTimer.current); };
+  }, [stockFilter, showExpiryList, showCustomerList, showHeldSales]);
   const [currency, setCurrency] = useState('৳');
   const [dataSyncStatus, setDataSyncStatus] = useState<'synced' | 'pending' | 'offline'>('synced');
   const [dataLastSyncTime, setDataLastSyncTime] = useState<string | null>(null);
@@ -4330,6 +4335,26 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const [viewSupplier, setViewSupplier] = useState<Supplier | null>(null);
   const [viewCategory, setViewCategory] = useState<SupplierCategory | null>(null);
   const [showPurchaseHistory, setShowPurchaseHistory] = useState<Supplier | null>(null);
+  const [supTabLoading, setSupTabLoading] = useState(false);
+  const [supDetailLoading, setSupDetailLoading] = useState(false);
+  const supTabInit = useRef(true);
+  const supDetailInit = useRef(true);
+  const supTabTimer = useRef<number | null>(null);
+  const supDetailTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (supTabInit.current) { supTabInit.current = false; return; }
+    setSupTabLoading(true);
+    if (supTabTimer.current) window.clearTimeout(supTabTimer.current);
+    supTabTimer.current = window.setTimeout(() => setSupTabLoading(false), 450);
+    return () => { if (supTabTimer.current) window.clearTimeout(supTabTimer.current); };
+  }, [activeTab]);
+  useEffect(() => {
+    if (supDetailInit.current) { supDetailInit.current = false; return; }
+    setSupDetailLoading(true);
+    if (supDetailTimer.current) window.clearTimeout(supDetailTimer.current);
+    supDetailTimer.current = window.setTimeout(() => setSupDetailLoading(false), 450);
+    return () => { if (supDetailTimer.current) window.clearTimeout(supDetailTimer.current); };
+  }, [viewSupplier, viewCategory, showPurchaseHistory]);
 
   const [suppliersTabReady, setSuppliersTabReady] = useState(false);
   useEffect(() => {
@@ -4842,6 +4867,10 @@ tr:nth-child(even){background:#F8FAFC}
           </div>
         </div>
 
+        {supTabLoading ? (
+          <TabLoader />
+        ) : (
+        <>
         {activeTab === 'companies' && (() => {
           const stats = [
             { icon: 'fas fa-building', label: t('totalSuppliers'), value: String(allSuppliers.length), color: T.teal, bg: T.tealLight },
@@ -4970,12 +4999,18 @@ tr:nth-child(even){background:#F8FAFC}
             </div>
           </div>
         )}
+        </>
+        )}
       </div>
 
       {/* Supplier Detail Modal */}
       {viewSupplier && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 500, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
+            {supDetailLoading ? (
+              <TabLoader />
+            ) : (
+            <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}><i className="fas fa-building" style={{marginRight: 4}}></i> {viewSupplier.name}</h3>
               <button onClick={() => setViewSupplier(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
@@ -5037,6 +5072,8 @@ tr:nth-child(even){background:#F8FAFC}
                 </>
               )}
             </div>
+            </>
+            )}
           </div>
         </div>
       )}
@@ -5045,6 +5082,10 @@ tr:nth-child(even){background:#F8FAFC}
       {viewCategory && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 400, padding: 20 }}>
+            {supDetailLoading ? (
+              <TabLoader />
+            ) : (
+            <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {viewCategory.name}</h3>
               <button onClick={() => setViewCategory(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
@@ -5067,6 +5108,8 @@ tr:nth-child(even){background:#F8FAFC}
                 <i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteAction')}
               </button>
             </div>
+            </>
+            )}
           </div>
         </div>
       )}
@@ -5075,6 +5118,10 @@ tr:nth-child(even){background:#F8FAFC}
       {showPurchaseHistory && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: '#fff', borderRadius: 16, width: '90%', maxWidth: 600, maxHeight: '90vh', overflow: 'auto', padding: 20 }}>
+            {supDetailLoading ? (
+              <TabLoader />
+            ) : (
+            <>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {showPurchaseHistory.name} - {t('purchaseHistory')}</h3>
               <button onClick={() => setShowPurchaseHistory(null)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer', color: '#9CA3AF' }}>×</button>
@@ -5094,6 +5141,8 @@ tr:nth-child(even){background:#F8FAFC}
                   </div>
                 ))}
               </div>
+            )}
+            </>
             )}
           </div>
         </div>
@@ -5900,6 +5949,26 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<TabType>('all');
+  const [custViewLoading, setCustViewLoading] = useState(false);
+  const [custTabLoading, setCustTabLoading] = useState(false);
+  const custViewInit = useRef(true);
+  const custTabInit = useRef(true);
+  const custViewTimer = useRef<number | null>(null);
+  const custTabTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (custViewInit.current) { custViewInit.current = false; return; }
+    setCustViewLoading(true);
+    if (custViewTimer.current) window.clearTimeout(custViewTimer.current);
+    custViewTimer.current = window.setTimeout(() => setCustViewLoading(false), 450);
+    return () => { if (custViewTimer.current) window.clearTimeout(custViewTimer.current); };
+  }, [view]);
+  useEffect(() => {
+    if (custTabInit.current) { custTabInit.current = false; return; }
+    setCustTabLoading(true);
+    if (custTabTimer.current) window.clearTimeout(custTabTimer.current);
+    custTabTimer.current = window.setTimeout(() => setCustTabLoading(false), 450);
+    return () => { if (custTabTimer.current) window.clearTimeout(custTabTimer.current); };
+  }, [activeTab]);
 
   const [customerReady, setCustomerReady] = useState(false);
   useEffect(() => {
@@ -6579,6 +6648,10 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
   if (view === 'dashboard') {
     return (
       <div style={containerStyle}>
+      {custViewLoading ? (
+        <TabLoader />
+      ) : (
+      <>
         {/* Top Bar */}
         <div style={topBarStyle}>
           <div style={searchWrapperStyle}>
@@ -6821,6 +6894,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
           onClose={() => { setIsEditCustomerModalOpen(false); setEditingCustomer(null); }}
           onSave={handleEditCustomer}
         />
+      </>
+      )}
       </div>
     );
   }
@@ -6833,6 +6908,10 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 
     return (
       <div style={containerStyle}>
+      {custViewLoading ? (
+        <TabLoader />
+      ) : (
+      <>
         {/* Header */}
         <div style={{
           display: 'flex',
@@ -7004,6 +7083,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
             {fmt(generalTotal)}
           </span>
         </div>
+      </>
+      )}
       </div>
     );
   }
@@ -7020,6 +7101,10 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
 
     return (
       <div style={containerStyle}>
+      {custViewLoading ? (
+        <TabLoader />
+      ) : (
+      <>
         {/* Header */}
         <div style={{
           display: 'flex',
@@ -7271,6 +7356,10 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
           overflow: 'hidden',
           marginBottom: '16px',
         }}>
+          {custTabLoading ? (
+            <TabLoader />
+          ) : (
+          <>
           {activeTab === 'all' && customerSales.length === 0 && (
             <div style={{
               padding: '60px 20px',
@@ -7369,6 +7458,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
               </table>
             )
           )}
+          </>
+          )}
         </div>
 
         {/* Footer */}
@@ -7400,6 +7491,8 @@ export function CustomerManagement({ customers, setCustomers, sales, onDeleteCus
           onClose={() => { setIsEditCustomerModalOpen(false); setEditingCustomer(null); }}
           onSave={handleEditCustomer}
         />
+      </>
+      )}
       </div>
     );
   }
@@ -7485,6 +7578,16 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const settingsInit = useRef(true);
+  const settingsTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (settingsInit.current) { settingsInit.current = false; return; }
+    setSettingsLoading(true);
+    if (settingsTimer.current) window.clearTimeout(settingsTimer.current);
+    settingsTimer.current = window.setTimeout(() => setSettingsLoading(false), 450);
+    return () => { if (settingsTimer.current) window.clearTimeout(settingsTimer.current); };
+  }, [activeTab]);
   const [priceHistoryCount, setPriceHistoryCount] = useState(0);
 
   // Load settings from PouchDB on mount
@@ -7742,6 +7845,10 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
       {/* Content */}
       <div style={{ padding: 24, background: '#f5f5f5', flex: 1, overflow: 'auto' }}>
+        {settingsLoading ? (
+          <TabLoader />
+        ) : (
+        <>
         {/* General Tab */}
         {activeTab === 0 && (
           <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
@@ -8518,6 +8625,8 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               </div>
             </div>
           </div>
+        )}
+        </>
         )}
       </div>
     </div>
