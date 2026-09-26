@@ -2112,7 +2112,7 @@ export default function App() {
                   transition: 'all 0.2s',
                   borderRadius: 6,
                 }}>
-                  <span style={{ fontSize: 16 }}>{tabLoading && currentTab === 'pos' ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-cart-shopping"></i>}</span>
+                  <span style={{ fontSize: 16 }}><i className="fas fa-cart-shopping"></i></span>
                   <span style={{ marginLeft: 6 }}>{t('sales')}</span>
                 </button>
                 {otherTabs.map((t) => (
@@ -2132,7 +2132,7 @@ export default function App() {
                     transition: 'all 0.2s',
                     borderRadius: 6,
                   }}>
-                    <span style={{ fontSize: 16 }}>{tabLoading && currentTab === t.id ? <i className="fas fa-spinner fa-spin"></i> : t.icon}</span>
+                    <span style={{ fontSize: 16 }}>{t.icon}</span>
                     <span style={{ marginLeft: 6 }}>{t.label}</span>
                   </button>
                 ))}
