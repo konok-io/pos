@@ -6688,6 +6688,7 @@ tr:nth-child(even){background:#F8FAFC}
                     <td style={{ padding: '10px 14px', textAlign: 'center' }}>
                       <div style={{ display: 'inline-flex', gap: 6, alignItems: 'center', justifyContent: 'center' }}>
                         <button title={t('adjust') || 'Adjust'} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => { setStockAdjustProduct(p); setStockAdjustQty(''); setStockAdjustType('add'); setStockAdjustReason(''); }}><i className="fas fa-gear"></i></button>
+                        <button title={p.stock <= 0 ? t('delete') : `${t('currentStock')}: ${p.stock}`} disabled={p.stock > 0} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, fontSize: 13, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, color: p.stock <= 0 ? T.red : T.gray300, opacity: p.stock <= 0 ? 1 : 0.45, cursor: p.stock <= 0 ? 'pointer' : 'not-allowed' }} onClick={() => { if (p.stock <= 0) handleDeleteProduct(p); }}><i className="fas fa-trash"></i></button>
                       </div>
                     </td>
                   </tr>
@@ -8196,90 +8197,21 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginLeft: 'auto' }}>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('totalProducts')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.teal, lineHeight: 1.2 }}>{products.length}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('stockAvailable')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.green, lineHeight: 1.2 }}>{stockCount}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('stockOut')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.red, lineHeight: 1.2 }}>{outOfStockCount}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-              <div style={{ textAlign: 'center' }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('stockLow')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.amber, lineHeight: 1.2 }}>{lowStockCount}</div></div>
-
-
-
-
-
-
-
-
-
-
-
-              <div style={{ borderLeft: `1px solid ${T.gray300}`, paddingLeft: 8 }}><div style={{ fontSize: 13, color: T.gray400, lineHeight: 1 }}>{t('totalValue')}</div><div style={{ fontSize: 15, fontWeight: 700, color: T.teal, lineHeight: 1.2 }}>{fmt(totalStockValue)}</div></div>
-
-
-
-
-
-
-
-
-
-
-
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginLeft: 'auto', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'stretch', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 10, boxShadow: '0 1px 3px rgba(0,0,0,0.06)', overflow: 'hidden', flexWrap: 'wrap' }}>
+              {[{ icon: 'fas fa-layer-group', label: t('totalProducts'), value: `${products.length}`, color: T.teal, bg: T.tealLight },
+                { icon: 'fas fa-circle-check', label: t('stockAvailable'), value: `${stockCount}`, color: T.green, bg: T.greenLight },
+                { icon: 'fas fa-circle-xmark', label: t('stockOut'), value: `${outOfStockCount}`, color: T.red, bg: T.redLight },
+                { icon: 'fas fa-triangle-exclamation', label: t('stockLow'), value: `${lowStockCount}`, color: '#D97706', bg: '#FEF3C7' },
+                { icon: 'fas fa-sack-dollar', label: t('totalValue'), value: fmt(totalStockValue), color: '#0369A1', bg: '#E0F2FE' }].map((st: any, i: number) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 12px', background: st.bg, borderLeft: i > 0 ? `1px solid ${T.gray200}` : 'none' }}>
+                  <span style={{ width: 26, height: 26, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.85)', color: st.color, fontSize: 12, flexShrink: 0, boxShadow: '0 1px 2px rgba(0,0,0,0.08)' }}><i className={st.icon}></i></span>
+                  <div style={{ lineHeight: 1.15, minWidth: 0 }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', color: T.gray400, whiteSpace: 'nowrap' }}>{st.label}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: st.color, whiteSpace: 'nowrap' }}>{st.value}</div>
+                  </div>
+                </div>
+              ))}
             </div>
 
 
