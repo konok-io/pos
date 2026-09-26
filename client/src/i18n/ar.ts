@@ -44,6 +44,8 @@ export const ar: Record<string, string> = {
   allSuppliers: 'جميع الموردين',
   stockAvailable: 'متوفر بالمخزون',
   stockLow: 'المخزون منخفض',
+  oldStock: 'المخزون القديم',
+  newStock: 'المخزون الجديد',
   stockOut: 'المخزون نفذ',
   hold: 'تعليق',
   holdSales: 'المبيعات معلقة',

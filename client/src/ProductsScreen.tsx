@@ -1200,7 +1200,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [stockHistoryFilter, setStockHistoryFilter] = useState<'all' | 'add' | 'remove'>('all');
+  const [stockHistoryFilter] = useState<'all' | 'add' | 'remove'>('all');
 
 
 
@@ -4625,310 +4625,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
           );
         })()}
       </div>
-      {showSupplierModal && (
-
-
-
-
-
-
-
-
-
-
-
-        <div style={overlay} onClick={() => setShowSupplierModal(false)}>
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 450, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-
-
-
-
-
-
-
-
-
-
-
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-building" style={{marginRight: 4}}></i> {editingSupplier ? t('edit') : t('addSupplier')}</h3>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('id')}</label><input value={supplierForm.id} readOnly style={{ ...inputStyle, background: T.gray50, fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }} /></div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('name')} *</label><input value={supplierForm.name} onChange={e => setSupplierForm({ ...supplierForm, name: e.target.value })} style={inputStyle} /></div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
-
-
-
-
-
-
-
-
-
-
-
-              <div><label style={labelStyle}>{t('phone')}</label><input value={supplierForm.phone} onChange={e => setSupplierForm({ ...supplierForm, phone: e.target.value })} style={inputStyle} /></div>
-
-
-
-
-
-
-
-
-
-
-
-              <div><label style={labelStyle}>{t('email')}</label><input value={supplierForm.email} onChange={e => setSupplierForm({ ...supplierForm, email: e.target.value })} style={inputStyle} /></div>
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('address')}</label><input value={supplierForm.address} onChange={e => setSupplierForm({ ...supplierForm, address: e.target.value })} style={inputStyle} /></div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
-
-
-
-
-
-
-
-
-
-
-
-              <div><label style={labelStyle}>CR {t('number')}</label><input value={supplierForm.crNumber} onChange={e => setSupplierForm({ ...supplierForm, crNumber: e.target.value })} style={inputStyle} /></div>
-
-
-
-
-
-
-
-
-
-
-
-              <div><label style={labelStyle}>VAT {t('number')}</label><input value={supplierForm.vatNumber} onChange={e => setSupplierForm({ ...supplierForm, vatNumber: e.target.value })} style={inputStyle} /></div>
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-
-
-
-
-
-
-
-
-
-
-
-              <button onClick={() => setShowSupplierModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-
-
-
-
-
-
-
-
-
-
-
-              <button onClick={() => {
-              if (!supplierForm.name.trim()) { alert(t('enterName')); return; }
-              const nameLower = supplierForm.name.trim().toLowerCase();
-              const dup = suppliers.some((s: any) => s.id !== editingSupplier?.id && (s.name || '').toLowerCase().trim() === nameLower);
-              if (dup) { alert(t('supplierNameExists')); return; }
-              const prevSuppliers = suppliers;
-              const prevProducts = products;
-              const prevPurchases = purchases;
-              if (editingSupplier) {
-                const oldName = editingSupplier.name || '';
-                const newName = supplierForm.name.trim();
-                const payload = { ...supplierForm, name: newName, code: supplierForm.code || editingSupplier.code || '' };
-                const updated = suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...payload } : s);
-                setSuppliers(updated);
-                setSuppliersParent(updated);
-                if (oldName && oldName.toLowerCase() !== newName.toLowerCase()) {
-                  const nameLc = oldName.toLowerCase();
-                  const nextProducts = products.map((p: any) => (p.company || '').toLowerCase() === nameLc ? { ...p, company: newName } : p);
-                  const nextPurchases = purchases.map((p: any) => (p.supplier || '').toLowerCase() === nameLc ? { ...p, supplier: newName } : p);
-                  setProducts(nextProducts);
-                  setProductsParent(nextProducts);
-                  setPurchasesParent(nextPurchases);
-                  for (const p of nextProducts) {
-                    if (prevProducts.find((x: any) => x.id === p.id && (x.company || '') !== (p.company || ''))) {
-                      api.updateProduct(p.id, p).catch(() => {});
-                    }
-                  }
-                }
-                api.updateSupplier(editingSupplier.id, payload).catch((e: any) => {
-                  setSuppliers(prevSuppliers);
-                  setSuppliersParent(prevSuppliers);
-                  setProducts(prevProducts);
-                  setProductsParent(prevProducts);
-                  setPurchasesParent(prevPurchases);
-                  alert(t('errorOccurred') + ': ' + e.message);
-                });
-              } else {
-                const maxCode = suppliers.reduce((max, x: any) => { const m = (x.code || '').match(/C-(\d+)/); return m ? Math.max(max, parseInt(m[1])) : max; }, 0);
-                const autoCode = supplierForm.code || `C-${String(maxCode + 1).padStart(5, '0')}`;
-                const newId = supplierForm.id || genSupplierId(suppliers);
-                const newSupplier = { ...supplierForm, id: newId, code: autoCode };
-                const updated = [...suppliers, newSupplier];
-                setSuppliers(updated);
-                setSuppliersParent(updated);
-                api.addSupplier(newSupplier).catch((e: any) => {
-                  setSuppliers(prevSuppliers);
-                  setSuppliersParent(prevSuppliers);
-                  alert(t('errorOccurred') + ': ' + e.message);
-                });
-              }
-              setShowSupplierModal(false);
-            }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-      )}
 
 
 
@@ -5098,80 +4794,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
           );
         })()}
       </div>
-      {showCategoryModal && (
-        <div style={overlay} onClick={() => setShowCategoryModal(false)}>
-          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {editingCategory ? t('edit') : t('addCategory')}</h3>
-            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('id')}</label><input value={categoryForm.id} readOnly style={{ ...inputStyle, background: T.gray50, fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }} /></div>
-            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              <button onClick={() => setShowCategoryModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
-              <button onClick={() => {
-                const name = categoryForm.name.trim();
-                if (!name) { alert(t('enterName')); return; }
-                const editingId = editingCategory?.id || '';
-                const oldName = String(editingCategory?.name || '').trim();
-                const norm = (s: any) => String(s || '').trim().toLowerCase();
-                const dup = categories.find((c: any) => (editingId ? c.id !== editingId : true) && norm(c.name) === norm(name));
-                if (dup) { alert(t('duplicateNameCat')); return; }
-                if (editingCategory) {
-                  const prevCatsR = categories;
-                  const doCascade = () => {
-                    if (oldName && norm(oldName) !== norm(name)) {
-                      const toRename = products.filter((p: any) => norm(p.cat) === norm(oldName));
-                      if (toRename.length) {
-                        const renamed = products.map((p: any) => norm(p.cat) === norm(oldName) ? { ...p, cat: name } : p);
-                        setProducts(renamed); setProductsParent(renamed);
-                        toRename.forEach((p: any) => api.updateProduct(p.id, { ...p, cat: name }).catch(() => {}));
-                      }
-                    }
-                  };
-                  if (editingId) {
-                    const updated = categories.map((c: any) => c.id === editingId ? { ...c, name } : c);
-                    setCategories(updated); setCategoriesParent(updated);
-                    api.updateCategory(editingId, { name }).then(doCascade).catch((e: any) => {
-                      setCategories(prevCatsR); setCategoriesParent(prevCatsR);
-                      alert(`${t('failed')}: ${e?.message || e}`);
-                    });
-                  } else {
-                    const startId = categoryForm.id && !categories.some((c: any) => c.id === categoryForm.id) ? categoryForm.id : genCategoryId(categories);
-                    const newCat = { id: startId, name };
-                    setCategories((prev: any[]) => [...prev, newCat]);
-                    setCategoriesParent((prev: any[]) => [...prev, newCat]);
-                    api.addCategory(newCat).then((res: any) => {
-                      if (res && res.id && res.id !== newCat.id) {
-                        setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
-                        setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
-                      }
-                      doCascade();
-                    }).catch((e: any) => {
-                      setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
-                      setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
-                      alert(`${t('failed')}: ${e?.message || e}`);
-                    });
-                  }
-                } else {
-                  const startId = categoryForm.id && !categories.some((c: any) => c.id === categoryForm.id) ? categoryForm.id : genCategoryId(categories);
-                  const newCat = { id: startId, name };
-                  setCategories((prev: any[]) => [...prev, newCat]);
-                  setCategoriesParent((prev: any[]) => [...prev, newCat]);
-                  api.addCategory(newCat).then((res: any) => {
-                    if (res && res.id && res.id !== newCat.id) {
-                      setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
-                      setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
-                    }
-                  }).catch((e: any) => {
-                    setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
-                    setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
-                    alert(`${t('failed')}: ${e?.message || e}`);
-                  });
-                }
-                setShowCategoryModal(false);
-              }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 
@@ -5729,7 +5351,6 @@ tr:nth-child(even){background:#F8FAFC}
                 <i className="fas fa-xmark"></i>
               </button>
             ) : null}
-            <span style={{ fontSize: 14, color: T.gray400 }}>{productSales.length + productStockHist.length}</span>
             <button style={{ ...btn('ghost', 'sm') }} onClick={() => exportViewProductHistory(viewProduct)}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
             <button style={{ ...btn('ghost', 'sm') }} onClick={() => printViewProduct(viewProduct)}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
           </div>
@@ -5927,7 +5548,17 @@ tr:nth-child(even){background:#F8FAFC}
       const sName = String(viewSupplier.name || '');
       const rec: any = { id: '', code: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', ...(viewSupplierRec || viewSupplier || {}) };
       const prods: any[] = viewSupplierProducts;
-      const purs: any[] = viewSupplierPurchases.slice().sort((a: any, b: any) => String(b.date || b.created_at || '').localeCompare(String(a.date || a.created_at || '')));
+      const inDate = (d: any): boolean => {
+        if (!filterFrom && !filterTo) return true;
+        if (!d) return false;
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return false;
+        const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        if (filterFrom && day < filterFrom) return false;
+        if (filterTo && day > filterTo) return false;
+        return true;
+      };
+      const purs: any[] = viewSupplierPurchases.filter((pu: any) => inDate(pu.date || pu.created_at)).sort((a: any, b: any) => String(b.date || b.created_at || '').localeCompare(String(a.date || a.created_at || '')));
       const stock = viewSupplierStock;
       const computedPur = purs.reduce((s: number, pu: any) => s + (pu.total || (pu.items || []).reduce((x: number, i: any) => x + (i.quantity || i.stock || 0) * (i.unitCost || i.costPrice || 0), 0)), 0);
       const totalPur = computedPur || (viewSupplier.totalPurchase || 0);
@@ -5936,6 +5567,66 @@ tr:nth-child(even){background:#F8FAFC}
       const hasProds = prods.length > 0;
       const q = (search || '').toLowerCase();
       const list = prods.filter((p: any) => !q || String(p.name || '').toLowerCase().includes(q) || String(codeOf(p)).toLowerCase().includes(q));
+      const exportViewCsv = () => {
+        const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const rows: string[] = [[esc(t('productName')), esc(t('code')), esc(t('category')), esc(t('sellPrice')), esc(t('stock'))].join(',')];
+        list.forEach((p: any) => rows.push([esc(p.name), esc(codeOf(p)), esc(p.cat || ''), esc(p.sellPrice), esc(p.stock || 0)].join(',')));
+        rows.push('');
+        rows.push([esc(t('invoice')), esc(t('date')), esc(t('qty')), esc(t('total'))].join(','));
+        purs.forEach((pu: any) => {
+          const qty = (pu.items || []).reduce((x: number, it: any) => x + (it.quantity || it.stock || 0), 0);
+          const tot = pu.total || (pu.items || []).reduce((x: number, it: any) => x + (it.quantity || it.stock || 0) * (it.unitCost || it.costPrice || 0), 0);
+          rows.push([esc(pu.invoiceNo || pu.invoice_no || pu.id || ''), esc(pu.date || pu.created_at || ''), esc(qty), esc(tot)].join(','));
+        });
+        const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `supplier-${sName}-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      };
+      const printView = () => {
+        const h = (v: any) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const puRows = purs.map((pu: any, i: number) => {
+          const qty = (pu.items || []).reduce((x: number, it: any) => x + (it.quantity || it.stock || 0), 0);
+          const tot = pu.total || (pu.items || []).reduce((x: number, it: any) => x + (it.quantity || it.stock || 0) * (it.unitCost || it.costPrice || 0), 0);
+          return `<tr><td>${i + 1}</td><td>${h(pu.invoiceNo || pu.invoice_no || pu.id)}</td><td>${h(pu.date || pu.created_at)}</td><td>${qty}</td><td>${h(fmt(tot))}</td></tr>`;
+        }).join('');
+        const pRows = list.map((p: any, i: number) => `<tr><td>${i + 1}</td><td>${h(p.name)}</td><td>${h(codeOf(p))}</td><td>${h(p.cat || '-')}</td><td>${h(fmt(p.sellPrice))}</td><td>${p.stock || 0}</td></tr>`).join('');
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4;margin:12mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
+.header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:3mm;margin-bottom:4mm}
+.header h1{color:#0F766E;font-size:16pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+.card{background:#F0FDFA;border:0.4mm solid #99f6e4;border-radius:2mm;padding:3mm;margin-bottom:3mm;display:flex;gap:6mm;flex-wrap:wrap}
+.lbl{font-size:8pt;color:#0F766E;text-transform:uppercase}
+.val{font-weight:700;font-size:12pt}
+h2{font-size:11pt;color:#0F766E;margin:4mm 0 1mm}
+table{width:100%;border-collapse:collapse;margin-top:2mm}
+th{background:#0F766E;color:#fff;padding:2.5mm;text-align:left;font-size:9pt}
+td{border:0.3mm solid #cbd5e1;padding:2mm;font-size:10pt}
+tr:nth-child(even){background:#F8FAFC}
+.footer{margin-top:8mm;font-size:9pt;color:#64748b}
+</style></head><body>
+<div class="header"><h1>Supplier Report</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
+<div class="card">
+  <div><div class="lbl">Supplier</div><div class="val">${h(sName)}</div></div>
+  <div><div class="lbl">Phone</div><div class="val">${h(rec.phone || '-')}</div></div>
+  <div><div class="lbl">Products</div><div class="val">${prods.length}</div></div>
+  <div><div class="lbl">Purchases</div><div class="val">${purs.length}</div></div>
+  <div><div class="lbl">Stock</div><div class="val">${stock}</div></div>
+  <div><div class="lbl">Total Purchase</div><div class="val">${h(fmt(totalPur))}</div></div>
+</div>
+<h2>Purchases</h2>
+<table><thead><tr><th>#</th><th>Invoice</th><th>Date</th><th>Qty</th><th>Total</th></tr></thead><tbody>${puRows || '<tr><td colspan="5" style="text-align:center;padding:6mm">No records in range</td></tr>'}</tbody></table>
+<h2>Products</h2>
+<table><thead><tr><th>#</th><th>Name</th><th>Code</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead><tbody>${pRows || '<tr><td colspan="6" style="text-align:center;padding:6mm">No products</td></tr>'}</tbody></table>
+<div class="footer">POS - ${list.length} products - ${purs.length} purchases</div>
+</body></html>`;
+        openPrintWin(html);
+      };
       const fmtDate = (d: any) => {
         if (!d) return '-';
         const n = Number(d);
@@ -5971,7 +5662,21 @@ tr:nth-child(even){background:#F8FAFC}
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
               </div>
-              <span style={{ fontSize: 14, color: T.gray400 }}>{list.length}/{prods.length}</span>
+              <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <i className="fas fa-calendar" style={{ color: T.teal }}></i>
+                <input type="date" value={filterFrom || ''} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+              </label>
+              <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
+              <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <input type="date" value={filterTo || ''} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+              </label>
+              {(filterFrom || filterTo) ? (
+                <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}>
+                  <i className="fas fa-xmark"></i>
+                </button>
+              ) : null}
+              <button style={{ ...btn('ghost', 'sm') }} onClick={exportViewCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
+              <button style={{ ...btn('ghost', 'sm') }} onClick={printView}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
             </div>
           </div>
 
@@ -5996,7 +5701,7 @@ tr:nth-child(even){background:#F8FAFC}
                   <div style={{ fontSize: 28, fontWeight: 800 }}>{fmt(totalPur)}</div>
                   <div style={{ fontSize: 13, opacity: 0.9 }}>{t('totalPurchase')}</div>
                   <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                    <button onClick={() => { setEditingSupplier(rec); setSupplierForm(rec); setShowSupplierModal(true); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)' }}><i className="fas fa-pen" style={{ marginRight: 4 }}></i> {t('edit')}</button>
+                    <button disabled={hasProds} onClick={() => { setEditingSupplier(rec); setSupplierForm(rec); setShowSupplierModal(true); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)', opacity: hasProds ? 0.4 : 1, cursor: hasProds ? 'not-allowed' : 'pointer' }}><i className="fas fa-pen" style={{ marginRight: 4 }}></i> {t('edit')}</button>
                     <button disabled={hasProds} onClick={() => { deleteSupplier(sName); setViewSupplier(null); }} style={{ ...btn('ghost', 'sm'), background: 'rgba(255,255,255,0.2)', color: T.white, border: '1px solid rgba(255,255,255,0.4)', opacity: hasProds ? 0.4 : 1, cursor: hasProds ? 'not-allowed' : 'pointer' }}><i className="fas fa-trash" style={{ marginRight: 4 }}></i> {t('delete')}</button>
                   </div>
                 </div>
@@ -6116,7 +5821,60 @@ tr:nth-child(even){background:#F8FAFC}
       const lowCount = prods.filter((p: any) => (p.stock || 0) > 0 && (p.stock || 0) <= (p.minStock || 5)).length;
       const hasProds = prods.length > 0;
       const q = (search || '').toLowerCase();
-      const list = prods.filter((p: any) => !q || String(p.name || '').toLowerCase().includes(q) || String(codeOf(p)).toLowerCase().includes(q));
+      const inDate = (d: any): boolean => {
+        if (!filterFrom && !filterTo) return true;
+        if (!d) return false;
+        const dt = new Date(d);
+        if (isNaN(dt.getTime())) return false;
+        const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+        if (filterFrom && day < filterFrom) return false;
+        if (filterTo && day > filterTo) return false;
+        return true;
+      };
+      const list = prods.filter((p: any) => inDate(p.createdAt || p.created_at) && (!q || String(p.name || '').toLowerCase().includes(q) || String(codeOf(p)).toLowerCase().includes(q)));
+      const exportViewCsv = () => {
+        const esc = (v: any) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const rows: string[] = [[esc(t('productName')), esc(t('code')), esc(t('supplier')), esc(t('sellPrice')), esc(t('stock'))].join(',')];
+        list.forEach((p: any) => rows.push([esc(p.name), esc(codeOf(p)), esc(p.company || ''), esc(p.sellPrice), esc(p.stock || 0)].join(',')));
+        const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `category-${cName}-${new Date().toISOString().slice(0, 10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+      };
+      const printView = () => {
+        const h = (v: any) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const pRows = list.map((p: any, i: number) => `<tr><td>${i + 1}</td><td>${h(p.name)}</td><td>${h(codeOf(p))}</td><td>${h(p.company || '-')}</td><td>${h(fmt(p.sellPrice))}</td><td>${p.stock || 0}</td></tr>`).join('');
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4;margin:12mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
+.header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:3mm;margin-bottom:4mm}
+.header h1{color:#0F766E;font-size:16pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+.card{background:#F0FDFA;border:0.4mm solid #99f6e4;border-radius:2mm;padding:3mm;margin-bottom:3mm;display:flex;gap:6mm;flex-wrap:wrap}
+.lbl{font-size:8pt;color:#0F766E;text-transform:uppercase}
+.val{font-weight:700;font-size:12pt}
+table{width:100%;border-collapse:collapse;margin-top:2mm}
+th{background:#0F766E;color:#fff;padding:2.5mm;text-align:left;font-size:9pt}
+td{border:0.3mm solid #cbd5e1;padding:2mm;font-size:10pt}
+tr:nth-child(even){background:#F8FAFC}
+.footer{margin-top:8mm;font-size:9pt;color:#64748b}
+</style></head><body>
+<div class="header"><h1>Category Report</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
+<div class="card">
+  <div><div class="lbl">Category</div><div class="val">${h(cName)}</div></div>
+  <div><div class="lbl">Products</div><div class="val">${prods.length}</div></div>
+  <div><div class="lbl">Stock</div><div class="val">${stock}</div></div>
+  <div><div class="lbl">Stock Out</div><div class="val">${outCount}</div></div>
+  <div><div class="lbl">Total Value</div><div class="val">${h(fmt(totalValue))}</div></div>
+</div>
+<table><thead><tr><th>#</th><th>Name</th><th>Code</th><th>Supplier</th><th>Price</th><th>Stock</th></tr></thead><tbody>${pRows || '<tr><td colspan="6" style="text-align:center;padding:6mm">No products</td></tr>'}</tbody></table>
+<div class="footer">POS - ${list.length} products</div>
+</body></html>`;
+        openPrintWin(html);
+      };
       const stats = [
         { icon: 'fas fa-boxes-stacked', label: t('products'), value: `${prods.length}`, color: T.teal, bg: T.tealLight },
         { icon: 'fas fa-warehouse', label: t('stock'), value: `${stock}`, color: outCount > 0 ? '#D97706' : T.green, bg: outCount > 0 ? '#FEF3C7' : '#DCFCE7' },
@@ -6144,7 +5902,21 @@ tr:nth-child(even){background:#F8FAFC}
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                 <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
               </div>
-              <span style={{ fontSize: 14, color: T.gray400 }}>{list.length}/{prods.length}</span>
+              <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <i className="fas fa-calendar" style={{ color: T.teal }}></i>
+                <input type="date" value={filterFrom || ''} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+              </label>
+              <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
+              <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <input type="date" value={filterTo || ''} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+              </label>
+              {(filterFrom || filterTo) ? (
+                <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}>
+                  <i className="fas fa-xmark"></i>
+                </button>
+              ) : null}
+              <button style={{ ...btn('ghost', 'sm') }} onClick={exportViewCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
+              <button style={{ ...btn('ghost', 'sm') }} onClick={printView}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
             </div>
           </div>
 
@@ -6849,69 +6621,508 @@ tr:nth-child(even){background:#F8FAFC}
   };
 
   const renderStock = () => (
+
+
+
+
+
+
+
+
+
+
+
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
-        <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
-          <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600, flexShrink: 0 }}>
-              <i className="fas fa-warehouse" style={{ marginRight: 6, color: T.teal }}></i>{t('stock')} {stockProducts.length}
-            </div>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: '1 1 260px', minWidth: 220, justifyContent: 'flex-end' }}>
-              <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 160, maxWidth: 480 }}>
-                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-                <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
-              </div>
-              <span style={{ fontSize: 14, color: T.gray400 }}>{stockProducts.length}</span>
-              <button style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
-            </div>
-          </div>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: T.tealLight }}>
-                {['#', t('productName'), t('company'), t('currentStock'), t('minStock'), t('totalValue'), t('status'), t('actions')].map((h, i) => (
-                  <th key={i} style={{ padding: '10px 14px', textAlign: 'center', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {stockProducts.length === 0 ? (
-                <tr>
-                  <td colSpan={8} style={{ padding: 48, textAlign: 'center', color: T.gray400 }}>
-                    <i className="fas fa-box-open" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
-                    {t('noProductsYet')}
-                  </td>
-                </tr>
-              ) : stockProducts.map((p: any, i: number) => {
-                const low = p.stock > 0 && p.stock <= (p.minStock || 5);
-                const status = p.stock <= 0 ? 'out' : low ? 'low' : 'ok';
-                return (
-                  <tr key={p.id} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
-                    <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray400, textAlign: 'center' }}>{i + 1}</td>
-                    <td style={{ padding: '10px 14px' }}>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>
-                      <div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p) || '-'}</div>
-                    </td>
-                    <td style={{ padding: '10px 14px', fontSize: 14, color: T.gray600 }}>{p.company || '-'}</td>
-                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                      <span style={{ fontWeight: 700, fontSize: 15, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>{fmtN(p.stock)}</span>
-                    </td>
-                    <td style={{ padding: '10px 14px', textAlign: 'center', fontSize: 14, color: T.gray500 }}>{p.minStock || 5}</td>
-                    <td style={{ padding: '10px 14px', textAlign: 'right', fontSize: 14 }}>{fmt(p.stock * p.costPrice)}</td>
-                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                      <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: status === 'out' ? T.redLight : status === 'low' ? T.amberLight : T.greenLight, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>
-                        {status === 'out' ? t('stockOut') : status === 'low' ? t('stockLow') : t('stockAvailable')}
-                      </span>
-                    </td>
-                    <td style={{ padding: '10px 14px', textAlign: 'center' }}>
-                      <button style={{ ...btn('primary', 'sm') }} onClick={() => { setStockAdjustProduct(p); setStockAdjustQty(''); setStockAdjustType('add'); setStockAdjustReason(''); }}><i className="fas fa-gear" style={{ marginRight: 4 }}></i> {t('adjust')}</button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+
+
+
+
+
+
+
+
+
+
+
+      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+
+
+
+
+
+
+
+
+
+
+
+        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+
+
+
+
+
+
+
+
+
+
+
+          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+
+
+
+
+
+
+
+
+
+
+
+          <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+
+
+
+
+
+
+
+
+
+
+
         </div>
+
+
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+        <button style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+
+
+
+
+
+
+
+
+
+
+
       </div>
+
+
+
+
+
+
+
+
+
+
+
+      <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
+
+
+
+
+
+
+
+
+
+
+
+        <table style={{ width: '100%', borderCollapse: 'collapse', background: T.white, borderRadius: 14, overflow: 'hidden', border: `1px solid ${T.gray200}` }}>
+
+
+
+
+
+
+
+
+
+
+
+          <thead><tr style={{ background: T.tealLight }}>
+
+
+
+
+
+
+
+
+
+
+
+            {[t('productName'), t('company'), t('currentStock'), t('minStock'), t('totalValue'), t('status'), t('actions')].map((h, i) => (
+
+
+
+
+
+
+
+
+
+
+
+              <th key={i} style={{ padding: '10px 12px', textAlign: i === 2 || i === 3 || i === 5 || i === 6 ? 'center' : i === 4 ? 'right' : 'left', fontSize: 14, fontWeight: 700, color: T.teal }}>{h}</th>
+
+
+
+
+
+
+
+
+
+
+
+            ))}
+
+
+
+
+
+
+
+
+
+
+
+          </tr></thead>
+
+
+
+
+
+
+
+
+
+
+
+          <tbody>
+
+
+
+
+
+
+
+
+
+
+
+            {stockProducts.map((p: any, i: number) => {
+
+
+
+
+
+
+
+
+
+
+
+              const low = p.stock > 0 && p.stock <= (p.minStock || 5);
+
+
+
+
+
+
+
+
+
+
+
+              const status = p.stock <= 0 ? 'out' : low ? 'low' : 'ok';
+
+
+
+
+
+
+
+
+
+
+
+              return (
+
+
+
+
+
+
+
+
+
+
+
+                <tr key={p.id} style={{ background: status === 'out' ? T.redLight : status === 'low' ? T.amberLight : i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+
+
+
+
+
+
+
+
+
+
+
+                  <td style={{ padding: '10px 12px', fontWeight: 600, fontSize: 14 }}>{p.name}<div style={{ fontSize: 12, color: T.gray400, fontFamily: 'monospace' }}>{codeOf(p) || '-'}</div></td>
+
+
+
+
+
+
+
+
+
+
+
+                  <td style={{ padding: '10px 12px', fontSize: 14, color: T.gray600 }}>{p.company || '-'}</td>
+
+
+
+
+
+
+
+
+
+
+
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}><span style={{ fontWeight: 700, fontSize: 18, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>{fmtN(p.stock)}</span></td>
+
+
+
+
+
+
+
+
+
+
+
+                  <td style={{ padding: '10px 12px', textAlign: 'center', fontSize: 14, color: T.gray500 }}>{p.minStock || 5}</td>
+
+
+
+
+
+
+
+
+
+
+
+                  <td style={{ padding: '10px 12px', textAlign: 'right', fontSize: 14 }}>{fmt(p.stock * p.costPrice)}</td>
+
+
+
+
+
+
+
+
+
+
+
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+
+
+
+
+
+
+
+
+
+
+
+                    <span style={{ padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: status === 'out' ? T.redLight : status === 'low' ? T.amberLight : T.greenLight, color: status === 'out' ? T.red : status === 'low' ? T.amber : T.green }}>
+
+
+
+
+
+
+
+
+
+
+
+                      {status === 'out' ? t('stockOut') : status === 'low' ? t('stockLow') : t('stockAvailable')}
+
+
+
+
+
+
+
+
+
+
+
+                    </span>
+
+
+
+
+
+
+
+
+
+
+
+                  </td>
+
+
+
+
+
+
+
+
+
+
+
+                  <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+
+
+
+
+
+
+
+
+
+
+
+                    <button style={{ ...btn('primary', 'sm') }} onClick={() => { setStockAdjustProduct(p); setStockAdjustQty(''); setStockAdjustType('add'); setStockAdjustReason(''); }}><i className="fas fa-gear" style={{marginRight: 4}}></i> {t('adjust')}</button>
+
+
+
+
+
+
+
+
+
+
+
+                  </td>
+
+
+
+
+
+
+
+
+
+
+
+                </tr>
+
+
+
+
+
+
+
+
+
+
+
+              );
+
+
+
+
+
+
+
+
+
+
+
+            })}
+
+
+
+
+
+
+
+
+
+
+
+          </tbody>
+
+
+
+
+
+
+
+
+
+
+
+        </table>
+
+
+
+
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+
+
+
+
+
+
 
       {stockAdjustProduct && (
 
@@ -7174,17 +7385,222 @@ tr:nth-child(even){background:#F8FAFC}
 
     </div>
 
-
-
-
-
-
-
-
-
-
-
   );
+
+
+
+
+
+
+
+
+
+
+
+
+  const renderStockHistoryPage = (mode: 'add' | 'remove') => {
+    const title = mode === 'add' ? t('stockAddHistory') : t('stockRemoveHistory');
+    const q = (search || '').toLowerCase();
+    const fromDate = (typeof filterFrom !== 'undefined' ? filterFrom : '') || '';
+    const toDate = (typeof filterTo !== 'undefined' ? filterTo : '') || '';
+    const inRange = (h: any): boolean => {
+      if (!fromDate && !toDate) return true;
+      const d = h.created_at;
+      if (!d) return false;
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return false;
+      const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+      if (fromDate && day < fromDate) return false;
+      if (toDate && day > toDate) return false;
+      return true;
+    };
+    const rows = (stockHistory || []).filter((h: any) => {
+      if (h.type !== mode) return false;
+      if (!inRange(h)) return false;
+      if (!q) return true;
+      return (h.productName || h.product_name || '').toLowerCase().includes(q)
+        || (h.reason || '').toLowerCase().includes(q);
+    });
+    const uniqueProducts = new Set(rows.map((h: any) => h.productName || h.product_name || h.productId || '').filter(Boolean));
+    const totalQty = rows.reduce((s: number, h: any) => s + (+h.quantity || 0), 0);
+    const lastEntry = rows[0] || null;
+
+    const exportHistCsv = () => {
+      const headers = [t('productName'), t('date'), t('quantity'), t('reason')];
+      const lines = [headers.join(',')];
+      rows.forEach((h: any) => {
+        const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+        lines.push([esc(h.productName || ''), esc(h.created_at || ''), esc(h.quantity), esc(h.reason || '')].join(','));
+      });
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `stock-${mode}-history-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+
+    const printHist = () => {
+      const trs = rows.map((h: any, i: number) => {
+        const oldS = +(h.oldStock ?? h.old_stock ?? 0);
+        const newS = +(h.newStock ?? h.new_stock ?? 0);
+        return `<tr><td>${i + 1}</td><td>${h.productName || '-'}</td><td>${h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td><td>${oldS}</td><td>${newS}</td><td>${h.type === 'add' ? '+' : '-'}${h.quantity || 0}</td><td>${h.reason || '-'}</td></tr>`;
+      }).join('');
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4 landscape;margin:10mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+.header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
+.header h1{color:#0F766E;font-size:14pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+.stats{display:flex;gap:4mm;margin-bottom:3mm}
+.stat{background:#F0FDFA;border:0.4mm solid #99f6e4;border-radius:2mm;padding:2mm 4mm;text-align:center}
+.stat .lbl{font-size:7pt;color:#0F766E;text-transform:uppercase}
+.stat .val{font-size:12pt;font-weight:800;color:#0F766E}
+table{width:100%;border-collapse:collapse}
+th{background:#0F766E;color:#fff;padding:2mm;text-align:left;font-size:8pt}
+td{border:0.3mm solid #cbd5e1;padding:1.5mm 2mm;font-size:9pt}
+tr:nth-child(even){background:#F8FAFC}
+.footer{margin-top:4mm;font-size:8pt;color:#64748b}
+</style></head><body>
+<div class="header"><h1>${title}</h1><div class="meta">${fromDate || '…'} → ${toDate || '…'}<br/>${new Date().toLocaleString()}</div></div>
+<div class="stats">
+  <div class="stat"><div class="lbl">Entries</div><div class="val">${rows.length}</div></div>
+  <div class="stat"><div class="lbl">Products</div><div class="val">${uniqueProducts.size}</div></div>
+  <div class="stat"><div class="lbl">Qty</div><div class="val">${totalQty}</div></div>
+</div>
+<table><thead><tr><th>#</th><th>Product</th><th>Date</th><th>Old</th><th>New</th><th>Qty</th><th>Reason</th></tr></thead><tbody>${trs || '<tr><td colspan="7" style="text-align:center;padding:8mm">No records</td></tr>'}</tbody></table>
+<div class="footer">Generated by POS · ${rows.length} records</div>
+</body></html>`;
+      openPrintWin(html);
+    };
+
+    const stats = [
+      { icon: 'fas fa-list', label: t('totalChanges'), value: String(rows.length), color: T.teal, bg: T.tealLight },
+      { icon: 'fas fa-box', label: t('products'), value: String(uniqueProducts.size), color: '#7C3AED', bg: '#EDE9FE' },
+      { icon: mode === 'add' ? 'fas fa-arrow-up' : 'fas fa-arrow-down', label: t('quantity'), value: String(totalQty), color: mode === 'add' ? T.green : T.red, bg: mode === 'add' ? '#DCFCE7' : T.redLight },
+      { icon: 'fas fa-clock', label: t('lastChange'), value: lastEntry ? new Date(lastEntry.created_at).toLocaleDateString() : '-', color: '#0369A1', bg: '#E0F2FE' },
+    ];
+
+    return (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
+        {/* Top bar */}
+        <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+          <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('stock'); setSearch(''); if (typeof setFilterFrom === 'function') { setFilterFrom(''); setFilterTo(''); } }}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
+          <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {title}</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', width: 180 }}>
+              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+            </div>
+            <input type="date" value={fromDate} onChange={e => setFilterFrom && setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate')} />
+            <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
+            <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
+            <span style={{ fontSize: 14, color: T.gray400 }}>{rows.length}</span>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={exportHistCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={printHist}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
+          </div>
+        </div>
+
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          {/* Gradient header */}
+          <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark || '#0F766E'} 100%)`, padding: '28px 24px 24px', color: T.white }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+              <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                <i className={mode === 'add' ? 'fas fa-box-open' : 'fas fa-box'}></i>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{title}</div>
+                <div style={{ fontSize: 13, opacity: 0.9 }}>
+                  {rows.length} {t('totalChanges')} · {uniqueProducts.size} {t('products')} · {totalQty} {t('quantity')}
+                </div>
+                <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                  <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                    <i className={mode === 'add' ? 'fas fa-arrow-up' : 'fas fa-arrow-down'} style={{ marginRight: 6 }}></i>{mode === 'add' ? '+' : '-'}{totalQty}
+                  </span>
+                  {(fromDate || toDate) ? (
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                      <i className="fas fa-calendar" style={{ marginRight: 6 }}></i>{fromDate || '…'} → {toDate || '…'}
+                    </span>
+                  ) : null}
+                </div>
+              </div>
+              <button style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer' }} onClick={exportHistCsv}>
+                <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
+              </button>
+            </div>
+          </div>
+
+          {/* Stats grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
+            {stats.map((s, i) => (
+              <div key={i} style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, color: s.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <i className={s.icon}></i>
+                  </div>
+                  <div style={{ fontSize: 12, color: T.gray400, fontWeight: 600 }}>{s.label}</div>
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Table */}
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
+            <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
+              <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600 }}>
+                  <i className="fas fa-list" style={{ marginRight: 6, color: T.teal }}></i>{title} · {rows.length}
+                </div>
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: T.tealLight }}>
+                    {['#', t('productName'), t('date'), t('oldStock'), t('newStock'), t('quantity'), t('reason')].map((h, hi) => (
+                      <th key={hi} style={{ padding: '10px 14px', textAlign: hi >= 3 && hi <= 5 ? 'center' : 'left', fontSize: 13, fontWeight: 700, color: T.teal }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ padding: 48, textAlign: 'center', color: T.gray400 }}>
+                        <i className="fas fa-box-open" style={{ fontSize: 36, marginBottom: 12, display: 'block', color: T.gray300 }}></i>
+                        {t('noStockHistory')}
+                      </td>
+                    </tr>
+                  ) : rows.map((h: any, i: number) => {
+                    const oldS = +(h.oldStock ?? h.old_stock ?? 0);
+                    const newS = +(h.newStock ?? h.new_stock ?? 0);
+                    const isAdd = h.type === 'add';
+                    return (
+                      <tr key={h.id || i} style={{ background: i % 2 === 0 ? T.white : '#FAFAFA', borderBottom: `1px solid ${T.gray100}` }}>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray400, textAlign: 'center' }}>{i + 1}</td>
+                        <td style={{ padding: '10px 14px' }}>
+                          <div style={{ fontWeight: 600, fontSize: 14 }}>{h.productName || h.product_name || '-'}</div>
+                          {h.reason ? <div style={{ fontSize: 12, color: T.gray400, marginTop: 2 }}>{h.reason}</div> : null}
+                        </td>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray500 }}>{h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'center', fontSize: 14, color: T.gray500 }}>{oldS}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'center', fontSize: 14, fontWeight: 700, color: isAdd ? T.green : T.red }}>{newS}</td>
+                        <td style={{ padding: '10px 14px', textAlign: 'center' }}>
+                          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 10, fontSize: 12, fontWeight: 800, background: isAdd ? '#DCFCE7' : T.redLight, color: isAdd ? T.green : T.red }}>
+                            {isAdd ? '+' : '-'}{h.quantity || 0}
+                          </span>
+                        </td>
+                        <td style={{ padding: '10px 14px', fontSize: 13, color: T.gray600 }}>{h.reason || '-'}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
 
 
@@ -8400,7 +8816,7 @@ tr:nth-child(even){background:#F8FAFC}
 
                   <button onClick={() => { setStockFilter('low'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'low' ? T.amberLight : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-triangle-exclamation" style={{marginRight: 4}}></i> {t('stockLow')}</button>
 
-                  <button onClick={() => { setStockFilter('foc'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'foc' ? '#FEF3C7' : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-gift" style={{marginRight: 4}}></i> {t('stockLow')}</button>
+                  <button onClick={() => { setStockFilter('foc'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: stockFilter === 'foc' ? '#FEF3C7' : 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-gift" style={{marginRight: 4}}></i> {t('focOnly')}</button>
 
 
 
@@ -8436,7 +8852,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button onClick={() => { setStockHistoryFilter('add'); setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stock')} + {t('history')}</button>
+                  <button onClick={() => { setProductTab('stockAddHistory'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stock')} + {t('history')}</button>
 
 
 
@@ -8448,7 +8864,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button onClick={() => { setStockHistoryFilter('remove'); setShowStockHistoryModal(true); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stock')} - {t('history')}</button>
+                  <button onClick={() => { setProductTab('stockRemoveHistory'); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-box" style={{marginRight: 4}}></i> {t('stock')} - {t('history')}</button>
                   <button onClick={() => { openDeleteHistory(); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-trash" style={{marginRight: 4}}></i> {t('deleteHistory')}</button>
 
 
@@ -9080,6 +9496,8 @@ tr:nth-child(even){background:#F8FAFC}
 
 
         {!viewProduct && !viewSupplier && !viewCategory && productTab === 'stock' && renderStock()}
+        {!viewProduct && !viewSupplier && !viewCategory && productTab === 'stockAddHistory' && renderStockHistoryPage('add')}
+        {!viewProduct && !viewSupplier && !viewCategory && productTab === 'stockRemoveHistory' && renderStockHistoryPage('remove')}
 
         {!viewProduct && !viewSupplier && !viewCategory && productTab === 'priceHistory' && renderPriceHistory()}
 
@@ -10773,6 +11191,386 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
+
+      {showSupplierModal && (
+
+
+
+
+
+
+
+
+
+
+
+        <div style={overlay} onClick={() => setShowSupplierModal(false)}>
+
+
+
+
+
+
+
+
+
+
+
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 450, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+
+
+
+
+
+
+
+
+
+
+
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-building" style={{marginRight: 4}}></i> {editingSupplier ? t('edit') : t('addSupplier')}</h3>
+
+
+
+
+
+
+
+
+
+
+
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('id')}</label><input value={supplierForm.id} readOnly style={{ ...inputStyle, background: T.gray50, fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }} /></div>
+
+
+
+
+
+
+
+
+
+
+
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('name')} *</label><input value={supplierForm.name} onChange={e => setSupplierForm({ ...supplierForm, name: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
+
+
+
+
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+
+
+
+
+
+
+
+
+
+
+
+              <div><label style={labelStyle}>{t('phone')}</label><input value={supplierForm.phone} onChange={e => setSupplierForm({ ...supplierForm, phone: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
+
+
+
+
+
+              <div><label style={labelStyle}>{t('email')}</label><input value={supplierForm.email} onChange={e => setSupplierForm({ ...supplierForm, email: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('address')}</label><input value={supplierForm.address} onChange={e => setSupplierForm({ ...supplierForm, address: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
+
+
+
+
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+
+
+
+
+
+
+
+
+
+
+
+              <div><label style={labelStyle}>CR {t('number')}</label><input value={supplierForm.crNumber} onChange={e => setSupplierForm({ ...supplierForm, crNumber: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
+
+
+
+
+
+              <div><label style={labelStyle}>VAT {t('number')}</label><input value={supplierForm.vatNumber} onChange={e => setSupplierForm({ ...supplierForm, vatNumber: e.target.value })} style={inputStyle} /></div>
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+
+
+
+
+
+
+
+
+
+
+
+              <button onClick={() => setShowSupplierModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+
+
+
+
+
+
+
+
+
+
+
+              <button onClick={() => {
+              if (!supplierForm.name.trim()) { alert(t('enterName')); return; }
+              const nameLower = supplierForm.name.trim().toLowerCase();
+              const dup = suppliers.some((s: any) => s.id !== editingSupplier?.id && (s.name || '').toLowerCase().trim() === nameLower);
+              if (dup) { alert(t('supplierNameExists')); return; }
+              const prevSuppliers = suppliers;
+              const prevProducts = products;
+              const prevPurchases = purchases;
+              if (editingSupplier) {
+                const oldName = editingSupplier.name || '';
+                const newName = supplierForm.name.trim();
+                const payload = { ...supplierForm, name: newName, code: supplierForm.code || editingSupplier.code || '' };
+                const updated = suppliers.map((s: any) => s.id === editingSupplier.id ? { ...s, ...payload } : s);
+                setSuppliers(updated);
+                setSuppliersParent(updated);
+                if (oldName && oldName.toLowerCase() !== newName.toLowerCase()) {
+                  const nameLc = oldName.toLowerCase();
+                  const nextProducts = products.map((p: any) => (p.company || '').toLowerCase() === nameLc ? { ...p, company: newName } : p);
+                  const nextPurchases = purchases.map((p: any) => (p.supplier || '').toLowerCase() === nameLc ? { ...p, supplier: newName } : p);
+                  setProducts(nextProducts);
+                  setProductsParent(nextProducts);
+                  setPurchasesParent(nextPurchases);
+                  for (const p of nextProducts) {
+                    if (prevProducts.find((x: any) => x.id === p.id && (x.company || '') !== (p.company || ''))) {
+                      api.updateProduct(p.id, p).catch(() => {});
+                    }
+                  }
+                }
+                api.updateSupplier(editingSupplier.id, payload).catch((e: any) => {
+                  setSuppliers(prevSuppliers);
+                  setSuppliersParent(prevSuppliers);
+                  setProducts(prevProducts);
+                  setProductsParent(prevProducts);
+                  setPurchasesParent(prevPurchases);
+                  alert(t('errorOccurred') + ': ' + e.message);
+                });
+              } else {
+                const maxCode = suppliers.reduce((max, x: any) => { const m = (x.code || '').match(/C-(\d+)/); return m ? Math.max(max, parseInt(m[1])) : max; }, 0);
+                const autoCode = supplierForm.code || `C-${String(maxCode + 1).padStart(5, '0')}`;
+                const newId = supplierForm.id || genSupplierId(suppliers);
+                const newSupplier = { ...supplierForm, id: newId, code: autoCode };
+                const updated = [...suppliers, newSupplier];
+                setSuppliers(updated);
+                setSuppliersParent(updated);
+                api.addSupplier(newSupplier).catch((e: any) => {
+                  setSuppliers(prevSuppliers);
+                  setSuppliersParent(prevSuppliers);
+                  alert(t('errorOccurred') + ': ' + e.message);
+                });
+              }
+              setShowSupplierModal(false);
+            }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+          </div>
+
+
+
+
+
+
+
+
+
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+      )}
+
+      {showCategoryModal && (
+        <div style={overlay} onClick={() => setShowCategoryModal(false)}>
+          <div style={{ background: T.white, borderRadius: 12, padding: 24, width: 400, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 16px', color: T.teal }}><i className="fas fa-folder" style={{marginRight: 4}}></i> {editingCategory ? t('edit') : t('addCategory')}</h3>
+            <div style={{ marginBottom: 12 }}><label style={labelStyle}>{t('id')}</label><input value={categoryForm.id} readOnly style={{ ...inputStyle, background: T.gray50, fontFamily: 'monospace', fontWeight: 700, letterSpacing: 1 }} /></div>
+            <div style={{ marginBottom: 16 }}><label style={labelStyle}>{t('categoryName')} *</label><input value={categoryForm.name} onChange={e => setCategoryForm({ ...categoryForm, name: e.target.value })} style={inputStyle} placeholder={t('enterCategoryName')} /></div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+              <button onClick={() => setShowCategoryModal(false)} style={{ ...btn('ghost'), flex: 1 }}>{t('cancel')}</button>
+              <button onClick={() => {
+                const name = categoryForm.name.trim();
+                if (!name) { alert(t('enterName')); return; }
+                const editingId = editingCategory?.id || '';
+                const oldName = String(editingCategory?.name || '').trim();
+                const norm = (s: any) => String(s || '').trim().toLowerCase();
+                const dup = categories.find((c: any) => (editingId ? c.id !== editingId : true) && norm(c.name) === norm(name));
+                if (dup) { alert(t('duplicateNameCat')); return; }
+                if (editingCategory) {
+                  const prevCatsR = categories;
+                  const doCascade = () => {
+                    if (oldName && norm(oldName) !== norm(name)) {
+                      const toRename = products.filter((p: any) => norm(p.cat) === norm(oldName));
+                      if (toRename.length) {
+                        const renamed = products.map((p: any) => norm(p.cat) === norm(oldName) ? { ...p, cat: name } : p);
+                        setProducts(renamed); setProductsParent(renamed);
+                        toRename.forEach((p: any) => api.updateProduct(p.id, { ...p, cat: name }).catch(() => {}));
+                      }
+                    }
+                  };
+                  if (editingId) {
+                    const updated = categories.map((c: any) => c.id === editingId ? { ...c, name } : c);
+                    setCategories(updated); setCategoriesParent(updated);
+                    api.updateCategory(editingId, { name }).then(doCascade).catch((e: any) => {
+                      setCategories(prevCatsR); setCategoriesParent(prevCatsR);
+                      alert(`${t('failed')}: ${e?.message || e}`);
+                    });
+                  } else {
+                    const startId = categoryForm.id && !categories.some((c: any) => c.id === categoryForm.id) ? categoryForm.id : genCategoryId(categories);
+                    const newCat = { id: startId, name };
+                    setCategories((prev: any[]) => [...prev, newCat]);
+                    setCategoriesParent((prev: any[]) => [...prev, newCat]);
+                    api.addCategory(newCat).then((res: any) => {
+                      if (res && res.id && res.id !== newCat.id) {
+                        setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
+                        setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
+                      }
+                      doCascade();
+                    }).catch((e: any) => {
+                      setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
+                      setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
+                      alert(`${t('failed')}: ${e?.message || e}`);
+                    });
+                  }
+                } else {
+                  const startId = categoryForm.id && !categories.some((c: any) => c.id === categoryForm.id) ? categoryForm.id : genCategoryId(categories);
+                  const newCat = { id: startId, name };
+                  setCategories((prev: any[]) => [...prev, newCat]);
+                  setCategoriesParent((prev: any[]) => [...prev, newCat]);
+                  api.addCategory(newCat).then((res: any) => {
+                    if (res && res.id && res.id !== newCat.id) {
+                      setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
+                      setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c));
+                    }
+                  }).catch((e: any) => {
+                    setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
+                    setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id));
+                    alert(`${t('failed')}: ${e?.message || e}`);
+                  });
+                }
+                setShowCategoryModal(false);
+              }} style={{ ...btn('primary'), flex: 2 }}><i className="fas fa-floppy-disk" style={{marginRight: 4}}></i> {t('save')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showStockHistoryModal && (
 

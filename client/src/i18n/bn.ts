@@ -44,6 +44,8 @@ export const bn: Record<string, string> = {
   allSuppliers: 'সব সরবরাহকারী',
   stockAvailable: 'স্টক আছে',
   stockLow: 'স্টক কম',
+  oldStock: 'পুরাতন স্টক',
+  newStock: 'নতুন স্টক',
   stockOut: 'স্টক শেষ',
   hold: 'হোল্ড',
   holdSales: 'হোল্ড সেল',

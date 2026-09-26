@@ -43,6 +43,8 @@ export const en: Record<string, string> = {
   allSuppliers: 'All Suppliers',
   stockAvailable: 'Stock Available',
   stockLow: 'Low Stock',
+  oldStock: 'Old Stock',
+  newStock: 'New Stock',
   stockOut: 'Stock Out',
   hold: 'Hold',
   holdSales: 'Hold Sales',

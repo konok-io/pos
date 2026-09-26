@@ -44,6 +44,8 @@ export const hi: Record<string, string> = {
   allSuppliers: 'सभी आपूर्तिकर्ता',
   stockAvailable: 'स्टॉक उपलब्ध',
   stockLow: 'स्टॉक कम',
+  oldStock: 'पुराना स्टॉक',
+  newStock: 'नया स्टॉक',
   stockOut: 'स्टॉक खत्म',
   hold: 'होल्ड',
   holdSales: 'होल्ड सेल्स',
