@@ -8942,53 +8942,53 @@ tr:nth-child(even){background:#F8FAFC}
                           <input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : Math.max(0, parseInt(e.target.value, 10))) })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
                         </div>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: productForm.foc ? '#B45309' : T.gray600, background: productForm.foc ? '#FEF3C7' : T.gray100, border: `1px solid ${productForm.foc ? '#FCD34D' : T.gray200}`, borderRadius: 8, padding: '10px 14px', width: '100%', justifyContent: 'center' }}>
+                      <div style={{ display: 'flex' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: productForm.foc ? '#B45309' : T.gray600, background: productForm.foc ? '#FEF3C7' : T.gray100, border: `1px solid ${productForm.foc ? '#FCD34D' : T.gray200}`, borderRadius: 8, padding: '10px 14px', minHeight: 38, boxSizing: 'border-box', width: '100%' }}>
                           <input type="checkbox" checked={!!productForm.foc} onChange={e => setProductForm({ ...productForm, foc: e.target.checked })} style={{ accentColor: '#D97706' }} />
                           <i className="fas fa-gift" style={{ fontSize: 12 }}></i>
                           {t('foc')}
                         </label>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: T.gray500, background: T.gray50, border: `1px dashed ${T.gray200}`, borderRadius: 8, padding: '8px 12px', justifyContent: 'center' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: T.gray500, background: T.gray50, border: `1px dashed ${T.gray200}`, borderRadius: 8, padding: '8px 12px', minHeight: 38, boxSizing: 'border-box', justifyContent: 'center' }}>
                         {t('purchasePrice')}: {_settings?.currencySymbol} {((productForm.paidQty || 0) * (productForm.costPrice || 0)).toFixed(2)}
                       </div>
                     {(() => {
                       const stock = productForm.stock || 0;
                       const min = productForm.minStock || 0;
                       if (stock <= 0) return (
-                        <div style={{ padding: '8px 12px', borderRadius: 8, background: T.redLight, color: T.red, fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
+                        <div style={{ padding: '8px 12px', borderRadius: 8, background: T.redLight, color: T.red, fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 38, boxSizing: 'border-box' }}>
                           <i className="fas fa-circle-xmark" style={{ marginRight: 4 }}></i>{t('outOfStock')}
                         </div>
                       );
                       if (stock <= min) return (
-                        <div style={{ padding: '8px 12px', borderRadius: 8, background: '#FEF3C7', color: '#B45309', fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
+                        <div style={{ padding: '8px 12px', borderRadius: 8, background: '#FEF3C7', color: '#B45309', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 38, boxSizing: 'border-box' }}>
                           <i className="fas fa-triangle-exclamation" style={{ marginRight: 4 }}></i>{t('lowStock')}
                         </div>
                       );
                       return (
-                        <div style={{ padding: '8px 12px', borderRadius: 8, background: '#DCFCE7', color: '#15803D', fontSize: 12, fontWeight: 600, marginBottom: 4 }}>
+                        <div style={{ padding: '8px 12px', borderRadius: 8, background: '#DCFCE7', color: '#15803D', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 38, boxSizing: 'border-box' }}>
                           <i className="fas fa-circle-check" style={{ marginRight: 4 }}></i>{t('inStock')}
                         </div>
                       );
                     })()}
-                  <div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} ({_settings?.currencySymbol})</label>
                     {(() => {
                       const profit = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
                       return (
-                        <div style={{ height: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7, display: 'flex', alignItems: 'center' }}>
+                        <div style={{ flex: 1, minHeight: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <span style={{ fontSize: 14, fontWeight: 700, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400 }}>{_settings?.currencySymbol} {profit}</span>
                         </div>
                       );
                     })()}
                   </div>
-                  <div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} (%)</label>
                     {(() => {
                       const profit = (productForm.sellPrice || 0) - (productForm.costPrice || 0);
                       const profitPct = (productForm.costPrice || 0) > 0 ? Math.round(profit / (productForm.costPrice || 1) * 100) : 0;
                       return (
-                        <div style={{ height: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7, display: 'flex', alignItems: 'center' }}>
+                        <div style={{ flex: 1, minHeight: 38, padding: '0 12px', background: T.gray50, border: `1px solid ${T.gray200}`, borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <span style={{ fontSize: 14, fontWeight: 700, color: profit > 0 ? '#16A34A' : profit < 0 ? '#DC2626' : T.gray400 }}>{profitPct === 0 && (productForm.costPrice || 0) === 0 && profit > 0 ? '∞' : profitPct}%</span>
                         </div>
                       );
@@ -8999,7 +8999,7 @@ tr:nth-child(even){background:#F8FAFC}
                   const sellPrice = productForm.sellPrice || 0;
                   const totalWithVat = sellPrice + (sellPrice * vat / 100);
                   return (
-                    <div style={{ gridColumn: 'span 2', marginBottom: 4, padding: '10px 14px', background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', borderRadius: 8, border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ gridColumn: 'span 2', padding: '10px 14px', minHeight: 38, boxSizing: 'border-box', background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', borderRadius: 8, border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: 7, background: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <i className="fas fa-receipt" style={{ color: '#fff', fontSize: 12 }}></i>
@@ -9010,9 +9010,9 @@ tr:nth-child(even){background:#F8FAFC}
                     </div>
                   );
                 })()}
-                      <div>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('totalIn')}</label>
-                        <div style={{ ...inputStyle, fontSize: 14, height: 38, display: 'flex', alignItems: 'center', background: T.gray100, fontWeight: 800, color: T.teal }}>
+                        <div style={{ ...inputStyle, fontSize: 14, flex: 1, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.gray100, fontWeight: 800, color: T.teal }}>
                           <i className="fas fa-layer-group" style={{ marginRight: 8, fontSize: 11, color: T.gray400 }}></i>
                           {(productForm.paidQty || 0) + (productForm.freeQty || 0)}
                         </div>
@@ -9026,7 +9026,7 @@ tr:nth-child(even){background:#F8FAFC}
                       const freeVal = free * unit;
                       if (totalIn <= 0) return null;
                       return (
-                        <div style={{ background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)', border: '1px solid #FCD34D', borderRadius: 10, padding: '10px 12px', marginBottom: 12, gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, fontSize: 12 }}>
+                        <div style={{ background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)', border: '1px solid #FCD34D', borderRadius: 10, padding: '10px 12px', marginBottom: 12, gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr', alignContent: 'center', gap: 8, fontSize: 12 }}>
                           <div><span style={{ color: T.gray500 }}>{t('invoiceTotal') || t('total')}:</span> <strong style={{ color: '#92400E' }}>{_settings?.currencySymbol} {paidTotal.toFixed(2)}</strong> <span style={{ color: T.gray400 }}>({paid} × {unit})</span></div>
                           <div><span style={{ color: T.gray500 }}>{t('totalIn')}:</span> <strong style={{ color: T.teal }}>{totalIn}</strong></div>
                           <div><span style={{ color: T.gray500 }}>{t('stockPrice') || t('purchasePrice')}:</span> <strong style={{ color: '#15803D' }}>{_settings?.currencySymbol} {unit.toFixed(2)}</strong></div>
