@@ -4094,103 +4094,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
 
 
 
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-
-
-
-
-
-
-
-
-
-
-
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-
-
-
-
-
-
-
-
-
-
-
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-
-
-
-
-
-
-
-
-
-
-
-          <input value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder={t('searchSupplier')} style={{ ...inputStyle, paddingLeft: 32 }} />
-
-
-
-
-
-
-
-
-
-
-
-        </div>
-
-
-
-
-
-
-
-
-
-
-
-        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredSuppliers.length}</span>
-
-
-
-
-
-
-
-
-
-
-
-        <button style={{ ...btn('ghost', 'sm') }} onClick={exportSuppliersCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
-
-
-
-
-
-
-
-
-
-
-
-        <button style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-
-
-
-
-
-
-
-
-
-
-
-      </div>
 
 
 
@@ -4261,6 +4164,13 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 ))}
               </div>
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
+                <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+                  <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                  <input value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder={t('searchSupplier')} style={{ ...inputStyle, paddingLeft: 32 }} />
+                </div>
+                <button style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+              </div>
         {filteredSuppliers.length === 0 ? (
 
 
@@ -5119,8 +5029,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                   <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
                 </div>
-                <span style={{ fontSize: 14, color: T.gray400 }}>{filteredCategories.length}</span>
-                <button style={{ ...btn('ghost', 'sm') }} onClick={exportCategoriesCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
                 <button style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
               </div>
         {filteredCategories.length === 0 ? (
