@@ -8467,49 +8467,6 @@ tr:nth-child(even){background:#F8FAFC}
 
         {!viewProduct && !viewSupplier && !viewCategory && productTab === 'newProduct' && (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
-            {/* Top bar — Product View style */}
-            <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap', flexShrink: 0 }}>
-              <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('allProducts')}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
-              <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('newProduct')}</span>
-              <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 13, color: T.gray400 }}>{tempProducts.length} {t('productList')}</span>
-                <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = (() => { const s = headers.findIndex((h: string) => h.includes('sell')); if (s >= 0) return s; return headers.findIndex((h: string) => (h.includes('sellprice') || h.includes('sell_price') || (h.includes('price') && !h.includes('cost') && !h.includes('purchase')))); })(); const stockIdx = headers.findIndex((h: string) => h.includes('stock') && !h.includes('min')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const minStockIdx = headers.findIndex((h: string) => h.includes('minstock') || h.includes('min_stock') || h === 'min'); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); const expiryIdx = headers.findIndex((h: string) => h.includes('expir')); const imported: any[] = []; const errors: string[] = []; const stockUpdated: string[] = []; for (let i = 1; i < lines2.length; i++) { const cols = lines2[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const companyName = companyIdx >= 0 ? cols[companyIdx] : ''; let supplierId = ''; if (companyName) { const matched = suppliers.find((s: any) => (s.name || '').toLowerCase() === companyName.toLowerCase()); if (matched) { supplierId = matched.id; } else { errors.push(`Row ${i+1}: "${companyName}" - ${t('supplierNotFound')}`); continue; } } const rowCode = (codeIdx >= 0 ? cols[codeIdx] : '').trim().toLowerCase();
-                      const existingIdx = tempProducts.findIndex((t: any) => {
-                        const tCode = (t.code || '').trim().toLowerCase();
-                        const tName = (t.name || '').trim().toLowerCase();
-                        return (rowCode !== '' && tCode === rowCode) || tName === name.trim().toLowerCase();
-                      });
-                      if (existingIdx >= 0) {
-                        setTempProducts((prev: any[]) => prev.map((t: any, idx: number) => idx === existingIdx ? { ...t, name: name || t.name, cat: (catIdx >= 0 && cols[catIdx]) ? cols[catIdx] : t.cat, costPrice: costIdx >= 0 && cols[costIdx] !== '' && cols[costIdx] !== undefined ? Math.max(0, parseFloat(cols[costIdx]) || t.costPrice || 0) : t.costPrice, sellPrice: sellIdx >= 0 && cols[sellIdx] !== '' && cols[sellIdx] !== undefined ? Math.max(0, parseFloat(cols[sellIdx]) || t.sellPrice || 0) : t.sellPrice, unit: (unitIdx >= 0 && cols[unitIdx]) ? cols[unitIdx] : t.unit, company: companyName || t.company, supplierId: supplierId || t.supplierId, minStock: minStockIdx >= 0 && cols[minStockIdx] !== '' && cols[minStockIdx] !== undefined ? (parseInt(cols[minStockIdx], 10) || t.minStock) : t.minStock, vat: vatIdx >= 0 && cols[vatIdx] !== '' && cols[vatIdx] !== undefined ? (parseFloat(cols[vatIdx]) || t.vat) : t.vat, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : t.expiryDate, stock: Math.max(0, t.stock || 0) + (stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0) } : t));
-                      } else {
-                        const existingDb = products.find((p: any) => {
-                          const pCode = (p.code || '').trim().toLowerCase();
-                          const pName = (p.name || '').trim().toLowerCase();
-                          return (rowCode !== '' && pCode === rowCode) || pName === name.trim().toLowerCase();
-                        });
-                        if (existingDb) {
-                          const addStk = stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0;
-                          const newStk = (existingDb.stock || 0) + addStk;
-                          api.updateProduct(existingDb.id, { ...existingDb, stock: newStk }).catch(() => {});
-                          if (addStk !== 0) api.addStockHistory({ productId: existingDb.id, productName: existingDb.name, type: 'purchase', quantity: addStk, oldStock: existingDb.stock || 0, newStock: newStk, reason: 'CSV import' }).catch(() => {});
-                          stockUpdated.push(`${existingDb.name} +${addStk}`);
-                        } else {
-                          imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? Math.max(0, parseFloat(cols[costIdx]) || 0) : 0, sellPrice: sellIdx >= 0 ? Math.max(0, parseFloat(cols[sellIdx]) || 0) : 0, stock: stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyName, minStock: minStockIdx >= 0 ? Math.max(0, parseInt(cols[minStockIdx]) || 5) : 5, supplierId, vat: vatIdx >= 0 ? parseFloat(cols[vatIdx]) || 0 : 0, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : '', _temp: true }); } } } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); } const msg = []; if (imported.length > 0) msg.push(`${imported.length} ${t('products')} imported!`); if (stockUpdated.length > 0) msg.push(`Stock updated:\n${stockUpdated.join('\n')}`); if (errors.length > 0) msg.push(`${errors.length} errors:\n${errors.join('\n')}`); if (msg.length) alert(msg.join('\n\n')); }; reader.readAsText(file); e.target.value = ''; }} />
-                <button title="CSV Upload" onClick={() => document.getElementById('csv-upload-input')?.click()} style={{ ...btn('ghost', 'sm') }}>
-                  <i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> CSV
-                </button>
-                <button title="Demo CSV" onClick={() => { const headers = ['Name', 'Code', 'Category', 'CostPrice', 'SellPrice', 'Stock', 'MinStock', 'VAT', 'Unit', 'Company', 'ExpiryDate']; const demo = [headers.join(','), 'Rice Basmati,1001,Groceries,80,120,50,5,15,kg,ABC Traders,2027-06-30', 'Samsung Galaxy S24,2001,Electronics,45000,55000,10,2,12,pcs,Mobile World,2028-12-31', 'Notebook A4,3001,Stationery,25,40,200,10,5,pcs,Paper House,'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'products_template.csv'; a.click(); URL.revokeObjectURL(url); }} style={{ ...btn('ghost', 'sm') }}>
-                  <i className="fas fa-download" style={{ marginRight: 4 }}></i> {t('demoCsv')}
-                </button>
-                <button onClick={handleClearTempProducts} disabled={tempProducts.length === 0} style={{ ...btn('ghost', 'sm'), opacity: tempProducts.length ? 1 : 0.5 }}>
-                  <i className="fas fa-trash-can" style={{ marginRight: 4 }}></i> {t('clear')}
-                </button>
-                <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0 || isPosting} style={{ ...btn('primary', 'sm'), opacity: tempProducts.length && !isPosting ? 1 : 0.5 }}>
-                  <i className={isPosting ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'} style={{ marginRight: 4 }}></i> {isPosting ? t('posting') : t('post')}
-                </button>
-              </div>
-            </div>
-
             {/* Page scroll area — Product View style */}
             <div style={{ flex: 1, overflow: 'auto' }}>
               {/* Gradient Header */}
@@ -8626,6 +8583,49 @@ tr:nth-child(even){background:#F8FAFC}
                     </div>
                   );
                 })()}
+
+                {/* Action toolbar — below stats */}
+                <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 12, flexWrap: 'wrap', marginBottom: 14 }}>
+                  <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('allProducts')}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
+                  <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('newProduct')}</span>
+                  <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 13, color: T.gray400 }}>{tempProducts.length} {t('productList')}</span>
+                    <input id="csv-upload-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name') || h.includes('product')); const codeIdx = headers.findIndex((h: string) => h.includes('code') || h.includes('barcode')); const catIdx = headers.findIndex((h: string) => h.includes('cat') || h.includes('category')); const costIdx = headers.findIndex((h: string) => h.includes('cost') || h.includes('purchase')); const sellIdx = (() => { const s = headers.findIndex((h: string) => h.includes('sell')); if (s >= 0) return s; return headers.findIndex((h: string) => (h.includes('sellprice') || h.includes('sell_price') || (h.includes('price') && !h.includes('cost') && !h.includes('purchase')))); })(); const stockIdx = headers.findIndex((h: string) => h.includes('stock') && !h.includes('min')); const unitIdx = headers.findIndex((h: string) => h.includes('unit')); const companyIdx = headers.findIndex((h: string) => h.includes('company') || h.includes('supplier')); const minStockIdx = headers.findIndex((h: string) => h.includes('minstock') || h.includes('min_stock') || h === 'min'); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); const expiryIdx = headers.findIndex((h: string) => h.includes('expir')); const imported: any[] = []; const errors: string[] = []; const stockUpdated: string[] = []; for (let i = 1; i < lines2.length; i++) { const cols = lines2[i].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const companyName = companyIdx >= 0 ? cols[companyIdx] : ''; let supplierId = ''; if (companyName) { const matched = suppliers.find((s: any) => (s.name || '').toLowerCase() === companyName.toLowerCase()); if (matched) { supplierId = matched.id; } else { errors.push(`Row ${i+1}: "${companyName}" - ${t('supplierNotFound')}`); continue; } } const rowCode = (codeIdx >= 0 ? cols[codeIdx] : '').trim().toLowerCase();
+                          const existingIdx = tempProducts.findIndex((t: any) => {
+                            const tCode = (t.code || '').trim().toLowerCase();
+                            const tName = (t.name || '').trim().toLowerCase();
+                            return (rowCode !== '' && tCode === rowCode) || tName === name.trim().toLowerCase();
+                          });
+                          if (existingIdx >= 0) {
+                            setTempProducts((prev: any[]) => prev.map((t: any, idx: number) => idx === existingIdx ? { ...t, name: name || t.name, cat: (catIdx >= 0 && cols[catIdx]) ? cols[catIdx] : t.cat, costPrice: costIdx >= 0 && cols[costIdx] !== '' && cols[costIdx] !== undefined ? Math.max(0, parseFloat(cols[costIdx]) || t.costPrice || 0) : t.costPrice, sellPrice: sellIdx >= 0 && cols[sellIdx] !== '' && cols[sellIdx] !== undefined ? Math.max(0, parseFloat(cols[sellIdx]) || t.sellPrice || 0) : t.sellPrice, unit: (unitIdx >= 0 && cols[unitIdx]) ? cols[unitIdx] : t.unit, company: companyName || t.company, supplierId: supplierId || t.supplierId, minStock: minStockIdx >= 0 && cols[minStockIdx] !== '' && cols[minStockIdx] !== undefined ? (parseInt(cols[minStockIdx], 10) || t.minStock) : t.minStock, vat: vatIdx >= 0 && cols[vatIdx] !== '' && cols[vatIdx] !== undefined ? (parseFloat(cols[vatIdx]) || t.vat) : t.vat, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : t.expiryDate, stock: Math.max(0, t.stock || 0) + (stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0) } : t));
+                          } else {
+                            const existingDb = products.find((p: any) => {
+                              const pCode = (p.code || '').trim().toLowerCase();
+                              const pName = (p.name || '').trim().toLowerCase();
+                              return (rowCode !== '' && pCode === rowCode) || pName === name.trim().toLowerCase();
+                            });
+                            if (existingDb) {
+                              const addStk = stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0;
+                              const newStk = (existingDb.stock || 0) + addStk;
+                              api.updateProduct(existingDb.id, { ...existingDb, stock: newStk }).catch(() => {});
+                              if (addStk !== 0) api.addStockHistory({ productId: existingDb.id, productName: existingDb.name, type: 'purchase', quantity: addStk, oldStock: existingDb.stock || 0, newStock: newStk, reason: 'CSV import' }).catch(() => {});
+                              stockUpdated.push(`${existingDb.name} +${addStk}`);
+                            } else {
+                              imported.push({ id: genId(), name, code: codeIdx >= 0 ? cols[codeIdx] : '', cat: catIdx >= 0 ? cols[catIdx] : '', costPrice: costIdx >= 0 ? Math.max(0, parseFloat(cols[costIdx]) || 0) : 0, sellPrice: sellIdx >= 0 ? Math.max(0, parseFloat(cols[sellIdx]) || 0) : 0, stock: stockIdx >= 0 ? Math.max(0, parseInt(cols[stockIdx]) || 0) : 0, unit: unitIdx >= 0 ? cols[unitIdx] || 'pcs' : 'pcs', company: companyName, minStock: minStockIdx >= 0 ? Math.max(0, parseInt(cols[minStockIdx]) || 5) : 5, supplierId, vat: vatIdx >= 0 ? parseFloat(cols[vatIdx]) || 0 : 0, expiryDate: expiryIdx >= 0 && cols[expiryIdx] ? cols[expiryIdx] : '', _temp: true }); } } } if (imported.length > 0) { setTempProducts((prev: any[]) => [...prev, ...imported]); } const msg = []; if (imported.length > 0) msg.push(`${imported.length} ${t('products')} imported!`); if (stockUpdated.length > 0) msg.push(`Stock updated:\n${stockUpdated.join('\n')}`); if (errors.length > 0) msg.push(`${errors.length} errors:\n${errors.join('\n')}`); if (msg.length) alert(msg.join('\n\n')); }; reader.readAsText(file); e.target.value = ''; }} />
+                    <button title="CSV Upload" onClick={() => document.getElementById('csv-upload-input')?.click()} style={{ ...btn('ghost', 'sm') }}>
+                      <i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> CSV
+                    </button>
+                    <button title="Demo CSV" onClick={() => { const headers = ['Name', 'Code', 'Category', 'CostPrice', 'SellPrice', 'Stock', 'MinStock', 'VAT', 'Unit', 'Company', 'ExpiryDate']; const demo = [headers.join(','), 'Rice Basmati,1001,Groceries,80,120,50,5,15,kg,ABC Traders,2027-06-30', 'Samsung Galaxy S24,2001,Electronics,45000,55000,10,2,12,pcs,Mobile World,2028-12-31', 'Notebook A4,3001,Stationery,25,40,200,10,5,pcs,Paper House,'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'products_template.csv'; a.click(); URL.revokeObjectURL(url); }} style={{ ...btn('ghost', 'sm') }}>
+                      <i className="fas fa-download" style={{ marginRight: 4 }}></i> {t('demoCsv')}
+                    </button>
+                    <button onClick={handleClearTempProducts} disabled={tempProducts.length === 0} style={{ ...btn('ghost', 'sm'), opacity: tempProducts.length ? 1 : 0.5 }}>
+                      <i className="fas fa-trash-can" style={{ marginRight: 4 }}></i> {t('clear')}
+                    </button>
+                    <button onClick={handlePostTempProducts} disabled={tempProducts.length === 0 || isPosting} style={{ ...btn('primary', 'sm'), opacity: tempProducts.length && !isPosting ? 1 : 0.5 }}>
+                      <i className={isPosting ? 'fas fa-spinner fa-spin' : 'fas fa-paper-plane'} style={{ marginRight: 4 }}></i> {isPosting ? t('posting') : t('post')}
+                    </button>
+                  </div>
+                </div>
 
                 {/* Two-column: Form | Preview+List — Product View grid */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr', gap: 16, marginBottom: 22 }}>
