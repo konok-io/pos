@@ -8793,7 +8793,7 @@ tr:nth-child(even){background:#F8FAFC}
                 })()}
 
                 {/* Two-column: Form | Preview+List — Product View grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 22 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.7fr 1fr', gap: 16, marginBottom: 22 }}>
                   {/* LEFT: Form sections (Basic + Pricing + Inventory) */}
                   <div>
                     {/* Basic Information Card */}
@@ -8802,31 +8802,31 @@ tr:nth-child(even){background:#F8FAFC}
                         <i className="fas fa-circle-info" style={{ marginRight: 6 }}></i>{t('basicInfo')}
                       </div>
                       <div style={{ padding: 16 }}>
-                {/* Supplier */}
-                <div style={{ marginBottom: 12 }}>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('suppliers')}</label>
-                  <div style={{ position: 'relative' }}>
-                    <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-building" style={{ fontSize: 13 }}></i></div>
-                    <input value={productForm.company || productForm.supplierId} onChange={e => { const val = e.target.value; const found = suppliers.find((s: any) => s.id === val || s.name.toLowerCase() === val.toLowerCase()); if (found) { setProductForm({ ...productForm, supplierId: found.id, company: found.name }); } else { setProductForm({ ...productForm, supplierId: '', company: val }); } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.company ? '#F0F9FF' : T.gray50, borderColor: productForm.company ? '#0369A1' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
-                    {productForm.supplierId && !productForm.company && suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).length > 0 && (
-                      <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
-                        {suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).map((s: any) => (
-                          <div key={s.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, supplierId: s.id, company: s.name })}>
-                            <div style={{ width: 28, height: 28, borderRadius: 6, background: '#E0F2FE', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                              <i className="fas fa-building" style={{ color: '#0369A1', fontSize: 11 }}></i>
-                            </div>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontWeight: 600, color: T.tealDark }}>{s.id}</div>
-                              <div style={{ fontSize: 11, color: T.gray500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
                 {/* Category + Expiry Date */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
+                 {/* Supplier */}
+                 <div style={{ marginBottom: 12 }}>
+                   <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('suppliers')}</label>
+                   <div style={{ position: 'relative' }}>
+                     <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-building" style={{ fontSize: 13 }}></i></div>
+                     <input value={productForm.company || productForm.supplierId} onChange={e => { const val = e.target.value; const found = suppliers.find((s: any) => s.id === val || s.name.toLowerCase() === val.toLowerCase()); if (found) { setProductForm({ ...productForm, supplierId: found.id, company: found.name }); } else { setProductForm({ ...productForm, supplierId: '', company: val }); } }} style={{ ...inputStyle, fontSize: 13, paddingLeft: 32, background: productForm.company ? '#F0F9FF' : T.gray50, borderColor: productForm.company ? '#0369A1' : T.gray200, height: 40 }} placeholder={`${t('enterToSearch')}...`} />
+                     {productForm.supplierId && !productForm.company && suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).length > 0 && (
+                       <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, maxHeight: 140, overflow: 'auto', zIndex: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4 }}>
+                         {suppliers.filter((s: any) => s.id.includes(productForm.supplierId) || s.name.toLowerCase().includes(productForm.supplierId.toLowerCase())).map((s: any) => (
+                           <div key={s.id} style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: `1px solid ${T.gray100}`, fontSize: 12, display: 'flex', alignItems: 'center', gap: 8 }} onClick={() => setProductForm({ ...productForm, supplierId: s.id, company: s.name })}>
+                             <div style={{ width: 28, height: 28, borderRadius: 6, background: '#E0F2FE', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                               <i className="fas fa-building" style={{ color: '#0369A1', fontSize: 11 }}></i>
+                             </div>
+                             <div style={{ flex: 1, minWidth: 0 }}>
+                               <div style={{ fontWeight: 600, color: T.tealDark }}>{s.id}</div>
+                               <div style={{ fontSize: 11, color: T.gray500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{s.name}</div>
+                             </div>
+                           </div>
+                         ))}
+                       </div>
+                     )}
+                   </div>
+                 </div>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('categories')}</label>
                     <div style={{ position: 'relative' }}>
@@ -8857,8 +8857,8 @@ tr:nth-child(even){background:#F8FAFC}
                     </div>
                   </div>
                 </div>
-                {/* Product Name + Barcode */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                {/* Product Name + Barcode + Unit */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block', textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('productName')} *</label>
                     <div style={{ position: 'relative' }}>
@@ -8906,16 +8906,16 @@ tr:nth-child(even){background:#F8FAFC}
                       )}
                     </div>
                   </div>
-                </div>
-                {/* Unit + VAT */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                  <div>
-                    <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('unit')}</label>
-                    <div style={{ position: 'relative' }}>
-                      <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-ruler" style={{ fontSize: 12 }}></i></div>
-                      <input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 30, height: 38 }} placeholder="pcs" />
+                    <div>
+                      <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('unit')}</label>
+                      <div style={{ position: 'relative' }}>
+                        <div style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-ruler" style={{ fontSize: 12 }}></i></div>
+                        <input value={productForm.unit} onChange={e => setProductForm({ ...productForm, unit: e.target.value })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 30, height: 38 }} placeholder="pcs" />
+                      </div>
                     </div>
-                  </div>
+                </div>
+                {/* VAT */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('vat')} (%)</label>
                     <input type="number" value={productForm.vat ?? _settings?.vatPercent ?? 0} onChange={e => setProductForm({ ...productForm, vat: e.target.value === '' ? 0 : parseFloat(e.target.value) || 0 })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#7C3AED' }} />
@@ -8930,7 +8930,7 @@ tr:nth-child(even){background:#F8FAFC}
                         <i className="fas fa-coins" style={{ marginRight: 6 }}></i>{t('pricingInfo')}
                       </div>
                       <div style={{ padding: 16 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('purchasePrice')} ({_settings?.currencySymbol})</label>
                     <input type="number" value={productForm.costPrice} onChange={e => setProductForm({ ...productForm, costPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#15803D' }} />
@@ -8939,8 +8939,6 @@ tr:nth-child(even){background:#F8FAFC}
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('sellPrice')} ({_settings?.currencySymbol})</label>
                     <input type="number" value={productForm.sellPrice} onChange={e => setProductForm({ ...productForm, sellPrice: Math.max(0, parseFloat(e.target.value) || 0) })} style={{ ...inputStyle, fontSize: 14, fontWeight: 600, height: 38, color: '#B91C1C' }} />
                   </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} ({_settings?.currencySymbol})</label>
                     {(() => {
@@ -8952,6 +8950,8 @@ tr:nth-child(even){background:#F8FAFC}
                       );
                     })()}
                   </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
                   <div>
                     <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('profit')} (%)</label>
                     {(() => {
@@ -8964,13 +8964,12 @@ tr:nth-child(even){background:#F8FAFC}
                       );
                     })()}
                   </div>
-                </div>
                 {(() => {
                   const vat = productForm.vat || _settings?.vatPercent || 0;
                   const sellPrice = productForm.sellPrice || 0;
                   const totalWithVat = sellPrice + (sellPrice * vat / 100);
                   return (
-                    <div style={{ marginBottom: 4, padding: '10px 14px', background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', borderRadius: 8, border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ gridColumn: 'span 2', marginBottom: 4, padding: '10px 14px', background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', borderRadius: 8, border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ width: 28, height: 28, borderRadius: 7, background: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <i className="fas fa-receipt" style={{ color: '#fff', fontSize: 12 }}></i>
@@ -8981,6 +8980,7 @@ tr:nth-child(even){background:#F8FAFC}
                     </div>
                   );
                 })()}
+                </div>
                       </div>
                     </div>
 
@@ -8990,7 +8990,7 @@ tr:nth-child(even){background:#F8FAFC}
                         <i className="fas fa-warehouse" style={{ marginRight: 6 }}></i>{t('inventoryInfo')}
                       </div>
                       <div style={{ padding: 16 }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
                       <div>
                         <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('paidQty')}</label>
                         <div style={{ position: 'relative' }}>
@@ -9012,6 +9012,8 @@ tr:nth-child(even){background:#F8FAFC}
                           {(productForm.paidQty || 0) + (productForm.freeQty || 0)}
                         </div>
                       </div>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 12 }}>
                       <div>
                         <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('minStock')}</label>
                         <div style={{ position: 'relative' }}>
@@ -9019,8 +9021,6 @@ tr:nth-child(even){background:#F8FAFC}
                           <input type="number" value={productForm.minStock} onChange={e => setProductForm({ ...productForm, minStock: e.target.value === '' ? 5 : (Number.isNaN(parseInt(e.target.value, 10)) ? 5 : Math.max(0, parseInt(e.target.value, 10))) })} style={{ ...inputStyle, fontSize: 13, paddingLeft: 28, height: 38 }} />
                         </div>
                       </div>
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, cursor: 'pointer', color: productForm.foc ? '#B45309' : T.gray600, background: productForm.foc ? '#FEF3C7' : T.gray100, border: `1px solid ${productForm.foc ? '#FCD34D' : T.gray200}`, borderRadius: 8, padding: '10px 14px', width: '100%', justifyContent: 'center' }}>
                           <input type="checkbox" checked={!!productForm.foc} onChange={e => setProductForm({ ...productForm, foc: e.target.checked })} style={{ accentColor: '#D97706' }} />
