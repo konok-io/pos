@@ -3979,14 +3979,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const apBtn = (dis: boolean): React.CSSProperties => ({ padding: '6px 14px', borderRadius: 8, border: `1px solid ${T.gray200}`, background: dis ? T.gray100 : T.white, color: dis ? T.gray400 : T.gray600, fontSize: 13, fontWeight: 600, cursor: dis ? 'not-allowed' : 'pointer' });
     return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '10px 12px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-        <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
-          <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-          <input value={search} onChange={e => { setSearch(e.target.value); setApPage(1); }} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
-        </div>
-        <span style={{ fontSize: 14, color: T.gray400 }}>{filteredProducts.length}</span>
-        <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
-      </div>
 
 
 
@@ -4000,9 +3992,16 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
 
       <div style={{ flex: 1, overflow: 'auto', padding: 12 }}>
         <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
-          <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600 }}>
+          <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600, flexShrink: 0 }}>
               <i className="fas fa-list" style={{ marginRight: 6, color: T.teal }}></i>{t('allProducts')} · {filteredProducts.length}
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flex: '1 1 260px', minWidth: 220, justifyContent: 'flex-end' }}>
+              <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 160, maxWidth: 480 }}>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                <input value={search} onChange={e => { setSearch(e.target.value); setApPage(1); }} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+              </div>
+              <button style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
           </div>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
