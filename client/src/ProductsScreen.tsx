@@ -8949,8 +8949,8 @@ tr:nth-child(even){background:#F8FAFC}
                           {t('foc')}
                         </label>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: T.gray500, background: T.gray50, border: `1px dashed ${T.gray200}`, borderRadius: 8, padding: '8px 12px', minHeight: 38, boxSizing: 'border-box', justifyContent: 'center' }}>
-                        {t('purchasePrice')}: {_settings?.currencySymbol} {((productForm.paidQty || 0) * (productForm.costPrice || 0)).toFixed(2)}
+                      <div style={{ display: 'flex', alignItems: 'center', fontSize: 12, color: '#15803D', background: '#F0FDF4', border: `1px solid #BBF7D0`, borderRadius: 8, padding: '8px 12px', minHeight: 38, boxSizing: 'border-box', justifyContent: 'center' }}>
+                        {t('salesPriceWithVat')}: {_settings?.currencySymbol} {((productForm.sellPrice || 0) + ((productForm.sellPrice || 0) * (productForm.vat || _settings?.vatPercent || 0) / 100)).toFixed(2)}
                       </div>
                     {(() => {
                       const stock = productForm.stock || 0;
@@ -8994,29 +8994,10 @@ tr:nth-child(even){background:#F8FAFC}
                       );
                     })()}
                   </div>
-                {(() => {
-                  const vat = productForm.vat || _settings?.vatPercent || 0;
-                  const sellPrice = productForm.sellPrice || 0;
-                  const totalWithVat = sellPrice + (sellPrice * vat / 100);
-                  return (
-                    <div style={{ gridColumn: 'span 2', padding: '10px 14px', minHeight: 38, boxSizing: 'border-box', background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)', borderRadius: 8, border: '1px solid #BBF7D0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ width: 28, height: 28, borderRadius: 7, background: '#16A34A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <i className="fas fa-receipt" style={{ color: '#fff', fontSize: 12 }}></i>
-                        </div>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: '#15803D' }}>{t('salesPriceWithVat')}</span>
-                      </div>
-                      <span style={{ fontSize: 16, fontWeight: 700, color: '#15803D' }}>{_settings?.currencySymbol} {totalWithVat.toFixed(2)}</span>
-                    </div>
-                  );
-                })()}
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <label style={{ fontSize: 12, fontWeight: 600, color: T.gray500, marginBottom: 6, display: 'block' }}>{t('totalIn')}</label>
-                        <div style={{ ...inputStyle, fontSize: 14, flex: 1, minHeight: 38, display: 'flex', alignItems: 'center', justifyContent: 'center', background: T.gray100, fontWeight: 800, color: T.teal }}>
-                          <i className="fas fa-layer-group" style={{ marginRight: 8, fontSize: 11, color: T.gray400 }}></i>
-                          {(productForm.paidQty || 0) + (productForm.freeQty || 0)}
-                        </div>
-                      </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+                    <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 14px', whiteSpace: 'nowrap' }}><i className="fas fa-eraser" style={{ marginRight: 4 }}></i> {t('clear')}</button>
+                    <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-plus" style={{ marginRight: 6 }}></i> {t('add')}</button>
+                  </div>
                     {(() => {
                       const paid = productForm.paidQty || 0;
                       const free = productForm.freeQty || 0;
@@ -9026,7 +9007,7 @@ tr:nth-child(even){background:#F8FAFC}
                       const freeVal = free * unit;
                       if (totalIn <= 0) return null;
                       return (
-                        <div style={{ background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)', border: '1px solid #FCD34D', borderRadius: 10, padding: '10px 12px', marginBottom: 12, gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr', alignContent: 'center', gap: 8, fontSize: 12 }}>
+                        <div style={{ background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)', border: '1px solid #FCD34D', borderRadius: 10, padding: '10px 12px', marginBottom: 12, gridColumn: 'span 3', display: 'grid', gridTemplateColumns: '1fr 1fr', alignContent: 'center', gap: 8, fontSize: 12 }}>
                           <div><span style={{ color: T.gray500 }}>{t('invoiceTotal') || t('total')}:</span> <strong style={{ color: '#92400E' }}>{_settings?.currencySymbol} {paidTotal.toFixed(2)}</strong> <span style={{ color: T.gray400 }}>({paid} × {unit})</span></div>
                           <div><span style={{ color: T.gray500 }}>{t('totalIn')}:</span> <strong style={{ color: T.teal }}>{totalIn}</strong></div>
                           <div><span style={{ color: T.gray500 }}>{t('stockPrice') || t('purchasePrice')}:</span> <strong style={{ color: '#15803D' }}>{_settings?.currencySymbol} {unit.toFixed(2)}</strong></div>
@@ -9036,13 +9017,6 @@ tr:nth-child(even){background:#F8FAFC}
                     })()}
                 </div>
                       </div>
-                    </div>
-
-
-                    {/* Buttons */}
-                    <div style={{ display: 'flex', gap: 8 }}>
-                      <button onClick={() => setProductForm({ name: '', code: '', company: '', cat: '', unit: 'pcs', costPrice: 0, sellPrice: 0, stock: 0, paidQty: 0, freeQty: 0, foc: false, minStock: 5, supplierId: '', vat: _settings?.vatPercent ?? 0, expiryDate: '' })} style={{ ...btn('ghost'), fontSize: 13, padding: '10px 16px' }}><i className="fas fa-eraser" style={{marginRight: 4}}></i> {t('clear')}</button>
-                      <button onClick={handleAddToTempList} style={{ ...btn('primary'), flex: 1, fontSize: 13, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="fas fa-plus" style={{marginRight: 6}}></i> {t('add')}</button>
                     </div>
                   </div>
 
