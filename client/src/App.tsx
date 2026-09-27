@@ -270,29 +270,13 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
   return (
     <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 40, height: 40,
-            background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-            borderRadius: 10,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 20,
-            color: '#fff'
-          }}><i className="fas fa-users"></i></div>
-          <div>
-            <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('userManagement')}</h3>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('totalUsers')}: {users.length}</p>
-          </div>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 20 }}>
         <button
           onClick={handleAddUser}
           style={{
             padding: '10px 20px',
-            background: '#e0e0e0',
-            color: '#000',
+            background: '#0F766E',
+            color: '#fff',
             border: 'none',
             borderRadius: 8,
             fontSize: 14,
@@ -7910,23 +7894,25 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
         <>
         {/* General Tab */}
         {activeTab === 0 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-              <div style={{
-                width: 40, height: 40,
-                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 20,
-                color: '#fff'
-              }}><i className="fas fa-gear"></i></div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('generalInfo')}</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('businessBasicInfo')}</p>
+          <div style={{ margin: '-24px -24px 0', background: '#f5f5f5', minHeight: '100%', boxSizing: 'border-box' }}>
+            <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark} 100%)`, padding: '28px 24px 24px', color: '#fff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+                <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                  <i className="fas fa-gear"></i>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('settings')}</div>
+                  <div style={{ fontSize: 13, opacity: 0.9 }}>{t('businessBasicInfo')}</div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}><i className="fas fa-store" style={{ marginRight: 6 }}></i>{form.name || t('businessName')}</span>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}><i className="fas fa-coins" style={{ marginRight: 6 }}></i>{form.currencySymbol || ''}</span>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}><i className="fas fa-percent" style={{ marginRight: 6 }}></i>VAT {form.vatPercent}%</span>
+                  </div>
+                </div>
               </div>
             </div>
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 24px' }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
               <div>
@@ -8297,27 +8283,31 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               )}
             </div>
           </div>
+            </div>
+          </div>
         )}
 
         {/* Design Tab - 80mm Thermal Printer Receipt Layout */}
         {activeTab === 1 && (
-          <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-              <div style={{
-                width: 40, height: 40,
-                background: 'linear-gradient(135deg, #0F766E 0%, #115E59 100%)',
-                borderRadius: 10,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 20,
-                color: '#fff'
-              }}><i className="fas fa-palette"></i></div>
-              <div>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#1e293b' }}>{t('designSettings')}</h3>
-                <p style={{ margin: '4px 0 0', fontSize: 13, color: '#64748b' }}>{t('receiptTemplateConfig')}</p>
+          <div style={{ margin: '-24px -24px 0', background: '#f5f5f5', minHeight: '100%', boxSizing: 'border-box' }}>
+            <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark} 100%)`, padding: '28px 24px 24px', color: '#fff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+                <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                  <i className="fas fa-palette"></i>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('designSettings')}</div>
+                  <div style={{ fontSize: 13, opacity: 0.9 }}>{t('receiptTemplateConfig')}</div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}><i className="fas fa-receipt" style={{ marginRight: 6 }}></i>80mm</span>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}><i className="fas fa-print" style={{ marginRight: 6 }}></i>{previewType === 'sales' ? t('sales') : t('purchases')}</span>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}><i className="fas fa-percent" style={{ marginRight: 6 }}></i>VAT {form.vatPercent}%</span>
+                  </div>
+                </div>
               </div>
             </div>
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 24px' }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
 
             {/* Preview Type Toggle */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
@@ -8511,11 +8501,32 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
               </div>
             </div>
           </div>
+            </div>
+          </div>
         )}
 
         {/* Users Tab */}
         {activeTab === 2 && (
-          <UserManagement users={users} setUsers={setUsers} t={t} />
+          <div style={{ margin: '-24px -24px 0', background: '#f5f5f5', minHeight: '100%', boxSizing: 'border-box' }}>
+            <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark} 100%)`, padding: '28px 24px 24px', color: '#fff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+                <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                  <i className="fas fa-users"></i>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('userManagement')}</div>
+                  <div style={{ fontSize: 13, opacity: 0.9 }}>{t('totalUsers')}: {users.length}</div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}><i className="fas fa-user-check" style={{ marginRight: 6 }}></i>{users.filter(u => u.isActive).length} {t('active')}</span>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}><i className="fas fa-user-slash" style={{ marginRight: 6 }}></i>{users.filter(u => !u.isActive).length} {t('inactive')}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 24px' }}>
+              <UserManagement users={users} setUsers={setUsers} t={t} />
+            </div>
+          </div>
         )}
 
         {/* Data Reset Tab */}
