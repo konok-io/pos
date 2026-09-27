@@ -6190,28 +6190,30 @@ tr:nth-child(even){background:#F8FAFC}
           </div>
 
         {/* Top bar */}
-        <div style={{ padding: '10px 16px', display: 'flex', gap: 10, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-          <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); setViewPurchase(null); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
-          <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('purchaseHistory')}</span>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-            <div style={{ position: 'relative', width: 200 }}>
-              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ padding: '10px 16px', display: 'flex', gap: 10, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); setViewPurchase(null); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
+            <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('purchaseHistory')}</span>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+              <div style={{ position: 'relative', width: 200 }}>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+              </div>
+              <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <i className="fas fa-calendar" style={{ color: T.teal }}></i>
+                <input type="date" value={filterFrom} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+              </label>
+              <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
+              <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <input type="date" value={filterTo} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+              </label>
+              {(filterFrom || filterTo) ? (
+                <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}>
+                  <i className="fas fa-xmark"></i>
+                </button>
+              ) : null}
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
             </div>
-            <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <i className="fas fa-calendar" style={{ color: T.teal }}></i>
-              <input type="date" value={filterFrom} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
-            </label>
-            <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
-            <label style={{ fontSize: 12, color: T.gray500, display: 'flex', alignItems: 'center', gap: 4 }}>
-              <input type="date" value={filterTo} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
-            </label>
-            {(filterFrom || filterTo) ? (
-              <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}>
-                <i className="fas fa-xmark"></i>
-              </button>
-            ) : null}
-            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
           </div>
         </div>
 
@@ -6520,19 +6522,21 @@ tr:nth-child(even){background:#F8FAFC}
           </div>
 
         {/* Top bar */}
-        <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-          <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); if (typeof setFilterFrom === 'function') { setFilterFrom(''); setFilterTo(''); } setSearch(''); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
-          <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('priceHistory')}</span>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', width: 180 }}>
-              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('allProducts'); if (typeof setFilterFrom === 'function') { setFilterFrom(''); setFilterTo(''); } setSearch(''); }}><i className="fas fa-arrow-left" style={{marginRight: 4}}></i> {t('back')}</button>
+            <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('priceHistory')}</span>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ position: 'relative', width: 180 }}>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+              </div>
+              <input type="date" value={fromDate} onChange={e => setFilterFrom && setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate')} />
+              <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
+              <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPriceCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printPriceHistory}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
-            <input type="date" value={fromDate} onChange={e => setFilterFrom && setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate')} />
-            <span style={{ color: T.gray400, fontSize: 12 }}>→</span>
-            <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
-            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPriceCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
-            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printPriceHistory}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
           </div>
         </div>
 
@@ -7010,11 +7014,13 @@ tr:nth-child(even){background:#F8FAFC}
           </div>
 
         {/* Top bar */}
-        <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-          <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('stock')}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
-          <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('deleteHistory')}</span>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-            <button data-loader onClick={clearHistory} style={{ ...btn('ghost', 'sm'), opacity: list.length === 0 ? 0.5 : 1 }}><i className="fas fa-broom" style={{ marginRight: 4 }}></i>{t('clear')}</button>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('stock')}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
+            <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('deleteHistory')}</span>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+              <button data-loader onClick={clearHistory} style={{ ...btn('ghost', 'sm'), opacity: list.length === 0 ? 0.5 : 1 }}><i className="fas fa-broom" style={{ marginRight: 4 }}></i>{t('clear')}</button>
+            </div>
           </div>
         </div>
 
@@ -7197,19 +7203,21 @@ tr:nth-child(even){background:#F8FAFC}
           </div>
 
         {/* Top bar */}
-        <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
-          <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('stock'); setSearch(''); if (typeof setFilterFrom === 'function') { setFilterFrom(''); setFilterTo(''); } }}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
-          <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {title}</span>
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', width: 180 }}>
-              <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+          <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}` }}>
+            <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setProductTab('stock'); setSearch(''); if (typeof setFilterFrom === 'function') { setFilterFrom(''); setFilterTo(''); } }}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
+            <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {title}</span>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ position: 'relative', width: 180 }}>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+              </div>
+              <input type="date" value={fromDate} onChange={e => setFilterFrom && setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate')} />
+              <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
+              <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportHistCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printHist}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
             </div>
-            <input type="date" value={fromDate} onChange={e => setFilterFrom && setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate')} />
-            <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
-            <input type="date" value={toDate} onChange={e => setFilterTo && setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate')} />
-            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportHistCsv}><i className="fas fa-file-csv" style={{ marginRight: 4 }}></i> {t('exportCsv')}</button>
-            <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printHist}><i className="fas fa-print" style={{ marginRight: 4 }}></i> {t('print')}</button>
           </div>
         </div>
 
