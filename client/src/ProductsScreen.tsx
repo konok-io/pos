@@ -4187,7 +4187,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
               </div>
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
-                <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+                <div style={{ position: 'relative', flex: '0 1 170px', minWidth: 150 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                   <input value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder={t('searchSupplier')} style={{ ...inputStyle, paddingLeft: 32 }} />
                 </div>
@@ -4199,9 +4199,9 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   {(listFrom || listTo) ? (
                     <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setListFrom(''); setListTo(''); }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
                   ) : null}
-                  <button onClick={() => { document.getElementById('supplier-csv-input')?.click(); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('suppliers')}</button>
+                  <button title={t('csvImport') || 'Import CSV'} onClick={() => { document.getElementById('supplier-csv-input')?.click(); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> Import</button>
                   <button onClick={() => { const headers = ['Name', 'Phone', 'Email', 'Address', 'CR Number', 'VAT Number']; const demo = [headers.join(','), 'ABC Trading Co,01712345678,abc@trading.com,Dhaka Bangladesh,1234567890,VAT1234', 'XYZ Suppliers,01987654321,xyz@suppliers.com,Chittagong Bangladesh,9876543210,VAT5678'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'suppliers_template.csv'; a.click(); URL.revokeObjectURL(url); setShowSupplierMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
-                  <button data-loader onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button data-loader title={t('exportCsv')} onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> Export</button>
                   <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
                   <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ id: genSupplierId(suppliers), name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setShowSupplierModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addSupplier')}</button>
                 </div>
@@ -4753,7 +4753,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
               </div>
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
-                <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
+                <div style={{ position: 'relative', flex: '0 1 170px', minWidth: 150 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                   <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
                 </div>
@@ -4781,9 +4781,9 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                   {(listFrom || listTo) ? (
                     <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setListFrom(''); setListTo(''); }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
                   ) : null}
-                  <button onClick={() => { document.getElementById('category-csv-input')?.click(); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('categories')}</button>
+                  <button title={t('csvImport') || 'Import CSV'} onClick={() => { document.getElementById('category-csv-input')?.click(); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> Import</button>
                   <button onClick={() => { const headers = ['Name']; const demo = [headers.join(','), 'Electronics', 'Groceries', 'Clothing', 'Stationery'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'categories_template.csv'; a.click(); URL.revokeObjectURL(url); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
-                  <button data-loader onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button data-loader title={t('exportCsv')} onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> Export</button>
                   <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
                   <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genCategoryId(categories), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCategory')}</button>
                 </div>
