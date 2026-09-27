@@ -876,7 +876,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [showSupplierMoreMenu, setShowSupplierMoreMenu] = useState(false);
+  const [, setShowSupplierMoreMenu] = useState(false);
 
 
 
@@ -888,7 +888,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [showCategoryMoreMenu, setShowCategoryMoreMenu] = useState(false);
+  const [, setShowCategoryMoreMenu] = useState(false);
 
 
 
@@ -3989,6 +3989,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                 <input value={search} onChange={e => { setSearch(e.target.value); setApPage(1); }} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
               </div>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportProductsCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
           </div>
@@ -4127,9 +4128,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       ) : null}
                     </div>
                   </div>
-                  <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportSuppliersCsv}>
-                    <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
-                  </button>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
@@ -4146,12 +4144,19 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 ))}
               </div>
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
                 <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                   <input value={supplierSearch} onChange={e => setSupplierSearch(e.target.value)} placeholder={t('searchSupplier')} style={{ ...inputStyle, paddingLeft: 32 }} />
                 </div>
-                <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input id="supplier-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); const phoneIdx = headers.findIndex((h: string) => h.includes('phone')); const emailIdx = headers.findIndex((h: string) => h.includes('email')); const addressIdx = headers.findIndex((h: string) => h.includes('address')); const crIdx = headers.findIndex((h: string) => h.includes('cr')); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); let imported = 0; for (let k = 1; k < lines2.length; k++) { const cols = lines2[k].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const newS = { id: genSupplierId(suppliers), name, phone: phoneIdx >= 0 ? cols[phoneIdx] || '' : '', email: emailIdx >= 0 ? cols[emailIdx] || '' : '', address: addressIdx >= 0 ? cols[addressIdx] || '' : '', crNumber: crIdx >= 0 ? cols[crIdx] || '' : '', vatNumber: vatIdx >= 0 ? cols[vatIdx] || '' : '' }; const exists = suppliers.find((s: any) => (s.name || '').toLowerCase() === name.toLowerCase()); if (!exists) { setSuppliers((prev: any[]) => [...prev, newS]); setSuppliersParent((prev: any[]) => [...prev, newS]); api.addSupplier(newS).catch(() => {}); imported++; } } alert(`${imported} ${t('suppliers')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
+                  <button onClick={() => { document.getElementById('supplier-csv-input')?.click(); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('suppliers')}</button>
+                  <button onClick={() => { const headers = ['Name', 'Phone', 'Email', 'Address', 'CR Number', 'VAT Number']; const demo = [headers.join(','), 'ABC Trading Co,01712345678,abc@trading.com,Dhaka Bangladesh,1234567890,VAT1234', 'XYZ Suppliers,01987654321,xyz@suppliers.com,Chittagong Bangladesh,9876543210,VAT5678'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'suppliers_template.csv'; a.click(); URL.revokeObjectURL(url); setShowSupplierMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
+                  <button data-loader onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printSupplierList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+                  <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ id: genSupplierId(suppliers), name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setShowSupplierModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addSupplier')}</button>
+                </div>
               </div>
         {filteredSuppliers.length === 0 ? (
 
@@ -4683,9 +4688,6 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                       ) : null}
                     </div>
                   </div>
-                  <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportCategoriesCsv}>
-                    <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
-                  </button>
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12, padding: '16px 24px', maxWidth: 1200, margin: '0 auto' }}>
@@ -4702,12 +4704,35 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 ))}
               </div>
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 14, padding: '10px 12px', marginBottom: 12 }}>
                 <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 200 }}>
                   <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                   <input value={categorySearch} onChange={e => setCategorySearch(e.target.value)} placeholder={t('searchCategory')} style={{ ...inputStyle, paddingLeft: 32 }} />
                 </div>
-                <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <input id="category-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim());
+                  const parseLine = (line: string): string[] => {
+                    const out: string[] = []; let cur = ''; let inQ = false;
+                    for (let ci = 0; ci < line.length; ci++) {
+                      const ch = line[ci];
+                      if (inQ) {
+                        if (ch === '"' && line[ci + 1] === '"') { cur += '"'; ci++; }
+                        else if (ch === '"') inQ = false;
+                        else cur += ch;
+                      } else if (ch === '"') inQ = true;
+                      else if (ch === ',') { out.push(cur); cur = ''; }
+                      else cur += ch;
+                    }
+                    out.push(cur);
+                    return out;
+                  };
+                  const headers = parseLine(lines2[0]).map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); let imported = 0; let failed = 0; const localCats: any[] = [...categories]; const jobs: Promise<void>[] = []; for (let k = 1; k < lines2.length; k++) { const cols = parseLine(lines2[k]).map((c: string) => c.trim()); const name = (nameIdx >= 0 ? cols[nameIdx] : '').trim(); if (!name) continue; const exists = localCats.find((ca: any) => String(ca.name || '').trim().toLowerCase() === name.toLowerCase()); if (exists) continue; const newCat = { id: genCategoryId(localCats), name }; localCats.push(newCat); setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); imported++; jobs.push(api.addCategory(newCat).then((res: any) => { if (res && res.id && res.id !== newCat.id) { setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c)); setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c)); } }).catch(() => { failed++; setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id)); setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id)); })); } Promise.all(jobs).finally(() => alert(`${imported} ${t('categories')} imported!${failed ? ` (${failed} ${t('failed')})` : ''}`)); }; reader.readAsText(file); e.target.value = ''; }} />
+                  <button onClick={() => { document.getElementById('category-csv-input')?.click(); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('categories')}</button>
+                  <button onClick={() => { const headers = ['Name']; const demo = [headers.join(','), 'Electronics', 'Groceries', 'Clothing', 'Stationery'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'categories_template.csv'; a.click(); URL.revokeObjectURL(url); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
+                  <button data-loader onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+                  <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printCategoryList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+                  <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genCategoryId(categories), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCategory')}</button>
+                </div>
               </div>
         {filteredCategories.length === 0 ? (
           categorySearch ? (
@@ -6130,6 +6155,33 @@ tr:nth-child(even){background:#F8FAFC}
 </body></html>`;
       openPrintWin(html);
     };
+    const printPurchaseList = () => {
+      const trs = list.map((p: any, i: number) => {
+        const items = p.items || [];
+        const qty = items.reduce((s: number, it: any) => s + (it.quantity || it.stock || 0), 0);
+        const paid = items.reduce((s: number, it: any) => s + (it.paidQty != null ? it.paidQty : (it.quantity || it.stock || 0)), 0);
+        const total = p.total || items.reduce((s: number, it: any) => s + ((it.paidQty != null ? it.paidQty : (it.quantity || it.stock || 0)) * (it.unitCost != null ? it.unitCost : (it.costPrice || 0))), 0);
+        return `<tr><td>${i + 1}</td><td>${p.id || '-'}</td><td>${p.date ? new Date(p.date).toLocaleString() : '-'}</td><td>${p.supplier || '-'}</td><td>${items.length}</td><td>${qty}</td><td>${paid}</td><td>${fmt(total)}</td></tr>`;
+      }).join('');
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4 landscape;margin:10mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+.header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
+.header h1{color:#0F766E;font-size:14pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+table{width:100%;border-collapse:collapse}
+th{background:#0F766E;color:#fff;padding:2mm;text-align:left;font-size:8pt}
+td{border:0.3mm solid #cbd5e1;padding:1.5mm 2mm;font-size:9pt}
+tr:nth-child(even){background:#F8FAFC}
+.footer{margin-top:4mm;font-size:8pt;color:#64748b}
+</style></head><body>
+<div class="header"><h1>Purchase History</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
+<table><thead><tr><th>#</th><th>ID</th><th>Date</th><th>Supplier</th><th>Products</th><th>Qty</th><th>Paid</th><th>Total</th></tr></thead><tbody>${trs || '<tr><td colspan="8" style="text-align:center">No records</td></tr>'}</tbody></table>
+<div class="footer">Generated by POS &#183; ${list.length} records</div>
+</body></html>`;
+      openPrintWin(html);
+    };
 
     const stats = [
       { icon: 'fas fa-boxes-stacked', label: t('totalPurchases') || 'Total Purchases', value: String(list.length), color: T.teal, bg: T.tealLight },
@@ -6171,9 +6223,6 @@ tr:nth-child(even){background:#F8FAFC}
                   </span>
                 </div>
               </div>
-              <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportPurchaseCsv}>
-                <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
-              </button>
             </div>
           </div>
 
@@ -6216,6 +6265,7 @@ tr:nth-child(even){background:#F8FAFC}
                 </button>
               ) : null}
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportPurchaseCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printPurchaseList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
           </div>
         </div>
@@ -6500,9 +6550,6 @@ tr:nth-child(even){background:#F8FAFC}
                   ) : null}
                 </div>
               </div>
-              <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportPriceCsv}>
-                <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
-              </button>
             </div>
           </div>
 
@@ -6635,6 +6682,7 @@ tr:nth-child(even){background:#F8FAFC}
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                 <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
               </div>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportStockCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
           </div>
@@ -7181,9 +7229,6 @@ tr:nth-child(even){background:#F8FAFC}
                   ) : null}
                 </div>
               </div>
-              <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer' }} onClick={exportHistCsv}>
-                <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
-              </button>
             </div>
           </div>
 
@@ -7854,7 +7899,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button data-loader onClick={() => { exportProductsCsv(); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
                   <button onClick={() => { setShowImportModal(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvUpload')}</button>
 
                   <button onClick={() => { setProductTab('priceHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {t('priceHistory')}</button>
@@ -7921,7 +7965,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-        {productTab === 'suppliers' && (
 
 
 
@@ -7933,339 +7976,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ position: 'relative' }}>
-
-
-
-
-
-
-
-
-
-
-
-              <button title={t('more')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setShowSupplierMoreMenu(!showSupplierMoreMenu)}><i className="fas fa-ellipsis-vertical"></i></button>
-
-
-
-
-
-
-
-
-
-
-
-              {showSupplierMoreMenu && (
-
-
-
-
-
-
-
-
-
-
-
-                <div data-menu="supplier" style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
-
-
-
-
-
-
-
-
-
-
-
-                  <button onClick={() => { document.getElementById('supplier-csv-input')?.click(); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('suppliers')}</button>
-                  <button onClick={() => { const headers = ['Name', 'Phone', 'Email', 'Address', 'CR Number', 'VAT Number']; const demo = [headers.join(','), 'ABC Trading Co,01712345678,abc@trading.com,Dhaka Bangladesh,1234567890,VAT1234', 'XYZ Suppliers,01987654321,xyz@suppliers.com,Chittagong Bangladesh,9876543210,VAT5678'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'suppliers_template.csv'; a.click(); URL.revokeObjectURL(url); setShowSupplierMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
-
-
-
-
-
-
-
-
-
-
-
-                  <button data-loader onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
-
-
-
-
-
-
-
-
-
-
-
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-              )}
-                  <input id="supplier-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); const phoneIdx = headers.findIndex((h: string) => h.includes('phone')); const emailIdx = headers.findIndex((h: string) => h.includes('email')); const addressIdx = headers.findIndex((h: string) => h.includes('address')); const crIdx = headers.findIndex((h: string) => h.includes('cr')); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); let imported = 0; for (let k = 1; k < lines2.length; k++) { const cols = lines2[k].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const newS = { id: genSupplierId(suppliers), name, phone: phoneIdx >= 0 ? cols[phoneIdx] || '' : '', email: emailIdx >= 0 ? cols[emailIdx] || '' : '', address: addressIdx >= 0 ? cols[addressIdx] || '' : '', crNumber: crIdx >= 0 ? cols[crIdx] || '' : '', vatNumber: vatIdx >= 0 ? cols[vatIdx] || '' : '' }; const exists = suppliers.find((s: any) => (s.name || '').toLowerCase() === name.toLowerCase()); if (!exists) { setSuppliers((prev: any[]) => [...prev, newS]); setSuppliersParent((prev: any[]) => [...prev, newS]); api.addSupplier(newS).catch(() => {}); imported++; } } alert(`${imported} ${t('suppliers')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingSupplier(null); setSupplierForm({ id: genSupplierId(suppliers), name: '', phone: '', email: '', address: '', crNumber: '', vatNumber: '', code: '' }); setShowSupplierModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addSupplier')}</button>
-
-
-
-
-
-
-
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-
-
-
-        )}
-
-
-
-
-
-
-
-
-
-
-
-        {productTab === 'categories' && (
-
-
-
-
-
-
-
-
-
-
-
-          <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
-
-
-
-
-
-
-
-
-
-
-
-            <div style={{ position: 'relative' }}>
-
-
-
-
-
-
-
-
-
-
-
-              <button title={t('more')} style={{ ...btn('ghost', 'sm'), padding: 0, width: 28, height: 28, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6 }} onClick={() => setShowCategoryMoreMenu(!showCategoryMoreMenu)}><i className="fas fa-ellipsis-vertical"></i></button>
-
-
-
-
-
-
-
-
-
-
-
-              {showCategoryMoreMenu && (
-
-
-
-
-
-
-
-
-
-
-
-                <div data-menu="category" style={{ position: 'absolute', top: '100%', right: 0, background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 50, minWidth: 200, padding: 4 }}>
-
-
-
-
-
-
-
-
-
-
-
-                  <button onClick={() => { document.getElementById('category-csv-input')?.click(); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('categories')}</button>
-                  <button onClick={() => { const headers = ['Name']; const demo = [headers.join(','), 'Electronics', 'Groceries', 'Clothing', 'Stationery'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'categories_template.csv'; a.click(); URL.revokeObjectURL(url); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
-
-
-
-
-
-
-
-
-
-
-
-                  <button data-loader onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
-
-
-
-
-
-
-
-
-
-
-
-                </div>
-
-
-
-
-
-
-
-
-
-
-
-              )}
-                  <input id="category-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim());
-                  const parseLine = (line: string): string[] => {
-                    const out: string[] = []; let cur = ''; let inQ = false;
-                    for (let ci = 0; ci < line.length; ci++) {
-                      const ch = line[ci];
-                      if (inQ) {
-                        if (ch === '"' && line[ci + 1] === '"') { cur += '"'; ci++; }
-                        else if (ch === '"') inQ = false;
-                        else cur += ch;
-                      } else if (ch === '"') inQ = true;
-                      else if (ch === ',') { out.push(cur); cur = ''; }
-                      else cur += ch;
-                    }
-                    out.push(cur);
-                    return out;
-                  };
-                  const headers = parseLine(lines2[0]).map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); let imported = 0; let failed = 0; const localCats: any[] = [...categories]; const jobs: Promise<void>[] = []; for (let k = 1; k < lines2.length; k++) { const cols = parseLine(lines2[k]).map((c: string) => c.trim()); const name = (nameIdx >= 0 ? cols[nameIdx] : '').trim(); if (!name) continue; const exists = localCats.find((ca: any) => String(ca.name || '').trim().toLowerCase() === name.toLowerCase()); if (exists) continue; const newCat = { id: genCategoryId(localCats), name }; localCats.push(newCat); setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); imported++; jobs.push(api.addCategory(newCat).then((res: any) => { if (res && res.id && res.id !== newCat.id) { setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c)); setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c)); } }).catch(() => { failed++; setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id)); setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id)); })); } Promise.all(jobs).finally(() => alert(`${imported} ${t('categories')} imported!${failed ? ` (${failed} ${t('failed')})` : ''}`)); }; reader.readAsText(file); e.target.value = ''; }} />
-
-
-
-
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-
-
-
-
-
-
-            <button style={{ ...btn('primary', 'sm') }} onClick={() => { setEditingCategory(null); setCategoryForm({ id: genCategoryId(categories), name: '' }); setShowCategoryModal(true); }}><i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addCategory')}</button>
-
-
-
-
-
-
-
-
-
-
-
-          </div>
-
-
-
-
-
-
-
-
-
-
-
-        )}
 
 
 
@@ -8449,7 +8159,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button data-loader onClick={() => { exportStockCsv(); setShowStockMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
 
 
 

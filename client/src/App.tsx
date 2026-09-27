@@ -4866,9 +4866,6 @@ tr:nth-child(even){background:#F8FAFC}
                 ) : null}
               </div>
             </div>
-            <button data-loader style={{ background: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.4)', color: T.white, borderRadius: 10, padding: '10px 16px', fontWeight: 700, cursor: 'pointer', fontSize: 14 }} onClick={exportSuppliersCsv}>
-              <i className="fas fa-file-csv" style={{ marginRight: 6 }}></i>{t('exportCsv')}
-            </button>
           </div>
         </div>
 
