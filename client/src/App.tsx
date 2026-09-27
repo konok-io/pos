@@ -269,8 +269,15 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
 
   return (
     <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid #e2e8f0' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 20 }}>
+      {/* Header — search box + Add User button inline on one line */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+        <input
+          type="text"
+          placeholder={t('searchUser')}
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          style={{ ...inputStyle, maxWidth: 300, flex: '1 1 240px', minWidth: 180 }}
+        />
         <button
           onClick={handleAddUser}
           style={{
@@ -284,22 +291,13 @@ function UserManagement({ users, setUsers, t }: UserManagementProps) {
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 6
+            gap: 6,
+            marginLeft: 'auto',
+            flexShrink: 0
           }}
         >
           <i className="fas fa-plus" style={{marginRight: 4}}></i> {t('addUser')}
         </button>
-      </div>
-
-      {/* Search */}
-      <div style={{ marginBottom: 16 }}>
-        <input
-          type="text"
-          placeholder={t('searchUser')}
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          style={{ ...inputStyle, maxWidth: 300 }}
-        />
       </div>
 
       {/* User List */}
