@@ -4033,6 +4033,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
               {(listFrom || listTo) ? (
                 <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setListFrom(''); setListTo(''); }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
               ) : null}
+              <button title={t('csvImport') || 'Import'} onClick={() => setShowImportModal(true)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{ marginRight: 4 }}></i> {t('csvImport') || 'Import'}</button>
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportProductsCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
@@ -7962,7 +7963,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-            <button title={t('csvImport') || 'Import'} onClick={() => setShowImportModal(true)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{ marginRight: 4 }}></i> {t('csvImport') || 'Import'}</button>
             <div style={{ position: 'relative' }}>
 
 
