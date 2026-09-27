@@ -1190,7 +1190,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'profit' | 'expiry'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'price' | 'stock' | 'profit' | 'expiry' | 'foc'>('name');
 
 
 
@@ -1574,6 +1574,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const filteredProducts = products.filter((p: any) => {
     if ((+p.stock || 0) <= 0) return false;
     if (!inDayRange(p.created_at || p.createdAt, listFrom, listTo)) return false;
+    if (sortBy === 'foc' && !p.foc) return false;
     return !search || (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.company || '').toLowerCase().includes(search.toLowerCase()) || (p.code || '').toLowerCase().includes(search.toLowerCase()) || (p.cat || '').toLowerCase().includes(search.toLowerCase());
   }).sort((a: any, b: any) => {
 
@@ -1636,6 +1637,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
     else if (sortBy === 'profit') cmp = (a.sellPrice - a.costPrice) - (b.sellPrice - b.costPrice);
+    else if (sortBy === 'foc') cmp = String(a.name || '').localeCompare(String(b.name || ''));
     else if (sortBy === 'expiry') {
       const parseD = (s: any) => {
         if (!s) return null;
@@ -7923,6 +7925,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
               <option value="expiry">{t('expiryDate')}</option>
+              <option value="foc">{t('foc')}</option>
 
 
 
