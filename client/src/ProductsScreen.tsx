@@ -7465,7 +7465,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-  const overlayModal = (title: string, onClose: () => void, content: React.ReactNode) => (
+  const overlayModal = (title: React.ReactNode, onClose: () => void, content: React.ReactNode) => (
 
 
 
@@ -7961,6 +7961,8 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
+
+            <button title={t('csvImport') || 'Import'} onClick={() => setShowImportModal(true)} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{ marginRight: 4 }}></i> {t('csvImport') || 'Import'}</button>
             <div style={{ position: 'relative' }}>
 
 
@@ -8020,7 +8022,6 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-                  <button onClick={() => { setShowImportModal(true); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvUpload')}</button>
 
                   <button onClick={() => { setProductTab('priceHistory'); setShowMoreMenu(false); }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '8px 12px', border: 'none', background: 'none', cursor: 'pointer', fontSize: 14, borderRadius: 4, color: T.gray600 }}><i className="fas fa-clock-rotate-left" style={{marginRight: 4}}></i> {t('priceHistory')}</button>
 
@@ -9609,7 +9610,7 @@ tr:nth-child(even){background:#F8FAFC}
 
 
 
-      {showImportModal && overlayModal(`<i className="fas fa-file-import"></i> ${t('csvUpload')}`, () => setShowImportModal(false), (
+      {showImportModal && overlayModal(<><i className="fas fa-file-import" style={{ marginRight: 8 }}></i>{t('csvUpload')}</>, () => setShowImportModal(false), (
 
 
 
