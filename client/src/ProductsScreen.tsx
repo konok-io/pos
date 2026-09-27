@@ -11,6 +11,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 
 
 import { useLanguage } from './i18n';
+import { printFontImport, printFontFamily } from './printFont';
 
 
 
@@ -3045,17 +3046,17 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const labelSheetCss = (sizeKey: string, paper?: string): string => {
     const w = labelWidthMm(sizeKey, paper);
     if (paper === 'roll58' || paper === 'roll80') {
-      return `@page{size:${w}mm auto;margin:0}
+      return `${printFontImport()}@page{size:${w}mm auto;margin:0}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;width:${w}mm;margin:0}
+body{font-family:${printFontFamily()};width:${w}mm;margin:0}
 .summary{display:none}
 .sheet{display:block;width:${w}mm;gap:0;padding:0}
 ` + labelItemCss(sizeKey, w, paper) + `
 .sheet .barcode-item{margin:0 auto}`;
     }
-    return `@page{size:A4;margin:4mm}
+    return `${printFontImport()}@page{size:A4;margin:4mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;width:202mm;margin:0}
+body{font-family:${printFontFamily()};width:202mm;margin:0}
 .summary{font-size:9pt;color:#444;padding:2mm 3mm;border-bottom:0.4mm solid #0F766E;margin-bottom:1mm}
 .sheet{display:flex;flex-wrap:wrap;gap:0;padding:0}
 ` + labelItemCss(sizeKey);
@@ -3216,7 +3217,7 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
     const totSellVal = list.reduce((x: number, p: any) => x + (+p.sellPrice || 0) * (+p.stock || 0), 0);
     const totProfitVal = totSellVal - totBuyVal;
     const totRow = `<tr style="background:#00897b;color:#fff;font-weight:700"><td colspan="3" style="text-align:center">${t('total') || 'Total'}</td><td>${fmt(totBuyVal)}</td><td>${fmt(totSellVal)}</td><td>${fmt(totProfitVal)}</td><td style="text-align:center">${totStock}</td><td colspan="2"></td></tr>`;
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@import url('https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap');@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tiro Bangla','Noto Sans Bengali',serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:6px 5px;text-align:left;font-size:10px;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:6px 5px;font-size:11px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('productList')}</h1><p>${new Date().toLocaleDateString()} | ${list.length} ${t('products')}</p></div><table><thead><tr><th style="text-align:center">#</th><th>${t('name')}</th><th>${t('company')}</th><th>${t('category')}</th><th>${t('purchasePrice')}</th><th>${t('sellPrice')}</th><th>${t('profit')}</th><th>${t('stock')}</th><th>${t('unit')}</th><th>${t('expiryDate')}</th></tr></thead><tbody>${rows}${totRow}</tbody></table></body></html>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>${printFontImport()}@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:${printFontFamily()};padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:6px 5px;text-align:left;font-size:10px;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:6px 5px;font-size:11px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('productList')}</h1><p>${new Date().toLocaleDateString()} | ${list.length} ${t('products')}</p></div><table><thead><tr><th style="text-align:center">#</th><th>${t('name')}</th><th>${t('company')}</th><th>${t('category')}</th><th>${t('purchasePrice')}</th><th>${t('sellPrice')}</th><th>${t('profit')}</th><th>${t('stock')}</th><th>${t('unit')}</th><th>${t('expiryDate')}</th></tr></thead><tbody>${rows}${totRow}</tbody></table></body></html>`;
 
 
 
@@ -3348,7 +3349,10 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
 
 
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('suppliers')}</h1><p>${new Date().toLocaleDateString()} | ${filteredSuppliers.length} ${t('suppliers')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('products')}</th><th>${t('totalPurchase')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const totProducts = filteredSuppliers.reduce((s: number, c: string) => s + products.filter((p: any) => (p.company || '').toLowerCase() === c.toLowerCase()).length, 0);
+    const totPurchase = filteredSuppliers.reduce((s: number, c: string) => s + purchases.filter((p: any) => (p.supplier || '').toLowerCase() === c.toLowerCase()).reduce((ss: number, p: any) => ss + (p.items || []).reduce((sss: number, i: any) => sss + (i.stock || 0) * (i.costPrice || 0), 0), 0), 0);
+    const totRow = `<tr style="background:#00897b;color:#fff;font-weight:700"><td>${t('total') || 'Total'}</td><td>${totProducts}</td><td>${fmt(totPurchase)}</td></tr>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:${printFontFamily()};padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('suppliers')}</h1><p>${new Date().toLocaleDateString()} | ${filteredSuppliers.length} ${t('suppliers')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('products')}</th><th>${t('totalPurchase')}</th></tr></thead><tbody>${rows}${totRow}</tbody></table></body></html>`;
 
 
 
@@ -3493,7 +3497,12 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
 
 
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('categories')}</h1><p>${new Date().toLocaleDateString()} | ${filteredCategories.length} ${t('categories')}</p></div><table><thead><tr><th>${t('id')}</th><th>${t('name')}</th><th>${t('products')}</th><th>${t('stock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const catOf = (c: string) => products.filter((p: any) => String(p.cat || '').trim().toLowerCase() === String(c).trim().toLowerCase());
+    const totProducts = filteredCategories.reduce((s: number, c: string) => s + catOf(c).length, 0);
+    const totStock = filteredCategories.reduce((s: number, c: string) => s + catOf(c).reduce((ss: number, p: any) => ss + (p.stock || 0), 0), 0);
+    const totValue = filteredCategories.reduce((s: number, c: string) => s + catOf(c).reduce((ss: number, p: any) => ss + Math.max(0, (p.stock || 0) - (p.freeQty || 0)) * (p.costPrice || 0), 0), 0);
+    const totRow = `<tr style="background:#00897b;color:#fff;font-weight:700"><td colspan="2">${t('total') || 'Total'}</td><td>${totProducts}</td><td>${totStock}</td><td>${fmt(totValue)}</td></tr>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:${printFontFamily()};padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('categories')}</h1><p>${new Date().toLocaleDateString()} | ${filteredCategories.length} ${t('categories')}</p></div><table><thead><tr><th>${t('id')}</th><th>${t('name')}</th><th>${t('products')}</th><th>${t('stock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}${totRow}</tbody></table></body></html>`;
 
 
 
@@ -3577,7 +3586,10 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
 
 
 
-    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('stock')}</h1><p>${new Date().toLocaleDateString()} | ${stockProducts.length} ${t('products')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('company')}</th><th>${t('stock')}</th><th>${t('minStock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}</tbody></table></body></html>`;
+    const totStock = stockProducts.reduce((s: number, p: any) => s + (p.stock || 0), 0);
+    const totValue = stockProducts.reduce((s: number, p: any) => s + (p.stock || 0) * (p.costPrice || 0), 0);
+    const totRow = `<tr style="background:#00897b;color:#fff;font-weight:700"><td colspan="2">${t('total') || 'Total'}</td><td>${totStock}</td><td></td><td>${fmt(totValue)}</td></tr>`;
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>@page{size:A4 landscape;margin:10mm}*{margin:0;padding:0;box-sizing:border-box}body{font-family:${printFontFamily()};padding:10px;font-size:11px}.header{text-align:center;margin-bottom:15px;border-bottom:2px solid #00897b;padding-bottom:10px}.header h1{color:#00897b;font-size:20px}table{width:100%;border-collapse:collapse}th{background:#e0f7f0;border:1px solid #b2dfdb;padding:8px;text-align:left;color:#00897b;font-weight:700}td{border:1px solid #e0e0e0;padding:8px}tr:nth-child(even){background:#fafafa}</style></head><body><div class="header"><h1>${t('stock')}</h1><p>${new Date().toLocaleDateString()} | ${stockProducts.length} ${t('products')}</p></div><table><thead><tr><th>${t('name')}</th><th>${t('company')}</th><th>${t('stock')}</th><th>${t('minStock')}</th><th>${t('totalValue')}</th></tr></thead><tbody>${rows}${totRow}</tbody></table></body></html>`;
 
 
 
@@ -5261,9 +5273,9 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
       ).filter((h: any) => inRange(h.created_at));
       const rows = hist.map((h: any, i: number) => `<tr><td>${i+1}</td><td>${h.type || '-'}</td><td>${h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td><td>${h.quantity || 0}</td><td>${h.reason || '-'}</td></tr>`).join('');
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4;margin:12mm}
+${printFontImport()}@page{size:A4;margin:12mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
+body{font-family:${printFontFamily()};font-size:11pt;color:#111}
 .header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:3mm;margin-bottom:4mm}
 .header h1{color:#0F766E;font-size:16pt}
 .meta{text-align:right;font-size:9pt;color:#555}
@@ -5664,9 +5676,9 @@ tr:nth-child(even){background:#F8FAFC}
         }).join('');
         const pRows = list.map((p: any, i: number) => `<tr><td>${i + 1}</td><td>${h(p.name)}</td><td>${h(codeOf(p))}</td><td>${h(p.cat || '-')}</td><td>${h(fmt(p.sellPrice))}</td><td>${p.stock || 0}</td></tr>`).join('');
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4;margin:12mm}
+${printFontImport()}@page{size:A4;margin:12mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
+body{font-family:${printFontFamily()};font-size:11pt;color:#111}
 .header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:3mm;margin-bottom:4mm}
 .header h1{color:#0F766E;font-size:16pt}
 .meta{text-align:right;font-size:9pt;color:#555}
@@ -5918,9 +5930,9 @@ tr:nth-child(even){background:#F8FAFC}
         const h = (v: any) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         const pRows = list.map((p: any, i: number) => `<tr><td>${i + 1}</td><td>${h(p.name)}</td><td>${h(codeOf(p))}</td><td>${h(p.company || '-')}</td><td>${h(fmt(p.sellPrice))}</td><td>${p.stock || 0}</td></tr>`).join('');
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4;margin:12mm}
+${printFontImport()}@page{size:A4;margin:12mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
+body{font-family:${printFontFamily()};font-size:11pt;color:#111}
 .header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:3mm;margin-bottom:4mm}
 .header h1{color:#0F766E;font-size:16pt}
 .meta{text-align:right;font-size:9pt;color:#555}
@@ -6180,9 +6192,9 @@ tr:nth-child(even){background:#F8FAFC}
         return s + paid * unit;
       }, 0);
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4;margin:12mm}
+${printFontImport()}@page{size:A4;margin:12mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:11pt;color:#111}
+body{font-family:${printFontFamily()};font-size:11pt;color:#111}
 .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1.2mm solid #0F766E;padding-bottom:3mm;margin-bottom:4mm}
 .header h1{color:#0F766E;font-size:16pt}
 .meta{text-align:right;font-size:9pt;color:#555}
@@ -6220,10 +6232,15 @@ tr:nth-child(even){background:#F8FAFC}
         const total = p.total || items.reduce((s: number, it: any) => s + ((it.paidQty != null ? it.paidQty : (it.quantity || it.stock || 0)) * (it.unitCost != null ? it.unitCost : (it.costPrice || 0))), 0);
         return `<tr><td>${i + 1}</td><td>${p.id || '-'}</td><td>${p.date ? new Date(p.date).toLocaleString() : '-'}</td><td>${p.supplier || '-'}</td><td>${items.length}</td><td>${qty}</td><td>${paid}</td><td>${fmt(total)}</td></tr>`;
       }).join('');
+      const tProducts = list.reduce((s: number, p: any) => s + (p.items || []).length, 0);
+      const tQty = list.reduce((s: number, p: any) => s + (p.items || []).reduce((x: number, it: any) => x + (it.quantity || it.stock || 0), 0), 0);
+      const tPaid = list.reduce((s: number, p: any) => s + (p.items || []).reduce((x: number, it: any) => x + (it.paidQty != null ? it.paidQty : (it.quantity || it.stock || 0)), 0), 0);
+      const tTotal = list.reduce((s: number, p: any) => s + (p.total || (p.items || []).reduce((x: number, it: any) => x + ((it.paidQty != null ? it.paidQty : (it.quantity || it.stock || 0)) * (it.unitCost != null ? it.unitCost : (it.costPrice || 0))), 0)), 0);
+      const totRow = `<tr style="background:#0F766E;color:#fff;font-weight:700"><td colspan="4">${t('total') || 'Total'}</td><td>${tProducts}</td><td>${tQty}</td><td>${tPaid}</td><td>${fmt(tTotal)}</td></tr>`;
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4 landscape;margin:10mm}
+${printFontImport()}@page{size:A4 landscape;margin:10mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+body{font-family:${printFontFamily()};font-size:10pt;color:#111}
 .header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
 .header h1{color:#0F766E;font-size:14pt}
 .meta{text-align:right;font-size:9pt;color:#555}
@@ -6234,7 +6251,7 @@ tr:nth-child(even){background:#F8FAFC}
 .footer{margin-top:4mm;font-size:8pt;color:#64748b}
 </style></head><body>
 <div class="header"><h1>Purchase History</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
-<table><thead><tr><th>#</th><th>ID</th><th>Date</th><th>Supplier</th><th>Products</th><th>Qty</th><th>Paid</th><th>Total</th></tr></thead><tbody>${trs || '<tr><td colspan="8" style="text-align:center">No records</td></tr>'}</tbody></table>
+<table><thead><tr><th>#</th><th>ID</th><th>Date</th><th>Supplier</th><th>Products</th><th>Qty</th><th>Paid</th><th>Total</th></tr></thead><tbody>${trs ? trs + totRow : totRow}</tbody></table>
 <div class="footer">Generated by POS &#183; ${list.length} records</div>
 </body></html>`;
       openPrintWin(html);
@@ -6538,9 +6555,9 @@ tr:nth-child(even){background:#F8FAFC}
         return `<tr><td>${i+1}</td><td>${h.productName || '-'}</td><td>${h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td><td>${fmt(oldP)}</td><td>${fmt(newP)}</td><td class="${diff>=0?'up':'down'}">${fmt(diff)} (${pct})</td><td>${h.reason || '-'}</td></tr>`;
       }).join('');
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4 landscape;margin:10mm}
+${printFontImport()}@page{size:A4 landscape;margin:10mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+body{font-family:${printFontFamily()};font-size:10pt;color:#111}
 .header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
 .header h1{color:#0F766E;font-size:14pt}
 .meta{text-align:right;font-size:9pt;color:#555}
@@ -7113,9 +7130,9 @@ tr:nth-child(even){background:#F8FAFC}
     const printDeleteList = () => {
       const trs = list.map((d: any, i: number) => `<tr><td>${i + 1}</td><td>${d.name || '-'}</td><td>${d.code || '-'}</td><td>${d.company || '-'}</td><td>${d.cat || '-'}</td><td>${d.stock || 0} ${d.unit || ''}</td><td>${fmt(d.sell_price ?? d.sellPrice ?? 0)}</td><td>${d.deleted_at ? new Date(d.deleted_at).toLocaleString() : '-'}</td></tr>`).join('');
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4 landscape;margin:10mm}
+${printFontImport()}@page{size:A4 landscape;margin:10mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+body{font-family:${printFontFamily()};font-size:10pt;color:#111}
 .header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
 .header h1{color:#0F766E;font-size:14pt}
 .meta{text-align:right;font-size:9pt;color:#555}
@@ -7290,9 +7307,9 @@ tr:nth-child(even){background:#F8FAFC}
         return `<tr><td>${i + 1}</td><td>${h.productName || '-'}</td><td>${h.created_at ? new Date(h.created_at).toLocaleString() : '-'}</td><td>${oldS}</td><td>${newS}</td><td>${h.type === 'add' ? '+' : '-'}${h.quantity || 0}</td><td>${h.reason || '-'}</td></tr>`;
       }).join('');
       const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4 landscape;margin:10mm}
+${printFontImport()}@page{size:A4 landscape;margin:10mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+body{font-family:${printFontFamily()};font-size:10pt;color:#111}
 .header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
 .header h1{color:#0F766E;font-size:14pt}
 .meta{text-align:right;font-size:9pt;color:#555}

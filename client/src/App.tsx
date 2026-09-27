@@ -3,6 +3,7 @@ import { api, zatcaApi, setToken, clearToken } from "./api";
 import { useState, useEffect, useRef, useMemo } from 'react';
 import './index.css';
 import { useLanguage, languages, defaultTranslations, Language } from './i18n';
+import { printFontImport, printFontFamily } from './printFont';
 import { QR } from './qrCode';
 // All application data lives in the database behind the API - no browser storage
 
@@ -1767,14 +1768,14 @@ export default function App() {
 <head>
 <meta charset="utf-8">
 <title>Receipt</title>
-<style>
+<style>${printFontImport()}
   @media print {
     @page { size: 80mm auto; margin: 2mm; }
     body { margin: 0; padding: 0; }
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: ${printFontFamily()};
     font-size: 12px;
     width: 80mm;
     color: #000;
@@ -4774,9 +4775,9 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
       return `<tr><td>${i + 1}</td><td>${sup.id || '-'}</td><td>${sup.name || '-'}</td><td>${sup.phone || '-'}</td><td>${getProductsCount(sup.name || '')}</td><td>${pc.length}</td></tr>`;
     }).join('');
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
-@page{size:A4 landscape;margin:10mm}
+${printFontImport()}@page{size:A4 landscape;margin:10mm}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+body{font-family:${printFontFamily()};font-size:10pt;color:#111}
 .header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
 .header h1{color:#0F766E;font-size:14pt}
 .meta{text-align:right;font-size:9pt;color:#555}

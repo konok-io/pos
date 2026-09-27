@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { en } from './en';
+import { setPrintLang } from '../printFont';
 import { api, setApiLang } from '../api';
 
 // Types
@@ -163,6 +164,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   useEffect(() => {
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
+    setPrintLang(language);
   }, [language, isRTL]);
 
   // Don't render children until DB is ready
