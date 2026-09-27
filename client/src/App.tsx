@@ -675,6 +675,16 @@ const genSupplierId = (suppliersList: any[]) => {
     return `${ymd}${String(max + 1).padStart(4, '0')}`;
   };
 const now = () => new Date().toISOString();
+const inDayRange = (d: any, from: string, to: string): boolean => {
+  if (!from && !to) return true;
+  if (!d) return false;
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return false;
+  const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+  if (from && day < from) return false;
+  if (to && day > to) return false;
+  return true;
+};
 
 // Tabs that exist in the current navigation menu (sanitizes the restored tab)
 const VALID_TABS = ['pos', 'products', 'customers', 'income', 'reports', 'settings'];
@@ -4331,6 +4341,8 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
   const { t } = useLanguage();
   
   const [search, setSearch] = useState('');
+  const [listFrom, setListFrom] = useState('');
+  const [listTo, setListTo] = useState('');
   const [activeTab, setActiveTab] = useState<'companies' | 'categories'>('companies');
   const [viewSupplier, setViewSupplier] = useState<Supplier | null>(null);
   const [viewCategory, setViewCategory] = useState<SupplierCategory | null>(null);
@@ -4412,18 +4424,32 @@ function SuppliersScreen({ suppliers, setSuppliers, categories, setCategories, p
     purchases.filter(p => (p.supplier || '').toLowerCase() === (name || '').toLowerCase());
   
   // Filter suppliers
+  const _supDay = (s: any): any => {
+    const direct = s && (s.created_at || s.createdAt);
+    if (direct) return direct;
+    const nm = String(s?.name || '').toLowerCase();
+    const ds = products.filter((p: any) => String(p.company || '').toLowerCase() === nm).map((p: any) => p.created_at || p.createdAt).filter(Boolean).sort();
+    return ds[0] || null;
+  };
   const filteredSuppliers = useMemo(() => allSuppliers
-    .filter(s => 
-      !search || 
-      (s.name || '').toLowerCase().includes(search.toLowerCase()) ||
-      (s.phone || '').includes(search) ||
-      (s.code || '').toLowerCase().includes(search.toLowerCase())
-    )
-    .sort((a, b) => getProductsCount(b.name) - getProductsCount(a.name)), [allSuppliers, search, products]);
+    .filter(s => {
+      if (search && !(
+        (s.name || '').toLowerCase().includes(search.toLowerCase()) ||
+        (s.phone || '').includes(search) ||
+        (s.code || '').toLowerCase().includes(search.toLowerCase())
+      )) return false;
+      if (listFrom || listTo) return inDayRange(_supDay(s), listFrom, listTo);
+      return true;
+    })
+    .sort((a, b) => getProductsCount(b.name) - getProductsCount(a.name)), [allSuppliers, search, products, listFrom, listTo]);
   
   // Filter categories
   const filteredCategories = useMemo(() => categories
-    .filter(c => !search || (c.name || '').toLowerCase().includes(search.toLowerCase())), [categories, search]);
+    .filter(c => {
+      if (search && !(c.name || '').toLowerCase().includes(search.toLowerCase())) return false;
+      if (listFrom || listTo) return inDayRange((c as any).created_at || (c as any).createdAt || null, listFrom, listTo);
+      return true;
+    }), [categories, search, listFrom, listTo]);
   
   // Filter companies for dropdown
   const filteredCompanies = suppliers;
@@ -4827,6 +4853,12 @@ tr:nth-child(even){background:#F8FAFC}
         <button onClick={() => { setEditingProductId(null); setProductForm({ company: '', cat: '', name: '', barcode: '', unit: 'pcs', buyP: '', sellP: '', stock: '0', minStock: '5' }); setShowProductModal(true); }} style={{ padding: '7px 12px', background: T.orange, color: T.white, border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
           <i className="fas fa-box" style={{ marginRight: 4 }}></i>{t('products')}
         </button>
+        <input type="date" value={listFrom} onChange={e => setListFrom(e.target.value)} style={{ width: 140, padding: '6px 10px', border: `1px solid ${T.gray200}`, borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box' }} title={t('fromDate') || 'From'} />
+        <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
+        <input type="date" value={listTo} onChange={e => setListTo(e.target.value)} style={{ width: 140, padding: '6px 10px', border: `1px solid ${T.gray200}`, borderRadius: 8, fontSize: 13, outline: 'none', boxSizing: 'border-box' }} title={t('toDate') || 'To'} />
+        {(listFrom || listTo) ? (
+          <button onClick={() => { setListFrom(''); setListTo(''); }} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
+        ) : null}
         <button data-loader onClick={exportSuppliersCsv} style={{ padding: '7px 12px', background: T.white, color: T.gray600, border: `1px solid ${T.gray200}`, borderRadius: 8, cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>
           <i className="fas fa-file-csv" style={{ marginRight: 4 }}></i>{t('exportCsv')}
         </button>

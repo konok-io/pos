@@ -338,6 +338,16 @@ const genCategoryId = (categoriesList: any[]) => {
 };
 
 const fmtN = (n: number) => (+n || 0).toLocaleString('en-IN');
+const inDayRange = (d: any, from: string, to: string): boolean => {
+  if (!from && !to) return true;
+  if (!d) return false;
+  const dt = new Date(d);
+  if (isNaN(dt.getTime())) return false;
+  const day = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0');
+  if (from && day < from) return false;
+  if (to && day > to) return false;
+  return true;
+};
 
 
 
@@ -939,6 +949,8 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
   const [apPage, setApPage] = useState(1);
   const [filterFrom, setFilterFrom] = useState('');
   const [filterTo, setFilterTo] = useState('');
+  const [listFrom, setListFrom] = useState('');
+  const [listTo, setListTo] = useState('');
 
 
 
@@ -1561,6 +1573,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
   const filteredProducts = products.filter((p: any) => {
     if ((+p.stock || 0) <= 0) return false;
+    if (!inDayRange(p.created_at || p.createdAt, listFrom, listTo)) return false;
     return !search || (p.name || '').toLowerCase().includes(search.toLowerCase()) || (p.company || '').toLowerCase().includes(search.toLowerCase()) || (p.code || '').toLowerCase().includes(search.toLowerCase()) || (p.cat || '').toLowerCase().includes(search.toLowerCase());
   }).sort((a: any, b: any) => {
 
@@ -1687,7 +1700,18 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const filteredSuppliers = useMemo(() => allCompanies.filter(c => !supplierSearch || (c || '').toLowerCase().includes(supplierSearch.toLowerCase())), [allCompanies, supplierSearch]);
+  const _supDay = (company: string): any => {
+    const sup: any = suppliers.find((s: any) => (s.name || '').toLowerCase() === (company || '').toLowerCase());
+    const direct = sup && (sup.created_at || sup.createdAt);
+    if (direct) return direct;
+    const ds = products.filter((p: any) => (p.company || '').toLowerCase() === (company || '').toLowerCase()).map((p: any) => p.created_at || p.createdAt).filter(Boolean).sort();
+    return ds[0] || null;
+  };
+  const filteredSuppliers = useMemo(() => allCompanies.filter(c => {
+    if (supplierSearch && !(c || '').toLowerCase().includes(supplierSearch.toLowerCase())) return false;
+    if (listFrom || listTo) return inDayRange(_supDay(c), listFrom, listTo);
+    return true;
+  }), [allCompanies, supplierSearch, suppliers, products, listFrom, listTo]);
 
 
 
@@ -1716,7 +1740,18 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
 
-  const filteredCategories = allCategories.filter(c => !categorySearch || (c || '').toLowerCase().includes(categorySearch.toLowerCase()));
+  const _catDay = (name: string): any => {
+    const cat: any = categories.find((c: any) => String(c.name || '').trim().toLowerCase() === String(name || '').trim().toLowerCase());
+    const direct = cat && (cat.created_at || cat.createdAt);
+    if (direct) return direct;
+    const ds = products.filter((p: any) => String(p.cat || '').trim().toLowerCase() === String(name || '').trim().toLowerCase()).map((p: any) => p.created_at || p.createdAt).filter(Boolean).sort();
+    return ds[0] || null;
+  };
+  const filteredCategories = allCategories.filter(c => {
+    if (categorySearch && !(c || '').toLowerCase().includes(categorySearch.toLowerCase())) return false;
+    if (listFrom || listTo) return inDayRange(_catDay(c), listFrom, listTo);
+    return true;
+  });
 
 
 
@@ -1741,6 +1776,7 @@ export default function ProductsScreen({ products: _initProducts, suppliers: _in
 
 
   const stockProducts = products.filter((p: any) => {
+    if (!inDayRange(p.created_at || p.createdAt, listFrom, listTo)) return false;
 
     if (stockFilter === 'out') return p.stock <= 0;
 
@@ -3989,6 +4025,12 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                 <input value={search} onChange={e => { setSearch(e.target.value); setApPage(1); }} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
               </div>
+              <input type="date" value={listFrom} onChange={e => setListFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+              <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
+              <input type="date" value={listTo} onChange={e => setListTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+              {(listFrom || listTo) ? (
+                <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setListFrom(''); setListTo(''); }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
+              ) : null}
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportProductsCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printProductList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
@@ -4151,6 +4193,12 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                 </div>
                 <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
                   <input id="supplier-csv-input" type="file" accept=".csv" style={{ display: 'none' }} onChange={e => { const file = e.target.files?.[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const text = (ev.target?.result as string) || ''; const lines2 = text.split('\n').filter((l: string) => l.trim()); const headers = lines2[0].split(',').map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); const phoneIdx = headers.findIndex((h: string) => h.includes('phone')); const emailIdx = headers.findIndex((h: string) => h.includes('email')); const addressIdx = headers.findIndex((h: string) => h.includes('address')); const crIdx = headers.findIndex((h: string) => h.includes('cr')); const vatIdx = headers.findIndex((h: string) => h.includes('vat')); let imported = 0; for (let k = 1; k < lines2.length; k++) { const cols = lines2[k].split(',').map((c: string) => c.trim()); const name = nameIdx >= 0 ? cols[nameIdx] : ''; if (!name) continue; const newS = { id: genSupplierId(suppliers), name, phone: phoneIdx >= 0 ? cols[phoneIdx] || '' : '', email: emailIdx >= 0 ? cols[emailIdx] || '' : '', address: addressIdx >= 0 ? cols[addressIdx] || '' : '', crNumber: crIdx >= 0 ? cols[crIdx] || '' : '', vatNumber: vatIdx >= 0 ? cols[vatIdx] || '' : '' }; const exists = suppliers.find((s: any) => (s.name || '').toLowerCase() === name.toLowerCase()); if (!exists) { setSuppliers((prev: any[]) => [...prev, newS]); setSuppliersParent((prev: any[]) => [...prev, newS]); api.addSupplier(newS).catch(() => {}); imported++; } } alert(`${imported} ${t('suppliers')} imported!`); }; reader.readAsText(file); e.target.value = ''; }} />
+                  <input type="date" value={listFrom} onChange={e => setListFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+                  <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
+                  <input type="date" value={listTo} onChange={e => setListTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+                  {(listFrom || listTo) ? (
+                    <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setListFrom(''); setListTo(''); }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
+                  ) : null}
                   <button onClick={() => { document.getElementById('supplier-csv-input')?.click(); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('suppliers')}</button>
                   <button onClick={() => { const headers = ['Name', 'Phone', 'Email', 'Address', 'CR Number', 'VAT Number']; const demo = [headers.join(','), 'ABC Trading Co,01712345678,abc@trading.com,Dhaka Bangladesh,1234567890,VAT1234', 'XYZ Suppliers,01987654321,xyz@suppliers.com,Chittagong Bangladesh,9876543210,VAT5678'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'suppliers_template.csv'; a.click(); URL.revokeObjectURL(url); setShowSupplierMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
                   <button data-loader onClick={() => { exportSuppliersCsv(); setShowSupplierMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
@@ -4727,6 +4775,12 @@ body{font-family:Arial,sans-serif;width:202mm;margin:0}
                     return out;
                   };
                   const headers = parseLine(lines2[0]).map((h: string) => h.trim().toLowerCase()); const nameIdx = headers.findIndex((h: string) => h.includes('name')); let imported = 0; let failed = 0; const localCats: any[] = [...categories]; const jobs: Promise<void>[] = []; for (let k = 1; k < lines2.length; k++) { const cols = parseLine(lines2[k]).map((c: string) => c.trim()); const name = (nameIdx >= 0 ? cols[nameIdx] : '').trim(); if (!name) continue; const exists = localCats.find((ca: any) => String(ca.name || '').trim().toLowerCase() === name.toLowerCase()); if (exists) continue; const newCat = { id: genCategoryId(localCats), name }; localCats.push(newCat); setCategories((prev: any[]) => [...prev, newCat]); setCategoriesParent((prev: any[]) => [...prev, newCat]); imported++; jobs.push(api.addCategory(newCat).then((res: any) => { if (res && res.id && res.id !== newCat.id) { setCategories((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c)); setCategoriesParent((prev: any[]) => prev.map((c: any) => c.id === newCat.id ? { ...c, id: res.id } : c)); } }).catch(() => { failed++; setCategories((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id)); setCategoriesParent((prev: any[]) => prev.filter((c: any) => c.id !== newCat.id)); })); } Promise.all(jobs).finally(() => alert(`${imported} ${t('categories')} imported!${failed ? ` (${failed} ${t('failed')})` : ''}`)); }; reader.readAsText(file); e.target.value = ''; }} />
+                  <input type="date" value={listFrom} onChange={e => setListFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+                  <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
+                  <input type="date" value={listTo} onChange={e => setListTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+                  {(listFrom || listTo) ? (
+                    <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setListFrom(''); setListTo(''); }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
+                  ) : null}
                   <button onClick={() => { document.getElementById('category-csv-input')?.click(); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-import" style={{marginRight: 4}}></i> {t('csvImport')} {t('categories')}</button>
                   <button onClick={() => { const headers = ['Name']; const demo = [headers.join(','), 'Electronics', 'Groceries', 'Clothing', 'Stationery'].join('\n'); const blob = new Blob([demo], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'categories_template.csv'; a.click(); URL.revokeObjectURL(url); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-download" style={{marginRight: 4}}></i> {t('demoCsv')}</button>
                   <button data-loader onClick={() => { exportCategoriesCsv(); setShowCategoryMoreMenu(false); }} style={{ ...btn('ghost', 'sm') }}><i className="fas fa-file-export" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
@@ -6682,6 +6736,12 @@ tr:nth-child(even){background:#F8FAFC}
                 <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
                 <input value={stockSearch} onChange={e => setStockSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
               </div>
+              <input type="date" value={listFrom} onChange={e => setListFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+              <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
+              <input type="date" value={listTo} onChange={e => setListTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+              {(listFrom || listTo) ? (
+                <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setListFrom(''); setListTo(''); }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
+              ) : null}
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportStockCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
               <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printStockList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
             </div>
@@ -7013,14 +7073,60 @@ tr:nth-child(even){background:#F8FAFC}
 
 
   const renderDeleteHistory = () => {
-    const list = deletedProducts || [];
+    const allList = deletedProducts || [];
+    const _q = (search || '').toLowerCase();
+    const _from = filterFrom || '';
+    const _to = filterTo || '';
+    const list = allList.filter((d: any) => {
+      if (!inDayRange(d.deleted_at, _from, _to)) return false;
+      if (!_q) return true;
+      return (d.name || '').toLowerCase().includes(_q)
+        || String(d.code || '').toLowerCase().includes(_q)
+        || (d.company || '').toLowerCase().includes(_q)
+        || (d.cat || '').toLowerCase().includes(_q);
+    });
     const totalQty = list.reduce((s: number, d: any) => s + (+d.stock || 0), 0);
     const uniqueCount = new Set(list.map((d: any) => d.name || d.code).filter(Boolean)).size;
     const lastEntry = list[0] || null;
     const clearHistory = () => {
-      if (list.length === 0) return;
+      if (allList.length === 0) return;
       if (!window.confirm(t('clearDeleteHistoryConfirm'))) return;
       api.clearDeletedProducts().then(() => setDeletedProducts([])).catch(() => alert(t('failed')));
+    };
+    const exportDeleteCsv = () => {
+      const esc = (v: any) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+      const hdr = [t('productName'), t('company'), t('category'), t('stock'), t('sellPrice'), t('date')];
+      const rowsCsv = [hdr.join(',')];
+      list.forEach((d: any) => {
+        rowsCsv.push([esc(d.name || ''), esc(d.company || ''), esc(d.cat || ''), esc(d.stock || 0), esc(d.sell_price ?? d.sellPrice ?? ''), esc(d.deleted_at || '')].join(','));
+      });
+      const blob = new Blob([rowsCsv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `delete-history-${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+    const printDeleteList = () => {
+      const trs = list.map((d: any, i: number) => `<tr><td>${i + 1}</td><td>${d.name || '-'}</td><td>${d.code || '-'}</td><td>${d.company || '-'}</td><td>${d.cat || '-'}</td><td>${d.stock || 0} ${d.unit || ''}</td><td>${fmt(d.sell_price ?? d.sellPrice ?? 0)}</td><td>${d.deleted_at ? new Date(d.deleted_at).toLocaleString() : '-'}</td></tr>`).join('');
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+@page{size:A4 landscape;margin:10mm}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;font-size:10pt;color:#111}
+.header{display:flex;justify-content:space-between;border-bottom:1.2mm solid #0F766E;padding-bottom:2mm;margin-bottom:3mm}
+.header h1{color:#0F766E;font-size:14pt}
+.meta{text-align:right;font-size:9pt;color:#555}
+table{width:100%;border-collapse:collapse}
+th{background:#0F766E;color:#fff;padding:2mm;text-align:left;font-size:8pt}
+td{border:0.3mm solid #cbd5e1;padding:1.5mm 2mm;font-size:9pt}
+tr:nth-child(even){background:#F8FAFC}
+.footer{margin-top:4mm;font-size:8pt;color:#64748b}
+</style></head><body>
+<div class="header"><h1>${t('deleteHistory')}</h1><div class="meta">${_from || '...'} ${_to ? '-> ' + _to : ''}<br/>${new Date().toLocaleString()}</div></div>
+<table><thead><tr><th>#</th><th>Product</th><th>Code</th><th>Company</th><th>Category</th><th>Stock</th><th>Price</th><th>Date</th></tr></thead><tbody>${trs || '<tr><td colspan="8" style="text-align:center">No records</td></tr>'}</tbody></table>
+<div class="footer">Generated by POS &#183; ${list.length} records</div>
+</body></html>`;
+      openPrintWin(html);
     };
     const stats = [
       { icon: 'fas fa-trash', label: t('deleteHistory'), value: String(list.length), color: T.teal, bg: T.tealLight },
@@ -7066,8 +7172,20 @@ tr:nth-child(even){background:#F8FAFC}
           <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
             <button style={{ ...btn('ghost', 'sm') }} onClick={() => setProductTab('stock')}><i className="fas fa-arrow-left" style={{ marginRight: 4 }}></i> {t('back')}</button>
             <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}>/ {t('deleteHistory')}</span>
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
-              <button data-loader onClick={clearHistory} style={{ ...btn('ghost', 'sm'), opacity: list.length === 0 ? 0.5 : 1 }}><i className="fas fa-broom" style={{ marginRight: 4 }}></i>{t('clear')}</button>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ position: 'relative', width: 200 }}>
+                <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchProductPlaceholder')} style={{ ...inputStyle, paddingLeft: 32 }} />
+              </div>
+              <input type="date" value={filterFrom} onChange={e => setFilterFrom(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('fromDate') || 'From'} />
+              <span style={{ color: T.gray400, fontSize: 12 }}>&rarr;</span>
+              <input type="date" value={filterTo} onChange={e => setFilterTo(e.target.value)} style={{ ...inputStyle, width: 140, padding: '6px 8px', fontSize: 13 }} title={t('toDate') || 'To'} />
+              {(filterFrom || filterTo) ? (
+                <button style={{ ...btn('ghost', 'sm') }} onClick={() => { setFilterFrom(''); setFilterTo(''); }} title={t('clear') || 'Clear'}><i className="fas fa-xmark"></i></button>
+              ) : null}
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={exportDeleteCsv}><i className="fas fa-file-csv" style={{marginRight: 4}}></i> {t('exportCsv')}</button>
+              <button data-loader style={{ ...btn('ghost', 'sm') }} onClick={printDeleteList}><i className="fas fa-print" style={{marginRight: 4}}></i> {t('print')}</button>
+              <button data-loader onClick={clearHistory} style={{ ...btn('ghost', 'sm'), opacity: allList.length === 0 ? 0.5 : 1 }}><i className="fas fa-broom" style={{ marginRight: 4 }}></i>{t('clear')}</button>
             </div>
           </div>
         </div>
