@@ -4800,10 +4800,10 @@ tr:nth-child(even){background:#F8FAFC}
     ? products.filter((x: any) => (x.company || '').toLowerCase() === (viewSupplier.name || '').toLowerCase())
     : [], [products, viewSupplier]);
 
-  return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
-      {/* Top bar */}
-      <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, borderBottom: `1px solid ${T.gray200}`, flexWrap: 'wrap' }}>
+  // Suppliers / Categories toolbar
+  const supToolbar = (
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px' }}>
+      <div style={{ padding: '10px 16px', display: 'flex', gap: 8, alignItems: 'center', background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, boxShadow: '0 4px 16px rgba(0,0,0,0.06)', flexWrap: 'wrap' }}>
         <span style={{ fontWeight: 700, fontSize: 15, color: T.gray600 }}><i className="fas fa-building" style={{ marginRight: 6, color: T.teal }}></i>{t('suppliers')}</span>
         <div style={{ position: 'relative', width: 200 }}>
           <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: T.gray400 }}><i className="fas fa-magnifying-glass"></i></span>
@@ -4834,6 +4834,11 @@ tr:nth-child(even){background:#F8FAFC}
           <i className="fas fa-print" style={{ marginRight: 4 }}></i>{t('print')}
         </button>
       </div>
+    </div>
+  );
+
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#F8FAFC' }}>
 
       <div style={{ flex: 1, overflow: 'auto' }}>
         {/* Gradient header */}
@@ -4896,6 +4901,8 @@ tr:nth-child(even){background:#F8FAFC}
                 ))}
               </div>
 
+              {supToolbar}
+
               <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
                 <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
                   <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -4955,7 +4962,9 @@ tr:nth-child(even){background:#F8FAFC}
         })()}
 
         {activeTab === 'categories' && (
-          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px 24px' }}>
+          <>
+          {supToolbar}
+          <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 24px' }}>
             <div style={{ background: T.white, border: `1px solid ${T.gray200}`, borderRadius: 16, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }}>
               <div style={{ padding: '14px 18px', borderBottom: `1px solid ${T.gray200}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ fontSize: 14, fontWeight: 700, color: T.gray600 }}>
@@ -4998,6 +5007,7 @@ tr:nth-child(even){background:#F8FAFC}
               </table>
             </div>
           </div>
+          </>
         )}
         </>
         )}
