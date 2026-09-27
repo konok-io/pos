@@ -7628,6 +7628,7 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     return () => { if (settingsTimer.current) window.clearTimeout(settingsTimer.current); };
   }, [activeTab]);
   const [priceHistoryCount, setPriceHistoryCount] = useState(0);
+  const [stockHistCounts, setStockHistCounts] = useState({ add: 0, remove: 0 });
 
   // Load settings from PouchDB on mount
   useEffect(() => {
@@ -7641,10 +7642,16 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
     (async () => {
       try {
         const rows = await api.getPriceHistory();
-        if (alive && Array.isArray(rows)) { setPriceHistoryCount(rows.length); return; }
+        if (alive && Array.isArray(rows)) setPriceHistoryCount(rows.length);
       } catch {}
       try {
-        // Price history count comes from the API only
+        const sh = await api.getStockHistory();
+        if (alive && Array.isArray(sh)) {
+          setStockHistCounts({
+            add: sh.filter((r: any) => r.type === 'add').length,
+            remove: sh.filter((r: any) => r.type === 'remove').length,
+          });
+        }
       } catch {}
     })();
     return () => { alive = false; };
@@ -7750,6 +7757,19 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
     alert(t('dataDeletedSuccessfully'));
     setTimeout(() => window.location.reload(), 300);
+  };
+
+  // Delete stock add / remove history entries
+  const deleteStockHist = async (type: 'add' | 'remove', count: number) => {
+    if (count === 0) return;
+    if (!confirm(t('warningPermanentDelete'))) return;
+    try {
+      await api.deleteAllStockHistory(type).catch(() => {});
+      alert(t('dataDeletedSuccessfully'));
+      window.location.reload();
+    } catch (error) {
+      alert(t('error') + '!');
+    }
   };
 
   // Helper function to delete all items of a type
@@ -8500,165 +8520,76 @@ export function SettingsScreen({ products, customers, sales, suppliers, categori
 
         {/* Data Reset Tab */}
         {activeTab === 3 && (
-          <div>
-            {/* Warning */}
-            <div style={{
-              padding: '14px 18px',
-              background: '#fef2f2',
-              borderRadius: 10,
-              border: '1px solid #fecaca',
-              marginBottom: 14,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12
-            }}>
-              <span style={{ fontSize: 18 }}><i className="fas fa-triangle-exclamation"></i></span>
-              <p style={{ margin: 0, fontSize: 14, color: '#dc2626' }}>
-                {t('warningPermanentDelete')}
-              </p>
-            </div>
-
-            {/* Row 1: 5 Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 10 }}>
-              {[
-                { label: t('productData'), count: products.length, icon: <i className="fas fa-box"></i>, onClick: () => deleteAllItems('products', products, setProducts, t) },
-                { label: t('customerData'), count: customers.filter(c => !c.isSystem).length, icon: <i className="fas fa-users"></i>, onClick: () => deleteAllCustomers(customers, setCustomers, t), disabled: customers.filter(c => !c.isSystem).length === 0 },
-                { label: t('categoryData'), count: categories.length, icon: <i className="fas fa-folder"></i>, onClick: () => deleteAllItems('categories', categories, setCategories, t) },
-                { label: t('supplierData'), count: suppliers.length, icon: <i className="fas fa-building"></i>, onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
-                { label: t('salesData'), count: sales.length, icon: <i className="fas fa-cart-shopping"></i>, onClick: () => deleteAllItems('sales', sales, setSales, t) },
-              ].map((item, i) => (
-                <div key={i} style={{ 
-                  background: '#fff', 
-                  borderRadius: 12, 
-                  padding: 14, 
-                  border: '1px solid #e5e7eb',
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 18 }}>{item.icon}</span>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: '#374151' }}>{item.label}</div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: '#374151' }}>{item.count}</span>
-                    <button
-                      onClick={item.onClick}
-                      disabled={item.disabled || item.count === 0}
-                      style={{ 
-                        padding: '5px 10px', 
-                        background: (item.disabled || item.count === 0) ? '#f3f4f6' : '#ef4444', 
-                        color: (item.disabled || item.count === 0) ? '#9ca3af' : '#fff', 
-                        border: 'none', 
-                        borderRadius: 6, 
-                        fontSize: 11, 
-                        fontWeight: 600, 
-                        cursor: (item.disabled || item.count === 0) ? 'not-allowed' : 'pointer',
-                      }}>
-                      {t('delete')}
-                    </button>
-                  </div>
+          <div style={{ margin: '-24px -24px 0', background: '#f5f5f5', minHeight: '100%', boxSizing: 'border-box' }}>
+            {/* Gradient header — same design as Suppliers / Categories / Add Product pages */}
+            <div style={{ background: `linear-gradient(135deg, ${T.teal} 0%, ${T.tealDark} 100%)`, padding: '28px 24px 24px', color: '#fff' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 18, maxWidth: 1200, margin: '0 auto' }}>
+                <div style={{ width: 72, height: 72, borderRadius: 18, background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, flexShrink: 0 }}>
+                  <i className="fas fa-trash-can"></i>
                 </div>
-              ))}
-            </div>
-
-            {/* Row 2: 2 Cards + Delete All Button */}
-            <div style={{ display: 'flex', gap: 10, alignItems: 'stretch' }}>
-              {/* Left: Purchase History + Price History Cards */}
-              <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div style={{ 
-                  background: '#fff', 
-                  borderRadius: 12, 
-                  padding: 14, 
-                  border: '1px solid #e5e7eb',
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  height: '100%',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 20 }}><i className="fas fa-file-import"></i></span>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t('purchaseHistoryDelete')}</div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{purchases.length}</span>
-                    <button
-                      onClick={() => deleteAllItems('purchases', purchases, setPurchases, t)}
-                      disabled={purchases.length === 0}
-                      style={{ 
-                        padding: '6px 12px', 
-                        background: purchases.length === 0 ? '#f3f4f6' : '#ef4444', 
-                        color: purchases.length === 0 ? '#9ca3af' : '#fff', 
-                        border: 'none', 
-                        borderRadius: 6, 
-                        fontSize: 12, 
-                        fontWeight: 600, 
-                        cursor: purchases.length === 0 ? 'not-allowed' : 'pointer',
-                      }}>
-                      {t('delete')}
-                    </button>
-                  </div>
-                </div>
-
-                <div style={{ 
-                  background: '#fff', 
-                  borderRadius: 12, 
-                  padding: 14, 
-                  border: '1px solid #e5e7eb',
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  height: '100%',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 20 }}><i className="fas fa-tags"></i></span>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{t('priceHistory')}</div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{priceHistoryCount}</span>
-                    <button
-                      onClick={() => deleteAllItems('price_history', Array.from({ length: priceHistoryCount }, (_, i) => ({ id: i })), () => setPriceHistoryCount(0), t)}
-                      disabled={priceHistoryCount === 0}
-                      style={{ 
-                        padding: '6px 12px', 
-                        background: priceHistoryCount === 0 ? '#f3f4f6' : '#ef4444', 
-                        color: priceHistoryCount === 0 ? '#9ca3af' : '#fff', 
-                        border: 'none', 
-                        borderRadius: 6, 
-                        fontSize: 12, 
-                        fontWeight: 600, 
-                        cursor: priceHistoryCount === 0 ? 'not-allowed' : 'pointer',
-                      }}>
-                      {t('delete')}
-                    </button>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>{t('dataReset')}</div>
+                  <div style={{ fontSize: 13, opacity: 0.9 }}>{t('warningPermanentDelete')}</div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                      <i className="fas fa-box" style={{ marginRight: 6 }}></i>{products.length} {t('productData')}
+                    </span>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                      <i className="fas fa-cart-shopping" style={{ marginRight: 6 }}></i>{sales.length} {t('salesData')}
+                    </span>
+                    <span style={{ background: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 700 }}>
+                      <i className="fas fa-file-import" style={{ marginRight: 6 }}></i>{purchases.length} {t('purchaseHistoryDelete')}
+                    </span>
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Right: Delete All Button - Single Line */}
-              <div style={{ 
-                background: '#dc2626',
-                borderRadius: 12, 
-                padding: '14px 20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 10,
-              }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '20px 24px 24px' }}>
+              {/* Warning */}
+              <div style={{ padding: '14px 18px', background: '#fef2f2', borderRadius: 12, border: '1px solid #fecaca', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span style={{ fontSize: 18, color: '#dc2626' }}><i className="fas fa-triangle-exclamation"></i></span>
+                <p style={{ margin: 0, fontSize: 14, color: '#dc2626' }}>{t('warningPermanentDelete')}</p>
+              </div>
+
+              {/* Data cards — every card has the same height */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12, marginBottom: 14 }}>
+                {[
+                  { label: t('productData'), count: products.length, icon: <i className="fas fa-box"></i>, bg: '#F0FDFA', color: '#0F766E', onClick: () => deleteAllItems('products', products, setProducts, t) },
+                  { label: t('customerData'), count: customers.filter(c => !c.isSystem).length, icon: <i className="fas fa-users"></i>, bg: '#EFF6FF', color: '#2563EB', onClick: () => deleteAllCustomers(customers, setCustomers, t) },
+                  { label: t('categoryData'), count: categories.length, icon: <i className="fas fa-folder"></i>, bg: '#FFF7ED', color: '#EA580C', onClick: () => deleteAllItems('categories', categories, setCategories, t) },
+                  { label: t('supplierData'), count: suppliers.length, icon: <i className="fas fa-building"></i>, bg: '#F5F3FF', color: '#7C3AED', onClick: () => deleteAllItems('suppliers', suppliers, setSuppliers, t) },
+                  { label: t('salesData'), count: sales.length, icon: <i className="fas fa-cart-shopping"></i>, bg: '#ECFDF5', color: '#059669', onClick: () => deleteAllItems('sales', sales, setSales, t) },
+                  { label: t('purchaseHistoryDelete'), count: purchases.length, icon: <i className="fas fa-file-import"></i>, bg: '#EFF6FF', color: '#0369A1', onClick: () => deleteAllItems('purchases', purchases, setPurchases, t) },
+                  { label: t('priceHistory'), count: priceHistoryCount, icon: <i className="fas fa-tags"></i>, bg: '#F5F3FF', color: '#7C3AED', onClick: () => deleteAllItems('price_history', Array.from({ length: priceHistoryCount }, (_, i) => ({ id: i })), () => setPriceHistoryCount(0), t) },
+                  { label: t('stockAddHistory'), count: stockHistCounts.add, icon: <i className="fas fa-arrow-up"></i>, bg: '#ECFDF5', color: '#16A34A', onClick: () => deleteStockHist('add', stockHistCounts.add) },
+                  { label: t('stockRemoveHistory'), count: stockHistCounts.remove, icon: <i className="fas fa-arrow-down"></i>, bg: '#FEF2F2', color: '#DC2626', onClick: () => deleteStockHist('remove', stockHistCounts.remove) },
+                ].map((item, i) => (
+                  <div key={i} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '12px 16px', height: 78, boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, flex: 1 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 10, background: item.bg, color: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 15 }}>{item.icon}</div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label}</div>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      <span style={{ fontSize: 16, fontWeight: 700, color: '#374151' }}>{item.count}</span>
+                      <button
+                        onClick={item.onClick}
+                        disabled={item.count === 0}
+                        style={{ padding: '6px 12px', background: item.count === 0 ? '#f3f4f6' : '#ef4444', color: item.count === 0 ? '#9ca3af' : '#fff', border: 'none', borderRadius: 6, fontSize: 12, fontWeight: 600, cursor: item.count === 0 ? 'not-allowed' : 'pointer' }}>
+                        {t('delete')}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Full reset */}
+              <div style={{ background: '#dc2626', borderRadius: 14, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <span style={{ fontSize: 20 }}><i className="fas fa-burst"></i></span>
                 <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{t('fullReset')}</div>
                 <button
                   onClick={clearAll}
-                  style={{ 
-                    padding: '8px 16px', 
-                    background: '#fff', 
-                    color: '#dc2626', 
-                    border: 'none', 
-                    borderRadius: 6, 
-                    fontSize: 13, 
-                    fontWeight: 700, 
-                    cursor: 'pointer',
-                  }}>
+                  style={{ padding: '8px 16px', background: '#fff', color: '#dc2626', border: 'none', borderRadius: 6, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
                   {t('deleteAllData')}
                 </button>
               </div>

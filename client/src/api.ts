@@ -200,7 +200,7 @@ export const api = {
   deleteAllSales: () => request('/sales/all', { method: 'DELETE' }),
   deleteAllCustomers: () => request('/customers/all', { method: 'DELETE' }),
   deleteAllPurchases: () => request('/purchases/all', { method: 'DELETE' }),
-  deleteAllStockHistory: () => request('/stock-history/all', { method: 'DELETE' }),
+  deleteAllStockHistory: (type?: string) => request('/stock-history/all' + (type ? '?type=' + type : ''), { method: 'DELETE' }),
   deleteAllPriceHistory: () => request('/price-history/all', { method: 'DELETE' }),
 
   // Customers CRUD
