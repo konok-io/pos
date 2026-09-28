@@ -1797,69 +1797,69 @@ export default function App() {
   <!-- Company Header -->
   <div class="center bold" style="font-size:14px;">${company}</div>
   ${address ? `<div class="center" style="font-size:10px;">${address}</div>` : ''}
-  ${phone ? `<div class="center" style="font-size:10px;">Tel: ${phone}</div>` : ''}
+  ${phone ? `<div class="center" style="font-size:10px;">${t('tel')}: ${phone}</div>` : ''}
   ${email ? `<div class="center" style="font-size:10px;">${email}</div>` : ''}
-  ${taxId ? `<div class="center bold" style="font-size:10px;">VAT No: ${taxId}</div>` : ''}
-  ${crNumber ? `<div class="center" style="font-size:10px;">CR: ${crNumber}</div>` : ''}
+  ${taxId ? `<div class="center bold" style="font-size:10px;">${t('vatNo')}: ${taxId}</div>` : ''}
+  ${crNumber ? `<div class="center" style="font-size:10px;">${t('crNumber')}: ${crNumber}</div>` : ''}
 
   <div class="line2"></div>
-  <div class="center bold" style="font-size:13px;padding:4px 0;">SALES INVOICE</div>
+  <div class="center bold" style="font-size:13px;padding:4px 0;">${t('salesInvoice')}</div>
   <div class="line2"></div>
 
   <!-- Invoice Info -->
   <div style="font-size:10px;margin:4px 0;">
-    <div><strong>Invoice:</strong> ${sale.invoiceNo}</div>
-    <div><strong>Date:</strong> ${new Date(sale.date || Date.now()).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'})} ${new Date(sale.date || Date.now()).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
+    <div><strong>${t('invoice')}:</strong> ${sale.invoiceNo}</div>
+    <div><strong>${t('date')}:</strong> ${new Date(sale.date || Date.now()).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'})} ${new Date(sale.date || Date.now()).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</div>
                     ${zatcaPhase === 'phase2' ? 'ZATCA Phase 2' : zatcaPhase === 'phase1' ? 'ZATCA Phase 1' : ''}
   </div>
 
   <!-- Customer Info -->
   <div class="line"></div>
   <div style="font-size:11px;padding:4px 0;">
-    <div><strong>Customer:</strong> ${customerName}</div>
-    ${customerVat ? `<div><strong>VAT:</strong> ${customerVat}</div>` : ''}
-    ${custPhone ? `<div><strong>Phone:</strong> ${custPhone}</div>` : ''}
-    ${custAddress ? `<div><strong>Address:</strong> ${custAddress}</div>` : ''}
-    <div style="font-size:10px;color:${invoiceType === 'B2B' ? '#059669' : '#666'};margin-top:2px;">${invoiceType === 'B2B' ? 'B2B Tax Invoice (Standard)' : 'B2C Simplified Invoice'}</div>
+    <div><strong>${t('customer')}:</strong> ${customerName}</div>
+    ${customerVat ? `<div><strong>${t('vat')}:</strong> ${customerVat}</div>` : ''}
+    ${custPhone ? `<div><strong>${t('phone')}:</strong> ${custPhone}</div>` : ''}
+    ${custAddress ? `<div><strong>${t('address')}:</strong> ${custAddress}</div>` : ''}
+    <div style="font-size:10px;color:${invoiceType === 'B2B' ? '#059669' : '#666'};margin-top:2px;">${invoiceType === 'B2B' ? t('b2b') : t('b2c')}</div>
   </div>
   ${sale.due > 0 || custBalance > 0 ? `<div class="line"></div>
   <div style="font-size:10px;padding:4px 0;background:#fef2f2;border-radius:4px;padding:4px 6px;">
-    ${sale.due > 0 ? `<div class="due">Due This Sale: ${cur} ${(+sale.due || 0).toLocaleString('en-IN')}</div>` : ''}
-    ${custBalance > 0 ? `<div class="due">Total Outstanding: ${cur} ${(+custBalance || 0).toLocaleString('en-IN')}</div>` : ''}
-    ${custDeposit > 0 ? `<div class="deposit">Deposit Available: ${cur} ${(+custDeposit || 0).toLocaleString('en-IN')}</div>` : ''}
+    ${sale.due > 0 ? `<div class="due">${t('dueThisSale')}: ${cur} ${(+sale.due || 0).toLocaleString('en-IN')}</div>` : ''}
+    ${custBalance > 0 ? `<div class="due">${t('outstanding')}: ${cur} ${(+custBalance || 0).toLocaleString('en-IN')}</div>` : ''}
+    ${custDeposit > 0 ? `<div class="deposit">${t('depositAvailable')}: ${cur} ${(+custDeposit || 0).toLocaleString('en-IN')}</div>` : ''}
   </div>` : ''}
   <div class="line"></div>
 
   <!-- Items Table -->
   <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:bold;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:2px;">
-    <span style="flex:1;">Product</span>
-    <span style="width:25px;text-align:center;">Qty</span>
-    <span style="width:45px;text-align:right;">Price</span>
-    <span style="width:60px;text-align:right;">Total</span>
+    <span style="flex:1;">${t('product')}</span>
+    <span style="width:25px;text-align:center;">${t('qty')}</span>
+    <span style="width:45px;text-align:right;">${t('price')}</span>
+    <span style="width:60px;text-align:right;">${t('total')}</span>
   </div>
   ${itemsHtml}
 
   <div class="line"></div>
 
   <!-- Totals -->
-  <div class="row"><span>Subtotal:</span><span>${cur} ${(+sale.subtotal || 0).toLocaleString('en-IN')}</span></div>
-  ${sale.discount > 0 ? `<div class="row"><span>Discount:</span><span>-${cur} ${(+sale.discount || 0).toLocaleString('en-IN')}</span></div>` : ''}
-  ${vatEnabled && sale.vatAmount > 0 ? `<div class="row"><span>VAT (${sale.vatPercent}%):</span><span>${cur} ${(+sale.vatAmount || 0).toLocaleString('en-IN')}</span></div>` : ''}
-  <div class="row-total"><span>TOTAL:</span><span>${cur} ${(+sale.total || 0).toLocaleString('en-IN')}</span></div>
+  <div class="row"><span>${t('subtotal')}:</span><span>${cur} ${(+sale.subtotal || 0).toLocaleString('en-IN')}</span></div>
+  ${sale.discount > 0 ? `<div class="row"><span>${t('discount')}:</span><span>-${cur} ${(+sale.discount || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  ${vatEnabled && sale.vatAmount > 0 ? `<div class="row"><span>${t('vat')} (${sale.vatPercent}%):</span><span>${cur} ${(+sale.vatAmount || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  <div class="row-total"><span>${t('total')}:</span><span>${cur} ${(+sale.total || 0).toLocaleString('en-IN')}</span></div>
 
   <div class="line"></div>
 
   <!-- Payment -->
-  <div class="row"><span>Paid:</span><span>${cur} ${(+sale.paid || 0).toLocaleString('en-IN')}</span></div>
-  ${sale.change > 0 ? `<div class="row"><span>Change:</span><span>${cur} ${(+sale.change || 0).toLocaleString('en-IN')}</span></div>` : ''}
-  ${sale.due > 0 ? `<div class="row due"><span>DUE AMOUNT:</span><span>${cur} ${(+sale.due || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  <div class="row"><span>${t('paid')}:</span><span>${cur} ${(+sale.paid || 0).toLocaleString('en-IN')}</span></div>
+  ${sale.change > 0 ? `<div class="row"><span>${t('changeAmount')}:</span><span>${cur} ${(+sale.change || 0).toLocaleString('en-IN')}</span></div>` : ''}
+  ${sale.due > 0 ? `<div class="row due"><span>${t('dueAmount')}:</span><span>${cur} ${(+sale.due || 0).toLocaleString('en-IN')}</span></div>` : ''}
 
   <!-- ZATCA QR Code -->
   ${qrHtml}
 
   <!-- Footer -->
   <div class="footer" style="border-top:1px dashed #ccc;padding-top:6px;margin-top:8px;">
-    <div style="font-size:9px;color:#666;margin-top:2px;">Thanks for shopping!</div>
+    <div style="font-size:9px;color:#666;margin-top:2px;">${t('thanksForShopping')}</div>
     <div style="font-size:9px;color:#666;">${new Date(sale.date || Date.now()).toLocaleDateString('en-GB')}</div>
   </div>
 </body>
@@ -4791,14 +4791,14 @@ td{border:0.3mm solid #cbd5e1;padding:1.5mm 2mm;font-size:9pt}
 tr:nth-child(even){background:#F8FAFC}
 .footer{margin-top:4mm;font-size:8pt;color:#64748b}
 </style></head><body>
-<div class="header"><h1>Suppliers</h1><div class="meta">${new Date().toLocaleString()}</div></div>
+<div class="header"><h1>${t('suppliers')}</h1><div class="meta">${new Date().toLocaleString()}</div></div>
 <div class="stats">
   <div class="stat"><div class="lbl">${t('totalSuppliers')}</div><div class="val">${filteredSuppliers.length}</div></div>
   <div class="stat"><div class="lbl">${t('withProducts')}</div><div class="val">${filteredSuppliers.filter((x: any) => getProductsCount(x.name || '') > 0).length}</div></div>
   <div class="stat"><div class="lbl">${t('products')}</div><div class="val">${products.length}</div></div>
 </div>
-<table><thead><tr><th>#</th><th>ID</th><th>${t('companyName') || t('suppliers')}</th><th>${t('phone')}</th><th>${t('products')}</th><th>${t('purchaseHistory')}</th></tr></thead><tbody>${trs || '<tr><td colspan="6" style="text-align:center;padding:8mm">No suppliers</td></tr>'}</tbody></table>
-<div class="footer">Generated by POS · ${filteredSuppliers.length} suppliers</div>
+<table><thead><tr><th>#</th><th>${t('id')}</th><th>${t('companyName') || t('suppliers')}</th><th>${t('phone')}</th><th>${t('products')}</th><th>${t('purchaseHistory')}</th></tr></thead><tbody>${trs || `<tr><td colspan="6" style="text-align:center;padding:8mm">${t('noSuppliers')}</td></tr>`}</tbody></table>
+<div class="footer">${t('generatedBy')} · ${filteredSuppliers.length} ${t('suppliers')}</div>
 </body></html>`;
     const w = window.open('', '_blank');
     if (w) { w.document.write(html); w.document.close(); w.focus(); setTimeout(() => w.print(), 300); }

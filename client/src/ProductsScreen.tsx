@@ -5288,17 +5288,17 @@ td{border:0.3mm solid #cbd5e1;padding:2mm;font-size:10pt}
 tr:nth-child(even){background:#F8FAFC}
 .footer{margin-top:8mm;font-size:9pt;color:#64748b}
 </style></head><body>
-<div class="header"><h1>Product Report</h1><div class="meta">${apFrom || '…'} → ${apTo || '…'}<br/>${new Date().toLocaleString()}</div></div>
+<div class="header"><h1>${t('productReport')}</h1><div class="meta">${apFrom || '…'} → ${apTo || '…'}<br/>${new Date().toLocaleString()}</div></div>
 <div class="card">
-  <div><div class="lbl">Name</div><div class="val">${p.name}</div></div>
-  <div><div class="lbl">Code</div><div class="val">${p.code || '-'}</div></div>
-  <div><div class="lbl">Stock</div><div class="val">${p.stock} ${p.unit || ''}</div></div>
-  <div><div class="lbl">Cost</div><div class="val">${fmt(p.costPrice)}</div></div>
-  <div><div class="lbl">Sell</div><div class="val">${fmt(p.sellPrice)}</div></div>
-  <div><div class="lbl">Supplier</div><div class="val">${p.company || '-'}</div></div>
+  <div><div class="lbl">${t('name')}</div><div class="val">${p.name}</div></div>
+  <div><div class="lbl">${t('code')}</div><div class="val">${p.code || '-'}</div></div>
+  <div><div class="lbl">${t('stock')}</div><div class="val">${p.stock} ${p.unit || ''}</div></div>
+  <div><div class="lbl">${t('cost')}</div><div class="val">${fmt(p.costPrice)}</div></div>
+  <div><div class="lbl">${t('sell')}</div><div class="val">${fmt(p.sellPrice)}</div></div>
+  <div><div class="lbl">${t('supplier')}</div><div class="val">${p.company || '-'}</div></div>
 </div>
-<table><thead><tr><th>#</th><th>Type</th><th>Date</th><th>Qty</th><th>Reason</th></tr></thead><tbody>${rows || '<tr><td colspan="5" style="text-align:center;padding:6mm">No records in range</td></tr>'}</tbody></table>
-<div class="footer">POS · ${hist.length} history records · ${apFrom || ''} ${apTo ? '→ ' + apTo : ''}</div>
+<table><thead><tr><th>#</th><th>${t('type')}</th><th>${t('date')}</th><th>${t('qty')}</th><th>${t('reason')}</th></tr></thead><tbody>${rows || `<tr><td colspan="5" style="text-align:center;padding:6mm">${t('noRecords')}</td></tr>`}</tbody></table>
+<div class="footer">${t('generatedBy')} · ${hist.length} ${t('records')} · ${apFrom || ''} ${apTo ? '→ ' + apTo : ''}</div>
 </body></html>`;
       openPrintWin(html);
     };
@@ -5692,20 +5692,20 @@ td{border:0.3mm solid #cbd5e1;padding:2mm;font-size:10pt}
 tr:nth-child(even){background:#F8FAFC}
 .footer{margin-top:8mm;font-size:9pt;color:#64748b}
 </style></head><body>
-<div class="header"><h1>Supplier Report</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
+<div class="header"><h1>${t('supplierReport')}</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
 <div class="card">
-  <div><div class="lbl">Supplier</div><div class="val">${h(sName)}</div></div>
-  <div><div class="lbl">Phone</div><div class="val">${h(rec.phone || '-')}</div></div>
-  <div><div class="lbl">Products</div><div class="val">${prods.length}</div></div>
-  <div><div class="lbl">Purchases</div><div class="val">${purs.length}</div></div>
-  <div><div class="lbl">Stock</div><div class="val">${stock}</div></div>
-  <div><div class="lbl">Total Purchase</div><div class="val">${h(fmt(totalPur))}</div></div>
+  <div><div class="lbl">${t('supplier')}</div><div class="val">${h(sName)}</div></div>
+  <div><div class="lbl">${t('phone')}</div><div class="val">${h(rec.phone || '-')}</div></div>
+  <div><div class="lbl">${t('products')}</div><div class="val">${prods.length}</div></div>
+  <div><div class="lbl">${t('purchases')}</div><div class="val">${purs.length}</div></div>
+  <div><div class="lbl">${t('stock')}</div><div class="val">${stock}</div></div>
+  <div><div class="lbl">${t('totalPurchase')}</div><div class="val">${h(fmt(totalPur))}</div></div>
 </div>
 <h2>Purchases</h2>
-<table><thead><tr><th>#</th><th>Invoice</th><th>Date</th><th>Qty</th><th>Total</th></tr></thead><tbody>${puRows || '<tr><td colspan="5" style="text-align:center;padding:6mm">No records in range</td></tr>'}</tbody></table>
+<table><thead><tr><th>#</th><th>${t('invoice')}</th><th>${t('date')}</th><th>${t('qty')}</th><th>${t('total')}</th></tr></thead><tbody>${puRows || `<tr><td colspan="5" style="text-align:center;padding:6mm">${t('noRecords')}</td></tr>`}</tbody></table>
 <h2>Products</h2>
-<table><thead><tr><th>#</th><th>Name</th><th>Code</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead><tbody>${pRows || '<tr><td colspan="6" style="text-align:center;padding:6mm">No products</td></tr>'}</tbody></table>
-<div class="footer">POS - ${list.length} products - ${purs.length} purchases</div>
+<table><thead><tr><th>#</th><th>${t('name')}</th><th>${t('code')}</th><th>${t('category')}</th><th>${t('price')}</th><th>${t('stock')}</th></tr></thead><tbody>${pRows || `<tr><td colspan="6" style="text-align:center;padding:6mm">${t('noProducts')}</td></tr>`}</tbody></table>
+<div class="footer">${t('generatedBy')} - ${list.length} ${t('products')} - ${purs.length} ${t('purchases')}</div>
 </body></html>`;
         openPrintWin(html);
       };
@@ -5945,16 +5945,16 @@ td{border:0.3mm solid #cbd5e1;padding:2mm;font-size:10pt}
 tr:nth-child(even){background:#F8FAFC}
 .footer{margin-top:8mm;font-size:9pt;color:#64748b}
 </style></head><body>
-<div class="header"><h1>Category Report</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
+<div class="header"><h1>${t('categoryReport')}</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
 <div class="card">
-  <div><div class="lbl">Category</div><div class="val">${h(cName)}</div></div>
-  <div><div class="lbl">Products</div><div class="val">${prods.length}</div></div>
-  <div><div class="lbl">Stock</div><div class="val">${stock}</div></div>
-  <div><div class="lbl">Stock Out</div><div class="val">${outCount}</div></div>
-  <div><div class="lbl">Total Value</div><div class="val">${h(fmt(totalValue))}</div></div>
+  <div><div class="lbl">${t('category')}</div><div class="val">${h(cName)}</div></div>
+  <div><div class="lbl">${t('products')}</div><div class="val">${prods.length}</div></div>
+  <div><div class="lbl">${t('stock')}</div><div class="val">${stock}</div></div>
+  <div><div class="lbl">${t('stockOut')}</div><div class="val">${outCount}</div></div>
+  <div><div class="lbl">${t('totalValue')}</div><div class="val">${h(fmt(totalValue))}</div></div>
 </div>
-<table><thead><tr><th>#</th><th>Name</th><th>Code</th><th>Supplier</th><th>Price</th><th>Stock</th></tr></thead><tbody>${pRows || '<tr><td colspan="6" style="text-align:center;padding:6mm">No products</td></tr>'}</tbody></table>
-<div class="footer">POS - ${list.length} products</div>
+<table><thead><tr><th>#</th><th>${t('name')}</th><th>${t('code')}</th><th>${t('supplier')}</th><th>${t('price')}</th><th>${t('stock')}</th></tr></thead><tbody>${pRows || `<tr><td colspan="6" style="text-align:center;padding:6mm">${t('noProducts')}</td></tr>`}</tbody></table>
+<div class="footer">${t('generatedBy')} - ${list.length} ${t('products')}</div>
 </body></html>`;
         openPrintWin(html);
       };
@@ -6210,17 +6210,17 @@ tr:nth-child(even){background:#F8FAFC}
 .footer{margin-top:8mm;display:flex;justify-content:space-between;font-size:9pt;color:#64748b}
 .footer span{flex:1;border-top:0.4mm solid #94a3b8;padding-top:2mm;margin-right:4mm}
 </style></head><body>
-<div class="header"><h1>Purchase Invoice</h1><div class="meta">ID: ${p.id}<br/>Date: ${new Date(p.date).toLocaleString()}<br/>Supplier: ${p.supplier || '-'}</div></div>
+<div class="header"><h1>${t('purchaseInvoice')}</h1><div class="meta">${t('id')}: ${p.id}<br/>${t('date')}: ${new Date(p.date).toLocaleString()}<br/>${t('supplier')}: ${p.supplier || '-'}</div></div>
 <div class="card">
-  <div><div class="lbl">Purchase ID</div><div class="val">${p.id}</div></div>
-  <div><div class="lbl">Supplier</div><div class="val">${p.supplier || '-'}</div></div>
-  <div><div class="lbl">Products</div><div class="val">${items.length}</div></div>
-  <div><div class="lbl">Total Qty</div><div class="val">${items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0)}</div></div>
-  <div><div class="lbl">Total</div><div class="val">${fmt(total)}</div></div>
+  <div><div class="lbl">${t('purchaseId')}</div><div class="val">${p.id}</div></div>
+  <div><div class="lbl">${t('supplier')}</div><div class="val">${p.supplier || '-'}</div></div>
+  <div><div class="lbl">${t('products')}</div><div class="val">${items.length}</div></div>
+  <div><div class="lbl">${t('totalQty')}</div><div class="val">${items.reduce((s: number, i: any) => s + (i.quantity || i.stock || 0), 0)}</div></div>
+  <div><div class="lbl">${t('total')}</div><div class="val">${fmt(total)}</div></div>
 </div>
-<table><thead><tr><th>#</th><th>Product</th><th>Code</th><th>Qty</th><th>Cost</th><th>Total</th></tr></thead><tbody>${rows}</tbody></table>
-<div class="tot">Grand Total: ${fmt(total)}</div>
-<div class="footer"><span>Received by: _______________</span><span>Authorized by: _______________</span></div>
+<table><thead><tr><th>#</th><th>${t('product')}</th><th>${t('code')}</th><th>${t('qty')}</th><th>${t('cost')}</th><th>${t('total')}</th></tr></thead><tbody>${rows}</tbody></table>
+<div class="tot">${t('grandTotal')}: ${fmt(total)}</div>
+<div class="footer"><span>${t('receivedBy')}: _______________</span><span>${t('authorizedBy')}: _______________</span></div>
 </body></html>`;
       openPrintWin(html);
     };
@@ -6250,9 +6250,9 @@ td{border:0.3mm solid #cbd5e1;padding:1.5mm 2mm;font-size:9pt}
 tr:nth-child(even){background:#F8FAFC}
 .footer{margin-top:4mm;font-size:8pt;color:#64748b}
 </style></head><body>
-<div class="header"><h1>Purchase History</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
-<table><thead><tr><th>#</th><th>ID</th><th>Date</th><th>Supplier</th><th>Products</th><th>Qty</th><th>Paid</th><th>Total</th></tr></thead><tbody>${trs ? trs + totRow : totRow}</tbody></table>
-<div class="footer">Generated by POS &#183; ${list.length} records</div>
+<div class="header"><h1>${t('purchaseHistory')}</h1><div class="meta">${filterFrom || '...'} ${filterTo ? '-> ' + filterTo : ''}<br/>${new Date().toLocaleString()}</div></div>
+<table><thead><tr><th>#</th><th>${t('id')}</th><th>${t('date')}</th><th>${t('supplier')}</th><th>${t('products')}</th><th>${t('qty')}</th><th>${t('paid')}</th><th>${t('total')}</th></tr></thead><tbody>${trs ? trs + totRow : totRow}</tbody></table>
+<div class="footer">${t('generatedBy')} &#183; ${list.length} ${t('records')}</div>
 </body></html>`;
       openPrintWin(html);
     };
@@ -6573,16 +6573,16 @@ tr:nth-child(even){background:#F8FAFC}
 .down{color:#dc2626;font-weight:700}
 .footer{margin-top:4mm;font-size:8pt;color:#64748b}
 </style></head><body>
-<div class="header"><h1>Price Change History</h1><div class="meta">${fromDate || '…'} → ${toDate || '…'}<br/>${new Date().toLocaleString()}</div></div>
+<div class="header"><h1>${t('priceHistory')}</h1><div class="meta">${fromDate || '…'} → ${toDate || '…'}<br/>${new Date().toLocaleString()}</div></div>
 <div class="stats">
-  <div class="stat"><div class="lbl">Changes</div><div class="val">${rows.length}</div></div>
-  <div class="stat"><div class="lbl">Products</div><div class="val">${uniqueProducts.size}</div></div>
-  <div class="stat"><div class="lbl">Price Up</div><div class="val">${upCount}</div></div>
-  <div class="stat"><div class="lbl">Price Down</div><div class="val">${downCount}</div></div>
-  <div class="stat"><div class="lbl">Avg Change</div><div class="val">${avgPct.toFixed(1)}%</div></div>
+  <div class="stat"><div class="lbl">${t('changes')}</div><div class="val">${rows.length}</div></div>
+  <div class="stat"><div class="lbl">${t('products')}</div><div class="val">${uniqueProducts.size}</div></div>
+  <div class="stat"><div class="lbl">${t('priceUp')}</div><div class="val">${upCount}</div></div>
+  <div class="stat"><div class="lbl">${t('priceDown')}</div><div class="val">${downCount}</div></div>
+  <div class="stat"><div class="lbl">${t('avgChange')}</div><div class="val">${avgPct.toFixed(1)}%</div></div>
 </div>
-<table><thead><tr><th>#</th><th>Product</th><th>Date</th><th>Old</th><th>New</th><th>Change</th><th>Reason</th></tr></thead><tbody>${trs || '<tr><td colspan="7" style="text-align:center;padding:8mm">No price history</td></tr>'}</tbody></table>
-<div class="footer">Generated by POS · ${rows.length} records</div>
+<table><thead><tr><th>#</th><th>${t('product')}</th><th>${t('date')}</th><th>${t('old')}</th><th>${t('new')}</th><th>${t('change')}</th><th>${t('reason')}</th></tr></thead><tbody>${trs || `<tr><td colspan="7" style="text-align:center;padding:8mm">${t('noPriceHistory')}</td></tr>`}</tbody></table>
+<div class="footer">${t('generatedBy')} · ${rows.length} ${t('records')}</div>
 </body></html>`;
       openPrintWin(html);
     };
@@ -7143,8 +7143,8 @@ tr:nth-child(even){background:#F8FAFC}
 .footer{margin-top:4mm;font-size:8pt;color:#64748b}
 </style></head><body>
 <div class="header"><h1>${t('deleteHistory')}</h1><div class="meta">${_from || '...'} ${_to ? '-> ' + _to : ''}<br/>${new Date().toLocaleString()}</div></div>
-<table><thead><tr><th>#</th><th>Product</th><th>Code</th><th>Company</th><th>Category</th><th>Stock</th><th>Price</th><th>Date</th></tr></thead><tbody>${trs || '<tr><td colspan="8" style="text-align:center">No records</td></tr>'}</tbody></table>
-<div class="footer">Generated by POS &#183; ${list.length} records</div>
+<table><thead><tr><th>#</th><th>${t('product')}</th><th>${t('code')}</th><th>${t('company')}</th><th>${t('category')}</th><th>${t('stock')}</th><th>${t('price')}</th><th>${t('date')}</th></tr></thead><tbody>${trs || `<tr><td colspan="8" style="text-align:center">${t('noRecords')}</td></tr>`}</tbody></table>
+<div class="footer">${t('generatedBy')} &#183; ${list.length} ${t('records')}</div>
 </body></html>`;
       openPrintWin(html);
     };
@@ -7325,12 +7325,12 @@ tr:nth-child(even){background:#F8FAFC}
 </style></head><body>
 <div class="header"><h1>${title}</h1><div class="meta">${fromDate || '…'} → ${toDate || '…'}<br/>${new Date().toLocaleString()}</div></div>
 <div class="stats">
-  <div class="stat"><div class="lbl">Entries</div><div class="val">${rows.length}</div></div>
-  <div class="stat"><div class="lbl">Products</div><div class="val">${uniqueProducts.size}</div></div>
-  <div class="stat"><div class="lbl">Qty</div><div class="val">${totalQty}</div></div>
+  <div class="stat"><div class="lbl">${t('entries')}</div><div class="val">${rows.length}</div></div>
+  <div class="stat"><div class="lbl">${t('products')}</div><div class="val">${uniqueProducts.size}</div></div>
+  <div class="stat"><div class="lbl">${t('qty')}</div><div class="val">${totalQty}</div></div>
 </div>
-<table><thead><tr><th>#</th><th>Product</th><th>Date</th><th>Old</th><th>New</th><th>Qty</th><th>Reason</th></tr></thead><tbody>${trs || '<tr><td colspan="7" style="text-align:center;padding:8mm">No records</td></tr>'}</tbody></table>
-<div class="footer">Generated by POS · ${rows.length} records</div>
+<table><thead><tr><th>#</th><th>${t('product')}</th><th>${t('date')}</th><th>${t('old')}</th><th>${t('new')}</th><th>${t('qty')}</th><th>${t('reason')}</th></tr></thead><tbody>${trs || `<tr><td colspan="7" style="text-align:center;padding:8mm">${t('noRecords')}</td></tr>`}</tbody></table>
+<div class="footer">${t('generatedBy')} · ${rows.length} ${t('records')}</div>
 </body></html>`;
       openPrintWin(html);
     };
